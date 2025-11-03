@@ -5,11 +5,11 @@ html,body{background:var(--app-bg);color:var(--txt);}
 .brand-logo{height:42px}
 .hero-band{position:relative;border-bottom:1px solid var(--line);} 
 /* Sichtbarkeit der Schleifbänder deutlich erhöhen */
-.hero-bg{position:relative;min-height:140px;background:url('https://customer-assets.emergentagent.com/job_score-zentrale/artifacts/g4o0uovx_Header.JPG') center/cover no-repeat;filter:saturate(1.15) contrast(1.1) brightness(1.02);} 
-/* Sanfte Abdunklung für Lesbarkeit – Bild bleibt sichtbar */
-.hero-bg:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,.18));}
-/* Leichte Vignette nur an den Rändern, damit Mitte heller bleibt */
-.hero-bg:after{content:"";position:absolute;inset:0;background:radial-gradient(100% 80% at 90% 80%, rgba(0,0,0,0) 0%, rgba(0,0,0,.08) 60%, rgba(0,0,0,.18) 100%);} 
+.hero-bg{position:relative;min-height:160px;background:url('https://customer-assets.emergentagent.com/job_score-zentrale/artifacts/g4o0uovx_Header.JPG') center/cover no-repeat;filter:saturate(1.2) contrast(1.15) brightness(1.05);} 
+/* Sehr leichte Abdunklung nur für Textlesbarkeit */
+.hero-bg:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.12));}
+/* Vignette zurückgenommen */
+.hero-bg:after{content:"";position:absolute;inset:0;background:radial-gradient(100% 80% at 90% 80%, rgba(0,0,0,0) 0%, rgba(0,0,0,.04) 60%, rgba(0,0,0,.10) 100%);} 
 .hero-bg .container{position:relative;z-index:2}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.35);} 
 .kpi{position:relative;overflow:hidden;} 
@@ -29,5 +29,5 @@ html,body{background:var(--app-bg);color:var(--txt);}
 .subnav-icons .nav-link{color:var(--muted);padding:.35rem .6rem;margin-right:.25rem;border-radius:10px;display:inline-flex;align-items:center;gap:.5rem}
 .subnav-icons .nav-link .bi{font-size:1.05rem}
 .subnav-icons .nav-link.active{background:var(--accent);color:#111}
-.brand-title{font-weight:700;letter-spacing:.6px}
+.brand-title{font-weight:800;letter-spacing:.6px}
 .chartjs-render-monitor{filter:contrast(1.02);} 

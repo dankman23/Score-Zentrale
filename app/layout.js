@@ -49,8 +49,8 @@ export default function RootLayout({ children }) {
           </div>
         </nav>
 
-        {/* Hero + Subnav Icons (Desktop) */}
-        <div className="hero-band d-none d-lg-block">
+        {/* Hero + Subnav Icons – auf allen Breakpoints sichtbar */}
+        <div className="hero-band">
           <div className="hero-bg d-flex align-items-end">
             <div className="container py-2">
               <div className="d-flex align-items-center justify-content-between mb-1">

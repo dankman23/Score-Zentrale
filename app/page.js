@@ -16,150 +16,183 @@ function KpiTile({ title, value, sub }) {
   )
 }
 
+const fmtCurrency = (n) => `€ ${Number(n||0).toLocaleString('de-DE')}`
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
+  const [from, setFrom] = useState(()=>{ const d=new Date(); d.setDate(d.getDate()-29); return d.toISOString().slice(0,10) })
+  const [to, setTo] = useState(()=> new Date().toISOString().slice(0,10))
+
+  const [kpi, setKpi] = useState(null)
+  const [kpiFees, setKpiFees] = useState(null)
+  const [ts, setTs] = useState([])
+  const [tsFees, setTsFees] = useState([])
+  const [platTs, setPlatTs] = useState([])
+  const [stacked, setStacked] = useState(false)
+
   const [loading, setLoading] = useState(true)
-  const [kpis, setKpis] = useState(null)
+  const [error, setError] = useState('')
+
   const revChartRef = useRef(null)
-  const campChartRef = useRef(null)
+  const platChartRef = useRef(null)
   const revChart = useRef(null)
-  const campChart = useRef(null)
+  const platChart = useRef(null)
 
   const [prospects, setProspects] = useState([])
   const [form, setForm] = useState({ name:'', website:'', region:'', industry:'', size:'', linkedinUrl:'', keywords:'' })
   const [compose, setCompose] = useState({ company:'', contactRole:'Einkauf', industry:'', useCases:'', hypotheses:'' })
   const [mail, setMail] = useState(null)
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await fetch('/api/kpis')
-        const data = await res.json()
-        setKpis(data)
-        setLoading(false)
-        setTimeout(() => renderCharts(data), 50)
-      } catch (e) {
-        console.error(e)
-        setLoading(false)
-      }
-    }
-    load()
-    refreshProspects()
-  }, [])
+  const [salesTab, setSalesTab] = useState('products')
+  const [topProducts, setTopProducts] = useState([])
+  const [topCategories, setTopCategories] = useState([])
+  const [limit, setLimit] = useState(20)
+
+  const fetchAll = async () => {
+    setLoading(true); setError('')
+    try {
+      const [k1, k2, t1, t2, p] = await Promise.all([
+        fetch(`/api/jtl/sales/kpi?from=${from}&to=${to}`).then(r=>r.json()),
+        fetch(`/api/jtl/sales/kpi/with_platform_fees?from=${from}&to=${to}`).then(r=>r.json()),
+        fetch(`/api/jtl/sales/timeseries?from=${from}&to=${to}`).then(r=>r.json()),
+        fetch(`/api/jtl/sales/timeseries/with_platform_fees?from=${from}&to=${to}`).then(r=>r.json()),
+        fetch(`/api/jtl/sales/platform-timeseries?from=${from}&to=${to}`).then(r=>r.json()),
+      ])
+      setKpi(k1); setKpiFees(k2); setTs(t1||[]); setTsFees(t2||[]); setPlatTs(p||[])
+    } catch (e) { setError(String(e)); }
+    setLoading(false)
+  }
+
+  const fetchSalesTables = async () => {
+    try {
+      const [prods, cats] = await Promise.all([
+        fetch(`/api/jtl/sales/top-products?limit=${limit}&from=${from}&to=${to}`).then(r=>r.json()),
+        fetch(`/api/jtl/sales/top-categories?limit=${limit}&from=${from}&to=${to}`).then(r=>r.json())
+      ])
+      setTopProducts(Array.isArray(prods)?prods:[])
+      setTopCategories(Array.isArray(cats)?cats:[])
+    } catch(e){ console.error(e) }
+  }
+
+  useEffect(() => { fetchAll(); fetchSalesTables(); refreshProspects() }, [])
+  useEffect(() => { fetchAll(); fetchSalesTables() }, [from, to, limit])
 
   useEffect(() => {
-    const applyHash = () => {
-      const h = (window.location.hash || '#dashboard').replace('#','')
-      setActiveTab(h)
-    }
-    applyHash()
-    window.addEventListener('hashchange', applyHash)
+    const applyHash = () => { const h=(window.location.hash||'#dashboard').replace('#',''); setActiveTab(h) }
+    applyHash(); window.addEventListener('hashchange', applyHash)
     return () => window.removeEventListener('hashchange', applyHash)
   }, [])
 
-  const refreshProspects = async () => {
-    try {
-      const res = await fetch('/api/prospects')
-      const data = await res.json()
-      setProspects(Array.isArray(data) ? data : [])
-    } catch (e) { console.error(e) }
-  }
+  useEffect(() => { renderCharts() }, [ts, tsFees, platTs, stacked])
 
-  const renderCharts = (data) => {
+  const renderCharts = () => {
     if (!window.Chart) return
-    const labels = (data?.jtl?.series || []).map(s => s.date)
-    const revenue = (data?.jtl?.series || []).map(s => s.revenue)
-    const adsCost = (data?.ads?.series || []).map(s => s.cost)
+    // Umsatz vs Marge (with fees)
+    const labels = (ts||[]).map(x=>x.date)
+    const revenue = (ts||[]).map(x=>x.revenue)
+    const marginF = (tsFees||[]).map(x=>x.margin_with_fees)
     const ctx1 = revChartRef.current?.getContext('2d')
     if (ctx1) {
       if (revChart.current) revChart.current.destroy()
       revChart.current = new window.Chart(ctx1, {
-        type: 'line',
-        data: { labels, datasets: [
-          { label: 'Umsatz (JTL)', data: revenue, borderColor: '#2dd4bf', backgroundColor: 'rgba(45,212,191,0.2)', tension: 0.3 },
-          { label: 'Ads-Kosten', data: adsCost, borderColor: '#f6b10a', backgroundColor: 'rgba(246,177,10,0.2)', tension: 0.3 },
-        ]},
-        options: { plugins:{ legend:{ labels:{ color:'var(--txt)'} } }, scales:{ x:{ ticks:{ color:'var(--muted)'} }, y:{ ticks:{ color:'var(--muted)'} } } }
+        type: 'line', data: { labels, datasets:[
+          { label:'Umsatz', data: revenue, borderColor:'#2dd4bf', backgroundColor:'rgba(45,212,191,0.2)', tension:.3, yAxisID:'y' },
+          { label:'Marge (mit Gebühren)', data: marginF, borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.2)', tension:.3, yAxisID:'y1' }
+        ]}, options:{ plugins:{ legend:{ labels:{ color:'var(--txt)' } } }, scales:{ y:{ ticks:{ color:'var(--muted)'} }, y1:{ position:'right', ticks:{ color:'var(--muted)'} }, x:{ ticks:{ color:'var(--muted)'} } } }
       })
     }
-    const labels2 = (data?.ads?.campaigns || []).map(c => c.name)
-    const roas = (data?.ads?.campaigns || []).map(c => c.roas)
-    const ctx2 = campChartRef.current?.getContext('2d')
+    // Plattform Kurven
+    const seriesByKey = {}
+    for(const r of (platTs||[])){
+      if(!seriesByKey[r.pKey]) seriesByKey[r.pKey] = { label:r.pName, data:{} }
+      seriesByKey[r.pKey].data[r.date] = (seriesByKey[r.pKey].data[r.date]||0) + (r.revenue||0)
+    }
+    const allDates = Array.from(new Set((platTs||[]).map(r=>r.date))).sort()
+    const datasets = Object.values(seriesByKey).map((s,i)=>{
+      const colorArr = ['#38bdf8','#34d399','#f6b10a','#f97316','#a78bfa','#fb7185']
+      const c = colorArr[i % colorArr.length]
+      return { label:s.label, data: allDates.map(d=>s.data[d]||0), borderColor:c, backgroundColor:c+'33', tension:.3, fill: stacked }
+    })
+    const ctx2 = platChartRef.current?.getContext('2d')
     if (ctx2) {
-      if (campChart.current) campChart.current.destroy()
-      campChart.current = new window.Chart(ctx2, {
-        type: 'bar',
-        data: { labels: labels2, datasets: [{ label: 'ROAS', data: roas, backgroundColor: ['#38bdf8','#34d399','#f6b10a'] }] },
-        options: { plugins:{ legend:{ labels:{ color:'var(--txt)'} } }, scales:{ x:{ ticks:{ color:'var(--muted)'} }, y:{ ticks:{ color:'var(--muted)'} } } }
-      })
+      if (platChart.current) platChart.current.destroy()
+      platChart.current = new window.Chart(ctx2, { type:'line', data:{ labels:allDates, datasets }, options:{ plugins:{ legend:{ labels:{ color:'var(--txt)'}} }, scales:{ x:{ stacked }, y:{ stacked, ticks:{ color:'var(--muted)'} } } } })
     }
+  }
+
+  const refreshProspects = async () => {
+    try { const res = await fetch('/api/prospects'); const data = await res.json(); setProspects(Array.isArray(data)?data:[]) } catch(e){ console.error(e) }
   }
 
   const submitProspect = async (e) => {
     e.preventDefault()
-    try {
-      const res = await fetch('/api/prospects', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(form) })
-      await res.json()
-      setForm({ name:'', website:'', region:'', industry:'', size:'', linkedinUrl:'', keywords:'' })
-      await refreshProspects()
-    } catch (e) { console.error(e) }
+    try { const res = await fetch('/api/prospects', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(form) }); await res.json(); setForm({ name:'', website:'', region:'', industry:'', size:'', linkedinUrl:'', keywords:'' }); await refreshProspects() } catch(e){ console.error(e) }
   }
-
   const analyzeCompany = async (p) => {
-    try {
-      const res = await fetch('/api/analyze', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ name: p.name, website: p.website, industry: p.industry }) })
-      const data = await res.json()
-      alert('Analyse erstellt. Produktgruppen: ' + (data?.productGroups || []).join(', '))
-    } catch (e) { console.error(e) }
+    try { const res = await fetch('/api/analyze', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ name:p.name, website:p.website, industry:p.industry }) }); const data = await res.json(); alert('Analyse erstellt. Produktgruppen: '+(data?.productGroups||[]).join(', ')) } catch(e){ console.error(e) }
   }
-
   const generateMail = async (e) => {
-    e.preventDefault()
-    try {
-      const res = await fetch('/api/mailer/compose', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ ...compose, useCases: compose.useCases.split(',').map(s=>s.trim()), hypotheses: compose.hypotheses }) })
-      const data = await res.json()
-      setMail(data)
-    } catch (e) { console.error(e) }
+    e.preventDefault(); try { const res = await fetch('/api/mailer/compose', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ ...compose, useCases: compose.useCases.split(',').map(s=>s.trim()), hypotheses: compose.hypotheses }) }); const data=await res.json(); setMail(data) } catch(e){ console.error(e) }
   }
 
-  const exportCSV = () => {
-    const rows = [['Name','Website','Region','Branche','Größe','Score']].concat((prospects||[]).map(p=>[p.name,p.website,p.region,p.industry,p.size,p.score]))
-    const csv = rows.map(r=>r.map(x=>`"${(x||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n')
-    const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a'); a.href=url; a.download='prospects.csv'; a.click(); URL.revokeObjectURL(url)
+  const exportCSV = (rows, filename) => {
+    const csv = rows.map(r=>Object.values(r).map(x=>`"${(x??'').toString().replace(/"/g,'""')}"`).join(',')).join('\n')
+    const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url)
   }
 
   return (
     <div>
-      {/* Desktop: Inhalt ohne linke Rail */}
+      {/* Tabs */}
+      <ul className="nav nav-pills mb-4">
+        {['dashboard','outbound','sales','marketing','settings'].map(t => (
+          <li key={t} className="nav-item">
+            <a className={`nav-link ${activeTab===t?'active':''}`} href={`#${t}`} onClick={(e)=>{e.preventDefault(); setActiveTab(t); location.hash = t}}>{t[0].toUpperCase()+t.slice(1)}</a>
+          </li>
+        ))}
+      </ul>
+
+      {/* Date Range */}
+      <div className="mb-3 d-flex align-items-center">
+        <div className="mr-2 small text-muted">Zeitraum:</div>
+        <input type="date" className="form-control form-control-sm mr-2" style={{maxWidth:160}} value={from} onChange={e=>setFrom(e.target.value)} />
+        <input type="date" className="form-control form-control-sm mr-2" style={{maxWidth:160}} value={to} onChange={e=>setTo(e.target.value)} />
+        <button className="btn btn-outline-primary btn-sm" onClick={()=>{fetchAll(); fetchSalesTables()}}>Aktualisieren</button>
+      </div>
+
       {activeTab==='dashboard' && (
         <div>
           <div className="row">
-            <KpiTile title="Umsatz (30T)" value={`€ ${kpis?.jtl?.totals?.revenue?.toLocaleString() || '-'}`} sub="JTL Wawi (Mock)" />
-            <KpiTile title="Bestellungen (30T)" value={kpis?.jtl?.totals?.orders?.toLocaleString() || '-'} sub="JTL Wawi (Mock)" />
-            <KpiTile title="Marge (30T)" value={`€ ${kpis?.jtl?.totals?.margin?.toLocaleString() || '-'}`} sub="JTL Wawi (Mock)" />
+            <KpiTile title="Umsatz (30T)" value={fmtCurrency(kpi?.revenue)} sub="JTL Wawi" />
+            <KpiTile title="Bestellungen (30T)" value={(kpi?.orders||'-').toLocaleString?.('de-DE')||kpi?.orders||'-'} sub="JTL Wawi" />
+            <KpiTile title="Marge (30T)" value={fmtCurrency(kpi?.margin)} sub="ohne Gebühren" />
           </div>
           <div className="row">
-            <KpiTile title="Ads-Kosten (30T)" value={`€ ${kpis?.ads?.totals?.cost?.toLocaleString() || '-'}`} sub={`ROAS ${kpis?.ads?.totals?.roas || '-'}`}/>
-            <KpiTile title="Clicks (30T)" value={kpis?.ads?.totals?.clicks?.toLocaleString() || '-'} sub="Google Ads (Mock)" />
-            <KpiTile title="Users (30T)" value={kpis?.ga4?.totals?.users?.toLocaleString() || '-'} sub="GA4 (Mock)" />
+            <KpiTile title="Marge (mit Gebühren)" value={fmtCurrency(kpiFees?.margin_with_fees)} sub="inkl. 1,50 € + 20% Plattformgebühr" />
+            <KpiTile title="" value="" />
+            <KpiTile title="" value="" />
           </div>
 
           <div className="row mt-1">
             <div className="col-md-8 mb-3">
               <div className="card">
-                <div className="card-header bg-transparent border-0">Umsatz & Ads-Kosten</div>
+                <div className="card-header bg-transparent border-0">Umsatz & Marge (mit Gebühren)</div>
                 <div className="card-body"><canvas ref={revChartRef} height="120" /></div>
               </div>
             </div>
             <div className="col-md-4 mb-3">
               <div className="card">
-                <div className="card-header bg-transparent border-0">Top-Kampagnen (ROAS)</div>
-                <div className="card-body"><canvas ref={campChartRef} height="120" /></div>
+                <div className="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                  <span>Umsatz pro Plattform pro Tag</span>
+                  <div className="custom-control custom-switch">
+                    <input type="checkbox" className="custom-control-input" id="stackedSwitch" checked={stacked} onChange={e=>setStacked(e.target.checked)} />
+                    <label className="custom-control-label" htmlFor="stackedSwitch">Stack</label>
+                  </div>
+                </div>
+                <div className="card-body"><canvas ref={platChartRef} height="120" /></div>
               </div>
             </div>
           </div>
+          {error && <div className="alert alert-danger">{String(error)}</div>}
         </div>
       )}
 
@@ -215,7 +248,7 @@ export default function App() {
                 <div className="card-header bg-transparent d-flex align-items-center justify-content-between">
                   <span>Prospects</span>
                   <div>
-                    <button className="btn btn-outline-primary btn-sm mr-2" onClick={exportCSV}><i className="bi bi-download mr-1"/>CSV</button>
+                    <button className="btn btn-outline-primary btn-sm mr-2" onClick={()=>exportCSV((prospects||[]).map(p=>({name:p.name,website:p.website,region:p.region,industry:p.industry,size:p.size,score:p.score})), 'prospects.csv')}><i className="bi bi-download mr-1"/>CSV</button>
                     <button className="btn btn-outline-primary btn-sm" onClick={refreshProspects}><i className="bi bi-arrow-repeat mr-1"/>Aktualisieren</button>
                   </div>
                 </div>
@@ -297,11 +330,70 @@ export default function App() {
         </div>
       )}
 
-      {activeTab!=='dashboard' && activeTab!=='outbound' && (
-        <div className="text-muted">Dieser Bereich ist für die nächste Iteration vorgesehen.</div>
+      {activeTab==='sales' && (
+        <div>
+          <div className="d-flex align-items-center mb-2">
+            <div className="mr-2 small text-muted">Limit:</div>
+            <select className="form-control form-control-sm" style={{maxWidth:120}} value={limit} onChange={e=>setLimit(parseInt(e.target.value))}>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+          <ul className="nav nav-tabs mb-3">
+            <li className="nav-item"><a className={`nav-link ${salesTab==='products'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSalesTab('products')}}>Top-Produkte</a></li>
+            <li className="nav-item"><a className={`nav-link ${salesTab==='categories'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSalesTab('categories')}}>Top-Kategorien</a></li>
+          </ul>
+
+          {salesTab==='products' && (
+            <div className="card">
+              <div className="card-header d-flex justify-content-between align-items-center">
+                <span>Top-Produkte</span>
+                <button className="btn btn-outline-primary btn-sm" onClick={()=>exportCSV(topProducts, 'top-products.csv')}>CSV</button>
+              </div>
+              <div className="card-body p-0">
+                <div className="table-responsive" style={{maxHeight:420}}>
+                  <table className="table table-dark table-hover table-sm mb-0">
+                    <thead className="thead-dark"><tr><th>ArtikelNr</th><th>Name</th><th>Umsatz</th><th>Marge</th><th>Marge (mit Gebühren)</th></tr></thead>
+                    <tbody>
+                      {(topProducts||[]).map((r,idx)=> (
+                        <tr key={idx}><td>{r.artikelNr}</td><td>{r.name}</td><td>{fmtCurrency(r.umsatz)}</td><td>{fmtCurrency(r.marge)}</td><td>{fmtCurrency(r.marge_with_fees)}</td></tr>
+                      ))}
+                      {topProducts?.length===0 && <tr><td colSpan={5} className="text-center text-muted">Keine Daten</td></tr>}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {salesTab==='categories' && (
+            <div className="card">
+              <div className="card-header d-flex justify-content-between align-items-center">
+                <span>Top-Kategorien</span>
+                <button className="btn btn-outline-primary btn-sm" onClick={()=>exportCSV(topCategories, 'top-categories.csv')}>CSV</button>
+              </div>
+              <div className="card-body p-0">
+                <div className="table-responsive" style={{maxHeight:420}}>
+                  <table className="table table-dark table-hover table-sm mb-0">
+                    <thead className="thead-dark"><tr><th>Kategorie</th><th>Umsatz</th><th>Marge</th><th>Marge (mit Gebühren)</th></tr></thead>
+                    <tbody>
+                      {(topCategories||[]).map((r,idx)=> (
+                        <tr key={idx}><td>{r.kategorie}</td><td>{fmtCurrency(r.umsatz)}</td><td>{fmtCurrency(r.marge)}</td><td>{fmtCurrency(r.marge_with_fees)}</td></tr>
+                      ))}
+                      {topCategories?.length===0 && <tr><td colSpan={4} className="text-center text-muted">Keine Daten</td></tr>}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
-      {/* Bottom Tabbar ist global in layout.js */}
+      {activeTab!=='dashboard' && activeTab!=='outbound' && activeTab!=='sales' && (
+        <div className="text-muted">Dieser Bereich ist für die nächste Iteration vorgesehen.</div>
+      )}
     </div>
   )
 }
