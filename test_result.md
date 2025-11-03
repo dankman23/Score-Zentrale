@@ -244,3 +244,5 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Bitte Backend-Routen gemäß test_plan prüfen. Mongo steht über MONGO_URL bereit; Collections werden on-the-fly angelegt. Keine externen Keys erforderlich."
+  - agent: "testing"
+    message: "✅ Backend testing completed successfully! All high-priority endpoints tested and working: GET /api/kpis (verified structure), Prospects flow (POST+GET with UUID, no _id), POST /api/analyze (returns productGroups/materials/hypotheses, creates DB entries), POST /api/mailer/compose (returns subject/text/html), Status endpoints (GET+POST working). Fixed minor _id cleanup issue in POST /api/prospects response. All 5/5 core backend tests PASSED. Ready for main agent to summarize and finish."
