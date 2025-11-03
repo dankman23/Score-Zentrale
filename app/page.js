@@ -18,7 +18,6 @@ function KpiTile({ title, value, sub }) {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
-  const [isLg, setIsLg] = useState(false)
   const [loading, setLoading] = useState(true)
   const [kpis, setKpis] = useState(null)
   const revChartRef = useRef(null)
@@ -54,11 +53,8 @@ export default function App() {
       setActiveTab(h)
     }
     applyHash()
-    const onResize = () => setIsLg(window.innerWidth >= 992)
     window.addEventListener('hashchange', applyHash)
-    window.addEventListener('resize', onResize)
-    onResize()
-    return () => { window.removeEventListener('hashchange', applyHash); window.removeEventListener('resize', onResize) }
+    return () => window.removeEventListener('hashchange', applyHash)
   }, [])
 
   const refreshProspects = async () => {
@@ -71,7 +67,6 @@ export default function App() {
 
   const renderCharts = (data) => {
     if (!window.Chart) return
-    // Umsatz vs Ads-Kosten
     const labels = (data?.jtl?.series || []).map(s => s.date)
     const revenue = (data?.jtl?.series || []).map(s => s.revenue)
     const adsCost = (data?.ads?.series || []).map(s => s.cost)
@@ -87,7 +82,6 @@ export default function App() {
         options: { plugins:{ legend:{ labels:{ color:'var(--txt)'} } }, scales:{ x:{ ticks:{ color:'var(--muted)'} }, y:{ ticks:{ color:'var(--muted)'} } } }
       })
     }
-    // Top-Kampagnen
     const labels2 = (data?.ads?.campaigns || []).map(c => c.name)
     const roas = (data?.ads?.campaigns || []).map(c => c.roas)
     const ctx2 = campChartRef.current?.getContext('2d')
@@ -136,209 +130,178 @@ export default function App() {
     const a = document.createElement('a'); a.href=url; a.download='prospects.csv'; a.click(); URL.revokeObjectURL(url)
   }
 
-  const contentStyle = isLg ? { marginLeft: 64 } : {}
-
   return (
     <div>
-      {/* Icon Sidebar (lg+) */}
-      <div className="icon-rail d-none d-lg-flex flex-column align-items-center pt-2">
-        {['dashboard','outbound','sales','marketing','settings'].map((tab, i)=> (
-          <a key={tab} href={`#${tab}`} className={`nav-link ${activeTab===tab?'active':''}`} title={tab}>
-            {i===0 && <i className="bi bi-speedometer2"/>}
-            {i===1 && <i className="bi bi-send"/>}
-            {i===2 && <i className="bi bi-bar-chart"/>}
-            {i===3 && <i className="bi bi-bullseye"/>}
-            {i===4 && <i className="bi bi-gear"/>}
-          </a>
-        ))}
-      </div>
+      {/* Desktop: Inhalt ohne linke Rail */}
+      {activeTab==='dashboard' && (
+        <div>
+          <div className="row">
+            <KpiTile title="Umsatz (30T)" value={`€ ${kpis?.jtl?.totals?.revenue?.toLocaleString() || '-'}`} sub="JTL Wawi (Mock)" />
+            <KpiTile title="Bestellungen (30T)" value={kpis?.jtl?.totals?.orders?.toLocaleString() || '-'} sub="JTL Wawi (Mock)" />
+            <KpiTile title="Marge (30T)" value={`€ ${kpis?.jtl?.totals?.margin?.toLocaleString() || '-'}`} sub="JTL Wawi (Mock)" />
+          </div>
+          <div className="row">
+            <KpiTile title="Ads-Kosten (30T)" value={`€ ${kpis?.ads?.totals?.cost?.toLocaleString() || '-'}`} sub={`ROAS ${kpis?.ads?.totals?.roas || '-'}`}/>
+            <KpiTile title="Clicks (30T)" value={kpis?.ads?.totals?.clicks?.toLocaleString() || '-'} sub="Google Ads (Mock)" />
+            <KpiTile title="Users (30T)" value={kpis?.ga4?.totals?.users?.toLocaleString() || '-'} sub="GA4 (Mock)" />
+          </div>
 
-      {/* Inhalt */}
-      <div style={contentStyle}>
-        {activeTab==='dashboard' && (
-          <div>
-            <div className="row">
-              <KpiTile title="Umsatz (30T)" value={`€ ${kpis?.jtl?.totals?.revenue?.toLocaleString() || '-'}`} sub="JTL Wawi (Mock)" />
-              <KpiTile title="Bestellungen (30T)" value={kpis?.jtl?.totals?.orders?.toLocaleString() || '-'} sub="JTL Wawi (Mock)" />
-              <KpiTile title="Marge (30T)" value={`€ ${kpis?.jtl?.totals?.margin?.toLocaleString() || '-'}`} sub="JTL Wawi (Mock)" />
-            </div>
-            <div className="row">
-              <KpiTile title="Ads-Kosten (30T)" value={`€ ${kpis?.ads?.totals?.cost?.toLocaleString() || '-'}`} sub={`ROAS ${kpis?.ads?.totals?.roas || '-'}`}/>
-              <KpiTile title="Clicks (30T)" value={kpis?.ads?.totals?.clicks?.toLocaleString() || '-'} sub="Google Ads (Mock)" />
-              <KpiTile title="Users (30T)" value={kpis?.ga4?.totals?.users?.toLocaleString() || '-'} sub="GA4 (Mock)" />
-            </div>
-
-            <div className="row mt-1">
-              <div className="col-md-8 mb-3">
-                <div className="card">
-                  <div className="card-header bg-transparent border-0">Umsatz & Ads-Kosten</div>
-                  <div className="card-body"><canvas ref={revChartRef} height="120" /></div>
-                </div>
+          <div className="row mt-1">
+            <div className="col-md-8 mb-3">
+              <div className="card">
+                <div className="card-header bg-transparent border-0">Umsatz & Ads-Kosten</div>
+                <div className="card-body"><canvas ref={revChartRef} height="120" /></div>
               </div>
-              <div className="col-md-4 mb-3">
-                <div className="card">
-                  <div className="card-header bg-transparent border-0">Top-Kampagnen (ROAS)</div>
-                  <div className="card-body"><canvas ref={campChartRef} height="120" /></div>
-                </div>
+            </div>
+            <div className="col-md-4 mb-3">
+              <div className="card">
+                <div className="card-header bg-transparent border-0">Top-Kampagnen (ROAS)</div>
+                <div className="card-body"><canvas ref={campChartRef} height="120" /></div>
               </div>
             </div>
           </div>
-        )}
-
-        {activeTab==='outbound' && (
-          <div>
-            <div className="row">
-              {/* Filter-Linke Spalte */}
-              <div className="col-lg-5 mb-4">
-                <div className="card h-100">
-                  <div className="card-header bg-transparent border-0">Prospect Filter</div>
-                  <div className="card-body">
-                    <form onSubmit={submitProspect}>
-                      <div className="form-group">
-                        <label>Firma</label>
-                        <input value={form.name} onChange={e=>setForm({...form, name:e.target.value})} className="form-control form-control-sm"/>
-                      </div>
-                      <div className="form-group">
-                        <label>Website</label>
-                        <input value={form.website} onChange={e=>setForm({...form, website:e.target.value})} className="form-control form-control-sm" placeholder="https://..."/>
-                      </div>
-                      <div className="form-row">
-                        <div className="form-group col-md-6">
-                          <label>Region</label>
-                          <input value={form.region} onChange={e=>setForm({...form, region:e.target.value})} className="form-control form-control-sm"/>
-                        </div>
-                        <div className="form-group col-md-6">
-                          <label>Branche</label>
-                          <input value={form.industry} onChange={e=>setForm({...form, industry:e.target.value})} className="form-control form-control-sm"/>
-                        </div>
-                      </div>
-                      <div className="form-row">
-                        <div className="form-group col-md-6">
-                          <label>Größe</label>
-                          <select value={form.size} onChange={e=>setForm({...form, size:e.target.value})} className="form-control form-control-sm">
-                            <option value="">-</option>
-                            <option>1-10</option>
-                            <option>11-50</option>
-                            <option>51-200</option>
-                            <option>200+</option>
-                          </select>
-                        </div>
-                        <div className="form-group col-md-6">
-                          <label>Keywords</label>
-                          <input value={form.keywords} onChange={e=>setForm({...form, keywords:e.target.value})} className="form-control form-control-sm" placeholder="Metall, Apparatebau"/>
-                        </div>
-                      </div>
-                      <button type="submit" className="btn btn-primary btn-sm">Zur Liste hinzufügen</button>
-                    </form>
-                  </div>
-                </div>
-              </div>
-
-              {/* Ergebnisse-Rechte Spalte */}
-              <div className="col-lg-7 mb-4">
-                <div className="card h-100">
-                  <div className="card-header bg-transparent d-flex align-items-center justify-content-between">
-                    <span>Prospects</span>
-                    <div>
-                      <button className="btn btn-outline-primary btn-sm mr-2" onClick={exportCSV}><i className="bi bi-download mr-1"/>CSV</button>
-                      <button className="btn btn-outline-primary btn-sm" onClick={refreshProspects}><i className="bi bi-arrow-repeat mr-1"/>Aktualisieren</button>
-                    </div>
-                  </div>
-                  <div className="card-body p-0">
-                    <div className="table-responsive" style={{maxHeight:360}}>
-                      <table className="table table-dark table-hover table-sm mb-0">
-                        <thead className="thead-dark"><tr><th>Name</th><th>Website</th><th>Region</th><th>Branche</th><th>Score</th><th></th></tr></thead>
-                        <tbody>
-                          {(prospects||[]).map(p => (
-                            <tr key={p.id}>
-                              <td>{p.name}</td>
-                              <td><a className="text-info" href={p.website} target="_blank" rel="noreferrer">{p.website}</a></td>
-                              <td>{p.region}</td>
-                              <td>{p.industry}</td>
-                              <td>{p.score}</td>
-                              <td>
-                                <button className="btn btn-outline-primary btn-sm" onClick={()=>analyzeCompany(p)}><i className="bi bi-search"/> Analysieren</button>
-                              </td>
-                            </tr>
-                          ))}
-                          {prospects?.length===0 && <tr><td colSpan={6} className="text-center text-muted">Noch keine Prospects</td></tr>}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Mail Composer */}
-            <div className="card">
-              <div className="card-header bg-transparent border-0">Mail Composer</div>
-              <div className="card-body">
-                <form onSubmit={generateMail}>
-                  <div className="form-row">
-                    <div className="form-group col-md-4">
-                      <label>Firma</label>
-                      <input className="form-control form-control-sm" value={compose.company} onChange={e=>setCompose({...compose, company:e.target.value})}/>
-                    </div>
-                    <div className="form-group col-md-4">
-                      <label>Rolle</label>
-                      <input className="form-control form-control-sm" value={compose.contactRole} onChange={e=>setCompose({...compose, contactRole:e.target.value})}/>
-                    </div>
-                    <div className="form-group col-md-4">
-                      <label>Branche</label>
-                      <input className="form-control form-control-sm" value={compose.industry} onChange={e=>setCompose({...compose, industry:e.target.value})}/>
-                    </div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group col-md-6">
-                      <label>Use-Cases (kommagetrennt)</label>
-                      <input className="form-control form-control-sm" value={compose.useCases} onChange={e=>setCompose({...compose, useCases:e.target.value})}/>
-                    </div>
-                    <div className="form-group col-md-6">
-                      <label>Hypothesen (frei)</label>
-                      <input className="form-control form-control-sm" value={compose.hypotheses} onChange={e=>setCompose({...compose, hypotheses:e.target.value})} placeholder="z.B. Bänder 50×2000 K80; Fiberscheiben Ø125 K60"/>
-                    </div>
-                  </div>
-                  <button className="btn btn-primary btn-sm" type="submit">E-Mail generieren</button>
-                </form>
-
-                {mail && (
-                  <div className="mt-3">
-                    <div className="mb-2"><strong>Betreff:</strong> {mail.subject}</div>
-                    <div className="row">
-                      <div className="col-md-6">
-                        <div className="small text-muted mb-1">Text</div>
-                        <pre className="p-2 rounded" style={{minHeight:120, background:'#141a20', color:'#e7ecf2'}}>{mail.text}</pre>
-                      </div>
-                      <div className="col-md-6">
-                        <div className="small text-muted mb-1">HTML Vorschau</div>
-                        <div className="bg-light text-dark p-2 rounded" dangerouslySetInnerHTML={{__html: mail.html}} />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab!=='dashboard' && activeTab!=='outbound' && (
-          <div className="text-muted">Dieser Bereich ist für die nächste Iteration vorgesehen.</div>
-        )}
-      </div>
-
-      {/* Bottom Tabbar (sm/md) */}
-      <div className="app-tabbar d-lg-none">
-        <div className="container">
-          <ul className="nav nav-pills nav-justified">
-            <li className="nav-item"><a className={`nav-link ${activeTab==='dashboard'?'active':''}`} href="#dashboard"><i className="bi bi-speedometer2"/> Dashboard</a></li>
-            <li className="nav-item"><a className={`nav-link ${activeTab==='outbound'?'active':''}`} href="#outbound"><i className="bi bi-send"/> Outbound</a></li>
-            <li className="nav-item"><a className={`nav-link ${activeTab==='sales'?'active':''}`} href="#sales"><i className="bi bi-bar-chart"/> Sales</a></li>
-            <li className="nav-item"><a className={`nav-link ${activeTab==='marketing'?'active':''}`} href="#marketing"><i className="bi bi-bullseye"/> Marketing</a></li>
-            <li className="nav-item"><a className={`nav-link ${activeTab==='settings'?'active':''}`} href="#settings"><i className="bi bi-gear"/> Settings</a></li>
-          </ul>
         </div>
-      </div>
+      )}
+
+      {activeTab==='outbound' && (
+        <div>
+          <div className="row">
+            <div className="col-lg-5 mb-4">
+              <div className="card h-100">
+                <div className="card-header bg-transparent border-0">Prospect Filter</div>
+                <div className="card-body">
+                  <form onSubmit={submitProspect}>
+                    <div className="form-group">
+                      <label>Firma</label>
+                      <input value={form.name} onChange={e=>setForm({...form, name:e.target.value})} className="form-control form-control-sm"/>
+                    </div>
+                    <div className="form-group">
+                      <label>Website</label>
+                      <input value={form.website} onChange={e=>setForm({...form, website:e.target.value})} className="form-control form-control-sm" placeholder="https://..."/>
+                    </div>
+                    <div className="form-row">
+                      <div className="form-group col-md-6">
+                        <label>Region</label>
+                        <input value={form.region} onChange={e=>setForm({...form, region:e.target.value})} className="form-control form-control-sm"/>
+                      </div>
+                      <div className="form-group col-md-6">
+                        <label>Branche</label>
+                        <input value={form.industry} onChange={e=>setForm({...form, industry:e.target.value})} className="form-control form-control-sm"/>
+                      </div>
+                    </div>
+                    <div className="form-row">
+                      <div className="form-group col-md-6">
+                        <label>Größe</label>
+                        <select value={form.size} onChange={e=>setForm({...form, size:e.target.value})} className="form-control form-control-sm">
+                          <option value="">-</option>
+                          <option>1-10</option>
+                          <option>11-50</option>
+                          <option>51-200</option>
+                          <option>200+</option>
+                        </select>
+                      </div>
+                      <div className="form-group col-md-6">
+                        <label>Keywords</label>
+                        <input value={form.keywords} onChange={e=>setForm({...form, keywords:e.target.value})} className="form-control form-control-sm" placeholder="Metall, Apparatebau"/>
+                      </div>
+                    </div>
+                    <button type="submit" className="btn btn-primary btn-sm">Zur Liste hinzufügen</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-7 mb-4">
+              <div className="card h-100">
+                <div className="card-header bg-transparent d-flex align-items-center justify-content-between">
+                  <span>Prospects</span>
+                  <div>
+                    <button className="btn btn-outline-primary btn-sm mr-2" onClick={exportCSV}><i className="bi bi-download mr-1"/>CSV</button>
+                    <button className="btn btn-outline-primary btn-sm" onClick={refreshProspects}><i className="bi bi-arrow-repeat mr-1"/>Aktualisieren</button>
+                  </div>
+                </div>
+                <div className="card-body p-0">
+                  <div className="table-responsive" style={{maxHeight:360}}>
+                    <table className="table table-dark table-hover table-sm mb-0">
+                      <thead className="thead-dark"><tr><th>Name</th><th>Website</th><th>Region</th><th>Branche</th><th>Score</th><th></th></tr></thead>
+                      <tbody>
+                        {(prospects||[]).map(p => (
+                          <tr key={p.id}>
+                            <td>{p.name}</td>
+                            <td><a className="text-info" href={p.website} target="_blank" rel="noreferrer">{p.website}</a></td>
+                            <td>{p.region}</td>
+                            <td>{p.industry}</td>
+                            <td>{p.score}</td>
+                            <td>
+                              <button className="btn btn-outline-primary btn-sm" onClick={()=>analyzeCompany(p)}><i className="bi bi-search"/> Analysieren</button>
+                            </td>
+                          </tr>
+                        ))}
+                        {prospects?.length===0 && <tr><td colSpan={6} className="text-center text-muted">Noch keine Prospects</td></tr>}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mail Composer */}
+          <div className="card">
+            <div className="card-header bg-transparent border-0">Mail Composer</div>
+            <div className="card-body">
+              <form onSubmit={generateMail}>
+                <div className="form-row">
+                  <div className="form-group col-md-4">
+                    <label>Firma</label>
+                    <input className="form-control form-control-sm" value={compose.company} onChange={e=>setCompose({...compose, company:e.target.value})}/>
+                  </div>
+                  <div className="form-group col-md-4">
+                    <label>Rolle</label>
+                    <input className="form-control form-control-sm" value={compose.contactRole} onChange={e=>setCompose({...compose, contactRole:e.target.value})}/>
+                  </div>
+                  <div className="form-group col-md-4">
+                    <label>Branche</label>
+                    <input className="form-control form-control-sm" value={compose.industry} onChange={e=>setCompose({...compose, industry:e.target.value})}/>
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="form-group col-md-6">
+                    <label>Use-Cases (kommagetrennt)</label>
+                    <input className="form-control form-control-sm" value={compose.useCases} onChange={e=>setCompose({...compose, useCases:e.target.value})}/>
+                  </div>
+                  <div className="form-group col-md-6">
+                    <label>Hypothesen (frei)</label>
+                    <input className="form-control form-control-sm" value={compose.hypotheses} onChange={e=>setCompose({...compose, hypotheses:e.target.value})} placeholder="z.B. Bänder 50×2000 K80; Fiberscheiben Ø125 K60"/>
+                  </div>
+                </div>
+                <button className="btn btn-primary btn-sm" type="submit">E-Mail generieren</button>
+              </form>
+
+              {mail && (
+                <div className="mt-3">
+                  <div className="mb-2"><strong>Betreff:</strong> {mail.subject}</div>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="small text-muted mb-1">Text</div>
+                      <pre className="p-2 rounded" style={{minHeight:120, background:'#141a20', color:'#e7ecf2'}}>{mail.text}</pre>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="small text-muted mb-1">HTML Vorschau</div>
+                      <div className="bg-light text-dark p-2 rounded" dangerouslySetInnerHTML={{__html: mail.html}} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab!=='dashboard' && activeTab!=='outbound' && (
+        <div className="text-muted">Dieser Bereich ist für die nächste Iteration vorgesehen.</div>
+      )}
+
+      {/* Bottom Tabbar ist global in layout.js */}
     </div>
   )
 }

@@ -20,12 +20,14 @@ export default function RootLayout({ children }) {
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
         {/* Chart.js Dark Defaults auf Basis CSS-Variablen */}
         <script dangerouslySetInnerHTML={{__html:`(function(){try{var css=getComputedStyle(document.documentElement);if(window.Chart){Chart.defaults.color=css.getPropertyValue('--txt').trim();Chart.defaults.borderColor=css.getPropertyValue('--line').trim();}}catch(e){}})();`}} />
+        {/* Subnav Active-State Sync */}
+        <script dangerouslySetInnerHTML={{__html:`(function(){function sync(){var h=location.hash||'#dashboard';document.querySelectorAll('.subnav-icons a').forEach(a=>{a.classList.toggle('active', a.getAttribute('href')===h)});document.querySelectorAll('.navbar .nav-link').forEach(a=>{a.classList.toggle('active', a.getAttribute('href')===h)});}window.addEventListener('hashchange',sync);document.addEventListener('DOMContentLoaded',sync);})();`}} />
       </head>
       <body>
         {/* Navbar */}
         <nav className="navbar navbar-expand-lg navbar-dark sticky-top">
           <a className="navbar-brand d-flex align-items-center" href="#dashboard">
-            <img src="https://customer-assets.emergentagent.com/job_fcbab1d5-29db-4ab5-a5a0-eaa26448019b/artifacts/9od052qs_Score-Logo-rechteckig.png" alt="SCORE" height="48" className="mr-2"/>
+            <img src="https://customer-assets.emergentagent.com/job_fcbab1d5-29db-4ab5-a5a0-eaa26448019b/artifacts/9od052qs_Score-Logo-rechteckig.png" alt="SCORE" className="brand-logo mr-2"/>
             <span>Score Zentrale</span>
           </a>
           <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,16 +49,38 @@ export default function RootLayout({ children }) {
           </div>
         </nav>
 
-        {/* Hero-Leiste */}
-        <div className="hero-band py-2">
-          <div className="container d-flex align-items-center justify-content-between">
-            <div className="small text-muted">SCORE Schleifwerkzeuge • Zentrale KPIs und Outbound-Tools</div>
-            <div className="small text-muted">Dark-Mode aktiv</div>
+        {/* Hero + Subnav Icons (Desktop) */}
+        <div className="hero-band py-2 d-none d-lg-block">
+          <div className="container">
+            <div className="d-flex align-items-center justify-content-between mb-1">
+              <div className="small text-muted">SCORE Schleifwerkzeuge • Zentrale KPIs und Outbound-Tools</div>
+              <div className="small text-muted">Dark-Mode aktiv</div>
+            </div>
+            <ul className="nav nav-pills subnav-icons">
+              <li className="nav-item"><a className="nav-link" href="#dashboard"><i className="bi bi-speedometer2 mr-1"/>Dashboard</a></li>
+              <li className="nav-item"><a className="nav-link" href="#outbound"><i className="bi bi-send mr-1"/>Outbound</a></li>
+              <li className="nav-item"><a className="nav-link" href="#sales"><i className="bi bi-bar-chart mr-1"/>Sales</a></li>
+              <li className="nav-item"><a className="nav-link" href="#marketing"><i className="bi bi-bullseye mr-1"/>Marketing</a></li>
+              <li className="nav-item"><a className="nav-link" href="#settings"><i className="bi bi-gear mr-1"/>Settings</a></li>
+            </ul>
           </div>
         </div>
 
         <div className="container py-4">
           {children}
+        </div>
+
+        {/* Bottom Tabbar (Mobile) */}
+        <div className="app-tabbar d-lg-none">
+          <div className="container">
+            <ul className="nav nav-pills nav-justified">
+              <li className="nav-item"><a className="nav-link" href="#dashboard"><i className="bi bi-speedometer2"/> Dashboard</a></li>
+              <li className="nav-item"><a className="nav-link" href="#outbound"><i className="bi bi-send"/> Outbound</a></li>
+              <li className="nav-item"><a className="nav-link" href="#sales"><i className="bi bi-bar-chart"/> Sales</a></li>
+              <li className="nav-item"><a className="nav-link" href="#marketing"><i className="bi bi-bullseye"/> Marketing</a></li>
+              <li className="nav-item"><a className="nav-link" href="#settings"><i className="bi bi-gear"/> Settings</a></li>
+            </ul>
+          </div>
         </div>
 
         {/* Bootstrap 4.6 JS (am Ende Body) */}
