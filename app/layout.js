@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
         <nav className="navbar navbar-expand-lg navbar-dark sticky-top">
           <a className="navbar-brand d-flex align-items-center" href="#dashboard">
             <img src="https://customer-assets.emergentagent.com/job_score-zentrale/artifacts/h3bcqslm_logo_score_schleifwerkzeuge.png" alt="SCORE" className="brand-logo mr-2"/>
-            <span>Score Zentrale</span>
+            <span className="brand-title">Score Zentrale</span>
           </a>
           <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
             <span className="navbar-toggler-icon"></span>
@@ -49,7 +49,7 @@ export default function RootLayout({ children }) {
           </div>
         </nav>
 
-        {/* Hero + Subnav Icons (Desktop) mit dunklem, transparentem Hintergrundbild */}
+        {/* Hero + Subnav Icons (Desktop) */}
         <div className="hero-band d-none d-lg-block">
           <div className="hero-bg d-flex align-items-end">
             <div className="container py-2">
@@ -58,11 +58,11 @@ export default function RootLayout({ children }) {
                 <div className="small text-muted">Dark-Mode aktiv</div>
               </div>
               <ul className="nav nav-pills subnav-icons">
-                <li className="nav-item"><a className="nav-link" href="#dashboard"><i className="bi bi-speedometer2 mr-1"/>Dashboard</a></li>
-                <li className="nav-item"><a className="nav-link" href="#outbound"><i className="bi bi-send mr-1"/>Outbound</a></li>
-                <li className="nav-item"><a className="nav-link" href="#sales"><i className="bi bi-bar-chart mr-1"/>Sales</a></li>
-                <li className="nav-item"><a className="nav-link" href="#marketing"><i className="bi bi-bullseye mr-1"/>Marketing</a></li>
-                <li className="nav-item"><a className="nav-link" href="#settings"><i className="bi bi-gear mr-1"/>Settings</a></li>
+                <li className="nav-item"><a className="nav-link" href="#dashboard"><i className="bi bi-speedometer2"/>Dashboard</a></li>
+                <li className="nav-item"><a className="nav-link" href="#outbound"><i className="bi bi-send"/>Outbound</a></li>
+                <li className="nav-item"><a className="nav-link" href="#sales"><i className="bi bi-bar-chart"/>Sales</a></li>
+                <li className="nav-item"><a className="nav-link" href="#marketing"><i className="bi bi-bullseye"/>Marketing</a></li>
+                <li className="nav-item"><a className="nav-link" href="#settings"><i className="bi bi-gear"/>Settings</a></li>
               </ul>
             </div>
           </div>

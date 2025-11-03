@@ -75,8 +75,8 @@ function generateKpisMock() {
 
 function buildDateParams(searchParams){ const from = searchParams.get('from') || new Date(Date.now()-29*24*3600*1000).toISOString().slice(0,10); const to = searchParams.get('to') || new Date().toISOString().slice(0,10); return { from, to } }
 
+// Ping with optional Basic Auth
 async function jtlPing(req){
-  // Basic Auth once; no redeclare
   const authHeader = req?.headers?.get ? (req.headers.get('authorization') || req.headers.get('Authorization')) : undefined
   if (authHeader && authHeader.toLowerCase().startsWith('basic ')) {
     try {
@@ -92,25 +92,219 @@ async function jtlPing(req){
       return { ok:false, error:String(e?.message||e), auth:'basic' }
     }
   }
-  // Fallback to ?u=&p=
-  try { const sp=new URL(req.url).searchParams; const u=sp.get('u'); const p=sp.get('p'); if (u && p) { const pool=await new sql.ConnectionPool({ user:u, password:p, server:process.env.JTL_SQL_HOST, port: parseInt(process.env.JTL_SQL_PORT||'1433',10), database:process.env.JTL_SQL_DB, pool:{max:1,min:0,idleTimeoutMillis:5000}, options:{ encrypt:false, trustServerCertificate:true } }).connect(); const r=await pool.request().query('SELECT DB_NAME() as db, @@VERSION as version'); await pool.close(); return { ok:true, db:r.recordset?.[0]?.db, version:r.recordset?.[0]?.version, auth:'query' } } } catch(_) {}
-  // Env pool
   const pool = await getMssqlPool(); const r = await pool.request().query('SELECT DB_NAME() as db, @@VERSION as version'); return { ok:true, db:r.recordset?.[0]?.db, version:r.recordset?.[0]?.version, auth:'env' }
 }
 
+// Helpers for SQL fragments
+const onlyArticleWhere = `rp.nPosTyp = 1` // fallback handled by DBA if needed
+
+// KPI without fees (still net)
 async function jtlKpi(pool, {from,to}){
   const request = pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59'))
-  const q = `WITH base AS (SELECT r.kRechnung, CAST(r.dErstellt AS date) AS d, ISNULL(rp.kArtikel,0) AS kArtikel, ISNULL(rp.fVKNetto,0) * ISNULL(rp.fMenge,1) AS vk, ISNULL(rp.fEKNetto,0) * ISNULL(rp.fMenge,1) AS ek FROM Rechnung.tRechnung r JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung WHERE r.dErstellt BETWEEN @from AND @to AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung) AND ISNULL(rp.kArtikel,0) > 0) SELECT SUM(vk) AS revenue, COUNT(DISTINCT kRechnung) AS orders, SUM(vk - ek) AS margin_items FROM base`
-  const r = await request.query(q); return { revenue:r.recordset?.[0]?.revenue||0, orders:r.recordset?.[0]?.orders||0, margin:r.recordset?.[0]?.margin_items||0 }
+  const q = `WITH base AS (
+    SELECT r.kRechnung, CAST(r.dBelegDatum AS date) AS d,
+           ISNULL(rp.fVKNetto,0) * ISNULL(rp.fMenge,1) AS vk,
+           ISNULL(COALESCE(rp.fEKNetto, a.fEKNetto),0) * ISNULL(rp.fMenge,1) AS ek
+    FROM Rechnung.tRechnung r
+    JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
+    LEFT JOIN dbo.tArtikel a ON a.kArtikel = rp.kArtikel
+    WHERE r.dBelegDatum BETWEEN @from AND @to
+      AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung)
+      AND ${onlyArticleWhere}
+  )
+  SELECT SUM(vk) AS revenue, COUNT(*) AS rowsCnt,
+         SUM(vk - ek) AS margin_items,
+         (SELECT COUNT(DISTINCT kRechnung) FROM base) AS orders`;
+  const r = await request.query(q); const row=r.recordset?.[0]||{}; return { revenue: row.revenue||0, orders: row.orders||0, margin: row.margin_items||0 }
 }
 
-async function jtlTopProducts(pool, {from,to,limit=20}){ const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59')); request.input('limit', sql.Int, limit); const q = `SELECT TOP (@limit) a.cArtNr AS artikelNr, a.cName AS name, SUM(ISNULL(rp.fVKNetto,0)*ISNULL(rp.fMenge,1)) AS umsatz, SUM(ISNULL(rp.fMenge,1)) AS menge, SUM(ISNULL(rp.fVKNetto,0)*ISNULL(rp.fMenge,1) - ISNULL(rp.fEKNetto,0)*ISNULL(rp.fMenge,1)) AS marge FROM Rechnung.tRechnung r JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung LEFT JOIN dbo.tArtikel a ON a.kArtikel = rp.kArtikel WHERE r.dErstellt BETWEEN @from AND @to AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung) AND ISNULL(rp.kArtikel,0) > 0 GROUP BY a.cArtNr, a.cName ORDER BY umsatz DESC`; const {recordset}=await request.query(q); return recordset||[] }
+// KPI with fees (per-invoice)
+async function jtlKpiWithFees(pool,{from,to}){
+  const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59'))
+  const q = `WITH pos AS (
+      SELECT r.kRechnung,
+             CAST(r.dBelegDatum AS date) AS d,
+             ISNULL(rp.fVKNetto,0) * ISNULL(rp.fMenge,1) AS vk,
+             ISNULL(COALESCE(rp.fEKNetto, a.fEKNetto),0) * ISNULL(rp.fMenge,1) AS ek,
+             ar.kAuftrag, o.kPlattform, o.kShop
+      FROM Rechnung.tRechnung r
+      JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
+      LEFT JOIN dbo.tArtikel a ON a.kArtikel = rp.kArtikel
+      LEFT JOIN Verkauf.tAuftragRechnung ar ON ar.kRechnung = r.kRechnung
+      LEFT JOIN Verkauf.tAuftrag o ON o.kAuftrag = ar.kAuftrag
+      WHERE r.dBelegDatum BETWEEN @from AND @to
+        AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung)
+        AND ${onlyArticleWhere}
+    ), inv AS (
+      SELECT kRechnung, d,
+             SUM(vk) AS inv_rev,
+             SUM(vk - ek) AS inv_pos_margin,
+             CASE WHEN MAX(CASE WHEN kPlattform IS NOT NULL AND kPlattform>0 THEN 1 ELSE 0 END)=1 THEN 1 ELSE 0 END AS is_platform
+      FROM pos
+      GROUP BY kRechnung, d
+    )
+    SELECT SUM(inv_rev) AS revenue,
+           COUNT(DISTINCT kRechnung) AS orders,
+           SUM(inv_pos_margin - (1.5 + CASE WHEN is_platform=1 THEN 0.2*inv_rev ELSE 0 END)) AS margin_with_fees
+    FROM inv`;
+  const {recordset}=await request.query(q); const row=recordset?.[0]||{}; return { revenue: row.revenue||0, orders: row.orders||0, margin_with_fees: row.margin_with_fees||0 }
+}
 
-async function jtlTopCategories(pool,{from,to,limit=20}){ const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59')); request.input('limit', sql.Int, limit); const q = `SELECT TOP (@limit) k.cName AS kategorie, SUM(ISNULL(rp.fVKNetto,0)*ISNULL(rp.fMenge,1)) AS umsatz, SUM(ISNULL(rp.fMenge,1)) AS menge, SUM(ISNULL(rp.fVKNetto,0)*ISNULL(rp.fMenge,1) - ISNULL(rp.fEKNetto,0)*ISNULL(rp.fMenge,1)) AS marge FROM Rechnung.tRechnung r JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung JOIN dbo.tkategorieartikel ka ON ka.kArtikel = rp.kArtikel JOIN dbo.tkategorie k ON k.kKategorie = ka.kKategorie WHERE r.dErstellt BETWEEN @from AND @to AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung) AND ISNULL(rp.kArtikel,0) > 0 GROUP BY k.cName ORDER BY umsatz DESC`; const {recordset}=await request.query(q); return recordset||[] }
+async function jtlTopProducts(pool, {from,to,limit=20}){
+  const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59')); request.input('limit', sql.Int, limit)
+  const q = `WITH base AS (
+      SELECT r.kRechnung, a.cArtNr, a.cName,
+             ISNULL(rp.fVKNetto,0)*ISNULL(rp.fMenge,1) AS pos_rev,
+             (ISNULL(rp.fVKNetto,0)-ISNULL(COALESCE(rp.fEKNetto, a.fEKNetto),0)) * ISNULL(rp.fMenge,1) AS pos_margin,
+             CAST(r.dBelegDatum AS date) AS d,
+             ar.kAuftrag, o.kPlattform, o.kShop
+      FROM Rechnung.tRechnung r
+      JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung=r.kRechnung
+      LEFT JOIN dbo.tArtikel a ON a.kArtikel=rp.kArtikel
+      LEFT JOIN Verkauf.tAuftragRechnung ar ON ar.kRechnung=r.kRechnung
+      LEFT JOIN Verkauf.tAuftrag o ON o.kAuftrag=ar.kAuftrag
+      WHERE r.dBelegDatum BETWEEN @from AND @to AND ${onlyArticleWhere}
+        AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung=r.kRechnung)
+    ), inv AS (
+      SELECT kRechnung, SUM(pos_rev) AS inv_rev,
+             CASE WHEN MAX(CASE WHEN kPlattform IS NOT NULL AND kPlattform>0 THEN 1 ELSE 0 END)=1 THEN 1 ELSE 0 END AS is_platform
+      FROM base GROUP BY kRechnung
+    ), alloc AS (
+      SELECT b.cArtNr, b.cName,
+             SUM(b.pos_rev) AS umsatz,
+             SUM(b.pos_margin) AS marge,
+             SUM(b.pos_margin - ( (1.5 + CASE WHEN i.is_platform=1 THEN 0.2*i.inv_rev ELSE 0 END) * (CASE WHEN i.inv_rev>0 THEN b.pos_rev/i.inv_rev ELSE 0 END) )) AS marge_with_fees
+      FROM base b JOIN inv i ON i.kRechnung=b.kRechnung
+      GROUP BY b.cArtNr, b.cName
+    )
+    SELECT TOP (@limit) cArtNr AS artikelNr, cName AS name, umsatz, marge, marge_with_fees
+    FROM alloc ORDER BY umsatz DESC`;
+  const {recordset}=await request.query(q); return recordset||[]
+}
 
-async function jtlTimeseries(pool,{from,to}){ const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59')); const q = `SELECT CONVERT(date, r.dErstellt) AS date, SUM(ISNULL(rp.fVKNetto,0)*ISNULL(rp.fMenge,1)) AS revenue, COUNT(DISTINCT r.kRechnung) AS orders, SUM(ISNULL(rp.fVKNetto,0)*ISNULL(rp.fMenge,1) - ISNULL(rp.fEKNetto,0)*ISNULL(rp.fMenge,1)) AS margin FROM Rechnung.tRechnung r JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung WHERE r.dErstellt BETWEEN @from AND @to AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung) AND ISNULL(rp.kArtikel,0) > 0 GROUP BY CONVERT(date, r.dErstellt) ORDER BY date`; const {recordset}=await request.query(q); return recordset||[] }
+async function jtlTopCategories(pool, {from,to,limit=20}){
+  const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59')); request.input('limit', sql.Int, limit)
+  const q = `WITH base AS (
+      SELECT r.kRechnung, k.cName AS kat,
+             ISNULL(rp.fVKNetto,0)*ISNULL(rp.fMenge,1) AS pos_rev,
+             (ISNULL(rp.fVKNetto,0)-ISNULL(COALESCE(rp.fEKNetto, a.fEKNetto),0)) * ISNULL(rp.fMenge,1) AS pos_margin,
+             CAST(r.dBelegDatum AS date) AS d,
+             ar.kAuftrag, o.kPlattform, o.kShop
+      FROM Rechnung.tRechnung r
+      JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung=r.kRechnung
+      JOIN dbo.tkategorieartikel ka ON ka.kArtikel=rp.kArtikel
+      JOIN dbo.tkategorie k ON k.kKategorie=ka.kKategorie
+      LEFT JOIN dbo.tArtikel a ON a.kArtikel=rp.kArtikel
+      LEFT JOIN Verkauf.tAuftragRechnung ar ON ar.kRechnung=r.kRechnung
+      LEFT JOIN Verkauf.tAuftrag o ON o.kAuftrag=ar.kAuftrag
+      WHERE r.dBelegDatum BETWEEN @from AND @to AND ${onlyArticleWhere}
+        AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung=r.kRechnung)
+    ), inv AS (
+      SELECT kRechnung, SUM(pos_rev) AS inv_rev,
+             CASE WHEN MAX(CASE WHEN kPlattform IS NOT NULL AND kPlattform>0 THEN 1 ELSE 0 END)=1 THEN 1 ELSE 0 END AS is_platform
+      FROM base GROUP BY kRechnung
+    ), alloc AS (
+      SELECT b.kat,
+             SUM(b.pos_rev) AS umsatz,
+             SUM(b.pos_margin) AS marge,
+             SUM(b.pos_margin - ( (1.5 + CASE WHEN i.is_platform=1 THEN 0.2*i.inv_rev ELSE 0 END) * (CASE WHEN i.inv_rev>0 THEN b.pos_rev/i.inv_rev ELSE 0 END) )) AS marge_with_fees
+      FROM base b JOIN inv i ON i.kRechnung=b.kRechnung
+      GROUP BY b.kat
+    )
+    SELECT TOP (@limit) kat AS kategorie, umsatz, marge, marge_with_fees
+    FROM alloc ORDER BY umsatz DESC`;
+  const {recordset}=await request.query(q); return recordset||[]
+}
 
-async function jtlPlatformTimeseries(pool,{from,to}){ const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59')); const q = `WITH pos AS (SELECT r.kRechnung, CONVERT(date, r.dErstellt) AS d, ISNULL(rp.fVKNetto,0)*ISNULL(rp.fMenge,1) AS vk, ar.kAuftrag FROM Rechnung.tRechnung r JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung LEFT JOIN Verkauf.tAuftragRechnung ar ON ar.kRechnung = r.kRechnung WHERE r.dErstellt BETWEEN @from AND @to AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung) AND ISNULL(rp.kArtikel,0) > 0), ax AS (SELECT p.d, p.vk, a.kPlattform, a.kShop, p.kRechnung FROM pos p LEFT JOIN Verkauf.tAuftrag a ON a.kAuftrag = p.kAuftrag) SELECT CASE WHEN ax.kPlattform IS NOT NULL AND ax.kPlattform>0 THEN ISNULL(pl.cName,'Plattform') WHEN ax.kShop IS NOT NULL AND ax.kShop>0 THEN ISNULL(s.cName,'Shop') ELSE 'Direktvertrieb' END AS pName, ax.d AS date, SUM(ax.vk) AS revenue FROM ax LEFT JOIN dbo.tPlattform pl ON pl.kPlattform = ax.kPlattform LEFT JOIN dbo.tShop s ON s.kShop = ax.kShop GROUP BY CASE WHEN ax.kPlattform IS NOT NULL AND ax.kPlattform>0 THEN ISNULL(pl.cName,'Plattform') WHEN ax.kShop IS NOT NULL AND ax.kShop>0 THEN ISNULL(s.cName,'Shop') ELSE 'Direktvertrieb' END, ax.d ORDER BY ax.d`; const {recordset}=await request.query(q); return recordset||[] }
+async function jtlTimeseries(pool,{from,to}){
+  const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59'))
+  const q = `SELECT CAST(r.dBelegDatum AS date) AS date,
+           SUM(ISNULL(rp.fVKNetto,0)*ISNULL(rp.fMenge,1)) AS revenue,
+           COUNT(DISTINCT r.kRechnung) AS orders,
+           SUM((ISNULL(rp.fVKNetto,0)-ISNULL(COALESCE(rp.fEKNetto, a.fEKNetto),0))*ISNULL(rp.fMenge,1)) AS margin
+    FROM Rechnung.tRechnung r
+    JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
+    LEFT JOIN dbo.tArtikel a ON a.kArtikel=rp.kArtikel
+    WHERE r.dBelegDatum BETWEEN @from AND @to
+      AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung)
+      AND ${onlyArticleWhere}
+    GROUP BY CAST(r.dBelegDatum AS date)
+    ORDER BY date`;
+  const {recordset}=await request.query(q); return recordset||[]
+}
+
+async function jtlTimeseriesWithFees(pool,{from,to}){
+  const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59'))
+  const q = `WITH pos AS (
+      SELECT r.kRechnung,
+             CAST(r.dBelegDatum AS date) AS d,
+             ISNULL(rp.fVKNetto,0) * ISNULL(rp.fMenge,1) AS vk,
+             ISNULL(COALESCE(rp.fEKNetto, a.fEKNetto),0) * ISNULL(rp.fMenge,1) AS ek,
+             ar.kAuftrag, o.kPlattform, o.kShop
+      FROM Rechnung.tRechnung r
+      JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
+      LEFT JOIN dbo.tArtikel a ON a.kArtikel = rp.kArtikel
+      LEFT JOIN Verkauf.tAuftragRechnung ar ON ar.kRechnung = r.kRechnung
+      LEFT JOIN Verkauf.tAuftrag o ON o.kAuftrag = ar.kAuftrag
+      WHERE r.dBelegDatum BETWEEN @from AND @to
+        AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung)
+        AND ${onlyArticleWhere}
+    ), inv AS (
+      SELECT kRechnung, d,
+             SUM(vk) AS inv_rev,
+             SUM(vk - ek) AS inv_pos_margin,
+             CASE WHEN MAX(CASE WHEN kPlattform IS NOT NULL AND kPlattform>0 THEN 1 ELSE 0 END)=1 THEN 1 ELSE 0 END AS is_platform
+      FROM pos
+      GROUP BY kRechnung, d
+    )
+    SELECT d AS date,
+           SUM(inv_rev) AS revenue,
+           COUNT(DISTINCT kRechnung) AS orders,
+           SUM(inv_pos_margin - (1.5 + CASE WHEN is_platform=1 THEN 0.2*inv_rev ELSE 0 END)) AS margin_with_fees
+    FROM inv
+    GROUP BY d
+    ORDER BY d`;
+  const {recordset}=await request.query(q); return recordset||[]
+}
+
+async function jtlPlatformTimeseries(pool,{from,to}){
+  const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59'))
+  const q = `WITH pos AS (
+      SELECT r.kRechnung, CAST(r.dBelegDatum AS date) AS d,
+             ISNULL(rp.fVKNetto,0)*ISNULL(rp.fMenge,1) AS vk,
+             ar.kAuftrag
+      FROM Rechnung.tRechnung r
+      JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
+      LEFT JOIN Verkauf.tAuftragRechnung ar ON ar.kRechnung = r.kRechnung
+      WHERE r.dBelegDatum BETWEEN @from AND @to
+        AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung)
+        AND ${onlyArticleWhere}
+    ), ax AS (
+      SELECT p.d, p.vk, a.kPlattform, a.kShop
+      FROM pos p LEFT JOIN Verkauf.tAuftrag a ON a.kAuftrag = p.kAuftrag
+    )
+    SELECT 
+      CASE WHEN ax.kPlattform IS NOT NULL AND ax.kPlattform>0 THEN CONCAT('pl:', ax.kPlattform)
+           WHEN ax.kShop IS NOT NULL AND ax.kShop>0 THEN CONCAT('shop:', ax.kShop)
+           ELSE 'direct' END AS pKey,
+      CASE WHEN ax.kPlattform IS NOT NULL AND ax.kPlattform>0 THEN ISNULL(pl.cName,'Plattform')
+           WHEN ax.kShop IS NOT NULL AND ax.kShop>0 THEN ISNULL(s.cName,'Shop')
+           ELSE 'Direktvertrieb' END AS pName,
+      ax.d AS date,
+      SUM(ax.vk) AS revenue
+    FROM ax
+    LEFT JOIN dbo.tPlattform pl ON pl.kPlattform = ax.kPlattform
+    LEFT JOIN dbo.tShop s ON s.kShop = ax.kShop
+    GROUP BY CASE WHEN ax.kPlattform IS NOT NULL AND ax.kPlattform>0 THEN CONCAT('pl:', ax.kPlattform)
+                  WHEN ax.kShop IS NOT NULL AND ax.kShop>0 THEN CONCAT('shop:', ax.kShop)
+                  ELSE 'direct' END,
+             CASE WHEN ax.kPlattform IS NOT NULL AND ax.kPlattform>0 THEN ISNULL(pl.cName,'Plattform')
+                  WHEN ax.kShop IS NOT NULL AND ax.kShop>0 THEN ISNULL(s.cName,'Shop')
+                  ELSE 'Direktvertrieb' END,
+             ax.d
+    ORDER BY ax.d`;
+  const {recordset}=await request.query(q); return recordset||[]
+}
 
 async function handleRoute(request, { params }) {
   const { path = [] } = params
@@ -124,9 +318,11 @@ async function handleRoute(request, { params }) {
 
     if (route === '/jtl/ping' && method === 'GET') { const data = await jtlPing(request); return cors(NextResponse.json(data)) }
     if (route === '/jtl/sales/kpi' && method === 'GET') { const pool=await getMssqlPool(); const {from,to}=buildDateParams(new URL(request.url).searchParams); const data=await jtlKpi(pool,{from,to}); return cors(NextResponse.json(data)) }
+    if (route === '/jtl/sales/kpi/with_platform_fees' && method === 'GET') { const pool=await getMssqlPool(); const {from,to}=buildDateParams(new URL(request.url).searchParams); const data=await jtlKpiWithFees(pool,{from,to}); return cors(NextResponse.json(data)) }
     if (route === '/jtl/sales/top-products' && method === 'GET') { const pool=await getMssqlPool(); const sp=new URL(request.url).searchParams; const {from,to}=buildDateParams(sp); const limit=parseInt(sp.get('limit')||'20',10); const list=await jtlTopProducts(pool,{from,to,limit}); return cors(NextResponse.json(list)) }
     if (route === '/jtl/sales/top-categories' && method === 'GET') { const pool=await getMssqlPool(); const sp=new URL(request.url).searchParams; const {from,to}=buildDateParams(sp); const limit=parseInt(sp.get('limit')||'20',10); const list=await jtlTopCategories(pool,{from,to,limit}); return cors(NextResponse.json(list)) }
     if (route === '/jtl/sales/timeseries' && method === 'GET') { const pool=await getMssqlPool(); const {from,to}=buildDateParams(new URL(request.url).searchParams); const list=await jtlTimeseries(pool,{from,to}); return cors(NextResponse.json(list)) }
+    if (route === '/jtl/sales/timeseries/with_platform_fees' && method === 'GET') { const pool=await getMssqlPool(); const {from,to}=buildDateParams(new URL(request.url).searchParams); const list=await jtlTimeseriesWithFees(pool,{from,to}); return cors(NextResponse.json(list)) }
     if (route === '/jtl/sales/platform-timeseries' && method === 'GET') { const pool=await getMssqlPool(); const {from,to}=buildDateParams(new URL(request.url).searchParams); const list=await jtlPlatformTimeseries(pool,{from,to}); return cors(NextResponse.json(list)) }
 
     if (route === '/kpis' && method === 'GET') { const data = generateKpisMock(); return cors(NextResponse.json(data)) }
