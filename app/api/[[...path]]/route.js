@@ -75,7 +75,36 @@ function generateKpisMock() {
 
 function buildDateParams(searchParams){ const from = searchParams.get('from') || new Date(Date.now()-29*24*3600*1000).toISOString().slice(0,10); const to = searchParams.get('to') || new Date().toISOString().slice(0,10); return { from, to } }
 
-async function jtlPing(){ const pool = await getMssqlPool(); const r = await pool.request().query('SELECT DB_NAME() as db, @@VERSION as version'); return { ok:true, db:r.recordset?.[0]?.db, version:r.recordset?.[0]?.version } }
+async function jtlPing(req){
+  // If Basic Auth provided, use those credentials for a one-off connection (no pooling)
+  const authHeader = req?.headers?.get ? req.headers.get('authorization') : undefined
+  if (authHeader && authHeader.toLowerCase().startsWith('basic ')) {
+    try {
+      const b64 = authHeader.split(' ')[1]
+      const decoded = Buffer.from(b64, 'base64').toString('utf8')
+      const [user, password] = decoded.split(':')
+      const cfg = {
+        user,
+        password,
+        server: process.env.JTL_SQL_HOST,
+        port: parseInt(process.env.JTL_SQL_PORT || '1433', 10),
+        database: process.env.JTL_SQL_DB,
+        pool: { max: 1, min: 0, idleTimeoutMillis: 5000 },
+        options: { encrypt: false, trustServerCertificate: true }
+      }
+      const tmpPool = await sql.connect(cfg)
+      const r = await tmpPool.request().query('SELECT DB_NAME() as db, @@VERSION as version')
+      await tmpPool.close()
+      return { ok: true, db: r.recordset?.[0]?.db, version: r.recordset?.[0]?.version, auth: 'basic' }
+    } catch (e) {
+      return { ok: false, error: String(e?.message||e), auth: 'basic' }
+    }
+  }
+  // Fallback to default pool with env credentials
+  const pool = await getMssqlPool();
+  const r = await pool.request().query('SELECT DB_NAME() as db, @@VERSION as version');
+  return { ok:true, db:r.recordset?.[0]?.db, version:r.recordset?.[0]?.version, auth: 'env' }
+}
 
 async function jtlKpi(pool, {from,to}){
   const request = pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59'))
