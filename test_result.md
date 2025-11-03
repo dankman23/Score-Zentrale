@@ -198,6 +198,18 @@ backend:
     status_history:
       - working: "NA"
         agent: "main"
+- task: "JTL Ping (Basic Auth)"
+  implemented: true
+  working: "NA"
+  file: "/app/app/api/[[...path]]/route.js"
+  stuck_count: 0
+  priority: "high"
+  needs_retesting: true
+  status_history:
+    - working: "NA"
+      agent: "main"
+      comment: "Route auf runtime=nodejs, dynamic, Basic-Auth-handling + one-off pool; zusätzlich Query-Param Fallback u/p"
+
         comment: "Template-Health; speichert status_checks"
       - working: true
         agent: "testing"
