@@ -106,59 +106,74 @@ user_problem_statement: "Build Score Zentrale MVP mit Dashboard-Skelett (mocked 
 backend:
   - task: "Catch-all API + Health"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implementiert GET /api/, /api/root Health-Check über catch-all"
+      - working: true
+        agent: "testing"
+        comment: "✅ Health endpoints GET /api/ and /api/root working correctly, returning 'Score Zentrale API online'"
   - task: "GET /api/kpis (Mock KPI Zeitreihen + Kampagnen)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Mock-Daten mit deterministischem Seed; Umsatz/Bestellungen/Marge + Ads + GA4"
+      - working: true
+        agent: "testing"
+        comment: "✅ KPIs endpoint verified: jtl.totals.revenue, jtl.series[0].date, ads.campaigns Array, ga4.totals.users all present. Sample: JTL Revenue 43804, GA4 Users 1768, 3 Ads Campaigns"
   - task: "Prospects: GET/POST /api/prospects (Mongo, UUID, ohne _id)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Einfügen + Dedupe über Domain-RegEx, Score-Heuristik, Liste"
+      - working: true
+        agent: "testing"
+        comment: "✅ Prospects flow working: POST creates prospects with UUID id (no _id), GET retrieves list without _id fields. Duplicate detection working. Fixed minor _id cleanup issue in POST response."
   - task: "Company Analyzer (mock) POST /api/analyze"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Heuristische Mapping auf Metall/Holz; schreibt companies + activities"
+      - working: true
+        agent: "testing"
+        comment: "✅ Analyze endpoint working: returns productGroups (5 items), materials (3 items), hypotheses (3 items). Creates DB entries in companies and activities collections as expected."
   - task: "Mail Composer (mock) POST /api/mailer/compose"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Generiert Subject/Text/HTML; noch kein Versand"
+      - working: true
+        agent: "testing"
+        comment: "✅ Mailer compose working: returns subject, text, html fields with proper content generation based on company, contactRole, industry, useCases, and hypotheses inputs."
   - task: "Emails Draft speichern POST /api/emails"
     implemented: true
     working: "NA"
@@ -170,17 +185,23 @@ backend:
       - working: "NA"
         agent: "main"
         comment: "Speichert Draft in emails-Collection"
+      - working: "NA"
+        agent: "testing"
+        comment: "Not tested - medium priority, not in current focus"
   - task: "Status Endpoints GET/POST /api/status"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "low"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Template-Health; speichert status_checks"
+      - working: true
+        agent: "testing"
+        comment: "✅ Status endpoints working: POST creates status records with UUID, GET retrieves list without _id fields. Tested with client_name 'qa'."
 frontend:
   - task: "Dashboard mit KPI Tiles + 2 Charts (Chart.js CDN)"
     implemented: true
