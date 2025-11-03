@@ -75,36 +75,11 @@ function generateKpisMock() {
 
 function buildDateParams(searchParams){ const from = searchParams.get('from') || new Date(Date.now()-29*24*3600*1000).toISOString().slice(0,10); const to = searchParams.get('to') || new Date().toISOString().slice(0,10); return { from, to } }
 
-// Column flags cached
-let colFlags = null
-async function columnExists(pool, objectName, column) {
-  const r = await pool.request()
-    .input('obj', sql.NVarChar, objectName)
-    .input('col', sql.NVarChar, column)
-    .query('SELECT 1 AS x FROM sys.columns WHERE object_id = OBJECT_ID(@obj) AND name = @col')
-  return (r.recordset || []).length > 0
-}
-async function getColFlags(pool){
-  if (colFlags) return colFlags
-  const hasPosTyp = await columnExists(pool, 'Rechnung.tRechnungPosition', 'nPosTyp')
-  const hasBeleg = await columnExists(pool, 'Rechnung.tRechnung', 'dBelegDatum')
-  const hasRpEK = await columnExists(pool, 'Rechnung.tRechnungPosition', 'fEKNetto')
-  const hasAEK = await columnExists(pool, 'dbo.tArtikel', 'fEKNetto')
-  colFlags = { hasPosTyp, hasBeleg, hasRpEK, hasAEK }
-  return colFlags
-}
+// Simple column flags cache was removed for robustness per customer request: always filter "only articles"
+const onlyArticleWhere = `rp.kArtikel > 0 AND ISNULL(rp.cName,'') NOT LIKE 'Versand%' AND ISNULL(rp.cName,'') NOT LIKE 'Gutschein%' AND ISNULL(rp.cName,'') NOT LIKE 'Rabatt%' AND ISNULL(rp.cName,'') NOT LIKE 'Pfand%'`
 
-function buildOnlyArticleWhere(flags){
-  if (flags.hasPosTyp) return 'rp.nPosTyp = 1'
-  return `rp.kArtikel > 0 AND ISNULL(rp.cName,'') NOT LIKE 'Versand%' AND ISNULL(rp.cName,'') NOT LIKE 'Gutschein%' AND ISNULL(rp.cName,'') NOT LIKE 'Rabatt%' AND ISNULL(rp.cName,'') NOT LIKE 'Pfand%'`
-}
-function ekExpr(flags){
-  if (flags.hasRpEK && flags.hasAEK) return 'ISNULL(COALESCE(rp.fEKNetto, a.fEKNetto),0)'
-  if (flags.hasRpEK) return 'ISNULL(rp.fEKNetto,0)'
-  if (flags.hasAEK) return 'ISNULL(a.fEKNetto,0)'
-  return '0'
-}
-function dateExpr(flags){ return flags.hasBeleg ? 'r.dBelegDatum' : 'r.dErstellt' }
+function ekExpr(){ return 'ISNULL(COALESCE(rp.fEKNetto, a.fEKNetto),0)' }
+function dateExpr(){ return `CASE WHEN COL_LENGTH('Rechnung.tRechnung','dBelegDatum') IS NOT NULL THEN r.dBelegDatum ELSE r.dErstellt END` }
 
 // Ping with optional Basic Auth
 async function jtlPing(req){
@@ -128,10 +103,8 @@ async function jtlPing(req){
 
 // KPI without fees (still net)
 async function jtlKpi(pool, {from,to}){
-  const flags = await getColFlags(pool)
-  const onlyWhere = buildOnlyArticleWhere(flags)
-  const ek = ekExpr(flags)
-  const dExpr = dateExpr(flags)
+  const ek = ekExpr()
+  const dExpr = dateExpr()
   const request = pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59'))
   const q = `WITH base AS (
     SELECT r.kRechnung, CAST(${dExpr} AS date) AS d,
@@ -142,7 +115,7 @@ async function jtlKpi(pool, {from,to}){
     LEFT JOIN dbo.tArtikel a ON a.kArtikel = rp.kArtikel
     WHERE ${dExpr} BETWEEN @from AND @to
       AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung)
-      AND ${onlyWhere}
+      AND ${onlyArticleWhere}
   )
   SELECT SUM(vk) AS revenue, COUNT(*) AS rowsCnt,
          SUM(vk - ek) AS margin_items,
@@ -152,10 +125,8 @@ async function jtlKpi(pool, {from,to}){
 
 // KPI with fees (per-invoice)
 async function jtlKpiWithFees(pool,{from,to}){
-  const flags = await getColFlags(pool)
-  const onlyWhere = buildOnlyArticleWhere(flags)
-  const ek = ekExpr(flags)
-  const dExpr = dateExpr(flags)
+  const ek = ekExpr()
+  const dExpr = dateExpr()
   const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59'))
   const q = `WITH pos AS (
       SELECT r.kRechnung,
@@ -170,7 +141,7 @@ async function jtlKpiWithFees(pool,{from,to}){
       LEFT JOIN Verkauf.tAuftrag o ON o.kAuftrag = ar.kAuftrag
       WHERE ${dExpr} BETWEEN @from AND @to
         AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung)
-        AND ${onlyWhere}
+        AND ${onlyArticleWhere}
     ), inv AS (
       SELECT kRechnung, d,
              SUM(vk) AS inv_rev,
@@ -187,10 +158,8 @@ async function jtlKpiWithFees(pool,{from,to}){
 }
 
 async function jtlTopProducts(pool, {from,to,limit=20}){
-  const flags = await getColFlags(pool)
-  const onlyWhere = buildOnlyArticleWhere(flags)
-  const ek = ekExpr(flags)
-  const dExpr = dateExpr(flags)
+  const ek = ekExpr()
+  const dExpr = dateExpr()
   const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59')); request.input('limit', sql.Int, limit)
   const q = `WITH base AS (
       SELECT r.kRechnung, a.cArtNr, a.cName,
@@ -203,7 +172,7 @@ async function jtlTopProducts(pool, {from,to,limit=20}){
       LEFT JOIN dbo.tArtikel a ON a.kArtikel=rp.kArtikel
       LEFT JOIN Verkauf.tAuftragRechnung ar ON ar.kRechnung=r.kRechnung
       LEFT JOIN Verkauf.tAuftrag o ON o.kAuftrag=ar.kAuftrag
-      WHERE ${dExpr} BETWEEN @from AND @to AND ${onlyWhere}
+      WHERE ${dExpr} BETWEEN @from AND @to AND ${onlyArticleWhere}
         AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung=r.kRechnung)
     ), inv AS (
       SELECT kRechnung, SUM(pos_rev) AS inv_rev,
@@ -223,10 +192,8 @@ async function jtlTopProducts(pool, {from,to,limit=20}){
 }
 
 async function jtlTopCategories(pool, {from,to,limit=20}){
-  const flags = await getColFlags(pool)
-  const onlyWhere = buildOnlyArticleWhere(flags)
-  const ek = ekExpr(flags)
-  const dExpr = dateExpr(flags)
+  const ek = ekExpr()
+  const dExpr = dateExpr()
   const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59')); request.input('limit', sql.Int, limit)
   const q = `WITH base AS (
       SELECT r.kRechnung, k.cName AS kat,
@@ -241,7 +208,7 @@ async function jtlTopCategories(pool, {from,to,limit=20}){
       LEFT JOIN dbo.tArtikel a ON a.kArtikel=rp.kArtikel
       LEFT JOIN Verkauf.tAuftragRechnung ar ON ar.kRechnung=r.kRechnung
       LEFT JOIN Verkauf.tAuftrag o ON o.kAuftrag=ar.kAuftrag
-      WHERE ${dExpr} BETWEEN @from AND @to AND ${onlyWhere}
+      WHERE ${dExpr} BETWEEN @from AND @to AND ${onlyArticleWhere}
         AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung=r.kRechnung)
     ), inv AS (
       SELECT kRechnung, SUM(pos_rev) AS inv_rev,
@@ -261,10 +228,8 @@ async function jtlTopCategories(pool, {from,to,limit=20}){
 }
 
 async function jtlTimeseries(pool,{from,to}){
-  const flags = await getColFlags(pool)
-  const onlyWhere = buildOnlyArticleWhere(flags)
-  const ek = ekExpr(flags)
-  const dExpr = dateExpr(flags)
+  const ek = ekExpr()
+  const dExpr = dateExpr()
   const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59'))
   const q = `SELECT CAST(${dExpr} AS date) AS date,
            SUM(ISNULL(rp.fVKNetto,0)*ISNULL(rp.fMenge,1)) AS revenue,
@@ -275,17 +240,15 @@ async function jtlTimeseries(pool,{from,to}){
     LEFT JOIN dbo.tArtikel a ON a.kArtikel=rp.kArtikel
     WHERE ${dExpr} BETWEEN @from AND @to
       AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung)
-      AND ${onlyWhere}
+      AND ${onlyArticleWhere}
     GROUP BY CAST(${dExpr} AS date)
     ORDER BY date`;
   const {recordset}=await request.query(q); return recordset||[]
 }
 
 async function jtlTimeseriesWithFees(pool,{from,to}){
-  const flags = await getColFlags(pool)
-  const onlyWhere = buildOnlyArticleWhere(flags)
-  const ek = ekExpr(flags)
-  const dExpr = dateExpr(flags)
+  const ek = ekExpr()
+  const dExpr = dateExpr()
   const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59'))
   const q = `WITH pos AS (
       SELECT r.kRechnung,
@@ -300,7 +263,7 @@ async function jtlTimeseriesWithFees(pool,{from,to}){
       LEFT JOIN Verkauf.tAuftrag o ON o.kAuftrag = ar.kAuftrag
       WHERE ${dExpr} BETWEEN @from AND @to
         AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung)
-        AND ${onlyWhere}
+        AND ${onlyArticleWhere}
     ), inv AS (
       SELECT kRechnung, d,
              SUM(vk) AS inv_rev,
@@ -320,9 +283,7 @@ async function jtlTimeseriesWithFees(pool,{from,to}){
 }
 
 async function jtlPlatformTimeseries(pool,{from,to}){
-  const flags = await getColFlags(pool)
-  const onlyWhere = buildOnlyArticleWhere(flags)
-  const dExpr = dateExpr(flags)
+  const dExpr = dateExpr()
   const request=pool.request(); request.input('from', sql.DateTime2, new Date(from+'T00:00:00')); request.input('to', sql.DateTime2, new Date(to+'T23:59:59'))
   const q = `WITH pos AS (
       SELECT r.kRechnung, CAST(${dExpr} AS date) AS d,
@@ -333,7 +294,7 @@ async function jtlPlatformTimeseries(pool,{from,to}){
       LEFT JOIN Verkauf.tAuftragRechnung ar ON ar.kRechnung = r.kRechnung
       WHERE ${dExpr} BETWEEN @from AND @to
         AND NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung)
-        AND ${onlyWhere}
+        AND ${onlyArticleWhere}
     ), ax AS (
       SELECT p.d, p.vk, a.kPlattform, a.kShop
       FROM pos p LEFT JOIN Verkauf.tAuftrag a ON a.kAuftrag = p.kAuftrag
@@ -362,9 +323,7 @@ async function jtlPlatformTimeseries(pool,{from,to}){
 }
 
 async function jtlDateRange(pool){
-  const flags = await getColFlags(pool)
-  const onlyWhere = buildOnlyArticleWhere(flags)
-  const dExpr = dateExpr(flags)
+  const dExpr = dateExpr()
   const request=pool.request()
   const q = `SELECT 
     MIN(CAST(${dExpr} AS date)) AS minDate,
@@ -372,7 +331,7 @@ async function jtlDateRange(pool){
   FROM Rechnung.tRechnung r
   JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
   WHERE NOT EXISTS(SELECT 1 FROM Rechnung.tRechnungStorno s WHERE s.kRechnung = r.kRechnung)
-    AND ${onlyWhere}`
+    AND ${onlyArticleWhere}`
   const {recordset}=await request.query(q)
   const row = recordset?.[0]||{}
   return { ok:true, minDate: row.minDate ? String(row.minDate).slice(0,10) : null, maxDate: row.maxDate ? String(row.maxDate).slice(0,10) : null }
