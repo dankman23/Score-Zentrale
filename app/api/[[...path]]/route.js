@@ -161,7 +161,8 @@ async function handleRoute(request, { params }) {
         ownerUid: body.ownerUid || null
       }
       await db.collection('prospects').insertOne(doc)
-      return cors(NextResponse.json(doc))
+      const { _id, ...cleanDoc } = doc
+      return cors(NextResponse.json(cleanDoc))
     }
 
     // Company Analyzer (mocked, heuristic). Also logs into companies + activities
