@@ -4,8 +4,12 @@ html,body{background:var(--app-bg);color:var(--txt);}
 .navbar .nav-link{color:var(--muted);} .navbar .nav-link.active,.navbar .nav-link:hover{color:var(--txt);} 
 .brand-logo{height:42px}
 .hero-band{position:relative;border-bottom:1px solid var(--line);} 
-.hero-bg{position:relative;min-height:72px;background:url('https://customer-assets.emergentagent.com/job_score-zentrale/artifacts/05l5dni0_Header.JPG') center/cover no-repeat;}
-.hero-bg:before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.35);} 
+/* Sichtbarkeit der Schleifbänder deutlich erhöhen */
+.hero-bg{position:relative;min-height:140px;background:url('https://customer-assets.emergentagent.com/job_score-zentrale/artifacts/g4o0uovx_Header.JPG') center/cover no-repeat;filter:saturate(1.15) contrast(1.1) brightness(1.02);} 
+/* Sanfte Abdunklung für Lesbarkeit – Bild bleibt sichtbar */
+.hero-bg:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,.18));}
+/* Leichte Vignette nur an den Rändern, damit Mitte heller bleibt */
+.hero-bg:after{content:"";position:absolute;inset:0;background:radial-gradient(100% 80% at 90% 80%, rgba(0,0,0,0) 0%, rgba(0,0,0,.08) 60%, rgba(0,0,0,.18) 100%);} 
 .hero-bg .container{position:relative;z-index:2}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.35);} 
 .kpi{position:relative;overflow:hidden;} 
