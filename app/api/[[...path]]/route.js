@@ -130,7 +130,7 @@ async function handleRoute(request, { params }) {
 
     if ((route === '/' || route === '/root') && method === 'GET') { return cors(NextResponse.json({ message: 'Score Zentrale API online' })) }
 
-    if (route === '/jtl/ping' && method === 'GET') { const data = await jtlPing(); const authHeader = request.headers.get('authorization') || ''; const auth = authHeader ? (authHeader.toLowerCase().startsWith('basic ') ? 'basic' : 'other') : 'none'; return cors(NextResponse.json({ ...data, auth })) }
+    if (route === '/jtl/ping' && method === 'GET') { const data = await jtlPing(request); return cors(NextResponse.json(data)) }
     if (route === '/jtl/sales/kpi' && method === 'GET') { const pool=await getMssqlPool(); const {from,to}=buildDateParams(new URL(request.url).searchParams); const data=await jtlKpi(pool,{from,to}); return cors(NextResponse.json(data)) }
     if (route === '/jtl/sales/top-products' && method === 'GET') { const pool=await getMssqlPool(); const sp=new URL(request.url).searchParams; const {from,to}=buildDateParams(sp); const limit=parseInt(sp.get('limit')||'20',10); const list=await jtlTopProducts(pool,{from,to,limit}); return cors(NextResponse.json(list)) }
     if (route === '/jtl/sales/top-categories' && method === 'GET') { const pool=await getMssqlPool(); const sp=new URL(request.url).searchParams; const {from,to}=buildDateParams(sp); const limit=parseInt(sp.get('limit')||'20',10); const list=await jtlTopCategories(pool,{from,to,limit}); return cors(NextResponse.json(list)) }
