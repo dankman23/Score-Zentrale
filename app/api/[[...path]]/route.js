@@ -20,7 +20,7 @@ async function connectToMongo() {
   return db
 }
 
-// MSSQL singleton
+// MSSQL singleton (env-credentials)
 let sqlPool = null
 async function getMssqlPool(){
   if (sqlPool) return sqlPool
@@ -76,49 +76,26 @@ function generateKpisMock() {
 function buildDateParams(searchParams){ const from = searchParams.get('from') || new Date(Date.now()-29*24*3600*1000).toISOString().slice(0,10); const to = searchParams.get('to') || new Date().toISOString().slice(0,10); return { from, to } }
 
 async function jtlPing(req){
-  // If Basic Auth provided, use those credentials for a one-off connection (no pooling)
-  const authHeader = req?.headers?.get ? req.headers.get('authorization') : undefined
-  const h1 = req?.headers?.get ? req.headers.get('authorization') : undefined
-  const h2 = req?.headers?.get ? req.headers.get('Authorization') : undefined
-  const authHeader = h1 || h2
+  // Basic Auth once; no redeclare
+  const authHeader = req?.headers?.get ? (req.headers.get('authorization') || req.headers.get('Authorization')) : undefined
   if (authHeader && authHeader.toLowerCase().startsWith('basic ')) {
     try {
       const b64 = authHeader.split(' ')[1]
       const decoded = Buffer.from(b64, 'base64').toString('utf8')
       const [user, password] = decoded.split(':')
-      const cfg = {
-        user,
-        password,
-        server: process.env.JTL_SQL_HOST,
-        port: parseInt(process.env.JTL_SQL_PORT || '1433', 10),
-        database: process.env.JTL_SQL_DB,
-        pool: { max: 1, min: 0, idleTimeoutMillis: 5000 },
-        options: { encrypt: false, trustServerCertificate: true }
-      }
+      const cfg = { user, password, server: process.env.JTL_SQL_HOST, port: parseInt(process.env.JTL_SQL_PORT||'1433',10), database: process.env.JTL_SQL_DB, pool:{max:1,min:0,idleTimeoutMillis:5000}, options:{ encrypt:false, trustServerCertificate:true } }
       const pool = await new sql.ConnectionPool(cfg).connect()
       const r = await pool.request().query('SELECT DB_NAME() as db, @@VERSION as version')
       await pool.close()
-      return { ok: true, db: r.recordset?.[0]?.db, version: r.recordset?.[0]?.version, auth: 'basic' }
+      return { ok:true, db:r.recordset?.[0]?.db, version:r.recordset?.[0]?.version, auth:'basic' }
     } catch (e) {
-      return { ok: false, error: String(e?.message||e), auth: 'basic' }
+      return { ok:false, error:String(e?.message||e), auth:'basic' }
     }
   }
-  // Fallback to query params ?u=&p=
-  try {
-    const u = (()=>{ try { const sp=new URL(req.url).searchParams; return sp.get('u') } catch(_) { return null } })()
-    const p = (()=>{ try { const sp=new URL(req.url).searchParams; return sp.get('p') } catch(_) { return null } })()
-    if (u && p) {
-      const cfg = { user:u, password:p, server: process.env.JTL_SQL_HOST, port: parseInt(process.env.JTL_SQL_PORT || '1433',10), database: process.env.JTL_SQL_DB, pool:{max:1,min:0,idleTimeoutMillis:5000}, options:{ encrypt:false, trustServerCertificate:true } }
-      const pool = await new sql.ConnectionPool(cfg).connect()
-      const r = await pool.request().query('SELECT DB_NAME() as db, @@VERSION as version')
-      await pool.close()
-      return { ok:true, db:r.recordset?.[0]?.db, version:r.recordset?.[0]?.version, auth:'query' }
-    }
-  } catch(_) {}
-  // Fallback to default pool with env credentials
-  const pool = await getMssqlPool();
-  const r = await pool.request().query('SELECT DB_NAME() as db, @@VERSION as version');
-  return { ok:true, db:r.recordset?.[0]?.db, version:r.recordset?.[0]?.version, auth: 'env' }
+  // Fallback to ?u=&p=
+  try { const sp=new URL(req.url).searchParams; const u=sp.get('u'); const p=sp.get('p'); if (u && p) { const pool=await new sql.ConnectionPool({ user:u, password:p, server:process.env.JTL_SQL_HOST, port: parseInt(process.env.JTL_SQL_PORT||'1433',10), database:process.env.JTL_SQL_DB, pool:{max:1,min:0,idleTimeoutMillis:5000}, options:{ encrypt:false, trustServerCertificate:true } }).connect(); const r=await pool.request().query('SELECT DB_NAME() as db, @@VERSION as version'); await pool.close(); return { ok:true, db:r.recordset?.[0]?.db, version:r.recordset?.[0]?.version, auth:'query' } } } catch(_) {}
+  // Env pool
+  const pool = await getMssqlPool(); const r = await pool.request().query('SELECT DB_NAME() as db, @@VERSION as version'); return { ok:true, db:r.recordset?.[0]?.db, version:r.recordset?.[0]?.version, auth:'env' }
 }
 
 async function jtlKpi(pool, {from,to}){
