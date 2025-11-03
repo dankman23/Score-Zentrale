@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { toArray, sortByDateAsc } from './lib/normalize'
+import { getJson } from './lib/api'
 
 function KpiTile({ title, value, sub }) {
   return (
@@ -52,13 +54,16 @@ export default function App() {
     setLoading(true); setError('')
     try {
       const [k1, k2, t1, t2, p] = await Promise.all([
-        fetch(`/api/jtl/sales/kpi?from=${from}&to=${to}`).then(r=>r.json()),
-        fetch(`/api/jtl/sales/kpi/with_platform_fees?from=${from}&to=${to}`).then(r=>r.json()),
-        fetch(`/api/jtl/sales/timeseries?from=${from}&to=${to}`).then(r=>r.json()),
-        fetch(`/api/jtl/sales/timeseries/with_platform_fees?from=${from}&to=${to}`).then(r=>r.json()),
-        fetch(`/api/jtl/sales/platform-timeseries?from=${from}&to=${to}`).then(r=>r.json()),
+        getJson(`/api/jtl/sales/kpi?from=${from}&to=${to}`),
+        getJson(`/api/jtl/sales/kpi/with_platform_fees?from=${from}&to=${to}`),
+        getJson(`/api/jtl/sales/timeseries?from=${from}&to=${to}`),
+        getJson(`/api/jtl/sales/timeseries/with_platform_fees?from=${from}&to=${to}`),
+        getJson(`/api/jtl/sales/platform-timeseries?from=${from}&to=${to}`),
       ])
-      setKpi(k1); setKpiFees(k2); setTs(t1||[]); setTsFees(t2||[]); setPlatTs(p||[])
+      const tsN = sortByDateAsc(toArray(t1))
+      const tsFeesN = sortByDateAsc(toArray(t2))
+      const platN = sortByDateAsc(toArray(p))
+      setKpi(k1); setKpiFees(k2); setTs(tsN); setTsFees(tsFeesN); setPlatTs(platN)
     } catch (e) { setError(String(e)); }
     setLoading(false)
   }
@@ -66,11 +71,11 @@ export default function App() {
   const fetchSalesTables = async () => {
     try {
       const [prods, cats] = await Promise.all([
-        fetch(`/api/jtl/sales/top-products?limit=${limit}&from=${from}&to=${to}`).then(r=>r.json()),
-        fetch(`/api/jtl/sales/top-categories?limit=${limit}&from=${from}&to=${to}`).then(r=>r.json())
+        getJson(`/api/jtl/sales/top-products?limit=${limit}&from=${from}&to=${to}`),
+        getJson(`/api/jtl/sales/top-categories?limit=${limit}&from=${from}&to=${to}`)
       ])
-      setTopProducts(Array.isArray(prods)?prods:[])
-      setTopCategories(Array.isArray(cats)?cats:[])
+      setTopProducts(Array.isArray(prods)?prods:toArray(prods))
+      setTopCategories(Array.isArray(cats)?cats:toArray(cats))
     } catch(e){ console.error(e) }
   }
 
@@ -88,26 +93,36 @@ export default function App() {
   const renderCharts = () => {
     if (!window.Chart) return
     // Umsatz vs Marge (with fees)
-    const labels = (ts||[]).map(x=>x.date)
-    const revenue = (ts||[]).map(x=>x.revenue)
-    const marginF = (tsFees||[]).map(x=>x.margin_with_fees)
+    const labels = (ts||[]).map(x=>x?.date).filter(Boolean)
+    const revenue = (ts||[]).map(x=>x?.revenue ?? x?.umsatz ?? 0)
+    const marginF = (tsFees||[]).map(x=>x?.margin_with_fees ?? x?.marge_with_fees ?? 0)
+
     const ctx1 = revChartRef.current?.getContext('2d')
     if (ctx1) {
       if (revChart.current) revChart.current.destroy()
-      revChart.current = new window.Chart(ctx1, {
-        type: 'line', data: { labels, datasets:[
-          { label:'Umsatz', data: revenue, borderColor:'#2dd4bf', backgroundColor:'rgba(45,212,191,0.2)', tension:.3, yAxisID:'y' },
-          { label:'Marge (mit Gebühren)', data: marginF, borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.2)', tension:.3, yAxisID:'y1' }
-        ]}, options:{ plugins:{ legend:{ labels:{ color:'var(--txt)' } } }, scales:{ y:{ ticks:{ color:'var(--muted)'} }, y1:{ position:'right', ticks:{ color:'var(--muted)'} }, x:{ ticks:{ color:'var(--muted)'} } } }
-      })
+      if (labels.length===0 && marginF.length===0) {
+        // draw placeholder background
+        ctx1.fillStyle = '#1d232b'; ctx1.fillRect(0,0,ctx1.canvas.width, ctx1.canvas.height)
+      } else {
+        revChart.current = new window.Chart(ctx1, {
+          type: 'line',
+          data: { labels, datasets:[
+            { label:'Umsatz', data: revenue, borderColor:'#2dd4bf', backgroundColor:'rgba(45,212,191,0.2)', tension:.3, yAxisID:'y' },
+            { label:'Marge (mit Gebühren)', data: marginF, borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.2)', tension:.3, yAxisID:'y1' }
+          ]},
+          options:{ responsive:true, interaction:{ mode:'index', intersect:false }, plugins:{ legend:{ labels:{ color:'var(--txt)' } } }, scales:{ y:{ ticks:{ color:'var(--muted)'}, beginAtZero:true }, y1:{ position:'right', ticks:{ color:'var(--muted)'}, beginAtZero:true }, x:{ ticks:{ color:'var(--muted)'} } } }
+        })
+      }
     }
+
     // Plattform Kurven
     const seriesByKey = {}
     for(const r of (platTs||[])){
-      if(!seriesByKey[r.pKey]) seriesByKey[r.pKey] = { label:r.pName, data:{} }
-      seriesByKey[r.pKey].data[r.date] = (seriesByKey[r.pKey].data[r.date]||0) + (r.revenue||0)
+      const key = r?.pKey || r?.pName || 'Serie'
+      if(!seriesByKey[key]) seriesByKey[key] = { label:r?.pName||String(key), data:{} }
+      if (r?.date) seriesByKey[key].data[r.date] = (seriesByKey[key].data[r.date]||0) + (r?.revenue||r?.umsatz||0)
     }
-    const allDates = Array.from(new Set((platTs||[]).map(r=>r.date))).sort()
+    const allDates = Array.from(new Set((platTs||[]).map(r=>r?.date).filter(Boolean))).sort()
     const datasets = Object.values(seriesByKey).map((s,i)=>{
       const colorArr = ['#38bdf8','#34d399','#f6b10a','#f97316','#a78bfa','#fb7185']
       const c = colorArr[i % colorArr.length]
@@ -116,7 +131,11 @@ export default function App() {
     const ctx2 = platChartRef.current?.getContext('2d')
     if (ctx2) {
       if (platChart.current) platChart.current.destroy()
-      platChart.current = new window.Chart(ctx2, { type:'line', data:{ labels:allDates, datasets }, options:{ plugins:{ legend:{ labels:{ color:'var(--txt)'}} }, scales:{ x:{ stacked }, y:{ stacked, ticks:{ color:'var(--muted)'} } } } })
+      if (allDates.length===0 || datasets.length===0) {
+        ctx2.fillStyle = '#1d232b'; ctx2.fillRect(0,0,ctx2.canvas.width, ctx2.canvas.height)
+      } else {
+        platChart.current = new window.Chart(ctx2, { type:'line', data:{ labels:allDates, datasets }, options:{ responsive:true, interaction:{ mode:'index', intersect:false }, plugins:{ legend:{ labels:{ color:'var(--txt)'}} }, scales:{ x:{ stacked }, y:{ stacked, ticks:{ color:'var(--muted)'}, beginAtZero:true } } } })
+      }
     }
   }
 
@@ -136,7 +155,8 @@ export default function App() {
   }
 
   const exportCSV = (rows, filename) => {
-    const csv = rows.map(r=>Object.values(r).map(x=>`"${(x??'').toString().replace(/"/g,'""')}"`).join(',')).join('\n')
+    const arr = Array.isArray(rows) ? rows : toArray(rows)
+    const csv = arr.map(r=>Object.values(r).map(x=>`"${(x??'').toString().replace(/"/g,'""')}"`).join(',')).join('\n')
     const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url)
   }
 
@@ -176,7 +196,13 @@ export default function App() {
             <div className="col-md-8 mb-3">
               <div className="card">
                 <div className="card-header bg-transparent border-0">Umsatz & Marge (mit Gebühren)</div>
-                <div className="card-body"><canvas ref={revChartRef} height="120" /></div>
+                <div className="card-body">
+                  {ts.length===0 && tsFees.length===0 ? (
+                    <div className="text-muted small">Keine Zeitreihen-Daten im Zeitraum</div>
+                  ) : (
+                    <canvas ref={revChartRef} height="120" />
+                  )}
+                </div>
               </div>
             </div>
             <div className="col-md-4 mb-3">
@@ -188,7 +214,13 @@ export default function App() {
                     <label className="custom-control-label" htmlFor="stackedSwitch">Stack</label>
                   </div>
                 </div>
-                <div className="card-body"><canvas ref={platChartRef} height="120" /></div>
+                <div className="card-body">
+                  {platTs.length===0 ? (
+                    <div className="text-muted small">Keine Plattform-Daten im Zeitraum</div>
+                  ) : (
+                    <canvas ref={platChartRef} height="120" />
+                  )}
+                </div>
               </div>
             </div>
           </div>
