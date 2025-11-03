@@ -49,9 +49,9 @@ export default function RootLayout({ children }) {
           </div>
         </nav>
 
-        {/* Hero + Subnav Icons – auf allen Breakpoints sichtbar */}
+        {/* Hero + Subnav Icons – mit Inline-Fallback für das Hintergrundbild */}
         <div className="hero-band">
-          <div className="hero-bg d-flex align-items-end">
+          <div className="hero-bg d-flex align-items-end" style={{backgroundImage:"url('https://customer-assets.emergentagent.com/job_score-zentrale/artifacts/g4o0uovx_Header.JPG')", backgroundSize:'cover', backgroundPosition:'center'}}>
             <div className="container py-2">
               <div className="d-flex align-items-center justify-content-between mb-1">
                 <div className="small text-muted">SCORE Schleifwerkzeuge • Zentrale KPIs und Outbound-Tools</div>
