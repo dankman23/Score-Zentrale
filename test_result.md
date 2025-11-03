@@ -101,3 +101,125 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Build Score Zentrale MVP mit Dashboard-Skelett (mocked KPIs) und minimaler Outbound Suite; Bootstrap 4.6, MongoDB; keine externen Keys jetzt"
+backend:
+  - task: "Catch-all API + Health"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implementiert GET /api/, /api/root Health-Check über catch-all"
+  - task: "GET /api/kpis (Mock KPI Zeitreihen + Kampagnen)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Mock-Daten mit deterministischem Seed; Umsatz/Bestellungen/Marge + Ads + GA4"
+  - task: "Prospects: GET/POST /api/prospects (Mongo, UUID, ohne _id)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Einfügen + Dedupe über Domain-RegEx, Score-Heuristik, Liste"
+  - task: "Company Analyzer (mock) POST /api/analyze"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Heuristische Mapping auf Metall/Holz; schreibt companies + activities"
+  - task: "Mail Composer (mock) POST /api/mailer/compose"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Generiert Subject/Text/HTML; noch kein Versand"
+  - task: "Emails Draft speichern POST /api/emails"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Speichert Draft in emails-Collection"
+  - task: "Status Endpoints GET/POST /api/status"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Template-Health; speichert status_checks"
+frontend:
+  - task: "Dashboard mit KPI Tiles + 2 Charts (Chart.js CDN)"
+    implemented: true
+    working: true
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Bootstrap 4.6 Dark Theme; lädt /api/kpis"
+  - task: "Outbound: Prospect Form + Table + Analyze Button + Mail Composer"
+    implemented: true
+    working: true
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Form POST /api/prospects; Analyze POST /api/analyze; Mailer POST /api/mailer/compose"
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Test GET /api/kpis returns expected JSON structure"
+    - "Test POST+GET /api/prospects (create + list, UUID, no _id)"
+    - "Test POST /api/analyze returns productGroups and logs companies/activities"
+    - "Test POST /api/mailer/compose returns subject/text/html"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Bitte Backend-Routen gemäß test_plan prüfen. Mongo steht über MONGO_URL bereit; Collections werden on-the-fly angelegt. Keine externen Keys erforderlich."
