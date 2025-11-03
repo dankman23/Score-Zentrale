@@ -1,0 +1,28 @@
+:root{--app-bg:#111418;--surf:#171b21;--card:#1d232b;--line:#2b3340;--txt:#e7ecf2;--muted:#a3afc1;--accent:#F6B10A;--ok:#2fb97f;--warn:#f0b429;--bad:#e44c4c;}
+html,body{background:var(--app-bg);color:var(--txt);} 
+.navbar{background:rgba(17,20,24,.9);border-bottom:1px solid var(--line);} 
+.navbar .nav-link{color:var(--muted);} .navbar .nav-link.active,.navbar .nav-link:hover{color:var(--txt);} 
+.brand-logo{height:42px}
+.hero-band{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,0));border-bottom:1px solid var(--line);} 
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.35);} 
+.kpi{position:relative;overflow:hidden;} 
+.kpi:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(246,177,10,.12),transparent 60%);} 
+.kpi .value{font-weight:700;font-size:1.6rem;} 
+.kpi .label{color:var(--muted);font-size:.9rem;} 
+.btn-primary{background:var(--accent);border-color:#e6a908;color:#111;} 
+.btn-outline-primary{border-color:var(--accent);color:var(--accent);} .btn-outline-primary:hover{background:var(--accent);color:#111;} 
+.table-dark{--bs-table-bg:var(--surf);--bs-table-striped-bg:#1a2027;--bs-table-hover-bg:#212832;color:var(--txt);} 
+.table thead th{position:sticky;top:0;background:var(--surf);z-index:2;} 
+.form-control,.form-select{background:#141a20;border-color:#2a3340;color:var(--txt);border-radius:10px;} 
+.text-muted{color:var(--muted)!important;} 
+.app-tabbar{position:fixed;bottom:0;left:0;right:0;background:#101419;border-top:1px solid var(--line);z-index:1030;} 
+.app-tabbar .nav-link{color:var(--muted);padding:.6rem .75rem;} 
+.app-tabbar .nav-link.active{color:#111;background:var(--accent);border-radius:14px;} 
+/* Icon Rail entfernt (Desktop jetzt horizontal) */
+.icon-rail{display:none}
+/* Subnav (horizontale Icon-Leiste unter dem Logo) */
+.subnav-icons{border-top:1px solid rgba(255,255,255,.04)}
+.subnav-icons .nav-link{color:var(--muted);padding:.35rem .6rem;margin-right:.25rem;border-radius:10px;display:inline-flex;align-items:center;}
+.subnav-icons .nav-link .bi{font-size:1.05rem;margin-right:.35rem}
+.subnav-icons .nav-link.active{background:var(--accent);color:#111}
+.chartjs-render-monitor{filter:contrast(1.02);} 
