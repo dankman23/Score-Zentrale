@@ -499,7 +499,9 @@ async function handleRoute(request, { params }) {
           : (grossCol ? `CAST(op.[${grossCol}] AS float)` : `(${netExpr}) * (1 + (CAST(${taxCol?`op.[${taxCol}]`:'0'} AS float)/100.0))`)
         const isShipping = await getShippingPredicate(pool, table, 'op')
         const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
-        const channelSql = buildChannelSql(channel, platformIds, shopIds)
+        const hasPlat = await hasColumn(pool, 'Verkauf.tAuftrag', 'kPlattform')
+        const hasShop = await hasColumn(pool, 'Verkauf.tAuftrag', 'kShop')
+        const channelSql = buildChannelSql(channel, platformIds, shopIds, hasPlat, hasShop)
         const bucket = grain === 'day' ? "CAST(o.dErstellt AS date)"
                      : grain === 'month' ? "DATEFROMPARTS(YEAR(o.dErstellt), MONTH(o.dErstellt), 1)"
                      : "DATEFROMPARTS(YEAR(o.dErstellt), 1, 1)"
