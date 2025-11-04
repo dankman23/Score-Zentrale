@@ -398,9 +398,10 @@ async function handleRoute(request, { params }) {
         const grossCol = await pickFirstExisting(pool, table, ['fVKBrutto','fBrutto','fPreisBrutto'])
         const qtyCol = await pickFirstExisting(pool, table, ['fMenge','nMenge','fAnzahl'])
         const taxCol = await pickFirstExisting(pool, table, ['fMwSt','fMwst','fMwStProzent'])
-        // Build expressions
+        const extendedAny = !!(extNetCol || extGrossCol)
+        // Build expressions (extended -> qty=1)
+        const qtyExpr = extendedAny ? 'CAST(1 AS float)' : (qtyCol ? `CAST(op.[${qtyCol}] AS float)` : 'CAST(1 AS float)')
         const netExpr = extNetCol ? `CAST(op.[${extNetCol}] AS float)` : (netCol ? `CAST(op.[${netCol}] AS float)` : 'CAST(0 AS float)')
-        const qtyExpr = extNetCol ? 'CAST(1 AS float)' : (qtyCol ? `CAST(op.[${qtyCol}] AS float)` : 'CAST(0 AS float)')
         const grossExpr = extGrossCol
           ? `CAST(op.[${extGrossCol}] AS float)`
           : (grossCol ? `CAST(op.[${grossCol}] AS float)` : `(${netExpr}) * (1 + (CAST(${taxCol?`op.[${taxCol}]`:'0'} AS float)/100.0))`)
