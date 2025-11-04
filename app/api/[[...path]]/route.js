@@ -671,9 +671,17 @@ async function handleRoute(request, { params }) {
           ? `CAST(op.[${extGrossCol}] AS float)`
           : (grossCol ? `CAST(op.[${grossCol}] AS float)` : `(${netExpr}) * (1 + (CAST(${taxCol?`op.[${taxCol}]`:'0'} AS float)/100.0))`)
         const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
+        const hasPlat = await hasColumn(pool, 'Verkauf.tAuftrag', 'kPlattform')
+        const hasShop = await hasColumn(pool, 'Verkauf.tAuftrag', 'kShop')
+        const headCols = `o.kAuftrag, ISNULL(o.cAuftragsNr,'') AS cAuftragsNr${hasPlat?`, o.kPlattform`:''}${hasShop?`, o.kShop`:''}`
+        const platJoin = hasPlat ? 'LEFT JOIN dbo.tPlattform p ON p.kPlattform = h.kPlattform' : ''
+        const shopJoin = hasShop ? 'LEFT JOIN dbo.tShop s ON s.kShop = h.kShop' : ''
+        const pName = hasPlat || hasShop
+          ? `COALESCE(${hasPlat?'p.cName':"NULL"}, ${hasShop?'s.cName':"NULL"}, ${hasPlat?"CASE WHEN ISNULL(h.kPlattform,0)>0 THEN CONCAT('Plattform ', h.kPlattform) ELSE NULL END":"NULL"}, ${hasShop?"CASE WHEN ISNULL(h.kShop,0)>0 THEN CONCAT('Shop ', h.kShop) ELSE NULL END":"NULL"}, 'Direktvertrieb')`
+          : `'Direktvertrieb'`
         const q = `DECLARE @d date = @pdate;
           ;WITH heads AS (
-            SELECT o.kAuftrag, ISNULL(o.cAuftragsNr,'') AS cAuftragsNr, o.kPlattform, o.kShop
+            SELECT ${headCols}
             FROM Verkauf.tAuftrag o
             WHERE CONVERT(date, o.dErstellt) = @d ${cancelCheck}
           )
@@ -681,13 +689,12 @@ async function handleRoute(request, { params }) {
                  CAST(SUM((${netExpr}) * (${qtyExpr})) AS float) AS net_sum,
                  CAST(SUM((${grossExpr}) * (${qtyExpr})) AS float) AS gross_sum,
                  COUNT(*) AS positions,
-                 ISNULL(p.cName, CASE WHEN ISNULL(h.kPlattform,0)>0 THEN CONCAT('Plattform ', h.kPlattform)
-                                      WHEN ISNULL(h.kShop,0)>0 THEN CONCAT('Shop ', h.kShop)
-                                      ELSE 'Direkt' END) AS platform
+                 ${pName} AS platform
           FROM heads h
           JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = h.kAuftrag
-          LEFT JOIN dbo.tPlattform p ON p.kPlattform = h.kPlattform
-          GROUP BY h.kAuftrag, h.cAuftragsNr, p.cName, h.kPlattform, h.kShop
+          ${platJoin}
+          ${shopJoin}
+          GROUP BY h.kAuftrag, h.cAuftragsNr${hasPlat?', h.kPlattform':''}${hasShop?', h.kShop':''}${hasPlat?' ,p.cName':''}${hasShop?' ,s.cName':''}
           ORDER BY auftragsNr`
         const res = await pool.request().input('pdate', sql.Date, date).query(q)
         const rows = res?.recordset || []
