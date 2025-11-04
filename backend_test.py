@@ -154,7 +154,7 @@ def main():
     
     # Summary
     print("\n" + "=" * 80)
-    print("📊 RE-TEST RESULTS SUMMARY")
+    print("📊 SHIPPING-SPLIT + REGRESSION TEST RESULTS")
     print("=" * 80)
     
     for i, result in enumerate(results, 1):
@@ -174,8 +174,23 @@ def main():
                 print(f"   Response ok: {json_data['ok']}")
             if 'error' in json_data:
                 print(f"   Error: {json_data['error']}")
-            if 'minDate' in json_data or 'maxDate' in json_data:
-                print(f"   Date range: {json_data.get('minDate')} to {json_data.get('maxDate')}")
+            
+            # Shipping-split specific fields
+            if 'period' in json_data:
+                period = json_data['period']
+                print(f"   Period: {period.get('from')} to {period.get('to')}")
+            if 'orders' in json_data:
+                print(f"   Orders: {json_data.get('orders')}")
+            if 'net' in json_data:
+                net = json_data['net']
+                print(f"   Net with shipping: {net.get('with_shipping')}")
+                print(f"   Net without shipping: {net.get('without_shipping')}")
+            if 'gross' in json_data:
+                gross = json_data['gross']
+                print(f"   Gross with shipping: {gross.get('with_shipping')}")
+                print(f"   Gross without shipping: {gross.get('without_shipping')}")
+            
+            # Sales KPI fields
             if 'revenue' in json_data:
                 print(f"   Revenue: {json_data.get('revenue')}")
                 print(f"   Orders: {json_data.get('orders')}")
@@ -186,61 +201,85 @@ def main():
     
     # Analysis
     print("\n" + "=" * 80)
-    print("🔍 ANALYSIS OF FILTER FIX IMPACT")
+    print("🔍 ANALYSIS OF NEW ENDPOINT + REGRESSION")
     print("=" * 80)
     
-    # Check date-range improvement
-    date_range_result = results[1]  # Second test
-    if date_range_result['status_code'] == 200:
-        data = date_range_result.get('json_data', {})
-        if data.get('ok') == True:
-            print("✅ SUCCESS: date-range now returns 200 ok:true (filter fix worked!)")
-            print(f"   minDate: {data.get('minDate', 'null')}")
-            print(f"   maxDate: {data.get('maxDate', 'null')}")
-        elif data.get('ok') == False:
-            print("⚠️  PARTIAL: date-range returns 200 ok:false (better than 500)")
+    # Check shipping-split endpoint (Test 1 & 2)
+    shipping_split_month = results[0]
+    shipping_split_range = results[1]
+    
+    def validate_shipping_split_response(result, test_name):
+        if result['status_code'] == 200:
+            data = result.get('json_data', {})
+            if data.get('ok') == True:
+                # Check required fields
+                required_fields = ['period', 'orders', 'net', 'gross']
+                missing_fields = [f for f in required_fields if f not in data]
+                if not missing_fields:
+                    period = data.get('period', {})
+                    net = data.get('net', {})
+                    gross = data.get('gross', {})
+                    if ('from' in period and 'to' in period and 
+                        'with_shipping' in net and 'without_shipping' in net and
+                        'with_shipping' in gross and 'without_shipping' in gross):
+                        print(f"✅ {test_name}: All required fields present and valid")
+                        return True
+                    else:
+                        print(f"❌ {test_name}: Missing sub-fields in period/net/gross")
+                        return False
+                else:
+                    print(f"❌ {test_name}: Missing required fields: {missing_fields}")
+                    return False
+            else:
+                print(f"❌ {test_name}: Returns ok:false")
+                return False
         else:
-            print("⚠️  PARTIAL: date-range returns 200 but no ok field")
-    elif date_range_result['status_code'] == 500:
-        print("❌ NO IMPROVEMENT: date-range still returns 500")
+            print(f"❌ {test_name}: Returns {result['status_code']} instead of 200")
+            return False
+    
+    shipping_month_valid = validate_shipping_split_response(shipping_split_month, "Shipping-split (month)")
+    shipping_range_valid = validate_shipping_split_response(shipping_split_range, "Shipping-split (from/to)")
+    
+    # Check regression tests (Test 3 & 4)
+    sales_kpi_result = results[2]
+    platform_timeseries_result = results[3]
+    
+    print(f"\n📝 REGRESSION - Sales KPI: {sales_kpi_result.get('status_code', 'ERROR')}")
+    if sales_kpi_result.get('json_data', {}).get('ok') == True:
+        print("✅ Sales KPI regression test PASSED")
+        sales_kpi_valid = True
     else:
-        print(f"❓ UNEXPECTED: date-range returns {date_range_result['status_code']}")
+        print("❌ Sales KPI regression test FAILED")
+        sales_kpi_valid = False
     
-    # Record KPI response
-    kpi_result = results[2]
-    kpi_status = kpi_result.get('status_code', 'ERROR')
-    print(f"\n📝 KPI endpoint response: {kpi_status}")
-    if kpi_result.get('json_data'):
-        data = kpi_result['json_data']
-        print(f"   ok: {data.get('ok')}")
-        if data.get('error'):
-            print(f"   error: {data['error']}")
-    elif kpi_result.get('error'):
-        print(f"   exception: {kpi_result['error']}")
-    
-    # Record platform-timeseries response  
-    platform_result = results[3]
-    platform_status = platform_result.get('status_code', 'ERROR')
-    print(f"\n📝 Platform-timeseries endpoint response: {platform_status}")
-    if platform_result.get('json_data'):
-        data = platform_result['json_data']
+    print(f"\n📝 REGRESSION - Platform Timeseries: {platform_timeseries_result.get('status_code', 'ERROR')}")
+    if platform_timeseries_result.get('status_code') == 200:
+        data = platform_timeseries_result.get('json_data')
         if isinstance(data, list):
-            print(f"   Returns array with {len(data)} items")
+            print(f"✅ Platform Timeseries regression test PASSED (returns array with {len(data)} items)")
+            platform_timeseries_valid = True
         else:
-            print(f"   ok: {data.get('ok')}")
-            if data.get('error'):
-                print(f"   error: {data['error']}")
-    elif platform_result.get('error'):
-        print(f"   exception: {platform_result['error']}")
+            print("❌ Platform Timeseries regression test FAILED (not returning array)")
+            platform_timeseries_valid = False
+    else:
+        print("❌ Platform Timeseries regression test FAILED")
+        platform_timeseries_valid = False
     
     # Overall assessment
-    critical_failures = [r for r in results if not r['success'] and not r['result'].startswith('📝')]
-    if not critical_failures:
-        print(f"\n🎯 OVERALL: All endpoints responding properly (no critical failures)")
-    else:
-        print(f"\n⚠️  OVERALL: {len(critical_failures)} endpoints have critical issues")
+    all_tests_passed = (shipping_month_valid and shipping_range_valid and 
+                       sales_kpi_valid and platform_timeseries_valid)
     
-    return results, len(critical_failures) == 0
+    if all_tests_passed:
+        print(f"\n🎯 OVERALL: All tests PASSED - New endpoint working + No regressions")
+    else:
+        failed_tests = []
+        if not shipping_month_valid: failed_tests.append("Shipping-split (month)")
+        if not shipping_range_valid: failed_tests.append("Shipping-split (from/to)")
+        if not sales_kpi_valid: failed_tests.append("Sales KPI regression")
+        if not platform_timeseries_valid: failed_tests.append("Platform Timeseries regression")
+        print(f"\n⚠️  OVERALL: {len(failed_tests)} test(s) FAILED: {', '.join(failed_tests)}")
+    
+    return results, all_tests_passed
 
 if __name__ == "__main__":
     results, success = main()
