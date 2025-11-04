@@ -424,6 +424,56 @@ async function handleRoute(request, { params }) {
                           WHEN ${grossCol?`1=1`:'0=1'} THEN CAST(op.[${grossCol||'__x'}] AS float) * (${qtyExpr})
                           ELSE 0 END) AS float) AS gross_with_shipping,
             CAST(SUM(CASE WHEN NOT (${isShipping}) THEN 
+
+    // ========== JTL ORDERS DIAG: DAY BREAKDOWN ==========
+    if (route === '/jtl/orders/diag/day' && method === 'GET'){
+      const sp = new URL(request.url).searchParams
+      const date = sp.get('date')
+      if (!date) return json({ ok:false, error:'Missing ?date=YYYY-MM-DD' }, { status: 400 })
+      try {
+        const pool = await getMssqlPool()
+        const table = 'Verkauf.tAuftragPosition'
+        const extNetCol = await pickFirstExisting(pool, table, ['fGesamtNetto','fVKNettoGesamt','fWertNetto','fWert'])
+        const extGrossCol = await pickFirstExisting(pool, table, ['fGesamtBrutto','fVKBruttoGesamt','fWertBrutto'])
+        const netCol = await pickFirstExisting(pool, table, ['fVKNetto','fNetto','fPreisNetto'])
+        const grossCol = await pickFirstExisting(pool, table, ['fVKBrutto','fBrutto','fPreisBrutto'])
+        const qtyCol = await pickFirstExisting(pool, table, ['fMenge','nMenge','fAnzahl'])
+        const taxCol = await pickFirstExisting(pool, table, ['fMwSt','fMwst','fMwStProzent'])
+        const extendedAny = !!(extNetCol || extGrossCol)
+        const qtyExpr = extendedAny ? 'CAST(1 AS float)' : (qtyCol ? `CAST(op.[${qtyCol}] AS float)` : 'CAST(1 AS float)')
+        const netExpr = extNetCol ? `CAST(op.[${extNetCol}] AS float)` : (netCol ? `CAST(op.[${netCol}] AS float)` : 'CAST(0 AS float)')
+        const grossExpr = extGrossCol
+          ? `CAST(op.[${extGrossCol}] AS float)`
+          : (grossCol ? `CAST(op.[${grossCol}] AS float)` : `(${netExpr}) * (1 + (CAST(${taxCol?`op.[${taxCol}]`:'0'} AS float)/100.0))`)
+        const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
+        const q = `DECLARE @d date = @pdate;
+          ;WITH heads AS (
+            SELECT o.kAuftrag, ISNULL(o.cAuftragsNr,'') AS cAuftragsNr, o.kPlattform, o.kShop
+            FROM Verkauf.tAuftrag o
+            WHERE CONVERT(date, o.dErstellt) = @d ${cancelCheck}
+          )
+          SELECT h.kAuftrag, h.cAuftragsNr AS auftragsNr,
+                 CAST(SUM((${netExpr}) * (${qtyExpr})) AS float) AS net_sum,
+                 CAST(SUM((${grossExpr}) * (${qtyExpr})) AS float) AS gross_sum,
+                 COUNT(*) AS positions,
+                 ISNULL(p.cName, CASE WHEN ISNULL(h.kPlattform,0)>0 THEN CONCAT('Plattform ', h.kPlattform)
+                                      WHEN ISNULL(h.kShop,0)>0 THEN CONCAT('Shop ', h.kShop)
+                                      ELSE 'Direkt' END) AS platform
+          FROM heads h
+          JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = h.kAuftrag
+          LEFT JOIN dbo.tPlattform p ON p.kPlattform = h.kPlattform
+          GROUP BY h.kAuftrag, h.cAuftragsNr, p.cName, h.kPlattform, h.kShop
+          ORDER BY auftragsNr`
+        const res = await pool.request().input('pdate', sql.Date, date).query(q)
+        const rows = res?.recordset || []
+        const totals = rows.reduce((a,r)=>({ orders:a.orders+1, net:a.net+(r.net_sum||0), gross:a.gross+(r.gross_sum||0)}), { orders:0, net:0, gross:0 })
+        return json({ ok:true, date, totals, rows })
+      } catch(err){
+        console.error('orders diag/day SQL error', err)
+        return json({ ok:false, error: String(err?.message||err) }, { status: 500 })
+      }
+    }
+
                           CASE WHEN ${extGrossCol?`1=1`:'0=1'} THEN CAST(op.[${extGrossCol||'__x'}] AS float)
                                WHEN ${extNetCol?`1=1`:'0=1'} THEN (${netExpr}) * (1 + (CAST(${taxCol?`op.[${taxCol}]`:'0'} AS float)/100.0))
                                WHEN ${grossCol?`1=1`:'0=1'} THEN CAST(op.[${grossCol||'__x'}] AS float) * (${qtyExpr})
