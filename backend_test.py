@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-JTL Endpoints Re-test After Filter Fix
-Tests specific JTL endpoints as requested in review_request
+JTL Orders Diagnostics and KPI Testing
+Tests specific JTL Orders endpoints as requested in review_request
 """
 
 import requests
