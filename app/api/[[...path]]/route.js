@@ -423,10 +423,18 @@ async function handleRoute(request, { params }) {
         const taxCol = await pickFirstExisting(pool, table, ['fMwSt','fMwst','fMwStProzent'])
         const extendedAny = !!(extNetCol || extGrossCol)
         const qtyExpr = extendedAny ? 'CAST(1 AS float)' : (qtyCol ? `CAST(op.[${qtyCol}] AS float)` : 'CAST(1 AS float)')
-        const netExpr = extNetCol ? `CAST(op.[${extNetCol}] AS float)` : (netCol ? `CAST(op.[${netCol}] AS float)` : 'CAST(0 AS float)')
-        const grossExpr = extGrossCol
+        const taxExpr = taxCol ? `CAST(op.[${taxCol}] AS float)` : 'CAST(0 AS float)'
+        // Totals pro Position (nicht Einheit): bevorzugt Positionssummen, sonst Einheit*Qty, mit robuster Ableitung
+        const netTotalExpr = extNetCol
+          ? `CAST(op.[${extNetCol}] AS float)`
+          : (netCol ? `(CAST(op.[${netCol}] AS float) * ${qtyExpr})`
+                    : (extGrossCol ? `(CAST(op.[${extGrossCol}] AS float) / NULLIF(1 + (${taxExpr}/100.0),0))`
+                                   : (grossCol ? `((CAST(op.[${grossCol}] AS float) * ${qtyExpr}) / NULLIF(1 + (${taxExpr}/100.0),0))`
+                                               : 'CAST(0 AS float)')))
+        const grossTotalExpr = extGrossCol
           ? `CAST(op.[${extGrossCol}] AS float)`
-          : (grossCol ? `CAST(op.[${grossCol}] AS float)` : `(${netExpr}) * (1 + (CAST(${taxCol?`op.[${taxCol}]`:'0'} AS float)/100.0))`)
+          : (grossCol ? `(CAST(op.[${grossCol}] AS float) * ${qtyExpr})`
+                      : `(${netTotalExpr}) * (1 + (${taxExpr}/100.0))`)
         const isShipping = await getShippingPredicate(pool, table, 'op')
         const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
         const channelSql = buildChannelSql(channel, platformIds, shopIds)
@@ -438,12 +446,12 @@ async function handleRoute(request, { params }) {
           )
           SELECT 
             (SELECT COUNT(*) FROM heads) AS orders,
-            CAST(SUM((${netExpr}) * (${qtyExpr})) AS float) AS net_with_shipping,
-            CAST(SUM(CASE WHEN NOT (${isShipping}) THEN (${netExpr}) * (${qtyExpr}) ELSE 0 END) AS float) AS net_without_shipping,
-            CAST(SUM((${grossExpr}) * (${qtyExpr})) AS float) AS gross_with_shipping,
-            CAST(SUM(CASE WHEN NOT (${isShipping}) THEN (${grossExpr}) * (${qtyExpr}) ELSE 0 END) AS float) AS gross_without_shipping
+            CAST(SUM(${netTotalExpr}) AS float) AS net_with_shipping,
+            CAST(SUM(CASE WHEN NOT (${isShipping}) THEN ${netTotalExpr} ELSE 0 END) AS float) AS net_without_shipping,
+            CAST(SUM(${grossTotalExpr}) AS float) AS gross_with_shipping,
+            CAST(SUM(CASE WHEN NOT (${isShipping}) THEN ${grossTotalExpr} ELSE 0 END) AS float) AS gross_without_shipping
           FROM heads h
-          JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = h.kAuftrag`
+          JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = h.kAuftrag`,
         const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
         const row = res?.recordset?.[0] || {}
         return json({ ok:true, period:{ from, to }, orders: row.orders||0, net_without_shipping: row.net_without_shipping||0, net_with_shipping: row.net_with_shipping||0, gross_without_shipping: row.gross_without_shipping||0, gross_with_shipping: row.gross_with_shipping||0 })
