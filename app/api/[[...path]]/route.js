@@ -609,7 +609,9 @@ async function handleRoute(request, { params }) {
       try {
         const pool = await getMssqlPool()
         const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
-        const channelSql = buildChannelSql(channel, platformIds, shopIds)
+        const hasPlat = await hasColumn(pool, 'Verkauf.tAuftrag', 'kPlattform')
+        const hasShop = await hasColumn(pool, 'Verkauf.tAuftrag', 'kShop')
+        const channelSql = buildChannelSql(channel, platformIds, shopIds, hasPlat, hasShop)
         const table = 'Verkauf.tAuftragPosition'
         const extNetCol = await pickFirstExisting(pool, table, ['fGesamtNetto','fVKNettoGesamt','fWertNetto','fWert'])
         const extGrossCol = await pickFirstExisting(pool, table, ['fGesamtBrutto','fVKBruttoGesamt','fWertBrutto'])
