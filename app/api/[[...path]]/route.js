@@ -49,8 +49,11 @@ function buildDateParams(searchParams){ const from = searchParams.get('from') ||
 
 // Helpers for MSSQL metadata and dynamic SQL building
 async function hasColumn(pool, table, column){
-  const r = await pool.request().input('tbl', sql.NVarChar, table).input('col', sql.NVarChar, column).query('SELECT CASE WHEN COL_LENGTH(@tbl, @col) IS NULL THEN 0 ELSE 1 END AS ok')
-  return (r?.recordset?.[0]?.ok ?? 0) === 1
+  const r = await pool.request()
+    .input('tbl', sql.NVarChar, table)
+    .input('col', sql.NVarChar, column)
+    .query('SELECT COUNT(*) AS ok FROM sys.columns WHERE object_id = OBJECT_ID(@tbl) AND name = @col')
+  return ((r?.recordset?.[0]?.ok ?? 0) > 0)
 }
 
 async function getOnlyArticleWhere(pool, alias='rp'){
