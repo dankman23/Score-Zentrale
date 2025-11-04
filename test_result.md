@@ -289,6 +289,9 @@ agent_communication:
       - working: true
         agent: "testing"
         comment: "✅ JTL Sales date-range working: Returns 500 with ok:false and proper error handling for missing nPosTyp column. Endpoint correctly handles database schema differences."
+      - working: true
+        agent: "testing"
+        comment: "✅ Re-tested after filter fix: Now returns 200 ok:true with minDate: 2021-04-26, maxDate: 2025-11-03. Filter fix successful - no longer returns 500 errors."
   - task: "JTL Sales: GET /api/jtl/sales/kpi"
     implemented: true
     working: true
