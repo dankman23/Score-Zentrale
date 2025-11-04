@@ -437,11 +437,11 @@ agent_communication:
     message: "✅ NEW SHIPPING-SPLIT ENDPOINT + REGRESSION TESTS COMPLETED! All 4/4 tests PASSED: 1) GET /api/jtl/orders/kpi/shipping-split?month=2025-10 (200 ok:true with all required fields), 2) GET /api/jtl/orders/kpi/shipping-split?from=2025-10-01&to=2025-10-31 (200 ok:true with all required fields), 3) REGRESSION /api/jtl/sales/kpi (200 ok:true), 4) REGRESSION /api/jtl/sales/platform-timeseries (200 array with 22 items). Fixed SQL column alias issue in shipping-split endpoint during testing. New endpoint working correctly with expected response structure: ok, period.from/to, orders, net.with_shipping/without_shipping, gross.with_shipping/without_shipping. No regressions detected."
   - task: "JTL Orders: GET /api/jtl/orders/diag/day"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "user"
@@ -449,6 +449,9 @@ agent_communication:
       - working: "NA"
         agent: "main"
         comment: "Patched diag/day to guard kPlattform/kShop via COL_LENGTH and fallback to 'Direktvertrieb'."
+      - working: true
+        agent: "testing"
+        comment: "✅ Orders Diagnostics working: Returns 200 ok:true with required fields (totals.orders=77, totals.gross=13018.87, rows array with 77 items). Fixed kPlattform column issue by simplifying platform detection logic."
   - task: "JTL Orders: KPI shipping-split accuracy (03.11)"
     implemented: true
     working: false
