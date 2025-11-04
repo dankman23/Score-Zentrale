@@ -42,13 +42,16 @@ def test_endpoint(method, endpoint, params=None, expect_200_ok=None):
         
         # Analyze result based on expectations
         if expect_200_ok is True:
-            # Expect 200 with ok:true
-            if response.status_code == 200 and json_data and json_data.get('ok') == True:
-                result = "✅ PASS (200 ok:true as expected)"
-            elif response.status_code == 200 and json_data and json_data.get('ok') == False:
-                result = "⚠️  PARTIAL (200 ok:false - better than 500)"
-            elif response.status_code == 200 and json_data:
-                result = "⚠️  PARTIAL (200 but no ok field)"
+            # Expect 200 with ok:true OR 200 with array (for timeseries endpoints)
+            if response.status_code == 200 and json_data:
+                if isinstance(json_data, list):
+                    result = "✅ PASS (200 array as expected)"
+                elif json_data.get('ok') == True:
+                    result = "✅ PASS (200 ok:true as expected)"
+                elif json_data.get('ok') == False:
+                    result = "⚠️  PARTIAL (200 ok:false - better than 500)"
+                else:
+                    result = "⚠️  PARTIAL (200 but no ok field)"
             elif response.status_code == 500:
                 result = "❌ FAIL (Still returning 500)"
             else:
