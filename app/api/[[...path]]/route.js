@@ -99,15 +99,22 @@ async function pickFirstExisting(pool, table, candidates){
 
 function json(data, init){ return cors(NextResponse.json(data, init)) }
 
-function buildChannelSql(channel, platformIds, shopIds){
+function buildChannelSql(channel, platformIds, shopIds, hasPlat, hasShop){
   const parts = []
+  const platExpr = hasPlat ? 'o.kPlattform' : null
+  const shopExpr = hasShop ? 'o.kShop' : null
   if (channel && channel !== 'all'){
-    if (channel === 'platform') parts.push('o.kPlattform IS NOT NULL')
-    else if (channel === 'shop') parts.push('o.kShop IS NOT NULL AND o.kPlattform IS NULL')
-    else if (channel === 'direct') parts.push('o.kPlattform IS NULL AND o.kShop IS NULL')
+    if (channel === 'platform' && platExpr) parts.push(`${platExpr} IS NOT NULL`)
+    else if (channel === 'shop' && shopExpr) parts.push(`${shopExpr} IS NOT NULL${platExpr?` AND ${platExpr} IS NULL`:''}`)
+    else if (channel === 'direct'){
+      const conds = []
+      if (platExpr) conds.push(`${platExpr} IS NULL`)
+      if (shopExpr) conds.push(`${shopExpr} IS NULL`)
+      if (conds.length) parts.push(conds.join(' AND '))
+    }
   }
-  if (platformIds?.length) parts.push(`o.kPlattform IN (${platformIds.map(n=>n).join(',')})`)
-  if (shopIds?.length) parts.push(`o.kShop IN (${shopIds.map(n=>n).join(',')})`)
+  if (platformIds?.length && platExpr) parts.push(`${platExpr} IN (${platformIds.map(n=>n).join(',')})`)
+  if (shopIds?.length && shopExpr) parts.push(`${shopExpr} IN (${shopIds.map(n=>n).join(',')})`)
   return parts.length ? (' AND ' + parts.join(' AND ')) : ''
 }
 
