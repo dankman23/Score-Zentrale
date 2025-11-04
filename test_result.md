@@ -470,7 +470,21 @@ agent_communication:
         agent: "testing"
         comment: "✅ Shipping-Split KPI working: Returns 200 ok:true with all required flat fields (orders=77, net_without_shipping=11306.82, net_with_shipping=11306.82, gross_without_shipping=13018.87, gross_with_shipping=13018.87). Values match diagnostics endpoint confirming accuracy."
 
+  - task: "JTL Orders: GET /api/jtl/orders/timeseries (sanity check)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ Orders Timeseries working: Returns 200 ok:true with grain='day' and rows array (3 items for 2025-11-01 to 2025-11-03). Sanity check passed."
+
 agent_communication:
   - agent: "main"
     message: "Please re-run backend tests for JTL Orders endpoints: diag/day and KPI shipping-split for 2025-11-03. Expect no schema errors and JSON with fields; record values."
+  - agent: "testing"
+    message: "✅ JTL ORDERS DIAGNOSTICS AND KPI TESTING COMPLETED! All 3/3 tests PASSED: 1) GET /api/jtl/orders/diag/day?date=2025-11-03 (200 ok:true with totals.orders=77, totals.gross=13018.87, rows array with 77 items), 2) GET /api/jtl/orders/kpi/shipping-split?from=2025-11-03&to=2025-11-03 (200 ok:true with all required flat fields: orders=77, net_without_shipping=11306.82, net_with_shipping=11306.82, gross_without_shipping=13018.87, gross_with_shipping=13018.87), 3) SANITY GET /api/jtl/orders/timeseries?from=2025-11-01&to=2025-11-03 (200 ok:true with grain='day' and 3 rows). Fixed kPlattform column issue in diagnostics endpoint by simplifying platform detection logic. All endpoints stable and returning expected data structures."
 
