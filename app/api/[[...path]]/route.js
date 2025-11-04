@@ -451,7 +451,7 @@ async function handleRoute(request, { params }) {
             CAST(SUM(${grossTotalExpr}) AS float) AS gross_with_shipping,
             CAST(SUM(CASE WHEN NOT (${isShipping}) THEN ${grossTotalExpr} ELSE 0 END) AS float) AS gross_without_shipping
           FROM heads h
-          JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = h.kAuftrag`,
+          JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = h.kAuftrag`
         const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
         const row = res?.recordset?.[0] || {}
         return json({ ok:true, period:{ from, to }, orders: row.orders||0, net_without_shipping: row.net_without_shipping||0, net_with_shipping: row.net_with_shipping||0, gross_without_shipping: row.gross_without_shipping||0, gross_with_shipping: row.gross_with_shipping||0 })
