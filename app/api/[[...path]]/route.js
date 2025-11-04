@@ -407,7 +407,7 @@ async function handleRoute(request, { params }) {
             SELECT o.kAuftrag,
                    ${netExpr} AS vk_netto,
                    ${grossExpr} AS vk_brutto,
-                   ${qtyExpr} AS qty,
+                   ${qtyExpr} AS anzahl,
                    CASE WHEN ${isShipping} THEN 1 ELSE 0 END AS is_shipping
             FROM Verkauf.tAuftrag o
             JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
@@ -415,10 +415,10 @@ async function handleRoute(request, { params }) {
           )
           SELECT 
             (SELECT COUNT(DISTINCT kAuftrag) FROM base) AS orders,
-            CAST(SUM(vk_netto*qty) AS float) AS net_with_shipping,
-            CAST(SUM(CASE WHEN is_shipping=0 THEN vk_netto*qty ELSE 0 END) AS float) AS net_without_shipping,
-            CAST(SUM(vk_brutto*qty) AS float) AS gross_with_shipping,
-            CAST(SUM(CASE WHEN is_shipping=0 THEN vk_brutto*qty ELSE 0 END) AS float) AS gross_without_shipping`
+            CAST(SUM(vk_netto*anzahl) AS float) AS net_with_shipping,
+            CAST(SUM(CASE WHEN is_shipping=0 THEN vk_netto*anzahl ELSE 0 END) AS float) AS net_without_shipping,
+            CAST(SUM(vk_brutto*anzahl) AS float) AS gross_with_shipping,
+            CAST(SUM(CASE WHEN is_shipping=0 THEN vk_brutto*anzahl ELSE 0 END) AS float) AS gross_without_shipping`
         const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
         const row = res?.recordset?.[0] || {}
         return json({ ok:true, period:{ from, to }, orders: row.orders||0, net: { with_shipping: row.net_with_shipping||0, without_shipping: row.net_without_shipping||0 }, gross: { with_shipping: row.gross_with_shipping||0, without_shipping: row.gross_without_shipping||0 } })
