@@ -445,7 +445,9 @@ async function handleRoute(request, { params }) {
                       : `(${netTotalExpr}) * (1 + (${taxExpr}/100.0))`)
         const isShipping = await getShippingPredicate(pool, table, 'op')
         const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
-        const channelSql = buildChannelSql(channel, platformIds, shopIds)
+        const hasPlat = await hasColumn(pool, 'Verkauf.tAuftrag', 'kPlattform')
+        const hasShop = await hasColumn(pool, 'Verkauf.tAuftrag', 'kShop')
+        const channelSql = buildChannelSql(channel, platformIds, shopIds, hasPlat, hasShop)
         const articleWhere = await getOnlyArticleWhere(pool, 'Verkauf.tAuftragPosition', 'op')
         const sqlText = `DECLARE @from date = @pfrom, @to date = @pto;
           ;WITH heads AS (
