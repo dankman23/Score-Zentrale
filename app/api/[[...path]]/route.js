@@ -309,7 +309,7 @@ async function handleRoute(request, { params }) {
                  CAST(SUM(CAST(${rev} AS float)) AS float) AS revenue
           FROM Rechnung.tRechnung r
           JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
-          WHERE ${onlyArticleWhere('rp')} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
+          WHERE ${await getOnlyArticleWhere(pool, 'rp')} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
           GROUP BY CONVERT(date, r.dErstellt), ${platformCase}
           ORDER BY date ASC`
         const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
