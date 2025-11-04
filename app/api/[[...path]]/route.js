@@ -113,7 +113,8 @@ async function handleRoute(request, { params }) {
       const doc = { id, createdAt, ...body, score }
       const existing = await db.collection('prospects').findOne({ website: { $regex: new RegExp((body.website||'').replace(/^https?:\/\//,''), 'i') } })
       if (!existing) await db.collection('prospects').insertOne(doc)
-      return json(doc)
+      const { _id, ...cleanDoc } = doc
+      return json(cleanDoc)
     }
 
     // Analyze (mock)
