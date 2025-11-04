@@ -56,9 +56,17 @@ def test_endpoint(method, endpoint, params=None, expect_200_ok=None):
         elif expect_200_ok is False:
             # Just record the response, may still be 500
             if response.status_code == 200:
-                result = f"📝 RECORDED (200 ok:{json_data.get('ok', 'N/A') if json_data else 'N/A'})"
+                if json_data and isinstance(json_data, list):
+                    result = f"📝 RECORDED (200 array with {len(json_data)} items)"
+                elif json_data and isinstance(json_data, dict):
+                    result = f"📝 RECORDED (200 ok:{json_data.get('ok', 'N/A')})"
+                else:
+                    result = f"📝 RECORDED (200)"
             elif response.status_code == 500:
-                result = f"📝 RECORDED (500 ok:{json_data.get('ok', 'N/A') if json_data else 'N/A'})"
+                if json_data and isinstance(json_data, dict):
+                    result = f"📝 RECORDED (500 ok:{json_data.get('ok', 'N/A')})"
+                else:
+                    result = f"📝 RECORDED (500)"
             else:
                 result = f"📝 RECORDED ({response.status_code})"
         else:
