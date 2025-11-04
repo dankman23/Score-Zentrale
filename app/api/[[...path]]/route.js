@@ -691,7 +691,7 @@ async function handleRoute(request, { params }) {
           JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = h.kAuftrag
           ${platJoin}
           ${shopJoin}
-          GROUP BY h.kAuftrag, h.cAuftragsNr${hasPlat?', h.kPlattform':''}${hasShop?', h.kShop':''}${hasPlat?' ,p.cName':''}${hasShop?' ,s.cName':''}
+          GROUP BY h.kAuftrag, h.cAuftragsNr
           ORDER BY auftragsNr`
         const res = await pool.request().input('pdate', sql.Date, date).query(q)
         const rows = res?.recordset || []
