@@ -108,6 +108,11 @@ export default function App() {
       const tsFeesN = sortByDateAsc(toArray(t2))
       const platN = sortByDateAsc(toArray(p))
       setKpi(k1); setKpiFees(k2); setTs(tsN); setTsFees(tsFeesN); setPlatTs(platN)
+      if (isDegradedFlag) {
+        const ksum = Number(k1?.revenue||0) + Number(k1?.orders||0) + Number(k1?.margin||0)
+        const hasData = (tsN?.length||0) + (tsFeesN?.length||0) + (platN?.length||0) > 0 || ksum > 0
+        if (!hasData) setDemoSnapshot()
+      }
     } catch (e) {
       setError(String(e))
       if (isDegradedFlag) { setDemoSnapshot() }
