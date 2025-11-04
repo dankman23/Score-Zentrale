@@ -237,17 +237,18 @@ export default function App() {
 
       {activeTab==='dashboard' && (
         <div>
+          {/* Oberste Reihe: nur Auftragsbasis */}
           <div className="row">
-            <KpiTile title="Umsatz (30T)" value={fmtCurrency(kpi?.revenue)} sub="JTL Wawi" demo={demoMode} />
-            <KpiTile title="Bestellungen (30T)" value={(kpi?.orders||'-').toLocaleString?.('de-DE')||kpi?.orders||'-'} sub="JTL Wawi" demo={demoMode} />
-            <KpiTile title="Marge (30T)" value={fmtCurrency(kpi?.margin)} sub="ohne Gebühren" demo={demoMode} />
-          </div>
-
-          {/* Neue Auftrags-Kacheln (oben ergänzen) */}
-          <div className="row">
+            <KpiTile title="Bestellungen (Aufträge)" value={(ordersSplit?.orders??'-').toLocaleString?.('de-DE')||ordersSplit?.orders||'-'} sub="nach 'Erstellt am'" demo={demoMode} />
             <KpiTile title="Umsatz (NETTO) — Aufträge" value={fmtCurrency(ordersSplit?.net?.without_shipping)} sub={`mit Versand: ${fmtCurrency(ordersSplit?.net?.with_shipping)}`} demo={demoMode} />
             <KpiTile title="Umsatz (BRUTTO) — Aufträge" value={fmtCurrency(ordersSplit?.gross?.without_shipping)} sub={`mit Versand: ${fmtCurrency(ordersSplit?.gross?.with_shipping)}`} demo={demoMode} />
-            <KpiTile title="Marge (mit Gebühren)" value={fmtCurrency(kpiFees?.margin_with_fees)} sub="inkl. 1,50 € + 20% Plattformgebühr" demo={demoMode} />
+          </div>
+
+          {/* Zweite Reihe: Rechnungsbasis (klar gekennzeichnet) */}
+          <div className="row">
+            <KpiTile title="Umsatz (Rechnungen)" value={fmtCurrency(kpi?.revenue)} sub="Quelle: Rechnungen" demo={demoMode} />
+            <KpiTile title="Marge (Rechnungen)" value={fmtCurrency(kpi?.margin)} sub="ohne Gebühren" demo={demoMode} />
+            <KpiTile title="Marge (mit Gebühren) — Rechnungen" value={fmtCurrency(kpiFees?.margin_with_fees)} sub="inkl. 1,50 € + 20% Plattformgebühr" demo={demoMode} />
           </div>
 
           <div className="row mt-1">
