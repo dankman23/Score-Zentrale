@@ -1,15 +1,21 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { toArray, sortByDateAsc } from './lib/normalize'
-import { getJson } from './lib/api'
 
-function KpiTile({ title, value, sub }) {
+// Lightweight utils inlined (avoid missing imports)
+const toArray = (v) => Array.isArray(v) ? v : (v && v.data && Array.isArray(v.data) ? v.data : (v ? [v] : []))
+const sortByDateAsc = (arr) => (arr||[]).slice().sort((a,b)=> new Date(a?.date||a?.Datum||0) - new Date(b?.date||b?.Datum||0))
+const getJson = async (url) => { const res = await fetch(url, { cache:'no-store' }); if(!res.ok){ const t = await res.text(); throw new Error(`HTTP ${res.status}: ${t}`) } return res.json() }
+
+function KpiTile({ title, value, sub, demo }) {
   return (
     <div className="col-md-4 mb-3">
       <div className="card kpi h-100">
         <div className="card-body">
-          <div className="label mb-1 text-uppercase small">{title}</div>
+          <div className="d-flex align-items-center justify-content-between">
+            <div className="label mb-1 text-uppercase small">{title}</div>
+            {demo ? <span className="badge badge-warning">Demo</span> : null}
+          </div>
           <div className="value mb-0">{value}</div>
           {sub ? <div className="text-muted small mt-1">{sub}</div> : null}
         </div>
@@ -34,6 +40,8 @@ export default function App() {
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [demoMode, setDemoMode] = useState(false)
+  const [autoAdjusted, setAutoAdjusted] = useState('')
 
   const revChartRef = useRef(null)
   const platChartRef = useRef(null)
@@ -50,8 +58,44 @@ export default function App() {
   const [topCategories, setTopCategories] = useState([])
   const [limit, setLimit] = useState(20)
 
+  const isDegradedFlag = (process.env.NEXT_PUBLIC_DEGRADED === '1')
+
+  const loadDateRangeAndAdjust = async () => {
+    try {
+      const dr = await getJson(`/api/jtl/sales/date-range`)
+      if (dr?.ok && dr.minDate && dr.maxDate){
+        const currentFrom = new Date(from)
+        const currentTo = new Date(to)
+        const min = new Date(dr.minDate)
+        const max = new Date(dr.maxDate)
+        if (currentTo < min || currentFrom > max){
+          const newTo = dr.maxDate
+          const d = new Date(newTo); d.setDate(d.getDate()-29)
+          const newFrom = d.toISOString().slice(0,10)
+          setFrom(newFrom); setTo(newTo)
+          setAutoAdjusted(`Zeitraum automatisch angepasst auf ${newFrom} bis ${newTo}`)
+        }
+      }
+    } catch(e){ /* ignore; fallback to UI defaults */ }
+  }
+
+  const setDemoSnapshot = () => {
+    const today = new Date()
+    const days = [...Array(30)].map((_,i)=>{ const d=new Date(today); d.setDate(d.getDate()-29+i); const ds=d.toISOString().slice(0,10); const rev=1000+Math.round(Math.random()*1500); const mar=Math.round(rev*0.35); return {date: ds, revenue: rev, margin_with_fees: Math.round(mar*0.8)} })
+    const plats = ['Shop','Amazon','eBay']
+    const platRows = []
+    days.forEach(d => plats.forEach((p,j)=>{ platRows.push({ date:d.date, pName:p, revenue: Math.round((d.revenue*(0.5-j*0.15))*(0.6+Math.random()*0.3)) }) }))
+    setKpi({ revenue: days.reduce((s,x)=>s+x.revenue,0), orders: 100, margin: days.reduce((s,x)=>s+Math.round(x.revenue*0.35),0) })
+    setKpiFees({ margin_with_fees: days.reduce((s,x)=>s+x.margin_with_fees,0) })
+    setTs(days.map(d=>({ date:d.date, revenue:d.revenue, margin: Math.round(d.revenue*0.35) })))
+    setTsFees(days.map(d=>({ date:d.date, margin_with_fees:d.margin_with_fees })))
+    setPlatTs(platRows)
+    setTopProducts([]); setTopCategories([])
+    setDemoMode(true)
+  }
+
   const fetchAll = async () => {
-    setLoading(true); setError('')
+    setLoading(true); setError(''); setDemoMode(false)
     try {
       const [k1, k2, t1, t2, p] = await Promise.all([
         getJson(`/api/jtl/sales/kpi?from=${from}&to=${to}`),
@@ -64,7 +108,10 @@ export default function App() {
       const tsFeesN = sortByDateAsc(toArray(t2))
       const platN = sortByDateAsc(toArray(p))
       setKpi(k1); setKpiFees(k2); setTs(tsN); setTsFees(tsFeesN); setPlatTs(platN)
-    } catch (e) { setError(String(e)); }
+    } catch (e) {
+      setError(String(e))
+      if (isDegradedFlag) { setDemoSnapshot() }
+    }
     setLoading(false)
   }
 
@@ -76,10 +123,10 @@ export default function App() {
       ])
       setTopProducts(Array.isArray(prods)?prods:toArray(prods))
       setTopCategories(Array.isArray(cats)?cats:toArray(cats))
-    } catch(e){ console.error(e) }
+    } catch(e){ if (isDegradedFlag){ setTopProducts([]); setTopCategories([]) } }
   }
 
-  useEffect(() => { fetchAll(); fetchSalesTables(); refreshProspects() }, [])
+  useEffect(() => { loadDateRangeAndAdjust(); fetchAll(); fetchSalesTables(); refreshProspects() }, [])
   useEffect(() => { fetchAll(); fetchSalesTables() }, [from, to, limit])
 
   useEffect(() => {
@@ -178,16 +225,17 @@ export default function App() {
         <input type="date" className="form-control form-control-sm mr-2" style={{maxWidth:160}} value={to} onChange={e=>setTo(e.target.value)} />
         <button className="btn btn-outline-primary btn-sm" onClick={()=>{fetchAll(); fetchSalesTables()}}>Aktualisieren</button>
       </div>
+      {autoAdjusted && (<div className="alert alert-info py-1 px-2 small">{autoAdjusted}</div>)}
 
       {activeTab==='dashboard' && (
         <div>
           <div className="row">
-            <KpiTile title="Umsatz (30T)" value={fmtCurrency(kpi?.revenue)} sub="JTL Wawi" />
-            <KpiTile title="Bestellungen (30T)" value={(kpi?.orders||'-').toLocaleString?.('de-DE')||kpi?.orders||'-'} sub="JTL Wawi" />
-            <KpiTile title="Marge (30T)" value={fmtCurrency(kpi?.margin)} sub="ohne Gebühren" />
+            <KpiTile title="Umsatz (30T)" value={fmtCurrency(kpi?.revenue)} sub="JTL Wawi" demo={demoMode} />
+            <KpiTile title="Bestellungen (30T)" value={(kpi?.orders||'-').toLocaleString?.('de-DE')||kpi?.orders||'-'} sub="JTL Wawi" demo={demoMode} />
+            <KpiTile title="Marge (30T)" value={fmtCurrency(kpi?.margin)} sub="ohne Gebühren" demo={demoMode} />
           </div>
           <div className="row">
-            <KpiTile title="Marge (mit Gebühren)" value={fmtCurrency(kpiFees?.margin_with_fees)} sub="inkl. 1,50 € + 20% Plattformgebühr" />
+            <KpiTile title="Marge (mit Gebühren)" value={fmtCurrency(kpiFees?.margin_with_fees)} sub="inkl. 1,50 € + 20% Plattformgebühr" demo={demoMode} />
             <KpiTile title="" value="" />
             <KpiTile title="" value="" />
           </div>
@@ -195,7 +243,10 @@ export default function App() {
           <div className="row mt-1">
             <div className="col-md-8 mb-3">
               <div className="card">
-                <div className="card-header bg-transparent border-0">Umsatz & Marge (mit Gebühren)</div>
+                <div className="card-header bg-transparent border-0 d-flex align-items-center justify-content-between">
+                  <span>Umsatz & Marge (mit Gebühren)</span>
+                  {demoMode && <span className="badge badge-warning">Demo</span>}
+                </div>
                 <div className="card-body">
                   {ts.length===0 && tsFees.length===0 ? (
                     <div className="text-muted small">Keine Zeitreihen-Daten im Zeitraum</div>

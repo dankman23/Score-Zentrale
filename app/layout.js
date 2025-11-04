@@ -49,21 +49,25 @@ export default function RootLayout({ children }) {
           </div>
         </nav>
 
-        {/* Hero + Subnav Icons – mit Inline-Fallback für das Hintergrundbild */}
+        {/* Hero + Subnav Icons – Bild abgeschwächt, Inhalte unterlegt */}
         <div className="hero-band">
           <div className="hero-bg d-flex align-items-end" style={{backgroundImage:"url('https://customer-assets.emergentagent.com/job_score-zentrale/artifacts/g4o0uovx_Header.JPG')", backgroundSize:'cover', backgroundPosition:'center'}}>
             <div className="container py-2">
-              <div className="d-flex align-items-center justify-content-between mb-1">
-                <div className="small text-muted">SCORE Schleifwerkzeuge • Zentrale KPIs und Outbound-Tools</div>
-                <div className="small text-muted">Dark-Mode aktiv</div>
+              <div className="hero-shield mb-2">
+                <div className="d-flex align-items-center justify-content-between">
+                  <div className="small text-muted">SCORE Schleifwerkzeuge • Zentrale KPIs und Outbound-Tools</div>
+                  <div className="small text-muted">Dark-Mode aktiv</div>
+                </div>
               </div>
-              <ul className="nav nav-pills subnav-icons">
-                <li className="nav-item"><a className="nav-link" href="#dashboard"><i className="bi bi-speedometer2"/>Dashboard</a></li>
-                <li className="nav-item"><a className="nav-link" href="#outbound"><i className="bi bi-send"/>Outbound</a></li>
-                <li className="nav-item"><a className="nav-link" href="#sales"><i className="bi bi-bar-chart"/>Sales</a></li>
-                <li className="nav-item"><a className="nav-link" href="#marketing"><i className="bi bi-bullseye"/>Marketing</a></li>
-                <li className="nav-item"><a className="nav-link" href="#settings"><i className="bi bi-gear"/>Settings</a></li>
-              </ul>
+              <div className="hero-shield p-0">
+                <ul className="nav nav-pills subnav-icons">
+                  <li className="nav-item"><a className="nav-link" href="#dashboard"><i className="bi bi-speedometer2"/>Dashboard</a></li>
+                  <li className="nav-item"><a className="nav-link" href="#outbound"><i className="bi bi-send"/>Outbound</a></li>
+                  <li className="nav-item"><a className="nav-link" href="#sales"><i className="bi bi-bar-chart"/>Sales</a></li>
+                  <li className="nav-item"><a className="nav-link" href="#marketing"><i className="bi bi-bullseye"/>Marketing</a></li>
+                  <li className="nav-item"><a className="nav-link" href="#settings"><i className="bi bi-gear"/>Settings</a></li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
