@@ -556,7 +556,9 @@ async function handleRoute(request, { params }) {
         const isShipping = await getShippingPredicate(pool, table, 'op')
         const netExpr = `CASE WHEN NOT (${isShipping}) THEN (${netExprRaw}) * (${qtyExpr}) ELSE 0 END`
         const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
-        const channelSql = buildChannelSql(channel, platformIds, shopIds)
+        const hasPlat = await hasColumn(pool, 'Verkauf.tAuftrag', 'kPlattform')
+        const hasShop = await hasColumn(pool, 'Verkauf.tAuftrag', 'kShop')
+        const channelSql = buildChannelSql(channel, platformIds, shopIds, hasPlat, hasShop)
         const bucket = grain === 'day' ? "CAST(o.dErstellt AS date)"
                      : grain === 'month' ? "DATEFROMPARTS(YEAR(o.dErstellt), MONTH(o.dErstellt), 1)"
                      : "DATEFROMPARTS(YEAR(o.dErstellt), 1, 1)"
