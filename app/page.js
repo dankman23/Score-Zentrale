@@ -240,8 +240,8 @@ export default function App() {
           {/* Oberste Reihe: nur Auftragsbasis */}
           <div className="row">
             <KpiTile title="Bestellungen (Aufträge)" value={(ordersSplit?.orders??'-').toLocaleString?.('de-DE')||ordersSplit?.orders||'-'} sub="nach 'Erstellt am'" demo={demoMode} />
-            <KpiTile title="Umsatz (NETTO) — Aufträge" value={fmtCurrency(ordersSplit?.net?.without_shipping)} sub={`mit Versand: ${fmtCurrency(ordersSplit?.net?.with_shipping)}`} demo={demoMode} />
-            <KpiTile title="Umsatz (BRUTTO) — Aufträge" value={fmtCurrency(ordersSplit?.gross?.without_shipping)} sub={`mit Versand: ${fmtCurrency(ordersSplit?.gross?.with_shipping)}`} demo={demoMode} />
+            <KpiTile title="Umsatz (NETTO) — Aufträge" value={fmtCurrency(ordersSplit?.net_without_shipping)} sub={`mit Versand: ${fmtCurrency(ordersSplit?.net_with_shipping)}`} demo={demoMode} />
+            <KpiTile title="Umsatz (BRUTTO) — Aufträge" value={fmtCurrency(ordersSplit?.gross_without_shipping)} sub={`mit Versand: ${fmtCurrency(ordersSplit?.gross_with_shipping)}`} demo={demoMode} />
           </div>
 
           {/* Zweite Reihe: Rechnungsbasis (klar gekennzeichnet) */}
