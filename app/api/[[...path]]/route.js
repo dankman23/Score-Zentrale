@@ -407,15 +407,29 @@ async function handleRoute(request, { params }) {
         const isShipping = await getShippingPredicate(pool, table, 'op')
         const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
         const sqlText = `DECLARE @from date = @pfrom, @to date = @pto;
+          ;WITH heads AS (
+            SELECT o.kAuftrag
+            FROM Verkauf.tAuftrag o
+            WHERE CONVERT(date, o.dErstellt) BETWEEN @from AND @to ${cancelCheck}
+          )
           SELECT 
-            COUNT(DISTINCT o.kAuftrag) AS orders,
-            CAST(SUM((${netExpr}) * (${qtyExpr})) AS float) AS net_with_shipping,
+            (SELECT COUNT(*) FROM heads) AS orders,
+            -- NETTO
+            CAST(SUM(CASE WHEN ${extNetCol?`1=1`:`${netCol?`1=1`:`1=0`}`} THEN (${netExpr}) * (${qtyExpr}) ELSE 0 END) AS float) AS net_with_shipping,
             CAST(SUM(CASE WHEN NOT (${isShipping}) THEN (${netExpr}) * (${qtyExpr}) ELSE 0 END) AS float) AS net_without_shipping,
-            CAST(SUM((${grossExpr}) * (${qtyExpr})) AS float) AS gross_with_shipping,
-            CAST(SUM(CASE WHEN NOT (${isShipping}) THEN (${grossExpr}) * (${qtyExpr}) ELSE 0 END) AS float) AS gross_without_shipping
-          FROM Verkauf.tAuftrag o
-          JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
-          WHERE CONVERT(date, o.dErstellt) BETWEEN @from AND @to ${cancelCheck}`
+            -- BRUTTO: bevorzugt extGross; sonst aus NETTO+MwSt; sonst unitGross*qty
+            CAST(SUM(CASE WHEN ${extGrossCol?`1=1`:'0=1'} THEN CAST(op.[${extGrossCol||'__x'}] AS float)
+                          WHEN ${extNetCol?`1=1`:'0=1'} THEN (${netExpr}) * (1 + (CAST(${taxCol?`op.[${taxCol}]`:'0'} AS float)/100.0))
+                          WHEN ${grossCol?`1=1`:'0=1'} THEN CAST(op.[${grossCol||'__x'}] AS float) * (${qtyExpr})
+                          ELSE 0 END) AS float) AS gross_with_shipping,
+            CAST(SUM(CASE WHEN NOT (${isShipping}) THEN 
+                          CASE WHEN ${extGrossCol?`1=1`:'0=1'} THEN CAST(op.[${extGrossCol||'__x'}] AS float)
+                               WHEN ${extNetCol?`1=1`:'0=1'} THEN (${netExpr}) * (1 + (CAST(${taxCol?`op.[${taxCol}]`:'0'} AS float)/100.0))
+                               WHEN ${grossCol?`1=1`:'0=1'} THEN CAST(op.[${grossCol||'__x'}] AS float) * (${qtyExpr})
+                               ELSE 0 END
+                        ELSE 0 END) AS float) AS gross_without_shipping
+          FROM heads h
+          JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = h.kAuftrag`
         const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
         const row = res?.recordset?.[0] || {}
         return json({ ok:true, period:{ from, to }, orders: row.orders||0, net: { with_shipping: row.net_with_shipping||0, without_shipping: row.net_without_shipping||0 }, gross: { with_shipping: row.gross_with_shipping||0, without_shipping: row.gross_without_shipping||0 } })
