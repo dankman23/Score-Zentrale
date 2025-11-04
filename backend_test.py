@@ -197,16 +197,20 @@ def main():
     
     # Record KPI response
     kpi_result = results[2]
-    print(f"\n📝 KPI endpoint response: {kpi_result['status_code']}")
+    kpi_status = kpi_result.get('status_code', 'ERROR')
+    print(f"\n📝 KPI endpoint response: {kpi_status}")
     if kpi_result.get('json_data'):
         data = kpi_result['json_data']
         print(f"   ok: {data.get('ok')}")
         if data.get('error'):
             print(f"   error: {data['error']}")
+    elif kpi_result.get('error'):
+        print(f"   exception: {kpi_result['error']}")
     
     # Record platform-timeseries response  
     platform_result = results[3]
-    print(f"\n📝 Platform-timeseries endpoint response: {platform_result['status_code']}")
+    platform_status = platform_result.get('status_code', 'ERROR')
+    print(f"\n📝 Platform-timeseries endpoint response: {platform_status}")
     if platform_result.get('json_data'):
         data = platform_result['json_data']
         if isinstance(data, list):
@@ -215,6 +219,8 @@ def main():
             print(f"   ok: {data.get('ok')}")
             if data.get('error'):
                 print(f"   error: {data['error']}")
+    elif platform_result.get('error'):
+        print(f"   exception: {platform_result['error']}")
     
     # Overall assessment
     critical_failures = [r for r in results if not r['success'] and not r['result'].startswith('📝')]
