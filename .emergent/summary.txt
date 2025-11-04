@@ -1,0 +1,50 @@
+<analysis>
+The previous AI engineer embarked on building the Score Zentrale dashboard, initially focusing on a UI skeleton and minimal outbound features. The work progressed through several iterations of UI refinement, adopting Bootstrap 4.6 and a dark theme. A significant portion of the trajectory focused on integrating the JTL-Wawi SQL database. This involved resolving persistent connectivity issues, adapting SQL queries to the specific JTL database schema, implementing a robust article position filter, and developing precise margin calculation logic, including platform fees. Despite numerous attempts to fix JTL connectivity and data display, the user's latest feedback indicates persistent problems with both the hero image visibility and the dashboard data, suggesting that the core JTL data retrieval and UI rendering are still not fully functional.
+</analysis>
+
+<product_requirements>
+The goal is to build a browser-based dashboard app, Score Zentrale, for SCORE Schleifwerkzeuge, displaying Sales (JTL-Wawi), Marketing (GA4 + Google Ads), and an Outbound Suite (Prospect Finder, Company Analyzer, Mail Composer). The frontend uses Next.js (App Router) + TypeScript, UI is Bootstrap 4.6 Grid with a dark theme and Score branding. The backend uses Next.js API Routes, Firebase (Firestore, Auth, Functions) for data (initially planned, then MongoDB used), and  for secrets. Authentication requires Google SSO + Email/Pass with role-based access (, , ). Key integrations include GA4, Google Ads, JTL-Wawi SQL, OpenAI, and LinkedIn. Firestore schema for , , , , , ,  was designed. MVP focus was on a Dashboard skeleton with minimal Outbound function (Prospect Form, simple Analysis stub) and mocks for external integrations. The UI underwent a significant redesign to a dark, professional Bootstrap 4.6 layout with specific navbar, hero, bottom tabbar, icon sidebar, and dark-themed components. JTL-Wawi integration was prioritized, requiring direct MS SQL connection to an external IP, with specific requirements for KPI calculation (revenue, orders, detailed margin with platform fees), top products/categories, and platform-specific timeseries, robustly handling SQL schema variations and login.
+</product_requirements>
+
+<key_technical_concepts>
+- **Next.js (App Router) & TypeScript**: Frontend and API routes.
+- **Bootstrap 4.6 Grid/Layout**: Primary UI framework, including CDN imports.
+- **MongoDB**: Database used for initial MVP data, replacing Firebase Firestore temporarily.
+- **MS SQL (JTL-Wawi)**: Direct database connection via  Node.js driver for JTL data.
+- **Chart.js**: For data visualization in dashboards.
+- **OpenAI**: Planned for Company Analyzer and Mail Composer (initially mocked).
+- **Environment Variables (.env)**: For managing secrets and API keys.
+- **Server-Side Rendering (SSR) / Client Components**: Next.js architecture.
+</key_technical_concepts>
+
+<code_architecture>
+The application's directory structure is a standard Next.js setup:
+
+-   **/app/app/api/[[...path]]/route.js**: This file serves as the primary backend API route handler. It manages MongoDB-based operations (prospects, analyzer, mailer) and now all JTL-Wawi SQL interactions. It has been heavily modified to include the  connection pool, various JTL sales endpoints (, , , , , , ), and complex SQL logic for margin calculation, article filtering, and platform detection, including runtime checks for SQL column existence.
+-   **/app/app/layout.js**: Manages the global layout, including HTML structure, head tags (Bootstrap/Bootstrap Icons/Chart.js CDN, custom ), and the main Navbar, Hero-band, and horizontal sub-navigation.
+-   **/app/app/page.js**: The main dashboard and outbound suite frontend. It contains the UI logic for KPI tiles, charts (using Chart.js), date range selection, prospect forms, tables, and the mail composer. It now uses the  and  utilities to fetch and process data from the JTL API endpoints.
+-   **/app/public/styles/score-theme.css**: A newly created custom CSS file containing specific dark theme variables and styling rules for Bootstrap components, KPI cards, tables, navigation elements, and chart defaults, reflecting Score branding. It has been iterated on to adjust logo size, hero image visibility, and spacing.
+-   **/app/public/images/logo_score_schleifwerkzeuge.png**: The Score branding logo.
+-   **/app/public/images/Header.JPG**: The background image for the hero section, adjusted for visibility.
+-   **/app/lib/db/mssql.ts**: A new server-only file creating a singleton connection pool for MS SQL, configured via  environment variables. This centralizes database connection management.
+-   **/app/lib/api.ts**: A new utility for fetching JSON data, ensuring  caching and basic error handling.
+-   **/app/lib/normalize.ts**: A new utility for robust data handling, including  (converting various API response formats into arrays) and  (sorting data by date).
+-   **app/.env**: Contains critical environment variables for MongoDB connection, JTL-Wawi SQL credentials (, , , , ), and .
+</code_architecture>
+
+<pending_tasks>
+- Investigate and fix the persistent JTL connectivity/login issues for the database pool.
+- Full implementation of the  and  using the OpenAI API.
+- Integration of GA4, Google Ads, and LinkedIn (currently mocked or placeholders).
+- Implementation of Firebase (Firestore, Auth, Functions) for core data persistence and authentication.
+- Automated frontend tests (klickpfade, responsiveness, charts, CSV, tabs, date range).
+- Refinement of UI elements (KPI card compactness, table row height, sum row in toplists, additional dashboard charts like Umsatz vs. Orders).
+</pending_tasks>
+
+<current_work>
+The immediate focus before this summary request was on resolving critical issues related to JTL-Wawi database integration and UI rendering. The AI engineer implemented runtime-safe SQL article filters using  to check for  column existence, aiming to eliminate SQL Error 207. A new  endpoint was created to determine the min/max available data period for UI defaulting. These SQL adjustments were applied across all JTL sales endpoints in . Concurrently, the hero image visibility was further refined in  by adjusting height, saturation, contrast, and overlay. On the frontend (), helper functions (, , ) were integrated to make charts robust against various API response formats and to display placeholders for empty data. However, the user's latest feedback (Sehe immer noch kein Hero Bild und auch keien Azhlen auf dem Dashboard? weiterhin die fehlermekldung) indicates that both the hero image and the dashboard data/charts are still not visible or are displaying error messages, suggesting that the previous fixes for JTL connectivity and UI rendering have not fully resolved the underlying issues. The JTL database connection, despite multiple password updates in  and  route adjustments for basic auth, seems to be failing for the main sales endpoints.
+</current_work>
+
+<optional_next_step>
+Investigate why the hero image is still not visible and why dashboard data and error messages persist.
+</optional_next_step>
