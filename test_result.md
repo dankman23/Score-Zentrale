@@ -392,11 +392,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Test JTL: GET /api/jtl/ping returns ok or clear error JSON"
-    - "Test JTL: GET /api/jtl/sales/date-range returns minDate/maxDate"
-    - "Test JTL: GET /api/jtl/sales/kpi & timeseries endpoints"
-  stuck_tasks:
-    - "JTL endpoints previously returned 404 in logs; verify routing and path matching"
+    - "JTL backend smoke tests completed - all endpoints working with proper error handling"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
