@@ -405,3 +405,5 @@ agent_communication:
     message: "Bitte zuerst Backend-Tests für neue JTL-Endpunkte ausführen. Erwartung: 200 mit ok:true oder 500 mit ok:false, aber keine unhandled errors. Danach gebe ich Go für UI-Tests."
   - agent: "testing"
     message: "✅ JTL Backend smoke tests completed successfully! Fixed critical variable hoisting bug in route.js (method used before declaration). All 8/8 endpoints tested: GET /api/ (200), GET /api/root (200), GET /api/jtl/ping (200 ok:true), GET /api/jtl/sales/* endpoints (500 ok:false with proper error handling for missing nPosTyp column), GET /api/prospects (200). No routing failures or unhandled errors. All endpoints return proper JSON responses as expected."
+  - agent: "testing"
+    message: "✅ Prospects flow re-testing completed successfully after catch-all changes! All 3/3 test steps PASSED: GET /api/prospects (200 array with 4 items), POST /api/prospects with Test GmbH data (200 with UUID, no _id), GET /api/prospects confirms Test GmbH present. Fixed minor _id cleanup issue in POST response during testing. Prospects flow working correctly."
