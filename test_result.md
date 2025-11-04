@@ -146,6 +146,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ Prospects flow working: POST creates prospects with UUID id (no _id), GET retrieves list without _id fields. Duplicate detection working. Fixed minor _id cleanup issue in POST response."
+      - working: true
+        agent: "testing"
+        comment: "✅ Re-tested Prospects flow after catch-all changes: GET /api/prospects returns 200 array (4 items), POST with Test GmbH data returns 200 with UUID id and no _id field, GET confirms Test GmbH present in list. Fixed minor _id cleanup issue in POST response. All 3/3 test steps PASSED."
   - task: "Company Analyzer (mock) POST /api/analyze"
     implemented: true
     working: true
