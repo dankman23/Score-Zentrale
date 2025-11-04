@@ -673,7 +673,7 @@ async function handleRoute(request, { params }) {
         const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
         const hasPlat = await hasColumn(pool, 'Verkauf.tAuftrag', 'kPlattform')
         const hasShop = await hasColumn(pool, 'Verkauf.tAuftrag', 'kShop')
-        const headCols = `o.kAuftrag, ISNULL(o.cAuftragsNr,'') AS cAuftragsNr${hasPlat?`, o.kPlattform`:''}${hasShop?`, o.kShop`:''}`
+        const headCols = `o.kAuftrag, ISNULL(o.cAuftragsNr,'') AS cAuftragsNr${hasPlat?`, ISNULL(o.kPlattform,0) AS kPlattform`:''}${hasShop?`, ISNULL(o.kShop,0) AS kShop`:''}`
         const platJoin = hasPlat ? 'LEFT JOIN dbo.tPlattform p ON p.kPlattform = h.kPlattform' : ''
         const shopJoin = hasShop ? 'LEFT JOIN dbo.tShop s ON s.kShop = h.kShop' : ''
         const pName = hasPlat || hasShop
