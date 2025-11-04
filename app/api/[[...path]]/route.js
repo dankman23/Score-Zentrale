@@ -169,6 +169,28 @@ async function handleRoute(request, { params }) {
         const hasEmail = await hasColumn(pool, 'Kunde.tKunde', 'cEMail')
         const hasPhone = await hasColumn(pool, 'Kunde.tKunde', 'cTelefon')
 
+        // Build robust position totals (handle qty/tax/alt columns)
+        const posTable = 'Verkauf.tAuftragPosition'
+        const extNetCol = await pickFirstExisting(pool, posTable, ['fGesamtNetto','fVKNettoGesamt','fWertNetto','fWert'])
+        const extGrossCol = await pickFirstExisting(pool, posTable, ['fGesamtBrutto','fVKBruttoGesamt','fWertBrutto'])
+        const netCol = await pickFirstExisting(pool, posTable, ['fVKNetto','fNetto','fPreisNetto'])
+        const grossCol = await pickFirstExisting(pool, posTable, ['fVKBrutto','fBrutto','fPreisBrutto'])
+        const qtyCol = await pickFirstExisting(pool, posTable, ['fMenge','nMenge','fAnzahl','nAnzahl','Menge'])
+        const taxCol = await pickFirstExisting(pool, posTable, ['fMwSt','fMwst','fMwStProzent','MwSt'])
+        const qtyExpr = qtyCol ? `ISNULL(op.[${qtyCol}],1)` : '1'
+        const taxExpr = taxCol ? `COALESCE(op.[${taxCol}],0)` : '0'
+        const netTotalExpr = extNetCol
+          ? `CAST(op.[${extNetCol}] AS float)`
+          : (netCol ? `(CAST(op.[${netCol}] AS float) * CAST(${qtyExpr} AS float))`
+                    : (extGrossCol ? `(CAST(op.[${extGrossCol}] AS float) / NULLIF(1 + (CAST(${taxExpr} AS float)/100.0),0))`
+                                   : (grossCol ? `((CAST(op.[${grossCol}] AS float) * CAST(${qtyExpr} AS float)) / NULLIF(1 + (CAST(${taxExpr} AS float)/100.0),0))`
+                                               : 'CAST(0 AS float)')))
+        const grossTotalExpr = extGrossCol
+          ? `CAST(op.[${extGrossCol}] AS float)`
+          : (grossCol ? `(CAST(op.[${grossCol}] AS float) * CAST(${qtyExpr} AS float))`
+                      : `(${netTotalExpr}) * (1 + (CAST(${taxExpr} AS float)/100.0))`)
+        const articleWhere = await getOnlyArticleWhere(pool, posTable, 'op')
+
         const q = `DECLARE @inactiveMonths int = @pInactive;
           DECLARE @fromRecent date = DATEADD(MONTH, -@inactiveMonths, CAST(GETDATE() AS date));
           DECLARE @minOrders int = @pMinOrders;
@@ -184,23 +206,12 @@ async function handleRoute(request, { params }) {
           ),
           revenue AS (
             SELECT o.kKunde,
-                   SUM(
-                     COALESCE(op.fGesamtBrutto,
-                              COALESCE(op.fVKBrutto, op.fVKNetto*(1+COALESCE(op.fMwSt,0)/100.0)) * ISNULL(op.fMenge,1),
-                              0)
-                   ) AS totalRevenueBrutto,
-                   SUM(
-                     COALESCE(op.fGesamtNetto,
-                              COALESCE(op.fVKNetto, op.fVKBrutto/(1+COALESCE(op.fMwSt,0)/100.0)) * ISNULL(op.fMenge,1),
-                              0)
-                   ) AS totalRevenueNetto
+                   SUM(${grossTotalExpr}) AS totalRevenueBrutto,
+                   SUM(${netTotalExpr})   AS totalRevenueNetto
             FROM Verkauf.tAuftrag o
             JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
             WHERE (COL_LENGTH('Verkauf.tAuftrag','nStorno') IS NULL OR ISNULL(o.nStorno,0)=0)
-              AND (
-                (COL_LENGTH('Verkauf.tAuftragPosition','nPosTyp') IS NOT NULL AND op.nPosTyp = 1)
-                OR (COL_LENGTH('Verkauf.tAuftragPosition','nPosTyp') IS NULL AND ISNULL(op.kArtikel,0) > 0)
-              )
+              AND (${articleWhere})
             GROUP BY o.kKunde
           )
           SELECT TOP (@pLimit)
