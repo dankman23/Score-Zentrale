@@ -155,10 +155,11 @@ async function handleRoute(request, { params }) {
     if (route === '/jtl/sales/date-range' && method === 'GET'){
       const pool = await getMssqlPool()
       try {
+        const where = await getOnlyArticleWhere(pool, 'rp')
         const q = `SELECT MIN(CONVERT(date, r.dErstellt)) AS minDate, MAX(CONVERT(date, r.dErstellt)) AS maxDate
                    FROM Rechnung.tRechnung r
                    JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
-                   WHERE ${onlyArticleWhere('rp')}`
+                   WHERE ${where}`
         const r = await pool.request().query(q)
         const row = r?.recordset?.[0] || {}
         return json({ ok:true, minDate: row.minDate ? new Date(row.minDate).toISOString().slice(0,10) : null, maxDate: row.maxDate ? new Date(row.maxDate).toISOString().slice(0,10) : null })
