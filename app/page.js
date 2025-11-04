@@ -5,7 +5,21 @@ import { useEffect, useRef, useState } from 'react'
 // Lightweight utils inlined (avoid missing imports)
 const toArray = (v) => Array.isArray(v) ? v : (v && v.data && Array.isArray(v.data) ? v.data : (v ? [v] : []))
 const sortByDateAsc = (arr) => (arr||[]).slice().sort((a,b)=> new Date(a?.date||a?.Datum||0) - new Date(b?.date||b?.Datum||0))
-const getJson = async (url) => { const res = await fetch(url, { cache:'no-store' }); if(!res.ok){ const t = await res.text(); throw new Error(`HTTP ${res.status}: ${t}`) } return res.json() }
+const getJsonRaw = async (url, init) => {
+  const started = performance.now()
+  try {
+    const res = await fetch(url, { cache:'no-store', ...init })
+    const data = await res.json().catch(()=>null)
+    return { ok: res.ok, status: res.status, ms: Math.round(performance.now()-started), data, error: res.ok ? null : (data?.error || `HTTP ${res.status}`) }
+  } catch (e) {
+    return { ok:false, status:0, ms: Math.round(performance.now()-started), data:null, error:String(e) }
+  }
+}
+const getJson = async (url, init) => {
+  const r = await getJsonRaw(url, init)
+  if (!r.ok) throw new Error(r.error||'Request failed')
+  return r.data
+}
 
 function KpiTile({ title, value, sub, demo }) {
   return (
@@ -24,7 +38,7 @@ function KpiTile({ title, value, sub, demo }) {
   )
 }
 
-const fmtCurrency = (n) => `€ ${Number(n||0).toLocaleString('de-DE')}`
+const fmtCurrency = (n) => new Intl.NumberFormat('de-DE', { style:'currency', currency:'EUR' }).format(Number(n||0))
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -49,17 +63,43 @@ export default function App() {
   const revChart = useRef(null)
   const platChart = useRef(null)
 
+  // Outbound
   const [prospects, setProspects] = useState([])
   const [form, setForm] = useState({ name:'', website:'', region:'', industry:'', size:'', linkedinUrl:'', keywords:'' })
   const [compose, setCompose] = useState({ company:'', contactRole:'Einkauf', industry:'', useCases:'', hypotheses:'' })
   const [mail, setMail] = useState(null)
 
+  // Sales tables
   const [salesTab, setSalesTab] = useState('products')
   const [topProducts, setTopProducts] = useState([])
   const [topCategories, setTopCategories] = useState([])
   const [limit, setLimit] = useState(20)
 
+  // Marketing → Warmaquise
+  const [leads, setLeads] = useState([])
+  const [leadsTotal, setLeadsTotal] = useState(0)
+  const [leadsLoading, setLeadsLoading] = useState(false)
+  const [leadsError, setLeadsError] = useState('')
+  const [statusF, setStatusF] = useState('') // '', open, called, qualified, discarded
+  const [b2bF, setB2bF] = useState('') // '', true, false
+  const [minScoreF, setMinScoreF] = useState('')
+  const [qF, setQF] = useState('')
+  const [qTyping, setQTyping] = useState('')
+  const [pageF, setPageF] = useState(1)
+  const [limitF, setLimitF] = useState(20)
+  const [sortF, setSortF] = useState('warmScore')
+  const [orderF, setOrderF] = useState('desc')
+  const [importing, setImporting] = useState(false)
+  const [toast, setToast] = useState('')
+  const [noteFor, setNoteFor] = useState(null)
+  const [noteText, setNoteText] = useState('')
+  const [netlog, setNetlog] = useState([]) // request inspector
+
   const isDegradedFlag = (process.env.NEXT_PUBLIC_DEGRADED === '1')
+
+  const pushLog = (entry) => {
+    setNetlog(l => [{ ...entry, at: new Date().toLocaleTimeString() }, ...l.slice(0,9)])
+  }
 
   const loadDateRangeAndAdjust = async () => {
     try {
@@ -88,7 +128,7 @@ export default function App() {
     days.forEach(d => plats.forEach((p,j)=>{ platRows.push({ date:d.date, pName:p, revenue: Math.round((d.revenue*(0.5-j*0.15))*(0.6+Math.random()*0.3)) }) }))
     setKpi({ revenue: days.reduce((s,x)=>s+x.revenue,0), orders: 100, margin: days.reduce((s,x)=>s+Math.round(x.revenue*0.35),0) })
     setKpiFees({ margin_with_fees: days.reduce((s,x)=>s+x.margin_with_fees,0) })
-    setOrdersSplit({ net:{ with_shipping: 25000, without_shipping: 22000 }, gross:{ with_shipping: 29800, without_shipping: 26200 } })
+    setOrdersSplit({ net_without_shipping: 22000, net_with_shipping: 25000, gross_without_shipping: 26200, gross_with_shipping: 29800 })
     setTs(days.map(d=>({ date:d.date, revenue:d.revenue, margin: Math.round(d.revenue*0.35) })))
     setTsFees(days.map(d=>({ date:d.date, margin_with_fees:d.margin_with_fees })))
     setPlatTs(platRows)
@@ -99,7 +139,8 @@ export default function App() {
   const fetchAll = async () => {
     setLoading(true); setError(''); setDemoMode(false)
     try {
-      const [k1, k2, t1, t2, p, os] = await Promise.all([
+      const started = performance.now()
+      const [k1, k2, t1, t2, p, osRaw] = await Promise.all([
         getJson(`/api/jtl/sales/kpi?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/kpi/with_platform_fees?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/timeseries?from=${from}&to=${to}`),
@@ -110,7 +151,8 @@ export default function App() {
       const tsN = sortByDateAsc(toArray(t1))
       const tsFeesN = sortByDateAsc(toArray(t2))
       const platN = sortByDateAsc(toArray(p))
-      setKpi(k1); setKpiFees(k2); setTs(tsN); setTsFees(tsFeesN); setPlatTs(platN); setOrdersSplit(os)
+      setKpi(k1); setKpiFees(k2); setTs(tsN); setTsFees(tsFeesN); setPlatTs(platN); setOrdersSplit(osRaw)
+      pushLog({ url:'/api/jtl/orders/kpi/shipping-split', status:200, ok:true, ms: Math.round(performance.now()-started) })
       if (isDegradedFlag) {
         const ksum = Number(k1?.revenue||0) + Number(k1?.orders||0) + Number(k1?.margin||0)
         const hasData = (tsN?.length||0) + (tsFeesN?.length||0) + (platN?.length||0) > 0 || ksum > 0
@@ -118,6 +160,7 @@ export default function App() {
       }
     } catch (e) {
       setError(String(e))
+      pushLog({ url:'/api/jtl/orders/kpi/shipping-split', status:0, ok:false, ms:0, error:String(e) })
       if (isDegradedFlag) { setDemoSnapshot() }
     }
     setLoading(false)
@@ -134,8 +177,75 @@ export default function App() {
     } catch(e){ if (isDegradedFlag){ setTopProducts([]); setTopCategories([]) } }
   }
 
+  // Warmaquise
+  const queryLeads = async () => {
+    setLeadsLoading(true); setLeadsError('')
+    const params = new URLSearchParams()
+    if (statusF) params.set('status', statusF)
+    if (b2bF) params.set('b2b', b2bF)
+    if (minScoreF) params.set('minScore', String(minScoreF))
+    if (qF) params.set('q', qF)
+    params.set('page', String(pageF))
+    params.set('limit', String(limitF))
+    params.set('sort', sortF); params.set('order', orderF)
+    const url = `/api/leads?${params.toString()}`
+    const r = await getJsonRaw(url)
+    pushLog({ url, status: r.status, ok: r.ok, ms: r.ms, error: r.error })
+    if (!r.ok) { setLeadsError(r.error||'Request failed'); setLeads([]); setLeadsTotal(0); setLeadsLoading(false); return }
+    const data = r.data||{}
+    setLeads(Array.isArray(data.rows)?data.rows:[])
+    setLeadsTotal(Number(data.total||0))
+    setLeadsLoading(false)
+  }
+
+  const runImport = async () => {
+    setImporting(true)
+    const r = await getJsonRaw('/api/leads/import', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({}) })
+    pushLog({ url:'/api/leads/import', status:r.status, ok:r.ok, ms:r.ms, error:r.error })
+    setImporting(false)
+    if (!r.ok) { setToast(`Import fehlgeschlagen: ${r.error}`); return }
+    setToast(`Import abgeschlossen: ${r.data?.imported||0} aktualisiert (Gesamt: ${r.data?.count||0})`)
+    setPageF(1)
+    await queryLeads()
+  }
+
+  const changeStatus = async (lead, status) => {
+    const prev = lead.status
+    setLeads(ls => ls.map(x => x.id===lead.id ? { ...x, status } : x))
+    const r = await getJsonRaw(`/api/leads/${lead.id}/status`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ status }) })
+    pushLog({ url:`/api/leads/${lead.id}/status`, status:r.status, ok:r.ok, ms:r.ms, error:r.error })
+    if (!r.ok) { setLeads(ls => ls.map(x => x.id===lead.id ? { ...x, status: prev } : x)); setToast('Status-Update fehlgeschlagen'); }
+  }
+
+  const saveNote = async () => {
+    if (!noteFor || !noteText.trim()) return
+    const id = noteFor.id
+    const r = await getJsonRaw(`/api/leads/${id}/note`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ text: noteText }) })
+    pushLog({ url:`/api/leads/${id}/note`, status:r.status, ok:r.ok, ms:r.ms, error:r.error })
+    if (r.ok) {
+      setToast('Notiz gespeichert')
+      setLeads(ls => ls.map(x => x.id===id ? { ...x, notes: [...(x.notes||[]), { at:new Date().toISOString(), by:'user', text: noteText }] } : x))
+      setNoteFor(null); setNoteText('')
+    } else {
+      setToast('Notiz fehlgeschlagen')
+    }
+  }
+
+  const exportLeadsCSV = () => {
+    const params = new URLSearchParams()
+    if (statusF) params.set('status', statusF)
+    if (b2bF) params.set('b2b', b2bF)
+    if (minScoreF) params.set('minScore', String(minScoreF))
+    const url = `/api/leads/export.csv?${params.toString()}`
+    window.open(url, '_blank')
+  }
+
+  // Debounce search
+  useEffect(() => { const t = setTimeout(()=>{ setQF(qTyping); setPageF(1) }, 300); return ()=>clearTimeout(t) }, [qTyping])
+
   useEffect(() => { loadDateRangeAndAdjust(); fetchAll(); fetchSalesTables(); refreshProspects() }, [])
   useEffect(() => { fetchAll(); fetchSalesTables() }, [from, to, limit])
+  useEffect(() => { if (activeTab==='marketing') queryLeads() }, [activeTab, statusF, b2bF, minScoreF, qF, pageF, limitF, sortF, orderF])
 
   useEffect(() => {
     const applyHash = () => { const h=(window.location.hash||'#dashboard').replace('#',''); setActiveTab(h) }
@@ -156,7 +266,6 @@ export default function App() {
     if (ctx1) {
       if (revChart.current) revChart.current.destroy()
       if (labels.length===0 && marginF.length===0) {
-        // draw placeholder background
         ctx1.fillStyle = '#1d232b'; ctx1.fillRect(0,0,ctx1.canvas.width, ctx1.canvas.height)
       } else {
         revChart.current = new window.Chart(ctx1, {
@@ -214,6 +323,13 @@ export default function App() {
     const csv = arr.map(r=>Object.values(r).map(x=>`"${(x??'').toString().replace(/"/g,'""')}"`).join(',')).join('\n')
     const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url)
   }
+
+  const ScoreBadge = ({v}) => (<span className="badge badge-warning" style={{fontSize:'0.95rem'}}>{Math.round(Number(v||0))}</span>)
+  const StatusBadge = ({s}) => {
+    const map = { open:'secondary', called:'info', qualified:'success', discarded:'dark' }
+    const cls = map[s]||'secondary'; return <span className={`badge badge-${cls}`}>{s||'open'}</span>
+  }
+  const B2BBadge = ({b}) => (<span className={`badge badge-${b?'warning':'secondary'}`}>{b?'B2B':'B2C'}</span>)
 
   return (
     <div>
@@ -485,9 +601,190 @@ export default function App() {
         </div>
       )}
 
-      {activeTab!=='dashboard' && activeTab!=='outbound' && activeTab!=='sales' && (
+      {activeTab==='marketing' && (
+        <div>
+          <div className="d-flex align-items-center justify-content-between mb-3">
+            <div>
+              <h3 className="mb-0">Warmaquise</h3>
+              <div className="text-muted small">Aktive, wertige Kunden – Score-basiert priorisiert</div>
+            </div>
+            <div>
+              <button className="btn btn-primary btn-sm mr-2" disabled={importing} onClick={runImport}>{importing? 'Import läuft…' : 'Kunden importieren / aktualisieren'}</button>
+              <button className="btn btn-outline-secondary btn-sm" onClick={exportLeadsCSV}>CSV Export</button>
+            </div>
+          </div>
+
+          {/* Filterleiste */}
+          <div className="card mb-3">
+            <div className="card-body d-flex align-items-center flex-wrap">
+              <div className="mr-2 mb-2">
+                <label className="small mb-1">Status</label>
+                <select className="form-control form-control-sm" value={statusF} onChange={e=>{ setStatusF(e.target.value); setPageF(1) }}>
+                  <option value="">Alle</option>
+                  <option value="open">open</option>
+                  <option value="called">called</option>
+                  <option value="qualified">qualified</option>
+                  <option value="discarded">discarded</option>
+                </select>
+              </div>
+              <div className="mr-2 mb-2">
+                <label className="small mb-1">B2B</label>
+                <select className="form-control form-control-sm" value={b2bF} onChange={e=>{ setB2bF(e.target.value); setPageF(1) }}>
+                  <option value="">Alle</option>
+                  <option value="true">nur B2B</option>
+                  <option value="false">nur B2C</option>
+                </select>
+              </div>
+              <div className="mr-2 mb-2">
+                <label className="small mb-1">Min-Score</label>
+                <input type="number" className="form-control form-control-sm" min={0} max={100} value={minScoreF} onChange={e=>{ setMinScoreF(e.target.value); setPageF(1) }} style={{width:110}}/>
+              </div>
+              <div className="ml-auto mb-2 d-flex align-items-center" style={{gap:8}}>
+                <input type="text" className="form-control form-control-sm" placeholder="Suchen (Name/Telefon/Email/Nr)" value={qTyping} onChange={e=>setQTyping(e.target.value)} style={{minWidth:260}}/>
+              </div>
+            </div>
+          </div>
+
+          {/* Tabelle */}
+          <div className="card">
+            <div className="card-body p-0">
+              <div className="table-responsive">
+                <table className="table table-dark table-hover table-sm mb-0">
+                  <thead className="thead-dark">
+                    <tr>
+                      <th style={{width:90}}>Score</th>
+                      <th>Name</th>
+                      <th style={{width:80}}>B2B</th>
+                      <th style={{width:140}}>Letzte Bestellung</th>
+                      <th style={{width:90}}>Orders</th>
+                      <th style={{width:160}}>Umsatz netto</th>
+                      <th style={{width:220}}>Kontakt</th>
+                      <th style={{width:120}}>Status</th>
+                      <th style={{width:120}}>Aktion</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leadsLoading && Array.from({length:5}).map((_,i)=> (
+                      <tr key={`sk-${i}`}>
+                        <td><div className="bg-secondary" style={{height:16, width:40, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:180, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:50, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:100, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:40, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:100, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:160, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:80, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:80, borderRadius:6}}/></td>
+                      </tr>
+                    ))}
+
+                    {!leadsLoading && leads.map(lead => (
+                      <tr key={lead.id}>
+                        <td className="align-middle"><ScoreBadge v={lead.warmScore}/></td>
+                        <td className="align-middle">
+                          <div className="font-weight-bold">{lead.name||'—'}</div>
+                          <div className="text-muted small">{lead.kundennr||'—'}</div>
+                        </td>
+                        <td className="align-middle"><B2BBadge b={lead.isB2B}/></td>
+                        <td className="align-middle">{lead.lastOrder||'—'}</td>
+                        <td className="align-middle">{lead.ordersCount??'—'}</td>
+                        <td className="align-middle">{fmtCurrency(lead.totalRevenueNetto||0)}</td>
+                        <td className="align-middle">
+                          <div><a className="text-info" href={`tel:${lead?.contact?.phone||''}`}>{lead?.contact?.phone||'—'}</a></div>
+                          <div><a className="text-info" href={`mailto:${lead?.contact?.email||''}`}>{lead?.contact?.email||'—'}</a></div>
+                        </td>
+                        <td className="align-middle">
+                          <div className="dropdown">
+                            <button className="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown">{lead.status||'open'}</button>
+                            <div className="dropdown-menu dropdown-menu-right">
+                              {['open','called','qualified','discarded'].map(s => (
+                                <a key={s} className="dropdown-item" href="#" onClick={(e)=>{e.preventDefault(); changeStatus(lead, s)}}>{s}</a>
+                              ))}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="align-middle">
+                          <button className="btn btn-outline-primary btn-sm" onClick={()=>{ setNoteFor(lead); setNoteText('') }}>Notiz</button>
+                        </td>
+                      </tr>
+                    ))}
+
+                    {!leadsLoading && leads?.length===0 && (
+                      <tr><td colSpan={9} className="text-center text-muted p-4">Kein Ergebnis für diese Filter</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              <div className="d-flex align-items-center justify-content-between p-2">
+                <div className="text-muted small">{leadsTotal.toLocaleString('de-DE')} Einträge</div>
+                <div className="d-flex align-items-center">
+                  <button className="btn btn-sm btn-outline-secondary mr-2" disabled={pageF<=1} onClick={()=>setPageF(p=>Math.max(1,p-1))}>Zurück</button>
+                  <div className="mr-2 small">Seite {pageF}</div>
+                  <button className="btn btn-sm btn-outline-secondary mr-3" disabled={(pageF*limitF)>=leadsTotal} onClick={()=>setPageF(p=>p+1)}>Weiter</button>
+                  <select className="form-control form-control-sm" style={{width:100}} value={limitF} onChange={e=>{ setLimitF(parseInt(e.target.value)); setPageF(1) }}>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Notiz Modal (simple) */}
+          {noteFor && (
+            <div className="modal d-block" tabIndex="-1" role="dialog" style={{background:'rgba(0,0,0,.5)'}}>
+              <div className="modal-dialog" role="document">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title">Notiz für {noteFor?.name}</h5>
+                    <button type="button" className="close" onClick={()=>setNoteFor(null)}><span>&times;</span></button>
+                  </div>
+                  <div className="modal-body">
+                    <textarea className="form-control" rows={4} value={noteText} onChange={e=>setNoteText(e.target.value)} placeholder="Notiz eintragen..." />
+                  </div>
+                  <div className="modal-footer">
+                    <button className="btn btn-secondary" onClick={()=>setNoteFor(null)}>Abbrechen</button>
+                    <button className="btn btn-primary" onClick={saveNote}>Speichern</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab!=='dashboard' && activeTab!=='outbound' && activeTab!=='sales' && activeTab!=='marketing' && (
         <div className="text-muted">Dieser Bereich ist für die nächste Iteration vorgesehen.</div>
       )}
+
+      {/* Toast */}
+      {toast && (
+        <div className="alert alert-info position-fixed" style={{right:12, bottom:12, zIndex:1060}} onClick={()=>setToast('')}>{toast}</div>
+      )}
+
+      {/* Request Inspector */}
+      <div className="position-fixed" style={{right:12, bottom:54, zIndex:1059, width:320}}>
+        <div className="card" style={{opacity:.95}}>
+          <div className="card-header py-1 px-2 d-flex justify-content-between align-items-center">
+            <span className="small">Request Inspector</span>
+            <span className="small text-muted">{netlog?.[0]?.ms? `${netlog[0].ms} ms` : ''}</span>
+          </div>
+          <div className="card-body p-2" style={{maxHeight:160, overflowY:'auto'}}>
+            {(netlog||[]).map((r,i)=> (
+              <div key={i} className="small mb-1">
+                <div className="d-flex justify-content-between"><span>{r.at||''}</span><span className={r.ok? 'text-success':'text-danger'}>{r.ok? 'OK':'ERR'} {r.status}</span></div>
+                <div className="text-muted" style={{whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{r.url}</div>
+                {r.error && <div className="text-danger">{String(r.error).slice(0,120)}</div>}
+                <hr className="my-1"/>
+              </div>
+            ))}
+            {netlog?.length===0 && <div className="text-muted small">Keine Requests</div>}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
