@@ -373,6 +373,20 @@ agent_communication:
       - working: "NA"
         agent: "main"
         comment: "Top-Produkte mit dynamischer Spalten-Erkennung (ArtNr, Name)"
+  - task: "JTL Orders: GET /api/jtl/orders/kpi/shipping-split"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Neuer Endpoint für Auftragsumsatz mit/ohne Versandkosten-Split"
+      - working: true
+        agent: "testing"
+        comment: "✅ Shipping-split endpoint working: Both month (2025-10) and from/to (2025-10-01 to 2025-10-31) parameter formats return 200 ok:true with all required fields (period.from/to, orders: 1897, net.with_shipping/without_shipping, gross.with_shipping/without_shipping). Fixed SQL column alias issue during testing. All expected fields present and valid."
 frontend:
   - task: "Hero sichtbar + abgeschwächt (Overlay, Shield)"
     implemented: true
