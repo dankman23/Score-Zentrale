@@ -359,6 +359,9 @@ agent_communication:
       - working: true
         agent: "testing"
         comment: "✅ JTL Sales platform-timeseries working: Returns 500 with ok:false and proper error handling for missing nPosTyp column. Endpoint correctly handles database schema differences."
+      - working: true
+        agent: "testing"
+        comment: "✅ Re-tested after filter fix: Now returns 200 with array of 22 data points for date range 2025-10-01 to 2025-10-31. Platform categorization working (all 'Sonstige'). Filter fix successful."
   - task: "JTL Sales: GET /api/jtl/sales/top-products"
     implemented: true
     working: "NA"
