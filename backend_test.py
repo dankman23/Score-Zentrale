@@ -108,45 +108,48 @@ def test_endpoint(method, endpoint, params=None, expect_200_ok=None):
         }
 
 def main():
-    """Re-test JTL endpoints after filter fix as requested"""
+    """Test new shipping-split endpoint and regression tests as requested"""
     print("=" * 80)
-    print("🔄 JTL ENDPOINTS RE-TEST AFTER FILTER FIX")
+    print("🔄 NEW SHIPPING-SPLIT ENDPOINT + REGRESSION TESTS")
     print("=" * 80)
     print(f"Base URL: {BASE_URL}")
     print(f"API Base: {API_BASE}")
     print(f"Test Time: {datetime.now().isoformat()}")
     print("\nAs requested in review_request:")
-    print("- GET /api/jtl/sales/date-range -> expect 200 ok:true with minDate/maxDate (or nulls) but not 500")
-    print("- GET /api/jtl/sales/kpi?from=2025-10-01&to=2025-10-31 -> may still be 500, record exact response")
-    print("- GET /api/jtl/sales/platform-timeseries?from=2025-10-01&to=2025-10-31 -> may still be 500, record")
-    print("- Also confirm GET /api/jtl/ping still 200")
+    print("1) GET /api/jtl/orders/kpi/shipping-split?month=2025-10")
+    print("   - Expected fields: ok, period.from, period.to, orders, net.with_shipping, net.without_shipping, gross.with_shipping, gross.without_shipping")
+    print("2) GET /api/jtl/orders/kpi/shipping-split?from=2025-10-01&to=2025-10-31")
+    print("   - Same field checks")
+    print("3) Regression: /api/jtl/sales/kpi and /api/jtl/sales/platform-timeseries should still return 200")
     
     results = []
     
-    # Test 1: GET /api/jtl/ping - should still be 200
+    # Test 1: NEW shipping-split endpoint with month parameter
     print("\n" + "="*50)
-    print("TEST 1: JTL Ping (should still work)")
-    result = test_endpoint('GET', '/jtl/ping', expect_200_ok=None)
+    print("TEST 1: NEW Shipping-Split KPI with month parameter")
+    params = {'month': '2025-10'}
+    result = test_endpoint('GET', '/jtl/orders/kpi/shipping-split', params=params, expect_200_ok=True)
     results.append(result)
     
-    # Test 2: GET /api/jtl/sales/date-range - expect 200 ok:true (or at least not 500)
+    # Test 2: NEW shipping-split endpoint with from/to parameters
     print("\n" + "="*50)
-    print("TEST 2: JTL Sales Date Range (expect improvement from 500)")
-    result = test_endpoint('GET', '/jtl/sales/date-range', expect_200_ok=True)
-    results.append(result)
-    
-    # Test 3: GET /api/jtl/sales/kpi with params - record exact response
-    print("\n" + "="*50)
-    print("TEST 3: JTL Sales KPI with date params (record response)")
+    print("TEST 2: NEW Shipping-Split KPI with from/to parameters")
     params = {'from': '2025-10-01', 'to': '2025-10-31'}
-    result = test_endpoint('GET', '/jtl/sales/kpi', params=params, expect_200_ok=False)
+    result = test_endpoint('GET', '/jtl/orders/kpi/shipping-split', params=params, expect_200_ok=True)
     results.append(result)
     
-    # Test 4: GET /api/jtl/sales/platform-timeseries with params - record response
+    # Test 3: REGRESSION - JTL Sales KPI should still work
     print("\n" + "="*50)
-    print("TEST 4: JTL Sales Platform Timeseries with date params (record response)")
+    print("TEST 3: REGRESSION - JTL Sales KPI (should still return 200)")
     params = {'from': '2025-10-01', 'to': '2025-10-31'}
-    result = test_endpoint('GET', '/jtl/sales/platform-timeseries', params=params, expect_200_ok=False)
+    result = test_endpoint('GET', '/jtl/sales/kpi', params=params, expect_200_ok=True)
+    results.append(result)
+    
+    # Test 4: REGRESSION - JTL Sales Platform Timeseries should still work
+    print("\n" + "="*50)
+    print("TEST 4: REGRESSION - JTL Sales Platform Timeseries (should still return 200)")
+    params = {'from': '2025-10-01', 'to': '2025-10-31'}
+    result = test_endpoint('GET', '/jtl/sales/platform-timeseries', params=params, expect_200_ok=True)
     results.append(result)
     
     # Summary
