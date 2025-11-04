@@ -170,31 +170,39 @@ def main():
         # Show key response data
         if result.get('json_data'):
             json_data = result['json_data']
-            if 'ok' in json_data:
-                print(f"   Response ok: {json_data['ok']}")
-            if 'error' in json_data:
-                print(f"   Error: {json_data['error']}")
             
-            # Shipping-split specific fields
-            if 'period' in json_data:
-                period = json_data['period']
-                print(f"   Period: {period.get('from')} to {period.get('to')}")
-            if 'orders' in json_data:
-                print(f"   Orders: {json_data.get('orders')}")
-            if 'net' in json_data:
-                net = json_data['net']
-                print(f"   Net with shipping: {net.get('with_shipping')}")
-                print(f"   Net without shipping: {net.get('without_shipping')}")
-            if 'gross' in json_data:
-                gross = json_data['gross']
-                print(f"   Gross with shipping: {gross.get('with_shipping')}")
-                print(f"   Gross without shipping: {gross.get('without_shipping')}")
-            
-            # Sales KPI fields
-            if 'revenue' in json_data:
-                print(f"   Revenue: {json_data.get('revenue')}")
-                print(f"   Orders: {json_data.get('orders')}")
-                print(f"   Margin: {json_data.get('margin')}")
+            # Handle array responses (like platform-timeseries)
+            if isinstance(json_data, list):
+                print(f"   Array response with {len(json_data)} items")
+                if len(json_data) > 0:
+                    print(f"   First item: {json_data[0]}")
+            else:
+                # Handle object responses
+                if 'ok' in json_data:
+                    print(f"   Response ok: {json_data['ok']}")
+                if 'error' in json_data:
+                    print(f"   Error: {json_data['error']}")
+                
+                # Shipping-split specific fields
+                if 'period' in json_data:
+                    period = json_data['period']
+                    print(f"   Period: {period.get('from')} to {period.get('to')}")
+                if 'orders' in json_data:
+                    print(f"   Orders: {json_data.get('orders')}")
+                if 'net' in json_data:
+                    net = json_data['net']
+                    print(f"   Net with shipping: {net.get('with_shipping')}")
+                    print(f"   Net without shipping: {net.get('without_shipping')}")
+                if 'gross' in json_data:
+                    gross = json_data['gross']
+                    print(f"   Gross with shipping: {gross.get('with_shipping')}")
+                    print(f"   Gross without shipping: {gross.get('without_shipping')}")
+                
+                # Sales KPI fields
+                if 'revenue' in json_data:
+                    print(f"   Revenue: {json_data.get('revenue')}")
+                    print(f"   Orders: {json_data.get('orders')}")
+                    print(f"   Margin: {json_data.get('margin')}")
         
         if result.get('error'):
             print(f"   Exception: {result['error']}")
