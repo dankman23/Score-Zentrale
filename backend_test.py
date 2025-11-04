@@ -100,97 +100,130 @@ def test_endpoint(method, endpoint, params=None, expect_200_ok=None):
         }
 
 def main():
-    """Run JTL backend smoke tests as requested"""
+    """Re-test JTL endpoints after filter fix as requested"""
     print("=" * 80)
-    print("🚀 BACKEND API SMOKE TESTS - Score Zentrale JTL Analytics")
+    print("🔄 JTL ENDPOINTS RE-TEST AFTER FILTER FIX")
     print("=" * 80)
     print(f"Base URL: {BASE_URL}")
     print(f"API Base: {API_BASE}")
     print(f"Test Time: {datetime.now().isoformat()}")
-    
-    # Test cases as requested in review_request
-    test_cases = [
-        # Basic routing tests
-        ('GET', '/', [200]),
-        ('GET', '/root', [200]),
-        
-        # JTL endpoints - main focus
-        ('GET', '/jtl/ping', [200, 500]),
-        ('GET', '/jtl/sales/date-range', [200, 500]),
-        ('GET', '/jtl/sales/kpi', [200, 500], {'from': '2025-10-01', 'to': '2025-10-31'}),
-        ('GET', '/jtl/sales/timeseries', [200, 500], {'from': '2025-10-01', 'to': '2025-10-31'}),
-        ('GET', '/jtl/sales/platform-timeseries', [200, 500], {'from': '2025-10-01', 'to': '2025-10-31'}),
-        
-        # Prospects endpoint
-        ('GET', '/prospects', [200, 500]),
-    ]
+    print("\nAs requested in review_request:")
+    print("- GET /api/jtl/sales/date-range -> expect 200 ok:true with minDate/maxDate (or nulls) but not 500")
+    print("- GET /api/jtl/sales/kpi?from=2025-10-01&to=2025-10-31 -> may still be 500, record exact response")
+    print("- GET /api/jtl/sales/platform-timeseries?from=2025-10-01&to=2025-10-31 -> may still be 500, record")
+    print("- Also confirm GET /api/jtl/ping still 200")
     
     results = []
     
-    for test_case in test_cases:
-        if len(test_case) == 3:
-            method, endpoint, expected_codes = test_case
-            params = None
-        else:
-            method, endpoint, expected_codes, params = test_case
-            
-        result = test_endpoint(method, endpoint, expected_codes, params)
-        results.append(result)
+    # Test 1: GET /api/jtl/ping - should still be 200
+    print("\n" + "="*50)
+    print("TEST 1: JTL Ping (should still work)")
+    result = test_endpoint('GET', '/jtl/ping', expect_200_ok=None)
+    results.append(result)
+    
+    # Test 2: GET /api/jtl/sales/date-range - expect 200 ok:true (or at least not 500)
+    print("\n" + "="*50)
+    print("TEST 2: JTL Sales Date Range (expect improvement from 500)")
+    result = test_endpoint('GET', '/jtl/sales/date-range', expect_200_ok=True)
+    results.append(result)
+    
+    # Test 3: GET /api/jtl/sales/kpi with params - record exact response
+    print("\n" + "="*50)
+    print("TEST 3: JTL Sales KPI with date params (record response)")
+    params = {'from': '2025-10-01', 'to': '2025-10-31'}
+    result = test_endpoint('GET', '/jtl/sales/kpi', params=params, expect_200_ok=False)
+    results.append(result)
+    
+    # Test 4: GET /api/jtl/sales/platform-timeseries with params - record response
+    print("\n" + "="*50)
+    print("TEST 4: JTL Sales Platform Timeseries with date params (record response)")
+    params = {'from': '2025-10-01', 'to': '2025-10-31'}
+    result = test_endpoint('GET', '/jtl/sales/platform-timeseries', params=params, expect_200_ok=False)
+    results.append(result)
     
     # Summary
     print("\n" + "=" * 80)
-    print("📊 TEST SUMMARY")
+    print("📊 RE-TEST RESULTS SUMMARY")
     print("=" * 80)
     
-    passed = sum(1 for r in results if r['success'])
-    total = len(results)
-    
-    print(f"Total Tests: {total}")
-    print(f"Passed: {passed}")
-    print(f"Failed: {total - passed}")
-    
-    print("\n📋 DETAILED RESULTS:")
-    for result in results:
-        status = result['result']
+    for i, result in enumerate(results, 1):
         endpoint = result['endpoint']
         method = result['method']
-        print(f"  {status} - {method} {endpoint}")
+        status = result.get('status_code', 'ERROR')
+        result_text = result['result']
         
-        if 'status_code' in result:
-            print(f"    Status Code: {result['status_code']}")
+        print(f"\n{i}. {method} {endpoint}")
+        print(f"   Status: {status}")
+        print(f"   Result: {result_text}")
         
+        # Show key response data
         if result.get('json_data'):
-            # Show key fields from JSON response
             json_data = result['json_data']
             if 'ok' in json_data:
-                print(f"    JSON ok field: {json_data['ok']}")
+                print(f"   Response ok: {json_data['ok']}")
             if 'error' in json_data:
-                print(f"    Error: {json_data['error']}")
+                print(f"   Error: {json_data['error']}")
+            if 'minDate' in json_data or 'maxDate' in json_data:
+                print(f"   Date range: {json_data.get('minDate')} to {json_data.get('maxDate')}")
+            if 'revenue' in json_data:
+                print(f"   Revenue: {json_data.get('revenue')}")
+                print(f"   Orders: {json_data.get('orders')}")
+                print(f"   Margin: {json_data.get('margin')}")
         
         if result.get('error'):
-            print(f"    Error: {result['error']}")
+            print(f"   Exception: {result['error']}")
     
-    # Check for routing failures (404s)
-    routing_failures = [r for r in results if r.get('status_code') == 404]
-    if routing_failures:
-        print(f"\n🚨 ROUTING FAILURES DETECTED ({len(routing_failures)} endpoints returned 404):")
-        for failure in routing_failures:
-            print(f"  - {failure['method']} {failure['endpoint']}")
-            if failure.get('raw_response'):
-                print(f"    Response: {failure['raw_response'][:200]}...")
+    # Analysis
+    print("\n" + "=" * 80)
+    print("🔍 ANALYSIS OF FILTER FIX IMPACT")
+    print("=" * 80)
     
-    # Check for unhandled errors (non-JSON 500s)
-    unhandled_errors = [r for r in results if r.get('status_code') == 500 and not r.get('json_data')]
-    if unhandled_errors:
-        print(f"\n🚨 UNHANDLED ERRORS DETECTED ({len(unhandled_errors)} endpoints returned non-JSON 500s):")
-        for error in unhandled_errors:
-            print(f"  - {error['method']} {error['endpoint']}")
-            if error.get('raw_response'):
-                print(f"    Response: {error['raw_response'][:200]}...")
+    # Check date-range improvement
+    date_range_result = results[1]  # Second test
+    if date_range_result['status_code'] == 200:
+        data = date_range_result.get('json_data', {})
+        if data.get('ok') == True:
+            print("✅ SUCCESS: date-range now returns 200 ok:true (filter fix worked!)")
+            print(f"   minDate: {data.get('minDate', 'null')}")
+            print(f"   maxDate: {data.get('maxDate', 'null')}")
+        elif data.get('ok') == False:
+            print("⚠️  PARTIAL: date-range returns 200 ok:false (better than 500)")
+        else:
+            print("⚠️  PARTIAL: date-range returns 200 but no ok field")
+    elif date_range_result['status_code'] == 500:
+        print("❌ NO IMPROVEMENT: date-range still returns 500")
+    else:
+        print(f"❓ UNEXPECTED: date-range returns {date_range_result['status_code']}")
     
-    print(f"\n🎯 OVERALL RESULT: {'✅ ALL TESTS PASSED' if passed == total else f'❌ {total - passed} TESTS FAILED'}")
+    # Record KPI response
+    kpi_result = results[2]
+    print(f"\n📝 KPI endpoint response: {kpi_result['status_code']}")
+    if kpi_result.get('json_data'):
+        data = kpi_result['json_data']
+        print(f"   ok: {data.get('ok')}")
+        if data.get('error'):
+            print(f"   error: {data['error']}")
     
-    return results, passed == total
+    # Record platform-timeseries response  
+    platform_result = results[3]
+    print(f"\n📝 Platform-timeseries endpoint response: {platform_result['status_code']}")
+    if platform_result.get('json_data'):
+        data = platform_result['json_data']
+        if isinstance(data, list):
+            print(f"   Returns array with {len(data)} items")
+        else:
+            print(f"   ok: {data.get('ok')}")
+            if data.get('error'):
+                print(f"   error: {data['error']}")
+    
+    # Overall assessment
+    critical_failures = [r for r in results if not r['success'] and not r['result'].startswith('📝')]
+    if not critical_failures:
+        print(f"\n🎯 OVERALL: All endpoints responding properly (no critical failures)")
+    else:
+        print(f"\n⚠️  OVERALL: {len(critical_failures)} endpoints have critical issues")
+    
+    return results, len(critical_failures) == 0
 
 if __name__ == "__main__":
     results, success = main()
