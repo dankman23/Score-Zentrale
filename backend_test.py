@@ -111,48 +111,42 @@ def test_endpoint(method, endpoint, params=None, expect_200_ok=None):
         }
 
 def main():
-    """Test new shipping-split endpoint and regression tests as requested"""
+    """Test JTL Orders diagnostics and KPI endpoints as requested"""
     print("=" * 80)
-    print("🔄 NEW SHIPPING-SPLIT ENDPOINT + REGRESSION TESTS")
+    print("🔄 JTL ORDERS DIAGNOSTICS AND KPI TESTING")
     print("=" * 80)
     print(f"Base URL: {BASE_URL}")
     print(f"API Base: {API_BASE}")
     print(f"Test Time: {datetime.now().isoformat()}")
     print("\nAs requested in review_request:")
-    print("1) GET /api/jtl/orders/kpi/shipping-split?month=2025-10")
-    print("   - Expected fields: ok, period.from, period.to, orders, net.with_shipping, net.without_shipping, gross.with_shipping, gross.without_shipping")
-    print("2) GET /api/jtl/orders/kpi/shipping-split?from=2025-10-01&to=2025-10-31")
-    print("   - Same field checks")
-    print("3) Regression: /api/jtl/sales/kpi and /api/jtl/sales/platform-timeseries should still return 200")
+    print("1) GET /api/jtl/orders/diag/day?date=2025-11-03")
+    print("   - Expected: 200 ok:true; check presence of totals.orders, totals.gross, rows array")
+    print("2) GET /api/jtl/orders/kpi/shipping-split?from=2025-11-03&to=2025-11-03")
+    print("   - Expected: 200 ok:true and flat fields: orders, net_without_shipping, net_with_shipping, gross_without_shipping, gross_with_shipping")
+    print("3) Sanity: GET /api/jtl/orders/timeseries?from=2025-11-01&to=2025-11-03")
+    print("   - Expected: 200 ok:true with grain and rows array")
     
     results = []
     
-    # Test 1: NEW shipping-split endpoint with month parameter
+    # Test 1: Orders diagnostics for specific day
     print("\n" + "="*50)
-    print("TEST 1: NEW Shipping-Split KPI with month parameter")
-    params = {'month': '2025-10'}
+    print("TEST 1: Orders Diagnostics for 2025-11-03")
+    params = {'date': '2025-11-03'}
+    result = test_endpoint('GET', '/jtl/orders/diag/day', params=params, expect_200_ok=True)
+    results.append(result)
+    
+    # Test 2: Orders KPI shipping-split for specific day
+    print("\n" + "="*50)
+    print("TEST 2: Orders KPI Shipping-Split for 2025-11-03")
+    params = {'from': '2025-11-03', 'to': '2025-11-03'}
     result = test_endpoint('GET', '/jtl/orders/kpi/shipping-split', params=params, expect_200_ok=True)
     results.append(result)
     
-    # Test 2: NEW shipping-split endpoint with from/to parameters
+    # Test 3: Sanity check - Orders timeseries
     print("\n" + "="*50)
-    print("TEST 2: NEW Shipping-Split KPI with from/to parameters")
-    params = {'from': '2025-10-01', 'to': '2025-10-31'}
-    result = test_endpoint('GET', '/jtl/orders/kpi/shipping-split', params=params, expect_200_ok=True)
-    results.append(result)
-    
-    # Test 3: REGRESSION - JTL Sales KPI should still work
-    print("\n" + "="*50)
-    print("TEST 3: REGRESSION - JTL Sales KPI (should still return 200)")
-    params = {'from': '2025-10-01', 'to': '2025-10-31'}
-    result = test_endpoint('GET', '/jtl/sales/kpi', params=params, expect_200_ok=True)
-    results.append(result)
-    
-    # Test 4: REGRESSION - JTL Sales Platform Timeseries should still work
-    print("\n" + "="*50)
-    print("TEST 4: REGRESSION - JTL Sales Platform Timeseries (should still return 200)")
-    params = {'from': '2025-10-01', 'to': '2025-10-31'}
-    result = test_endpoint('GET', '/jtl/sales/platform-timeseries', params=params, expect_200_ok=True)
+    print("TEST 3: SANITY - Orders Timeseries (2025-11-01 to 2025-11-03)")
+    params = {'from': '2025-11-01', 'to': '2025-11-03'}
+    result = test_endpoint('GET', '/jtl/orders/timeseries', params=params, expect_200_ok=True)
     results.append(result)
     
     # Summary
