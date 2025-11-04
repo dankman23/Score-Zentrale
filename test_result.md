@@ -418,8 +418,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "NEW shipping-split endpoint testing completed - all tests passed"
-    - "Regression testing completed - no issues detected"
+    - "JTL Orders diagnostics and KPI testing completed - all tests passed"
+    - "Orders endpoints verified for 2025-11-03 date range"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
