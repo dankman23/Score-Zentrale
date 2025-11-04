@@ -88,7 +88,8 @@ async function getOnlyArticleWhere(pool, table, alias){
 async function getShippingPredicate(pool, table, alias){
   const has = await hasColumn(pool, table, 'nPosTyp')
   if (has) return `${alias}.nPosTyp IN (3,4)`
-  return `${alias}.kArtikel = 0 AND (ISNULL(${alias}.cName,'') LIKE 'Versand%' OR ISNULL(${alias}.cArtNr,'') LIKE 'VERSAND%')`
+  // Fallback: erkennen Versand auch dann, wenn als Artikel geführt wird (kArtikel > 0)
+  return `(ISNULL(${alias}.cName,'') LIKE 'Versand%' OR ISNULL(${alias}.cArtNr,'') LIKE 'VERSAND%' OR ISNULL(${alias}.cName,'') LIKE '%Shipping%' OR ISNULL(${alias}.cName,'') LIKE 'Fracht%' OR ISNULL(${alias}.cName,'') LIKE 'Porto%' OR ISNULL(${alias}.cName,'') LIKE 'Transport%')`
 }
 
 async function pickFirstExisting(pool, table, candidates){
