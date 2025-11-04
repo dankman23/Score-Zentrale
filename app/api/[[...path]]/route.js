@@ -439,11 +439,13 @@ async function handleRoute(request, { params }) {
         const isShipping = await getShippingPredicate(pool, table, 'op')
         const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
         const channelSql = buildChannelSql(channel, platformIds, shopIds)
+        const articleWhere = await getOnlyArticleWhere(pool, 'Verkauf.tAuftragPosition', 'op')
         const sqlText = `DECLARE @from date = @pfrom, @to date = @pto;
           ;WITH heads AS (
-            SELECT o.kAuftrag
+            SELECT DISTINCT o.kAuftrag
             FROM Verkauf.tAuftrag o
-            WHERE o.dErstellt >= @from AND o.dErstellt < DATEADD(day,1,@to) ${cancelCheck} ${channelSql}
+            JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
+            WHERE o.dErstellt >= @from AND o.dErstellt < DATEADD(day,1,@to) ${cancelCheck} ${channelSql} AND (${articleWhere})
           )
           SELECT 
             COUNT(DISTINCT h.kAuftrag) AS orders,
