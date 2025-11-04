@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Score Zentrale MVP
-Tests all backend endpoints according to test_result.md requirements
+Backend API Smoke Tests for Score Zentrale JTL Analytics
+Tests the specific endpoints requested in the review_request
 """
 
 import requests
