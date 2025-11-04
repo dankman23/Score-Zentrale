@@ -46,7 +46,6 @@ function cors(response) {
 export async function OPTIONS() { return cors(new NextResponse(null, { status: 200 })) }
 
 function buildDateParams(searchParams){
-  // Supports from/to or month=YYYY-MM
   const month = searchParams.get('month')
   if (month) {
     const [y,m] = month.split('-').map(x=>parseInt(x,10))
@@ -59,6 +58,18 @@ function buildDateParams(searchParams){
   return { from, to }
 }
 
+function parseIdsParam(sp, key){
+  const raw = sp.get(key)
+  if (!raw) return []
+  return raw.split(',').map(s=>parseInt(s.trim(),10)).filter(n=>Number.isFinite(n))
+}
+
+function autoGrain(from, to, userGrain){
+  if (userGrain && userGrain !== 'auto') return userGrain
+  const days = (new Date(to).getTime() - new Date(from).getTime())/86400000
+  return days <= 60 ? 'day' : (days <= 548 ? 'month' : 'year')
+}
+
 // Helpers for MSSQL metadata and dynamic SQL building
 async function hasColumn(pool, table, column){
   const r = await pool.request()
@@ -69,14 +80,12 @@ async function hasColumn(pool, table, column){
 }
 
 async function getOnlyArticleWhere(pool, table, alias){
-  // Build a predicate string without referencing nPosTyp if it doesn't exist
   const has = await hasColumn(pool, table, 'nPosTyp')
   if (has) return `${alias}.nPosTyp = 1`
   return `${alias}.kArtikel > 0 AND ISNULL(${alias}.cName,'') NOT LIKE 'Versand%' AND ISNULL(${alias}.cName,'') NOT LIKE 'Gutschein%' AND ISNULL(${alias}.cName,'') NOT LIKE 'Rabatt%' AND ISNULL(${alias}.cName,'') NOT LIKE 'Pfand%'`
 }
 
 async function getShippingPredicate(pool, table, alias){
-  // Returns a predicate string that evaluates to 1 for shipping rows
   const has = await hasColumn(pool, table, 'nPosTyp')
   if (has) return `${alias}.nPosTyp IN (3,4)`
   return `${alias}.kArtikel = 0 AND (ISNULL(${alias}.cName,'') LIKE 'Versand%' OR ISNULL(${alias}.cArtNr,'') LIKE 'VERSAND%')`
@@ -88,6 +97,18 @@ async function pickFirstExisting(pool, table, candidates){
 }
 
 function json(data, init){ return cors(NextResponse.json(data, init)) }
+
+function buildChannelSql(channel, platformIds, shopIds){
+  const parts = []
+  if (channel && channel !== 'all'){
+    if (channel === 'platform') parts.push('o.kPlattform IS NOT NULL')
+    else if (channel === 'shop') parts.push('o.kShop IS NOT NULL AND o.kPlattform IS NULL')
+    else if (channel === 'direct') parts.push('o.kPlattform IS NULL AND o.kShop IS NULL')
+  }
+  if (platformIds?.length) parts.push(`o.kPlattform IN (${platformIds.map(n=>n).join(',')})`)
+  if (shopIds?.length) parts.push(`o.kShop IN (${shopIds.map(n=>n).join(',')})`)
+  return parts.length ? (' AND ' + parts.join(' AND ')) : ''
+}
 
 async function handleRoute(request, { params }) {
   const { path = [] } = params
@@ -182,7 +203,7 @@ async function handleRoute(request, { params }) {
                    FROM Rechnung.tRechnung r
                    JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
                    WHERE ${where}`
-        const r = await pool.request().query(q) // expects no nPosTyp since where built dynamically
+        const r = await pool.request().query(q)
         const row = r?.recordset?.[0] || {}
         return json({ ok:true, minDate: row.minDate ? new Date(row.minDate).toISOString().slice(0,10) : null, maxDate: row.maxDate ? new Date(row.maxDate).toISOString().slice(0,10) : null })
       } catch(err){
@@ -319,7 +340,6 @@ async function handleRoute(request, { params }) {
       const { from, to } = buildDateParams(sp)
       try{
         const pool = await getMssqlPool()
-        // Build a source text from available columns on Rechnung
         const cols = ['cBestellNr','cInetBestellnummer','cHinweis','cRechnungsNr']
         const present = []
         for (const c of cols){ if (await hasColumn(pool, 'Rechnung.tRechnung', c)) present.push(`ISNULL(r.[${c}], '')`) }
@@ -385,13 +405,16 @@ async function handleRoute(request, { params }) {
     }
 
     // ========== NEW: ORDERS SHIPPING SPLIT KPI (AUFTRAG) ==========
-    if (route === '/jtl/orders/kpi/shipping-split' && method === 'GET'){
+    if (route === '/jtl/orders/kpi/shipping-split' && (method === 'GET' || method === 'POST')){
       const sp = new URL(request.url).searchParams
+      const body = method === 'POST' ? (await request.json().catch(()=>({}))) : {}
       const { from, to } = buildDateParams(sp)
+      const channel = (sp.get('channel') || body.channel || 'all').toLowerCase()
+      const platformIds = (body.platformIds && Array.isArray(body.platformIds)) ? body.platformIds : parseIdsParam(sp, 'platformIds')
+      const shopIds = (body.shopIds && Array.isArray(body.shopIds)) ? body.shopIds : parseIdsParam(sp, 'shopIds')
       try {
         const pool = await getMssqlPool()
         const table = 'Verkauf.tAuftragPosition'
-        // Prefer extended (positionssumme) columns first to avoid double counting with qty
         const extNetCol = await pickFirstExisting(pool, table, ['fGesamtNetto','fVKNettoGesamt','fWertNetto','fWert'])
         const extGrossCol = await pickFirstExisting(pool, table, ['fGesamtBrutto','fVKBruttoGesamt','fWertBrutto'])
         const netCol = await pickFirstExisting(pool, table, ['fVKNetto','fNetto','fPreisNetto'])
@@ -399,7 +422,6 @@ async function handleRoute(request, { params }) {
         const qtyCol = await pickFirstExisting(pool, table, ['fMenge','nMenge','fAnzahl'])
         const taxCol = await pickFirstExisting(pool, table, ['fMwSt','fMwst','fMwStProzent'])
         const extendedAny = !!(extNetCol || extGrossCol)
-        // Build expressions (extended -> qty=1)
         const qtyExpr = extendedAny ? 'CAST(1 AS float)' : (qtyCol ? `CAST(op.[${qtyCol}] AS float)` : 'CAST(1 AS float)')
         const netExpr = extNetCol ? `CAST(op.[${extNetCol}] AS float)` : (netCol ? `CAST(op.[${netCol}] AS float)` : 'CAST(0 AS float)')
         const grossExpr = extGrossCol
@@ -407,23 +429,200 @@ async function handleRoute(request, { params }) {
           : (grossCol ? `CAST(op.[${grossCol}] AS float)` : `(${netExpr}) * (1 + (CAST(${taxCol?`op.[${taxCol}]`:'0'} AS float)/100.0))`)
         const isShipping = await getShippingPredicate(pool, table, 'op')
         const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
+        const channelSql = buildChannelSql(channel, platformIds, shopIds)
         const sqlText = `DECLARE @from date = @pfrom, @to date = @pto;
           ;WITH heads AS (
             SELECT o.kAuftrag
             FROM Verkauf.tAuftrag o
-            WHERE CONVERT(date, o.dErstellt) BETWEEN @from AND @to ${cancelCheck}
+            WHERE o.dErstellt >= @from AND o.dErstellt < DATEADD(day,1,@to) ${cancelCheck} ${channelSql}
           )
           SELECT 
             (SELECT COUNT(*) FROM heads) AS orders,
-            -- NETTO
-            CAST(SUM(CASE WHEN ${extNetCol?`1=1`:`${netCol?`1=1`:`1=0`}`} THEN (${netExpr}) * (${qtyExpr}) ELSE 0 END) AS float) AS net_with_shipping,
+            CAST(SUM((${netExpr}) * (${qtyExpr})) AS float) AS net_with_shipping,
             CAST(SUM(CASE WHEN NOT (${isShipping}) THEN (${netExpr}) * (${qtyExpr}) ELSE 0 END) AS float) AS net_without_shipping,
-            -- BRUTTO: bevorzugt extGross; sonst aus NETTO+MwSt; sonst unitGross*qty
-            CAST(SUM(CASE WHEN ${extGrossCol?`1=1`:'0=1'} THEN CAST(op.[${extGrossCol||'__x'}] AS float)
-                          WHEN ${extNetCol?`1=1`:'0=1'} THEN (${netExpr}) * (1 + (CAST(${taxCol?`op.[${taxCol}]`:'0'} AS float)/100.0))
-                          WHEN ${grossCol?`1=1`:'0=1'} THEN CAST(op.[${grossCol||'__x'}] AS float) * (${qtyExpr})
-                          ELSE 0 END) AS float) AS gross_with_shipping,
-            CAST(SUM(CASE WHEN NOT (${isShipping}) THEN 
+            CAST(SUM((${grossExpr}) * (${qtyExpr})) AS float) AS gross_with_shipping,
+            CAST(SUM(CASE WHEN NOT (${isShipping}) THEN (${grossExpr}) * (${qtyExpr}) ELSE 0 END) AS float) AS gross_without_shipping
+          FROM heads h
+          JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = h.kAuftrag`
+        const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
+        const row = res?.recordset?.[0] || {}
+        return json({ ok:true, period:{ from, to }, orders: row.orders||0, net_without_shipping: row.net_without_shipping||0, net_with_shipping: row.net_with_shipping||0, gross_without_shipping: row.gross_without_shipping||0, gross_with_shipping: row.gross_with_shipping||0 })
+      } catch(err){
+        console.error('orders shipping-split SQL error', err)
+        return json({ ok:false, error: String(err?.message||err) }, { status: 500 })
+      }
+    }
+
+    // ========== NEW: ORDERS TIMESERIES (AUFTRAG) ==========
+    if (route === '/jtl/orders/timeseries' && method === 'GET'){
+      const sp = new URL(request.url).searchParams
+      const { from, to } = buildDateParams(sp)
+      const channel = (sp.get('channel') || 'all').toLowerCase()
+      const platformIds = parseIdsParam(sp, 'platformIds')
+      const shopIds = parseIdsParam(sp, 'shopIds')
+      const userGrain = (sp.get('grain') || 'auto').toLowerCase()
+      const grain = autoGrain(from, to, userGrain)
+      try {
+        const pool = await getMssqlPool()
+        const table = 'Verkauf.tAuftragPosition'
+        const extNetCol = await pickFirstExisting(pool, table, ['fGesamtNetto','fVKNettoGesamt','fWertNetto','fWert'])
+        const extGrossCol = await pickFirstExisting(pool, table, ['fGesamtBrutto','fVKBruttoGesamt','fWertBrutto'])
+        const netCol = await pickFirstExisting(pool, table, ['fVKNetto','fNetto','fPreisNetto'])
+        const grossCol = await pickFirstExisting(pool, table, ['fVKBrutto','fBrutto','fPreisBrutto'])
+        const qtyCol = await pickFirstExisting(pool, table, ['fMenge','nMenge','fAnzahl'])
+        const taxCol = await pickFirstExisting(pool, table, ['fMwSt','fMwst','fMwStProzent'])
+        const extendedAny = !!(extNetCol || extGrossCol)
+        const qtyExpr = extendedAny ? 'CAST(1 AS float)' : (qtyCol ? `CAST(op.[${qtyCol}] AS float)` : 'CAST(1 AS float)')
+        const netExpr = extNetCol ? `CAST(op.[${extNetCol}] AS float)` : (netCol ? `CAST(op.[${netCol}] AS float)` : 'CAST(0 AS float)')
+        const grossExpr = extGrossCol
+          ? `CAST(op.[${extGrossCol}] AS float)`
+          : (grossCol ? `CAST(op.[${grossCol}] AS float)` : `(${netExpr}) * (1 + (CAST(${taxCol?`op.[${taxCol}]`:'0'} AS float)/100.0))`)
+        const isShipping = await getShippingPredicate(pool, table, 'op')
+        const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
+        const channelSql = buildChannelSql(channel, platformIds, shopIds)
+        const bucket = grain === 'day' ? "CAST(o.dErstellt AS date)"
+                     : grain === 'month' ? "DATEFROMPARTS(YEAR(o.dErstellt), MONTH(o.dErstellt), 1)"
+                     : "DATEFROMPARTS(YEAR(o.dErstellt), 1, 1)"
+        const sqlText = `DECLARE @from date = @pfrom, @to date = @pto;
+          ;WITH base AS (
+            SELECT ${bucket} AS d,
+                   CASE WHEN ${isShipping} THEN 1 ELSE 0 END AS is_ship,
+                   (${netExpr}) * (${qtyExpr}) AS net,
+                   (${grossExpr}) * (${qtyExpr}) AS gross,
+                   o.kAuftrag
+            FROM Verkauf.tAuftrag o
+            JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
+            WHERE o.dErstellt >= @from AND o.dErstellt < DATEADD(day,1,@to) ${cancelCheck} ${channelSql}
+          )
+          SELECT d AS date,
+                 CAST(SUM(CASE WHEN is_ship=0 THEN net   ELSE 0 END) AS float) AS net_wo_ship,
+                 CAST(SUM(net) AS float) AS net_w_ship,
+                 CAST(SUM(CASE WHEN is_ship=0 THEN gross ELSE 0 END) AS float) AS gross_wo_ship,
+                 CAST(SUM(gross) AS float) AS gross_w_ship,
+                 COUNT(DISTINCT kAuftrag) AS orders
+          FROM base
+          GROUP BY d
+          ORDER BY d ASC`
+        const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
+        return json({ ok:true, grain, rows: res.recordset || [] })
+      } catch(err){
+        console.error('orders timeseries SQL error', err)
+        return json({ ok:false, error: String(err?.message||err) }, { status: 500 })
+      }
+    }
+
+    // ========== NEW: ORDERS PLATFORM TIMESERIES ==========
+    if (route === '/jtl/orders/platform-timeseries' && method === 'GET'){
+      const sp = new URL(request.url).searchParams
+      const { from, to } = buildDateParams(sp)
+      const channel = (sp.get('channel') || 'all').toLowerCase()
+      const platformIds = parseIdsParam(sp, 'platformIds')
+      const shopIds = parseIdsParam(sp, 'shopIds')
+      const userGrain = (sp.get('grain') || 'auto').toLowerCase()
+      const grain = autoGrain(from, to, userGrain)
+      try {
+        const pool = await getMssqlPool()
+        const table = 'Verkauf.tAuftragPosition'
+        const extNetCol = await pickFirstExisting(pool, table, ['fGesamtNetto','fVKNettoGesamt','fWertNetto','fWert'])
+        const netCol = await pickFirstExisting(pool, table, ['fVKNetto','fNetto','fPreisNetto'])
+        const qtyCol = await pickFirstExisting(pool, table, ['fMenge','nMenge','fAnzahl'])
+        const taxCol = await pickFirstExisting(pool, table, ['fMwSt','fMwst','fMwStProzent'])
+        const extendedAny = !!(extNetCol)
+        const qtyExpr = extendedAny ? 'CAST(1 AS float)' : (qtyCol ? `CAST(op.[${qtyCol}] AS float)` : 'CAST(1 AS float)')
+        const netExprRaw = extNetCol ? `CAST(op.[${extNetCol}] AS float)` : (netCol ? `CAST(op.[${netCol}] AS float)` : 'CAST(0 AS float)')
+        // For platform-timeseries default to net without shipping
+        const isShipping = await getShippingPredicate(pool, table, 'op')
+        const netExpr = `CASE WHEN NOT (${isShipping}) THEN (${netExprRaw}) * (${qtyExpr}) ELSE 0 END`
+        const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
+        const channelSql = buildChannelSql(channel, platformIds, shopIds)
+        const bucket = grain === 'day' ? "CAST(o.dErstellt AS date)"
+                     : grain === 'month' ? "DATEFROMPARTS(YEAR(o.dErstellt), MONTH(o.dErstellt), 1)"
+                     : "DATEFROMPARTS(YEAR(o.dErstellt), 1, 1)"
+        const sqlText = `DECLARE @from date = @pfrom, @to date = @pto;
+          ;WITH base AS (
+            SELECT ${bucket} AS d,
+                   o.kAuftrag, o.kPlattform, o.kShop,
+                   ${netExpr} AS revenue_net
+            FROM Verkauf.tAuftrag o
+            JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
+            WHERE o.dErstellt >= @from AND o.dErstellt < DATEADD(day,1,@to) ${cancelCheck} ${channelSql}
+          )
+          SELECT b.d AS date,
+                 CASE WHEN b.kPlattform IS NOT NULL THEN CONCAT('PLT_', b.kPlattform)
+                      WHEN b.kShop IS NOT NULL THEN CONCAT('SHOP_', b.kShop)
+                      ELSE 'DIRECT' END AS pKey,
+                 COALESCE(p.cName, s.cName,
+                          CASE WHEN b.kPlattform IS NOT NULL THEN CONCAT('Plattform ', b.kPlattform)
+                               WHEN b.kShop IS NOT NULL THEN CONCAT('Shop ', b.kShop)
+                               ELSE 'Direktvertrieb' END) AS pName,
+                 CAST(SUM(b.revenue_net) AS float) AS net
+          FROM base b
+          LEFT JOIN dbo.tPlattform p ON p.kPlattform = b.kPlattform
+          LEFT JOIN dbo.tShop s ON s.kShop = b.kShop
+          GROUP BY b.d, CASE WHEN b.kPlattform IS NOT NULL THEN CONCAT('PLT_', b.kPlattform)
+                             WHEN b.kShop IS NOT NULL THEN CONCAT('SHOP_', b.kShop)
+                             ELSE 'DIRECT' END,
+                   COALESCE(p.cName, s.cName,
+                            CASE WHEN b.kPlattform IS NOT NULL THEN CONCAT('Plattform ', b.kPlattform)
+                                 WHEN b.kShop IS NOT NULL THEN CONCAT('Shop ', b.kShop)
+                                 ELSE 'Direktvertrieb' END)
+          ORDER BY date ASC`
+        const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
+        return json({ ok:true, grain, rows: res.recordset || [] })
+      } catch(err){
+        console.error('orders platform-timeseries SQL error', err)
+        return json({ ok:false, error: String(err?.message||err) }, { status: 500 })
+      }
+    }
+
+    // ========== NEW: ORDERS KPI COMPARE ==========
+    if (route === '/jtl/orders/kpi/compare' && method === 'GET'){
+      const sp = new URL(request.url).searchParams
+      const { from, to } = buildDateParams(sp)
+      const channel = (sp.get('channel') || 'all').toLowerCase()
+      const platformIds = parseIdsParam(sp, 'platformIds')
+      const shopIds = parseIdsParam(sp, 'shopIds')
+      try {
+        const pool = await getMssqlPool()
+        const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
+        const channelSql = buildChannelSql(channel, platformIds, shopIds)
+        const table = 'Verkauf.tAuftragPosition'
+        const extNetCol = await pickFirstExisting(pool, table, ['fGesamtNetto','fVKNettoGesamt','fWertNetto','fWert'])
+        const extGrossCol = await pickFirstExisting(pool, table, ['fGesamtBrutto','fVKBruttoGesamt','fWertBrutto'])
+        const netCol = await pickFirstExisting(pool, table, ['fVKNetto','fNetto','fPreisNetto'])
+        const grossCol = await pickFirstExisting(pool, table, ['fVKBrutto','fBrutto','fPreisBrutto'])
+        const qtyCol = await pickFirstExisting(pool, table, ['fMenge','nMenge','fAnzahl'])
+        const taxCol = await pickFirstExisting(pool, table, ['fMwSt','fMwst','fMwStProzent'])
+        const extendedAny = !!(extNetCol || extGrossCol)
+        const qtyExpr = extendedAny ? 'CAST(1 AS float)' : (qtyCol ? `CAST(op.[${qtyCol}] AS float)` : 'CAST(1 AS float)')
+        const netExpr = extNetCol ? `CAST(op.[${extNetCol}] AS float)` : (netCol ? `CAST(op.[${netCol}] AS float)` : 'CAST(0 AS float)')
+        const grossExpr = extGrossCol
+          ? `CAST(op.[${extGrossCol}] AS float)`
+          : (grossCol ? `CAST(op.[${grossCol}] AS float)` : `(${netExpr}) * (1 + (CAST(${taxCol?`op.[${taxCol}]`:'0'} AS float)/100.0))`)
+        const isShipping = await getShippingPredicate(pool, table, 'op')
+        const summarySql = (rangeCond) => `;WITH heads AS (SELECT o.kAuftrag FROM Verkauf.tAuftrag o WHERE ${rangeCond} ${cancelCheck} ${channelSql})
+          SELECT (SELECT COUNT(*) FROM heads) AS orders,
+                 CAST(SUM((${netExpr})*(${qtyExpr})) AS float) AS net_with_shipping,
+                 CAST(SUM(CASE WHEN NOT (${isShipping}) THEN (${netExpr})*(${qtyExpr}) ELSE 0 END) AS float) AS net_without_shipping,
+                 CAST(SUM((${grossExpr})*(${qtyExpr})) AS float) AS gross_with_shipping,
+                 CAST(SUM(CASE WHEN NOT (${isShipping}) THEN (${grossExpr})*(${qtyExpr}) ELSE 0 END) AS float) AS gross_without_shipping
+          FROM heads h JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = h.kAuftrag`
+        // Current range (inclusive to)
+        const currentRange = 'o.dErstellt >= @from AND o.dErstellt < DATEADD(day,1,@to)'
+        const cur = await pool.request().input('from', sql.Date, from).input('to', sql.Date, to).query(summarySql(currentRange))
+        // Previous range
+        const fromD = new Date(from); const toD = new Date(to)
+        const lenDays = Math.floor((toD.getTime() - fromD.getTime())/86400000) + 1
+        const prevTo = new Date(fromD.getTime() - 1*86400000)
+        const prevFrom = new Date(prevTo.getTime() - (lenDays-1)*86400000)
+        const pf = prevFrom.toISOString().slice(0,10); const pt = prevTo.toISOString().slice(0,10)
+        const prev = await pool.request().input('pf', sql.Date, pf).input('pt', sql.Date, pt).query(summarySql('o.dErstellt >= @pf AND o.dErstellt < DATEADD(day,1,@pt)'))
+        return json({ ok:true, current: cur?.recordset?.[0]||{}, previous: prev?.recordset?.[0]||{}, period:{ from, to }, previousPeriod:{ from: pf, to: pt } })
+      } catch(err){
+        console.error('orders kpi compare SQL error', err)
+        return json({ ok:false, error: String(err?.message||err) }, { status: 500 })
+      }
+    }
 
     // ========== JTL ORDERS DIAG: DAY BREAKDOWN ==========
     if (route === '/jtl/orders/diag/day' && method === 'GET'){
@@ -470,22 +669,6 @@ async function handleRoute(request, { params }) {
         return json({ ok:true, date, totals, rows })
       } catch(err){
         console.error('orders diag/day SQL error', err)
-        return json({ ok:false, error: String(err?.message||err) }, { status: 500 })
-      }
-    }
-
-                          CASE WHEN ${extGrossCol?`1=1`:'0=1'} THEN CAST(op.[${extGrossCol||'__x'}] AS float)
-                               WHEN ${extNetCol?`1=1`:'0=1'} THEN (${netExpr}) * (1 + (CAST(${taxCol?`op.[${taxCol}]`:'0'} AS float)/100.0))
-                               WHEN ${grossCol?`1=1`:'0=1'} THEN CAST(op.[${grossCol||'__x'}] AS float) * (${qtyExpr})
-                               ELSE 0 END
-                        ELSE 0 END) AS float) AS gross_without_shipping
-          FROM heads h
-          JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = h.kAuftrag`
-        const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
-        const row = res?.recordset?.[0] || {}
-        return json({ ok:true, period:{ from, to }, orders: row.orders||0, net: { with_shipping: row.net_with_shipping||0, without_shipping: row.net_without_shipping||0 }, gross: { with_shipping: row.gross_with_shipping||0, without_shipping: row.gross_without_shipping||0 } })
-      } catch(err){
-        console.error('orders shipping-split SQL error', err)
         return json({ ok:false, error: String(err?.message||err) }, { status: 500 })
       }
     }
