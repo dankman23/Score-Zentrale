@@ -160,7 +160,7 @@ async function handleRoute(request, { params }) {
                    FROM Rechnung.tRechnung r
                    JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
                    WHERE ${where}`
-        const r = await pool.request().query(q)
+        const r = await pool.request().query(q) // expects no nPosTyp since where built dynamically
         const row = r?.recordset?.[0] || {}
         return json({ ok:true, minDate: row.minDate ? new Date(row.minDate).toISOString().slice(0,10) : null, maxDate: row.maxDate ? new Date(row.maxDate).toISOString().slice(0,10) : null })
       } catch(err){
