@@ -404,7 +404,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "JTL backend smoke tests completed - all endpoints working with proper error handling"
+    - "JTL endpoints re-test after filter fix completed - all endpoints now returning 200 responses"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
