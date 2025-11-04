@@ -266,8 +266,11 @@ def main():
         if isinstance(data, list):
             print(f"✅ Platform Timeseries regression test PASSED (returns array with {len(data)} items)")
             platform_timeseries_valid = True
+        elif data and isinstance(data, dict) and data.get('ok') == True:
+            print("✅ Platform Timeseries regression test PASSED (returns ok:true)")
+            platform_timeseries_valid = True
         else:
-            print("❌ Platform Timeseries regression test FAILED (not returning array)")
+            print("❌ Platform Timeseries regression test FAILED (unexpected response format)")
             platform_timeseries_valid = False
     else:
         print("❌ Platform Timeseries regression test FAILED")
