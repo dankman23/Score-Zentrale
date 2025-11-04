@@ -258,3 +258,133 @@ agent_communication:
     message: "Bitte Backend-Routen gemäß test_plan prüfen. Mongo steht über MONGO_URL bereit; Collections werden on-the-fly angelegt. Keine externen Keys erforderlich."
   - agent: "testing"
     message: "✅ Backend testing completed successfully! All high-priority endpoints tested and working: GET /api/kpis (verified structure), Prospects flow (POST+GET with UUID, no _id), POST /api/analyze (returns productGroups/materials/hypotheses, creates DB entries), POST /api/mailer/compose (returns subject/text/html), Status endpoints (GET+POST working). Fixed minor _id cleanup issue in POST /api/prospects response. All 5/5 core backend tests PASSED. Ready for main agent to summarize and finish."
+  - task: "JTL Sales: GET /api/jtl/ping"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implementiert Ping mit hasColumn(COL_LENGTH) Check für nPosTyp"
+  - task: "JTL Sales: GET /api/jtl/sales/date-range"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Ermittelt min/max Rechnungsdatum basierend auf Artikelposition-Filter"
+  - task: "JTL Sales: GET /api/jtl/sales/kpi"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Aggregiert Umsatz/Orders/Marge mit runtime-sicherem Artikel-Filter"
+  - task: "JTL Sales: GET /api/jtl/sales/kpi/with_platform_fees"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Berechnet Marge inkl. Gebühren pauschal (20% + 1.5 EUR pro Rechnung)"
+  - task: "JTL Sales: GET /api/jtl/sales/timeseries"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Zeitreihe Umsatz/Marge pro Tag"
+  - task: "JTL Sales: GET /api/jtl/sales/timeseries/with_platform_fees"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Zeitreihe Umsatz + Marge inkl. Gebühren pro Tag"
+  - task: "JTL Sales: GET /api/jtl/sales/platform-timeseries"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Zeitreihe Umsatz nach Plattform (CASE über Rechnungs-Felder)"
+  - task: "JTL Sales: GET /api/jtl/sales/top-products"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Top-Produkte mit dynamischer Spalten-Erkennung (ArtNr, Name)"
+frontend:
+  - task: "Hero sichtbar + abgeschwächt (Overlay, Shield)"
+    implemented: true
+    working: "NA"
+    file: "/app/public/styles/score-theme.css"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Höhe ~170px, weniger Sättigung/Helligkeit, Shields unterlegen für Logo/Text"
+  - task: "Dashboard Degraded Mode (Demo) + Autorange via /date-range"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Bei 500ern und Flag NEXT_PUBLIC_DEGRADED=1: Demo-Snapshot mit Badge; Zeitraum ggf. automatisch anpassen"
+metadata:
+  created_by: "main_agent"
+  version: "1.1"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Test JTL: GET /api/jtl/ping returns ok or clear error JSON"
+    - "Test JTL: GET /api/jtl/sales/date-range returns minDate/maxDate"
+    - "Test JTL: GET /api/jtl/sales/kpi & timeseries endpoints"
+  stuck_tasks:
+    - "JTL endpoints previously returned 404 in logs; verify routing and path matching"
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Bitte zuerst Backend-Tests für neue JTL-Endpunkte ausführen. Erwartung: 200 mit ok:true oder 500 mit ok:false, aber keine unhandled errors. Danach gebe ich Go für UI-Tests."
