@@ -191,7 +191,7 @@ async function handleRoute(request, { params }) {
             CAST(SUM(CAST(${rev} AS float) - CAST(${cost} AS float)) AS float) AS margin
           FROM Rechnung.tRechnung r
           JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
-          WHERE ${onlyArticleWhere('rp')} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to`
+          WHERE ${await getOnlyArticleWhere(pool, 'rp')} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to`
         const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
         const row = res?.recordset?.[0] || {}
         return json({ ok:true, from, to, revenue: row.revenue||0, orders: row.orders||0, margin: row.margin||0 })
