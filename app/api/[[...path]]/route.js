@@ -445,7 +445,7 @@ async function handleRoute(request, { params }) {
             WHERE o.dErstellt >= @from AND o.dErstellt < DATEADD(day,1,@to) ${cancelCheck} ${channelSql}
           )
           SELECT 
-            (SELECT COUNT(*) FROM heads) AS orders,
+            COUNT(DISTINCT h.kAuftrag) AS orders,
             CAST(SUM(${netTotalExpr}) AS float) AS net_with_shipping,
             CAST(SUM(CASE WHEN NOT (${isShipping}) THEN ${netTotalExpr} ELSE 0 END) AS float) AS net_without_shipping,
             CAST(SUM(${grossTotalExpr}) AS float) AS gross_with_shipping,
