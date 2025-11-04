@@ -53,19 +53,11 @@ async function hasColumn(pool, table, column){
   return (r?.recordset?.[0]?.ok ?? 0) === 1
 }
 
-function onlyArticleWhere(alias='rp'){
-  // runtime-safe article position filter
-  return `(
-    (COL_LENGTH('Rechnung.tRechnungPosition','nPosTyp') IS NOT NULL AND ${alias}.nPosTyp = 1)
-    OR
-    (COL_LENGTH('Rechnung.tRechnungPosition','nPosTyp') IS NULL
-      AND ${alias}.kArtikel > 0
-      AND ISNULL(${alias}.cName,'') NOT LIKE 'Versand%'
-      AND ISNULL(${alias}.cName,'') NOT LIKE 'Gutschein%'
-      AND ISNULL(${alias}.cName,'') NOT LIKE 'Rabatt%'
-      AND ISNULL(${alias}.cName,'') NOT LIKE 'Pfand%'
-    )
-  )`
+async function getOnlyArticleWhere(pool, alias='rp'){
+  // Runtime-safe article position filter: do not reference nPosTyp if it doesn't exist
+  const has = await hasColumn(pool, 'Rechnung.tRechnungPosition', 'nPosTyp')
+  if (has) return `${alias}.nPosTyp = 1`
+  return `${alias}.kArtikel > 0 AND ISNULL(${alias}.cName,'') NOT LIKE 'Versand%' AND ISNULL(${alias}.cName,'') NOT LIKE 'Gutschein%' AND ISNULL(${alias}.cName,'') NOT LIKE 'Rabatt%' AND ISNULL(${alias}.cName,'') NOT LIKE 'Pfand%'`
 }
 
 async function pickFirstExisting(pool, table, candidates){
