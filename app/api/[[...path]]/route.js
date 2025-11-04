@@ -391,15 +391,19 @@ async function handleRoute(request, { params }) {
       try {
         const pool = await getMssqlPool()
         const table = 'Verkauf.tAuftragPosition'
-        // dynamic columns
+        // Prefer extended (positionssumme) columns first to avoid double counting with qty
+        const extNetCol = await pickFirstExisting(pool, table, ['fGesamtNetto','fVKNettoGesamt','fWertNetto','fWert'])
+        const extGrossCol = await pickFirstExisting(pool, table, ['fGesamtBrutto','fVKBruttoGesamt','fWertBrutto'])
         const netCol = await pickFirstExisting(pool, table, ['fVKNetto','fNetto','fPreisNetto'])
         const grossCol = await pickFirstExisting(pool, table, ['fVKBrutto','fBrutto','fPreisBrutto'])
         const qtyCol = await pickFirstExisting(pool, table, ['fMenge','nMenge','fAnzahl'])
         const taxCol = await pickFirstExisting(pool, table, ['fMwSt','fMwst','fMwStProzent'])
-        const netExpr = netCol ? `CAST(op.[${netCol}] AS float)` : 'CAST(0 AS float)'
-        const qtyExpr = qtyCol ? `CAST(op.[${qtyCol}] AS float)` : 'CAST(0 AS float)'
-        const taxExpr = taxCol ? `CAST(op.[${taxCol}] AS float)` : 'CAST(0 AS float)'
-        const grossExpr = grossCol ? `CAST(op.[${grossCol}] AS float)` : `(${netExpr}) * (1 + (${taxExpr}/100.0))`
+        // Build expressions
+        const netExpr = extNetCol ? `CAST(op.[${extNetCol}] AS float)` : (netCol ? `CAST(op.[${netCol}] AS float)` : 'CAST(0 AS float)')
+        const qtyExpr = extNetCol ? 'CAST(1 AS float)' : (qtyCol ? `CAST(op.[${qtyCol}] AS float)` : 'CAST(0 AS float)')
+        const grossExpr = extGrossCol
+          ? `CAST(op.[${extGrossCol}] AS float)`
+          : (grossCol ? `CAST(op.[${grossCol}] AS float)` : `(${netExpr}) * (1 + (CAST(${taxCol?`op.[${taxCol}]`:'0'} AS float)/100.0))`)
         const isShipping = await getShippingPredicate(pool, table, 'op')
         const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
         const sqlText = `DECLARE @from date = @pfrom, @to date = @pto;
