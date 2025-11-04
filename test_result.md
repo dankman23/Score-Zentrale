@@ -306,6 +306,9 @@ agent_communication:
       - working: true
         agent: "testing"
         comment: "✅ JTL Sales KPI working: Returns 500 with ok:false and proper error handling for missing nPosTyp column. Endpoint correctly handles database schema differences."
+      - working: true
+        agent: "testing"
+        comment: "✅ Re-tested after filter fix: Now returns 200 ok:true with revenue: 37893.99, orders: 789, margin: 21522.08 for date range 2025-10-01 to 2025-10-31. Filter fix successful."
   - task: "JTL Sales: GET /api/jtl/sales/kpi/with_platform_fees"
     implemented: true
     working: "NA"
