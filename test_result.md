@@ -418,7 +418,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "JTL endpoints re-test after filter fix completed - all endpoints now returning 200 responses"
+    - "NEW shipping-split endpoint testing completed - all tests passed"
+    - "Regression testing completed - no issues detected"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
