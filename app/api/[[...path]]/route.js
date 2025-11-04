@@ -341,7 +341,7 @@ async function handleRoute(request, { params }) {
             CAST(SUM((CAST(${rev} AS float) - CAST(${cost} AS float)) - (CAST(${rev} AS float)*0.20) - 1.5) AS float) AS marge_with_fees
           FROM Rechnung.tRechnung r
           JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
-          WHERE ${onlyArticleWhere('rp')} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
+          WHERE ${await getOnlyArticleWhere(pool, 'rp')} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
           GROUP BY ${grp}
           ORDER BY umsatz DESC`
         const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
