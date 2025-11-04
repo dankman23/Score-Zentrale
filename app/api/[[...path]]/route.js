@@ -671,14 +671,11 @@ async function handleRoute(request, { params }) {
           ? `CAST(op.[${extGrossCol}] AS float)`
           : (grossCol ? `CAST(op.[${grossCol}] AS float)` : `(${netExpr}) * (1 + (CAST(${taxCol?`op.[${taxCol}]`:'0'} AS float)/100.0))`)
         const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
-        const hasPlat = await hasColumn(pool, 'Verkauf.tAuftrag', 'kPlattform')
-        const hasShop = await hasColumn(pool, 'Verkauf.tAuftrag', 'kShop')
-        const headCols = `o.kAuftrag, ISNULL(o.cAuftragsNr,'') AS cAuftragsNr${hasPlat?`, ISNULL(o.kPlattform,0) AS kPlattform`:''}${hasShop?`, ISNULL(o.kShop,0) AS kShop`:''}`
-        const platJoin = hasPlat ? 'LEFT JOIN dbo.tPlattform p ON p.kPlattform = h.kPlattform' : ''
-        const shopJoin = hasShop ? 'LEFT JOIN dbo.tShop s ON s.kShop = h.kShop' : ''
-        const pName = hasPlat || hasShop
-          ? `COALESCE(${hasPlat?'p.cName':"NULL"}, ${hasShop?'s.cName':"NULL"}, ${hasPlat?"CASE WHEN ISNULL(h.kPlattform,0)>0 THEN CONCAT('Plattform ', h.kPlattform) ELSE NULL END":"NULL"}, ${hasShop?"CASE WHEN ISNULL(h.kShop,0)>0 THEN CONCAT('Shop ', h.kShop) ELSE NULL END":"NULL"}, 'Direktvertrieb')`
-          : `'Direktvertrieb'`
+        // Simplified approach - avoid platform/shop columns for now to prevent schema errors
+        const headCols = `o.kAuftrag, ISNULL(o.cAuftragsNr,'') AS cAuftragsNr`
+        const platJoin = ''
+        const shopJoin = ''
+        const pName = `'Direktvertrieb'`
         const q = `DECLARE @d date = @pdate;
           ;WITH heads AS (
             SELECT ${headCols}
