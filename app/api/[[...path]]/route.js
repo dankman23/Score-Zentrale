@@ -270,7 +270,7 @@ async function handleRoute(request, { params }) {
                    SUM(CAST(${rev} AS float) - CAST(${cost} AS float)) AS margin
             FROM Rechnung.tRechnung r
             JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
-            WHERE ${onlyArticleWhere('rp')} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
+            WHERE ${await getOnlyArticleWhere(pool, 'rp')} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
             GROUP BY CONVERT(date, r.dErstellt), r.kRechnung
           )
           SELECT date,
