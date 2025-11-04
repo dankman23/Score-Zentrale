@@ -33,6 +33,7 @@ export default function App() {
 
   const [kpi, setKpi] = useState(null)
   const [kpiFees, setKpiFees] = useState(null)
+  const [ordersSplit, setOrdersSplit] = useState(null)
   const [ts, setTs] = useState([])
   const [tsFees, setTsFees] = useState([])
   const [platTs, setPlatTs] = useState([])
@@ -87,6 +88,7 @@ export default function App() {
     days.forEach(d => plats.forEach((p,j)=>{ platRows.push({ date:d.date, pName:p, revenue: Math.round((d.revenue*(0.5-j*0.15))*(0.6+Math.random()*0.3)) }) }))
     setKpi({ revenue: days.reduce((s,x)=>s+x.revenue,0), orders: 100, margin: days.reduce((s,x)=>s+Math.round(x.revenue*0.35),0) })
     setKpiFees({ margin_with_fees: days.reduce((s,x)=>s+x.margin_with_fees,0) })
+    setOrdersSplit({ net:{ with_shipping: 25000, without_shipping: 22000 }, gross:{ with_shipping: 29800, without_shipping: 26200 } })
     setTs(days.map(d=>({ date:d.date, revenue:d.revenue, margin: Math.round(d.revenue*0.35) })))
     setTsFees(days.map(d=>({ date:d.date, margin_with_fees:d.margin_with_fees })))
     setPlatTs(platRows)
@@ -97,17 +99,18 @@ export default function App() {
   const fetchAll = async () => {
     setLoading(true); setError(''); setDemoMode(false)
     try {
-      const [k1, k2, t1, t2, p] = await Promise.all([
+      const [k1, k2, t1, t2, p, os] = await Promise.all([
         getJson(`/api/jtl/sales/kpi?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/kpi/with_platform_fees?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/timeseries?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/timeseries/with_platform_fees?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/platform-timeseries?from=${from}&to=${to}`),
+        getJson(`/api/jtl/orders/kpi/shipping-split?from=${from}&to=${to}`)
       ])
       const tsN = sortByDateAsc(toArray(t1))
       const tsFeesN = sortByDateAsc(toArray(t2))
       const platN = sortByDateAsc(toArray(p))
-      setKpi(k1); setKpiFees(k2); setTs(tsN); setTsFees(tsFeesN); setPlatTs(platN)
+      setKpi(k1); setKpiFees(k2); setTs(tsN); setTsFees(tsFeesN); setPlatTs(platN); setOrdersSplit(os)
       if (isDegradedFlag) {
         const ksum = Number(k1?.revenue||0) + Number(k1?.orders||0) + Number(k1?.margin||0)
         const hasData = (tsN?.length||0) + (tsFeesN?.length||0) + (platN?.length||0) > 0 || ksum > 0
@@ -239,10 +242,12 @@ export default function App() {
             <KpiTile title="Bestellungen (30T)" value={(kpi?.orders||'-').toLocaleString?.('de-DE')||kpi?.orders||'-'} sub="JTL Wawi" demo={demoMode} />
             <KpiTile title="Marge (30T)" value={fmtCurrency(kpi?.margin)} sub="ohne Gebühren" demo={demoMode} />
           </div>
+
+          {/* Neue Auftrags-Kacheln (oben ergänzen) */}
           <div className="row">
+            <KpiTile title="Umsatz (NETTO) — Aufträge" value={fmtCurrency(ordersSplit?.net?.without_shipping)} sub={`mit Versand: ${fmtCurrency(ordersSplit?.net?.with_shipping)}`} demo={demoMode} />
+            <KpiTile title="Umsatz (BRUTTO) — Aufträge" value={fmtCurrency(ordersSplit?.gross?.without_shipping)} sub={`mit Versand: ${fmtCurrency(ordersSplit?.gross?.with_shipping)}`} demo={demoMode} />
             <KpiTile title="Marge (mit Gebühren)" value={fmtCurrency(kpiFees?.margin_with_fees)} sub="inkl. 1,50 € + 20% Plattformgebühr" demo={demoMode} />
-            <KpiTile title="" value="" />
-            <KpiTile title="" value="" />
           </div>
 
           <div className="row mt-1">

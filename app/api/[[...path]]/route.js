@@ -45,7 +45,19 @@ function cors(response) {
 
 export async function OPTIONS() { return cors(new NextResponse(null, { status: 200 })) }
 
-function buildDateParams(searchParams){ const from = searchParams.get('from') || new Date(Date.now()-29*24*3600*1000).toISOString().slice(0,10); const to = searchParams.get('to') || new Date().toISOString().slice(0,10); return { from, to } }
+function buildDateParams(searchParams){
+  // Supports from/to or month=YYYY-MM
+  const month = searchParams.get('month')
+  if (month) {
+    const [y,m] = month.split('-').map(x=>parseInt(x,10))
+    const from = new Date(Date.UTC(y, m-1, 1)).toISOString().slice(0,10)
+    const to = new Date(Date.UTC(y, m, 0)).toISOString().slice(0,10)
+    return { from, to }
+  }
+  const from = searchParams.get('from') || new Date(Date.now()-29*24*3600*1000).toISOString().slice(0,10)
+  const to = searchParams.get('to') || new Date().toISOString().slice(0,10)
+  return { from, to }
+}
 
 // Helpers for MSSQL metadata and dynamic SQL building
 async function hasColumn(pool, table, column){
@@ -56,11 +68,18 @@ async function hasColumn(pool, table, column){
   return ((r?.recordset?.[0]?.ok ?? 0) > 0)
 }
 
-async function getOnlyArticleWhere(pool, alias='rp'){
-  // Runtime-safe article position filter: do not reference nPosTyp if it doesn't exist
-  const has = await hasColumn(pool, 'Rechnung.tRechnungPosition', 'nPosTyp')
+async function getOnlyArticleWhere(pool, table, alias){
+  // Build a predicate string without referencing nPosTyp if it doesn't exist
+  const has = await hasColumn(pool, table, 'nPosTyp')
   if (has) return `${alias}.nPosTyp = 1`
   return `${alias}.kArtikel > 0 AND ISNULL(${alias}.cName,'') NOT LIKE 'Versand%' AND ISNULL(${alias}.cName,'') NOT LIKE 'Gutschein%' AND ISNULL(${alias}.cName,'') NOT LIKE 'Rabatt%' AND ISNULL(${alias}.cName,'') NOT LIKE 'Pfand%'`
+}
+
+async function getShippingPredicate(pool, table, alias){
+  // Returns a predicate string that evaluates to 1 for shipping rows
+  const has = await hasColumn(pool, table, 'nPosTyp')
+  if (has) return `${alias}.nPosTyp IN (3,4)`
+  return `${alias}.kArtikel = 0 AND (ISNULL(${alias}.cName,'') LIKE 'Versand%' OR ISNULL(${alias}.cArtNr,'') LIKE 'VERSAND%')`
 }
 
 async function pickFirstExisting(pool, table, candidates){
@@ -82,7 +101,7 @@ async function handleRoute(request, { params }) {
     // Root health
     if ((route === '/' || route === '/root') && method === 'GET') { return json({ message: 'Score Zentrale API online' }) }
 
-    // Basic status storage (kept from previous iterations)
+    // Basic status storage
     if (route === '/status' && method === 'POST'){
       const body = await request.json()
       const rec = { id: uuidv4(), createdAt: new Date().toISOString(), ...body }
@@ -95,7 +114,7 @@ async function handleRoute(request, { params }) {
       return json(cleaned)
     }
 
-    // Prospects CRUD (kept)
+    // Prospects CRUD
     if (route === '/prospects' && method === 'GET'){
       const arr = await db.collection('prospects').find({}).sort({ createdAt: -1 }).limit(200).toArray()
       return json(arr.map(({ _id, ...r})=>r))
@@ -130,7 +149,7 @@ async function handleRoute(request, { params }) {
       return json({ subject, text, html })
     }
 
-    // JTL: diagnostics
+    // ========== JTL DIAG ==========
     if (route === '/jtl/diag/columns' && method === 'GET') {
       const sp = new URL(request.url).searchParams
       const table = sp.get('table') || 'Rechnung.tRechnungPosition'
@@ -143,22 +162,22 @@ async function handleRoute(request, { params }) {
       return json({ ok:true, table, cols })
     }
 
-    // JTL: ping (does not throw; always 200)
     if (route === '/jtl/ping' && method === 'GET'){
       try {
         const pool = await getMssqlPool()
-        const hasNPosTyp = await hasColumn(pool, 'Rechnung.tRechnungPosition', 'nPosTyp')
-        return json({ ok:true, sql:{ server: process.env.JTL_SQL_HOST, db: process.env.JTL_SQL_DB, hasNPosTyp } })
+        const hasNPosTypR = await hasColumn(pool, 'Rechnung.tRechnungPosition', 'nPosTyp')
+        const hasNPosTypO = await hasColumn(pool, 'Verkauf.tAuftragPosition', 'nPosTyp')
+        return json({ ok:true, sql:{ server: process.env.JTL_SQL_HOST, db: process.env.JTL_SQL_DB, hasNPosTypRechnung: hasNPosTypR, hasNPosTypAuftrag: hasNPosTypO } })
       } catch(err){
         return json({ ok:false, error: String(err?.message||err) })
       }
     }
 
-    // JTL: sales/date-range
+    // ========== JTL SALES: DATE RANGE (RECHNUNG) ==========
     if (route === '/jtl/sales/date-range' && method === 'GET'){
       const pool = await getMssqlPool()
       try {
-        const where = await getOnlyArticleWhere(pool, 'rp')
+        const where = await getOnlyArticleWhere(pool, 'Rechnung.tRechnungPosition', 'rp')
         const q = `SELECT MIN(CONVERT(date, r.dErstellt)) AS minDate, MAX(CONVERT(date, r.dErstellt)) AS maxDate
                    FROM Rechnung.tRechnung r
                    JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
@@ -172,21 +191,22 @@ async function handleRoute(request, { params }) {
       }
     }
 
-    // Helper: dynamic aggregates
-    async function buildAggExprs(pool){
+    // Helper: dynamic aggregates for Rechnung
+    async function buildAggExprsRechnung(pool){
       const table = 'Rechnung.tRechnungPosition'
       const rev = await pickFirstExisting(pool, table, ['fVKNetto','fNetto','fVKBrutto','fBrutto','fPreis'])
       const cost = await pickFirstExisting(pool, table, ['fEKNetto','fEK','fEKBrutto','fEK'])
       return { rev: rev ? `${'rp'}.[${rev}]` : 'CAST(0 AS float)', cost: cost ? `${'rp'}.[${cost}]` : 'CAST(0 AS float)' }
     }
 
-    // JTL: sales/kpi
+    // ========== JTL SALES: KPI (RECHNUNG) ==========
     if (route === '/jtl/sales/kpi' && method === 'GET'){
       const sp = new URL(request.url).searchParams
       const { from, to } = buildDateParams(sp)
       try{
         const pool = await getMssqlPool()
-        const { rev, cost } = await buildAggExprs(pool)
+        const { rev, cost } = await buildAggExprsRechnung(pool)
+        const where = await getOnlyArticleWhere(pool, 'Rechnung.tRechnungPosition', 'rp')
         const sqlText = `DECLARE @from date = @pfrom, @to date = @pto;
           SELECT 
             CAST(SUM(CAST(${rev} AS float)) AS float) AS revenue,
@@ -194,7 +214,7 @@ async function handleRoute(request, { params }) {
             CAST(SUM(CAST(${rev} AS float) - CAST(${cost} AS float)) AS float) AS margin
           FROM Rechnung.tRechnung r
           JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
-          WHERE ${await getOnlyArticleWhere(pool, 'rp')} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to`
+          WHERE ${where} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to`
         const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
         const row = res?.recordset?.[0] || {}
         return json({ ok:true, from, to, revenue: row.revenue||0, orders: row.orders||0, margin: row.margin||0 })
@@ -204,13 +224,14 @@ async function handleRoute(request, { params }) {
       }
     }
 
-    // JTL: sales/kpi/with_platform_fees
+    // KPI with platform fees (RECHNUNG)
     if (route === '/jtl/sales/kpi/with_platform_fees' && method === 'GET'){
       const sp = new URL(request.url).searchParams
       const { from, to } = buildDateParams(sp)
       try{
         const pool = await getMssqlPool()
-        const { rev, cost } = await buildAggExprs(pool)
+        const { rev, cost } = await buildAggExprsRechnung(pool)
+        const where = await getOnlyArticleWhere(pool, 'Rechnung.tRechnungPosition', 'rp')
         const sqlText = `DECLARE @from date = @pfrom, @to date = @pto, @feePct float = 0.20, @feeFix float = 1.5;
           WITH base AS (
             SELECT r.kRechnung, CAST(CONVERT(date, r.dErstellt) AS date) AS d, 
@@ -218,7 +239,7 @@ async function handleRoute(request, { params }) {
                    SUM(CAST(${rev} AS float) - CAST(${cost} AS float)) AS margin
             FROM Rechnung.tRechnung r
             JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
-            WHERE ${await getOnlyArticleWhere(pool, 'rp')} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
+            WHERE ${where} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
             GROUP BY r.kRechnung, CONVERT(date, r.dErstellt)
           )
           SELECT 
@@ -235,20 +256,21 @@ async function handleRoute(request, { params }) {
       }
     }
 
-    // JTL: sales/timeseries
+    // Timeseries (RECHNUNG)
     if (route === '/jtl/sales/timeseries' && method === 'GET'){
       const sp = new URL(request.url).searchParams
       const { from, to } = buildDateParams(sp)
       try{
         const pool = await getMssqlPool()
-        const { rev, cost } = await buildAggExprs(pool)
+        const { rev, cost } = await buildAggExprsRechnung(pool)
+        const where = await getOnlyArticleWhere(pool, 'Rechnung.tRechnungPosition', 'rp')
         const sqlText = `DECLARE @from date = @pfrom, @to date = @pto;
           SELECT CONVERT(date, r.dErstellt) AS date,
                  CAST(SUM(CAST(${rev} AS float)) AS float) AS revenue,
                  CAST(SUM(CAST(${rev} AS float) - CAST(${cost} AS float)) AS float) AS margin
           FROM Rechnung.tRechnung r
           JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
-          WHERE ${await getOnlyArticleWhere(pool, 'rp')} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
+          WHERE ${where} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
           GROUP BY CONVERT(date, r.dErstellt)
           ORDER BY date ASC`
         const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
@@ -259,13 +281,14 @@ async function handleRoute(request, { params }) {
       }
     }
 
-    // JTL: sales/timeseries/with_platform_fees
+    // Timeseries with platform fees (RECHNUNG)
     if (route === '/jtl/sales/timeseries/with_platform_fees' && method === 'GET'){
       const sp = new URL(request.url).searchParams
       const { from, to } = buildDateParams(sp)
       try{
         const pool = await getMssqlPool()
-        const { rev, cost } = await buildAggExprs(pool)
+        const { rev, cost } = await buildAggExprsRechnung(pool)
+        const where = await getOnlyArticleWhere(pool, 'Rechnung.tRechnungPosition', 'rp')
         const sqlText = `DECLARE @from date = @pfrom, @to date = @pto, @feePct float = 0.20, @feeFix float = 1.5;
           WITH base AS (
             SELECT CAST(CONVERT(date, r.dErstellt) AS date) AS date, r.kRechnung,
@@ -273,7 +296,7 @@ async function handleRoute(request, { params }) {
                    SUM(CAST(${rev} AS float) - CAST(${cost} AS float)) AS margin
             FROM Rechnung.tRechnung r
             JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
-            WHERE ${await getOnlyArticleWhere(pool, 'rp')} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
+            WHERE ${where} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
             GROUP BY CONVERT(date, r.dErstellt), r.kRechnung
           )
           SELECT date,
@@ -290,7 +313,7 @@ async function handleRoute(request, { params }) {
       }
     }
 
-    // JTL: sales/platform-timeseries
+    // Platform timeseries (RECHNUNG)
     if (route === '/jtl/sales/platform-timeseries' && method === 'GET'){
       const sp = new URL(request.url).searchParams
       const { from, to } = buildDateParams(sp)
@@ -306,13 +329,14 @@ async function handleRoute(request, { params }) {
             WHEN LOWER(${source}) LIKE '%ebay%' THEN 'eBay'
             WHEN LOWER(${source}) LIKE '%shop%' OR LOWER(${source}) LIKE '%woocommerce%' OR LOWER(${source}) LIKE '%shopify%' THEN 'Shop'
             ELSE 'Sonstige' END`
-        const { rev } = await buildAggExprs(pool)
+        const { rev } = await buildAggExprsRechnung(pool)
+        const where = await getOnlyArticleWhere(pool, 'Rechnung.tRechnungPosition', 'rp')
         const sqlText = `DECLARE @from date = @pfrom, @to date = @pto;
           SELECT CONVERT(date, r.dErstellt) AS date, ${platformCase} AS pName,
                  CAST(SUM(CAST(${rev} AS float)) AS float) AS revenue
           FROM Rechnung.tRechnung r
           JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
-          WHERE ${await getOnlyArticleWhere(pool, 'rp')} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
+          WHERE ${where} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
           GROUP BY CONVERT(date, r.dErstellt), ${platformCase}
           ORDER BY date ASC`
         const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
@@ -323,18 +347,18 @@ async function handleRoute(request, { params }) {
       }
     }
 
-    // JTL: sales/top-products
+    // Top products (RECHNUNG)
     if (route === '/jtl/sales/top-products' && method === 'GET'){
       const sp = new URL(request.url).searchParams
       const { from, to } = buildDateParams(sp)
       const limit = parseInt(sp.get('limit')||'20', 10)
       try{
         const pool = await getMssqlPool()
-        const { rev, cost } = await buildAggExprs(pool)
-        // Prefer article number + name if available
+        const { rev, cost } = await buildAggExprsRechnung(pool)
         const artNrCol = await pickFirstExisting(pool, 'Rechnung.tRechnungPosition', ['cArtNr','cArtikelNr','Artikelnummer'])
         const nameCol = await pickFirstExisting(pool, 'Rechnung.tRechnungPosition', ['cName','cBez','cBezeichnung'])
         const grp = [artNrCol?`rp.[${artNrCol}]`:"''", nameCol?`rp.[${nameCol}]`:"''"].join(', ')
+        const where = await getOnlyArticleWhere(pool, 'Rechnung.tRechnungPosition', 'rp')
         const sqlText = `DECLARE @from date = @pfrom, @to date = @pto;
           SELECT TOP (${limit}) 
             ${artNrCol?`rp.[${artNrCol}]`:"''"} AS artikelNr,
@@ -344,7 +368,7 @@ async function handleRoute(request, { params }) {
             CAST(SUM((CAST(${rev} AS float) - CAST(${cost} AS float)) - (CAST(${rev} AS float)*0.20) - 1.5) AS float) AS marge_with_fees
           FROM Rechnung.tRechnung r
           JOIN Rechnung.tRechnungPosition rp ON rp.kRechnung = r.kRechnung
-          WHERE ${await getOnlyArticleWhere(pool, 'rp')} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
+          WHERE ${where} AND CONVERT(date, r.dErstellt) BETWEEN @from AND @to
           GROUP BY ${grp}
           ORDER BY umsatz DESC`
         const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
@@ -355,9 +379,58 @@ async function handleRoute(request, { params }) {
       }
     }
 
-    // JTL: sales/top-categories (placeholder: returns empty array with ok=true to avoid UI errors)
+    // Top categories placeholder (RECHNUNG)
     if (route === '/jtl/sales/top-categories' && method === 'GET'){
       return json([])
+    }
+
+    // ========== NEW: ORDERS SHIPPING SPLIT KPI (AUFTRAG) ==========
+    if (route === '/jtl/orders/kpi/shipping-split' && method === 'GET'){
+      const sp = new URL(request.url).searchParams
+      const { from, to } = buildDateParams(sp)
+      try {
+        const pool = await getMssqlPool()
+        const table = 'Verkauf.tAuftragPosition'
+        // dynamic columns
+        const netCol = await pickFirstExisting(pool, table, ['fVKNetto','fNetto','fPreisNetto'])
+        const grossCol = await pickFirstExisting(pool, table, ['fVKBrutto','fBrutto','fPreisBrutto'])
+        const qtyCol = await pickFirstExisting(pool, table, ['fMenge','nMenge','fAnzahl'])
+        const taxCol = await pickFirstExisting(pool, table, ['fMwSt','fMwst','fMwStProzent'])
+        const netExpr = netCol ? `CAST(op.[${netCol}] AS float)` : 'CAST(0 AS float)'
+        const qtyExpr = qtyCol ? `CAST(op.[${qtyCol}] AS float)` : 'CAST(0 AS float)'
+        const taxExpr = taxCol ? `CAST(op.[${taxCol}] AS float)` : 'CAST(0 AS float)'
+        const grossExpr = grossCol ? `CAST(op.[${grossCol}] AS float)` : `(${netExpr}) * (1 + (${taxExpr}/100.0))`
+        const isShipping = await getShippingPredicate(pool, table, 'op')
+        const cancelCheck = (await hasColumn(pool, 'Verkauf.tAuftrag', 'nStorno')) ? 'AND ISNULL(o.nStorno,0)=0' : ''
+        const sqlText = `DECLARE @from date = @pfrom, @to date = @pto;
+          WITH base AS (
+            SELECT o.kAuftrag,
+                   ${netExpr} AS vk_netto,
+                   ${grossExpr} AS vk_brutto,
+                   ${qtyExpr} AS qty,
+                   CASE WHEN ${isShipping} THEN 1 ELSE 0 END AS is_shipping
+            FROM Verkauf.tAuftrag o
+            JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
+            WHERE CONVERT(date, o.dErstellt) BETWEEN @from AND @to ${cancelCheck}
+          )
+          SELECT 
+            (SELECT COUNT(DISTINCT kAuftrag) FROM base) AS orders,
+            CAST(SUM(vk_netto*qty) AS float) AS net_with_shipping,
+            CAST(SUM(CASE WHEN is_shipping=0 THEN vk_netto*qty ELSE 0 END) AS float) AS net_without_shipping,
+            CAST(SUM(vk_brutto*qty) AS float) AS gross_with_shipping,
+            CAST(SUM(CASE WHEN is_shipping=0 THEN vk_brutto*qty ELSE 0 END) AS float) AS gross_without_shipping`
+        const res = await pool.request().input('pfrom', sql.Date, from).input('pto', sql.Date, to).query(sqlText)
+        const row = res?.recordset?.[0] || {}
+        return json({ ok:true, period:{ from, to }, orders: row.orders||0, net: { with_shipping: row.net_with_shipping||0, without_shipping: row.net_without_shipping||0 }, gross: { with_shipping: row.gross_with_shipping||0, without_shipping: row.gross_without_shipping||0 } })
+      } catch(err){
+        console.error('orders shipping-split SQL error', err)
+        return json({ ok:false, error: String(err?.message||err) }, { status: 500 })
+      }
+    }
+
+    // TODO: Rechnungen inkl. externer Belege – benötigt Tabellennamen/Views
+    if (route === '/jtl/invoices/kpi/with-external' && method === 'GET'){
+      return json({ ok:false, error:'External invoices table/view not configured. Please provide table names.' }, { status: 501 })
     }
 
     return json({ error: `Route ${route} not found` }, { status: 404 })
