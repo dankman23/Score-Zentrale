@@ -78,6 +78,8 @@ function json(data, init){ return cors(NextResponse.json(data, init)) }
 async function handleRoute(request, { params }) {
   const { path = [] } = params
   const route = `/${path.join('/')}`
+  console.log('API route hit', { method, route, url: request.url })
+
   const method = request.method
 
   try {
