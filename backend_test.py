@@ -91,39 +91,97 @@ def test_endpoint(method, endpoint, expected_status_codes=[200, 500], params=Non
         }
 
 def main():
-    """Run all backend tests"""
-    print("🚀 Starting Score Zentrale Backend API Tests")
-    print(f"Testing against: {API_BASE}")
+    """Run JTL backend smoke tests as requested"""
+    print("=" * 80)
+    print("🚀 BACKEND API SMOKE TESTS - Score Zentrale JTL Analytics")
+    print("=" * 80)
+    print(f"Base URL: {BASE_URL}")
+    print(f"API Base: {API_BASE}")
+    print(f"Test Time: {datetime.now().isoformat()}")
     
-    test_results = {
-        'GET /api/kpis': test_get_kpis(),
-        'Prospects Flow (POST+GET /api/prospects)': test_prospects_flow(), 
-        'POST /api/analyze': test_analyze_endpoint(),
-        'POST /api/mailer/compose': test_mailer_compose(),
-        'Status Endpoints (GET+POST /api/status)': test_status_endpoints()
-    }
+    # Test cases as requested in review_request
+    test_cases = [
+        # Basic routing tests
+        ('GET', '/', [200]),
+        ('GET', '/root', [200]),
+        
+        # JTL endpoints - main focus
+        ('GET', '/jtl/ping', [200, 500]),
+        ('GET', '/jtl/sales/date-range', [200, 500]),
+        ('GET', '/jtl/sales/kpi', [200, 500], {'from': '2025-10-01', 'to': '2025-10-31'}),
+        ('GET', '/jtl/sales/timeseries', [200, 500], {'from': '2025-10-01', 'to': '2025-10-31'}),
+        ('GET', '/jtl/sales/platform-timeseries', [200, 500], {'from': '2025-10-01', 'to': '2025-10-31'}),
+        
+        # Prospects endpoint
+        ('GET', '/prospects', [200, 500]),
+    ]
     
-    print("\n" + "="*60)
-    print("📊 BACKEND TEST RESULTS SUMMARY")
-    print("="*60)
+    results = []
     
-    passed = 0
-    total = len(test_results)
+    for test_case in test_cases:
+        if len(test_case) == 3:
+            method, endpoint, expected_codes = test_case
+            params = None
+        else:
+            method, endpoint, expected_codes, params = test_case
+            
+        result = test_endpoint(method, endpoint, expected_codes, params)
+        results.append(result)
     
-    for test_name, result in test_results.items():
-        status = "✅ PASS" if result else "❌ FAIL"
-        print(f"{status} - {test_name}")
-        if result:
-            passed += 1
+    # Summary
+    print("\n" + "=" * 80)
+    print("📊 TEST SUMMARY")
+    print("=" * 80)
     
-    print(f"\nOverall: {passed}/{total} tests passed")
+    passed = sum(1 for r in results if r['success'])
+    total = len(results)
     
-    if passed == total:
-        print("🎉 All backend tests PASSED!")
-        return True
-    else:
-        print(f"⚠️  {total - passed} backend tests FAILED")
-        return False
+    print(f"Total Tests: {total}")
+    print(f"Passed: {passed}")
+    print(f"Failed: {total - passed}")
+    
+    print("\n📋 DETAILED RESULTS:")
+    for result in results:
+        status = result['result']
+        endpoint = result['endpoint']
+        method = result['method']
+        print(f"  {status} - {method} {endpoint}")
+        
+        if 'status_code' in result:
+            print(f"    Status Code: {result['status_code']}")
+        
+        if result.get('json_data'):
+            # Show key fields from JSON response
+            json_data = result['json_data']
+            if 'ok' in json_data:
+                print(f"    JSON ok field: {json_data['ok']}")
+            if 'error' in json_data:
+                print(f"    Error: {json_data['error']}")
+        
+        if result.get('error'):
+            print(f"    Error: {result['error']}")
+    
+    # Check for routing failures (404s)
+    routing_failures = [r for r in results if r.get('status_code') == 404]
+    if routing_failures:
+        print(f"\n🚨 ROUTING FAILURES DETECTED ({len(routing_failures)} endpoints returned 404):")
+        for failure in routing_failures:
+            print(f"  - {failure['method']} {failure['endpoint']}")
+            if failure.get('raw_response'):
+                print(f"    Response: {failure['raw_response'][:200]}...")
+    
+    # Check for unhandled errors (non-JSON 500s)
+    unhandled_errors = [r for r in results if r.get('status_code') == 500 and not r.get('json_data')]
+    if unhandled_errors:
+        print(f"\n🚨 UNHANDLED ERRORS DETECTED ({len(unhandled_errors)} endpoints returned non-JSON 500s):")
+        for error in unhandled_errors:
+            print(f"  - {error['method']} {error['endpoint']}")
+            if error.get('raw_response'):
+                print(f"    Response: {error['raw_response'][:200]}...")
+    
+    print(f"\n🎯 OVERALL RESULT: {'✅ ALL TESTS PASSED' if passed == total else f'❌ {total - passed} TESTS FAILED'}")
+    
+    return results, passed == total
 
 if __name__ == "__main__":
     success = main()
