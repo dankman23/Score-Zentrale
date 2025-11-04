@@ -260,15 +260,18 @@ agent_communication:
     message: "✅ Backend testing completed successfully! All high-priority endpoints tested and working: GET /api/kpis (verified structure), Prospects flow (POST+GET with UUID, no _id), POST /api/analyze (returns productGroups/materials/hypotheses, creates DB entries), POST /api/mailer/compose (returns subject/text/html), Status endpoints (GET+POST working). Fixed minor _id cleanup issue in POST /api/prospects response. All 5/5 core backend tests PASSED. Ready for main agent to summarize and finish."
   - task: "JTL Sales: GET /api/jtl/ping"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implementiert Ping mit hasColumn(COL_LENGTH) Check für nPosTyp"
+      - working: true
+        agent: "testing"
+        comment: "✅ JTL Ping working: Returns 200 with ok:true, SQL connection info (server: 162.55.235.45, db: eazybusiness, hasNPosTyp: false). Fixed variable hoisting bug in route.js."
   - task: "JTL Sales: GET /api/jtl/sales/date-range"
     implemented: true
     working: "NA"
