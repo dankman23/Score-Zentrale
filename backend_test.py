@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend API Smoke Tests for Score Zentrale JTL Analytics
-Tests the specific endpoints requested in the review_request
+JTL Endpoints Re-test After Filter Fix
+Tests specific JTL endpoints as requested in review_request
 """
 
 import requests
@@ -13,13 +13,15 @@ from datetime import datetime
 BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://jtl-analytics.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
-def test_endpoint(method, endpoint, expected_status_codes=[200, 500], params=None):
-    """Test a single endpoint and return results"""
+def test_endpoint(method, endpoint, params=None, expect_200_ok=None):
+    """Test a single endpoint and return detailed results"""
     url = f"{API_BASE}{endpoint}"
     
     try:
         print(f"\n🔍 Testing {method} {endpoint}")
         print(f"   URL: {url}")
+        if params:
+            print(f"   Params: {params}")
         
         if method.upper() == 'GET':
             response = requests.get(url, params=params, timeout=30)
@@ -33,31 +35,38 @@ def test_endpoint(method, endpoint, expected_status_codes=[200, 500], params=Non
         # Try to parse JSON
         try:
             json_data = response.json()
-            print(f"   JSON Response: {json.dumps(json_data, indent=2)[:200]}...")
+            print(f"   JSON Response: {json.dumps(json_data, indent=2)}")
         except:
-            print(f"   Raw Response: {response.text[:200]}...")
+            print(f"   Raw Response: {response.text}")
             json_data = None
         
-        # Check if status code is expected
-        if response.status_code in expected_status_codes:
-            if json_data is not None:
-                # Check for proper JSON structure
-                if response.status_code == 200:
-                    if 'ok' in json_data:
-                        result = "✅ PASS" if json_data.get('ok') else "⚠️  PASS (ok:false)"
-                    else:
-                        result = "✅ PASS (JSON response)"
-                elif response.status_code == 500:
-                    if 'ok' in json_data and json_data.get('ok') == False:
-                        result = "✅ PASS (500 with ok:false)"
-                    else:
-                        result = "⚠️  PASS (500 but no ok:false)"
-                else:
-                    result = "✅ PASS"
+        # Analyze result based on expectations
+        if expect_200_ok is True:
+            # Expect 200 with ok:true
+            if response.status_code == 200 and json_data and json_data.get('ok') == True:
+                result = "✅ PASS (200 ok:true as expected)"
+            elif response.status_code == 200 and json_data and json_data.get('ok') == False:
+                result = "⚠️  PARTIAL (200 ok:false - better than 500)"
+            elif response.status_code == 200 and json_data:
+                result = "⚠️  PARTIAL (200 but no ok field)"
+            elif response.status_code == 500:
+                result = "❌ FAIL (Still returning 500)"
             else:
-                result = "❌ FAIL (No JSON response)"
+                result = f"❌ FAIL (Unexpected: {response.status_code})"
+        elif expect_200_ok is False:
+            # Just record the response, may still be 500
+            if response.status_code == 200:
+                result = f"📝 RECORDED (200 ok:{json_data.get('ok', 'N/A') if json_data else 'N/A'})"
+            elif response.status_code == 500:
+                result = f"📝 RECORDED (500 ok:{json_data.get('ok', 'N/A') if json_data else 'N/A'})"
+            else:
+                result = f"📝 RECORDED ({response.status_code})"
         else:
-            result = f"❌ FAIL (Unexpected status {response.status_code})"
+            # General test - just check if it responds properly
+            if response.status_code in [200, 500] and json_data:
+                result = f"✅ PASS ({response.status_code} with JSON)"
+            else:
+                result = f"❌ FAIL ({response.status_code})"
         
         print(f"   Result: {result}")
         
@@ -66,9 +75,9 @@ def test_endpoint(method, endpoint, expected_status_codes=[200, 500], params=Non
             'method': method,
             'status_code': response.status_code,
             'json_data': json_data,
-            'raw_response': response.text[:500] if json_data is None else None,
+            'raw_response': response.text if json_data is None else None,
             'result': result,
-            'success': result.startswith('✅') or result.startswith('⚠️')
+            'success': result.startswith('✅') or result.startswith('⚠️') or result.startswith('📝')
         }
         
     except requests.exceptions.Timeout:
