@@ -435,3 +435,36 @@ agent_communication:
     message: "✅ JTL endpoints re-test after filter fix SUCCESSFUL! All 4/4 requested endpoints now working: GET /api/jtl/ping (200 ok:true), GET /api/jtl/sales/date-range (200 ok:true with minDate/maxDate), GET /api/jtl/sales/kpi (200 ok:true with revenue/orders/margin data), GET /api/jtl/sales/platform-timeseries (200 with 22 data points). Filter fix completely resolved the previous 500 errors - all endpoints now return proper 200 responses with expected data."
   - agent: "testing"
     message: "✅ NEW SHIPPING-SPLIT ENDPOINT + REGRESSION TESTS COMPLETED! All 4/4 tests PASSED: 1) GET /api/jtl/orders/kpi/shipping-split?month=2025-10 (200 ok:true with all required fields), 2) GET /api/jtl/orders/kpi/shipping-split?from=2025-10-01&to=2025-10-31 (200 ok:true with all required fields), 3) REGRESSION /api/jtl/sales/kpi (200 ok:true), 4) REGRESSION /api/jtl/sales/platform-timeseries (200 array with 22 items). Fixed SQL column alias issue in shipping-split endpoint during testing. New endpoint working correctly with expected response structure: ok, period.from/to, orders, net.with_shipping/without_shipping, gross.with_shipping/without_shipping. No regressions detected."
+  - task: "JTL Orders: GET /api/jtl/orders/diag/day"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "GET /api/jtl/orders/diag/day?date=2025-11-03 returned Invalid column name 'kPlattform' initially."
+      - working: "NA"
+        agent: "main"
+        comment: "Patched diag/day to guard kPlattform/kShop via COL_LENGTH and fallback to 'Direktvertrieb'."
+  - task: "JTL Orders: KPI shipping-split accuracy (03.11)"
+    implemented: true
+    working: false
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 2
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "For 2025-11-03 KPI shows orders=77 and gross≈13018.87; expected ~71 and ~7077.67."
+      - working: "NA"
+        agent: "main"
+        comment: "Adjusted Heads CTE to require article positions; expanded shipping detection; use position totals for net/gross."
+
+agent_communication:
+  - agent: "main"
+    message: "Please re-run backend tests for JTL Orders endpoints: diag/day and KPI shipping-split for 2025-11-03. Expect no schema errors and JSON with fields; record values."
+
