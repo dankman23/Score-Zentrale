@@ -206,85 +206,95 @@ def main():
     
     # Analysis
     print("\n" + "=" * 80)
-    print("🔍 ANALYSIS OF NEW ENDPOINT + REGRESSION")
+    print("🔍 ANALYSIS OF JTL ORDERS ENDPOINTS")
     print("=" * 80)
     
-    # Check shipping-split endpoint (Test 1 & 2)
-    shipping_split_month = results[0]
-    shipping_split_range = results[1]
+    # Test 1: Orders diagnostics validation
+    diag_result = results[0]
+    def validate_diag_response(result, test_name):
+        if result['status_code'] == 200:
+            data = result.get('json_data', {})
+            if data.get('ok') == True:
+                # Check required fields: totals.orders, totals.gross, rows array
+                if 'totals' in data and 'rows' in data:
+                    totals = data['totals']
+                    if 'orders' in totals and 'gross' in totals and isinstance(data['rows'], list):
+                        print(f"✅ {test_name}: All required fields present (totals.orders, totals.gross, rows array)")
+                        print(f"   Captured totals: orders={totals.get('orders')}, gross={totals.get('gross')}")
+                        return True, totals
+                    else:
+                        print(f"❌ {test_name}: Missing required fields in totals or rows not array")
+                        return False, None
+                else:
+                    print(f"❌ {test_name}: Missing totals or rows fields")
+                    return False, None
+            else:
+                print(f"❌ {test_name}: Returns ok:false - {data.get('error', 'No error message')}")
+                return False, None
+        else:
+            print(f"❌ {test_name}: Returns {result['status_code']} instead of 200")
+            return False, None
     
+    diag_valid, diag_totals = validate_diag_response(diag_result, "Orders Diagnostics")
+    
+    # Test 2: Shipping-split validation
+    shipping_result = results[1]
     def validate_shipping_split_response(result, test_name):
         if result['status_code'] == 200:
             data = result.get('json_data', {})
             if data.get('ok') == True:
-                # Check required fields
-                required_fields = ['period', 'orders', 'net', 'gross']
+                # Check flat fields: orders, net_without_shipping, net_with_shipping, gross_without_shipping, gross_with_shipping
+                required_fields = ['orders', 'net_without_shipping', 'net_with_shipping', 'gross_without_shipping', 'gross_with_shipping']
                 missing_fields = [f for f in required_fields if f not in data]
                 if not missing_fields:
-                    period = data.get('period', {})
-                    net = data.get('net', {})
-                    gross = data.get('gross', {})
-                    if ('from' in period and 'to' in period and 
-                        'with_shipping' in net and 'without_shipping' in net and
-                        'with_shipping' in gross and 'without_shipping' in gross):
-                        print(f"✅ {test_name}: All required fields present and valid")
-                        return True
-                    else:
-                        print(f"❌ {test_name}: Missing sub-fields in period/net/gross")
-                        return False
+                    print(f"✅ {test_name}: All required flat fields present")
+                    print(f"   Captured values: orders={data.get('orders')}, net_without_shipping={data.get('net_without_shipping')}, net_with_shipping={data.get('net_with_shipping')}, gross_without_shipping={data.get('gross_without_shipping')}, gross_with_shipping={data.get('gross_with_shipping')}")
+                    return True, data
                 else:
                     print(f"❌ {test_name}: Missing required fields: {missing_fields}")
-                    return False
+                    return False, None
             else:
-                print(f"❌ {test_name}: Returns ok:false")
-                return False
+                print(f"❌ {test_name}: Returns ok:false - {data.get('error', 'No error message')}")
+                return False, None
         else:
             print(f"❌ {test_name}: Returns {result['status_code']} instead of 200")
-            return False
+            return False, None
     
-    shipping_month_valid = validate_shipping_split_response(shipping_split_month, "Shipping-split (month)")
-    shipping_range_valid = validate_shipping_split_response(shipping_split_range, "Shipping-split (from/to)")
+    shipping_valid, shipping_data = validate_shipping_split_response(shipping_result, "Shipping-Split KPI")
     
-    # Check regression tests (Test 3 & 4)
-    sales_kpi_result = results[2]
-    platform_timeseries_result = results[3]
-    
-    print(f"\n📝 REGRESSION - Sales KPI: {sales_kpi_result.get('status_code', 'ERROR')}")
-    if sales_kpi_result.get('json_data', {}).get('ok') == True:
-        print("✅ Sales KPI regression test PASSED")
-        sales_kpi_valid = True
-    else:
-        print("❌ Sales KPI regression test FAILED")
-        sales_kpi_valid = False
-    
-    print(f"\n📝 REGRESSION - Platform Timeseries: {platform_timeseries_result.get('status_code', 'ERROR')}")
-    if platform_timeseries_result.get('status_code') == 200:
-        data = platform_timeseries_result.get('json_data')
-        if isinstance(data, list):
-            print(f"✅ Platform Timeseries regression test PASSED (returns array with {len(data)} items)")
-            platform_timeseries_valid = True
-        elif data and isinstance(data, dict) and data.get('ok') == True:
-            print("✅ Platform Timeseries regression test PASSED (returns ok:true)")
-            platform_timeseries_valid = True
+    # Test 3: Timeseries validation
+    timeseries_result = results[2]
+    def validate_timeseries_response(result, test_name):
+        if result['status_code'] == 200:
+            data = result.get('json_data', {})
+            if data.get('ok') == True:
+                # Check grain and rows array
+                if 'grain' in data and 'rows' in data and isinstance(data['rows'], list):
+                    print(f"✅ {test_name}: Required fields present (grain and rows array)")
+                    print(f"   Captured: grain={data.get('grain')}, rows count={len(data['rows'])}")
+                    return True, data
+                else:
+                    print(f"❌ {test_name}: Missing grain or rows fields, or rows not array")
+                    return False, None
+            else:
+                print(f"❌ {test_name}: Returns ok:false - {data.get('error', 'No error message')}")
+                return False, None
         else:
-            print("❌ Platform Timeseries regression test FAILED (unexpected response format)")
-            platform_timeseries_valid = False
-    else:
-        print("❌ Platform Timeseries regression test FAILED")
-        platform_timeseries_valid = False
+            print(f"❌ {test_name}: Returns {result['status_code']} instead of 200")
+            return False, None
+    
+    timeseries_valid, timeseries_data = validate_timeseries_response(timeseries_result, "Orders Timeseries")
     
     # Overall assessment
-    all_tests_passed = (shipping_month_valid and shipping_range_valid and 
-                       sales_kpi_valid and platform_timeseries_valid)
+    all_tests_passed = diag_valid and shipping_valid and timeseries_valid
     
     if all_tests_passed:
-        print(f"\n🎯 OVERALL: All tests PASSED - New endpoint working + No regressions")
+        print(f"\n🎯 OVERALL: All 3 tests PASSED - Orders diagnostics and KPI endpoints working correctly")
     else:
         failed_tests = []
-        if not shipping_month_valid: failed_tests.append("Shipping-split (month)")
-        if not shipping_range_valid: failed_tests.append("Shipping-split (from/to)")
-        if not sales_kpi_valid: failed_tests.append("Sales KPI regression")
-        if not platform_timeseries_valid: failed_tests.append("Platform Timeseries regression")
+        if not diag_valid: failed_tests.append("Orders Diagnostics")
+        if not shipping_valid: failed_tests.append("Shipping-Split KPI")
+        if not timeseries_valid: failed_tests.append("Orders Timeseries")
         print(f"\n⚠️  OVERALL: {len(failed_tests)} test(s) FAILED: {', '.join(failed_tests)}")
     
     return results, all_tests_passed
