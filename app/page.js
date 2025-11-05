@@ -928,7 +928,136 @@ export default function App() {
         </div>
       )}
 
-      {activeTab!=='dashboard' && activeTab!=='outbound' && activeTab!=='sales' && activeTab!=='marketing' && (
+      {/* Kaltakquise */}
+      {activeTab==='coldleads' && (
+        <div>
+          <h2 className="mb-4">Kaltakquise-Tool</h2>
+          
+          {/* Suchformular */}
+          <div className="card mb-4">
+            <div className="card-body">
+              <h5>Neue Firmen suchen</h5>
+              <div className="row">
+                <div className="col-md-4">
+                  <input 
+                    className="form-control mb-2" 
+                    placeholder="Branche (z.B. Metallbau)" 
+                    value={coldSearchForm.industry}
+                    onChange={e => setColdSearchForm({...coldSearchForm, industry: e.target.value})}
+                  />
+                </div>
+                <div className="col-md-4">
+                  <input 
+                    className="form-control mb-2" 
+                    placeholder="Region (z.B. Berlin)" 
+                    value={coldSearchForm.region}
+                    onChange={e => setColdSearchForm({...coldSearchForm, region: e.target.value})}
+                  />
+                </div>
+                <div className="col-md-2">
+                  <input 
+                    type="number" 
+                    className="form-control mb-2" 
+                    placeholder="Limit" 
+                    value={coldSearchForm.limit}
+                    onChange={e => setColdSearchForm({...coldSearchForm, limit: parseInt(e.target.value)})}
+                  />
+                </div>
+                <div className="col-md-2">
+                  <button 
+                    className="btn btn-primary btn-block" 
+                    onClick={searchColdLeads}
+                    disabled={coldLoading}
+                  >
+                    {coldLoading ? 'Lädt...' : 'Suchen'}
+                  </button>
+                </div>
+              </div>
+              <small className="text-muted">💡 Beispiele: Metallbau Berlin, Holzbearbeitung München, Edelstahlverarbeitung Hamburg</small>
+            </div>
+          </div>
+
+          {/* Ergebnis-Tabelle */}
+          {coldProspects.length > 0 && (
+            <div className="card">
+              <div className="card-body">
+                <h5>{coldProspects.length} Firmen gefunden</h5>
+                <div className="table-responsive">
+                  <table className="table table-hover table-sm">
+                    <thead>
+                      <tr>
+                        <th>Firma</th>
+                        <th>Website</th>
+                        <th>Branche</th>
+                        <th>Region</th>
+                        <th>Score</th>
+                        <th>Status</th>
+                        <th>Aktionen</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {coldProspects.map((p, i) => (
+                        <tr key={i}>
+                          <td>{p.company_name}</td>
+                          <td><a href={p.website} target="_blank" rel="noopener" className="text-truncate d-inline-block" style={{maxWidth:200}}>{p.website}</a></td>
+                          <td>{p.industry}</td>
+                          <td>{p.region}</td>
+                          <td>{p.score ? <span className="badge badge-success">{p.score}</span> : '-'}</td>
+                          <td>
+                            <span className={`badge badge-${p.status==='new'?'secondary':p.status==='analyzed'?'info':'success'}`}>
+                              {p.status}
+                            </span>
+                          </td>
+                          <td>
+                            {p.status === 'new' && (
+                              <button className="btn btn-sm btn-info mr-1" onClick={() => analyzeProspect(p)} disabled={coldLoading}>
+                                Analysieren
+                              </button>
+                            )}
+                            {p.status === 'analyzed' && (
+                              <button className="btn btn-sm btn-success" onClick={() => generateColdEmail(p)} disabled={coldLoading}>
+                                Email
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Email-Editor Modal */}
+          {generatedEmail && (
+            <div className="card mt-4">
+              <div className="card-body">
+                <h5>Generierte Email</h5>
+                <p className="text-muted">Empfänger: {generatedEmail.recipient}</p>
+                <div className="form-group">
+                  <label>Betreff:</label>
+                  <input className="form-control" value={generatedEmail.subject} readOnly />
+                </div>
+                <div className="form-group">
+                  <label>Nachricht:</label>
+                  <textarea className="form-control" rows="10" value={generatedEmail.body} readOnly />
+                </div>
+                <div className="d-flex justify-content-between">
+                  <button className="btn btn-secondary" onClick={() => setGeneratedEmail(null)}>
+                    Schließen
+                  </button>
+                  <button className="btn btn-primary" onClick={sendColdEmail} disabled={coldLoading}>
+                    {coldLoading ? 'Versendet...' : 'Jetzt versenden'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab!=='dashboard' && activeTab!=='outbound' && activeTab!=='sales' && activeTab!=='marketing' && activeTab!=='coldleads' && (
         <div className="text-muted">Dieser Bereich ist für die nächste Iteration vorgesehen.</div>
       )}
 
