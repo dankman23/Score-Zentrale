@@ -167,189 +167,198 @@ def validate_diag_day_response(response_data):
     return True, "Valid structure"
 
 def main():
-    """Test JTL Orders diagnostics and KPI endpoints as requested"""
-    print("=" * 80)
-    print("🔄 JTL ORDERS DIAGNOSTICS AND KPI TESTING")
-    print("=" * 80)
+    """Run all JTL endpoint tests"""
+    print("🚀 Starting JTL Backend Testing")
     print(f"Base URL: {BASE_URL}")
-    print(f"API Base: {API_BASE}")
-    print(f"Test Time: {datetime.now().isoformat()}")
-    print("\nAs requested in review_request:")
-    print("1) GET /api/jtl/orders/diag/day?date=2025-11-03")
-    print("   - Expected: 200 ok:true; check presence of totals.orders, totals.gross, rows array")
-    print("2) GET /api/jtl/orders/kpi/shipping-split?from=2025-11-03&to=2025-11-03")
-    print("   - Expected: 200 ok:true and flat fields: orders, net_without_shipping, net_with_shipping, gross_without_shipping, gross_with_shipping")
-    print("3) Sanity: GET /api/jtl/orders/timeseries?from=2025-11-01&to=2025-11-03")
-    print("   - Expected: 200 ok:true with grain and rows array")
     
-    results = []
+    # Test date ranges
+    from_date = "2025-11-01"
+    to_date = "2025-11-30"
+    single_date = "2025-11-03"
     
-    # Test 1: Orders diagnostics for specific day
-    print("\n" + "="*50)
-    print("TEST 1: Orders Diagnostics for 2025-11-03")
-    params = {'date': '2025-11-03'}
-    result = test_endpoint('GET', '/jtl/orders/diag/day', params=params, expect_200_ok=True)
-    results.append(result)
+    test_results = []
     
-    # Test 2: Orders KPI shipping-split for specific day
-    print("\n" + "="*50)
-    print("TEST 2: Orders KPI Shipping-Split for 2025-11-03")
-    params = {'from': '2025-11-03', 'to': '2025-11-03'}
-    result = test_endpoint('GET', '/jtl/orders/kpi/shipping-split', params=params, expect_200_ok=True)
-    results.append(result)
+    # 1. NEW: Purchase Expenses
+    print("\n" + "="*60)
+    print("1. Testing NEW: Purchase Expenses Endpoint")
+    print("="*60)
     
-    # Test 3: Sanity check - Orders timeseries
-    print("\n" + "="*50)
-    print("TEST 3: SANITY - Orders Timeseries (2025-11-01 to 2025-11-03)")
-    params = {'from': '2025-11-01', 'to': '2025-11-03'}
-    result = test_endpoint('GET', '/jtl/orders/timeseries', params=params, expect_200_ok=True)
-    results.append(result)
+    try:
+        result = test_endpoint("GET", "/api/jtl/purchase/expenses", 
+                             params={"from": from_date, "to": to_date})
+        
+        if result['success'] and result['json']:
+            is_valid, msg = validate_purchase_expenses_response(result['json'])
+            if is_valid:
+                print("   ✅ PASS: Purchase expenses endpoint working correctly")
+                data = result['json']
+                print(f"   📊 Invoices: {data.get('invoices')}")
+                print(f"   💰 Net: {data.get('net')}, Gross: {data.get('gross')}")
+                print(f"   🏗️  Material: {data.get('cost_components', {}).get('material')}")
+                print(f"   🚚 Freight: {data.get('cost_components', {}).get('freight')}")
+                print(f"   📋 Source: {data.get('debug', {}).get('source')}")
+                test_results.append(("Purchase Expenses", True, "Working correctly"))
+            else:
+                print(f"   ❌ FAIL: Invalid response structure - {msg}")
+                test_results.append(("Purchase Expenses", False, f"Invalid structure: {msg}"))
+        else:
+            error_msg = result.get('error', f"HTTP {result['status_code']}")
+            print(f"   ❌ FAIL: {error_msg}")
+            test_results.append(("Purchase Expenses", False, error_msg))
+    except Exception as e:
+        print(f"   ❌ FAIL: Exception - {str(e)}")
+        test_results.append(("Purchase Expenses", False, f"Exception: {str(e)}"))
+    
+    # 2. NEW: Gross Profit Margin
+    print("\n" + "="*60)
+    print("2. Testing NEW: Gross Profit Margin Endpoint")
+    print("="*60)
+    
+    try:
+        result = test_endpoint("GET", "/api/jtl/orders/kpi/margin", 
+                             params={"from": from_date, "to": to_date})
+        
+        if result['success'] and result['json']:
+            is_valid, msg = validate_margin_response(result['json'])
+            if is_valid:
+                print("   ✅ PASS: Margin endpoint working correctly")
+                data = result['json']
+                print(f"   📊 Orders: {data.get('orders')}")
+                print(f"   💰 Revenue (net w/o ship): {data.get('revenue_net_wo_ship')}")
+                print(f"   💸 Cost (net): {data.get('cost_net')}")
+                print(f"   📈 Margin (net): {data.get('margin_net')}")
+                cost_from = data.get('cost_source', {}).get('from', {})
+                print(f"   🔄 Cost Sources - Position: {cost_from.get('position_pct')}%, History: {cost_from.get('history_pct')}%, Article: {cost_from.get('article_current_pct')}%")
+                test_results.append(("Gross Profit Margin", True, "Working correctly"))
+            else:
+                print(f"   ❌ FAIL: Invalid response structure - {msg}")
+                test_results.append(("Gross Profit Margin", False, f"Invalid structure: {msg}"))
+        else:
+            error_msg = result.get('error', f"HTTP {result['status_code']}")
+            print(f"   ❌ FAIL: {error_msg}")
+            test_results.append(("Gross Profit Margin", False, error_msg))
+    except Exception as e:
+        print(f"   ❌ FAIL: Exception - {str(e)}")
+        test_results.append(("Gross Profit Margin", False, f"Exception: {str(e)}"))
+    
+    # 3. REFACTORED: Shipping Split
+    print("\n" + "="*60)
+    print("3. Testing REFACTORED: Shipping Split Endpoint")
+    print("="*60)
+    
+    try:
+        result = test_endpoint("GET", "/api/jtl/orders/kpi/shipping-split", 
+                             params={"from": "2025-10-01", "to": "2025-10-31"})
+        
+        if result['success'] and result['json']:
+            is_valid, msg = validate_shipping_split_response(result['json'])
+            if is_valid:
+                print("   ✅ PASS: Shipping split endpoint working correctly")
+                data = result['json']
+                print(f"   📊 Orders: {data.get('orders')}")
+                print(f"   💰 Net w/o shipping: {data.get('net_without_shipping')}")
+                print(f"   💰 Net w/ shipping: {data.get('net_with_shipping')}")
+                print(f"   💰 Gross w/o shipping: {data.get('gross_without_shipping')}")
+                print(f"   💰 Gross w/ shipping: {data.get('gross_with_shipping')}")
+                test_results.append(("Shipping Split", True, "Working correctly"))
+            else:
+                print(f"   ❌ FAIL: Invalid response structure - {msg}")
+                test_results.append(("Shipping Split", False, f"Invalid structure: {msg}"))
+        else:
+            error_msg = result.get('error', f"HTTP {result['status_code']}")
+            print(f"   ❌ FAIL: {error_msg}")
+            test_results.append(("Shipping Split", False, error_msg))
+    except Exception as e:
+        print(f"   ❌ FAIL: Exception - {str(e)}")
+        test_results.append(("Shipping Split", False, f"Exception: {str(e)}"))
+    
+    # 4. REFACTORED: Timeseries
+    print("\n" + "="*60)
+    print("4. Testing REFACTORED: Timeseries Endpoint")
+    print("="*60)
+    
+    try:
+        result = test_endpoint("GET", "/api/jtl/orders/timeseries", 
+                             params={"from": "2025-11-01", "to": "2025-11-03"})
+        
+        if result['success'] and result['json']:
+            is_valid, msg = validate_timeseries_response(result['json'])
+            if is_valid:
+                print("   ✅ PASS: Timeseries endpoint working correctly")
+                data = result['json']
+                print(f"   📊 Grain: {data.get('grain')}")
+                print(f"   📅 Rows count: {len(data.get('rows', []))}")
+                if data.get('rows'):
+                    first_row = data['rows'][0]
+                    print(f"   📈 Sample row: {first_row.get('date')} - Orders: {first_row.get('orders')}, Net: {first_row.get('net')}")
+                test_results.append(("Timeseries", True, "Working correctly"))
+            else:
+                print(f"   ❌ FAIL: Invalid response structure - {msg}")
+                test_results.append(("Timeseries", False, f"Invalid structure: {msg}"))
+        else:
+            error_msg = result.get('error', f"HTTP {result['status_code']}")
+            print(f"   ❌ FAIL: {error_msg}")
+            test_results.append(("Timeseries", False, error_msg))
+    except Exception as e:
+        print(f"   ❌ FAIL: Exception - {str(e)}")
+        test_results.append(("Timeseries", False, f"Exception: {str(e)}"))
+    
+    # 5. REFACTORED: Diagnostics Day
+    print("\n" + "="*60)
+    print("5. Testing REFACTORED: Diagnostics Day Endpoint")
+    print("="*60)
+    
+    try:
+        result = test_endpoint("GET", "/api/jtl/orders/diag/day", 
+                             params={"date": single_date})
+        
+        if result['success'] and result['json']:
+            is_valid, msg = validate_diag_day_response(result['json'])
+            if is_valid:
+                print("   ✅ PASS: Diagnostics day endpoint working correctly")
+                data = result['json']
+                totals = data.get('totals', {})
+                print(f"   📊 Date: {data.get('date')}")
+                print(f"   📊 Total Orders: {totals.get('orders')}")
+                print(f"   💰 Total Net: {totals.get('net')}")
+                print(f"   💰 Total Gross: {totals.get('gross')}")
+                print(f"   📋 Rows count: {len(data.get('rows', []))}")
+                test_results.append(("Diagnostics Day", True, "Working correctly"))
+            else:
+                print(f"   ❌ FAIL: Invalid response structure - {msg}")
+                test_results.append(("Diagnostics Day", False, f"Invalid structure: {msg}"))
+        else:
+            error_msg = result.get('error', f"HTTP {result['status_code']}")
+            print(f"   ❌ FAIL: {error_msg}")
+            test_results.append(("Diagnostics Day", False, error_msg))
+    except Exception as e:
+        print(f"   ❌ FAIL: Exception - {str(e)}")
+        test_results.append(("Diagnostics Day", False, f"Exception: {str(e)}"))
     
     # Summary
-    print("\n" + "=" * 80)
-    print("📊 JTL ORDERS DIAGNOSTICS AND KPI TEST RESULTS")
-    print("=" * 80)
+    print("\n" + "="*60)
+    print("📋 TEST SUMMARY")
+    print("="*60)
     
-    for i, result in enumerate(results, 1):
-        endpoint = result['endpoint']
-        method = result['method']
-        status = result.get('status_code', 'ERROR')
-        result_text = result['result']
-        
-        print(f"\n{i}. {method} {endpoint}")
-        print(f"   Status: {status}")
-        print(f"   Result: {result_text}")
-        
-        # Show key response data
-        if result.get('json_data'):
-            json_data = result['json_data']
-            
-            # Handle object responses
-            if 'ok' in json_data:
-                print(f"   Response ok: {json_data['ok']}")
-            if 'error' in json_data:
-                print(f"   Error: {json_data['error']}")
-            
-            # Orders diagnostics specific fields
-            if 'totals' in json_data:
-                totals = json_data['totals']
-                print(f"   Totals orders: {totals.get('orders')}")
-                print(f"   Totals gross: {totals.get('gross')}")
-            if 'rows' in json_data and isinstance(json_data['rows'], list):
-                print(f"   Rows array length: {len(json_data['rows'])}")
-            
-            # Shipping-split flat fields
-            if 'net_without_shipping' in json_data:
-                print(f"   Orders: {json_data.get('orders')}")
-                print(f"   Net without shipping: {json_data.get('net_without_shipping')}")
-                print(f"   Net with shipping: {json_data.get('net_with_shipping')}")
-                print(f"   Gross without shipping: {json_data.get('gross_without_shipping')}")
-                print(f"   Gross with shipping: {json_data.get('gross_with_shipping')}")
-            
-            # Timeseries fields
-            if 'grain' in json_data:
-                print(f"   Grain: {json_data.get('grain')}")
-                if 'rows' in json_data and isinstance(json_data['rows'], list):
-                    print(f"   Rows array length: {len(json_data['rows'])}")
-        
-        if result.get('error'):
-            print(f"   Exception: {result['error']}")
+    passed = 0
+    failed = 0
     
-    # Analysis
-    print("\n" + "=" * 80)
-    print("🔍 ANALYSIS OF JTL ORDERS ENDPOINTS")
-    print("=" * 80)
-    
-    # Test 1: Orders diagnostics validation
-    diag_result = results[0]
-    def validate_diag_response(result, test_name):
-        if result['status_code'] == 200:
-            data = result.get('json_data', {})
-            if data.get('ok') == True:
-                # Check required fields: totals.orders, totals.gross, rows array
-                if 'totals' in data and 'rows' in data:
-                    totals = data['totals']
-                    if 'orders' in totals and 'gross' in totals and isinstance(data['rows'], list):
-                        print(f"✅ {test_name}: All required fields present (totals.orders, totals.gross, rows array)")
-                        print(f"   Captured totals: orders={totals.get('orders')}, gross={totals.get('gross')}")
-                        return True, totals
-                    else:
-                        print(f"❌ {test_name}: Missing required fields in totals or rows not array")
-                        return False, None
-                else:
-                    print(f"❌ {test_name}: Missing totals or rows fields")
-                    return False, None
-            else:
-                print(f"❌ {test_name}: Returns ok:false - {data.get('error', 'No error message')}")
-                return False, None
+    for test_name, success, message in test_results:
+        status = "✅ PASS" if success else "❌ FAIL"
+        print(f"{status}: {test_name} - {message}")
+        if success:
+            passed += 1
         else:
-            print(f"❌ {test_name}: Returns {result['status_code']} instead of 200")
-            return False, None
+            failed += 1
     
-    diag_valid, diag_totals = validate_diag_response(diag_result, "Orders Diagnostics")
+    print(f"\n📊 Results: {passed} passed, {failed} failed out of {len(test_results)} tests")
     
-    # Test 2: Shipping-split validation
-    shipping_result = results[1]
-    def validate_shipping_split_response(result, test_name):
-        if result['status_code'] == 200:
-            data = result.get('json_data', {})
-            if data.get('ok') == True:
-                # Check flat fields: orders, net_without_shipping, net_with_shipping, gross_without_shipping, gross_with_shipping
-                required_fields = ['orders', 'net_without_shipping', 'net_with_shipping', 'gross_without_shipping', 'gross_with_shipping']
-                missing_fields = [f for f in required_fields if f not in data]
-                if not missing_fields:
-                    print(f"✅ {test_name}: All required flat fields present")
-                    print(f"   Captured values: orders={data.get('orders')}, net_without_shipping={data.get('net_without_shipping')}, net_with_shipping={data.get('net_with_shipping')}, gross_without_shipping={data.get('gross_without_shipping')}, gross_with_shipping={data.get('gross_with_shipping')}")
-                    return True, data
-                else:
-                    print(f"❌ {test_name}: Missing required fields: {missing_fields}")
-                    return False, None
-            else:
-                print(f"❌ {test_name}: Returns ok:false - {data.get('error', 'No error message')}")
-                return False, None
-        else:
-            print(f"❌ {test_name}: Returns {result['status_code']} instead of 200")
-            return False, None
-    
-    shipping_valid, shipping_data = validate_shipping_split_response(shipping_result, "Shipping-Split KPI")
-    
-    # Test 3: Timeseries validation
-    timeseries_result = results[2]
-    def validate_timeseries_response(result, test_name):
-        if result['status_code'] == 200:
-            data = result.get('json_data', {})
-            if data.get('ok') == True:
-                # Check grain and rows array
-                if 'grain' in data and 'rows' in data and isinstance(data['rows'], list):
-                    print(f"✅ {test_name}: Required fields present (grain and rows array)")
-                    print(f"   Captured: grain={data.get('grain')}, rows count={len(data['rows'])}")
-                    return True, data
-                else:
-                    print(f"❌ {test_name}: Missing grain or rows fields, or rows not array")
-                    return False, None
-            else:
-                print(f"❌ {test_name}: Returns ok:false - {data.get('error', 'No error message')}")
-                return False, None
-        else:
-            print(f"❌ {test_name}: Returns {result['status_code']} instead of 200")
-            return False, None
-    
-    timeseries_valid, timeseries_data = validate_timeseries_response(timeseries_result, "Orders Timeseries")
-    
-    # Overall assessment
-    all_tests_passed = diag_valid and shipping_valid and timeseries_valid
-    
-    if all_tests_passed:
-        print(f"\n🎯 OVERALL: All 3 tests PASSED - Orders diagnostics and KPI endpoints working correctly")
+    if failed > 0:
+        print("\n⚠️  Some tests failed. Check the detailed output above for error messages.")
+        sys.exit(1)
     else:
-        failed_tests = []
-        if not diag_valid: failed_tests.append("Orders Diagnostics")
-        if not shipping_valid: failed_tests.append("Shipping-Split KPI")
-        if not timeseries_valid: failed_tests.append("Orders Timeseries")
-        print(f"\n⚠️  OVERALL: {len(failed_tests)} test(s) FAILED: {', '.join(failed_tests)}")
-    
-    return results, all_tests_passed
+        print("\n🎉 All tests passed successfully!")
+        sys.exit(0)
 
 if __name__ == "__main__":
-    results, success = main()
-    exit(0 if success else 1)
+    main()
