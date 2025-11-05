@@ -183,6 +183,10 @@ async function handleRoute(request, { params }) {
         const hasFirma = await hasColumn(pool, kundeTable, 'cFirma')
         const hasEmail = await hasColumn(pool, kundeTable, 'cEMail')
         const hasPhone = await hasColumn(pool, kundeTable, 'cTelefon')
+        const hasVorname = await hasColumn(pool, kundeTable, 'cVorname')
+        const hasNachname = await hasColumn(pool, kundeTable, 'cNachname')
+        const hasName = await hasColumn(pool, kundeTable, 'cName')
+        const hasKundenNr = await hasColumn(pool, kundeTable, 'cKundenNr')
 
         // Build robust position totals (handle qty/tax/alt columns)
         const posTable = auftragPosTable
