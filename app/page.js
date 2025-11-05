@@ -342,6 +342,99 @@ export default function App() {
     const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url)
   }
 
+  // Kaltakquise Functions
+  const searchColdLeads = async () => {
+    if (!coldSearchForm.industry || !coldSearchForm.region) {
+      alert('Bitte Branche und Region eingeben'); return
+    }
+    setColdLoading(true)
+    try {
+      const res = await fetch('/api/coldleads/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(coldSearchForm)
+      })
+      const data = await res.json()
+      if (data.ok) {
+        setColdProspects(data.prospects)
+        alert(`${data.count} Firmen gefunden!`)
+      } else {
+        alert('Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('Fehler: ' + e.message)
+    }
+    setColdLoading(false)
+  }
+
+  const analyzeProspect = async (prospect) => {
+    if (!confirm(`Firma "${prospect.company_name}" jetzt analysieren? (Nutzt OpenAI)`)) return
+    setColdLoading(true)
+    try {
+      const res = await fetch('/api/coldleads/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ website: prospect.website, industry: prospect.industry })
+      })
+      const data = await res.json()
+      if (data.ok) {
+        setSelectedProspect({ ...prospect, analysis: data.analysis })
+        alert('Analyse abgeschlossen! Score: ' + data.analysis.needs_assessment.score)
+        // Refresh list
+        const list = await fetch('/api/coldleads/search?limit=50')
+        const listData = await list.json()
+        if (listData.ok) setColdProspects(listData.prospects)
+      } else {
+        alert('Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('Fehler: ' + e.message)
+    }
+    setColdLoading(false)
+  }
+
+  const generateColdEmail = async (prospect) => {
+    setColdLoading(true)
+    try {
+      const res = await fetch('/api/coldleads/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ website: prospect.website, send: false })
+      })
+      const data = await res.json()
+      if (data.ok) {
+        setGeneratedEmail({ ...data.email, recipient: data.recipient, website: prospect.website })
+      } else {
+        alert('Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('Fehler: ' + e.message)
+    }
+    setColdLoading(false)
+  }
+
+  const sendColdEmail = async () => {
+    if (!confirm('Email jetzt wirklich versenden?')) return
+    setColdLoading(true)
+    try {
+      const res = await fetch('/api/coldleads/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ website: generatedEmail.website, send: true })
+      })
+      const data = await res.json()
+      if (data.ok && data.sent) {
+        alert('Email erfolgreich versendet!')
+        setGeneratedEmail(null)
+      } else {
+        alert('Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('Fehler: ' + e.message)
+    }
+    setColdLoading(false)
+  }
+
   const ScoreBadge = ({v}) => (<span className="badge badge-warning" style={{fontSize:'0.95rem'}}>{Math.round(Number(v||0))}</span>)
   const StatusBadge = ({s}) => {
     const map = { open:'secondary', called:'info', qualified:'success', discarded:'dark' }
