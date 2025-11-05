@@ -106,7 +106,7 @@ export async function GET(request: NextRequest) {
         LEFT JOIN Articles a ON o.kAuftrag = a.kAuftrag
         LEFT JOIN Shipping s ON o.kAuftrag = s.kAuftrag
         WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
-          AND o.cStatus != 'storno'
+          ${stornoFilter}
           AND (a.net_articles > 0 OR s.net_shipping > 0)
       )
       SELECT 
