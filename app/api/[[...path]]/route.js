@@ -215,17 +215,17 @@ async function handleRoute(request, { params }) {
             SELECT o.kKunde,
                    COUNT(DISTINCT o.kAuftrag) AS ordersCount,
                    MAX(o.dErstellt)          AS lastOrderDate
-            FROM Verkauf.tAuftrag o
-            WHERE (COL_LENGTH('Verkauf.tAuftrag','nStorno') IS NULL OR ISNULL(o.nStorno,0)=0)
+            FROM ${auftragTable} o
+            WHERE (COL_LENGTH('${auftragTable}','nStorno') IS NULL OR ISNULL(o.nStorno,0)=0)
             GROUP BY o.kKunde
           ),
           revenue AS (
             SELECT o.kKunde,
                    SUM(${grossTotalExpr}) AS totalRevenueBrutto,
                    SUM(${netTotalExpr})   AS totalRevenueNetto
-            FROM Verkauf.tAuftrag o
-            JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
-            WHERE (COL_LENGTH('Verkauf.tAuftrag','nStorno') IS NULL OR ISNULL(o.nStorno,0)=0)
+            FROM ${auftragTable} o
+            JOIN ${auftragPosTable} op ON op.kAuftrag = o.kAuftrag
+            WHERE (COL_LENGTH('${auftragTable}','nStorno') IS NULL OR ISNULL(o.nStorno,0)=0)
               AND (${articleWhere})
             GROUP BY o.kKunde
           )
@@ -238,7 +238,7 @@ async function handleRoute(request, { params }) {
             ${hasUSTID? 'k.cUSTID' : "NULL AS cUSTID"},
             o.ordersCount, o.lastOrderDate,
             r.totalRevenueNetto, r.totalRevenueBrutto
-          FROM Kunde.tKunde k
+          FROM ${kundeTable} k
           JOIN orders  o ON o.kKunde = k.kKunde
           JOIN revenue r ON r.kKunde = k.kKunde
           WHERE o.lastOrderDate >= @fromRecent
