@@ -50,27 +50,35 @@ export async function GET(request: NextRequest) {
     const postedFilter = hasVerbucht ? 'AND h.nVerbucht = 1' : ''
 
     // Positionsfelder robust ermitteln
-    const qtyField = await pickFirstExisting(pool, posTable, ['fMenge', 'nMenge', 'fAnzahl', 'nAnzahl']) || '1'
-    const mwstField = await pickFirstExisting(pool, posTable, ['fMwSt', 'fMwst', 'fMwStProzent', 'MwSt']) || '0'
+    const qtyField = await pickFirstExisting(pool, posTable, ['fMenge', 'nMenge', 'fAnzahl', 'nAnzahl']) || 'fMenge'
+    const mwstField = await pickFirstExisting(pool, posTable, ['fMwSt', 'fMwst', 'fMwStProzent', 'MwSt']) || 'fMwSt'
     
-    // Netto- und Brutto-Summen
-    let netExpr = 'COALESCE(p.fGesamtNetto, 0)'
-    let grossExpr = 'COALESCE(p.fGesamtBrutto, 0)'
+    // Netto- und Brutto-Summen - robuste Ermittlung
+    let netExpr: string
+    let grossExpr: string
     
-    if (!(await hasColumn(pool, posTable, 'fGesamtNetto'))) {
-      if (await hasColumn(pool, posTable, 'fVKNetto')) {
-        netExpr = `COALESCE(p.fVKNetto * p.${qtyField}, 0)`
-      } else if (await hasColumn(pool, posTable, 'fGesamtBrutto')) {
-        netExpr = `COALESCE(p.fGesamtBrutto / (1 + p.${mwstField} / 100.0), 0)`
-      }
+    const hasGesamtNetto = await hasColumn(pool, posTable, 'fGesamtNetto')
+    const hasGesamtBrutto = await hasColumn(pool, posTable, 'fGesamtBrutto')
+    const hasVKNetto = await hasColumn(pool, posTable, 'fVKNetto')
+    const hasVKBrutto = await hasColumn(pool, posTable, 'fVKBrutto')
+    const hasEKNetto = await hasColumn(pool, posTable, 'fEKNetto')
+    
+    if (hasGesamtNetto) {
+      netExpr = 'COALESCE(p.fGesamtNetto, 0)'
+    } else if (hasVKNetto) {
+      netExpr = `COALESCE(p.fVKNetto * COALESCE(p.${qtyField}, 1), 0)`
+    } else if (hasEKNetto) {
+      netExpr = `COALESCE(p.fEKNetto * COALESCE(p.${qtyField}, 1), 0)`
+    } else {
+      netExpr = '0'
     }
     
-    if (!(await hasColumn(pool, posTable, 'fGesamtBrutto'))) {
-      if (await hasColumn(pool, posTable, 'fVKBrutto')) {
-        grossExpr = `COALESCE(p.fVKBrutto * p.${qtyField}, 0)`
-      } else {
-        grossExpr = `${netExpr} * (1 + p.${mwstField} / 100.0)`
-      }
+    if (hasGesamtBrutto) {
+      grossExpr = 'COALESCE(p.fGesamtBrutto, 0)'
+    } else if (hasVKBrutto) {
+      grossExpr = `COALESCE(p.fVKBrutto * COALESCE(p.${qtyField}, 1), 0)`
+    } else {
+      grossExpr = `(${netExpr}) * (1 + COALESCE(p.${mwstField}, 19) / 100.0)`
     }
 
     // Fracht-Erkennung
