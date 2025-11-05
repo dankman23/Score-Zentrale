@@ -441,10 +441,10 @@ agent_communication:
   - task: "JTL Orders: GET /api/jtl/orders/diag/day"
     implemented: true
     working: true
-    file: "/app/app/api/[[...path]]/route.js"
+    file: "/app/app/api/jtl/orders/diag/day/route.ts"
     stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: false
         agent: "user"
@@ -455,6 +455,9 @@ agent_communication:
       - working: true
         agent: "testing"
         comment: "✅ Orders Diagnostics working: Returns 200 ok:true with required fields (totals.orders=77, totals.gross=13018.87, rows array with 77 items). Fixed kPlattform column issue by simplifying platform detection logic."
+      - working: "NA"
+        agent: "main"
+        comment: "Re-implemented as separate route file with improved platform detection using hasColumn checks"
   - task: "JTL Orders: KPI shipping-split accuracy (03.11)"
     implemented: true
     working: true
