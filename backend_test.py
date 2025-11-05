@@ -10,7 +10,7 @@ import os
 from datetime import datetime
 
 # Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://jtl-analytics.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://warm-leads.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def test_endpoint(method, endpoint, params=None, expect_200_ok=None):
