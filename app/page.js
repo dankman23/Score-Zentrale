@@ -48,6 +48,8 @@ export default function App() {
   const [kpi, setKpi] = useState(null)
   const [kpiFees, setKpiFees] = useState(null)
   const [ordersSplit, setOrdersSplit] = useState(null)
+  const [expenses, setExpenses] = useState(null)
+  const [margin, setMargin] = useState(null)
   const [ts, setTs] = useState([])
   const [tsFees, setTsFees] = useState([])
   const [platTs, setPlatTs] = useState([])
