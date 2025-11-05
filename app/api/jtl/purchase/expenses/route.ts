@@ -36,9 +36,33 @@ export async function GET(request: NextRequest) {
     const headerTable = await firstExistingTable(pool, headerCandidates)
     const posTable = await firstExistingTable(pool, posCandidates)
 
-    // Fallback auf Wareneingang
+    // Prüfe ob Eingangsrechnungen vorhanden
     if (!headerTable || !posTable) {
-      return await handleGoodsReceipts(pool, from, to)
+      return await handlePurchaseOrdersFallback(pool, from, to)
+    }
+
+    // Prüfe ob Daten im Zeitraum vorhanden
+    const dateColumns = ['dBelegDatum', 'dErstellt', 'dEingang']
+    const dateField = await pickFirstExisting(pool, headerTable, dateColumns) || 'dErstellt'
+    const hasVerbucht = await hasColumn(pool, headerTable, 'nVerbucht')
+    const postedFilter = hasVerbucht ? 'AND h.nVerbucht = 1' : ''
+
+    const countQuery = `
+      SELECT COUNT(*) AS cnt
+      FROM ${headerTable} h
+      WHERE CAST(h.${dateField} AS DATE) BETWEEN @from AND @to
+        ${postedFilter}
+    `
+    const countResult = await pool.request()
+      .input('from', sql.Date, from)
+      .input('to', sql.Date, to)
+      .query(countQuery)
+    
+    const recordCount = countResult.recordset[0]?.cnt || 0
+    
+    // Fallback wenn keine Eingangsrechnungen im Zeitraum
+    if (recordCount === 0) {
+      return await handlePurchaseOrdersFallback(pool, from, to)
     }
 
     // Datumsspalten-Priorität
