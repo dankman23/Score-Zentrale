@@ -225,6 +225,14 @@ async function handleRoute(request, { params }) {
             WHERE (COL_LENGTH('${auftragTable}','nStorno') IS NULL OR ISNULL(o.nStorno,0)=0)
             GROUP BY o.kKunde
           ),
+          lastPlat AS (
+            SELECT o.kKunde,
+                   MAX(o.dErstellt) AS lastDate,
+                   MAX(CASE WHEN o.dErstellt = (SELECT MAX(dErstellt) FROM ${auftragTable} WHERE kKunde=o.kKunde) THEN ISNULL(o.kPlattform, NULL) END) AS kPlattform,
+                   MAX(CASE WHEN o.dErstellt = (SELECT MAX(dErstellt) FROM ${auftragTable} WHERE kKunde=o.kKunde) THEN ISNULL(o.kShop, NULL) END) AS kShop
+            FROM ${auftragTable} o
+            GROUP BY o.kKunde
+          ),
           revenue AS (
             SELECT o.kKunde,
                    SUM(${grossTotalExpr}) AS totalRevenueBrutto,
@@ -244,10 +252,15 @@ async function handleRoute(request, { params }) {
             ${hasPhone? 'k.cTelefon' : "CAST(NULL AS nvarchar(100)) AS cTelefon"},
             ${hasUSTID? 'k.cUSTID' : "CAST(NULL AS nvarchar(50)) AS cUSTID"},
             o.ordersCount, o.lastOrderDate,
-            r.totalRevenueNetto, r.totalRevenueBrutto
+            r.totalRevenueNetto, r.totalRevenueBrutto,
+            CASE 
+              WHEN ${plTable? '1=1' : '1=0'} THEN (SELECT TOP 1 COALESCE(p.cName, CONCAT('Plattform ', lp.kPlattform)) FROM ${plTable||'dbo.tPlattform'} p RIGHT JOIN lastPlat lp ON 1=1 WHERE lp.kKunde = k.kKunde AND lp.kPlattform IS NOT NULL)
+              WHEN ${shTable? '1=1' : '1=0'} THEN (SELECT TOP 1 COALESCE(s.cName, CONCAT('Shop ', lp.kShop)) FROM ${shTable||'dbo.tShop'} s RIGHT JOIN lastPlat lp ON 1=1 WHERE lp.kKunde = k.kKunde AND lp.kShop IS NOT NULL)
+              ELSE 'Direktvertrieb' END AS lastChannel
           FROM ${kundeTable} k
           JOIN orders  o ON o.kKunde = k.kKunde
           JOIN revenue r ON r.kKunde = k.kKunde
+          LEFT JOIN lastPlat lp ON lp.kKunde = k.kKunde
           WHERE o.lastOrderDate >= @fromRecent
             AND (o.ordersCount >= @minOrders OR r.totalRevenueBrutto >= @minRevenue)
           ORDER BY r.totalRevenueBrutto DESC;`
