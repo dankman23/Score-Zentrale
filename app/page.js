@@ -266,6 +266,7 @@ export default function App() {
   useEffect(() => { loadDateRangeAndAdjust(); fetchAll(); fetchSalesTables(); refreshProspects() }, [])
   useEffect(() => { fetchAll(); fetchSalesTables() }, [from, to, limit])
   useEffect(() => { if (activeTab==='marketing') queryLeads() }, [activeTab, statusF, b2bF, minScoreF, qF, pageF, limitF, sortF, orderF])
+  useEffect(() => { if (activeTab==='coldleads') loadColdProspects() }, [activeTab, coldStatusFilter])
 
   useEffect(() => {
     const applyHash = () => { const h=(window.location.hash||'#dashboard').replace('#',''); setActiveTab(h) }
