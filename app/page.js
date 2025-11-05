@@ -961,6 +961,42 @@ export default function App() {
         <div>
           <h2 className="mb-4">Kaltakquise-Tool</h2>
           
+          {/* Statistiken */}
+          <div className="row mb-4">
+            <div className="col-md-3">
+              <div className="card text-center">
+                <div className="card-body py-2">
+                  <h3 className="mb-0">{coldStats.total}</h3>
+                  <small className="text-muted">Gesamt</small>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-3">
+              <div className="card text-center">
+                <div className="card-body py-2">
+                  <h3 className="mb-0 text-secondary">{coldStats.new}</h3>
+                  <small className="text-muted">Neu</small>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-3">
+              <div className="card text-center">
+                <div className="card-body py-2">
+                  <h3 className="mb-0 text-info">{coldStats.analyzed}</h3>
+                  <small className="text-muted">Analysiert</small>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-3">
+              <div className="card text-center">
+                <div className="card-body py-2">
+                  <h3 className="mb-0 text-success">{coldStats.contacted}</h3>
+                  <small className="text-muted">Kontaktiert</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Suchformular */}
           <div className="card mb-4">
             <div className="card-body">
