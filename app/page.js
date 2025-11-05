@@ -377,19 +377,38 @@ export default function App() {
             <KpiTile title="Marge (mit Gebühren) — Rechnungen" value={fmtCurrency(kpiFees?.margin_with_fees)} sub="inkl. 1,50 € + 20% Plattformgebühr" demo={demoMode} />
           </div>
 
-          {/* Dritte Reihe: Ausgaben & Rohertragsmarge */}
+          {/* Dritte Reihe: Beschaffung & Rohertragsmarge */}
           <div className="row">
             <KpiTile 
-              title="Ausgaben (Lieferanten) — Netto" 
+              title="Einkaufsbestellungen — Netto (Bestellwert)" 
+              value={fmtCurrency(purchaseOrders?.net)} 
+              sub={
+                <span>
+                  Brutto: {fmtCurrency(purchaseOrders?.gross)} | Quelle: Beschaffung → Bestellungen
+                  {purchaseOrders?.debug && (
+                    <span 
+                      className="ml-2" 
+                      style={{cursor:'help'}} 
+                      title={`Tabellen: ${purchaseOrders?.debug?.headerTable}, ${purchaseOrders?.debug?.posTable}\nDatum: ${purchaseOrders?.debug?.dateFieldUsed}`}
+                    >
+                      ⓘ
+                    </span>
+                  )}
+                </span>
+              } 
+              demo={demoMode} 
+            />
+            <KpiTile 
+              title="Ausgaben (Eingangsrechnungen) — Netto" 
               value={fmtCurrency(expenses?.net)} 
               sub={
                 <span>
-                  <strong>Brutto:</strong> {fmtCurrency(expenses?.gross)}
+                  Brutto: {fmtCurrency(expenses?.gross)} | Quelle: Eingangsrechnungen {expenses?.debug?.source?.includes('fallback') ? '(Fallback: Bestellungen)' : ''}
                   {expenses?.debug && (
                     <span 
                       className="ml-2" 
                       style={{cursor:'help'}} 
-                      title={`Material: ${fmtCurrency(expenses?.cost_components?.material)} | Fracht: ${fmtCurrency(expenses?.cost_components?.freight)} | Other: ${fmtCurrency(expenses?.cost_components?.other)}\nTabellen: ${expenses?.debug?.headerTable}, ${expenses?.debug?.posTable}`}
+                      title={`Material: ${fmtCurrency(expenses?.cost_components?.material)} | Fracht: ${fmtCurrency(expenses?.cost_components?.freight)} | Other: ${fmtCurrency(expenses?.cost_components?.other)}\nTabellen: ${expenses?.debug?.headerTable}, ${expenses?.debug?.posTable}\nQuelle: ${expenses?.debug?.source}`}
                     >
                       ⓘ
                     </span>
@@ -417,7 +436,6 @@ export default function App() {
               } 
               demo={demoMode} 
             />
-            <div className="col-md-4 mb-3"></div>
           </div>
 
           <div className="row mt-1">
