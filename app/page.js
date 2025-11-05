@@ -1117,6 +1117,86 @@ export default function App() {
             </div>
           )}
 
+          {/* Detail-Ansicht */}
+          {selectedProspect && selectedProspect.analysis && (
+            <div className="card mt-4">
+              <div className="card-body">
+                <div className="d-flex justify-content-between align-items-start mb-3">
+                  <h5>{selectedProspect.company_name}</h5>
+                  <button className="btn btn-sm btn-outline-secondary" onClick={() => setSelectedProspect(null)}>✕</button>
+                </div>
+                
+                <div className="row">
+                  <div className="col-md-6">
+                    <h6>Firmen-Info:</h6>
+                    <p className="small">{selectedProspect.analysis.company_info.description}</p>
+                    {selectedProspect.analysis.company_info.products?.length > 0 && (
+                      <div>
+                        <strong className="small">Produkte:</strong>
+                        <ul className="small">
+                          {selectedProspect.analysis.company_info.products.map((p, i) => <li key={i}>{p}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="col-md-6">
+                    <h6>Bedarfs-Assessment:</h6>
+                    <div className="mb-2">
+                      <strong className="small">Score:</strong> 
+                      <span className={`badge ml-2 badge-${selectedProspect.score >= 70 ? 'success' : selectedProspect.score >= 50 ? 'info' : 'secondary'}`}>
+                        {selectedProspect.score}/100
+                      </span>
+                    </div>
+                    <p className="small">{selectedProspect.analysis.needs_assessment.reasoning}</p>
+                    {selectedProspect.analysis.needs_assessment.potential_products?.length > 0 && (
+                      <div>
+                        <strong className="small">Potenzielle Produkte:</strong>
+                        <ul className="small">
+                          {selectedProspect.analysis.needs_assessment.potential_products.map((p, i) => <li key={i}>{p}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {selectedProspect.analysis.contact_persons?.length > 0 && (
+                  <div className="mt-3">
+                    <h6>Ansprechpartner:</h6>
+                    <div className="table-responsive">
+                      <table className="table table-sm">
+                        <thead>
+                          <tr>
+                            <th>Name</th>
+                            <th>Funktion</th>
+                            <th>Email</th>
+                            <th>Telefon</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedProspect.analysis.contact_persons.map((c, i) => (
+                            <tr key={i}>
+                              <td>{c.name}</td>
+                              <td>{c.title}</td>
+                              <td>{c.email || '-'}</td>
+                              <td>{c.phone || '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-3">
+                  <button className="btn btn-success" onClick={() => { setSelectedProspect(null); generateColdEmail(selectedProspect) }}>
+                    Email generieren
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Email-Editor Modal */}
           {generatedEmail && (
             <div className="card mt-4">
