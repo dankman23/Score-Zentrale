@@ -1045,7 +1045,23 @@ export default function App() {
           {coldProspects.length > 0 && (
             <div className="card">
               <div className="card-body">
-                <h5>{coldProspects.length} Firmen gefunden</h5>
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <h5 className="mb-0">{coldProspects.length} Firmen</h5>
+                  <div className="btn-group btn-group-sm">
+                    <button className={`btn ${coldStatusFilter==='all'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('all')}>
+                      Alle
+                    </button>
+                    <button className={`btn ${coldStatusFilter==='new'?'btn-secondary':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('new')}>
+                      Neu
+                    </button>
+                    <button className={`btn ${coldStatusFilter==='analyzed'?'btn-info':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('analyzed')}>
+                      Analysiert
+                    </button>
+                    <button className={`btn ${coldStatusFilter==='contacted'?'btn-success':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('contacted')}>
+                      Kontaktiert
+                    </button>
+                  </div>
+                </div>
                 <div className="table-responsive">
                   <table className="table table-hover table-sm">
                     <thead>
