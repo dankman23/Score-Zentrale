@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 """
-JTL Orders Diagnostics and KPI Testing
-Tests specific JTL Orders endpoints as requested in review_request
+Backend Testing for Score Zentrale - JTL Endpoints
+Tests NEW and REFACTORED JTL endpoints with dynamic schema detection
 """
 
 import requests
 import json
-import os
-from datetime import datetime
+import sys
+from datetime import datetime, timedelta
 
-# Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://warm-leads.preview.emergentagent.com')
-API_BASE = f"{BASE_URL}/api"
+# Base URL from environment
+BASE_URL = "https://warm-leads.preview.emergentagent.com"
 
 def test_endpoint(method, endpoint, params=None, expect_200_ok=None):
     """Test a single endpoint and return detailed results"""
