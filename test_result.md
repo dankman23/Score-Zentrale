@@ -421,8 +421,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "JTL Orders diagnostics and KPI testing completed - all tests passed"
-    - "Orders endpoints verified for 2025-11-03 date range"
+    - "Test NEW /api/jtl/purchase/expenses with from/to params - expect ok:true, invoices count, net/gross, cost_components breakdown"
+    - "Test NEW /api/jtl/orders/kpi/margin with from/to params - expect ok:true, orders, revenue_net_wo_ship, cost_net, margin_net, cost_source percentages"
+    - "Re-test REFACTORED /api/jtl/orders/kpi/shipping-split - verify still works after route file migration"
+    - "Re-test REFACTORED /api/jtl/orders/timeseries - verify grain and rows"
+    - "Re-test REFACTORED /api/jtl/orders/diag/day - verify totals and rows"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
