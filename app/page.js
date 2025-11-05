@@ -373,6 +373,49 @@ export default function App() {
             <KpiTile title="Marge (mit Gebühren) — Rechnungen" value={fmtCurrency(kpiFees?.margin_with_fees)} sub="inkl. 1,50 € + 20% Plattformgebühr" demo={demoMode} />
           </div>
 
+          {/* Dritte Reihe: Ausgaben & Rohertragsmarge */}
+          <div className="row">
+            <KpiTile 
+              title="Ausgaben (Lieferanten) — Netto" 
+              value={fmtCurrency(expenses?.net)} 
+              sub={
+                <span>
+                  <strong>Brutto:</strong> {fmtCurrency(expenses?.gross)}
+                  {expenses?.debug && (
+                    <span 
+                      className="ml-2" 
+                      style={{cursor:'help'}} 
+                      title={`Material: ${fmtCurrency(expenses?.cost_components?.material)} | Fracht: ${fmtCurrency(expenses?.cost_components?.freight)} | Other: ${fmtCurrency(expenses?.cost_components?.other)}\nTabellen: ${expenses?.debug?.headerTable}, ${expenses?.debug?.posTable}`}
+                    >
+                      ⓘ
+                    </span>
+                  )}
+                </span>
+              } 
+              demo={demoMode} 
+            />
+            <KpiTile 
+              title="Rohertragsmarge — Netto (ohne Versand)" 
+              value={fmtCurrency(margin?.margin_net)} 
+              sub={
+                <span>
+                  Umsatz: {fmtCurrency(margin?.revenue_net_wo_ship)} | EK: {fmtCurrency(margin?.cost_net)}
+                  {margin?.cost_source && (
+                    <span 
+                      className="ml-2" 
+                      style={{cursor:'help'}} 
+                      title={`Cost Sources:\nPosition: ${margin?.cost_source?.from?.position_pct}%\nHistorie: ${margin?.cost_source?.from?.history_pct}%\nArtikel-EK: ${margin?.cost_source?.from?.article_current_pct}%`}
+                    >
+                      ⓘ
+                    </span>
+                  )}
+                </span>
+              } 
+              demo={demoMode} 
+            />
+            <div className="col-md-4 mb-3"></div>
+          </div>
+
           <div className="row mt-1">
             <div className="col-md-8 mb-3">
               <div className="card">
