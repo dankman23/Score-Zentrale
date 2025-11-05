@@ -143,18 +143,21 @@ export default function App() {
     setLoading(true); setError(''); setDemoMode(false)
     try {
       const started = performance.now()
-      const [k1, k2, t1, t2, p, osRaw] = await Promise.all([
+      const [k1, k2, t1, t2, p, osRaw, expRaw, marginRaw] = await Promise.all([
         getJson(`/api/jtl/sales/kpi?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/kpi/with_platform_fees?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/timeseries?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/timeseries/with_platform_fees?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/platform-timeseries?from=${from}&to=${to}`),
-        getJson(`/api/jtl/orders/kpi/shipping-split?from=${from}&to=${to}`)
+        getJson(`/api/jtl/orders/kpi/shipping-split?from=${from}&to=${to}`),
+        getJson(`/api/jtl/purchase/expenses?from=${from}&to=${to}`),
+        getJson(`/api/jtl/orders/kpi/margin?from=${from}&to=${to}`)
       ])
       const tsN = sortByDateAsc(toArray(t1))
       const tsFeesN = sortByDateAsc(toArray(t2))
       const platN = sortByDateAsc(toArray(p))
       setKpi(k1); setKpiFees(k2); setTs(tsN); setTsFees(tsFeesN); setPlatTs(platN); setOrdersSplit(osRaw)
+      setExpenses(expRaw); setMargin(marginRaw)
       pushLog({ url:'/api/jtl/orders/kpi/shipping-split', status:200, ok:true, ms: Math.round(performance.now()-started) })
       if (isDegradedFlag) {
         const ksum = Number(k1?.revenue||0) + Number(k1?.orders||0) + Number(k1?.margin||0)
