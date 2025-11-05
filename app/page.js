@@ -94,6 +94,7 @@ export default function App() {
   const [noteFor, setNoteFor] = useState(null)
   const [noteText, setNoteText] = useState('')
   const [netlog, setNetlog] = useState([]) // request inspector
+  const [marketingSub, setMarketingSub] = useState('warmaquise') // warmaquise|kaltaquise|sea|seo
 
   const isDegradedFlag = (process.env.NEXT_PUBLIC_DEGRADED === '1')
 
