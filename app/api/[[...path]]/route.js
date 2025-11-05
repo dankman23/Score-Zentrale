@@ -173,14 +173,19 @@ async function handleRoute(request, { params }) {
         const limit = Math.max(1, Math.min( Number(body?.limit ?? 2000), 10000))
         const weights = body?.weights || {}
 
+        // Resolve actual table names (schema differs by JTL version)
+        const kundeTable = await firstExistingTable(pool, ['Kunde.tKunde','dbo.tKunde']) || 'dbo.tKunde'
+        const auftragTable = await firstExistingTable(pool, ['Verkauf.tAuftrag','dbo.tAuftrag']) || 'dbo.tAuftrag'
+        const auftragPosTable = await firstExistingTable(pool, ['Verkauf.tAuftragPosition','dbo.tAuftragPosition','dbo.tAuftragPos','Verkauf.tAuftragPos']) || 'dbo.tAuftragPosition'
+
         // Column presence on Kunde
-        const hasUSTID = await hasColumn(pool, 'Kunde.tKunde', 'cUSTID')
-        const hasFirma = await hasColumn(pool, 'Kunde.tKunde', 'cFirma')
-        const hasEmail = await hasColumn(pool, 'Kunde.tKunde', 'cEMail')
-        const hasPhone = await hasColumn(pool, 'Kunde.tKunde', 'cTelefon')
+        const hasUSTID = await hasColumn(pool, kundeTable, 'cUSTID')
+        const hasFirma = await hasColumn(pool, kundeTable, 'cFirma')
+        const hasEmail = await hasColumn(pool, kundeTable, 'cEMail')
+        const hasPhone = await hasColumn(pool, kundeTable, 'cTelefon')
 
         // Build robust position totals (handle qty/tax/alt columns)
-        const posTable = 'Verkauf.tAuftragPosition'
+        const posTable = auftragPosTable
         const extNetCol = await pickFirstExisting(pool, posTable, ['fGesamtNetto','fVKNettoGesamt','fWertNetto','fWert'])
         const extGrossCol = await pickFirstExisting(pool, posTable, ['fGesamtBrutto','fVKBruttoGesamt','fWertBrutto'])
         const netCol = await pickFirstExisting(pool, posTable, ['fVKNetto','fNetto','fPreisNetto'])
