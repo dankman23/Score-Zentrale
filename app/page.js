@@ -353,9 +353,9 @@ export default function App() {
     <div>
       {/* Tabs */}
       <ul className="nav nav-pills mb-4">
-        {['dashboard','outbound','sales','marketing','settings'].map(t => (
+        {['dashboard','outbound','sales','marketing','coldleads','settings'].map(t => (
           <li key={t} className="nav-item">
-            <a className={`nav-link ${activeTab===t?'active':''}`} href={`#${t}`} onClick={(e)=>{e.preventDefault(); setActiveTab(t); location.hash = t}}>{t[0].toUpperCase()+t.slice(1)}</a>
+            <a className={`nav-link ${activeTab===t?'active':''}`} href={`#${t}`} onClick={(e)=>{e.preventDefault(); setActiveTab(t); location.hash = t}}>{t==='coldleads'?'Kaltakquise':t[0].toUpperCase()+t.slice(1)}</a>
           </li>
         ))}
       </ul>
