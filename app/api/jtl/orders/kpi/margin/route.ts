@@ -163,7 +163,7 @@ export async function GET(request: NextRequest) {
         LEFT JOIN ${articleTable} a ON op.kArtikel = a.kArtikel
         ${historicalEkClause}
         WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
-          AND o.cStatus != 'storno'
+          ${stornoFilter}
           AND ${articleFilter}
       )
       SELECT 
