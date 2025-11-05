@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
         FROM ${orderTable} o
         INNER JOIN ${orderPosTable} op ON o.kAuftrag = op.kAuftrag
         WHERE CAST(o.dErstellt AS DATE) = @date
-          AND o.cStatus != 'storno'
+          ${stornoFilter}
           AND ${articleFilter}
         GROUP BY o.kAuftrag, o.cAuftragsNr, o.dErstellt, o.kPlattform
       )
