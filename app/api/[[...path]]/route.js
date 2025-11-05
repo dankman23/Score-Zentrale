@@ -177,6 +177,8 @@ async function handleRoute(request, { params }) {
         const kundeTable = await firstExistingTable(pool, ['Kunde.tKunde','dbo.tKunde']) || 'dbo.tKunde'
         const auftragTable = await firstExistingTable(pool, ['Verkauf.tAuftrag','dbo.tAuftrag']) || 'dbo.tAuftrag'
         const auftragPosTable = await firstExistingTable(pool, ['Verkauf.tAuftragPosition','dbo.tAuftragPosition','dbo.tAuftragPos','Verkauf.tAuftragPos']) || 'dbo.tAuftragPosition'
+        const plTable = await firstExistingTable(pool, ['dbo.tPlattform','tPlattform'])
+        const shTable = await firstExistingTable(pool, ['dbo.tShop','tShop'])
 
         // Column presence on Kunde
         const hasUSTID = await hasColumn(pool, kundeTable, 'cUSTID')
