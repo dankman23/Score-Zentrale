@@ -473,14 +473,41 @@ agent_communication:
   - task: "JTL Orders: GET /api/jtl/orders/timeseries (sanity check)"
     implemented: true
     working: true
-    file: "/app/app/api/[[...path]]/route.js"
+    file: "/app/app/api/jtl/orders/timeseries/route.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "testing"
         comment: "✅ Orders Timeseries working: Returns 200 ok:true with grain='day' and rows array (3 items for 2025-11-01 to 2025-11-03). Sanity check passed."
+      - working: "NA"
+        agent: "main"
+        comment: "Re-implemented as separate route file with dynamic schema detection"
+
+  - task: "JTL Purchase: GET /api/jtl/purchase/expenses"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/jtl/purchase/expenses/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW: Lieferantenrechnungen (Eingangsrechnung) aggregieren mit Material/Fracht/Other breakdown. Fallback auf Wareneingang. Dynamic table/column detection with currency normalization."
+
+  - task: "JTL Orders: GET /api/jtl/orders/kpi/margin"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/jtl/orders/kpi/margin/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW: Rohertragsmarge (Gross Profit Margin). Revenue netto (articles only) - Cost netto. EK cascade: Position → Historical (Eingangsrechnung/Wareneingang) → Article current. Cost source breakdown included."
 
 agent_communication:
   - agent: "main"
