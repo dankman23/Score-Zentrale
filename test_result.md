@@ -487,4 +487,6 @@ agent_communication:
     message: "Please re-run backend tests for JTL Orders endpoints: diag/day and KPI shipping-split for 2025-11-03. Expect no schema errors and JSON with fields; record values."
   - agent: "testing"
     message: "✅ JTL ORDERS DIAGNOSTICS AND KPI TESTING COMPLETED! All 3/3 tests PASSED: 1) GET /api/jtl/orders/diag/day?date=2025-11-03 (200 ok:true with totals.orders=77, totals.gross=13018.87, rows array with 77 items), 2) GET /api/jtl/orders/kpi/shipping-split?from=2025-11-03&to=2025-11-03 (200 ok:true with all required flat fields: orders=77, net_without_shipping=11306.82, net_with_shipping=11306.82, gross_without_shipping=13018.87, gross_with_shipping=13018.87), 3) SANITY GET /api/jtl/orders/timeseries?from=2025-11-01&to=2025-11-03 (200 ok:true with grain='day' and 3 rows). Fixed kPlattform column issue in diagnostics endpoint by simplifying platform detection logic. All endpoints stable and returning expected data structures."
+  - agent: "main"
+    message: "Implemented SQL utils (/app/app/lib/sql/utils.ts) + new endpoints: /api/jtl/purchase/expenses, /api/jtl/orders/kpi/margin, /api/jtl/orders/kpi/shipping-split, /api/jtl/orders/timeseries, /api/jtl/orders/diag/day. All use dynamic schema detection for JTL-Wawi robustness. Ready for backend testing."
 
