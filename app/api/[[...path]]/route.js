@@ -96,6 +96,16 @@ async function pickFirstExisting(pool, table, candidates){
   return null
 }
 
+async function tableExists(pool, fullyQualified){
+  const r = await pool.request().input('name', sql.NVarChar, fullyQualified).query("SELECT CASE WHEN OBJECT_ID(@name) IS NULL THEN 0 ELSE 1 END AS ok")
+  return (r?.recordset?.[0]?.ok ?? 0) === 1
+}
+
+async function firstExistingTable(pool, candidates){
+  for (const t of candidates){ if (await tableExists(pool, t)) return t }
+  return null
+}
+
 function json(data, init){ return cors(NextResponse.json(data, init)) }
 
 function buildChannelSql(channel, platformIds, shopIds, hasPlat, hasShop){
