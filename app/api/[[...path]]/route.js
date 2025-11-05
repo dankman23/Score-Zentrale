@@ -234,12 +234,14 @@ async function handleRoute(request, { params }) {
             GROUP BY o.kKunde
           )
           SELECT TOP (@pLimit)
-            k.kKunde, k.cKundenNr,
-            ${hasFirma? 'k.cFirma' : "NULL AS cFirma"},
-            k.cVorname, k.cNachname,
-            ${hasEmail? 'k.cEMail' : "NULL AS cEMail"},
-            ${hasPhone? 'k.cTelefon' : "NULL AS cTelefon"},
-            ${hasUSTID? 'k.cUSTID' : "NULL AS cUSTID"},
+            k.kKunde,
+            ${hasKundenNr? 'k.cKundenNr' : "CAST(NULL AS nvarchar(50)) AS cKundenNr"},
+            ${hasFirma? 'k.cFirma' : (hasName? 'k.cName' : "CAST(NULL AS nvarchar(200)) AS cFirma")},
+            ${hasVorname? 'k.cVorname' : "CAST(NULL AS nvarchar(100)) AS cVorname"},
+            ${hasNachname? 'k.cNachname' : "CAST(NULL AS nvarchar(100)) AS cNachname"},
+            ${hasEmail? 'k.cEMail' : "CAST(NULL AS nvarchar(200)) AS cEMail"},
+            ${hasPhone? 'k.cTelefon' : "CAST(NULL AS nvarchar(100)) AS cTelefon"},
+            ${hasUSTID? 'k.cUSTID' : "CAST(NULL AS nvarchar(50)) AS cUSTID"},
             o.ordersCount, o.lastOrderDate,
             r.totalRevenueNetto, r.totalRevenueBrutto
           FROM ${kundeTable} k
