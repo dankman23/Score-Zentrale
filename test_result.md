@@ -413,6 +413,17 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Bei 500ern und Flag NEXT_PUBLIC_DEGRADED=1: Demo-Snapshot mit Badge; Zeitraum ggf. automatisch anpassen"
+  - task: "Dashboard: NEW KPI Tiles for Expenses & Margin"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added two new KPI tiles: 'Ausgaben (Lieferanten) - Netto' with Brutto sub and tooltip with cost breakdown, and 'Rohertragsmarge - Netto (ohne Versand)' with revenue/cost sub and cost source percentages tooltip. Integrated with /api/jtl/purchase/expenses and /api/jtl/orders/kpi/margin endpoints."
 metadata:
   created_by: "main_agent"
   version: "1.1"
