@@ -78,6 +78,14 @@ export default function App() {
   const [topCategories, setTopCategories] = useState([])
   const [limit, setLimit] = useState(20)
 
+  // Kaltakquise
+  const [coldLeadsTab, setColdLeadsTab] = useState('search')
+  const [coldSearchForm, setColdSearchForm] = useState({ industry: '', region: '', limit: 10 })
+  const [coldProspects, setColdProspects] = useState([])
+  const [coldLoading, setColdLoading] = useState(false)
+  const [selectedProspect, setSelectedProspect] = useState(null)
+  const [generatedEmail, setGeneratedEmail] = useState(null)
+
   // Marketing → Warmaquise
   const [leads, setLeads] = useState([])
   const [leadsTotal, setLeadsTotal] = useState(0)
