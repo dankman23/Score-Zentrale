@@ -12,20 +12,19 @@ from datetime import datetime, timedelta
 # Base URL from environment
 BASE_URL = "https://warm-leads.preview.emergentagent.com"
 
-def test_endpoint(method, endpoint, params=None, expect_200_ok=None):
-    """Test a single endpoint and return detailed results"""
-    url = f"{API_BASE}{endpoint}"
+def test_endpoint(method, endpoint, params=None, data=None, expected_status=200):
+    """Test an API endpoint and return response"""
+    url = f"{BASE_URL}{endpoint}"
     
     try:
         print(f"\n🔍 Testing {method} {endpoint}")
-        print(f"   URL: {url}")
         if params:
             print(f"   Params: {params}")
         
-        if method.upper() == 'GET':
+        if method == "GET":
             response = requests.get(url, params=params, timeout=30)
-        elif method.upper() == 'POST':
-            response = requests.post(url, json=params or {}, timeout=30)
+        elif method == "POST":
+            response = requests.post(url, json=data, timeout=30)
         else:
             raise ValueError(f"Unsupported method: {method}")
         
@@ -34,80 +33,138 @@ def test_endpoint(method, endpoint, params=None, expect_200_ok=None):
         # Try to parse JSON
         try:
             json_data = response.json()
-            print(f"   JSON Response: {json.dumps(json_data, indent=2)}")
+            print(f"   Response: {json.dumps(json_data, indent=2)[:500]}...")
         except:
-            print(f"   Raw Response: {response.text}")
+            print(f"   Raw Response: {response.text[:200]}...")
             json_data = None
         
-        # Analyze result based on expectations
-        if expect_200_ok is True:
-            # Expect 200 with ok:true OR 200 with array (for timeseries endpoints)
-            if response.status_code == 200 and json_data:
-                if isinstance(json_data, list):
-                    result = "✅ PASS (200 array as expected)"
-                elif json_data.get('ok') == True:
-                    result = "✅ PASS (200 ok:true as expected)"
-                elif json_data.get('ok') == False:
-                    result = "⚠️  PARTIAL (200 ok:false - better than 500)"
-                else:
-                    result = "⚠️  PARTIAL (200 but no ok field)"
-            elif response.status_code == 500:
-                result = "❌ FAIL (Still returning 500)"
-            else:
-                result = f"❌ FAIL (Unexpected: {response.status_code})"
-        elif expect_200_ok is False:
-            # Just record the response, may still be 500
-            if response.status_code == 200:
-                if json_data and isinstance(json_data, list):
-                    result = f"📝 RECORDED (200 array with {len(json_data)} items)"
-                elif json_data and isinstance(json_data, dict):
-                    result = f"📝 RECORDED (200 ok:{json_data.get('ok', 'N/A')})"
-                else:
-                    result = f"📝 RECORDED (200)"
-            elif response.status_code == 500:
-                if json_data and isinstance(json_data, dict):
-                    result = f"📝 RECORDED (500 ok:{json_data.get('ok', 'N/A')})"
-                else:
-                    result = f"📝 RECORDED (500)"
-            else:
-                result = f"📝 RECORDED ({response.status_code})"
-        else:
-            # General test - just check if it responds properly
-            if response.status_code in [200, 500] and json_data:
-                result = f"✅ PASS ({response.status_code} with JSON)"
-            else:
-                result = f"❌ FAIL ({response.status_code})"
-        
-        print(f"   Result: {result}")
-        
         return {
-            'endpoint': endpoint,
-            'method': method,
             'status_code': response.status_code,
-            'json_data': json_data,
-            'raw_response': response.text if json_data is None else None,
-            'result': result,
-            'success': result.startswith('✅') or result.startswith('⚠️') or result.startswith('📝')
+            'json': json_data,
+            'text': response.text,
+            'success': response.status_code == expected_status
         }
         
-    except requests.exceptions.Timeout:
-        print(f"   Result: ❌ FAIL (Timeout)")
-        return {
-            'endpoint': endpoint,
-            'method': method,
-            'error': 'Timeout',
-            'result': '❌ FAIL (Timeout)',
-            'success': False
-        }
     except Exception as e:
-        print(f"   Result: ❌ FAIL (Exception: {str(e)})")
+        print(f"   ❌ ERROR: {str(e)}")
         return {
-            'endpoint': endpoint,
-            'method': method,
-            'error': str(e),
-            'result': f'❌ FAIL (Exception: {str(e)})',
-            'success': False
+            'status_code': None,
+            'json': None,
+            'text': str(e),
+            'success': False,
+            'error': str(e)
         }
+
+def validate_purchase_expenses_response(response_data):
+    """Validate purchase expenses endpoint response structure"""
+    if not response_data or not isinstance(response_data, dict):
+        return False, "Invalid JSON response"
+    
+    required_fields = ['ok', 'invoices', 'net', 'gross', 'cost_components', 'debug']
+    for field in required_fields:
+        if field not in response_data:
+            return False, f"Missing required field: {field}"
+    
+    if not response_data.get('ok'):
+        return False, f"Response ok=false: {response_data.get('error', 'Unknown error')}"
+    
+    # Check cost_components structure
+    cost_comp = response_data.get('cost_components', {})
+    cost_fields = ['material', 'freight', 'other']
+    for field in cost_fields:
+        if field not in cost_comp:
+            return False, f"Missing cost_components.{field}"
+    
+    # Check debug structure
+    debug = response_data.get('debug', {})
+    debug_fields = ['headerTable', 'posTable', 'dateFieldUsed', 'currency', 'source']
+    for field in debug_fields:
+        if field not in debug:
+            return False, f"Missing debug.{field}"
+    
+    return True, "Valid structure"
+
+def validate_margin_response(response_data):
+    """Validate margin endpoint response structure"""
+    if not response_data or not isinstance(response_data, dict):
+        return False, "Invalid JSON response"
+    
+    required_fields = ['ok', 'orders', 'revenue_net_wo_ship', 'cost_net', 'margin_net', 'cost_source', 'debug']
+    for field in required_fields:
+        if field not in response_data:
+            return False, f"Missing required field: {field}"
+    
+    if not response_data.get('ok'):
+        return False, f"Response ok=false: {response_data.get('error', 'Unknown error')}"
+    
+    # Check cost_source structure
+    cost_source = response_data.get('cost_source', {})
+    if 'from' not in cost_source:
+        return False, "Missing cost_source.from"
+    
+    cost_from = cost_source.get('from', {})
+    pct_fields = ['position_pct', 'history_pct', 'article_current_pct']
+    for field in pct_fields:
+        if field not in cost_from:
+            return False, f"Missing cost_source.from.{field}"
+    
+    return True, "Valid structure"
+
+def validate_shipping_split_response(response_data):
+    """Validate shipping split endpoint response structure"""
+    if not response_data or not isinstance(response_data, dict):
+        return False, "Invalid JSON response"
+    
+    required_fields = ['ok', 'period', 'orders', 'net_without_shipping', 'net_with_shipping', 
+                      'gross_without_shipping', 'gross_with_shipping']
+    for field in required_fields:
+        if field not in response_data:
+            return False, f"Missing required field: {field}"
+    
+    if not response_data.get('ok'):
+        return False, f"Response ok=false: {response_data.get('error', 'Unknown error')}"
+    
+    return True, "Valid structure"
+
+def validate_timeseries_response(response_data):
+    """Validate timeseries endpoint response structure"""
+    if not response_data or not isinstance(response_data, dict):
+        return False, "Invalid JSON response"
+    
+    required_fields = ['ok', 'grain', 'rows']
+    for field in required_fields:
+        if field not in response_data:
+            return False, f"Missing required field: {field}"
+    
+    if not response_data.get('ok'):
+        return False, f"Response ok=false: {response_data.get('error', 'Unknown error')}"
+    
+    if response_data.get('grain') != 'day':
+        return False, f"Expected grain='day', got '{response_data.get('grain')}'"
+    
+    return True, "Valid structure"
+
+def validate_diag_day_response(response_data):
+    """Validate diagnostics day endpoint response structure"""
+    if not response_data or not isinstance(response_data, dict):
+        return False, "Invalid JSON response"
+    
+    required_fields = ['ok', 'totals', 'rows']
+    for field in required_fields:
+        if field not in response_data:
+            return False, f"Missing required field: {field}"
+    
+    if not response_data.get('ok'):
+        return False, f"Response ok=false: {response_data.get('error', 'Unknown error')}"
+    
+    # Check totals structure
+    totals = response_data.get('totals', {})
+    totals_fields = ['orders', 'net', 'gross']
+    for field in totals_fields:
+        if field not in totals:
+            return False, f"Missing totals.{field}"
+    
+    return True, "Valid structure"
 
 def main():
     """Test JTL Orders diagnostics and KPI endpoints as requested"""
