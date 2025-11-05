@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
         FROM ${orderTable} o
         INNER JOIN ${orderPosTable} op ON o.kAuftrag = op.kAuftrag
         WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
-          AND o.cStatus != 'storno'
+          ${stornoFilter}
           AND ${articleFilter}
         GROUP BY o.kAuftrag
       ),
