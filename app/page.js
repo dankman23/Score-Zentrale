@@ -453,14 +453,18 @@ export default function App() {
         ))}
       </ul>
 
-      {/* Date Range */}
-      <div className="mb-3 d-flex align-items-center">
-        <div className="mr-2 small text-muted">Zeitraum:</div>
-        <input type="date" className="form-control form-control-sm mr-2" style={{maxWidth:160}} value={from} onChange={e=>setFrom(e.target.value)} />
-        <input type="date" className="form-control form-control-sm mr-2" style={{maxWidth:160}} value={to} onChange={e=>setTo(e.target.value)} />
-        <button className="btn btn-outline-primary btn-sm" onClick={()=>{fetchAll(); fetchSalesTables()}}>Aktualisieren</button>
-      </div>
-      {autoAdjusted && (<div className="alert alert-info py-1 px-2 small">{autoAdjusted}</div>)}
+      {/* Date Range - nur bei Dashboard, Sales, Marketing */}
+      {activeTab !== 'coldleads' && activeTab !== 'outbound' && activeTab !== 'settings' && (
+        <>
+          <div className="mb-3 d-flex align-items-center">
+            <div className="mr-2 small text-muted">Zeitraum:</div>
+            <input type="date" className="form-control form-control-sm mr-2" style={{maxWidth:160}} value={from} onChange={e=>setFrom(e.target.value)} />
+            <input type="date" className="form-control form-control-sm mr-2" style={{maxWidth:160}} value={to} onChange={e=>setTo(e.target.value)} />
+            <button className="btn btn-outline-primary btn-sm" onClick={()=>{fetchAll(); fetchSalesTables()}}>Aktualisieren</button>
+          </div>
+          {autoAdjusted && (<div className="alert alert-info py-1 px-2 small">{autoAdjusted}</div>)}
+        </>
+      )}
 
       {activeTab==='dashboard' && (
         <div>
