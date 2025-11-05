@@ -376,10 +376,10 @@ agent_communication:
   - task: "JTL Orders: GET /api/jtl/orders/kpi/shipping-split"
     implemented: true
     working: true
-    file: "/app/app/api/[[...path]]/route.js"
+    file: "/app/app/api/jtl/orders/kpi/shipping-split/route.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
@@ -387,6 +387,9 @@ agent_communication:
       - working: true
         agent: "testing"
         comment: "✅ Shipping-split endpoint working: Both month (2025-10) and from/to (2025-10-01 to 2025-10-31) parameter formats return 200 ok:true with all required fields (period.from/to, orders: 1897, net.with_shipping/without_shipping, gross.with_shipping/without_shipping). Fixed SQL column alias issue during testing. All expected fields present and valid."
+      - working: "NA"
+        agent: "main"
+        comment: "Re-implemented as separate route file with improved dynamic schema detection and robust position filtering"
 frontend:
   - task: "Hero sichtbar + abgeschwächt (Overlay, Shield)"
     implemented: true
