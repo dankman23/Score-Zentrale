@@ -33,6 +33,10 @@ export async function GET(request: NextRequest) {
       }, { status: 404 })
     }
 
+    // Storno-Filter
+    const hasNStorno = await hasColumn(pool, orderTable, 'nStorno')
+    const stornoFilter = hasNStorno ? 'AND (o.nStorno IS NULL OR o.nStorno = 0)' : ''
+
     // Artikel-Filter
     const hasNPosTyp = await hasColumn(pool, orderPosTable, 'nPosTyp')
     const articleFilter = hasNPosTyp 
