@@ -182,12 +182,12 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * Fallback: Wareneingang verwenden wenn keine Eingangsrechnungen
+ * Fallback: Bestellungen verwenden wenn keine Eingangsrechnungen
  */
-async function handleGoodsReceipts(pool: any, from: string, to: string) {
+async function handlePurchaseOrdersFallback(pool: any, from: string, to: string) {
   try {
-    const headerCandidates = ['Einkauf.tWareneingang', 'dbo.tWareneingang']
-    const posCandidates = ['Einkauf.tWareneingangPos', 'dbo.tWareneingangPos']
+    const headerCandidates = ['Beschaffung.tBestellung', 'dbo.tBestellung']
+    const posCandidates = ['Beschaffung.tBestellungPos', 'dbo.tBestellungPos']
 
     const headerTable = await firstExistingTable(pool, headerCandidates)
     const posTable = await firstExistingTable(pool, posCandidates)
@@ -195,21 +195,30 @@ async function handleGoodsReceipts(pool: any, from: string, to: string) {
     if (!headerTable || !posTable) {
       return NextResponse.json({
         ok: false,
-        error: 'Keine Eingangsrechnungs- oder Wareneingangs-Tabellen gefunden'
+        error: 'Keine Eingangsrechnungs- oder Bestellungs-Tabellen gefunden'
       }, { status: 404 })
     }
 
-    const dateField = await pickFirstExisting(pool, headerTable, ['dErstellt', 'dDatum']) || 'dErstellt'
-    const qtyField = await pickFirstExisting(pool, posTable, ['fMenge', 'nMenge', 'fAnzahl']) || 'fMenge'
-    const ekField = await pickFirstExisting(pool, posTable, ['fEKNetto', 'fEK']) || 'fEKNetto'
+    const dateField = await pickFirstExisting(pool, headerTable, ['dErstellt', 'dBestelldatum']) || 'dErstellt'
+    const qtyField = await pickFirstExisting(pool, posTable, ['fMenge', 'nMenge']) || 'fMenge'
+    const ekField = await pickFirstExisting(pool, posTable, ['fEKPreis', 'fEKNetto']) || 'fEKPreis'
+    const mwstField = await pickFirstExisting(pool, posTable, ['fMwSt', 'fMwst']) || 'fMwSt'
+    const fkField = await pickFirstExisting(pool, posTable, ['kBestellung', 'tBestellung_kBestellung']) || 'kBestellung'
+
+    // Robuste Netto-Berechnung
+    const hasGesamtNetto = await hasColumn(pool, posTable, 'fGesamtNetto')
+    const netExpr = hasGesamtNetto 
+      ? 'COALESCE(p.fGesamtNetto, 0)'
+      : `COALESCE(p.${ekField} * COALESCE(p.${qtyField}, 1), 0)`
 
     const query = `
       SELECT 
-        COUNT(DISTINCT h.kWareneingang) AS invoices,
-        SUM(p.${ekField} * p.${qtyField}) AS total_net
-      FROM ${headerTable} h
-      INNER JOIN ${posTable} p ON h.kWareneingang = p.kWareneingang
-      WHERE CAST(h.${dateField} AS DATE) BETWEEN @from AND @to
+        COUNT(DISTINCT b.kBestellung) AS orders,
+        SUM(${netExpr}) AS total_net
+      FROM ${headerTable} b
+      INNER JOIN ${posTable} p ON b.kBestellung = p.${fkField}
+      WHERE CAST(b.${dateField} AS DATE) >= @from 
+        AND CAST(b.${dateField} AS DATE) < DATEADD(day, 1, @to)
     `
 
     const result = await pool.request()
@@ -223,7 +232,7 @@ async function handleGoodsReceipts(pool: any, from: string, to: string) {
     return NextResponse.json({
       ok: true,
       period: { from, to },
-      invoices: row.invoices || 0,
+      invoices: row.orders || 0,
       net: net.toFixed(2),
       gross: (net * 1.19).toFixed(2), // Annahme 19% MwSt
       cost_components: {
@@ -236,14 +245,14 @@ async function handleGoodsReceipts(pool: any, from: string, to: string) {
         posTable,
         dateFieldUsed: dateField,
         currency: 'EUR (assumed)',
-        source: 'goods_receipts'
+        source: 'fallback: purchase_orders'
       }
     })
 
   } catch (error: any) {
     return NextResponse.json({
       ok: false,
-      error: error.message || 'Goods receipts fallback failed'
+      error: error.message || 'Purchase orders fallback failed'
     }, { status: 500 })
   }
 }
