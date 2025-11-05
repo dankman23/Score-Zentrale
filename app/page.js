@@ -1091,13 +1091,21 @@ export default function App() {
                           <td>
                             {p.status === 'new' && (
                               <button className="btn btn-sm btn-info mr-1" onClick={() => analyzeProspect(p)} disabled={coldLoading}>
-                                Analysieren
+                                {coldLoading ? '...' : 'Analysieren'}
                               </button>
                             )}
                             {p.status === 'analyzed' && (
-                              <button className="btn btn-sm btn-success" onClick={() => generateColdEmail(p)} disabled={coldLoading}>
-                                Email
-                              </button>
+                              <>
+                                <button className="btn btn-sm btn-outline-info mr-1" onClick={() => setSelectedProspect(p)} disabled={coldLoading}>
+                                  Details
+                                </button>
+                                <button className="btn btn-sm btn-success" onClick={() => generateColdEmail(p)} disabled={coldLoading}>
+                                  Email
+                                </button>
+                              </>
+                            )}
+                            {p.status === 'contacted' && (
+                              <span className="badge badge-success">✓ Versendet</span>
                             )}
                           </td>
                         </tr>
