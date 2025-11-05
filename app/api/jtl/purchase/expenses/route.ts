@@ -65,14 +65,6 @@ export async function GET(request: NextRequest) {
       return await handlePurchaseOrdersFallback(pool, from, to)
     }
 
-    // Datumsspalten-Priorität
-    const dateColumns = ['dBelegDatum', 'dErstellt', 'dEingang']
-    const dateField = await pickFirstExisting(pool, headerTable, dateColumns) || 'dErstellt'
-
-    // Posted-Filter
-    const hasVerbucht = await hasColumn(pool, headerTable, 'nVerbucht')
-    const postedFilter = hasVerbucht ? 'AND h.nVerbucht = 1' : ''
-
     // Positionsfelder robust ermitteln
     const qtyField = await pickFirstExisting(pool, posTable, ['fMenge', 'nMenge', 'fAnzahl', 'nAnzahl']) || 'fMenge'
     const mwstField = await pickFirstExisting(pool, posTable, ['fMwSt', 'fMwst', 'fMwStProzent', 'MwSt']) || 'fMwSt'
