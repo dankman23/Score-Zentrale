@@ -345,6 +345,26 @@ export default function App() {
   }
 
   // Kaltakquise Functions
+  const loadColdProspects = async () => {
+    try {
+      const res = await fetch(`/api/coldleads/search?status=${coldStatusFilter}&limit=100`)
+      const data = await res.json()
+      if (data.ok) {
+        setColdProspects(data.prospects)
+        // Statistiken berechnen
+        const all = data.prospects
+        setColdStats({
+          total: all.length,
+          new: all.filter(p => p.status === 'new').length,
+          analyzed: all.filter(p => p.status === 'analyzed').length,
+          contacted: all.filter(p => p.status === 'contacted').length
+        })
+      }
+    } catch (e) {
+      console.error('Load prospects failed:', e)
+    }
+  }
+
   const searchColdLeads = async () => {
     if (!coldSearchForm.industry || !coldSearchForm.region) {
       alert('Bitte Branche und Region eingeben'); return
@@ -360,6 +380,7 @@ export default function App() {
       if (data.ok) {
         setColdProspects(data.prospects)
         alert(`${data.count} Firmen gefunden!`)
+        loadColdProspects() // Refresh
       } else {
         alert('Fehler: ' + data.error)
       }
