@@ -1066,26 +1066,28 @@ export default function App() {
         <div className="alert alert-info position-fixed" style={{right:12, bottom:12, zIndex:1060}} onClick={()=>setToast('')}>{toast}</div>
       )}
 
-      {/* Request Inspector */}
-      <div className="position-fixed" style={{right:12, bottom:54, zIndex:1059, width:320}}>
-        <div className="card" style={{opacity:.95}}>
-          <div className="card-header py-1 px-2 d-flex justify-content-between align-items-center">
-            <span className="small">Request Inspector</span>
-            <span className="small text-muted">{netlog?.[0]?.ms? `${netlog[0].ms} ms` : ''}</span>
-          </div>
-          <div className="card-body p-2" style={{maxHeight:160, overflowY:'auto'}}>
-            {(netlog||[]).map((r,i)=> (
-              <div key={i} className="small mb-1">
-                <div className="d-flex justify-content-between"><span>{r.at||''}</span><span className={r.ok? 'text-success':'text-danger'}>{r.ok? 'OK':'ERR'} {r.status}</span></div>
-                <div className="text-muted" style={{whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{r.url}</div>
-                {r.error && <div className="text-danger">{String(r.error).slice(0,120)}</div>}
-                <hr className="my-1"/>
-              </div>
-            ))}
-            {netlog?.length===0 && <div className="text-muted small">Keine Requests</div>}
+      {/* Request Inspector - nur bei Dashboard/Outbound/Sales/Marketing */}
+      {activeTab !== 'coldleads' && activeTab !== 'settings' && (
+        <div className="position-fixed" style={{right:12, bottom:54, zIndex:1059, width:320}}>
+          <div className="card" style={{opacity:.95}}>
+            <div className="card-header py-1 px-2 d-flex justify-content-between align-items-center">
+              <span className="small">Request Inspector</span>
+              <span className="small text-muted">{netlog?.[0]?.ms? `${netlog[0].ms} ms` : ''}</span>
+            </div>
+            <div className="card-body p-2" style={{maxHeight:160, overflowY:'auto'}}>
+              {(netlog||[]).map((r,i)=> (
+                <div key={i} className="small mb-1">
+                  <div className="d-flex justify-content-between"><span>{r.at||''}</span><span className={r.ok? 'text-success':'text-danger'}>{r.ok? 'OK':'ERR'} {r.status}</span></div>
+                  <div className="text-muted" style={{whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{r.url}</div>
+                  {r.error && <div className="text-danger">{String(r.error).slice(0,120)}</div>}
+                  <hr className="my-1"/>
+                </div>
+              ))}
+              {netlog?.length===0 && <div className="text-muted small">Keine Requests</div>}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
