@@ -468,25 +468,19 @@ export default function App() {
 
   return (
     <div>
-      {/* Tabs */}
-      <ul className="nav nav-pills mb-4">
-        {['dashboard','outbound','sales','marketing','coldleads','settings'].map(t => (
-          <li key={t} className="nav-item">
-            <a className={`nav-link ${activeTab===t?'active':''}`} href={`#${t}`} onClick={(e)=>{e.preventDefault(); setActiveTab(t); location.hash = t}}>{t==='coldleads'?'Kaltakquise':t[0].toUpperCase()+t.slice(1)}</a>
-          </li>
-        ))}
-      </ul>
-
       {/* Date Range - nur bei Dashboard, Sales, Marketing */}
-      {activeTab !== 'coldleads' && activeTab !== 'outbound' && activeTab !== 'settings' && (
+      {(activeTab === 'dashboard' || activeTab === 'sales' || activeTab === 'marketing') && (
         <>
-          <div className="mb-3 d-flex align-items-center">
-            <div className="mr-2 small text-muted">Zeitraum:</div>
-            <input type="date" className="form-control form-control-sm mr-2" style={{maxWidth:160}} value={from} onChange={e=>setFrom(e.target.value)} />
-            <input type="date" className="form-control form-control-sm mr-2" style={{maxWidth:160}} value={to} onChange={e=>setTo(e.target.value)} />
-            <button className="btn btn-outline-primary btn-sm" onClick={()=>{fetchAll(); fetchSalesTables()}}>Aktualisieren</button>
+          <div className="mb-3 d-flex align-items-center justify-content-between">
+            <div className="d-flex align-items-center">
+              <div className="mr-2 text-muted" style={{fontSize:'0.9rem'}}>Zeitraum:</div>
+              <input type="date" className="form-control form-control-sm mr-2" style={{maxWidth:150}} value={from} onChange={e=>setFrom(e.target.value)} />
+              <input type="date" className="form-control form-control-sm mr-2" style={{maxWidth:150}} value={to} onChange={e=>setTo(e.target.value)} />
+              <button className="btn btn-primary btn-sm" onClick={()=>{fetchAll(); fetchSalesTables()}}><i className="bi bi-arrow-repeat mr-1"/>Aktualisieren</button>
+            </div>
+            {loading && <div className="spinner-border spinner-border-sm text-primary" role="status"><span className="sr-only">Loading...</span></div>}
           </div>
-          {autoAdjusted && (<div className="alert alert-info py-1 px-2 small">{autoAdjusted}</div>)}
+          {autoAdjusted && (<div className="alert alert-info py-2 px-3 small mb-3"><i className="bi bi-info-circle mr-2"/>{autoAdjusted}</div>)}
         </>
       )}
 
