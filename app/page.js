@@ -1283,24 +1283,29 @@ export default function App() {
         <div className="alert alert-info position-fixed" style={{right:12, bottom:12, zIndex:1060}} onClick={()=>setToast('')}>{toast}</div>
       )}
 
-      {/* Request Inspector - nur bei Dashboard/Outbound/Sales/Marketing */}
-      {activeTab !== 'coldleads' && activeTab !== 'settings' && (
-        <div className="position-fixed" style={{right:12, bottom:54, zIndex:1059, width:320}}>
-          <div className="card" style={{opacity:.95}}>
-            <div className="card-header py-1 px-2 d-flex justify-content-between align-items-center">
-              <span className="small">Request Inspector</span>
-              <span className="small text-muted">{netlog?.[0]?.ms? `${netlog[0].ms} ms` : ''}</span>
+      {/* Request Inspector - nur bei Dashboard/Sales/Marketing */}
+      {(activeTab === 'dashboard' || activeTab === 'sales' || activeTab === 'marketing') && (
+        <div className="position-fixed d-none d-lg-block" style={{right:12, bottom:54, zIndex:1059, width:340}}>
+          <div className="card border-0 shadow-sm" style={{opacity:.96}}>
+            <div className="card-header bg-dark text-white py-2 px-3 d-flex justify-content-between align-items-center border-0">
+              <div className="d-flex align-items-center">
+                <i className="bi bi-activity mr-2"/>
+                <span className="small font-weight-bold">API Monitor</span>
+              </div>
+              <span className="badge badge-light">{netlog?.[0]?.ms? `${netlog[0].ms} ms` : ''}</span>
             </div>
-            <div className="card-body p-2" style={{maxHeight:160, overflowY:'auto'}}>
+            <div className="card-body p-2" style={{maxHeight:180, overflowY:'auto', fontSize:'0.8rem'}}>
               {(netlog||[]).map((r,i)=> (
-                <div key={i} className="small mb-1">
-                  <div className="d-flex justify-content-between"><span>{r.at||''}</span><span className={r.ok? 'text-success':'text-danger'}>{r.ok? 'OK':'ERR'} {r.status}</span></div>
-                  <div className="text-muted" style={{whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{r.url}</div>
-                  {r.error && <div className="text-danger">{String(r.error).slice(0,120)}</div>}
-                  <hr className="my-1"/>
+                <div key={i} className="mb-2 p-2 rounded" style={{backgroundColor: r.ok?'rgba(40,167,69,0.1)':'rgba(220,53,69,0.1)'}}>
+                  <div className="d-flex justify-content-between align-items-center mb-1">
+                    <span className="text-muted">{r.at||''}</span>
+                    <span className={`badge badge-${r.ok?'success':'danger'}`}>{r.ok? '✓':'✗'} {r.status}</span>
+                  </div>
+                  <div className="text-truncate" style={{fontSize:'0.75rem'}} title={r.url}>{r.url}</div>
+                  {r.error && <div className="text-danger mt-1" style={{fontSize:'0.7rem'}}>{String(r.error).slice(0,80)}...</div>}
                 </div>
               ))}
-              {netlog?.length===0 && <div className="text-muted small">Keine Requests</div>}
+              {netlog?.length===0 && <div className="text-center text-muted py-3"><i className="bi bi-hourglass-split mr-2"/>Warte auf Requests...</div>}
             </div>
           </div>
         </div>
