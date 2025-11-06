@@ -261,6 +261,8 @@ agent_communication:
     message: "Bitte Backend-Routen gemäß test_plan prüfen. Mongo steht über MONGO_URL bereit; Collections werden on-the-fly angelegt. Keine externen Keys erforderlich."
   - agent: "testing"
     message: "✅ Backend testing completed successfully! All high-priority endpoints tested and working: GET /api/kpis (verified structure), Prospects flow (POST+GET with UUID, no _id), POST /api/analyze (returns productGroups/materials/hypotheses, creates DB entries), POST /api/mailer/compose (returns subject/text/html), Status endpoints (GET+POST working). Fixed minor _id cleanup issue in POST /api/prospects response. All 5/5 core backend tests PASSED. Ready for main agent to summarize and finish."
+  - agent: "main"
+    message: "KALTAKQUISE EMAIL-GENERIERUNG: Habe emailer.ts aktualisiert - Prompt erweitert um (1) Beratungsangebot per Email/Telefon 0221-25999901, (2) Jahresbedarfs-Angebot für Artikel. Signatur hinzugefügt mit Christian Berres, Score Handels GmbH & Co. KG, berres@score-schleifwerkzeuge.de. Backend muss getestet werden."
   - task: "JTL Sales: GET /api/jtl/ping"
     implemented: true
     working: true
