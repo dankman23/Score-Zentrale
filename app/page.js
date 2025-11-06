@@ -563,14 +563,20 @@ export default function App() {
 
           <div className="row mt-1">
             <div className="col-md-8 mb-3">
-              <div className="card">
+              <div className="card border-0 shadow-sm">
                 <div className="card-header bg-transparent border-0 d-flex align-items-center justify-content-between">
-                  <span>Umsatz & Marge (mit Gebühren)</span>
-                  {demoMode && <span className="badge badge-warning">Demo</span>}
+                  <div className="d-flex align-items-center">
+                    <i className="bi bi-graph-up text-primary mr-2"/>
+                    <span className="font-weight-bold">Umsatz & Marge (mit Gebühren)</span>
+                  </div>
+                  {demoMode && <span className="badge badge-warning"><i className="bi bi-exclamation-triangle mr-1"/>Demo-Modus</span>}
                 </div>
                 <div className="card-body">
                   {ts.length===0 && tsFees.length===0 ? (
-                    <div className="text-muted small">Keine Zeitreihen-Daten im Zeitraum</div>
+                    <div className="text-center text-muted py-5">
+                      <i className="bi bi-inbox" style={{fontSize:'3rem', opacity:0.3}}/>
+                      <p className="mt-2 mb-0">Keine Zeitreihen-Daten im gewählten Zeitraum</p>
+                    </div>
                   ) : (
                     <canvas ref={revChartRef} height="120" />
                   )}
@@ -578,17 +584,23 @@ export default function App() {
               </div>
             </div>
             <div className="col-md-4 mb-3">
-              <div className="card">
+              <div className="card border-0 shadow-sm">
                 <div className="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
-                  <span>Umsatz pro Plattform pro Tag</span>
+                  <div className="d-flex align-items-center">
+                    <i className="bi bi-bar-chart text-success mr-2"/>
+                    <span className="font-weight-bold">Plattform-Umsatz</span>
+                  </div>
                   <div className="custom-control custom-switch">
                     <input type="checkbox" className="custom-control-input" id="stackedSwitch" checked={stacked} onChange={e=>setStacked(e.target.checked)} />
-                    <label className="custom-control-label" htmlFor="stackedSwitch">Stack</label>
+                    <label className="custom-control-label" htmlFor="stackedSwitch"><small>Stack</small></label>
                   </div>
                 </div>
                 <div className="card-body">
                   {platTs.length===0 ? (
-                    <div className="text-muted small">Keine Plattform-Daten im Zeitraum</div>
+                    <div className="text-center text-muted py-5">
+                      <i className="bi bi-inbox" style={{fontSize:'3rem', opacity:0.3}}/>
+                      <p className="mt-2 mb-0 small">Keine Plattform-Daten</p>
+                    </div>
                   ) : (
                     <canvas ref={platChartRef} height="120" />
                   )}
@@ -596,7 +608,7 @@ export default function App() {
               </div>
             </div>
           </div>
-          {error && <div className="alert alert-danger">{String(error)}</div>}
+          {error && <div className="alert alert-danger border-0 shadow-sm d-flex align-items-center"><i className="bi bi-exclamation-triangle-fill mr-2"/><strong>Fehler:</strong>&nbsp;{String(error)}</div>}
         </div>
       )}
 
