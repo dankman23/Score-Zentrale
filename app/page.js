@@ -996,47 +996,58 @@ export default function App() {
             </div>
           </div>
 
-          {/* Suchformular */}
-          <div className="card mb-4">
+          {/* Suchformular - moderner */}
+          <div className="card border-0 shadow-sm mb-4">
             <div className="card-body">
-              <h5>Neue Firmen suchen</h5>
+              <div className="d-flex align-items-center mb-3">
+                <i className="bi bi-search text-primary mr-2" style={{fontSize:'1.5rem'}}/>
+                <div>
+                  <h5 className="mb-0">Neue Firmen finden</h5>
+                  <small className="text-muted">Durchsuche das Web nach passenden B2B-Kunden</small>
+                </div>
+              </div>
               <div className="row">
-                <div className="col-md-4">
+                <div className="col-md-4 mb-2">
+                  <label className="small text-muted mb-1">Branche *</label>
                   <input 
-                    className="form-control mb-2" 
-                    placeholder="Branche (z.B. Metallbau)" 
+                    className="form-control" 
+                    placeholder="z.B. Metallbau, Holzbearbeitung" 
                     value={coldSearchForm.industry}
                     onChange={e => setColdSearchForm({...coldSearchForm, industry: e.target.value})}
                   />
                 </div>
-                <div className="col-md-4">
+                <div className="col-md-4 mb-2">
+                  <label className="small text-muted mb-1">Region *</label>
                   <input 
-                    className="form-control mb-2" 
-                    placeholder="Region (z.B. Berlin)" 
+                    className="form-control" 
+                    placeholder="z.B. Berlin, München, Hamburg" 
                     value={coldSearchForm.region}
                     onChange={e => setColdSearchForm({...coldSearchForm, region: e.target.value})}
                   />
                 </div>
-                <div className="col-md-2">
+                <div className="col-md-2 mb-2">
+                  <label className="small text-muted mb-1">Anzahl</label>
                   <input 
                     type="number" 
-                    className="form-control mb-2" 
-                    placeholder="Limit" 
+                    className="form-control" 
+                    placeholder="10" 
                     value={coldSearchForm.limit}
-                    onChange={e => setColdSearchForm({...coldSearchForm, limit: parseInt(e.target.value)})}
+                    onChange={e => setColdSearchForm({...coldSearchForm, limit: parseInt(e.target.value) || 10})}
+                    min="1"
+                    max="50"
                   />
                 </div>
-                <div className="col-md-2">
+                <div className="col-md-2 mb-2">
+                  <label className="small text-muted mb-1">&nbsp;</label>
                   <button 
                     className="btn btn-primary btn-block" 
                     onClick={searchColdLeads}
-                    disabled={coldLoading}
+                    disabled={coldLoading || !coldSearchForm.industry || !coldSearchForm.region}
                   >
-                    {coldLoading ? 'Lädt...' : 'Suchen'}
+                    {coldLoading ? <><span className="spinner-border spinner-border-sm mr-2"/>Suche...</> : <><i className="bi bi-search mr-1"/>Suchen</>}
                   </button>
                 </div>
               </div>
-              <small className="text-muted">💡 Beispiele: Metallbau Berlin, Holzbearbeitung München, Edelstahlverarbeitung Hamburg</small>
             </div>
           </div>
 
