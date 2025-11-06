@@ -1051,71 +1051,76 @@ export default function App() {
             </div>
           </div>
 
-          {/* Ergebnis-Tabelle */}
+          {/* Ergebnis-Tabelle - moderner */}
           {coldProspects.length > 0 && (
-            <div className="card">
-              <div className="card-body">
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h5 className="mb-0">{coldProspects.length} Firmen</h5>
+            <div className="card border-0 shadow-sm">
+              <div className="card-header bg-transparent border-bottom">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-center">
+                    <i className="bi bi-building text-primary mr-2"/>
+                    <h5 className="mb-0">{coldProspects.length} Firmen gefunden</h5>
+                  </div>
                   <div className="btn-group btn-group-sm">
                     <button className={`btn ${coldStatusFilter==='all'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('all')}>
-                      Alle
+                      Alle ({coldStats.total})
                     </button>
                     <button className={`btn ${coldStatusFilter==='new'?'btn-secondary':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('new')}>
-                      Neu
+                      Neu ({coldStats.new})
                     </button>
                     <button className={`btn ${coldStatusFilter==='analyzed'?'btn-info':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('analyzed')}>
-                      Analysiert
+                      Analysiert ({coldStats.analyzed})
                     </button>
                     <button className={`btn ${coldStatusFilter==='contacted'?'btn-success':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('contacted')}>
-                      Kontaktiert
+                      Kontaktiert ({coldStats.contacted})
                     </button>
                   </div>
                 </div>
+              </div>
+              <div className="card-body p-0">
                 <div className="table-responsive">
-                  <table className="table table-hover table-sm">
-                    <thead>
+                  <table className="table table-hover mb-0">
+                    <thead className="thead-light">
                       <tr>
-                        <th>Firma</th>
-                        <th>Website</th>
-                        <th>Branche</th>
-                        <th>Region</th>
-                        <th>Score</th>
-                        <th>Status</th>
-                        <th>Aktionen</th>
+                        <th className="border-0"><i className="bi bi-building mr-1"/>Firma</th>
+                        <th className="border-0"><i className="bi bi-globe mr-1"/>Website</th>
+                        <th className="border-0"><i className="bi bi-briefcase mr-1"/>Branche</th>
+                        <th className="border-0"><i className="bi bi-geo-alt mr-1"/>Region</th>
+                        <th className="border-0 text-center"><i className="bi bi-star mr-1"/>Score</th>
+                        <th className="border-0 text-center">Status</th>
+                        <th className="border-0 text-right">Aktionen</th>
                       </tr>
                     </thead>
                     <tbody>
                       {coldProspects.map((p, i) => (
                         <tr key={i}>
-                          <td>{p.company_name}</td>
-                          <td><a href={p.website} target="_blank" rel="noopener" className="text-truncate d-inline-block" style={{maxWidth:200}}>{p.website}</a></td>
-                          <td>{p.industry}</td>
-                          <td>{p.region}</td>
-                          <td>{p.score ? <span className="badge badge-success">{p.score}</span> : '-'}</td>
-                          <td>
-                            <span className={`badge badge-${p.status==='new'?'secondary':p.status==='analyzed'?'info':'success'}`}>
-                              {p.status}
+                          <td className="align-middle font-weight-bold">{p.company_name || 'Unbekannt'}</td>
+                          <td className="align-middle"><a href={p.website} target="_blank" rel="noopener" className="text-info text-truncate d-inline-block" style={{maxWidth:250}}>{p.website}</a></td>
+                          <td className="align-middle"><span className="badge badge-light">{p.industry}</span></td>
+                          <td className="align-middle">{p.region}</td>
+                          <td className="align-middle text-center">{p.score ? <span className={`badge badge-${p.score>=70?'success':p.score>=50?'info':'secondary'}`}>{p.score}/100</span> : <span className="text-muted">-</span>}</td>
+                          <td className="align-middle text-center">
+                            <span className={`badge badge-${p.status==='new'?'secondary':p.status==='analyzed'?'info':'success'}`} style={{minWidth:90}}>
+                              {p.status==='new'?'🆕 Neu':p.status==='analyzed'?'🔍 Analysiert':'✅ Kontaktiert'}
                             </span>
                           </td>
-                          <td>
+                          <td className="align-middle text-right">
                             {p.status === 'new' && (
-                              <button className="btn btn-sm btn-info mr-1" onClick={() => analyzeProspect(p)} disabled={coldLoading}>
-                                {coldLoading ? '...' : 'Analysieren'}
+                              <button className="btn btn-sm btn-info" onClick={() => analyzeProspect(p)} disabled={coldLoading}>
+                                <i className="bi bi-search mr-1"/>{coldLoading ? 'Lädt...' : 'Analysieren'}
                               </button>
                             )}
                             {p.status === 'analyzed' && (
                               <>
                                 <button className="btn btn-sm btn-outline-info mr-1" onClick={() => setSelectedProspect(p)} disabled={coldLoading}>
-                                  Details
+                                  <i className="bi bi-eye mr-1"/>Details
                                 </button>
                                 <button className="btn btn-sm btn-success" onClick={() => generateColdEmail(p)} disabled={coldLoading}>
-                                  Email
+                                  <i className="bi bi-envelope mr-1"/>Email
                                 </button>
                               </>
                             )}
                             {p.status === 'contacted' && (
-                              <span className="badge badge-success">✓ Versendet</span>
+                              <span className="badge badge-pill badge-success px-3"><i className="bi bi-check-circle mr-1"/>Versendet</span>
                             )}
                           </td>
                         </tr>
