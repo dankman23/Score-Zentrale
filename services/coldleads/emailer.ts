@@ -93,9 +93,22 @@ Erstelle eine professionelle, aber nicht zu förmliche B2B-Erstkontakt-Email.
   
   try {
     const result = JSON.parse(content)
+    
+    // Signatur hinzufügen
+    const signature = `
+
+Mit freundlichen Grüßen
+
+Christian Berres
+Score Handels GmbH & Co. KG
+
+Telefon: 0221-25999901
+E-Mail: berres@score-schleifwerkzeuge.de
+Web: www.score-schleifwerkzeuge.de`
+    
     return {
       subject: result.subject || 'Anfrage zu Schleifwerkzeugen',
-      body: result.body || '',
+      body: (result.body || '') + signature,
       personalization_score: result.personalization_score || 50
     }
   } catch (error) {
