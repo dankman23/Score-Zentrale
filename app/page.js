@@ -953,39 +953,44 @@ export default function App() {
       {/* Kaltakquise */}
       {activeTab==='coldleads' && (
         <div>
-          <h2 className="mb-4">Kaltakquise-Tool</h2>
+          <div className="d-flex align-items-center justify-content-between mb-4">
+            <div>
+              <h2 className="mb-1"><i className="bi bi-search mr-2"/>Kaltakquise-Tool</h2>
+              <p className="text-muted small mb-0">B2B-Kundenakquise mit KI-gestützter Analyse</p>
+            </div>
+          </div>
           
-          {/* Statistiken */}
+          {/* Statistiken - kompakter und moderner */}
           <div className="row mb-4">
-            <div className="col-md-3">
-              <div className="card text-center">
-                <div className="card-body py-2">
-                  <h3 className="mb-0">{coldStats.total}</h3>
-                  <small className="text-muted">Gesamt</small>
+            <div className="col-md-3 mb-3">
+              <div className="card border-0 shadow-sm">
+                <div className="card-body text-center py-3">
+                  <div className="h4 mb-1 font-weight-bold">{coldStats.total}</div>
+                  <div className="text-muted small">Gesamt Firmen</div>
                 </div>
               </div>
             </div>
-            <div className="col-md-3">
-              <div className="card text-center">
-                <div className="card-body py-2">
-                  <h3 className="mb-0 text-secondary">{coldStats.new}</h3>
-                  <small className="text-muted">Neu</small>
+            <div className="col-md-3 mb-3">
+              <div className="card border-0 shadow-sm" style={{borderLeft:'3px solid #6c757d'}}>
+                <div className="card-body text-center py-3">
+                  <div className="h4 mb-1 font-weight-bold text-secondary">{coldStats.new}</div>
+                  <div className="text-muted small">Neu gefunden</div>
                 </div>
               </div>
             </div>
-            <div className="col-md-3">
-              <div className="card text-center">
-                <div className="card-body py-2">
-                  <h3 className="mb-0 text-info">{coldStats.analyzed}</h3>
-                  <small className="text-muted">Analysiert</small>
+            <div className="col-md-3 mb-3">
+              <div className="card border-0 shadow-sm" style={{borderLeft:'3px solid #17a2b8'}}>
+                <div className="card-body text-center py-3">
+                  <div className="h4 mb-1 font-weight-bold text-info">{coldStats.analyzed}</div>
+                  <div className="text-muted small">Analysiert</div>
                 </div>
               </div>
             </div>
-            <div className="col-md-3">
-              <div className="card text-center">
-                <div className="card-body py-2">
-                  <h3 className="mb-0 text-success">{coldStats.contacted}</h3>
-                  <small className="text-muted">Kontaktiert</small>
+            <div className="col-md-3 mb-3">
+              <div className="card border-0 shadow-sm" style={{borderLeft:'3px solid #28a745'}}>
+                <div className="card-body text-center py-3">
+                  <div className="h4 mb-1 font-weight-bold text-success">{coldStats.contacted}</div>
+                  <div className="text-muted small">Kontaktiert</div>
                 </div>
               </div>
             </div>
