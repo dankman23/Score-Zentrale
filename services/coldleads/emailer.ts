@@ -63,8 +63,10 @@ Erstelle eine professionelle, aber nicht zu förmliche B2B-Erstkontakt-Email.
   1. Kurze persönliche Ansprache (${options.contact_person ? 'mit Namen' : 'allgemein'})
   2. Konkrete Verbindung zu deren Branche/Bedarf
   3. Unser Mehrwert (spezifisch für deren Anwendung)
-  4. Klarer Call-to-Action (Telefonat/Meeting anbieten)
-  5. Freundlicher Abschluss
+  4. WICHTIG: Biete eine kostenlose Beratung per E-Mail oder Telefon (0221-25999901) an
+  5. WICHTIG: Erwähne, dass wir bei Interesse gerne ein Angebot für den Jahresbedarf der gefundenen Artikel erstellen
+  6. Klarer Call-to-Action (Telefonat/Meeting anbieten)
+  7. Freundlicher Abschluss
 - KEINE generischen Phrasen
 - KEINE übertriebenen Versprechen
 - Fokus auf konkreten Nutzen
@@ -72,7 +74,7 @@ Erstelle eine professionelle, aber nicht zu förmliche B2B-Erstkontakt-Email.
 **Output-Format:**
 {
   "subject": "Betreff hier",
-  "body": "Email-Text hier (mit Absätzen)",
+  "body": "Email-Text hier (mit Absätzen, OHNE Signatur - die wird automatisch hinzugefügt)",
   "personalization_score": 0-100
 }
 `
