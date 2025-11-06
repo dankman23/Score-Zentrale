@@ -377,9 +377,11 @@ def test_smtp_connection():
         return False, f"Error: {e}"
 
 def main():
-    """Run all JTL endpoint tests"""
-    print("🚀 Starting JTL Backend Testing")
+    """Run all backend tests including JTL endpoints and Kaltakquise Email Generation"""
+    print("🚀 Starting Backend Testing - JTL Endpoints & Kaltakquise Email Generation")
     print(f"Base URL: {BASE_URL}")
+    print(f"MongoDB URL: {MONGO_URL}")
+    print(f"Database: {DB_NAME}")
     
     # Test date ranges
     from_date = "2025-11-01"
@@ -387,6 +389,29 @@ def main():
     single_date = "2025-11-03"
     
     test_results = []
+    
+    # PRIORITY: Test Kaltakquise Email Generation first (as requested)
+    print("\n" + "🔥"*60)
+    print("PRIORITY: KALTAKQUISE EMAIL GENERATION TESTS")
+    print("🔥"*60)
+    
+    # Test Cold Leads Email Generation
+    try:
+        success, message = test_coldleads_email_generation()
+        test_results.append(("Kaltakquise Email Generation", success, message))
+    except Exception as e:
+        test_results.append(("Kaltakquise Email Generation", False, f"Exception: {str(e)}"))
+    
+    # Test SMTP Connection
+    try:
+        success, message = test_smtp_connection()
+        test_results.append(("SMTP Connection Test", success, message))
+    except Exception as e:
+        test_results.append(("SMTP Connection Test", False, f"Exception: {str(e)}"))
+    
+    print("\n" + "⚙️"*60)
+    print("JTL ENDPOINTS TESTS (Background)")
+    print("⚙️"*60)
     
     # 1. NEW: Purchase Expenses
     print("\n" + "="*60)
