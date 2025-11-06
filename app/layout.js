@@ -58,10 +58,10 @@ export default function RootLayout({ children }) {
               <div className="hero-shield p-0">
                 <ul className="nav nav-pills subnav-icons">
                   <li className="nav-item"><a className="nav-link" href="#dashboard"><i className="bi bi-speedometer2"/>Dashboard</a></li>
-                  <li className="nav-item"><a className="nav-link" href="#outbound"><i className="bi bi-send"/>Outbound</a></li>
                   <li className="nav-item"><a className="nav-link" href="#sales"><i className="bi bi-bar-chart"/>Sales</a></li>
                   <li className="nav-item"><a className="nav-link" href="#marketing"><i className="bi bi-bullseye"/>Marketing</a></li>
-                  <li className="nav-item"><a className="nav-link" href="#settings"><i className="bi bi-gear"/>Settings</a></li>
+                  <li className="nav-item"><a className="nav-link" href="#coldleads"><i className="bi bi-search"/>Kaltakquise</a></li>
+                  <li className="nav-item"><a className="nav-link" href="#outbound"><i className="bi bi-send"/>Outbound</a></li>
                 </ul>
               </div>
             </div>
