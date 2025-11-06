@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Score Zentrale - JTL Endpoints
+Backend Testing for Score Zentrale - JTL Endpoints and Kaltakquise Email Generation
 Tests NEW and REFACTORED JTL endpoints with dynamic schema detection
+Tests Kaltakquise Email Generation functionality
 """
 
 import requests
 import json
 import sys
+import os
 from datetime import datetime, timedelta
+from pymongo import MongoClient
 
 # Base URL from environment
 BASE_URL = "https://bizanalytics-11.preview.emergentagent.com"
+MONGO_URL = os.getenv('MONGO_URL', 'mongodb://localhost:27017')
+DB_NAME = os.getenv('DB_NAME', 'your_database_name')
 
 def test_endpoint(method, endpoint, params=None, data=None, expected_status=200):
     """Test an API endpoint and return response"""
