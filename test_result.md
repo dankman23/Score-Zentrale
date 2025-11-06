@@ -207,15 +207,18 @@ backend:
         comment: "✅ Status endpoints working: POST creates status records with UUID, GET retrieves list without _id fields. Tested with client_name 'qa'."
   - task: "Kaltakquise Email-Generierung"
     implemented: true
-    working: "NA"
-    file: "/app/app/lib/emailer.ts"
+    working: true
+    file: "/app/services/coldleads/emailer.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Prompt erweitert um (1) Beratungsangebot per Email/Telefon 0221-25999901, (2) Jahresbedarfs-Angebot für Artikel. Signatur hinzugefügt mit Christian Berres, Score Handels GmbH & Co. KG, berres@score-schleifwerkzeuge.de"
+      - working: true
+        agent: "testing"
+        comment: "✅ Kaltakquise Email Generation working perfectly! POST /api/coldleads/email tested with test prospect (Test Metallbau GmbH). All required elements verified: ✅ Beratungsangebot mit Telefon 0221-25999901, ✅ Jahresbedarfs-Angebot erwähnt, ✅ Christian Berres Signatur, ✅ Score Handels GmbH & Co. KG, ✅ berres@score-schleifwerkzeuge.de. Email generation working with proper personalization (score: 85), correct recipient (test@test.de), send=false flag working correctly. Generated email contains all required business elements and professional signature."
   - task: "JTL Ping (Basic Auth)"
   implemented: true
   working: "NA"
