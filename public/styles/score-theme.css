@@ -33,3 +33,37 @@ html,body{background:var(--app-bg);color:var(--txt);}
 .subnav-icons .nav-link.active{background:var(--accent);color:#111}
 .brand-title{font-weight:800;letter-spacing:.6px}
 .chartjs-render-monitor{filter:contrast(1.02);} 
+
+/* Gradient-Header für Karten */
+.bg-gradient-primary{background:linear-gradient(135deg, #667eea 0%, #764ba2 100%)!important;}
+.bg-gradient-info{background:linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)!important;}
+
+/* Verbesserte Buttons */
+.btn{border-radius:8px;font-weight:500;transition:all 0.2s ease;}
+.btn-success{background:#28a745;border-color:#28a745;}
+.btn-success:hover{background:#218838;transform:translateY(-1px);box-shadow:0 4px 12px rgba(40,167,69,0.3);}
+.btn-info{background:#17a2b8;border-color:#17a2b8;}
+.btn-info:hover{background:#138496;transform:translateY(-1px);}
+.btn-lg{padding:0.75rem 1.5rem;font-size:1.05rem;}
+
+/* Tabellen-Optimierung */
+.table thead th{font-weight:600;text-transform:uppercase;font-size:0.75rem;letter-spacing:0.5px;}
+.table-hover tbody tr:hover{background:rgba(246,177,10,0.08)!important;transition:all 0.15s ease;}
+
+/* Badge-Optimierung */
+.badge{padding:0.35rem 0.65rem;font-weight:500;border-radius:6px;}
+.badge-pill{border-radius:50px;}
+
+/* Shadow-Helpers */
+.shadow-sm{box-shadow:0 2px 8px rgba(0,0,0,0.25)!important;}
+.shadow-lg{box-shadow:0 8px 24px rgba(0,0,0,0.4)!important;}
+
+/* Card-Body Spacing */
+.card-body{padding:1.25rem;}
+
+/* Loading Spinner */
+.spinner-border-sm{width:1rem;height:1rem;border-width:0.15em;}
+
+/* Links */
+a{transition:all 0.2s ease;}
+a:hover{text-decoration:none;opacity:0.85;}
