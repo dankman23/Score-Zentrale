@@ -35,17 +35,13 @@ export default function RootLayout({ children }) {
           </button>
 
           <div className="collapse navbar-collapse" id="navMain">
-            <ul className="navbar-nav mr-auto">
-              <li className="nav-item"><a className="nav-link" href="#dashboard">Dashboard</a></li>
-              <li className="nav-item"><a className="nav-link" href="#outbound">Outbound</a></li>
-              <li className="nav-item"><a className="nav-link" href="#sales">Sales</a></li>
-              <li className="nav-item"><a className="nav-link" href="#marketing">Marketing</a></li>
-              <li className="nav-item"><a className="nav-link" href="#settings">Settings</a></li>
+            <ul className="navbar-nav ml-auto">
+              <li className="nav-item"><a className="nav-link" href="#dashboard"><i className="bi bi-speedometer2 mr-1"/>Dashboard</a></li>
+              <li className="nav-item"><a className="nav-link" href="#sales"><i className="bi bi-bar-chart mr-1"/>Sales</a></li>
+              <li className="nav-item"><a className="nav-link" href="#marketing"><i className="bi bi-bullseye mr-1"/>Marketing</a></li>
+              <li className="nav-item"><a className="nav-link" href="#coldleads"><i className="bi bi-search mr-1"/>Kaltakquise</a></li>
+              <li className="nav-item"><a className="nav-link" href="#outbound"><i className="bi bi-send mr-1"/>Outbound</a></li>
             </ul>
-            <form className="form-inline my-2 my-lg-0">
-              <input className="form-control form-control-sm mr-2" type="date" />
-              <input className="form-control form-control-sm" type="date" />
-            </form>
           </div>
         </nav>
 
