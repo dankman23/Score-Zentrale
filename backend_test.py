@@ -10,7 +10,7 @@ import sys
 from datetime import datetime, timedelta
 
 # Base URL from environment
-BASE_URL = "https://warm-leads.preview.emergentagent.com"
+BASE_URL = "https://bizanalytics-11.preview.emergentagent.com"
 
 def test_endpoint(method, endpoint, params=None, data=None, expected_status=200):
     """Test an API endpoint and return response"""
