@@ -201,7 +201,22 @@ backend:
     status_history:
       - working: "NA"
         agent: "main"
-- task: "JTL Ping (Basic Auth)"
+        comment: "Template-Health; speichert status_checks"
+      - working: true
+        agent: "testing"
+        comment: "✅ Status endpoints working: POST creates status records with UUID, GET retrieves list without _id fields. Tested with client_name 'qa'."
+  - task: "Kaltakquise Email-Generierung"
+    implemented: true
+    working: "NA"
+    file: "/app/app/lib/emailer.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Prompt erweitert um (1) Beratungsangebot per Email/Telefon 0221-25999901, (2) Jahresbedarfs-Angebot für Artikel. Signatur hinzugefügt mit Christian Berres, Score Handels GmbH & Co. KG, berres@score-schleifwerkzeuge.de"
+  - task: "JTL Ping (Basic Auth)"
   implemented: true
   working: "NA"
   file: "/app/app/api/[[...path]]/route.js"
