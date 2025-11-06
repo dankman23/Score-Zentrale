@@ -1212,26 +1212,46 @@ export default function App() {
             </div>
           )}
 
-          {/* Email-Editor Modal */}
+          {/* Email-Vorschau - moderner */}
           {generatedEmail && (
-            <div className="card mt-4">
+            <div className="card border-0 shadow-lg mt-4">
+              <div className="card-header bg-gradient-primary text-white d-flex align-items-center justify-content-between">
+                <div className="d-flex align-items-center">
+                  <i className="bi bi-envelope-fill mr-2" style={{fontSize:'1.5rem'}}/>
+                  <div>
+                    <h5 className="mb-0">Generierte Email</h5>
+                    <small>Bereit zum Versenden</small>
+                  </div>
+                </div>
+                <button className="btn btn-sm btn-outline-light" onClick={() => setGeneratedEmail(null)}>
+                  <i className="bi bi-x-lg"/>
+                </button>
+              </div>
               <div className="card-body">
-                <h5>Generierte Email</h5>
-                <p className="text-muted">Empfänger: {generatedEmail.recipient}</p>
-                <div className="form-group">
-                  <label>Betreff:</label>
-                  <input className="form-control" value={generatedEmail.subject} readOnly />
+                <div className="alert alert-info d-flex align-items-center mb-3">
+                  <i className="bi bi-person-circle mr-2" style={{fontSize:'1.5rem'}}/>
+                  <div>
+                    <strong>Empfänger:</strong> {generatedEmail.recipient}
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Nachricht:</label>
-                  <textarea className="form-control" rows="10" value={generatedEmail.body} readOnly />
+                <div className="mb-3">
+                  <label className="font-weight-bold text-muted small mb-2">BETREFF:</label>
+                  <div className="p-3 bg-light rounded border">
+                    <strong>{generatedEmail.subject}</strong>
+                  </div>
                 </div>
-                <div className="d-flex justify-content-between">
-                  <button className="btn btn-secondary" onClick={() => setGeneratedEmail(null)}>
-                    Schließen
+                <div className="mb-4">
+                  <label className="font-weight-bold text-muted small mb-2">NACHRICHT:</label>
+                  <div className="p-3 bg-white rounded border" style={{whiteSpace:'pre-wrap', fontFamily:'system-ui', lineHeight:'1.8'}}>
+                    {generatedEmail.body}
+                  </div>
+                </div>
+                <div className="d-flex justify-content-between align-items-center pt-3 border-top">
+                  <button className="btn btn-outline-secondary" onClick={() => setGeneratedEmail(null)}>
+                    <i className="bi bi-x-circle mr-1"/>Abbrechen
                   </button>
-                  <button className="btn btn-primary" onClick={sendColdEmail} disabled={coldLoading}>
-                    {coldLoading ? 'Versendet...' : 'Jetzt versenden'}
+                  <button className="btn btn-success btn-lg" onClick={sendColdEmail} disabled={coldLoading}>
+                    {coldLoading ? <><span className="spinner-border spinner-border-sm mr-2"/>Wird versendet...</> : <><i className="bi bi-send-fill mr-2"/>Jetzt versenden</>}
                   </button>
                 </div>
               </div>
