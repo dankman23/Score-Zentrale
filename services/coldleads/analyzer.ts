@@ -1,5 +1,5 @@
 /**
- * Kaltakquise - Phase 2: Analyzer
+ * Kaltakquise - Phase 2: Analyzer (Stabilisiert)
  * Crawlt Website und analysiert mit OpenAI
  */
 
@@ -12,6 +12,8 @@ interface AnalysisResult {
     description: string
     products: string[]
     services: string[]
+    surface_processing_indicators: string[]
+    target_materials: string[]
     employees_estimate?: string
   }
   contact_persons: Array<{
@@ -20,11 +22,13 @@ interface AnalysisResult {
     department?: string
     email?: string
     phone?: string
+    priority?: number
   }>
   needs_assessment: {
     potential_products: string[]
     estimated_volume: 'low' | 'medium' | 'high'
     reasoning: string
+    individual_hook: string
     score: number // 0-100
   }
   website_quality: {
@@ -35,138 +39,149 @@ interface AnalysisResult {
 }
 
 /**
- * Crawlt und analysiert eine Firmen-Website
+ * Crawlt und analysiert eine Firmen-Website (mit Error-Handling)
  */
 export async function analyzeCompany(websiteUrl: string, industry: string): Promise<AnalysisResult> {
   console.log(`[Analyzer] Analyzing: ${websiteUrl}`)
 
-  // 1. Website crawlen
-  const websiteData = await crawlWebsite(websiteUrl)
+  try {
+    // 1. Website crawlen (mit Timeout)
+    const websiteData = await Promise.race([
+      crawlWebsite(websiteUrl),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Crawl Timeout')), 30000))
+    ]) as any
 
-  // 2. OpenAI-Analyse
-  const aiAnalysis = await analyzeWithAI(websiteData, industry)
+    // 2. Kontakte extrahieren
+    const contacts = extractContacts(websiteData.html)
 
-  return {
-    company_info: aiAnalysis.company_info,
-    contact_persons: websiteData.contacts,
-    needs_assessment: aiAnalysis.needs_assessment,
-    website_quality: websiteData.quality
+    // 3. OpenAI-Analyse (mit Fallback)
+    let aiAnalysis
+    try {
+      aiAnalysis = await analyzeWithAI(websiteData, industry)
+    } catch (error) {
+      console.error('[Analyzer] AI Analysis failed, using fallback:', error)
+      aiAnalysis = createFallbackAnalysis(websiteData, industry)
+    }
+
+    return {
+      company_info: aiAnalysis.company_info,
+      contact_persons: contacts,
+      needs_assessment: aiAnalysis.needs_assessment,
+      website_quality: {
+        has_impressum: websiteData.html.toLowerCase().includes('impressum'),
+        has_contact_page: websiteData.html.toLowerCase().includes('kontakt'),
+        professional: true
+      }
+    }
+  } catch (error: any) {
+    console.error('[Analyzer] Analysis failed:', error)
+    // Return minimal viable analysis
+    return {
+      company_info: {
+        name: 'Unbekannt',
+        description: 'Website konnte nicht analysiert werden.',
+        products: [],
+        services: [],
+        surface_processing_indicators: [],
+        target_materials: []
+      },
+      contact_persons: [],
+      needs_assessment: {
+        potential_products: ['Schleifmittel allgemein'],
+        estimated_volume: 'medium',
+        reasoning: `Analyse konnte nicht vollständig durchgeführt werden: ${error.message}`,
+        individual_hook: `Unternehmen aus dem Bereich ${industry}`,
+        score: 30
+      },
+      website_quality: {
+        has_impressum: false,
+        has_contact_page: false,
+        professional: false
+      }
+    }
   }
 }
 
 /**
- * Crawlt Website und extrahiert relevante Informationen
+ * Crawlt Website
  */
 async function crawlWebsite(url: string) {
-  const data = {
-    text_content: '',
-    contacts: [] as any[],
-    quality: {
-      has_impressum: false,
-      has_contact_page: false,
-      professional: true
-    }
-  }
-
   try {
-    // Hauptseite laden
-    const mainPage = await fetchPage(url)
-    data.text_content += mainPage.text
-    data.quality = mainPage.quality
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; SCORE-Bot/1.0)'
+      },
+      signal: AbortSignal.timeout(20000)
+    })
 
-    // Kontaktseite suchen
-    const contactUrl = findContactPage(mainPage.html, url)
-    if (contactUrl) {
-      const contactPage = await fetchPage(contactUrl)
-      data.contacts = extractContacts(contactPage.html)
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
     }
 
-    // Impressum prüfen
-    const impressumUrl = findImpressumPage(mainPage.html, url)
-    if (impressumUrl) {
-      data.quality.has_impressum = true
-      const impressum = await fetchPage(impressumUrl)
-      const impressumContacts = extractContacts(impressum.html)
-      data.contacts.push(...impressumContacts)
-    }
+    const html = await response.text()
+    const $ = cheerio.load(html)
 
-    // Deduplizieren
-    data.contacts = deduplicateContacts(data.contacts)
+    // Text extrahieren
+    $('script, style, nav, footer').remove()
+    const text = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 5000)
 
-  } catch (error) {
-    console.error('[Analyzer] Crawling error:', error)
+    return { html, text_content: text, title: $('title').text() }
+  } catch (error: any) {
+    console.error('[Crawler] Failed:', error.message)
+    throw new Error(`Website nicht erreichbar: ${error.message}`)
   }
-
-  return data
 }
 
 /**
- * Lädt eine einzelne Seite
+ * Fallback-Analyse wenn OpenAI fehlschlägt
  */
-async function fetchPage(url: string) {
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (compatible; ScoreCRM/1.0; +https://score-schleifwerkzeuge.de)'
+function createFallbackAnalysis(websiteData: any, industry: string): any {
+  const text = websiteData.text_content.toLowerCase()
+  
+  // Einfache Keyword-Detection
+  const metalKeywords = ['metall', 'stahl', 'edelstahl', 'aluminium', 'schweißen']
+  const woodKeywords = ['holz', 'tischlerei', 'schreinerei', 'möbel']
+  const surfaceKeywords = ['schleifen', 'polieren', 'oberflä che', 'finish']
+  
+  const hasMetalIndicators = metalKeywords.some(kw => text.includes(kw))
+  const hasWoodIndicators = woodKeywords.some(kw => text.includes(kw))
+  const hasSurfaceIndicators = surfaceKeywords.some(kw => text.includes(kw))
+  
+  let score = 40
+  let products = ['Schleifbänder', 'Fächerscheiben']
+  let materials = []
+  
+  if (hasMetalIndicators) {
+    score += 20
+    materials.push('Stahl', 'Edelstahl')
+    products = ['Schleifbänder für Edelstahl', 'Fächerscheiben', 'Trennscheiben']
+  }
+  if (hasWoodIndicators) {
+    score += 15
+    materials.push('Holz')
+    products.push('Schleifbänder für Holz')
+  }
+  if (hasSurfaceIndicators) {
+    score += 15
+  }
+  
+  return {
+    company_info: {
+      name: websiteData.title || 'Unbekannt',
+      description: `Unternehmen im Bereich ${industry}. Basiert auf automatischer Keyword-Analyse.`,
+      products: [],
+      services: [],
+      surface_processing_indicators: hasSurfaceIndicators ? ['Oberflächenbearbeitung'] : [],
+      target_materials: materials
+    },
+    needs_assessment: {
+      potential_products: products,
+      estimated_volume: 'medium',
+      reasoning: `Basierend auf Branchen-Zuordnung (${industry}) und Website-Keywords besteht Potenzial für Schleifmittel.`,
+      individual_hook: `Unternehmen im Bereich ${industry}`,
+      score: Math.min(score, 100)
     }
-  })
-
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`)
   }
-
-  const html = await response.text()
-  const $ = cheerio.load(html)
-
-  // Text extrahieren
-  $('script, style, nav, footer').remove()
-  const text = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 5000) // Limit 5000 chars
-
-  // Qualität bewerten
-  const quality = {
-    has_impressum: html.toLowerCase().includes('impressum'),
-    has_contact_page: html.toLowerCase().includes('kontakt'),
-    professional: !html.toLowerCase().includes('unter konstruktion')
-  }
-
-  return { html, text, quality }
-}
-
-/**
- * Findet Kontaktseite
- */
-function findContactPage(html: string, baseUrl: string): string | null {
-  const $ = cheerio.load(html)
-  const contactLinks = $('a').filter((_, el) => {
-    const href = $(el).attr('href') || ''
-    const text = $(el).text().toLowerCase()
-    return text.includes('kontakt') || href.includes('kontakt') || href.includes('contact')
-  })
-
-  if (contactLinks.length > 0) {
-    const href = contactLinks.first().attr('href')
-    return href ? new URL(href, baseUrl).href : null
-  }
-
-  return null
-}
-
-/**
- * Findet Impressum-Seite
- */
-function findImpressumPage(html: string, baseUrl: string): string | null {
-  const $ = cheerio.load(html)
-  const impressumLinks = $('a').filter((_, el) => {
-    const href = $(el).attr('href') || ''
-    const text = $(el).text().toLowerCase()
-    return text.includes('impressum') || href.includes('impressum')
-  })
-
-  if (impressumLinks.length > 0) {
-    const href = impressumLinks.first().attr('href')
-    return href ? new URL(href, baseUrl).href : null
-  }
-
-  return null
 }
 
 /**
@@ -259,14 +274,16 @@ function extractContacts(html: string) {
       const name = match[2] || match[1]
       const role = match[3] || match[2]
       
-      contacts.push({
-        name: name,
-        title: role,
-        department: role.toLowerCase().includes('einkauf') ? 'Einkauf' : 'Produktion',
-        email: emails[contacts.length] || emails[0] || null,
-        phone: phones[contacts.length] || phones[0] || null,
-        priority: role.toLowerCase().includes('einkauf') ? 1 : 2
-      })
+      if (name && role) {
+        contacts.push({
+          name: name,
+          title: role,
+          department: role.toLowerCase().includes('einkauf') ? 'Einkauf' : 'Produktion',
+          email: emails[contacts.length] || emails[0] || null,
+          phone: phones[contacts.length] || phones[0] || null,
+          priority: role.toLowerCase().includes('einkauf') ? 1 : 2
+        })
+      }
     }
   }
 
@@ -303,9 +320,9 @@ function extractContacts(html: string) {
 }
 
 /**
- * Analysiert mit OpenAI
+ * Analysiert mit OpenAI (mit Retry)
  */
-async function analyzeWithAI(websiteData: any, industry: string): Promise<any> {
+async function analyzeWithAI(websiteData: any, industry: string, retries = 2): Promise<any> {
   const apiKey = process.env.OPENAI_API_KEY
 
   if (!apiKey) {
@@ -338,7 +355,7 @@ Branche: "${industry}"
 Website-Content: ${websiteData.text_content}
 
 **AUFGABE:**
-Analysiere ob und warum diese Firma Schleifmittel benötigt. Identifiziere spezifische Anwendungen und Entscheidungspersonen.
+Analysiere ob und warum diese Firma Schleifmittel benötigt. Identifiziere spezifische Anwendungen.
 
 **OUTPUT (JSON):**
 {
@@ -353,57 +370,45 @@ Analysiere ob und warum diese Firma Schleifmittel benötigt. Identifiziere spezi
   "needs_assessment": {
     "potential_products": ["Schleifbänder K80", "Fächerscheiben 125mm", etc.],
     "estimated_volume": "low|medium|high",
-    "reasoning": "DETAILLIERT: Welche konkreten Schleif-Anwendungen hat die Firma? Warum brauchen sie unsere Produkte? Welche Prozesse verwenden Schleifmittel?",
+    "reasoning": "DETAILLIERT: Welche konkreten Schleif-Anwendungen hat die Firma? Warum brauchen sie unsere Produkte?",
     "score": 0-100,
     "individual_hook": "Spezifischer Aufhänger für Email (z.B. 'spezialisiert auf Edelstahl-Schweißkonstruktionen')"
   }
 }
 
 **SCORING (0-100):**
-- 85-100: TOP-Lead - Kernzielgruppe mit hohem Volumen (Fertigung, viele Mitarbeiter, Schweißen/Schleifen erwähnt)
-- 70-84: Sehr guter Lead - Klare Schleifmittel-Anwendung erkennbar
-- 55-69: Guter Lead - Potenzial vorhanden, Oberflächenbearbeitung wahrscheinlich
-- 40-54: Mittleres Potenzial - Branche passt, Details unklar
-- 0-39: Geringes Potenzial - Kein klarer Bedarf erkennbar
-
-**WICHTIG:**
-- "individual_hook" muss SPEZIFISCH sein (nicht generisch)
-- "reasoning" muss KONKRET auf deren Anwendungen eingehen
-- "surface_processing_indicators" sind Schlüsselwörter von der Website
+- 85-100: TOP-Lead - Kernzielgruppe mit hohem Volumen
+- 70-84: Sehr guter Lead - Klare Schleifmittel-Anwendung
+- 55-69: Guter Lead - Potenzial vorhanden
+- 40-54: Mittleres Potenzial
+- 0-39: Geringes Potenzial
 `
 
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4',
-    messages: [
-      { role: 'system', content: 'Du bist ein präziser B2B-Analyst für Schleifmittel. Antworte nur mit validem JSON.' },
-      { role: 'user', content: prompt }
-    ],
-    temperature: 0.3,
-    max_tokens: 1000
-  })
-
-  const content = response.choices[0].message.content || '{}'
-  
   try {
-    return JSON.parse(content)
-  } catch {
-    // Fallback wenn JSON-Parsing fehlschlägt
-    return {
-      company_info: {
-        name: 'Unbekannt',
-        description: content.slice(0, 200),
-        products: [],
-        services: [],
-        surface_processing_indicators: [],
-        target_materials: []
-      },
-      needs_assessment: {
-        potential_products: ['Schleifbänder', 'Fächerscheiben'],
-        estimated_volume: 'medium',
-        reasoning: 'Analyse konnte nicht vollständig durchgeführt werden. Branche deutet auf Schleifmittel-Bedarf hin.',
-        score: 50,
-        individual_hook: `Unternehmen aus dem Bereich ${industry}`
-      }
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        { role: 'system', content: 'Du bist ein präziser B2B-Analyst für Schleifmittel. Antworte nur mit validem JSON.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.3,
+      max_tokens: 1000,
+      timeout: 30000
+    })
+
+    const content = response.choices[0].message.content || '{}'
+    
+    try {
+      return JSON.parse(content)
+    } catch {
+      throw new Error('Invalid JSON response from AI')
     }
+  } catch (error: any) {
+    if (retries > 0) {
+      console.log(`[Analyzer] Retrying AI analysis... (${retries} attempts left)`)
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      return analyzeWithAI(websiteData, industry, retries - 1)
+    }
+    throw error
   }
 }
