@@ -303,19 +303,6 @@ function extractContacts(html: string) {
 }
 
 /**
- * Dedupliziert Kontakte
- */
-function deduplicateContacts(contacts: any[]) {
-  const seen = new Set()
-  return contacts.filter(c => {
-    const key = c.email || c.name
-    if (seen.has(key)) return false
-    seen.add(key)
-    return true
-  })
-}
-
-/**
  * Analysiert mit OpenAI
  */
 async function analyzeWithAI(websiteData: any, industry: string): Promise<any> {
