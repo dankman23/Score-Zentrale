@@ -1126,7 +1126,11 @@ export default function App() {
                               )}
                               {p.status === 'analyzed' && (
                                 <>
-                                  <button className="btn btn-sm btn-outline-info mr-1" onClick={(e) => { e.stopPropagation(); setSelectedProspect(selectedProspect?.website === p.website ? null : p) }} disabled={coldLoading}>
+                                  <button className="btn btn-sm btn-outline-info mr-1" onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    console.log('Details clicked for:', p.company_name, 'Has analysis:', !!p.analysis);
+                                    setSelectedProspect(selectedProspect?.website === p.website ? null : p) 
+                                  }} disabled={coldLoading}>
                                     <i className={`bi bi-chevron-${selectedProspect?.website === p.website ? 'up' : 'down'} mr-1`}/>Details
                                   </button>
                                   <button className="btn btn-sm btn-success" onClick={(e) => { e.stopPropagation(); if (generatedEmail?.website === p.website) { setGeneratedEmail(null) } else { generateColdEmail(p) } }} disabled={coldLoading}>
