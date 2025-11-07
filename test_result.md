@@ -219,6 +219,62 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ Kaltakquise Email Generation working perfectly! POST /api/coldleads/email tested with test prospect (Test Metallbau GmbH). All required elements verified: ✅ Beratungsangebot mit Telefon 0221-25999901, ✅ Jahresbedarfs-Angebot erwähnt, ✅ Christian Berres Signatur, ✅ Score Handels GmbH & Co. KG, ✅ berres@score-schleifwerkzeuge.de. Email generation working with proper personalization (score: 85), correct recipient (test@test.de), send=false flag working correctly. Generated email contains all required business elements and professional signature."
+  - task: "Kaltakquise: POST /api/coldleads/search (Firmen-Suche)"
+    implemented: true
+    working: true
+    file: "/app/app/api/coldleads/search/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Sucht potenzielle B2B-Kunden über Google Custom Search API oder Mock-Daten. Speichert in MongoDB cold_prospects Collection."
+      - working: true
+        agent: "testing"
+        comment: "✅ Company search working perfectly! POST /api/coldleads/search with industry='Metallbau', region='Köln', limit=5 returned 200 OK with 5 mock prospects. All prospects have required fields: company_name, website, status='new', snippet, location. Real German websites returned: metall-froebel.de, mueller-metallbau-koeln.de, mr-stahltechnik.de, metallbau-schiefer.de, nickel-mv.de. Mock data generation working as expected when Google API not configured."
+  - task: "Kaltakquise: POST /api/coldleads/analyze (Firmen-Analyse)"
+    implemented: true
+    working: true
+    file: "/app/app/api/coldleads/analyze/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Analysiert Firma via Website-Crawling + AI. Extrahiert company_info, contact_persons, needs_assessment mit Score 0-100. Speichert in MongoDB."
+      - working: true
+        agent: "testing"
+        comment: "✅ Company analysis working! POST /api/coldleads/analyze with website='https://metall-froebel.de', industry='Metallbau' returned 200 OK. Analysis completed successfully with all required fields: company_info (name, products, services, target_materials), contact_persons (1 found with email info@metall-froebel.de), needs_assessment (score=60, potential_products, reasoning, individual_hook). Analysis data saved to MongoDB with status updated to 'analyzed'. AI-powered analysis functioning correctly."
+  - task: "Kaltakquise: GET /api/coldleads/search (Prospects abrufen)"
+    implemented: true
+    working: true
+    file: "/app/app/api/coldleads/search/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Liste gespeicherter Prospects aus MongoDB mit Filter nach Status und Limit."
+      - working: true
+        agent: "testing"
+        comment: "✅ Prospects retrieval working! GET /api/coldleads/search?limit=10 returned 200 OK with 10 prospects. Analyzed prospect (metall-froebel.de) correctly shows status='analyzed' and score=60. All prospects have required fields: id, company_name, website, industry, region, status, score (null for non-analyzed), created_at. Status update from 'new' to 'analyzed' working correctly after analysis."
+  - task: "Kaltakquise: POST /api/coldleads/email (Email-Generierung)"
+    implemented: true
+    working: false
+    file: "/app/app/api/coldleads/email/route.ts"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Generiert personalisierte Email mit OpenAI GPT-4 basierend auf Analyse-Daten. Signatur mit Christian Berres, Telefon 0221-25999901, berres@score-schleifwerkzeuge.de."
+      - working: false
+        agent: "testing"
+        comment: "❌ Email generation FAILED with API authentication error. POST /api/coldleads/email with website='https://metall-froebel.de', send=false returned 500 error: 'Emergent API error (401): Incorrect API key provided: sk-emerg******************6A36'. The Emergent Universal Key (sk-emergent-a5626Df00550106A36) in .env is being rejected by OpenAI API endpoint. Code in /app/lib/emergent-llm.ts sends key to https://api.openai.com/v1/chat/completions but OpenAI returns 401. CRITICAL: API key configuration issue - either key is invalid/expired OR Emergent keys require different endpoint URL (Emergent's own proxy, not direct OpenAI endpoint). Steps 1-3 of workflow working perfectly, only email generation blocked by authentication."
   - task: "JTL Ping (Basic Auth)"
   implemented: true
   working: "NA"
