@@ -165,38 +165,3 @@ export async function testSMTP(): Promise<{ ok: boolean; message: string }> {
     }
   }
 }
-
-/**
- * Email-Template für Branche anpassen
- */
-export function getIndustryTemplate(industry: string): string {
-  const templates: Record<string, string> = {
-    'metallbau': `
-Wir sind spezialisiert auf Schleifmittel für Metallverarbeitung:
-- Schweißnahtbearbeitung
-- Oberflächenvorbereitung
-- Entgraten und Finishing
-`,
-    'holzbearbeitung': `
-Unser Sortiment für Holzverarbeitung umfasst:
-- Schleifbänder für Breitbandschleifer
-- Schleifpapiere für Handmaschinen
-- Spezial-Körnung für verschiedene Holzarten
-`,
-    'edelstahl': `
-Für Edelstahl-Verarbeitung bieten wir:
-- Keramik-Schleifmittel für längere Standzeit
-- Spezial-Vlies für Finish-Arbeiten
-- Anlauffarben-Entfernung
-`
-  }
-
-  const industryLower = industry.toLowerCase()
-  for (const [key, template] of Object.entries(templates)) {
-    if (industryLower.includes(key)) {
-      return template
-    }
-  }
-
-  return 'Unsere Schleifwerkzeuge für Ihre spezifische Anwendung.'
-}
