@@ -448,8 +448,10 @@ export default function App() {
       })
       const data = await res.json()
       if (data.ok && data.sent) {
-        alert('Email erfolgreich versendet!')
+        alert('✅ Email erfolgreich versendet!')
         setGeneratedEmail(null)
+        // Prospects neu laden um Status zu aktualisieren
+        await fetchColdProspects()
       } else {
         alert('Fehler: ' + data.error)
       }
