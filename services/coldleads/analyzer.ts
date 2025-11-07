@@ -170,6 +170,19 @@ function findImpressumPage(html: string, baseUrl: string): string | null {
 }
 
 /**
+ * Dedupliziert Kontakte basierend auf Email
+ */
+function deduplicateContacts(contacts: any[]): any[] {
+  const seen = new Set()
+  return contacts.filter(c => {
+    const key = c.email || c.name
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
+/**
  * Extrahiert Kontaktpersonen aus HTML mit Fokus auf Einkauf & Produktion
  */
 function extractContacts(html: string) {
