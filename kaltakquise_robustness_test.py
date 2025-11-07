@@ -46,16 +46,21 @@ def test_step_1_company_search():
         print(f"Response: {json.dumps(data, indent=2)}")
         
         # Validierung
-        if not isinstance(data, list):
-            print(f"❌ FAILED: Expected array, got {type(data)}")
+        if not data.get('ok'):
+            print(f"❌ FAILED: ok field is not true")
             return None
         
-        if len(data) != 3:
-            print(f"❌ FAILED: Expected 3 companies, got {len(data)}")
+        prospects = data.get('prospects', [])
+        if not isinstance(prospects, list):
+            print(f"❌ FAILED: Expected prospects array, got {type(prospects)}")
+            return None
+        
+        if len(prospects) != 3:
+            print(f"❌ FAILED: Expected 3 companies, got {len(prospects)}")
             return None
         
         # Prüfe erste Firma
-        first_company = data[0]
+        first_company = prospects[0]
         required_fields = ['company_name', 'website', 'industry', 'region', 'status']
         
         for field in required_fields:
