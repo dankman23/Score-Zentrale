@@ -24,10 +24,10 @@ export async function findProspects(options: ProspectorOptions): Promise<Prospec
   const { industry, region, limit = 10 } = options
 
   const apiKey = process.env.GOOGLE_SEARCH_API_KEY
-  const engineId = process.env.GOOGLE_SEARCH_ENGINE_ID
+  const engineId = process.env.GOOGLE_SEARCH_ENGINE_ID || '017576662512468239146:omuauf_lfve' // Default CSE
 
-  if (!apiKey || !engineId) {
-    throw new Error('Google Search API nicht konfiguriert. Bitte GOOGLE_SEARCH_API_KEY und GOOGLE_SEARCH_ENGINE_ID in .env setzen.')
+  if (!apiKey) {
+    throw new Error('Google Search API nicht konfiguriert. Bitte GOOGLE_SEARCH_API_KEY in .env setzen.')
   }
 
   const prospects: ProspectResult[] = []
