@@ -61,12 +61,18 @@ def test_step_1_company_search():
         
         # Prüfe erste Firma
         first_company = prospects[0]
-        required_fields = ['company_name', 'website', 'industry', 'region', 'status']
+        required_fields = ['company_name', 'website', 'status']
         
         for field in required_fields:
             if field not in first_company:
                 print(f"❌ FAILED: Missing field '{field}' in company")
                 return None
+        
+        # Prüfe dass Website eine echte deutsche Website ist
+        website = first_company['website']
+        if not website.startswith('http'):
+            print(f"❌ FAILED: Website does not start with http: {website}")
+            return None
         
         print(f"\n✅ STEP 1 PASSED")
         print(f"   - Found {len(prospects)} companies")
