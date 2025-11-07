@@ -105,20 +105,11 @@ Schreibe eine INDIVIDUALISIERTE Erstkontakt-Email, die sofort Interesse weckt.
 }
 `
 
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4',
-    messages: [
-      { role: 'system', content: 'Du bist ein präziser B2B-Email-Texter. Antworte nur mit validem JSON.' },
-      { role: 'user', content: prompt }
-    ],
-    temperature: 0.7,
-    max_tokens: 600
-  })
-
-  const content = response.choices[0].message.content || '{}'
+  const systemPrompt = 'Du bist ein präziser B2B-Email-Texter. Antworte nur mit validem JSON.'
+  
+  const result = await emergentGetJSON(systemPrompt, prompt, 2)
   
   try {
-    const result = JSON.parse(content)
     
     // Signatur hinzufügen
     const signature = `
