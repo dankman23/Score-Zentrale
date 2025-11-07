@@ -54,104 +54,10 @@ Kontakt:
  * Generiert personalisierte Kaltakquise-Email mit OpenAI
  */
 export async function generateEmail(options: EmailGenerationOptions): Promise<GeneratedEmail> {
-
-  const prompt = `
-Du bist ein erfahrener B2B-Sales-Texter für SCORE Schleifwerkzeuge.
-
-**ÜBER SCORE:**
-- 15 Jahre Erfahrung im Schleifmittel-Vertrieb
-- Kontakte zu ALLEN führenden Herstellern: Klingspor, VSM, Starke, 3M, Bosch und weitere
-- Können ALLE Preise mindestens matchen (oft sogar unterbieten)
-- Komplettes Sortiment deckt JEDEN Bedarf ab
-- Für jedes Oberflächenbearbeitungs-Problem die richtige Lösung
-
-**Portfolio:**
-- Schleifbänder (Edelstahl, Stahl, Holz, NE-Metalle, alle Körnungen)
-- Fächerscheiben & Fiberscheiben
-- Trennscheiben & Schruppscheiben
-- Spezialprodukte für verschiedene Branchen
-
-**ZIELKUNDE:**
-- Firma: ${options.company_name}
-- Branche: ${options.industry}
-${options.contact_person ? `- Ansprechpartner: ${options.contact_person}` : ''}
-- Spezifische Anwendungen: ${options.analysis.needs.join(', ')}
-- Individueller Aufhänger: ${options.analysis.reasoning}
-
-**AUFGABE:**
-Schreibe eine INDIVIDUALISIERTE Erstkontakt-Email, die sofort Interesse weckt.
-
-**STRUKTUR:**
-
-**Erste 2 Sätze (KRITISCH):**
-- Nutze den individuellen Aufhänger
-- Zeige, dass wir uns mit DEREN Firma beschäftigt haben
-- Beispiel: "Wir haben gesehen, dass Sie sich auf Edelstahl-Schweißkonstruktionen spezialisiert haben..."
-- Wecke sofort Interesse und Relevanz
-
-**Hauptteil:**
-1. Kurze Vorstellung SCORE (1-2 Sätze):
-   - 15 Jahre Erfahrung
-   - Kontakte zu allen relevanten Herstellern
-   - Können Preise matchen/unterbieten
-
-2. Konkreter Mehrwert für DEREN Anwendung:
-   - Bezug zu deren spezifischen Produkten/Prozessen
-   - Welche unserer Produkte lösen DEREN Probleme?
-
-3. **USPs hervorheben:**
-   - "Durch unsere Partnerschaften können wir für jeden Bedarf die optimale Lösung bieten"
-   - "Wir kennen die Herausforderungen in Ihrer Branche"
-
-**Call-to-Actions (BEIDE einbauen):**
-1. **Beratungsgespräch:** "Gerne vereinbaren wir einen kurzen Beratungstermin per Telefon (0221-25999901) oder E-Mail"
-2. **Jahresbedarf-Angebot:** "Wenn Sie uns Ihren aktuellen Jahresbedarf mitteilen, erstellen wir Ihnen ein unverbindliches Vergleichsangebot"
-
-**Abschluss:**
-- Freundlich und einladend
-- Niedrigschwellig (keine Verpflichtung)
-
-**WICHTIG:**
-- Länge: 120-160 Wörter (prägnant!)
-- Ton: Professionell aber sympathisch
-- KEIN Werbe-Blabla
-- Fokus: DEREN Nutzen, nicht unsere Features
-- INDIVIDUELL: Jede Email muss zeigen, dass wir die Firma kennen
-
-**Output-Format (JSON):**
-{
-  "subject": "Betreff (max 60 Zeichen, wertorientiert, neugierig machend)",
-  "body": "Email-Text hier (mit Absätzen, OHNE Signatur)",
-  "personalization_score": 0-100
-}
-`
-
-  const systemPrompt = 'Du bist ein präziser B2B-Email-Texter. Antworte nur mit validem JSON.'
+  console.log('[Emailer] Generating email for:', options.company_name)
   
-  const result = await emergentGetJSON(systemPrompt, prompt, 2)
-  
-  try {
-    
-    // Signatur hinzufügen
-    const signature = `
-
-Mit freundlichen Grüßen
-
-Christian Berres
-Score Handels GmbH & Co. KG
-
-Telefon: 0221-25999901
-E-Mail: berres@score-schleifwerkzeuge.de
-Web: www.score-schleifwerkzeuge.de`
-    
-    return {
-      subject: result.subject || 'Anfrage zu Schleifwerkzeugen',
-      body: (result.body || '') + signature,
-      personalization_score: result.personalization_score || 50
-    }
-  } catch (error) {
-    throw new Error('Email-Generierung fehlgeschlagen: Ungültiges JSON-Format')
-  }
+  // FALLBACK: Template-basierte Email (IMMER verfügbar)
+  return generateTemplateEmail(options)
 }
 
 /**
