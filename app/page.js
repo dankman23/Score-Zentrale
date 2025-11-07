@@ -1145,9 +1145,15 @@ export default function App() {
                           </tr>
                           
                           {/* Details Accordion */}
-                          {selectedProspect?.website === p.website && p.analysis && (
+                          {selectedProspect?.website === p.website && (
                             <tr key={`details-${i}`}>
                               <td colSpan="7" className="p-0">
+                                {!p.analysis ? (
+                                  <div className="bg-warning text-dark p-3 text-center">
+                                    <i className="bi bi-exclamation-triangle mr-2"/>
+                                    Keine Analyse-Daten verfügbar. Bitte Firma erneut analysieren.
+                                  </div>
+                                ) : (
                                 <div className="bg-dark border-top border-bottom p-4">
                                   <div className="row">
                                     <div className="col-md-6 mb-3">
