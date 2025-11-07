@@ -32,30 +32,8 @@ export async function POST(request: NextRequest) {
       contactsFound: analysis.contact_persons.length 
     })
 
-    // 2. JTL-Customer-Matching
+    // JTL-Customer-Matching temporarily disabled
     let matchResult = null
-    try {
-      const contactEmails = analysis.contact_persons
-        .map(c => c.email)
-        .filter(e => e) as string[]
-      
-      matchResult = await matchProspectWithJTLCustomer(
-        analysis.company_info.name,
-        website,
-        contactEmails
-      )
-      
-      if (matchResult.is_match) {
-        console.log('[ColdLeads] JTL Customer Match found:', {
-          customer: matchResult.matched_customer_name,
-          confidence: matchResult.match_confidence,
-          type: matchResult.match_type
-        })
-      }
-    } catch (error) {
-      console.error('[ColdLeads] JTL Matching failed (non-critical):', error)
-      // Nicht-kritischer Fehler, weiter machen
-    }
 
     // 3. In MongoDB speichern
     const { db } = await connectToDatabase()
