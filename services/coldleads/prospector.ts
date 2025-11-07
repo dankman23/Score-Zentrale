@@ -24,10 +24,13 @@ export async function findProspects(options: ProspectorOptions): Promise<Prospec
   const { industry, region, limit = 10 } = options
 
   const apiKey = process.env.GOOGLE_SEARCH_API_KEY
-  const engineId = process.env.GOOGLE_SEARCH_ENGINE_ID || '017576662512468239146:omuauf_lfve' // Default CSE
+  const engineId = process.env.GOOGLE_SEARCH_ENGINE_ID
+  const useMockData = !apiKey || !engineId || process.env.USE_MOCK_COLDLEADS === 'true'
 
-  if (!apiKey) {
-    throw new Error('Google Search API nicht konfiguriert. Bitte GOOGLE_SEARCH_API_KEY in .env setzen.')
+  // MOCK-DATEN für Tests (wenn Google API nicht konfiguriert)
+  if (useMockData) {
+    console.log('[Prospector] Using MOCK data (Google API not configured)')
+    return generateMockProspects(industry, region, limit)
   }
 
   const prospects: ProspectResult[] = []
@@ -38,8 +41,8 @@ export async function findProspects(options: ProspectorOptions): Promise<Prospec
   try {
     // Google Custom Search API
     const url = new URL('https://www.googleapis.com/customsearch/v1')
-    url.searchParams.set('key', apiKey)
-    url.searchParams.set('cx', engineId)
+    url.searchParams.set('key', apiKey!)
+    url.searchParams.set('cx', engineId!)
     url.searchParams.set('q', query)
     url.searchParams.set('num', Math.min(limit, 10).toString())
     url.searchParams.set('gl', 'de') // Germany
