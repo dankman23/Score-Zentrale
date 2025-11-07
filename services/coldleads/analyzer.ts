@@ -237,44 +237,71 @@ async function analyzeWithAI(websiteData: any, industry: string): Promise<any> {
   const openai = new OpenAI({ apiKey })
 
   const prompt = `
-Du bist ein B2B-Sales-Analyst für SCORE Schleifwerkzeuge (Hersteller von Schleifbändern, Schleifscheiben, Trennscheiben, etc.).
+Du bist ein B2B-Sales-Analyst für SCORE Schleifwerkzeuge - spezialisiert auf Oberflächenbearbeitung.
 
-Analysiere diese Firma aus der Branche "${industry}":
+**ÜBER SCORE:**
+- 15 Jahre Erfahrung im Schleifmittel-Vertrieb
+- Kontakte zu ALLEN führenden Herstellern: Klingspor, VSM, Starke, 3M, Bosch, etc.
+- Komplettes Portfolio: Schleifbänder, Fächerscheiben, Fiberscheiben, Trennscheiben, Schruppscheiben
+- Für jede Oberflächenbearbeitungs-Anwendung die passende Lösung
 
+**ZIELGRUPPEN (Oberflächenbearbeitung):**
+- Metallbau & Stahlbau (Schweißnahtbearbeitung, Entgraten, Polieren)
+- Edelstahlverarbeitung (Finish, Spiegeloberflächen, Korrosionsschutz)
+- Maschinenbau & Anlagenbau (Bauteile, Komponenten)
+- Automotive (Karosseriebau, Zulieferer)
+- Schlossereien & Metallwerkstätten
+- Holzbearbeitung (Möbelbau, Schreinereien, Tischlereien)
+- Lackierereien (Oberflächenvorbereitung)
+- Fertigungsbetriebe mit Schleifprozessen
+
+**ANALYSIERE DIESE FIRMA:**
+Branche: "${industry}"
 Website-Content: ${websiteData.text_content}
 
-Bitte liefere eine strukturierte Analyse als JSON:
+**AUFGABE:**
+Analysiere ob und warum diese Firma Schleifmittel benötigt. Identifiziere spezifische Anwendungen und Entscheidungspersonen.
 
+**OUTPUT (JSON):**
 {
   "company_info": {
     "name": "Firmenname",
-    "description": "Kurze Beschreibung (max 100 Wörter)",
-    "products": ["Produkt 1", "Produkt 2"],
-    "services": ["Service 1"]
+    "description": "Was macht die Firma? Produkte/Dienstleistungen (max 80 Wörter)",
+    "products": ["Hauptprodukt 1", "Hauptprodukt 2"],
+    "services": ["Hauptservice 1"],
+    "surface_processing_indicators": ["Schweißen", "Polieren", "Schleifen", etc.],
+    "target_materials": ["Edelstahl", "Stahl", "Aluminium", "Holz", etc.]
   },
   "needs_assessment": {
-    "potential_products": ["Schleifbänder für Edelstahl", "Trennscheiben", etc.],
+    "potential_products": ["Schleifbänder K80", "Fächerscheiben 125mm", etc.],
     "estimated_volume": "low|medium|high",
-    "reasoning": "Warum passt diese Firma zu uns?",
-    "score": 0-100
+    "reasoning": "DETAILLIERT: Welche konkreten Schleif-Anwendungen hat die Firma? Warum brauchen sie unsere Produkte? Welche Prozesse verwenden Schleifmittel?",
+    "score": 0-100,
+    "individual_hook": "Spezifischer Aufhänger für Email (z.B. 'spezialisiert auf Edelstahl-Schweißkonstruktionen')"
   }
 }
 
-Scoring-Kriterien:
-- 80-100: Perfekter Match (große Fertigung, viel Metallverarbeitung)
-- 60-79: Guter Lead (mittlere Fertigung)
-- 40-59: Potenzial vorhanden
-- 0-39: Wahrscheinlich nicht relevant
+**SCORING (0-100):**
+- 85-100: TOP-Lead - Kernzielgruppe mit hohem Volumen (Fertigung, viele Mitarbeiter, Schweißen/Schleifen erwähnt)
+- 70-84: Sehr guter Lead - Klare Schleifmittel-Anwendung erkennbar
+- 55-69: Guter Lead - Potenzial vorhanden, Oberflächenbearbeitung wahrscheinlich
+- 40-54: Mittleres Potenzial - Branche passt, Details unklar
+- 0-39: Geringes Potenzial - Kein klarer Bedarf erkennbar
+
+**WICHTIG:**
+- "individual_hook" muss SPEZIFISCH sein (nicht generisch)
+- "reasoning" muss KONKRET auf deren Anwendungen eingehen
+- "surface_processing_indicators" sind Schlüsselwörter von der Website
 `
 
   const response = await openai.chat.completions.create({
     model: 'gpt-4',
     messages: [
-      { role: 'system', content: 'Du bist ein präziser B2B-Analyst. Antworte nur mit validem JSON.' },
+      { role: 'system', content: 'Du bist ein präziser B2B-Analyst für Schleifmittel. Antworte nur mit validem JSON.' },
       { role: 'user', content: prompt }
     ],
     temperature: 0.3,
-    max_tokens: 800
+    max_tokens: 1000
   })
 
   const content = response.choices[0].message.content || '{}'
@@ -288,13 +315,16 @@ Scoring-Kriterien:
         name: 'Unbekannt',
         description: content.slice(0, 200),
         products: [],
-        services: []
+        services: [],
+        surface_processing_indicators: [],
+        target_materials: []
       },
       needs_assessment: {
-        potential_products: [],
+        potential_products: ['Schleifbänder', 'Fächerscheiben'],
         estimated_volume: 'medium',
-        reasoning: 'Analyse konnte nicht vollständig durchgeführt werden',
-        score: 50
+        reasoning: 'Analyse konnte nicht vollständig durchgeführt werden. Branche deutet auf Schleifmittel-Bedarf hin.',
+        score: 50,
+        individual_hook: `Unternehmen aus dem Bereich ${industry}`
       }
     }
   }
