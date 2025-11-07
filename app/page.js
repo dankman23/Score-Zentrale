@@ -1260,8 +1260,8 @@ export default function App() {
             </div>
           )}
 
-          {/* Detail-Ansicht - moderner */}
-          {selectedProspect && selectedProspect.analysis && (
+          {/* Alte Ansichten entfernt - jetzt als Accordions in Tabelle */}
+          {false && selectedProspect && selectedProspect.analysis && (
             <div className="card border-0 shadow-lg mt-4">
               <div className="card-header bg-gradient-info text-white d-flex align-items-center justify-content-between">
                 <div className="d-flex align-items-center">
