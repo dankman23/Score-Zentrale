@@ -1354,8 +1354,8 @@ export default function App() {
             </div>
           )}
 
-          {/* Email-Vorschau - moderner */}
-          {generatedEmail && (
+          {/* Email-Vorschau als Accordion in Tabelle */}
+          {false && generatedEmail && (
             <div className="card border-0 shadow-lg mt-4">
               <div className="card-header bg-gradient-primary text-white d-flex align-items-center justify-content-between">
                 <div className="d-flex align-items-center">
