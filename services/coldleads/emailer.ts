@@ -23,6 +23,34 @@ interface GeneratedEmail {
 }
 
 /**
+ * FALLBACK: Template-basierte Email-Generierung
+ */
+function generateTemplateEmail(options: EmailGenerationOptions): GeneratedEmail {
+  const industryTemplate = getIndustryTemplate(options.industry)
+  
+  const subject = `Schleifwerkzeuge für ${options.company_name} - Kostenvergleich`
+  
+  const body = `Sehr geehrte Damen und Herren${options.contact_person ? `, sehr geehrte/r ${options.contact_person}` : ''},
+
+wir haben gesehen, dass Sie in der ${options.industry}-Branche tätig sind und möchten Ihnen gerne unser Schleifwerkzeug-Sortiment vorstellen.
+
+Als erfahrener Partner mit 15 Jahren Expertise im Schleifmittel-Vertrieb haben wir Kontakte zu allen führenden Herstellern (Klingspor, VSM, Starke, 3M, Bosch) und können für jeden Bedarf die optimale Lösung bieten.
+
+${industryTemplate}
+
+Gerne erstellen wir Ihnen ein unverbindliches Vergleichsangebot für Ihren Jahresbedarf oder vereinbaren einen kurzen Beratungstermin.
+
+Kontakt:
+- Telefon: 0221-25999901
+- E-Mail: berres@score-schleifwerkzeuge.de`
+
+  return {
+    subject,
+    body,
+    personalization_score: 30 // Template hat niedrigere Personalisierung
+  }
+}
+/**
  * Generiert personalisierte Kaltakquise-Email mit OpenAI
  */
 export async function generateEmail(options: EmailGenerationOptions): Promise<GeneratedEmail> {
