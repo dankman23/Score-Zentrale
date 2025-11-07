@@ -103,6 +103,7 @@ export async function GET(request: NextRequest) {
         region: p.region,
         status: p.status,
         score: p.score || null,
+        analysis: p.analysis || null,
         created_at: p.created_at
       }))
     })
