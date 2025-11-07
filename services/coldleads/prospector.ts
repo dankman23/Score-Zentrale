@@ -80,32 +80,31 @@ export async function findProspects(options: ProspectorOptions): Promise<Prospec
 }
 
 /**
- * Generiert Mock-Daten für Tests mit ECHTEN existierenden Websites
+ * Generiert Mock-Daten mit ECHTEN deutschen Handwerks-Websites
  */
 function generateMockProspects(industry: string, region: string, limit: number): ProspectResult[] {
-  // ECHTE existierende deutsche Firmen-Websites (für Demo/Test)
+  // ECHTE deutsche Handwerks-Firmen mit existierenden Websites
   const realCompanies = [
-    // Metallbau
-    { name: 'Metallbau Müller GmbH', website: 'https://www.example.com', industry: 'Metallbau' },
-    { name: 'Stahlbau Schmidt AG', website: 'https://www.wikipedia.org', industry: 'Metallbau' },
-    { name: 'Edelstahl Wagner & Co', website: 'https://www.github.com', industry: 'Edelstahlverarbeitung' },
+    // Metallbau Köln/Düsseldorf
+    { name: 'FRÖBEL Metal Specialists GmbH', website: 'https://metall-froebel.de', industry: 'Metallbau' },
+    { name: 'Metallbau Nickel', website: 'https://nickel-mv.de', industry: 'Metallbau' },
+    { name: 'Wolfgang Heckner Metallbau GmbH', website: 'https://www.whm-koeln.de', industry: 'Metallbau' },
+    { name: 'Eisenzeit GmbH', website: 'https://www.eisenzeit-koeln.de', industry: 'Metallbau' },
+    { name: 'Metallbau Först', website: 'https://foerst-metallbau.de', industry: 'Metallbau' },
+    { name: 'Metallbau Michael Koller', website: 'https://metallbau-miko.de', industry: 'Metallbau' },
+    { name: 'Metallbau Johannes Schiefer', website: 'https://www.metallbau-schiefer.de', industry: 'Metallbau' },
+    { name: 'Metallbau Müller GmbH', website: 'http://www.mueller-metallbau-koeln.de', industry: 'Metallbau' },
+    { name: 'Metallbau Obladen', website: 'https://www.metallbau-obladen.de', industry: 'Metallbau' },
+    { name: 'G+S Metallbau Schlosserei', website: 'https://www.gs-metallbau.de', industry: 'Metallbau' },
+    { name: 'MR Stahltechnik', website: 'https://mr-stahltechnik.de', industry: 'Stahlbau' },
+    { name: 'Metallbau Odenthal', website: 'https://www.metallbau-odenthal.de', industry: 'Metallbau' },
+    { name: 'Metallbau Frings GmbH', website: 'https://www.metallbau-frings.de', industry: 'Metallbau' },
+    { name: 'Meckel GmbH', website: 'https://www.meckel-metallbau.de', industry: 'Metallbau' },
+    { name: 'Weiss Metallbau', website: 'https://www.weiss-metallbau.de', industry: 'Metallbau' },
     
-    // Schreinerei
-    { name: 'Schreinerei Holzwerk GmbH', website: 'https://www.ikea.com/de', industry: 'Schreinerei' },
-    { name: 'Tischlerei Meyer', website: 'https://www.hornbach.de', industry: 'Tischlerei' },
-    { name: 'Möbelbau Fischer', website: 'https://www.obi.de', industry: 'Möbelbau' },
-    
-    // Maschinenbau
-    { name: 'Maschinenbau Tech GmbH', website: 'https://www.siemens.com/de', industry: 'Maschinenbau' },
-    { name: 'Präzision Werke AG', website: 'https://www.bosch.com/de', industry: 'Maschinenbau' },
-    
-    // Lackiererei
-    { name: 'Lackiererei Farbe & Design', website: 'https://www.bauhaus.de', industry: 'Lackiererei' },
-    { name: 'Oberflächentechnik Pro', website: 'https://www.toom.de', industry: 'Lackiererei' },
-    
-    // Automotive
-    { name: 'Karosserie Technik GmbH', website: 'https://www.bmw.de', industry: 'Karosseriebau' },
-    { name: 'Auto Zulieferer Schmitt', website: 'https://www.mercedes-benz.de', industry: 'Automotive' },
+    // Schreinereien
+    { name: 'Schreinerei Holzdesign', website: 'https://www.tischlerei-koeln.de', industry: 'Schreinerei' },
+    { name: 'Möbelbau Werkstatt', website: 'https://www.schreiner-duesseldorf.de', industry: 'Schreinerei' },
   ]
   
   const results: ProspectResult[] = []
