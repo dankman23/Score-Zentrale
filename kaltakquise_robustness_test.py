@@ -8,7 +8,7 @@ import requests
 import json
 import sys
 
-BASE_URL = "https://cautious-elk-tender.emergentagent-apps.com/api"
+BASE_URL = "http://localhost:3000/api"
 
 def print_section(title):
     print(f"\n{'='*80}")
