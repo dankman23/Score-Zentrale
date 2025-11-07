@@ -1104,38 +1104,154 @@ export default function App() {
                     </thead>
                     <tbody>
                       {coldProspects.map((p, i) => (
-                        <tr key={i}>
-                          <td className="align-middle font-weight-bold">{p.company_name || 'Unbekannt'}</td>
-                          <td className="align-middle"><a href={p.website} target="_blank" rel="noopener" className="text-info text-truncate d-inline-block" style={{maxWidth:250}}>{p.website}</a></td>
-                          <td className="align-middle"><span className="badge badge-light">{p.industry}</span></td>
-                          <td className="align-middle">{p.region}</td>
-                          <td className="align-middle text-center">{p.score ? <span className={`badge badge-${p.score>=70?'success':p.score>=50?'info':'secondary'}`}>{p.score}/100</span> : <span className="text-muted">-</span>}</td>
-                          <td className="align-middle text-center">
-                            <span className={`badge badge-${p.status==='new'?'secondary':p.status==='analyzed'?'info':'success'}`} style={{minWidth:90}}>
-                              {p.status==='new'?'🆕 Neu':p.status==='analyzed'?'🔍 Analysiert':'✅ Kontaktiert'}
-                            </span>
-                          </td>
-                          <td className="align-middle text-right">
-                            {p.status === 'new' && (
-                              <button className="btn btn-sm btn-info" onClick={() => analyzeProspect(p)} disabled={coldLoading}>
-                                <i className="bi bi-search mr-1"/>{coldLoading ? 'Lädt...' : 'Analysieren'}
-                              </button>
-                            )}
-                            {p.status === 'analyzed' && (
-                              <>
-                                <button className="btn btn-sm btn-outline-info mr-1" onClick={() => setSelectedProspect(p)} disabled={coldLoading}>
-                                  <i className="bi bi-eye mr-1"/>Details
+                        <>
+                          <tr key={`row-${i}`} style={{cursor: p.status === 'analyzed' ? 'pointer' : 'default'}}>
+                            <td className="align-middle font-weight-bold text-white">{p.company_name || 'Unbekannt'}</td>
+                            <td className="align-middle"><a href={p.website} target="_blank" rel="noopener" className="text-info text-truncate d-inline-block" style={{maxWidth:250}}>{p.website}</a></td>
+                            <td className="align-middle"><span className="badge badge-light">{p.industry}</span></td>
+                            <td className="align-middle text-white">{p.region}</td>
+                            <td className="align-middle text-center">{p.score ? <span className={`badge badge-${p.score>=70?'success':p.score>=50?'info':'secondary'}`}>{p.score}/100</span> : <span className="text-muted">-</span>}</td>
+                            <td className="align-middle text-center">
+                              <span className={`badge badge-${p.status==='new'?'secondary':p.status==='analyzed'?'info':'success'}`} style={{minWidth:90}}>
+                                {p.status==='new'?'🆕 Neu':p.status==='analyzed'?'🔍 Analysiert':'✅ Kontaktiert'}
+                              </span>
+                            </td>
+                            <td className="align-middle text-right">
+                              {p.status === 'new' && (
+                                <button className="btn btn-sm btn-info" onClick={() => analyzeProspect(p)} disabled={coldLoading}>
+                                  <i className="bi bi-search mr-1"/>{coldLoading ? 'Lädt...' : 'Analysieren'}
                                 </button>
-                                <button className="btn btn-sm btn-success" onClick={() => generateColdEmail(p)} disabled={coldLoading}>
-                                  <i className="bi bi-envelope mr-1"/>Email
-                                </button>
-                              </>
-                            )}
-                            {p.status === 'contacted' && (
-                              <span className="badge badge-pill badge-success px-3"><i className="bi bi-check-circle mr-1"/>Versendet</span>
-                            )}
-                          </td>
-                        </tr>
+                              )}
+                              {p.status === 'analyzed' && (
+                                <>
+                                  <button className="btn btn-sm btn-outline-info mr-1" onClick={(e) => { e.stopPropagation(); setSelectedProspect(selectedProspect?.website === p.website ? null : p) }} disabled={coldLoading}>
+                                    <i className={`bi bi-chevron-${selectedProspect?.website === p.website ? 'up' : 'down'} mr-1`}/>Details
+                                  </button>
+                                  <button className="btn btn-sm btn-success" onClick={(e) => { e.stopPropagation(); if (generatedEmail?.website === p.website) { setGeneratedEmail(null) } else { generateColdEmail(p) } }} disabled={coldLoading}>
+                                    <i className={`bi bi-${generatedEmail?.website === p.website ? 'x-circle' : 'envelope'} mr-1`}/>{generatedEmail?.website === p.website ? 'Schließen' : 'Email'}
+                                  </button>
+                                </>
+                              )}
+                              {p.status === 'contacted' && (
+                                <span className="badge badge-pill badge-success px-3"><i className="bi bi-check-circle mr-1"/>Versendet</span>
+                              )}
+                            </td>
+                          </tr>
+                          
+                          {/* Details Accordion */}
+                          {selectedProspect?.website === p.website && selectedProspect.analysis && (
+                            <tr key={`details-${i}`}>
+                              <td colSpan="7" className="p-0">
+                                <div className="bg-dark border-top border-bottom p-4">
+                                  <div className="row">
+                                    <div className="col-md-6 mb-3">
+                                      <div className="p-3 bg-secondary rounded">
+                                        <h6 className="text-primary mb-3"><i className="bi bi-info-circle mr-2"/>Firmen-Info</h6>
+                                        <p className="text-white mb-3">{selectedProspect.analysis.company_info.description}</p>
+                                        {selectedProspect.analysis.company_info.products?.length > 0 && (
+                                          <div>
+                                            <strong className="text-muted small d-block mb-2">Produkte:</strong>
+                                            <div className="d-flex flex-wrap">
+                                              {selectedProspect.analysis.company_info.products.map((prod, idx) => (
+                                                <span key={idx} className="badge badge-light mr-1 mb-1">{prod}</span>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="col-md-6 mb-3">
+                                      <div className="p-3 bg-secondary rounded">
+                                        <h6 className="text-success mb-3"><i className="bi bi-graph-up mr-2"/>Bedarfs-Assessment</h6>
+                                        <div className="mb-3">
+                                          <strong className="text-white mr-2">Score:</strong> 
+                                          <span className={`badge badge-${selectedProspect.score >= 70 ? 'success' : selectedProspect.score >= 50 ? 'info' : 'secondary'} px-3 py-2`}>
+                                            {selectedProspect.score}/100
+                                          </span>
+                                        </div>
+                                        <p className="text-white mb-3">{selectedProspect.analysis.needs_assessment.reasoning}</p>
+                                        {selectedProspect.analysis.needs_assessment.potential_products?.length > 0 && (
+                                          <div>
+                                            <strong className="text-muted small d-block mb-2">Potenzielle Produkte:</strong>
+                                            <div className="d-flex flex-wrap">
+                                              {selectedProspect.analysis.needs_assessment.potential_products.map((prod, idx) => (
+                                                <span key={idx} className="badge badge-success mr-1 mb-1">{prod}</span>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  {selectedProspect.analysis.contact_persons?.length > 0 && (
+                                    <div className="mt-3">
+                                      <h6 className="text-warning mb-3"><i className="bi bi-people-fill mr-2"/>Ansprechpartner</h6>
+                                      <div className="row">
+                                        {selectedProspect.analysis.contact_persons.map((c, idx) => (
+                                          <div key={idx} className="col-md-6 mb-2">
+                                            <div className="card bg-secondary border-0">
+                                              <div className="card-body p-3">
+                                                <div className="d-flex align-items-start">
+                                                  <div className="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center mr-3" style={{width:40, height:40}}>
+                                                    <i className="bi bi-person-fill"/>
+                                                  </div>
+                                                  <div>
+                                                    <h6 className="mb-1 text-white">{c.name}</h6>
+                                                    <p className="text-muted small mb-1">{c.title}</p>
+                                                    {c.email && <p className="mb-0 small text-white"><i className="bi bi-envelope mr-1"/>{c.email}</p>}
+                                                    {c.phone && <p className="mb-0 small text-white"><i className="bi bi-telephone mr-1"/>{c.phone}</p>}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                          
+                          {/* Email Accordion */}
+                          {generatedEmail?.website === p.website && (
+                            <tr key={`email-${i}`}>
+                              <td colSpan="7" className="p-0">
+                                <div className="bg-gradient-primary text-white p-4">
+                                  <div className="d-flex align-items-center justify-content-between mb-3">
+                                    <div className="d-flex align-items-center">
+                                      <i className="bi bi-envelope-fill mr-2" style={{fontSize:'1.5rem'}}/>
+                                      <h5 className="mb-0">Generierte Email</h5>
+                                    </div>
+                                  </div>
+                                  <div className="alert alert-light mb-3">
+                                    <strong>Empfänger:</strong> {generatedEmail.recipient}
+                                  </div>
+                                  <div className="mb-3">
+                                    <label className="font-weight-bold small mb-2">BETREFF:</label>
+                                    <div className="p-3 bg-white text-dark rounded">
+                                      <strong>{generatedEmail.subject}</strong>
+                                    </div>
+                                  </div>
+                                  <div className="mb-3">
+                                    <label className="font-weight-bold small mb-2">NACHRICHT:</label>
+                                    <div className="p-3 bg-white text-dark rounded" style={{whiteSpace:'pre-wrap', maxHeight:400, overflowY:'auto'}}>
+                                      {generatedEmail.body}
+                                    </div>
+                                  </div>
+                                  <div className="d-flex justify-content-end">
+                                    <button className="btn btn-success btn-lg" onClick={sendColdEmail} disabled={coldLoading}>
+                                      {coldLoading ? <><span className="spinner-border spinner-border-sm mr-2"/>Wird versendet...</> : <><i className="bi bi-send-fill mr-2"/>Jetzt versenden</>}
+                                    </button>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </>
                       ))}
                     </tbody>
                   </table>
