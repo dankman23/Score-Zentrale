@@ -37,44 +37,70 @@ export async function generateEmail(options: EmailGenerationOptions): Promise<Ge
   const prompt = `
 Du bist ein erfahrener B2B-Sales-Texter für SCORE Schleifwerkzeuge.
 
-**Über uns:**
-SCORE Schleifwerkzeuge ist ein führender Anbieter von professionellen Schleif- und Trennwerkzeugen für industrielle Anwendungen. 
-Unser Portfolio umfasst:
-- Schleifbänder (für Edelstahl, Stahl, Holz, NE-Metalle)
-- Fiberscheiben & Fächerscheiben
+**ÜBER SCORE:**
+- 15 Jahre Erfahrung im Schleifmittel-Vertrieb
+- Kontakte zu ALLEN führenden Herstellern: Klingspor, VSM, Starke, 3M, Bosch und weitere
+- Können ALLE Preise mindestens matchen (oft sogar unterbieten)
+- Komplettes Sortiment deckt JEDEN Bedarf ab
+- Für jedes Oberflächenbearbeitungs-Problem die richtige Lösung
+
+**Portfolio:**
+- Schleifbänder (Edelstahl, Stahl, Holz, NE-Metalle, alle Körnungen)
+- Fächerscheiben & Fiberscheiben
 - Trennscheiben & Schruppscheiben
 - Spezialprodukte für verschiedene Branchen
 
-**Zielkunde:**
+**ZIELKUNDE:**
 - Firma: ${options.company_name}
 - Branche: ${options.industry}
 ${options.contact_person ? `- Ansprechpartner: ${options.contact_person}` : ''}
-- Potenzielle Bedarfe: ${options.analysis.needs.join(', ')}
-- Warum relevant: ${options.analysis.reasoning}
+- Spezifische Anwendungen: ${options.analysis.needs.join(', ')}
+- Individueller Aufhänger: ${options.analysis.reasoning}
 
-**Aufgabe:**
-Erstelle eine professionelle, aber nicht zu förmliche B2B-Erstkontakt-Email.
+**AUFGABE:**
+Schreibe eine INDIVIDUALISIERTE Erstkontakt-Email, die sofort Interesse weckt.
 
-**Anforderungen:**
-- Länge: 150-200 Wörter
-- Tonalität: Professionell, aber persönlich
-- Betreff: Prägnant und wertorientiert
-- Inhalt:
-  1. Kurze persönliche Ansprache (${options.contact_person ? 'mit Namen' : 'allgemein'})
-  2. Konkrete Verbindung zu deren Branche/Bedarf
-  3. Unser Mehrwert (spezifisch für deren Anwendung)
-  4. WICHTIG: Biete eine kostenlose Beratung per E-Mail oder Telefon (0221-25999901) an
-  5. WICHTIG: Erwähne, dass wir bei Interesse gerne ein Angebot für den Jahresbedarf der gefundenen Artikel erstellen
-  6. Klarer Call-to-Action (Telefonat/Meeting anbieten)
-  7. Freundlicher Abschluss
-- KEINE generischen Phrasen
-- KEINE übertriebenen Versprechen
-- Fokus auf konkreten Nutzen
+**STRUKTUR:**
 
-**Output-Format:**
+**Erste 2 Sätze (KRITISCH):**
+- Nutze den individuellen Aufhänger
+- Zeige, dass wir uns mit DEREN Firma beschäftigt haben
+- Beispiel: "Wir haben gesehen, dass Sie sich auf Edelstahl-Schweißkonstruktionen spezialisiert haben..."
+- Wecke sofort Interesse und Relevanz
+
+**Hauptteil:**
+1. Kurze Vorstellung SCORE (1-2 Sätze):
+   - 15 Jahre Erfahrung
+   - Kontakte zu allen relevanten Herstellern
+   - Können Preise matchen/unterbieten
+
+2. Konkreter Mehrwert für DEREN Anwendung:
+   - Bezug zu deren spezifischen Produkten/Prozessen
+   - Welche unserer Produkte lösen DEREN Probleme?
+
+3. **USPs hervorheben:**
+   - "Durch unsere Partnerschaften können wir für jeden Bedarf die optimale Lösung bieten"
+   - "Wir kennen die Herausforderungen in Ihrer Branche"
+
+**Call-to-Actions (BEIDE einbauen):**
+1. **Beratungsgespräch:** "Gerne vereinbaren wir einen kurzen Beratungstermin per Telefon (0221-25999901) oder E-Mail"
+2. **Jahresbedarf-Angebot:** "Wenn Sie uns Ihren aktuellen Jahresbedarf mitteilen, erstellen wir Ihnen ein unverbindliches Vergleichsangebot"
+
+**Abschluss:**
+- Freundlich und einladend
+- Niedrigschwellig (keine Verpflichtung)
+
+**WICHTIG:**
+- Länge: 120-160 Wörter (prägnant!)
+- Ton: Professionell aber sympathisch
+- KEIN Werbe-Blabla
+- Fokus: DEREN Nutzen, nicht unsere Features
+- INDIVIDUELL: Jede Email muss zeigen, dass wir die Firma kennen
+
+**Output-Format (JSON):**
 {
-  "subject": "Betreff hier",
-  "body": "Email-Text hier (mit Absätzen, OHNE Signatur - die wird automatisch hinzugefügt)",
+  "subject": "Betreff (max 60 Zeichen, wertorientiert, neugierig machend)",
+  "body": "Email-Text hier (mit Absätzen, OHNE Signatur)",
   "personalization_score": 0-100
 }
 `
