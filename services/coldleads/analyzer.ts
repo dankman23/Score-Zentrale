@@ -170,7 +170,7 @@ function findImpressumPage(html: string, baseUrl: string): string | null {
 }
 
 /**
- * Extrahiert Kontaktpersonen aus HTML
+ * Extrahiert Kontaktpersonen aus HTML mit Fokus auf Einkauf & Produktion
  */
 function extractContacts(html: string) {
   const $ = cheerio.load(html)
@@ -178,37 +178,115 @@ function extractContacts(html: string) {
 
   // Suche nach typischen Mustern
   const text = $('body').text()
+  const lowerText = text.toLowerCase()
 
   // Email-Adressen
   const emails = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || []
+  
+  // Telefonnummern (verbessertes Pattern)
+  const phones = text.match(/(\+49|0)\s*\(?\d{2,5}\)?[\s\-\/]*\d{3,}[\s\-]*\d*/g) || []
 
-  // Telefonnummern
-  const phones = text.match(/(\+49|0)\s*\d{2,5}[\s\-\/]*\d{3,}/g) || []
-
-  // Namen mit Titeln (einfaches Pattern)
-  const namePattern = /(Herr|Frau|Hr\.|Fr\.)\s+([A-ZÄÖÜ][a-zäöüß]+\s+[A-ZÄÖÜ][a-zäöüß]+)/g
-  const nameMatches = [...text.matchAll(namePattern)]
-
-  for (const match of nameMatches) {
-    contacts.push({
-      name: match[2],
-      title: '', // Wird von AI ergänzt
-      email: emails[0] || null, // Erste Email als Fallback
-      phone: phones[0] || null
-    })
+  // PRIORITY 1: Einkauf (Material)
+  const einkaufPatterns = [
+    /einkauf[^\n]{0,100}?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi,
+    /material.*einkauf[^\n]{0,100}?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi,
+    /beschaffung[^\n]{0,100}?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi
+  ]
+  
+  for (const pattern of einkaufPatterns) {
+    const matches = [...text.matchAll(pattern)]
+    for (const match of matches) {
+      if (match[1]) {
+        contacts.push({
+          name: 'Einkauf Material',
+          title: 'Einkaufsleitung Material',
+          department: 'Einkauf',
+          email: match[1],
+          phone: phones[0] || null,
+          priority: 1
+        })
+        break
+      }
+    }
   }
 
-  // Wenn keine Namen gefunden: Generic Contact
-  if (contacts.length === 0 && emails.length > 0) {
-    contacts.push({
-      name: 'Vertrieb',
-      title: 'Vertriebsleitung',
-      email: emails[0],
-      phone: phones[0] || null
-    })
+  // PRIORITY 2: Produktion
+  const produktionPatterns = [
+    /produktion[^\n]{0,100}?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi,
+    /fertigungs?leitung[^\n]{0,100}?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi,
+    /betriebsleiter[^\n]{0,100}?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi
+  ]
+  
+  for (const pattern of produktionPatterns) {
+    const matches = [...text.matchAll(pattern)]
+    for (const match of matches) {
+      if (match[1]) {
+        contacts.push({
+          name: 'Produktionsleitung',
+          title: 'Produktionsleiter',
+          department: 'Produktion',
+          email: match[1],
+          phone: phones[1] || phones[0] || null,
+          priority: 2
+        })
+        break
+      }
+    }
   }
 
-  return contacts.slice(0, 3) // Max 3 Kontakte
+  // Namen mit Titeln und Rollen
+  const rolePatterns = [
+    /(Herr|Frau|Hr\.|Fr\.)\s+([A-ZÄÖÜ][a-zäöüß]+\s+[A-ZÄÖÜ][a-zäöüß-]+)[^\n]{0,50}?(Einkauf|Produktion|Fertigung|Geschäftsführung)/gi,
+    /([A-ZÄÖÜ][a-zäöüß]+\s+[A-ZÄÖÜ][a-zäöüß-]+)[,\s]+(Einkaufs?leiter|Produktions?leiter|Fertigungs?leiter)/gi
+  ]
+
+  for (const pattern of rolePatterns) {
+    const matches = [...text.matchAll(pattern)]
+    for (const match of matches) {
+      const name = match[2] || match[1]
+      const role = match[3] || match[2]
+      
+      contacts.push({
+        name: name,
+        title: role,
+        department: role.toLowerCase().includes('einkauf') ? 'Einkauf' : 'Produktion',
+        email: emails[contacts.length] || emails[0] || null,
+        phone: phones[contacts.length] || phones[0] || null,
+        priority: role.toLowerCase().includes('einkauf') ? 1 : 2
+      })
+    }
+  }
+
+  // Wenn keine spezifischen Kontakte gefunden: Fallback
+  if (contacts.length === 0) {
+    // Einkauf als Fallback
+    if (lowerText.includes('einkauf') && emails.length > 0) {
+      contacts.push({
+        name: 'Einkauf',
+        title: 'Einkaufsabteilung',
+        department: 'Einkauf',
+        email: emails[0],
+        phone: phones[0] || null,
+        priority: 1
+      })
+    }
+    // Generic Vertrieb
+    if (contacts.length === 0 && emails.length > 0) {
+      contacts.push({
+        name: 'Vertrieb',
+        title: 'Vertriebsleitung',
+        department: 'Vertrieb',
+        email: emails[0],
+        phone: phones[0] || null,
+        priority: 3
+      })
+    }
+  }
+
+  // Nach Priorität sortieren und deduplizieren
+  return deduplicateContacts(contacts)
+    .sort((a, b) => (a.priority || 3) - (b.priority || 3))
+    .slice(0, 5) // Max 5 Kontakte
 }
 
 /**
