@@ -1154,9 +1154,19 @@ export default function App() {
                             <tr key={`details-${i}`}>
                               <td colSpan="7" className="p-0">
                                 {!p.analysis ? (
-                                  <div className="bg-warning text-dark p-3 text-center">
-                                    <i className="bi bi-exclamation-triangle mr-2"/>
-                                    Keine Analyse-Daten verfügbar. Bitte Firma erneut analysieren.
+                                  <div className="bg-warning text-dark p-4">
+                                    <div className="d-flex align-items-center justify-content-between">
+                                      <div className="d-flex align-items-center">
+                                        <i className="bi bi-exclamation-triangle mr-3" style={{fontSize:'2rem'}}/>
+                                        <div>
+                                          <h6 className="mb-1">Keine Analyse-Daten verfügbar</h6>
+                                          <p className="mb-0 small">Die Analyse konnte nicht vollständig durchgeführt werden oder wurde noch nicht gespeichert.</p>
+                                        </div>
+                                      </div>
+                                      <button className="btn btn-dark btn-sm" onClick={() => { setSelectedProspect(null); analyzeProspect(p) }} disabled={coldLoading}>
+                                        <i className="bi bi-arrow-repeat mr-2"/>Jetzt analysieren
+                                      </button>
+                                    </div>
                                   </div>
                                 ) : (
                                 <div className="bg-dark border-top border-bottom p-4">
