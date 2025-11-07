@@ -1010,7 +1010,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Suchformular - moderner */}
+          {/* Suchformular - mit Dropdowns */}
           <div className="card border-0 shadow-sm mb-4">
             <div className="card-body">
               <div className="d-flex align-items-center mb-3">
@@ -1023,21 +1023,112 @@ export default function App() {
               <div className="row">
                 <div className="col-md-4 mb-2">
                   <label className="small text-muted mb-1">Branche *</label>
-                  <input 
+                  <select 
                     className="form-control" 
-                    placeholder="z.B. Metallbau, Holzbearbeitung" 
                     value={coldSearchForm.industry}
                     onChange={e => setColdSearchForm({...coldSearchForm, industry: e.target.value})}
-                  />
+                  >
+                    <option value="">-- Branche wählen --</option>
+                    <optgroup label="🔩 Metallverarbeitung">
+                      <option value="Metallbau">🔩 Metallbau</option>
+                      <option value="Stahlbau">🏭 Stahlbau</option>
+                      <option value="Edelstahlverarbeitung">✨ Edelstahlverarbeitung</option>
+                      <option value="Maschinenbau">⚙️ Maschinenbau</option>
+                      <option value="Anlagenbau">🏭 Anlagenbau</option>
+                      <option value="Schlosserei">🔑 Schlosserei</option>
+                      <option value="Schweißtechnik">🔥 Schweißtechnik</option>
+                    </optgroup>
+                    <optgroup label="🚗 Automotive">
+                      <option value="Karosseriebau">🚗 Karosseriebau</option>
+                      <option value="Automotive Zulieferer">🚙 Automotive Zulieferer</option>
+                    </optgroup>
+                    <optgroup label="🪵 Holzverarbeitung">
+                      <option value="Schreinerei">🪵 Schreinerei</option>
+                      <option value="Tischlerei">🪵 Tischlerei</option>
+                      <option value="Möbelbau">🛋️ Möbelbau</option>
+                      <option value="Holzbearbeitung">🌲 Holzbearbeitung</option>
+                    </optgroup>
+                    <optgroup label="✨ Oberflächenbearbeitung">
+                      <option value="Lackiererei">🎨 Lackiererei</option>
+                      <option value="Oberflächentechnik">✨ Oberflächentechnik</option>
+                      <option value="Schleiferei">🔩 Schleiferei</option>
+                      <option value="Poliererei">✨ Poliererei</option>
+                    </optgroup>
+                    <optgroup label="🏭 Fertigung">
+                      <option value="Fertigungsbetrieb">🏭 Fertigungsbetrieb</option>
+                      <option value="Industriebetrieb">🏭 Industriebetrieb</option>
+                      <option value="Werkstatt">🔧 Werkstatt</option>
+                    </optgroup>
+                  </select>
                 </div>
                 <div className="col-md-4 mb-2">
                   <label className="small text-muted mb-1">Region *</label>
-                  <input 
+                  <select 
                     className="form-control" 
-                    placeholder="z.B. Berlin, München, Hamburg" 
                     value={coldSearchForm.region}
                     onChange={e => setColdSearchForm({...coldSearchForm, region: e.target.value})}
-                  />
+                  >
+                    <option value="">-- Region wählen --</option>
+                    <optgroup label="📍 Bundesländer">
+                      <option value="Baden-Württemberg">Baden-Württemberg</option>
+                      <option value="Bayern">Bayern</option>
+                      <option value="Berlin">Berlin</option>
+                      <option value="Brandenburg">Brandenburg</option>
+                      <option value="Bremen">Bremen</option>
+                      <option value="Hamburg">Hamburg</option>
+                      <option value="Hessen">Hessen</option>
+                      <option value="Niedersachsen">Niedersachsen</option>
+                      <option value="Nordrhein-Westfalen">Nordrhein-Westfalen</option>
+                      <option value="Rheinland-Pfalz">Rheinland-Pfalz</option>
+                      <option value="Saarland">Saarland</option>
+                      <option value="Sachsen">Sachsen</option>
+                      <option value="Schleswig-Holstein">Schleswig-Holstein</option>
+                      <option value="Thüringen">Thüringen</option>
+                    </optgroup>
+                    <optgroup label="🏛️ NRW - Top Städte">
+                      <option value="Köln">Köln</option>
+                      <option value="Düsseldorf">Düsseldorf</option>
+                      <option value="Dortmund">Dortmund</option>
+                      <option value="Essen">Essen</option>
+                      <option value="Duisburg">Duisburg</option>
+                      <option value="Bochum">Bochum</option>
+                      <option value="Wuppertal">Wuppertal</option>
+                      <option value="Bielefeld">Bielefeld</option>
+                      <option value="Bonn">Bonn</option>
+                      <option value="Münster">Münster</option>
+                    </optgroup>
+                    <optgroup label="🏛️ Bayern - Top Städte">
+                      <option value="München">München</option>
+                      <option value="Nürnberg">Nürnberg</option>
+                      <option value="Augsburg">Augsburg</option>
+                      <option value="Regensburg">Regensburg</option>
+                      <option value="Ingolstadt">Ingolstadt</option>
+                      <option value="Würzburg">Würzburg</option>
+                      <option value="Fürth">Fürth</option>
+                      <option value="Erlangen">Erlangen</option>
+                      <option value="Bayreuth">Bayreuth</option>
+                      <option value="Bamberg">Bamberg</option>
+                    </optgroup>
+                    <optgroup label="🏛️ BW - Top Städte">
+                      <option value="Stuttgart">Stuttgart</option>
+                      <option value="Mannheim">Mannheim</option>
+                      <option value="Karlsruhe">Karlsruhe</option>
+                      <option value="Freiburg">Freiburg</option>
+                      <option value="Heidelberg">Heidelberg</option>
+                      <option value="Ulm">Ulm</option>
+                      <option value="Heilbronn">Heilbronn</option>
+                      <option value="Pforzheim">Pforzheim</option>
+                      <option value="Reutlingen">Reutlingen</option>
+                      <option value="Esslingen">Esslingen</option>
+                    </optgroup>
+                    <optgroup label="🏛️ Weitere Top-Städte">
+                      <option value="Frankfurt am Main">Frankfurt am Main</option>
+                      <option value="Leipzig">Leipzig</option>
+                      <option value="Dresden">Dresden</option>
+                      <option value="Hannover">Hannover</option>
+                      <option value="Bremen">Bremen</option>
+                    </optgroup>
+                  </select>
                 </div>
                 <div className="col-md-2 mb-2">
                   <label className="small text-muted mb-1">Anzahl</label>
