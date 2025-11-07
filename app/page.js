@@ -1141,7 +1141,7 @@ export default function App() {
                           </tr>
                           
                           {/* Details Accordion */}
-                          {selectedProspect?.website === p.website && selectedProspect.analysis && (
+                          {selectedProspect?.website === p.website && p.analysis && (
                             <tr key={`details-${i}`}>
                               <td colSpan="7" className="p-0">
                                 <div className="bg-dark border-top border-bottom p-4">
