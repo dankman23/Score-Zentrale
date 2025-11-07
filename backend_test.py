@@ -10,8 +10,8 @@ import time
 import os
 from datetime import datetime
 
-# Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://cautious-elk-tender.emergentagent-apps.com')
+# Get base URL - use internal localhost since we're inside the container
+BASE_URL = "http://localhost:3000"
 API_BASE = f"{BASE_URL}/api"
 
 def log_test(step, message):
