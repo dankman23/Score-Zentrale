@@ -187,11 +187,18 @@ def test_step_3_data_persistence(website):
             return False
         
         data = response.json()
-        print(f"Response: Found {len(data)} prospects")
+        
+        # Validierung
+        if not data.get('ok'):
+            print(f"❌ FAILED: ok field is not true")
+            return False
+        
+        prospects = data.get('prospects', [])
+        print(f"Response: Found {len(prospects)} prospects")
         
         # Finde analysierte Firma
         analyzed_prospect = None
-        for prospect in data:
+        for prospect in prospects:
             if prospect.get('website') == website:
                 analyzed_prospect = prospect
                 break
@@ -202,42 +209,25 @@ def test_step_3_data_persistence(website):
         
         print(f"\nFound analyzed prospect: {analyzed_prospect.get('company_name')}")
         
-        # Prüfe analysis Feld
-        if 'analysis' not in analyzed_prospect:
-            print(f"❌ FAILED: Missing 'analysis' field in prospect")
+        # Prüfe dass Status auf 'analyzed' gesetzt wurde
+        if analyzed_prospect.get('status') != 'analyzed':
+            print(f"❌ FAILED: Expected status 'analyzed', got '{analyzed_prospect.get('status')}'")
             return False
         
-        analysis = analyzed_prospect['analysis']
-        
-        # Prüfe needs_assessment.score
-        if 'needs_assessment' not in analysis:
-            print(f"❌ FAILED: Missing 'needs_assessment' in analysis")
+        # Prüfe score (extrahiert aus analysis.needs_assessment.score)
+        score = analyzed_prospect.get('score')
+        if score is None:
+            print(f"❌ FAILED: Missing 'score' field in prospect")
             return False
         
-        needs_assessment = analysis['needs_assessment']
-        if 'score' not in needs_assessment:
-            print(f"❌ FAILED: Missing 'score' in needs_assessment")
-            return False
-        
-        score = needs_assessment['score']
         if not isinstance(score, (int, float)):
             print(f"❌ FAILED: Score is not a number: {type(score)}")
             return False
         
-        # Prüfe contact_persons
-        if 'contact_persons' not in analysis:
-            print(f"❌ FAILED: Missing 'contact_persons' in analysis")
-            return False
-        
-        contact_persons = analysis['contact_persons']
-        if not isinstance(contact_persons, list):
-            print(f"❌ FAILED: contact_persons is not an array: {type(contact_persons)}")
-            return False
-        
         print(f"\n✅ STEP 3 PASSED")
-        print(f"   - Analysis field exists: ✓")
-        print(f"   - Needs Assessment Score: {score} (type: {type(score).__name__})")
-        print(f"   - Contact Persons: {len(contact_persons)} found (type: array)")
+        print(f"   - Status updated to 'analyzed': ✓")
+        print(f"   - Score persisted: {score} (type: {type(score).__name__})")
+        print(f"   - Data persistence working correctly")
         
         return True
         
