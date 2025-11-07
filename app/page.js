@@ -1133,6 +1133,11 @@ export default function App() {
                                   }} disabled={coldLoading}>
                                     <i className={`bi bi-chevron-${selectedProspect?.website === p.website ? 'up' : 'down'} mr-1`}/>Details
                                   </button>
+                                  {!p.analysis && (
+                                    <button className="btn btn-sm btn-warning mr-1" onClick={() => analyzeProspect(p)} disabled={coldLoading}>
+                                      <i className="bi bi-arrow-repeat mr-1"/>Erneut
+                                    </button>
+                                  )}
                                   <button className="btn btn-sm btn-success" onClick={(e) => { e.stopPropagation(); if (generatedEmail?.website === p.website) { setGeneratedEmail(null) } else { generateColdEmail(p) } }} disabled={coldLoading}>
                                     <i className={`bi bi-${generatedEmail?.website === p.website ? 'x-circle' : 'envelope'} mr-1`}/>{generatedEmail?.website === p.website ? 'Schließen' : 'Email'}
                                   </button>
