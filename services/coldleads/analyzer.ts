@@ -379,29 +379,10 @@ Analysiere ob und warum diese Firma Schleifmittel benötigt. Identifiziere spezi
 `
 
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        { role: 'system', content: 'Du bist ein präziser B2B-Analyst für Schleifmittel. Antworte nur mit validem JSON.' },
-        { role: 'user', content: prompt }
-      ],
-      temperature: 0.3,
-      max_tokens: 1000
-    })
-
-    const content = response.choices[0].message.content || '{}'
-    
-    try {
-      return JSON.parse(content)
-    } catch {
-      throw new Error('Invalid JSON response from AI')
-    }
+    const result = await emergentGetJSON(systemPrompt, userPrompt, retries)
+    return result
   } catch (error: any) {
-    if (retries > 0) {
-      console.log(`[Analyzer] Retrying AI analysis... (${retries} attempts left)`)
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      return analyzeWithAI(websiteData, industry, retries - 1)
-    }
+    console.error('[Analyzer] Emergent LLM failed:', error)
     throw error
   }
 }
