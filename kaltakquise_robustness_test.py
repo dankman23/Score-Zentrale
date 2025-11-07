@@ -125,14 +125,21 @@ def test_step_2_analyze_company(website):
             print(f"❌ FAILED: Missing 'analysis' field")
             return False
         
-        # Prüfe analysis.score
-        if 'score' not in analysis:
-            print(f"❌ FAILED: Missing 'score' in analysis")
+        # Prüfe needs_assessment
+        if 'needs_assessment' not in analysis:
+            print(f"❌ FAILED: Missing 'needs_assessment' in analysis")
             return False
         
-        score = analysis['score']
-        if not isinstance(score, (int, float)) or score < 40 or score > 100:
-            print(f"❌ FAILED: Score {score} not in range 40-100")
+        needs_assessment = analysis['needs_assessment']
+        
+        # Prüfe score in needs_assessment
+        if 'score' not in needs_assessment:
+            print(f"❌ FAILED: Missing 'score' in needs_assessment")
+            return False
+        
+        score = needs_assessment['score']
+        if not isinstance(score, (int, float)) or score < 0 or score > 100:
+            print(f"❌ FAILED: Score {score} not in range 0-100")
             return False
         
         # Prüfe company_info
