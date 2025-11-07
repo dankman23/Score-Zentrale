@@ -320,18 +320,12 @@ function extractContacts(html: string) {
 }
 
 /**
- * Analysiert mit OpenAI (mit Retry)
+ * Analysiert mit Emergent LLM (GPT-4)
  */
 async function analyzeWithAI(websiteData: any, industry: string, retries = 2): Promise<any> {
-  const apiKey = process.env.OPENAI_API_KEY
-
-  if (!apiKey) {
-    throw new Error('OPENAI_API_KEY nicht konfiguriert')
-  }
-
-  const openai = new OpenAI({ apiKey })
-
-  const prompt = `
+  const systemPrompt = 'Du bist ein präziser B2B-Analyst für Schleifmittel. Antworte nur mit validem JSON.'
+  
+  const userPrompt = `
 Du bist ein B2B-Sales-Analyst für SCORE Schleifwerkzeuge - spezialisiert auf Oberflächenbearbeitung.
 
 **ÜBER SCORE:**
