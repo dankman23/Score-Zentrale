@@ -4,7 +4,7 @@
  */
 
 import * as cheerio from 'cheerio'
-import OpenAI from 'openai'
+import { emergentGetJSON } from '../../lib/emergent-llm'
 
 interface AnalysisResult {
   company_info: {
