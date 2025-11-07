@@ -80,6 +80,37 @@ export async function findProspects(options: ProspectorOptions): Promise<Prospec
 }
 
 /**
+ * Generiert Mock-Daten für Tests
+ */
+function generateMockProspects(industry: string, region: string, limit: number): ProspectResult[] {
+  const mockCompanies = [
+    { prefix: 'Metallbau', websites: ['mustermann-metallbau.de', 'schmidt-stahl.de', 'wagner-edelstahl.com', 'becker-metallbau.de', 'mueller-stahlbau.de'] },
+    { prefix: 'Schreinerei', websites: ['holz-meister.de', 'tischlerei-weber.de', 'schreinerei-hoffmann.com', 'moebel-fischer.de'] },
+    { prefix: 'Lackiererei', websites: ['lack-profi.de', 'oberflaechen-technik.de', 'farbe-design.com'] },
+    { prefix: 'Maschinenbau', websites: ['maschinenbau-gmbh.de', 'industrie-technik.de', 'praezision-werke.com'] }
+  ]
+  
+  const results: ProspectResult[] = []
+  const baseNames = ['GmbH', 'AG', '& Co. KG', 'Betrieb']
+  
+  for (let i = 0; i < Math.min(limit, 10); i++) {
+    const companyType = mockCompanies[Math.floor(Math.random() * mockCompanies.length)]
+    const website = companyType.websites[i % companyType.websites.length]
+    const companyName = `${companyType.prefix} ${region} ${baseNames[i % baseNames.length]}`
+    
+    results.push({
+      company_name: companyName,
+      website: `https://${website}`,
+      snippet: `Professionelle ${industry} in ${region}. Langjährige Erfahrung, modernste Ausstattung. Kontaktieren Sie uns für ein Angebot.`,
+      location: region,
+      source: 'google_search'
+    })
+  }
+  
+  return results
+}
+
+/**
  * Extrahiert Firmennamen aus Google-Titel
  */
 function extractCompanyName(title: string): string {
