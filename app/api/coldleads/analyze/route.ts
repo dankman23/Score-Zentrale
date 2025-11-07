@@ -4,7 +4,6 @@ export const maxDuration = 60
 
 import { NextRequest, NextResponse } from 'next/server'
 import { analyzeCompany } from '../../../../services/coldleads/analyzer'
-import { matchProspectWithJTLCustomer } from '../../../../services/coldleads/customer-matcher'
 import { connectToDatabase } from '../../../lib/api'
 
 /**
