@@ -1149,12 +1149,12 @@ export default function App() {
                                     <div className="col-md-6 mb-3">
                                       <div className="p-3 bg-secondary rounded">
                                         <h6 className="text-primary mb-3"><i className="bi bi-info-circle mr-2"/>Firmen-Info</h6>
-                                        <p className="text-white mb-3">{selectedProspect.analysis.company_info.description}</p>
-                                        {selectedProspect.analysis.company_info.products?.length > 0 && (
+                                        <p className="text-white mb-3">{p.analysis.company_info.description}</p>
+                                        {p.analysis.company_info.products?.length > 0 && (
                                           <div>
                                             <strong className="text-muted small d-block mb-2">Produkte:</strong>
                                             <div className="d-flex flex-wrap">
-                                              {selectedProspect.analysis.company_info.products.map((prod, idx) => (
+                                              {p.analysis.company_info.products.map((prod, idx) => (
                                                 <span key={idx} className="badge badge-light mr-1 mb-1">{prod}</span>
                                               ))}
                                             </div>
@@ -1168,16 +1168,16 @@ export default function App() {
                                         <h6 className="text-success mb-3"><i className="bi bi-graph-up mr-2"/>Bedarfs-Assessment</h6>
                                         <div className="mb-3">
                                           <strong className="text-white mr-2">Score:</strong> 
-                                          <span className={`badge badge-${selectedProspect.score >= 70 ? 'success' : selectedProspect.score >= 50 ? 'info' : 'secondary'} px-3 py-2`}>
-                                            {selectedProspect.score}/100
+                                          <span className={`badge badge-${p.score >= 70 ? 'success' : p.score >= 50 ? 'info' : 'secondary'} px-3 py-2`}>
+                                            {p.score}/100
                                           </span>
                                         </div>
-                                        <p className="text-white mb-3">{selectedProspect.analysis.needs_assessment.reasoning}</p>
-                                        {selectedProspect.analysis.needs_assessment.potential_products?.length > 0 && (
+                                        <p className="text-white mb-3">{p.analysis.needs_assessment.reasoning}</p>
+                                        {p.analysis.needs_assessment.potential_products?.length > 0 && (
                                           <div>
                                             <strong className="text-muted small d-block mb-2">Potenzielle Produkte:</strong>
                                             <div className="d-flex flex-wrap">
-                                              {selectedProspect.analysis.needs_assessment.potential_products.map((prod, idx) => (
+                                              {p.analysis.needs_assessment.potential_products.map((prod, idx) => (
                                                 <span key={idx} className="badge badge-success mr-1 mb-1">{prod}</span>
                                               ))}
                                             </div>
@@ -1187,11 +1187,11 @@ export default function App() {
                                     </div>
                                   </div>
                                   
-                                  {selectedProspect.analysis.contact_persons?.length > 0 && (
+                                  {p.analysis.contact_persons?.length > 0 && (
                                     <div className="mt-3">
                                       <h6 className="text-warning mb-3"><i className="bi bi-people-fill mr-2"/>Ansprechpartner</h6>
                                       <div className="row">
-                                        {selectedProspect.analysis.contact_persons.map((c, idx) => (
+                                        {p.analysis.contact_persons.map((c, idx) => (
                                           <div key={idx} className="col-md-6 mb-2">
                                             <div className="card bg-secondary border-0">
                                               <div className="card-body p-3">
