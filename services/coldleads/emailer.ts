@@ -26,13 +26,6 @@ interface GeneratedEmail {
  * Generiert personalisierte Kaltakquise-Email mit OpenAI
  */
 export async function generateEmail(options: EmailGenerationOptions): Promise<GeneratedEmail> {
-  const apiKey = process.env.OPENAI_API_KEY
-
-  if (!apiKey) {
-    throw new Error('OPENAI_API_KEY nicht konfiguriert')
-  }
-
-  const openai = new OpenAI({ apiKey })
 
   const prompt = `
 Du bist ein erfahrener B2B-Sales-Texter für SCORE Schleifwerkzeuge.
