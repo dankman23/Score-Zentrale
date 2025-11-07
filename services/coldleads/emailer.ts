@@ -2,8 +2,8 @@
  * Kaltakquise - Phase 3: Email-Generator & Versand
  */
 
-import OpenAI from 'openai'
 import nodemailer from 'nodemailer'
+import { emergentGetJSON } from '../../lib/emergent-llm'
 
 interface EmailGenerationOptions {
   company_name: string
