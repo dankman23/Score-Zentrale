@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       analysis: {
         products: prospect.analysis.company_info.products || [],
         needs: prospect.analysis.needs_assessment.potential_products || [],
-        reasoning: prospect.analysis.needs_assessment.reasoning || ''
+        reasoning: prospect.analysis.needs_assessment.individual_hook || prospect.analysis.needs_assessment.reasoning || `Unternehmen aus dem Bereich ${prospect.industry}`
       }
     })
 
