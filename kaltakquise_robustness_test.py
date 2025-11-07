@@ -69,7 +69,7 @@ def test_step_1_company_search():
                 return None
         
         print(f"\n✅ STEP 1 PASSED")
-        print(f"   - Found {len(data)} companies")
+        print(f"   - Found {len(prospects)} companies")
         print(f"   - Company 1: {first_company['company_name']}")
         print(f"   - Website: {first_company['website']}")
         print(f"   - Status: {first_company['status']}")
