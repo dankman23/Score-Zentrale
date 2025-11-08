@@ -46,11 +46,9 @@ export default function App() {
   
   // JTL/Sales Filter
   const [selectedWarengruppen, setSelectedWarengruppen] = useState([])
-  const [selectedPlattformen, setSelectedPlattformen] = useState([])
   const [selectedHersteller, setSelectedHersteller] = useState([])
   const [selectedLieferanten, setSelectedLieferanten] = useState([])
   const [availableWarengruppen, setAvailableWarengruppen] = useState([])
-  const [availablePlattformen, setAvailablePlattformen] = useState([])
   const [availableHersteller, setAvailableHersteller] = useState([])
   const [availableLieferanten, setAvailableLieferanten] = useState([])
   
