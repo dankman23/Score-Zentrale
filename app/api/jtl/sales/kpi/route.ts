@@ -26,16 +26,19 @@ export async function GET(request: NextRequest) {
 
     const qtyField = await pickFirstExisting(pool, orderPosTable, ['fAnzahl', 'nAnzahl', 'fMenge']) || 'fAnzahl'
     const netField = await pickFirstExisting(pool, orderPosTable, ['fVKNetto', 'fPreis']) || 'fVKNetto'
+    const costField = await pickFirstExisting(pool, orderPosTable, ['fEKNetto', 'fEK']) || 'fEKNetto'
     
-    // Gross = Netto * (1 + MwSt) - berechnen wir selbst
+    // Berechne Umsatz, Kosten und Marge
     const netTotalExpr = `(op.${netField} * op.${qtyField})`
     const grossTotalExpr = netTotalExpr // Vereinfachung: verwenden erstmal Netto als Gross
+    const costTotalExpr = `(op.${costField} * op.${qtyField})`
 
     const query = `
       SELECT 
         COUNT(DISTINCT o.kAuftrag) AS orders,
         SUM(${netTotalExpr}) AS net,
-        SUM(${grossTotalExpr}) AS gross
+        SUM(${grossTotalExpr}) AS gross,
+        SUM(${costTotalExpr}) AS cost
       FROM ${orderTable} o
       INNER JOIN ${orderPosTable} op ON o.kAuftrag = op.kAuftrag
       WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
