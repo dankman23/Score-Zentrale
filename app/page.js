@@ -434,10 +434,12 @@ export default function App() {
 
   // Analytics Functions
   const loadAnalytics = async () => {
+    console.log('[Analytics] Start loading...')
     setAnalyticsLoading(true)
     try {
       const dateParam = `startDate=${analyticsDateRange}&endDate=today`
       
+      console.log('[Analytics] Fetching APIs...')
       // Parallel laden
       const [metricsRes, sourcesRes, topPagesRes, categoryRes, productRes, timeSeriesRes] = await Promise.all([
         fetch(`/api/analytics/metrics?${dateParam}`),
@@ -448,6 +450,7 @@ export default function App() {
         fetch(`/api/analytics/timeseries/metrics?${dateParam}`)
       ])
       
+      console.log('[Analytics] Parsing responses...')
       const metrics = await metricsRes.json()
       const sources = await sourcesRes.json()
       const topPages = await topPagesRes.json()
@@ -455,16 +458,22 @@ export default function App() {
       const product = await productRes.json()
       const timeSeries = await timeSeriesRes.json()
       
+      console.log('[Analytics] Consolidating pages...', {topPages: topPages.length, category: category.length, product: product.length})
+      
       setAnalyticsMetrics(metrics)
       setAnalyticsTrafficSources(sources)
       setAnalyticsTopPages(consolidatePages(topPages))
       setAnalyticsCategoryPages(consolidatePages(category))
       setAnalyticsProductPages(consolidatePages(product))
       setMetricsTimeSeries(timeSeries)
+      
+      console.log('[Analytics] Done!')
     } catch (e) {
-      console.error('Analytics load failed:', e)
+      console.error('[Analytics] Load failed:', e)
+      alert('Analytics konnte nicht geladen werden: ' + e.message)
+    } finally {
+      setAnalyticsLoading(false)
     }
-    setAnalyticsLoading(false)
   }
   
   const loadPageTimeSeries = async (pagePath, setterFn) => {
