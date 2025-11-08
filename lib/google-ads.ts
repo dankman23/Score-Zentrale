@@ -20,10 +20,13 @@ async function getAccessToken(): Promise<string> {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to get access token');
+    const errorText = await response.text();
+    console.error('[Google Ads] OAuth token error:', response.status, errorText);
+    throw new Error(`Failed to get access token: ${response.status}`);
   }
 
   const data = await response.json();
+  console.log('[Google Ads] Access token obtained successfully');
   return data.access_token;
 }
 
