@@ -70,13 +70,14 @@ export async function getCampaignMetrics(
     `;
 
     const response = await fetch(
-      `https://googleads.googleapis.com/v18/customers/${customerId}/googleAds:searchStream`,
+      `https://googleads.googleapis.com/v18/customers/${customerId}/googleAds:search`,
       {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'developer-token': developerToken!,
           'Content-Type': 'application/json',
+          'login-customer-id': customerId!,
         },
         body: JSON.stringify({ query }),
       }
@@ -84,7 +85,7 @@ export async function getCampaignMetrics(
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Google Ads API Error:', errorText);
+      console.error('Google Ads API Error:', response.status, errorText);
       throw new Error(`Google Ads API error: ${response.status}`);
     }
 
@@ -92,25 +93,21 @@ export async function getCampaignMetrics(
     const campaigns: CampaignMetric[] = [];
 
     // Parse response
-    if (data && Array.isArray(data)) {
-      for (const result of data) {
-        if (result.results) {
-          for (const row of result.results) {
-            campaigns.push({
-              campaignId: row.campaign?.id || '',
-              campaignName: row.campaign?.name || '',
-              status: row.campaign?.status || '',
-              impressions: parseInt(row.metrics?.impressions || '0', 10),
-              clicks: parseInt(row.metrics?.clicks || '0', 10),
-              ctr: parseFloat(row.metrics?.ctr || '0') * 100,
-              costMicros: parseInt(row.metrics?.costMicros || '0', 10),
-              costAmount: parseInt(row.metrics?.costMicros || '0', 10) / 1000000,
-              cpcMicros: parseInt(row.metrics?.averageCpc || '0', 10),
-              cpcAmount: parseInt(row.metrics?.averageCpc || '0', 10) / 1000000,
-              conversions: parseFloat(row.metrics?.conversions || '0'),
-            });
-          }
-        }
+    if (data && data.results) {
+      for (const row of data.results) {
+        campaigns.push({
+          campaignId: row.campaign?.id || '',
+          campaignName: row.campaign?.name || '',
+          status: row.campaign?.status || '',
+          impressions: parseInt(row.metrics?.impressions || '0', 10),
+          clicks: parseInt(row.metrics?.clicks || '0', 10),
+          ctr: parseFloat(row.metrics?.ctr || '0') * 100,
+          costMicros: parseInt(row.metrics?.costMicros || '0', 10),
+          costAmount: parseInt(row.metrics?.costMicros || '0', 10) / 1000000,
+          cpcMicros: parseInt(row.metrics?.averageCpc || '0', 10),
+          cpcAmount: parseInt(row.metrics?.averageCpc || '0', 10) / 1000000,
+          conversions: parseFloat(row.metrics?.conversions || '0'),
+        });
       }
     }
 
