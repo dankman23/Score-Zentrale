@@ -467,7 +467,7 @@ agent_communication:
     file: "/app/app/api/jtl/orders/kpi/shipping-split/route.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -478,6 +478,9 @@ agent_communication:
       - working: "NA"
         agent: "main"
         comment: "Re-implemented as separate route file with improved dynamic schema detection and robust position filtering"
+      - working: true
+        agent: "testing"
+        comment: "✅ Re-tested Orders Shipping Split: GET /api/jtl/orders/kpi/shipping-split?from=2025-11-01&to=2025-11-03 returns 200 ok:true with all required fields: orders=195, net_without_shipping=16732.63, net_with_shipping=16732.63, gross_without_shipping=19577.47, gross_with_shipping=19577.47. All fields present and valid."
 frontend:
   - task: "Hero sichtbar + abgeschwächt (Overlay, Shield)"
     implemented: true
