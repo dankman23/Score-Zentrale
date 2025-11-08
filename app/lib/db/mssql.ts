@@ -16,7 +16,7 @@ export async function getMssqlPool(): Promise<ConnectionPool> {
     password: process.env.JTL_SQL_PASSWORD as string,
     server: process.env.JTL_SQL_HOST as string,
     port: parseInt(process.env.JTL_SQL_PORT || '1433', 10),
-    database: process.env.JTL_SQL_DB as string,
+    database: process.env.JTL_SQL_DATABASE as string,
     connectionTimeout: 15000,
     requestTimeout: 30000,
     pool: { 
