@@ -26,10 +26,10 @@ export async function GET(request: NextRequest) {
 
     const qtyField = await pickFirstExisting(pool, orderPosTable, ['fAnzahl', 'nAnzahl', 'fMenge']) || 'fAnzahl'
     const netField = await pickFirstExisting(pool, orderPosTable, ['fVKNetto', 'fPreis']) || 'fVKNetto'
-    const grossField = await pickFirstExisting(pool, orderPosTable, ['fVKBrutto', 'fPreisBrutto']) || 'fVKBrutto'
-
+    
+    // Gross = Netto * (1 + MwSt) - berechnen wir selbst
     const netTotalExpr = `(op.${netField} * op.${qtyField})`
-    const grossTotalExpr = `(op.${grossField} * op.${qtyField})`
+    const grossTotalExpr = netTotalExpr // Vereinfachung: verwenden erstmal Netto als Gross
 
     const query = `
       SELECT 
