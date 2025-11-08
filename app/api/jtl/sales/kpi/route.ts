@@ -52,13 +52,19 @@ export async function GET(request: NextRequest) {
       .query(query)
 
     const row = result.recordset?.[0] || {}
+    
+    const net = parseFloat(row.net || 0)
+    const cost = parseFloat(row.cost || 0)
+    const margin = net - cost
 
     return NextResponse.json({
       ok: true,
       period: { from, to },
       orders: row.orders || 0,
-      net: parseFloat(row.net || 0).toFixed(2),
-      gross: parseFloat(row.gross || 0).toFixed(2)
+      net: net.toFixed(2),
+      gross: parseFloat(row.gross || 0).toFixed(2),
+      cost: cost.toFixed(2),
+      margin: margin.toFixed(2)
     })
   } catch (error: any) {
     console.error('[/api/jtl/sales/kpi] Error:', error)
