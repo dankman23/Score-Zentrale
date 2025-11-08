@@ -316,6 +316,13 @@ export default function App() {
     }
   }, [activeTab, marketingSub, analyticsDateRange])
   useEffect(() => { if (activeTab==='marketing' && marketingSub==='googleads') loadGoogleAds() }, [activeTab, marketingSub])
+  
+  // Load filter options when Sales tab is active
+  useEffect(() => {
+    if (activeTab === 'sales') {
+      loadFilterOptions()
+    }
+  }, [activeTab])
 
   useEffect(() => {
     const applyHash = () => { const h=(window.location.hash||'#dashboard').replace('#',''); setActiveTab(h) }
