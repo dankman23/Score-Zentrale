@@ -418,15 +418,18 @@ agent_communication:
         comment: "✅ JTL Sales timeseries working: Returns 500 with ok:false and proper error handling for missing nPosTyp column. Endpoint correctly handles database schema differences."
   - task: "JTL Sales: GET /api/jtl/sales/timeseries/with_platform_fees"
     implemented: true
-    working: "NA"
-    file: "/app/app/api/[[...path]]/route.js"
+    working: true
+    file: "/app/app/api/jtl/sales/timeseries/with_platform_fees/route.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Zeitreihe Umsatz + Marge inkl. Gebühren pro Tag"
+      - working: true
+        agent: "testing"
+        comment: "✅ Sales Timeseries with Platform Fees working: GET /api/jtl/sales/timeseries/with_platform_fees?from=2025-11-01&to=2025-11-03 returns 200 ok:true with rows array containing 3 items (one per day). All expected fields present."
   - task: "JTL Sales: GET /api/jtl/sales/platform-timeseries"
     implemented: true
     working: true
