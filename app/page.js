@@ -521,20 +521,17 @@ export default function App() {
 
   const loadFilterOptions = async () => {
     try {
-      const [wgRes, platRes, herstRes, liefRes] = await Promise.all([
+      const [wgRes, herstRes, liefRes] = await Promise.all([
         fetch('/api/jtl/sales/filters/warengruppen'),
-        fetch('/api/jtl/sales/filters/plattformen'),
         fetch('/api/jtl/sales/filters/hersteller'),
         fetch('/api/jtl/sales/filters/lieferanten')
       ])
 
       const wgData = await wgRes.json()
-      const platData = await platRes.json()
       const herstData = await herstRes.json()
       const liefData = await liefRes.json()
 
       if (wgData.ok) setAvailableWarengruppen(wgData.values || [])
-      if (platData.ok) setAvailablePlattformen(platData.values || [])
       if (herstData.ok) setAvailableHersteller(herstData.values || [])
       if (liefData.ok) setAvailableLieferanten(liefData.values || [])
     } catch (e) {
