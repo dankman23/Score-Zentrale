@@ -127,7 +127,7 @@ export async function fetchTopPages(
         { name: 'userEngagementDuration' },
       ],
       orderBys: [
-        { metric: { metricName: 'screenPageViews' }, desc: true }
+        { metric: { metricName: 'sessions' }, desc: true }
       ],
       limit,
     });
@@ -257,7 +257,7 @@ export async function fetchTopProductPages(
         }
       },
       orderBys: [
-        { metric: { metricName: 'screenPageViews' }, desc: true }
+        { metric: { metricName: 'sessions' }, desc: true }
       ],
       limit,
     });
