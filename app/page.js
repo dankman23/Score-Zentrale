@@ -433,12 +433,13 @@ export default function App() {
       const dateParam = `startDate=${analyticsDateRange}&endDate=today`
       
       // Parallel laden
-      const [metricsRes, sourcesRes, topPagesRes, categoryRes, productRes] = await Promise.all([
+      const [metricsRes, sourcesRes, topPagesRes, categoryRes, productRes, timeSeriesRes] = await Promise.all([
         fetch(`/api/analytics/metrics?${dateParam}`),
         fetch(`/api/analytics/traffic-sources?${dateParam}&limit=10`),
         fetch(`/api/analytics/top-pages?${dateParam}&limit=100`),
         fetch(`/api/analytics/category-pages?${dateParam}`),
-        fetch(`/api/analytics/product-pages?${dateParam}&limit=100`)
+        fetch(`/api/analytics/product-pages?${dateParam}&limit=100`),
+        fetch(`/api/analytics/timeseries/metrics?${dateParam}`)
       ])
       
       const metrics = await metricsRes.json()
@@ -446,16 +447,29 @@ export default function App() {
       const topPages = await topPagesRes.json()
       const category = await categoryRes.json()
       const product = await productRes.json()
+      const timeSeries = await timeSeriesRes.json()
       
       setAnalyticsMetrics(metrics)
       setAnalyticsTrafficSources(sources)
       setAnalyticsTopPages(consolidatePages(topPages))
       setAnalyticsCategoryPages(consolidatePages(category))
       setAnalyticsProductPages(consolidatePages(product))
+      setMetricsTimeSeries(timeSeries)
     } catch (e) {
       console.error('Analytics load failed:', e)
     }
     setAnalyticsLoading(false)
+  }
+  
+  const loadPageTimeSeries = async (pagePath, setterFn) => {
+    try {
+      const dateParam = `startDate=${analyticsDateRange}&endDate=today&pagePath=${encodeURIComponent(pagePath)}`
+      const res = await fetch(`/api/analytics/timeseries/page?${dateParam}`)
+      const data = await res.json()
+      setterFn(data)
+    } catch (e) {
+      console.error('Page time series load failed:', e)
+    }
   }
 
   const loadGoogleAds = async () => {
