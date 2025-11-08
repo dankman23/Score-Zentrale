@@ -1,5 +1,3 @@
-import { GoogleAdsApi } from 'google-ads-api';
-
 // Campaign Metrics Interface
 export interface CampaignMetric {
   campaignId: string;
