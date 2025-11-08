@@ -237,13 +237,15 @@ export default function App() {
 
   const fetchSalesTables = async () => {
     try {
-      const [prods, cats] = await Promise.all([
-        getJson(`/api/jtl/sales/top-products?limit=${limit}&from=${from}&to=${to}`),
-        getJson(`/api/jtl/sales/top-categories?limit=${limit}&from=${from}&to=${to}`)
-      ])
-      setTopProducts(Array.isArray(prods)?prods:toArray(prods))
-      setTopCategories(Array.isArray(cats)?cats:toArray(cats))
-    } catch(e){ if (isDegradedFlag){ setTopProducts([]); setTopCategories([]) } }
+      const prods = await getJson(`/api/jtl/sales/top-products?limit=${limit}&from=${from}&to=${to}`)
+      setTopProducts(Array.isArray(prods?.rows)?prods.rows:(Array.isArray(prods)?prods:toArray(prods)))
+      setTopCategories([]) // Top categories API not yet implemented
+    } catch(e){ 
+      if (isDegradedFlag){ 
+        setTopProducts([]); 
+        setTopCategories([]) 
+      } 
+    }
   }
 
   // Warmaquise
