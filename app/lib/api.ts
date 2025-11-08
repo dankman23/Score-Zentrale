@@ -8,8 +8,12 @@ export async function connectToDatabase() {
     return { client: cachedClient, db: cachedDb }
   }
 
-  const uri = process.env.MONGO_URL || 'mongodb://localhost:27017'
-  const dbName = process.env.DB_NAME || 'your_database_name'
+  const uri = process.env.MONGO_URL
+  const dbName = process.env.DB_NAME
+  
+  if (!uri || !dbName) {
+    throw new Error('MONGO_URL and DB_NAME environment variables must be set')
+  }
 
   const client = new MongoClient(uri)
   await client.connect()
