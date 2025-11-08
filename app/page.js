@@ -1395,7 +1395,14 @@ export default function App() {
                           </thead>
                           <tbody>
                             {sortData(analyticsProductPages, productSort.field, productSort.order).slice(0, 100).map((page, i) => (
-                              <tr key={i}>
+                              <tr key={i}
+                                  style={{cursor: 'pointer'}}
+                                  className={selectedProductPage?.pagePath === page.pagePath ? 'table-active' : ''}
+                                  onClick={()=>{
+                                    setSelectedProductPage(page)
+                                    setShowProductChart(true)
+                                    loadPageTimeSeries(page.pagePath, setProductPageTimeSeries)
+                                  }}>
                                 <td className="text-muted">{i + 1}</td>
                                 <td>
                                   <div className="font-weight-bold small">{page.pageTitle || page.pagePath}</div>
