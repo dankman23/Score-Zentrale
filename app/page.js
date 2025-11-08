@@ -948,7 +948,7 @@ export default function App() {
           <div className="card mb-3">
             <div className="card-body">
               <div className="row">
-                <div className="col-md-3">
+                <div className="col-md-4">
                   <label className="small text-muted mb-1">Warengruppe</label>
                   <select 
                     className="form-control form-control-sm" 
@@ -964,23 +964,7 @@ export default function App() {
                   <div className="small text-muted mt-1">{selectedWarengruppen.length} ausgewählt</div>
                 </div>
                 
-                <div className="col-md-3">
-                  <label className="small text-muted mb-1">Plattform</label>
-                  <select 
-                    className="form-control form-control-sm" 
-                    multiple 
-                    size="3"
-                    value={selectedPlattformen}
-                    onChange={(e) => setSelectedPlattformen(Array.from(e.target.selectedOptions, option => option.value))}>
-                    {availablePlattformen.map(plat => (
-                      <option key={plat} value={plat}>{plat}</option>
-                    ))}
-                    {availablePlattformen.length === 0 && <option disabled>Lade...</option>}
-                  </select>
-                  <div className="small text-muted mt-1">{selectedPlattformen.length} ausgewählt</div>
-                </div>
-                
-                <div className="col-md-3">
+                <div className="col-md-4">
                   <label className="small text-muted mb-1">Hersteller</label>
                   <select 
                     className="form-control form-control-sm" 
@@ -996,7 +980,7 @@ export default function App() {
                   <div className="small text-muted mt-1">{selectedHersteller.length} ausgewählt</div>
                 </div>
                 
-                <div className="col-md-3">
+                <div className="col-md-4">
                   <label className="small text-muted mb-1">Lieferant</label>
                   <select 
                     className="form-control form-control-sm" 
