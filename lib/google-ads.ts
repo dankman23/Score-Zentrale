@@ -1,21 +1,43 @@
-import { getGoogleAdsClient, getCustomerId, getRefreshToken, CampaignMetric, CampaignMetricsResponse } from './google-ads-client';
+import { CampaignMetric, CampaignMetricsResponse } from './google-ads-client';
 
 /**
- * Fetch campaign metrics from Google Ads
+ * Get OAuth2 access token from refresh token
+ */
+async function getAccessToken(): Promise<string> {
+  const clientId = process.env.GOOGLE_ADS_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_ADS_CLIENT_SECRET;
+  const refreshToken = process.env.GOOGLE_ADS_REFRESH_TOKEN;
+
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: clientId!,
+      client_secret: clientSecret!,
+      refresh_token: refreshToken!,
+      grant_type: 'refresh_token',
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get access token');
+  }
+
+  const data = await response.json();
+  return data.access_token;
+}
+
+/**
+ * Fetch campaign metrics from Google Ads using REST API
  */
 export async function getCampaignMetrics(
   startDate?: string,
   endDate?: string
 ): Promise<CampaignMetricsResponse> {
   try {
-    const client = getGoogleAdsClient();
-    const customerId = getCustomerId();
-    const refreshToken = getRefreshToken();
-
-    const customer = client.Customer({
-      customer_id: customerId,
-      refresh_token: refreshToken,
-    });
+    const accessToken = await getAccessToken();
+    const customerId = process.env.GOOGLE_ADS_CUSTOMER_ID;
+    const developerToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
 
     // Format dates for Google Ads API (YYYYMMDD)
     let dateCondition = '';
@@ -47,22 +69,50 @@ export async function getCampaignMetrics(
       LIMIT 50
     `;
 
-    const response = await customer.query(query);
-    
-    // Transform the response
-    const campaigns: CampaignMetric[] = response.map((row: any) => ({
-      campaignId: row.campaign.id.toString(),
-      campaignName: row.campaign.name,
-      status: row.campaign.status,
-      impressions: parseInt(row.metrics.impressions, 10) || 0,
-      clicks: parseInt(row.metrics.clicks, 10) || 0,
-      ctr: parseFloat(row.metrics.ctr) * 100 || 0, // Convert to percentage
-      costMicros: parseInt(row.metrics.cost_micros, 10) || 0,
-      costAmount: parseInt(row.metrics.cost_micros, 10) / 1000000 || 0,
-      cpcMicros: parseInt(row.metrics.average_cpc, 10) || 0,
-      cpcAmount: parseInt(row.metrics.average_cpc, 10) / 1000000 || 0,
-      conversions: parseFloat(row.metrics.conversions) || 0,
-    }));
+    const response = await fetch(
+      `https://googleads.googleapis.com/v18/customers/${customerId}/googleAds:searchStream`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'developer-token': developerToken!,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Google Ads API Error:', errorText);
+      throw new Error(`Google Ads API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const campaigns: CampaignMetric[] = [];
+
+    // Parse response
+    if (data && Array.isArray(data)) {
+      for (const result of data) {
+        if (result.results) {
+          for (const row of result.results) {
+            campaigns.push({
+              campaignId: row.campaign?.id || '',
+              campaignName: row.campaign?.name || '',
+              status: row.campaign?.status || '',
+              impressions: parseInt(row.metrics?.impressions || '0', 10),
+              clicks: parseInt(row.metrics?.clicks || '0', 10),
+              ctr: parseFloat(row.metrics?.ctr || '0') * 100,
+              costMicros: parseInt(row.metrics?.costMicros || '0', 10),
+              costAmount: parseInt(row.metrics?.costMicros || '0', 10) / 1000000,
+              cpcMicros: parseInt(row.metrics?.averageCpc || '0', 10),
+              cpcAmount: parseInt(row.metrics?.averageCpc || '0', 10) / 1000000,
+              conversions: parseFloat(row.metrics?.conversions || '0'),
+            });
+          }
+        }
+      }
+    }
 
     return {
       campaigns,
