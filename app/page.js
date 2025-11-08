@@ -874,16 +874,42 @@ export default function App() {
 
       {activeTab==='marketing' && (
         <div>
-          <div className="d-flex align-items-center justify-content-between mb-3">
-            <div>
-              <h3 className="mb-0">Warmaquise</h3>
-              <div className="text-muted small">Aktive, wertige Kunden – Score-basiert priorisiert</div>
-            </div>
-            <div>
-              <button className="btn btn-primary btn-sm mr-2" disabled={importing} onClick={runImport}>{importing? 'Import läuft…' : 'Kunden importieren / aktualisieren'}</button>
-              <button className="btn btn-outline-secondary btn-sm" onClick={exportLeadsCSV}>CSV Export</button>
-            </div>
+          <div className="mb-4">
+            <h2 className="mb-3"><i className="bi bi-bullseye mr-2"/>Marketing & Analytics</h2>
+            
+            {/* Sub-Navigation */}
+            <ul className="nav nav-tabs mb-4">
+              <li className="nav-item">
+                <a className={`nav-link ${marketingSub==='warmaquise'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setMarketingSub('warmaquise')}}>
+                  <i className="bi bi-people mr-1"/>Warmaquise
+                </a>
+              </li>
+              <li className="nav-item">
+                <a className={`nav-link ${marketingSub==='analytics'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setMarketingSub('analytics')}}>
+                  <i className="bi bi-graph-up mr-1"/>Analytics (GA4)
+                </a>
+              </li>
+              <li className="nav-item">
+                <a className={`nav-link ${marketingSub==='googleads'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setMarketingSub('googleads')}}>
+                  <i className="bi bi-megaphone mr-1"/>Google Ads
+                </a>
+              </li>
+            </ul>
           </div>
+
+          {/* Warmaquise Tab */}
+          {marketingSub==='warmaquise' && (
+            <div>
+              <div className="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                  <h3 className="mb-0">Warmaquise</h3>
+                  <div className="text-muted small">Aktive, wertige Kunden – Score-basiert priorisiert</div>
+                </div>
+                <div>
+                  <button className="btn btn-primary btn-sm mr-2" disabled={importing} onClick={runImport}>{importing? 'Import läuft…' : 'Kunden importieren / aktualisieren'}</button>
+                  <button className="btn btn-outline-secondary btn-sm" onClick={exportLeadsCSV}>CSV Export</button>
+                </div>
+              </div>
 
           {/* Filterleiste */}
           <div className="card mb-3">
