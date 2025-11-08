@@ -1470,7 +1470,14 @@ export default function App() {
                           </thead>
                           <tbody>
                             {sortData(analyticsTopPages, allPagesSort.field, allPagesSort.order).slice(0, 100).map((page, i) => (
-                              <tr key={i}>
+                              <tr key={i}
+                                  style={{cursor: 'pointer'}}
+                                  className={selectedAllPage?.pagePath === page.pagePath ? 'table-active' : ''}
+                                  onClick={()=>{
+                                    setSelectedAllPage(page)
+                                    setShowAllPagesChart(true)
+                                    loadPageTimeSeries(page.pagePath, setAllPageTimeSeries)
+                                  }}>
                                 <td className="text-muted">{i + 1}</td>
                                 <td>
                                   <div className="font-weight-bold small">{page.pageTitle || page.pagePath}</div>
