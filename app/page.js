@@ -298,7 +298,12 @@ export default function App() {
   useEffect(() => { fetchAll(); fetchSalesTables() }, [from, to, limit])
   useEffect(() => { if (activeTab==='marketing' && marketingSub==='warmaquise') queryLeads() }, [activeTab, marketingSub, statusF, b2bF, minScoreF, qF, pageF, limitF, sortF, orderF])
   useEffect(() => { if (activeTab==='coldleads') loadColdProspects() }, [activeTab, coldStatusFilter])
-  useEffect(() => { if (activeTab==='marketing' && marketingSub==='analytics') loadAnalytics() }, [activeTab, marketingSub, analyticsDateRange])
+  useEffect(() => { 
+    if (activeTab==='marketing' && marketingSub==='analytics') {
+      console.log('[Analytics] Loading...', {analyticsDateRange})
+      loadAnalytics() 
+    }
+  }, [activeTab, marketingSub, analyticsDateRange])
   useEffect(() => { if (activeTab==='marketing' && marketingSub==='googleads') loadGoogleAds() }, [activeTab, marketingSub])
 
   useEffect(() => {
