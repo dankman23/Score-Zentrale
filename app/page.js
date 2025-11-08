@@ -1002,7 +1002,6 @@ export default function App() {
                   className="btn btn-sm btn-secondary"
                   onClick={() => {
                     setSelectedWarengruppen([])
-                    setSelectedPlattformen([])
                     setSelectedHersteller([])
                     setSelectedLieferanten([])
                   }}>
