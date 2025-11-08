@@ -117,9 +117,10 @@ export default function App() {
   const [analyticsProductPages, setAnalyticsProductPages] = useState([])
   const [analyticsLoading, setAnalyticsLoading] = useState(false)
   const [analyticsDateRange, setAnalyticsDateRange] = useState('30daysAgo')
-  const [categorySort, setCategorySort] = useState({ field: 'uniquePageViews', order: 'desc' })
-  const [productSort, setProductSort] = useState({ field: 'uniquePageViews', order: 'desc' })
-  const [allPagesSort, setAllPagesSort] = useState({ field: 'uniquePageViews', order: 'desc' })
+  const [trafficSort, setTrafficSort] = useState({ field: 'sessions', order: 'desc' })
+  const [categorySort, setCategorySort] = useState({ field: 'pageViews', order: 'desc' })
+  const [productSort, setProductSort] = useState({ field: 'pageViews', order: 'desc' })
+  const [allPagesSort, setAllPagesSort] = useState({ field: 'pageViews', order: 'desc' })
   
   // Google Ads
   const [googleAdsCampaigns, setGoogleAdsCampaigns] = useState([])
