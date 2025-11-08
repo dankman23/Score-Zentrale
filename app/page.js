@@ -209,8 +209,20 @@ export default function App() {
       const mappedK1 = { ...k1, revenue: k1?.net || 0, margin: 0 } // Sales KPI doesn't have margin yet
       const mappedK2 = { ...k2, margin_with_fees: (Number(k2?.net || 0) - Number(k2?.platform_fees || 0)) }
       
-      const tsN = sortByDateAsc(toArray(t1?.rows || t1))
-      const tsFeesN = sortByDateAsc(toArray(t2?.rows || t2))
+      // Map timeseries data: net -> revenue, fees -> margin_with_fees
+      const rawTsN = toArray(t1?.rows || t1)
+      const rawTsFeesN = toArray(t2?.rows || t2)
+      
+      const tsN = sortByDateAsc(rawTsN.map(r => ({
+        date: r?.date,
+        revenue: Number(r?.net || r?.revenue || 0),
+        orders: r?.orders || 0
+      })))
+      
+      const tsFeesN = sortByDateAsc(rawTsFeesN.map(r => ({
+        date: r?.date,
+        margin_with_fees: Number(r?.net || 0) - Number(r?.fees || 0)
+      })))
       
       setKpi(mappedK1)
       setKpiFees(mappedK2)
