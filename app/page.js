@@ -43,6 +43,17 @@ const fmtCurrency = (n) => new Intl.NumberFormat('de-DE', { style:'currency', cu
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
+  
+  // JTL/Sales Filter
+  const [selectedWarengruppen, setSelectedWarengruppen] = useState([])
+  const [selectedPlattformen, setSelectedPlattformen] = useState([])
+  const [selectedHersteller, setSelectedHersteller] = useState([])
+  const [selectedLieferanten, setSelectedLieferanten] = useState([])
+  const [availableWarengruppen, setAvailableWarengruppen] = useState([])
+  const [availablePlattformen, setAvailablePlattformen] = useState([])
+  const [availableHersteller, setAvailableHersteller] = useState([])
+  const [availableLieferanten, setAvailableLieferanten] = useState([])
+  
   const [from, setFrom] = useState(()=>{ const d=new Date(); d.setDate(d.getDate()-29); return d.toISOString().slice(0,10) })
   const [to, setTo] = useState(()=> new Date().toISOString().slice(0,10))
 
