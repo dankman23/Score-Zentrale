@@ -86,12 +86,15 @@ export async function getCampaignMetrics(
       headers['login-customer-id'] = mccId;
     }
 
+    console.log('[Google Ads] Request URL:', `https://googleads.googleapis.com/v17/customers/${customerId}/googleAds:search`);
+    console.log('[Google Ads] Query:', query.trim());
+    
     const response = await fetch(
-      `https://googleads.googleapis.com/v18/customers/${customerId}/googleAds:search`,
+      `https://googleads.googleapis.com/v17/customers/${customerId}/googleAds:search`,
       {
         method: 'POST',
         headers,
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query: query.trim() }),
       }
     );
 
