@@ -363,6 +363,27 @@ export default function App() {
     const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url)
   }
 
+  // Sortier-Funktion für Analytics-Tabellen
+  const sortData = (data, field, order) => {
+    return [...data].sort((a, b) => {
+      const aVal = a[field] || 0
+      const bVal = b[field] || 0
+      if (order === 'asc') {
+        return aVal > bVal ? 1 : -1
+      } else {
+        return aVal < bVal ? 1 : -1
+      }
+    })
+  }
+
+  const toggleSort = (currentSort, setSort, field) => {
+    if (currentSort.field === field) {
+      setSort({ field, order: currentSort.order === 'asc' ? 'desc' : 'asc' })
+    } else {
+      setSort({ field, order: 'desc' })
+    }
+  }
+
   // Analytics Functions
   const loadAnalytics = async () => {
     setAnalyticsLoading(true)
