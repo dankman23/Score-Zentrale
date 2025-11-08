@@ -122,7 +122,7 @@ export async function fetchTopPages(
         { name: 'pageTitle' },
       ],
       metrics: [
-        { name: 'screenPageViews' },
+        { name: 'sessions' },
         { name: 'totalUsers' },
         { name: 'userEngagementDuration' },
       ],
@@ -178,7 +178,7 @@ export async function fetchCategoryPages(
         { name: 'pageTitle' },
       ],
       metrics: [
-        { name: 'screenPageViews' },
+        { name: 'sessions' },
         { name: 'totalUsers' },
         { name: 'userEngagementDuration' },
       ],
@@ -243,7 +243,7 @@ export async function fetchTopProductPages(
         { name: 'pageTitle' },
       ],
       metrics: [
-        { name: 'screenPageViews' },
+        { name: 'sessions' },
         { name: 'totalUsers' },
         { name: 'userEngagementDuration' },
       ],
