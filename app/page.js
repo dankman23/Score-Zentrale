@@ -385,6 +385,34 @@ export default function App() {
     }
   }
 
+  // Funktion zum Gruppieren von Seiten nach pagePath (entfernt mehrsprachige Duplikate)
+  const consolidatePages = (pages) => {
+    const grouped = {}
+    pages.forEach(page => {
+      const path = page.pagePath
+      if (!grouped[path]) {
+        grouped[path] = {
+          pagePath: path,
+          pageTitle: page.pageTitle,
+          pageViews: 0,
+          uniquePageViews: 0,
+          avgTimeOnPage: 0,
+          count: 0
+        }
+      }
+      grouped[path].pageViews += page.pageViews
+      grouped[path].uniquePageViews += page.uniquePageViews
+      grouped[path].avgTimeOnPage += page.avgTimeOnPage
+      grouped[path].count += 1
+    })
+    
+    // Durchschnitt für avgTimeOnPage berechnen
+    return Object.values(grouped).map(item => ({
+      ...item,
+      avgTimeOnPage: item.avgTimeOnPage / item.count
+    }))
+  }
+
   // Analytics Functions
   const loadAnalytics = async () => {
     setAnalyticsLoading(true)
@@ -408,9 +436,9 @@ export default function App() {
       
       setAnalyticsMetrics(metrics)
       setAnalyticsTrafficSources(sources)
-      setAnalyticsTopPages(topPages)
-      setAnalyticsCategoryPages(category)
-      setAnalyticsProductPages(product)
+      setAnalyticsTopPages(consolidatePages(topPages))
+      setAnalyticsCategoryPages(consolidatePages(category))
+      setAnalyticsProductPages(consolidatePages(product))
     } catch (e) {
       console.error('Analytics load failed:', e)
     }
