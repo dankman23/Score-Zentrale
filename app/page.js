@@ -919,13 +919,97 @@ export default function App() {
 
       {activeTab==='sales' && (
         <div>
-          <div className="d-flex align-items-center mb-2">
-            <div className="mr-2 small text-muted">Limit:</div>
-            <select className="form-control form-control-sm" style={{maxWidth:120}} value={limit} onChange={e=>setLimit(parseInt(e.target.value))}>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-            </select>
+          {/* Filter Section */}
+          <div className="card mb-3">
+            <div className="card-body">
+              <div className="row">
+                <div className="col-md-3">
+                  <label className="small text-muted mb-1">Warengruppe</label>
+                  <select 
+                    className="form-control form-control-sm" 
+                    multiple 
+                    size="3"
+                    value={selectedWarengruppen}
+                    onChange={(e) => setSelectedWarengruppen(Array.from(e.target.selectedOptions, option => option.value))}>
+                    {availableWarengruppen.map(wg => (
+                      <option key={wg} value={wg}>{wg}</option>
+                    ))}
+                    {availableWarengruppen.length === 0 && <option disabled>Lade...</option>}
+                  </select>
+                  <div className="small text-muted mt-1">{selectedWarengruppen.length} ausgewählt</div>
+                </div>
+                
+                <div className="col-md-3">
+                  <label className="small text-muted mb-1">Plattform</label>
+                  <select 
+                    className="form-control form-control-sm" 
+                    multiple 
+                    size="3"
+                    value={selectedPlattformen}
+                    onChange={(e) => setSelectedPlattformen(Array.from(e.target.selectedOptions, option => option.value))}>
+                    {availablePlattformen.map(plat => (
+                      <option key={plat} value={plat}>{plat}</option>
+                    ))}
+                    {availablePlattformen.length === 0 && <option disabled>Lade...</option>}
+                  </select>
+                  <div className="small text-muted mt-1">{selectedPlattformen.length} ausgewählt</div>
+                </div>
+                
+                <div className="col-md-3">
+                  <label className="small text-muted mb-1">Hersteller</label>
+                  <select 
+                    className="form-control form-control-sm" 
+                    multiple 
+                    size="3"
+                    value={selectedHersteller}
+                    onChange={(e) => setSelectedHersteller(Array.from(e.target.selectedOptions, option => option.value))}>
+                    {availableHersteller.map(herst => (
+                      <option key={herst} value={herst}>{herst}</option>
+                    ))}
+                    {availableHersteller.length === 0 && <option disabled>Lade...</option>}
+                  </select>
+                  <div className="small text-muted mt-1">{selectedHersteller.length} ausgewählt</div>
+                </div>
+                
+                <div className="col-md-3">
+                  <label className="small text-muted mb-1">Lieferant</label>
+                  <select 
+                    className="form-control form-control-sm" 
+                    multiple 
+                    size="3"
+                    value={selectedLieferanten}
+                    onChange={(e) => setSelectedLieferanten(Array.from(e.target.selectedOptions, option => option.value))}>
+                    {availableLieferanten.map(lief => (
+                      <option key={lief} value={lief}>{lief}</option>
+                    ))}
+                    {availableLieferanten.length === 0 && <option disabled>Lade...</option>}
+                  </select>
+                  <div className="small text-muted mt-1">{selectedLieferanten.length} ausgewählt</div>
+                </div>
+              </div>
+              
+              <div className="d-flex justify-content-between align-items-center mt-3">
+                <button 
+                  className="btn btn-sm btn-secondary"
+                  onClick={() => {
+                    setSelectedWarengruppen([])
+                    setSelectedPlattformen([])
+                    setSelectedHersteller([])
+                    setSelectedLieferanten([])
+                  }}>
+                  <i className="bi bi-x-circle mr-1"/>Filter zurücksetzen
+                </button>
+                
+                <div className="d-flex align-items-center">
+                  <div className="mr-2 small text-muted">Limit:</div>
+                  <select className="form-control form-control-sm" style={{maxWidth:120}} value={limit} onChange={e=>setLimit(parseInt(e.target.value))}>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
           <ul className="nav nav-tabs mb-3">
             <li className="nav-item"><a className={`nav-link ${salesTab==='products'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSalesTab('products')}}>Top-Produkte</a></li>
