@@ -1259,18 +1259,26 @@ export default function App() {
                             <tr>
                               <th style={{width: '60px'}}>#</th>
                               <th>Seite</th>
-                              <th className="text-right">Besucher</th>
-                              <th className="text-right">Ø Zeit (Sek.)</th>
+                              <th className="text-right" style={{cursor:'pointer'}} onClick={()=>toggleSort(allPagesSort, setAllPagesSort, 'pageViews')}>
+                                Impressionen {allPagesSort.field === 'pageViews' && (allPagesSort.order === 'asc' ? '↑' : '↓')}
+                              </th>
+                              <th className="text-right" style={{cursor:'pointer'}} onClick={()=>toggleSort(allPagesSort, setAllPagesSort, 'uniquePageViews')}>
+                                Besucher {allPagesSort.field === 'uniquePageViews' && (allPagesSort.order === 'asc' ? '↑' : '↓')}
+                              </th>
+                              <th className="text-right" style={{cursor:'pointer'}} onClick={()=>toggleSort(allPagesSort, setAllPagesSort, 'avgTimeOnPage')}>
+                                Ø Verweildauer (Sek.) {allPagesSort.field === 'avgTimeOnPage' && (allPagesSort.order === 'asc' ? '↑' : '↓')}
+                              </th>
                             </tr>
                           </thead>
                           <tbody>
-                            {analyticsTopPages.slice(0, 100).map((page, i) => (
+                            {sortData(analyticsTopPages, allPagesSort.field, allPagesSort.order).slice(0, 100).map((page, i) => (
                               <tr key={i}>
                                 <td className="text-muted">{i + 1}</td>
                                 <td>
                                   <div className="font-weight-bold small">{page.pageTitle || page.pagePath}</div>
                                   <div className="small text-muted text-truncate" style={{maxWidth: '500px'}}>{page.pagePath}</div>
                                 </td>
+                                <td className="text-right">{page.pageViews.toLocaleString('de-DE')}</td>
                                 <td className="text-right">{page.uniquePageViews.toLocaleString('de-DE')}</td>
                                 <td className="text-right">{Math.round(page.avgTimeOnPage)}</td>
                               </tr>
