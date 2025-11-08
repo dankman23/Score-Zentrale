@@ -390,15 +390,18 @@ agent_communication:
         comment: "✅ Re-tested after filter fix: Now returns 200 ok:true with revenue: 37893.99, orders: 789, margin: 21522.08 for date range 2025-10-01 to 2025-10-31. Filter fix successful."
   - task: "JTL Sales: GET /api/jtl/sales/kpi/with_platform_fees"
     implemented: true
-    working: "NA"
-    file: "/app/app/api/[[...path]]/route.js"
+    working: true
+    file: "/app/app/api/jtl/sales/kpi/with_platform_fees/route.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Berechnet Marge inkl. Gebühren pauschal (20% + 1.5 EUR pro Rechnung)"
+      - working: true
+        agent: "testing"
+        comment: "✅ Sales KPI with Platform Fees working: GET /api/jtl/sales/kpi/with_platform_fees?from=2025-11-01&to=2025-11-03 returns 200 ok:true with net: 16732.63 and platform_fees object. All expected fields present."
   - task: "JTL Sales: GET /api/jtl/sales/timeseries"
     implemented: true
     working: true
