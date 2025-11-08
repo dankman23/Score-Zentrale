@@ -8,10 +8,10 @@ export async function GET() {
   try {
     const pool = await getMssqlPool()
     const query = `
-      SELECT DISTINCT l.cName
-      FROM dbo.tLieferant l
-      WHERE l.cName IS NOT NULL AND l.cName != ''
-      ORDER BY l.cName
+      SELECT DISTINCT cName
+      FROM dbo.tLieferant
+      WHERE cName IS NOT NULL AND cName != ''
+      ORDER BY cName
     `
     const result = await pool.request().query(query)
     const values = (result.recordset || []).map(r => r.cName)
