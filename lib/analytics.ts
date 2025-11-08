@@ -140,12 +140,16 @@ export async function fetchTopPages(
       const dimensionValues = row.dimensionValues || [];
       const metricValues = row.metricValues || [];
 
+      const pageViews = parseInt(metricValues[0]?.value || '0', 10);
+      const totalUsers = parseInt(metricValues[1]?.value || '0', 10);
+      const userEngagementDuration = parseFloat(metricValues[2]?.value || '0');
+      
       return {
         pagePath: dimensionValues[0]?.value || '',
         pageTitle: dimensionValues[1]?.value || '',
-        pageViews: parseInt(metricValues[0]?.value || '0', 10),
-        uniquePageViews: parseInt(metricValues[1]?.value || '0', 10),
-        avgTimeOnPage: parseFloat(metricValues[2]?.value || '0'),
+        pageViews: pageViews,
+        uniquePageViews: totalUsers,
+        avgTimeOnPage: totalUsers > 0 ? userEngagementDuration / totalUsers : 0,
       };
     });
   } catch (error) {
@@ -201,12 +205,16 @@ export async function fetchCategoryPages(
       const dimensionValues = row.dimensionValues || [];
       const metricValues = row.metricValues || [];
 
+      const pageViews = parseInt(metricValues[0]?.value || '0', 10);
+      const totalUsers = parseInt(metricValues[1]?.value || '0', 10);
+      const userEngagementDuration = parseFloat(metricValues[2]?.value || '0');
+      
       return {
         pagePath: dimensionValues[0]?.value || '',
         pageTitle: dimensionValues[1]?.value || '',
-        pageViews: parseInt(metricValues[0]?.value || '0', 10),
-        uniquePageViews: parseInt(metricValues[1]?.value || '0', 10),
-        avgTimeOnPage: parseFloat(metricValues[2]?.value || '0'),
+        pageViews: pageViews,
+        uniquePageViews: totalUsers,
+        avgTimeOnPage: totalUsers > 0 ? userEngagementDuration / totalUsers : 0,
       };
     });
   } catch (error) {
@@ -262,12 +270,16 @@ export async function fetchTopProductPages(
       const dimensionValues = row.dimensionValues || [];
       const metricValues = row.metricValues || [];
 
+      const pageViews = parseInt(metricValues[0]?.value || '0', 10);
+      const totalUsers = parseInt(metricValues[1]?.value || '0', 10);
+      const userEngagementDuration = parseFloat(metricValues[2]?.value || '0');
+      
       return {
         pagePath: dimensionValues[0]?.value || '',
         pageTitle: dimensionValues[1]?.value || '',
-        pageViews: parseInt(metricValues[0]?.value || '0', 10),
-        uniquePageViews: parseInt(metricValues[1]?.value || '0', 10),
-        avgTimeOnPage: parseFloat(metricValues[2]?.value || '0'),
+        pageViews: pageViews,
+        uniquePageViews: totalUsers,
+        avgTimeOnPage: totalUsers > 0 ? userEngagementDuration / totalUsers : 0,
       };
     });
   } catch (error) {
