@@ -206,7 +206,7 @@ export default function App() {
       ])
       
       // Map Sales API field names to what frontend expects
-      const mappedK1 = { ...k1, revenue: k1?.net || 0, margin: 0 } // Sales KPI doesn't have margin yet
+      const mappedK1 = { ...k1, revenue: k1?.net || 0, margin: k1?.margin || 0 } // Now includes margin!
       const mappedK2 = { ...k2, margin_with_fees: (Number(k2?.net || 0) - Number(k2?.platform_fees || 0)) }
       
       // Map timeseries data: net -> revenue, fees -> margin_with_fees
