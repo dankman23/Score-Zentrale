@@ -102,8 +102,13 @@ export async function getCampaignMetrics(
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Google Ads API Error:', response.status, errorText);
-      throw new Error(`Google Ads API error: ${response.status}`);
+      console.error('[Google Ads] API Error Response:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText,
+        headers: Object.fromEntries(response.headers.entries())
+      });
+      throw new Error(`Google Ads API error: ${response.status} - ${errorText.substring(0, 200)}`);
     }
 
     const data = await response.json();
