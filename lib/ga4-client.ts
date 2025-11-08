@@ -25,6 +25,17 @@ export interface PageMetrics {
   avgTimeOnPage: number;
 }
 
+export interface TimeSeriesDataPoint {
+  date: string;
+  sessions?: number;
+  users?: number;
+  bounceRate?: number;
+  avgSessionDuration?: number;
+  pageViews?: number;
+  uniquePageViews?: number;
+  avgTimeOnPage?: number;
+}
+
 // Singleton client instance
 let analyticsClient: BetaAnalyticsDataClient | null = null;
 
