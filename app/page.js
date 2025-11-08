@@ -194,28 +194,37 @@ export default function App() {
     setLoading(true); setError(''); setDemoMode(false)
     try {
       const started = performance.now()
-      const [k1, k2, t1, t2, p, osRaw, poRaw, expRaw, marginRaw] = await Promise.all([
+      const [k1, k2, t1, t2, osRaw, poRaw, expRaw, marginRaw] = await Promise.all([
         getJson(`/api/jtl/sales/kpi?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/kpi/with_platform_fees?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/timeseries?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/timeseries/with_platform_fees?from=${from}&to=${to}`),
-        getJson(`/api/jtl/sales/platform-timeseries?from=${from}&to=${to}`),
         getJson(`/api/jtl/orders/kpi/shipping-split?from=${from}&to=${to}`),
         getJsonRaw(`/api/jtl/purchase/orders?from=${from}&to=${to}`),
         getJsonRaw(`/api/jtl/purchase/expenses?from=${from}&to=${to}`),
         getJson(`/api/jtl/orders/kpi/margin?from=${from}&to=${to}`)
       ])
-      const tsN = sortByDateAsc(toArray(t1))
-      const tsFeesN = sortByDateAsc(toArray(t2))
-      const platN = sortByDateAsc(toArray(p))
-      setKpi(k1); setKpiFees(k2); setTs(tsN); setTsFees(tsFeesN); setPlatTs(platN); setOrdersSplit(osRaw)
+      
+      // Map Sales API field names to what frontend expects
+      const mappedK1 = { ...k1, revenue: k1?.net || 0, margin: 0 } // Sales KPI doesn't have margin yet
+      const mappedK2 = { ...k2, margin_with_fees: (Number(k2?.net || 0) - Number(k2?.platform_fees || 0)) }
+      
+      const tsN = sortByDateAsc(toArray(t1?.rows || t1))
+      const tsFeesN = sortByDateAsc(toArray(t2?.rows || t2))
+      
+      setKpi(mappedK1)
+      setKpiFees(mappedK2)
+      setTs(tsN)
+      setTsFees(tsFeesN)
+      setPlatTs([]) // Platform timeseries removed - will implement later if needed
+      setOrdersSplit(osRaw)
       setPurchaseOrders(poRaw?.ok ? poRaw.data : null)
       setExpenses(expRaw?.ok ? expRaw.data : null)
       setMargin(marginRaw)
       pushLog({ url:'/api/jtl/orders/kpi/shipping-split', status:200, ok:true, ms: Math.round(performance.now()-started) })
       if (isDegradedFlag) {
-        const ksum = Number(k1?.revenue||0) + Number(k1?.orders||0) + Number(k1?.margin||0)
-        const hasData = (tsN?.length||0) + (tsFeesN?.length||0) + (platN?.length||0) > 0 || ksum > 0
+        const ksum = Number(mappedK1?.revenue||0) + Number(mappedK1?.orders||0) + Number(mappedK1?.margin||0)
+        const hasData = (tsN?.length||0) + (tsFeesN?.length||0) > 0 || ksum > 0
         if (!hasData) setDemoSnapshot()
       }
     } catch (e) {
