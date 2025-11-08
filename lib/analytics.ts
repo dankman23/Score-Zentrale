@@ -123,8 +123,8 @@ export async function fetchTopPages(
       ],
       metrics: [
         { name: 'screenPageViews' },
-        { name: 'activeUsers' },
-        { name: 'averageSessionDuration' },
+        { name: 'totalUsers' },
+        { name: 'userEngagementDuration' },
       ],
       orderBys: [
         { metric: { metricName: 'screenPageViews' }, desc: true }
@@ -175,8 +175,8 @@ export async function fetchCategoryPages(
       ],
       metrics: [
         { name: 'screenPageViews' },
-        { name: 'activeUsers' },
-        { name: 'averageSessionDuration' },
+        { name: 'totalUsers' },
+        { name: 'userEngagementDuration' },
       ],
       dimensionFilter: {
         orGroup: {
@@ -236,8 +236,8 @@ export async function fetchTopProductPages(
       ],
       metrics: [
         { name: 'screenPageViews' },
-        { name: 'activeUsers' },
-        { name: 'averageSessionDuration' },
+        { name: 'totalUsers' },
+        { name: 'userEngagementDuration' },
       ],
       dimensionFilter: {
         filter: {
