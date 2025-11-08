@@ -122,6 +122,19 @@ export default function App() {
   const [productSort, setProductSort] = useState({ field: 'pageViews', order: 'desc' })
   const [allPagesSort, setAllPagesSort] = useState({ field: 'pageViews', order: 'desc' })
   
+  // Charts
+  const [metricsTimeSeries, setMetricsTimeSeries] = useState([])
+  const [selectedKpiMetric, setSelectedKpiMetric] = useState('sessions')
+  const [showCategoryChart, setShowCategoryChart] = useState(false)
+  const [showProductChart, setShowProductChart] = useState(false)
+  const [showAllPagesChart, setShowAllPagesChart] = useState(false)
+  const [selectedCategoryPage, setSelectedCategoryPage] = useState(null)
+  const [selectedProductPage, setSelectedProductPage] = useState(null)
+  const [selectedAllPage, setSelectedAllPage] = useState(null)
+  const [categoryPageTimeSeries, setCategoryPageTimeSeries] = useState([])
+  const [productPageTimeSeries, setProductPageTimeSeries] = useState([])
+  const [allPageTimeSeries, setAllPageTimeSeries] = useState([])
+  
   // Google Ads
   const [googleAdsCampaigns, setGoogleAdsCampaigns] = useState([])
   const [googleAdsLoading, setGoogleAdsLoading] = useState(false)
