@@ -1274,8 +1274,34 @@ export default function App() {
                   {/* Kategorie-Seiten */}
                   <div className="card mb-4">
                     <div className="card-header bg-transparent border-0">
-                      <h5 className="mb-0"><i className="bi bi-folder mr-2"/>Kategorie-Seiten Performance</h5>
+                      <div className="d-flex justify-content-between align-items-center">
+                        <h5 className="mb-0"><i className="bi bi-folder mr-2"/>Kategorie-Seiten Performance</h5>
+                        <button className="btn btn-sm btn-outline-secondary" onClick={()=>setShowCategoryChart(!showCategoryChart)}>
+                          <i className={`bi bi-${showCategoryChart?'chevron-up':'chevron-down'} mr-1`}/>
+                          {showCategoryChart ? 'Chart ausblenden' : 'Chart anzeigen'}
+                        </button>
+                      </div>
                     </div>
+                    
+                    {/* Chart Bereich */}
+                    {showCategoryChart && selectedCategoryPage && categoryPageTimeSeries.length > 0 && (
+                      <div className="card-body border-bottom" style={{height: '300px'}}>
+                        <div className="mb-2 small text-muted">
+                          <strong>{selectedCategoryPage.pageTitle}</strong> - Zeitverlauf
+                        </div>
+                        <ResponsiveContainer width="100%" height="85%">
+                          <LineChart data={categoryPageTimeSeries}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                            <XAxis dataKey="date" stroke="#999" />
+                            <YAxis stroke="#999" />
+                            <Tooltip contentStyle={{backgroundColor: '#2d2d2d', border: '1px solid #444'}} />
+                            <Line type="monotone" dataKey="pageViews" stroke="#28a745" strokeWidth={2} name="Impressionen" />
+                            <Line type="monotone" dataKey="uniquePageViews" stroke="#0d6efd" strokeWidth={2} name="Besucher" />
+                            <Line type="monotone" dataKey="avgTimeOnPage" stroke="#ffc107" strokeWidth={2} name="Ø Verweildauer (Sek.)" />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
                     <div className="card-body p-0">
                       <div className="table-responsive">
                         <table className="table table-dark table-hover table-sm mb-0">
