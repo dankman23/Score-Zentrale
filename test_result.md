@@ -449,15 +449,18 @@ agent_communication:
         comment: "✅ Re-tested after filter fix: Now returns 200 with array of 22 data points for date range 2025-10-01 to 2025-10-31. Platform categorization working (all 'Sonstige'). Filter fix successful."
   - task: "JTL Sales: GET /api/jtl/sales/top-products"
     implemented: true
-    working: "NA"
-    file: "/app/app/api/[[...path]]/route.js"
+    working: true
+    file: "/app/app/api/jtl/sales/top-products/route.ts"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Top-Produkte mit dynamischer Spalten-Erkennung (ArtNr, Name)"
+      - working: true
+        agent: "testing"
+        comment: "✅ Top Products working: GET /api/jtl/sales/top-products?limit=10&from=2025-11-01&to=2025-11-03 returns 200 ok:true with rows array containing 10 products. All expected fields (sku, name, quantity, revenue) present."
   - task: "JTL Orders: GET /api/jtl/orders/kpi/shipping-split"
     implemented: true
     working: true
