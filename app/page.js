@@ -1030,24 +1030,276 @@ export default function App() {
             </div>
           </div>
 
-          {/* Notiz Modal (simple) */}
-          {noteFor && (
-            <div className="modal d-block" tabIndex="-1" role="dialog" style={{background:'rgba(0,0,0,.5)'}}>
-              <div className="modal-dialog" role="document">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5 className="modal-title">Notiz für {noteFor?.name}</h5>
-                    <button type="button" className="close" onClick={()=>setNoteFor(null)}><span>&times;</span></button>
-                  </div>
-                  <div className="modal-body">
-                    <textarea className="form-control" rows={4} value={noteText} onChange={e=>setNoteText(e.target.value)} placeholder="Notiz eintragen..." />
-                  </div>
-                  <div className="modal-footer">
-                    <button className="btn btn-secondary" onClick={()=>setNoteFor(null)}>Abbrechen</button>
-                    <button className="btn btn-primary" onClick={saveNote}>Speichern</button>
+              {/* Notiz Modal (simple) */}
+              {noteFor && (
+                <div className="modal d-block" tabIndex="-1" role="dialog" style={{background:'rgba(0,0,0,.5)'}}>
+                  <div className="modal-dialog" role="document">
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h5 className="modal-title">Notiz für {noteFor?.name}</h5>
+                        <button type="button" className="close" onClick={()=>setNoteFor(null)}><span>&times;</span></button>
+                      </div>
+                      <div className="modal-body">
+                        <textarea className="form-control" rows={4} value={noteText} onChange={e=>setNoteText(e.target.value)} placeholder="Notiz eintragen..." />
+                      </div>
+                      <div className="modal-footer">
+                        <button className="btn btn-secondary" onClick={()=>setNoteFor(null)}>Abbrechen</button>
+                        <button className="btn btn-primary" onClick={saveNote}>Speichern</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              )}
+            </div>
+          )}
+
+          {/* Analytics (GA4) Tab */}
+          {marketingSub==='analytics' && (
+            <div>
+              <div className="d-flex align-items-center justify-content-between mb-4">
+                <h3 className="mb-0">Google Analytics 4</h3>
+                <div className="btn-group btn-group-sm">
+                  <button className={`btn ${analyticsDateRange==='7daysAgo'?'btn-primary':'btn-outline-primary'}`} onClick={()=>setAnalyticsDateRange('7daysAgo')}>7 Tage</button>
+                  <button className={`btn ${analyticsDateRange==='30daysAgo'?'btn-primary':'btn-outline-primary'}`} onClick={()=>setAnalyticsDateRange('30daysAgo')}>30 Tage</button>
+                  <button className={`btn ${analyticsDateRange==='90daysAgo'?'btn-primary':'btn-outline-primary'}`} onClick={()=>setAnalyticsDateRange('90daysAgo')}>90 Tage</button>
+                </div>
               </div>
+
+              {analyticsLoading ? (
+                <div className="text-center py-5">
+                  <div className="spinner-border text-primary" role="status"><span className="sr-only">Laden...</span></div>
+                  <p className="mt-3 text-muted">Analytics-Daten werden geladen...</p>
+                </div>
+              ) : (
+                <>
+                  {/* KPI Tiles */}
+                  {analyticsMetrics && (
+                    <div className="row mb-4">
+                      <div className="col-md-3 mb-3">
+                        <div className="card h-100">
+                          <div className="card-body">
+                            <div className="label mb-2 text-uppercase small text-muted">Sessions</div>
+                            <div className="value h2 mb-0">{analyticsMetrics.sessions.toLocaleString('de-DE')}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3 mb-3">
+                        <div className="card h-100">
+                          <div className="card-body">
+                            <div className="label mb-2 text-uppercase small text-muted">Nutzer</div>
+                            <div className="value h2 mb-0">{analyticsMetrics.users.toLocaleString('de-DE')}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3 mb-3">
+                        <div className="card h-100">
+                          <div className="card-body">
+                            <div className="label mb-2 text-uppercase small text-muted">Ø Session-Dauer</div>
+                            <div className="value h2 mb-0">{Math.round(analyticsMetrics.avgSessionDuration)}s</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3 mb-3">
+                        <div className="card h-100">
+                          <div className="card-body">
+                            <div className="label mb-2 text-uppercase small text-muted">Bounce Rate</div>
+                            <div className="value h2 mb-0">{(analyticsMetrics.bounceRate * 100).toFixed(1)}%</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Traffic Sources */}
+                  <div className="card mb-4">
+                    <div className="card-header bg-transparent border-0">
+                      <h5 className="mb-0"><i className="bi bi-diagram-3 mr-2"/>Traffic-Quellen (Top 10)</h5>
+                    </div>
+                    <div className="card-body p-0">
+                      <div className="table-responsive">
+                        <table className="table table-dark table-hover table-sm mb-0">
+                          <thead>
+                            <tr>
+                              <th>Quelle / Medium</th>
+                              <th className="text-right">Sessions</th>
+                              <th className="text-right">Nutzer</th>
+                              <th className="text-right">Conversions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {analyticsTrafficSources.map((src, i) => (
+                              <tr key={i}>
+                                <td><strong>{src.source}</strong> / {src.medium}</td>
+                                <td className="text-right">{src.sessions.toLocaleString('de-DE')}</td>
+                                <td className="text-right">{src.users.toLocaleString('de-DE')}</td>
+                                <td className="text-right">{src.conversions.toLocaleString('de-DE')}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Kategorie-Seiten */}
+                  <div className="card mb-4">
+                    <div className="card-header bg-transparent border-0">
+                      <h5 className="mb-0"><i className="bi bi-folder mr-2"/>Kategorie-Seiten Performance</h5>
+                    </div>
+                    <div className="card-body p-0">
+                      <div className="table-responsive">
+                        <table className="table table-dark table-hover table-sm mb-0">
+                          <thead>
+                            <tr>
+                              <th>Seite</th>
+                              <th className="text-right">Besucher</th>
+                              <th className="text-right">Ø Zeit (Sek.)</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {analyticsCategoryPages.map((page, i) => (
+                              <tr key={i}>
+                                <td>
+                                  <div className="font-weight-bold">{page.pageTitle}</div>
+                                  <div className="small text-muted">{page.pagePath}</div>
+                                </td>
+                                <td className="text-right">{page.uniquePageViews.toLocaleString('de-DE')}</td>
+                                <td className="text-right">{Math.round(page.avgTimeOnPage)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Top 100 Produktseiten */}
+                  <div className="card mb-4">
+                    <div className="card-header bg-transparent border-0">
+                      <h5 className="mb-0"><i className="bi bi-box mr-2"/>Top 100 Produktseiten</h5>
+                    </div>
+                    <div className="card-body p-0">
+                      <div className="table-responsive">
+                        <table className="table table-dark table-hover table-sm mb-0">
+                          <thead>
+                            <tr>
+                              <th style={{width: '60px'}}>#</th>
+                              <th>Produktseite</th>
+                              <th className="text-right">Besucher</th>
+                              <th className="text-right">Ø Zeit (Sek.)</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {analyticsProductPages.slice(0, 100).map((page, i) => (
+                              <tr key={i}>
+                                <td className="text-muted">{i + 1}</td>
+                                <td>
+                                  <div className="font-weight-bold small">{page.pageTitle || page.pagePath}</div>
+                                  <div className="small text-muted text-truncate" style={{maxWidth: '500px'}}>{page.pagePath}</div>
+                                </td>
+                                <td className="text-right">{page.uniquePageViews.toLocaleString('de-DE')}</td>
+                                <td className="text-right">{Math.round(page.avgTimeOnPage)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Top 100 Alle Seiten */}
+                  <div className="card">
+                    <div className="card-header bg-transparent border-0">
+                      <h5 className="mb-0"><i className="bi bi-file-earmark-text mr-2"/>Top 100 Alle Seiten</h5>
+                    </div>
+                    <div className="card-body p-0">
+                      <div className="table-responsive">
+                        <table className="table table-dark table-hover table-sm mb-0">
+                          <thead>
+                            <tr>
+                              <th style={{width: '60px'}}>#</th>
+                              <th>Seite</th>
+                              <th className="text-right">Besucher</th>
+                              <th className="text-right">Ø Zeit (Sek.)</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {analyticsTopPages.slice(0, 100).map((page, i) => (
+                              <tr key={i}>
+                                <td className="text-muted">{i + 1}</td>
+                                <td>
+                                  <div className="font-weight-bold small">{page.pageTitle || page.pagePath}</div>
+                                  <div className="small text-muted text-truncate" style={{maxWidth: '500px'}}>{page.pagePath}</div>
+                                </td>
+                                <td className="text-right">{page.uniquePageViews.toLocaleString('de-DE')}</td>
+                                <td className="text-right">{Math.round(page.avgTimeOnPage)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Google Ads Tab */}
+          {marketingSub==='googleads' && (
+            <div>
+              <h3 className="mb-4">Google Ads Kampagnen</h3>
+
+              {googleAdsLoading ? (
+                <div className="text-center py-5">
+                  <div className="spinner-border text-primary" role="status"><span className="sr-only">Laden...</span></div>
+                  <p className="mt-3 text-muted">Google Ads Daten werden geladen...</p>
+                </div>
+              ) : googleAdsCampaigns.length > 0 ? (
+                <div className="card">
+                  <div className="card-body p-0">
+                    <div className="table-responsive">
+                      <table className="table table-dark table-hover table-sm mb-0">
+                        <thead>
+                          <tr>
+                            <th>Kampagne</th>
+                            <th>Status</th>
+                            <th className="text-right">Impressionen</th>
+                            <th className="text-right">Klicks</th>
+                            <th className="text-right">CTR</th>
+                            <th className="text-right">Kosten</th>
+                            <th className="text-right">CPC</th>
+                            <th className="text-right">Conversions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {googleAdsCampaigns.map((camp, i) => (
+                            <tr key={i}>
+                              <td className="font-weight-bold">{camp.campaignName}</td>
+                              <td>
+                                <span className={`badge badge-${camp.status==='ENABLED'?'success':'secondary'}`}>
+                                  {camp.status}
+                                </span>
+                              </td>
+                              <td className="text-right">{camp.impressions.toLocaleString('de-DE')}</td>
+                              <td className="text-right">{camp.clicks.toLocaleString('de-DE')}</td>
+                              <td className="text-right">{camp.ctr.toFixed(2)}%</td>
+                              <td className="text-right">{fmtCurrency(camp.costAmount)}</td>
+                              <td className="text-right">{fmtCurrency(camp.cpcAmount)}</td>
+                              <td className="text-right">{camp.conversions.toFixed(0)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="alert alert-info">
+                  <i className="bi bi-info-circle mr-2"/>
+                  Google Ads API ist derzeit noch in Entwicklung. Die Daten werden bald verfügbar sein.
+                </div>
+              )}
             </div>
           )}
         </div>
