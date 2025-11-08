@@ -1174,13 +1174,19 @@ export default function App() {
                           <thead>
                             <tr>
                               <th>Quelle / Medium</th>
-                              <th className="text-right">Sessions</th>
-                              <th className="text-right">Nutzer</th>
-                              <th className="text-right">Conversions</th>
+                              <th className="text-right" style={{cursor:'pointer'}} onClick={()=>toggleSort(trafficSort, setTrafficSort, 'sessions')}>
+                                Sessions {trafficSort.field === 'sessions' && (trafficSort.order === 'asc' ? '↑' : '↓')}
+                              </th>
+                              <th className="text-right" style={{cursor:'pointer'}} onClick={()=>toggleSort(trafficSort, setTrafficSort, 'users')}>
+                                Nutzer {trafficSort.field === 'users' && (trafficSort.order === 'asc' ? '↑' : '↓')}
+                              </th>
+                              <th className="text-right" style={{cursor:'pointer'}} onClick={()=>toggleSort(trafficSort, setTrafficSort, 'conversions')}>
+                                Conversions {trafficSort.field === 'conversions' && (trafficSort.order === 'asc' ? '↑' : '↓')}
+                              </th>
                             </tr>
                           </thead>
                           <tbody>
-                            {analyticsTrafficSources.map((src, i) => (
+                            {sortData(analyticsTrafficSources, trafficSort.field, trafficSort.order).map((src, i) => (
                               <tr key={i}>
                                 <td><strong>{src.source}</strong> / {src.medium}</td>
                                 <td className="text-right">{src.sessions.toLocaleString('de-DE')}</td>
