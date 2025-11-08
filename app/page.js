@@ -360,6 +360,54 @@ export default function App() {
     const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url)
   }
 
+  // Analytics Functions
+  const loadAnalytics = async () => {
+    setAnalyticsLoading(true)
+    try {
+      const dateParam = `startDate=${analyticsDateRange}&endDate=today`
+      
+      // Parallel laden
+      const [metricsRes, sourcesRes, topPagesRes, categoryRes, productRes] = await Promise.all([
+        fetch(`/api/analytics/metrics?${dateParam}`),
+        fetch(`/api/analytics/traffic-sources?${dateParam}&limit=10`),
+        fetch(`/api/analytics/top-pages?${dateParam}&limit=100`),
+        fetch(`/api/analytics/category-pages?${dateParam}`),
+        fetch(`/api/analytics/product-pages?${dateParam}&limit=100`)
+      ])
+      
+      const metrics = await metricsRes.json()
+      const sources = await sourcesRes.json()
+      const topPages = await topPagesRes.json()
+      const category = await categoryRes.json()
+      const product = await productRes.json()
+      
+      setAnalyticsMetrics(metrics)
+      setAnalyticsTrafficSources(sources)
+      setAnalyticsTopPages(topPages)
+      setAnalyticsCategoryPages(category)
+      setAnalyticsProductPages(product)
+    } catch (e) {
+      console.error('Analytics load failed:', e)
+    }
+    setAnalyticsLoading(false)
+  }
+
+  const loadGoogleAds = async () => {
+    setGoogleAdsLoading(true)
+    try {
+      const res = await fetch('/api/google-ads/campaigns')
+      const data = await res.json()
+      if (data.campaigns) {
+        setGoogleAdsCampaigns(data.campaigns)
+      } else if (data.error) {
+        console.error('Google Ads Error:', data.error)
+      }
+    } catch (e) {
+      console.error('Google Ads load failed:', e)
+    }
+    setGoogleAdsLoading(false)
+  }
+
   // Kaltakquise Functions
   const loadColdProspects = async () => {
     try {
