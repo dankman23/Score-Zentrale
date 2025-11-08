@@ -107,7 +107,20 @@ export default function App() {
   const [noteFor, setNoteFor] = useState(null)
   const [noteText, setNoteText] = useState('')
   const [netlog, setNetlog] = useState([]) // request inspector
-  const [marketingSub, setMarketingSub] = useState('warmaquise') // warmaquise|kaltaquise|sea|seo
+  const [marketingSub, setMarketingSub] = useState('warmaquise') // warmaquise|analytics|googleads
+  
+  // Analytics (GA4)
+  const [analyticsMetrics, setAnalyticsMetrics] = useState(null)
+  const [analyticsTrafficSources, setAnalyticsTrafficSources] = useState([])
+  const [analyticsTopPages, setAnalyticsTopPages] = useState([])
+  const [analyticsCategoryPages, setAnalyticsCategoryPages] = useState([])
+  const [analyticsProductPages, setAnalyticsProductPages] = useState([])
+  const [analyticsLoading, setAnalyticsLoading] = useState(false)
+  const [analyticsDateRange, setAnalyticsDateRange] = useState('30daysAgo')
+  
+  // Google Ads
+  const [googleAdsCampaigns, setGoogleAdsCampaigns] = useState([])
+  const [googleAdsLoading, setGoogleAdsLoading] = useState(false)
 
   const isDegradedFlag = (process.env.NEXT_PUBLIC_DEGRADED === '1')
 
