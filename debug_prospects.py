@@ -7,7 +7,7 @@ import requests
 import json
 import os
 
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://scorezen.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://kpi-central-4.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def debug_prospects():

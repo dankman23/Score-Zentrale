@@ -8,7 +8,7 @@ import json
 import os
 import uuid
 
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://scorezen.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://kpi-central-4.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def verify_analyze_db_entries():
