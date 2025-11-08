@@ -224,6 +224,118 @@ export async function fetchCategoryPages(
 }
 
 /**
+ * Fetch overall metrics time series
+ */
+export async function fetchMetricsTimeSeries(
+  startDate: string = '30daysAgo',
+  endDate: string = 'today'
+): Promise<TimeSeriesDataPoint[]> {
+  const client = getAnalyticsClient();
+  const propertyId = getPropertyId();
+
+  try {
+    const [response] = await client.runReport({
+      property: `properties/${propertyId}`,
+      dateRanges: [{ startDate, endDate }],
+      dimensions: [{ name: 'date' }],
+      metrics: [
+        { name: 'sessions' },
+        { name: 'totalUsers' },
+        { name: 'bounceRate' },
+        { name: 'averageSessionDuration' },
+      ],
+      orderBys: [{ dimension: { dimensionName: 'date' }, desc: false }],
+    });
+
+    if (!response.rows || response.rows.length === 0) {
+      return [];
+    }
+
+    return response.rows.map(row => {
+      const dimensionValues = row.dimensionValues || [];
+      const metricValues = row.metricValues || [];
+      const dateStr = dimensionValues[0]?.value || '';
+      
+      // Format date as YYYY-MM-DD
+      const formattedDate = `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`;
+
+      return {
+        date: formattedDate,
+        sessions: parseInt(metricValues[0]?.value || '0', 10),
+        users: parseInt(metricValues[1]?.value || '0', 10),
+        bounceRate: parseFloat(metricValues[2]?.value || '0'),
+        avgSessionDuration: parseFloat(metricValues[3]?.value || '0'),
+      };
+    });
+  } catch (error) {
+    console.error('Error fetching metrics time series:', error);
+    throw new Error('Failed to fetch metrics time series');
+  }
+}
+
+/**
+ * Fetch time series for a specific page
+ */
+export async function fetchPageTimeSeries(
+  pagePath: string,
+  startDate: string = '30daysAgo',
+  endDate: string = 'today'
+): Promise<TimeSeriesDataPoint[]> {
+  const client = getAnalyticsClient();
+  const propertyId = getPropertyId();
+
+  try {
+    const [response] = await client.runReport({
+      property: `properties/${propertyId}`,
+      dateRanges: [{ startDate, endDate }],
+      dimensions: [{ name: 'date' }],
+      metrics: [
+        { name: 'sessions' },
+        { name: 'totalUsers' },
+        { name: 'userEngagementDuration' },
+      ],
+      dimensionFilter: {
+        filter: {
+          fieldName: 'pagePath',
+          stringFilter: {
+            matchType: 'EXACT' as const,
+            value: pagePath
+          }
+        }
+      },
+      orderBys: [{ dimension: { dimensionName: 'date' }, desc: false }],
+    });
+
+    if (!response.rows || response.rows.length === 0) {
+      return [];
+    }
+
+    return response.rows.map(row => {
+      const dimensionValues = row.dimensionValues || [];
+      const metricValues = row.metricValues || [];
+      const dateStr = dimensionValues[0]?.value || '';
+      
+      // Format date as YYYY-MM-DD
+      const formattedDate = `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`;
+      
+      const pageViews = parseInt(metricValues[0]?.value || '0', 10);
+      const totalUsers = parseInt(metricValues[1]?.value || '0', 10);
+      const userEngagementDuration = parseFloat(metricValues[2]?.value || '0');
+
+      return {
+        date: formattedDate,
+        pageViews: pageViews,
+        uniquePageViews: totalUsers,
+        avgTimeOnPage: totalUsers > 0 ? userEngagementDuration / totalUsers : 0,
+      };
+    });
+  } catch (error) {
+    console.error('Error fetching page time series:', error);
+    throw new Error('Failed to fetch page time series');
+  }
+}
+
+/**
  * Fetch top product detail pages (filter by URL pattern)
  */
 export async function fetchTopProductPages(
