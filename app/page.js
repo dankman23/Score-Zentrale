@@ -1321,7 +1321,14 @@ export default function App() {
                           </thead>
                           <tbody>
                             {sortData(analyticsCategoryPages, categorySort.field, categorySort.order).map((page, i) => (
-                              <tr key={i}>
+                              <tr key={i} 
+                                  style={{cursor: 'pointer'}} 
+                                  className={selectedCategoryPage?.pagePath === page.pagePath ? 'table-active' : ''}
+                                  onClick={()=>{
+                                    setSelectedCategoryPage(page)
+                                    setShowCategoryChart(true)
+                                    loadPageTimeSeries(page.pagePath, setCategoryPageTimeSeries)
+                                  }}>
                                 <td>
                                   <div className="font-weight-bold">{page.pageTitle}</div>
                                   <div className="small text-muted">{page.pagePath}</div>
