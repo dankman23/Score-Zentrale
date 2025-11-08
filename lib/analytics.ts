@@ -1,4 +1,4 @@
-import { getAnalyticsClient, getPropertyId, AnalyticsMetrics, TrafficSource, PageMetrics } from './ga4-client';
+import { getAnalyticsClient, getPropertyId, AnalyticsMetrics, TrafficSource, PageMetrics, TimeSeriesDataPoint } from './ga4-client';
 
 /**
  * Fetch key analytics metrics for a given date range
