@@ -1154,40 +1154,83 @@ export default function App() {
                 <>
                   {/* KPI Tiles */}
                   {analyticsMetrics && (
-                    <div className="row mb-4">
-                      <div className="col-md-3 mb-3">
-                        <div className="card h-100">
-                          <div className="card-body">
-                            <div className="label mb-2 text-uppercase small text-muted">Sessions</div>
-                            <div className="value h2 mb-0">{analyticsMetrics.sessions.toLocaleString('de-DE')}</div>
+                    <>
+                      <div className="row mb-4">
+                        <div className="col-md-3 mb-3">
+                          <div className="card h-100">
+                            <div className="card-body">
+                              <div className="label mb-2 text-uppercase small text-muted">Sessions</div>
+                              <div className="value h2 mb-0">{analyticsMetrics.sessions.toLocaleString('de-DE')}</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-md-3 mb-3">
+                          <div className="card h-100">
+                            <div className="card-body">
+                              <div className="label mb-2 text-uppercase small text-muted">Nutzer</div>
+                              <div className="value h2 mb-0">{analyticsMetrics.users.toLocaleString('de-DE')}</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-md-3 mb-3">
+                          <div className="card h-100">
+                            <div className="card-body">
+                              <div className="label mb-2 text-uppercase small text-muted">Ø Session-Dauer</div>
+                              <div className="value h2 mb-0">{Math.round(analyticsMetrics.avgSessionDuration)}s</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-md-3 mb-3">
+                          <div className="card h-100">
+                            <div className="card-body">
+                              <div className="label mb-2 text-uppercase small text-muted">Bounce Rate</div>
+                              <div className="value h2 mb-0">{(analyticsMetrics.bounceRate * 100).toFixed(1)}%</div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div className="col-md-3 mb-3">
-                        <div className="card h-100">
-                          <div className="card-body">
-                            <div className="label mb-2 text-uppercase small text-muted">Nutzer</div>
-                            <div className="value h2 mb-0">{analyticsMetrics.users.toLocaleString('de-DE')}</div>
+
+                      {/* KPI Charts mit Tabs */}
+                      {metricsTimeSeries.length > 0 && (
+                        <div className="card mb-4">
+                          <div className="card-header bg-transparent border-0 pb-0">
+                            <ul className="nav nav-tabs card-header-tabs">
+                              <li className="nav-item">
+                                <a className={`nav-link ${selectedKpiMetric==='sessions'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSelectedKpiMetric('sessions')}}>
+                                  Sessions
+                                </a>
+                              </li>
+                              <li className="nav-item">
+                                <a className={`nav-link ${selectedKpiMetric==='users'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSelectedKpiMetric('users')}}>
+                                  Nutzer
+                                </a>
+                              </li>
+                              <li className="nav-item">
+                                <a className={`nav-link ${selectedKpiMetric==='avgSessionDuration'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSelectedKpiMetric('avgSessionDuration')}}>
+                                  Ø Session-Dauer
+                                </a>
+                              </li>
+                              <li className="nav-item">
+                                <a className={`nav-link ${selectedKpiMetric==='bounceRate'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSelectedKpiMetric('bounceRate')}}>
+                                  Bounce Rate
+                                </a>
+                              </li>
+                            </ul>
+                          </div>
+                          <div className="card-body" style={{height: '300px'}}>
+                            <ResponsiveContainer width="100%" height="100%">
+                              <LineChart data={metricsTimeSeries}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                                <XAxis dataKey="date" stroke="#999" />
+                                <YAxis stroke="#999" />
+                                <Tooltip contentStyle={{backgroundColor: '#2d2d2d', border: '1px solid #444'}} />
+                                <Line type="monotone" dataKey={selectedKpiMetric} stroke="#0d6efd" strokeWidth={2} dot={{fill: '#0d6efd'}} />
+                              </LineChart>
+                            </ResponsiveContainer>
                           </div>
                         </div>
-                      </div>
-                      <div className="col-md-3 mb-3">
-                        <div className="card h-100">
-                          <div className="card-body">
-                            <div className="label mb-2 text-uppercase small text-muted">Ø Session-Dauer</div>
-                            <div className="value h2 mb-0">{Math.round(analyticsMetrics.avgSessionDuration)}s</div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-3 mb-3">
-                        <div className="card h-100">
-                          <div className="card-body">
-                            <div className="label mb-2 text-uppercase small text-muted">Bounce Rate</div>
-                            <div className="value h2 mb-0">{(analyticsMetrics.bounceRate * 100).toFixed(1)}%</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                      )}
+                    </>
                   )}
 
                   {/* Traffic Sources */}
