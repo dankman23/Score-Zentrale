@@ -61,7 +61,7 @@ export async function getCampaignMetrics(
       `;
     }
 
-    // Google Ads Query Language (GAQL) query
+    // Google Ads Query Language (GAQL) query - simplified for Basic Access
     const query = `
       SELECT
         campaign.id,
@@ -69,14 +69,9 @@ export async function getCampaignMetrics(
         campaign.status,
         metrics.impressions,
         metrics.clicks,
-        metrics.ctr,
-        metrics.cost_micros,
-        metrics.average_cpc,
-        metrics.conversions
+        metrics.cost_micros
       FROM campaign
       WHERE campaign.status != 'REMOVED'
-      ${dateCondition}
-      ORDER BY metrics.impressions DESC
       LIMIT 50
     `;
 
