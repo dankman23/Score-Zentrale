@@ -11,7 +11,7 @@ export async function GET() {
       SELECT DISTINCT cName1 AS name
       FROM dbo.tLieferant
       WHERE cName1 IS NOT NULL AND cName1 != ''
-      ORDER BY cName1
+      ORDER BY name
     `
     const result = await pool.request().query(query)
     const values = (result.recordset || []).map(r => r.name)
