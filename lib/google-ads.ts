@@ -37,7 +37,15 @@ export async function getCampaignMetrics(
   try {
     const accessToken = await getAccessToken();
     const customerId = process.env.GOOGLE_ADS_CUSTOMER_ID;
+    const mccId = process.env.GOOGLE_ADS_MCC_ID;
     const developerToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
+
+    console.log('[Google Ads] Starting request with:', {
+      customerId,
+      mccId,
+      hasToken: !!accessToken,
+      hasDeveloperToken: !!developerToken
+    });
 
     // Format dates for Google Ads API (YYYYMMDD)
     let dateCondition = '';
@@ -69,16 +77,22 @@ export async function getCampaignMetrics(
       LIMIT 50
     `;
 
+    const headers: Record<string, string> = {
+      'Authorization': `Bearer ${accessToken}`,
+      'developer-token': developerToken!,
+      'Content-Type': 'application/json',
+    };
+
+    // Use MCC ID as login-customer-id if available
+    if (mccId) {
+      headers['login-customer-id'] = mccId;
+    }
+
     const response = await fetch(
       `https://googleads.googleapis.com/v18/customers/${customerId}/googleAds:search`,
       {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'developer-token': developerToken!,
-          'Content-Type': 'application/json',
-          'login-customer-id': customerId!,
-        },
+        headers,
         body: JSON.stringify({ query }),
       }
     );
