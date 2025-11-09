@@ -222,8 +222,8 @@ async function handleRoute(request, { params }) {
           positions: positions.recordset.map(p => ({
             orderNumber: p.cAuftragsNr,
             orderDate: p.dErstellt?.toISOString().slice(0, 10),
+            orderType: p.cType,
             kArtikel: p.kArtikel,
-            posName: p.posName,
             quantity: parseFloat(p.fAnzahl || 0).toFixed(2),
             netPrice: parseFloat(p.fVKNetto || 0).toFixed(2),
             netTotal: parseFloat(p.netTotal || 0).toFixed(2)
