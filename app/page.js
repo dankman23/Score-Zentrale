@@ -1692,6 +1692,200 @@ export default function App() {
         </div>
       )}
 
+      {/* Warmakquise */}
+      {activeTab==='warmakquise' && (
+        <div>
+          <div className="d-flex align-items-center justify-content-between mb-3">
+            <div>
+              <h3 className="mb-0"><i className="bi bi-people mr-2"/>Warmakquise</h3>
+              <div className="text-muted small">Aktive, wertige Kunden – Score-basiert priorisiert</div>
+            </div>
+            <div>
+              <button className="btn btn-primary btn-sm mr-2" disabled={importing} onClick={runImport}>{importing? 'Import läuft…' : 'Kunden importieren / aktualisieren'}</button>
+              <button className="btn btn-outline-secondary btn-sm" onClick={exportLeadsCSV}>CSV Export</button>
+            </div>
+          </div>
+
+          {/* Filterleiste */}
+          <div className="card mb-3">
+            <div className="card-body d-flex align-items-center flex-wrap">
+              <div className="mr-2 mb-2">
+                <label className="small mb-1">Status</label>
+                <select className="form-control form-control-sm" value={statusF} onChange={e=>{ setStatusF(e.target.value); setPageF(1) }}>
+                  <option value="">Alle</option>
+                  <option value="open">open</option>
+                  <option value="called">called</option>
+                  <option value="qualified">qualified</option>
+                  <option value="discarded">discarded</option>
+                </select>
+              </div>
+              <div className="mr-2 mb-2">
+                <label className="small mb-1">B2B</label>
+                <select className="form-control form-control-sm" value={b2bF} onChange={e=>{ setB2bF(e.target.value); setPageF(1) }}>
+                  <option value="">Alle</option>
+                  <option value="true">nur B2B</option>
+                  <option value="false">nur B2C</option>
+                </select>
+              </div>
+              <div className="mr-2 mb-2">
+                <label className="small mb-1">Min-Score</label>
+                <input type="number" className="form-control form-control-sm" min={0} max={100} value={minScoreF} onChange={e=>{ setMinScoreF(e.target.value); setPageF(1) }} style={{width:110}}/>
+              </div>
+              <div className="ml-auto mb-2 d-flex align-items-center" style={{gap:8}}>
+                <input type="text" className="form-control form-control-sm" placeholder="Suchen (Name/Telefon/Email/Nr)" value={qTyping} onChange={e=>setQTyping(e.target.value)} style={{minWidth:260}}/>
+              </div>
+            </div>
+          </div>
+
+          {/* Tabelle */}
+          <div className="card">
+            <div className="card-body p-0">
+              <div className="table-responsive">
+                <table className="table table-dark table-hover table-sm mb-0">
+                  <thead className="thead-dark">
+                    <tr>
+                      <th style={{width:90}}>Score</th>
+                      <th>Name</th>
+                      <th style={{width:80}}>B2B</th>
+                      <th style={{width:140}}>Letzte Bestellung</th>
+                      <th style={{width:90}}>Orders</th>
+                      <th style={{width:160}}>Umsatz netto</th>
+                      <th style={{width:220}}>Kontakt</th>
+                      <th style={{width:120}}>Status</th>
+                      <th style={{width:120}}>Aktion</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leadsLoading && Array.from({length:5}).map((_,i)=> (
+                      <tr key={`sk-${i}`}>
+                        <td><div className="bg-secondary" style={{height:16, width:40, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:180, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:50, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:100, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:40, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:100, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:160, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:80, borderRadius:6}}/></td>
+                        <td><div className="bg-secondary" style={{height:14, width:80, borderRadius:6}}/></td>
+                      </tr>
+                    ))}
+
+                    {!leadsLoading && leads.map(lead => (
+                      <tr key={lead.id}>
+                        <td className="align-middle"><ScoreBadge v={lead.warmScore}/></td>
+                        <td className="align-middle">
+                          <div className="font-weight-bold">{lead.name||lead.kundennr||'—'}</div>
+                          <div className="text-muted small">Nr: {lead.kundennr||'—'}</div>
+                        </td>
+                        <td className="align-middle"><B2BBadge b={lead.isB2B}/></td>
+                        <td className="align-middle">{lead.lastOrder||'—'}</td>
+                        <td className="align-middle">{lead.ordersCount??'—'}</td>
+                        <td className="align-middle">{fmtCurrency(lead.totalRevenueNetto||0)}</td>
+                        <td className="align-middle">
+                          <div><a className="text-info" href={`tel:${lead?.contact?.phone||''}`}><i className="bi bi-telephone mr-1"/>{lead?.contact?.phone||'—'}</a></div>
+                          <div><a className="text-info" href={`mailto:${lead?.contact?.email||''}`}><i className="bi bi-envelope mr-1"/>{lead?.contact?.email||'—'}</a></div>
+                        </td>
+                        <td className="align-middle">
+                          <div className="dropdown">
+                            <button className="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown">{lead.status||'open'}</button>
+                            <div className="dropdown-menu dropdown-menu-right">
+                              {['open','called','qualified','discarded'].map(s => (
+                                <a key={s} className="dropdown-item" href="#" onClick={(e)=>{e.preventDefault(); changeStatus(lead, s)}}>{s}</a>
+                              ))}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="align-middle">
+                          <button className="btn btn-outline-primary btn-sm" onClick={()=>{ setNoteFor(lead); setNoteText('') }}>
+                            <i className="bi bi-chat-left-text mr-1"/>Notiz
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+
+                    {!leadsLoading && leads?.length===0 && (
+                      <tr><td colSpan={9} className="text-center text-muted p-4">Kein Ergebnis für diese Filter</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              <div className="d-flex align-items-center justify-content-between p-2">
+                <div className="text-muted small">{leadsTotal.toLocaleString('de-DE')} Einträge</div>
+                <div className="d-flex align-items-center">
+                  <button className="btn btn-sm btn-outline-secondary mr-2" disabled={pageF<=1} onClick={()=>setPageF(p=>Math.max(1,p-1))}>Zurück</button>
+                  <div className="mr-2 small">Seite {pageF}</div>
+                  <button className="btn btn-sm btn-outline-secondary mr-3" disabled={(pageF*limitF)>=leadsTotal} onClick={()=>setPageF(p=>p+1)}>Weiter</button>
+                  <select className="form-control form-control-sm" style={{width:100}} value={limitF} onChange={e=>{ setLimitF(parseInt(e.target.value)); setPageF(1) }}>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Notizen-History Sektion */}
+          {leads.length > 0 && (
+            <div className="card mt-3">
+              <div className="card-header">
+                <i className="bi bi-clock-history mr-2"/>Kontakt-History & Notizen
+              </div>
+              <div className="card-body">
+                <p className="text-muted small mb-0">Notizen werden pro Kunde gespeichert. Klicken Sie auf "Notiz" bei einem Kunden um History zu sehen.</p>
+              </div>
+            </div>
+          )}
+
+          {/* Notiz Modal */}
+          {noteFor && (
+            <div className="modal d-block" tabIndex="-1" role="dialog" style={{background:'rgba(0,0,0,.5)'}}>
+              <div className="modal-dialog modal-lg" role="document">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title">
+                      <i className="bi bi-chat-left-text mr-2"/>Notiz für {noteFor?.name || noteFor?.kundennr}
+                    </h5>
+                    <button type="button" className="close" onClick={()=>setNoteFor(null)}><span>&times;</span></button>
+                  </div>
+                  <div className="modal-body">
+                    {/* History anzeigen */}
+                    {noteFor.notes && noteFor.notes.length > 0 && (
+                      <div className="mb-3">
+                        <h6 className="text-muted">Bisherige Notizen:</h6>
+                        <div className="list-group mb-3">
+                          {noteFor.notes.map((note, idx) => (
+                            <div key={idx} className="list-group-item list-group-item-dark">
+                              <div className="d-flex justify-content-between align-items-start">
+                                <div className="flex-grow-1">
+                                  <p className="mb-1">{note.text}</p>
+                                  <small className="text-muted">{new Date(note.createdAt).toLocaleString('de-DE')}</small>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    <label className="font-weight-bold">Neue Notiz hinzufügen:</label>
+                    <textarea className="form-control" rows={4} value={noteText} onChange={e=>setNoteText(e.target.value)} placeholder="Notiz eintragen (z.B. Telefonat, Meeting, Follow-up)..." />
+                  </div>
+                  <div className="modal-footer">
+                    <button className="btn btn-secondary" onClick={()=>setNoteFor(null)}>Abbrechen</button>
+                    <button className="btn btn-primary" onClick={saveNote}>
+                      <i className="bi bi-save mr-1"/>Speichern
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Kaltakquise */}
       {activeTab==='kaltakquise' && (
         <div>
