@@ -278,6 +278,39 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ FINALER ROBUSTNESS-TEST PASSED! Email generation now working with ROBUST FALLBACK SYSTEM (template-based). Fixed duplicate getIndustryTemplate function in emailer.ts. Tested complete end-to-end workflow: POST /api/coldleads/email with website='https://mr-stahltechnik.de', send=false returned 200 OK. Email generated successfully with ALL required elements: ✅ Subject: 'Schleifwerkzeuge für MR Stahltechnik - Köln - Kostenvergleich', ✅ Body contains 'Schleifwerkzeuge', ✅ Body contains 'Score', ✅ Phone '0221-25999901' present, ✅ Email 'berres@score-schleifwerkzeuge.de' present, ✅ Jahresbedarfs-Angebot mentioned, ✅ Beratungstermin mentioned. Template-based email generation (personalization_score: 30) working perfectly without AI API dependency. NO 500 errors, NO AI-Fehler. System is ROBUST!"
+  - task: "Kaltakquise: GET /api/coldleads/stats (Dashboard Widget)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/coldleads/stats/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Liefert Statistiken für Dashboard Widget: unreadReplies (hasReply=true, replyRead!=true), recentReplies (last 7 days), awaitingFollowup (contacted >6 days ago, keine Antwort, <2 follow-ups), byStatus Zählung."
+  - task: "Kaltakquise: GET /api/coldleads/inbox (IMAP Email Fetching)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/coldleads/inbox/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Fetched unread emails via IMAP, matched mit Prospects über email, aktualisiert hasReply, lastReplyAt, status='replied', pusht history entry (type='reply_received')."
+  - task: "Kaltakquise: GET /api/coldleads/search mit replied Filter"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/coldleads/search/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Erweitert GET /api/coldleads/search um 'replied' Filter (hasReply=true). Response enthält jetzt auch history Array, hasReply, lastReplyAt."
   - task: "JTL Ping (Basic Auth)"
   implemented: true
   working: "NA"
