@@ -79,7 +79,7 @@ export default function RootLayout({ children }) {
               <li className="nav-item"><a className="nav-link" href="#dashboard"><i className="bi bi-speedometer2 d-block"/><small>Dashboard</small></a></li>
               <li className="nav-item"><a className="nav-link" href="#sales"><i className="bi bi-bar-chart d-block"/><small>Sales</small></a></li>
               <li className="nav-item"><a className="nav-link" href="#marketing"><i className="bi bi-bullseye d-block"/><small>Marketing</small></a></li>
-              <li className="nav-item"><a className="nav-link" href="#coldleads"><i className="bi bi-search d-block"/><small>Kaltakquise</small></a></li>
+              <li className="nav-item"><a className="nav-link" href="#akquise"><i className="bi bi-people d-block"/><small>Akquise</small></a></li>
               <li className="nav-item"><a className="nav-link" href="#outbound"><i className="bi bi-send d-block"/><small>Outbound</small></a></li>
             </ul>
           </div>
