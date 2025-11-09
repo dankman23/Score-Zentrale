@@ -79,84 +79,93 @@ async function robustAnalyze(websiteData: any, industry: string): Promise<any> {
 }
 
 /**
- * Keyword-basierte Analyse (100% reliable)
+ * Intelligente Anwendungs-basierte Analyse mit Produkt-Katalog
  */
 function createKeywordAnalysis(websiteData: any, industry: string): any {
   const text = (websiteData.text_content || '').toLowerCase()
   const title = websiteData.title || ''
   
-  // Keyword-Detection
-  const metalKeywords = ['metall', 'stahl', 'edelstahl', 'aluminium', 'schweißen', 'schleifen']
-  const woodKeywords = ['holz', 'tischlerei', 'schreinerei', 'möbel']
-  const surfaceKeywords = ['schleifen', 'polieren', 'oberfläche', 'finish', 'lackieren']
-  const industrieKeywords = ['fertigung', 'produktion', 'werkstatt', 'herstellung']
+  console.log('[Analyzer] Detecting applications from website content...')
   
-  const hasMetal = metalKeywords.some(kw => text.includes(kw))
-  const hasWood = woodKeywords.some(kw => text.includes(kw))
-  const hasSurface = surfaceKeywords.some(kw => text.includes(kw))
-  const hasIndustry = industrieKeywords.some(kw => text.includes(kw))
+  // 1. Erkenne Anwendungen basierend auf Website-Content
+  const detectedApps = detectApplications(text, industry)
+  console.log(`[Analyzer] Detected ${detectedApps.length} applications:`, 
+    detectedApps.map(a => `${a.name} (confidence: ${(a as any).confidence})`))
   
-  // Scoring
+  // 2. Generiere Produktempfehlungen
+  const recommendations = generateProductRecommendations(detectedApps)
+  console.log(`[Analyzer] Generated ${recommendations.products.length} product recommendations`)
+  
+  // 3. Sammle alle Materialien
+  const materials = new Set<string>()
+  detectedApps.forEach(app => app.materials.forEach(m => materials.add(m)))
+  
+  // 4. Berechne Score
   let score = 40 // Basis-Score
-  let products = ['Schleifbänder', 'Fächerscheiben']
-  let materials = []
-  let indicators = []
-  let reasoning = []
   
-  if (hasMetal) {
-    score += 25
-    products = ['Schleifbänder für Edelstahl K80-K240', 'Fächerscheiben 125mm', 'Trennscheiben']
-    materials.push('Stahl', 'Edelstahl', 'Aluminium')
-    indicators.push('Metallverarbeitung')
-    reasoning.push('Website enthält klare Hinweise auf Metallverarbeitung')
-  }
+  // Score basierend auf Anzahl erkannter Anwendungen
+  score += detectedApps.length * 10
   
-  if (hasWood) {
+  // Score-Bonus für high-volume Produkte
+  const highVolumeProducts = recommendations.products.filter(p => p.typical_volume === 'high').length
+  score += highVolumeProducts * 5
+  
+  // Score-Bonus für klare Metallverarbeitung
+  if (detectedApps.some(a => ['metal_grinding', 'welding_prep', 'welding_finishing'].includes(a.id))) {
     score += 15
-    products.push('Schleifbänder für Holz K60-K180', 'Schleifpapier')
-    materials.push('Holz')
-    indicators.push('Holzbearbeitung')
-    reasoning.push('Firma arbeitet mit Holz')
-  }
-  
-  if (hasSurface) {
-    score += 20
-    indicators.push('Oberflächenbearbeitung', 'Schleifen')
-    reasoning.push('Spezialisiert auf Oberflächenbearbeitung - direkter Bedarf für Schleifmittel')
-  }
-  
-  if (hasIndustry) {
-    score += 10
-    reasoning.push('Industrielle Fertigung deutet auf regelmäßigen Bedarf hin')
-  }
-  
-  // Branche berücksichtigen
-  if (industry.toLowerCase().includes('metall') || industry.toLowerCase().includes('stahl')) {
-    score = Math.max(score, 60)
-    if (!hasMetal) {
-      materials.push('Metall', 'Stahl')
-      reasoning.push(`Branche "${industry}" lässt auf Metallverarbeitung schließen`)
-    }
   }
   
   score = Math.min(score, 100)
   
+  // 5. Erstelle Reasoning
+  const reasoning: string[] = []
+  
+  if (detectedApps.length > 0) {
+    const appNames = detectedApps.slice(0, 3).map(a => a.name).join(', ')
+    reasoning.push(`Erkannte Anwendungen: ${appNames}`)
+  }
+  
+  if (recommendations.estimated_volume === 'high') {
+    reasoning.push('Hoher geschätzter Bedarf an Schleifmitteln')
+  } else if (recommendations.estimated_volume === 'medium') {
+    reasoning.push('Mittlerer geschätzter Bedarf an Schleifmitteln')
+  }
+  
+  if (materials.size > 0) {
+    reasoning.push(`Bearbeitete Materialien: ${Array.from(materials).join(', ')}`)
+  }
+  
+  // 6. Erstelle Individual Hook
+  let hook = `Unternehmen im Bereich ${industry}`
+  if (detectedApps.length > 0) {
+    hook = `Spezialisiert auf ${detectedApps[0].name}`
+  }
+  
   return {
     company_info: {
-      name: title.split('-')[0].trim() || 'Firma',
-      description: `Unternehmen im Bereich ${industry}. ${reasoning.join('. ')}.`,
+      name: title.split('-')[0].trim() || title.slice(0, 50) || 'Firma',
+      description: reasoning.length > 0 
+        ? `${reasoning[0]}. ${reasoning.slice(1).join('. ')}.`
+        : `Unternehmen im Bereich ${industry}`,
       products: [],
       services: [],
-      surface_processing_indicators: indicators.length > 0 ? indicators : ['Branchenspezifisch'],
-      target_materials: materials.length > 0 ? materials : ['Diverse']
+      detected_applications: detectedApps.map(a => ({
+        name: a.name,
+        confidence: (a as any).confidence || 0,
+        description: a.description
+      })),
+      target_materials: Array.from(materials)
     },
     needs_assessment: {
-      potential_products: products,
-      estimated_volume: score >= 70 ? 'high' : score >= 50 ? 'medium' : 'low',
-      reasoning: reasoning.length > 0 
-        ? reasoning.join('. ') + '.'
-        : `Basierend auf der Branche ${industry} besteht Potenzial für Schleifmittel.`,
-      individual_hook: `Spezialisiert auf ${industry}`,
+      potential_products: recommendations.products.map(p => ({
+        name: p.name,
+        category: p.category,
+        reason: p.reason,
+        grain_sizes: p.grain_sizes
+      })),
+      estimated_volume: recommendations.estimated_volume,
+      reasoning: reasoning.join('. ') + '.',
+      individual_hook: hook,
       score: score
     }
   }
