@@ -2275,9 +2275,20 @@ export default function App() {
                             <td className="align-middle text-white">{p.region}</td>
                             <td className="align-middle text-center">{p.score ? <span className={`badge badge-${p.score>=70?'success':p.score>=50?'info':'secondary'}`}>{p.score}/100</span> : <span className="text-muted">-</span>}</td>
                             <td className="align-middle text-center">
-                              <span className={`badge badge-${p.status==='new'?'secondary':p.status==='analyzed'?'info':'success'}`} style={{minWidth:90}}>
-                                {p.status==='new'?'🆕 Neu':p.status==='analyzed'?'🔍 Analysiert':'✅ Kontaktiert'}
-                              </span>
+                              <select 
+                                className={`form-control form-control-sm badge badge-${p.status==='new'?'secondary':p.status==='analyzed'?'info':p.status==='contacted'?'warning':p.status==='replied'?'success':p.status==='called'?'primary':p.status==='customer'?'success':'danger'}`}
+                                style={{minWidth:120, border:'none', fontWeight:'bold'}}
+                                value={p.status}
+                                onChange={(e) => changeProspectStatus(p.id, e.target.value, p.status)}
+                              >
+                                <option value="new">🆕 Neu</option>
+                                <option value="analyzed">🔍 Analysiert</option>
+                                <option value="contacted">📧 Kontaktiert</option>
+                                <option value="replied">💬 Antwort</option>
+                                <option value="called">📞 Angerufen</option>
+                                <option value="customer">🎯 Kunde</option>
+                                <option value="discarded">❌ Verworfen</option>
+                              </select>
                             </td>
                             <td className="align-middle text-right">
                               {p.status === 'new' && (
