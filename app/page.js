@@ -1976,6 +1976,70 @@ export default function App() {
             </div>
           </div>
           
+          {/* Autopilot Control Panel */}
+          <div className="card border-0 shadow-sm mb-4" style={{background:'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
+            <div className="card-body">
+              <div className="row align-items-center">
+                <div className="col-md-6">
+                  <h5 className="text-white mb-2">
+                    <i className="bi bi-robot mr-2"/>
+                    Autopilot System
+                    {autopilotState.running && <span className="badge badge-success ml-2 animate-pulse">AKTIV</span>}
+                    {!autopilotState.running && <span className="badge badge-secondary ml-2">INAKTIV</span>}
+                  </h5>
+                  <div className="text-white-50 small">
+                    Automatische Suche, Analyse & Email-Versand (1 Email/Minute)
+                  </div>
+                  {autopilotState.currentPhase && (
+                    <div className="text-white small mt-2">
+                      <i className="bi bi-arrow-repeat mr-1"/>Phase: {autopilotState.currentPhase}
+                    </div>
+                  )}
+                </div>
+                <div className="col-md-6">
+                  <div className="d-flex align-items-center justify-content-end">
+                    <div className="mr-3">
+                      <div className="text-white small mb-1">Tages-Limit</div>
+                      <input 
+                        type="number" 
+                        className="form-control form-control-sm" 
+                        style={{width:'100px'}}
+                        value={autopilotLimit}
+                        onChange={(e) => setAutopilotLimit(parseInt(e.target.value) || 1)}
+                        min="1"
+                        max="500"
+                        disabled={autopilotState.running}
+                      />
+                    </div>
+                    <div className="mr-3 text-center">
+                      <div className="text-white small mb-1">Heute</div>
+                      <div className="h5 text-white mb-0 font-weight-bold">
+                        {autopilotState.dailyCount}/{autopilotState.dailyLimit}
+                      </div>
+                    </div>
+                    <div>
+                      {!autopilotState.running ? (
+                        <button 
+                          className="btn btn-success btn-lg"
+                          onClick={startAutopilot}
+                        >
+                          <i className="bi bi-play-fill mr-1"/>Start
+                        </button>
+                      ) : (
+                        <button 
+                          className="btn btn-danger btn-lg"
+                          onClick={stopAutopilot}
+                        >
+                          <i className="bi bi-stop-fill mr-1"/>Stop
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Statistiken - kompakter und moderner */}
           <div className="row mb-4">
             <div className="col-md-3 mb-3">
