@@ -19,6 +19,10 @@ export async function GET(request: NextRequest) {
     const hasNStorno = await hasColumn(pool, orderTable, 'nStorno')
     const stornoFilter = hasNStorno ? 'AND (o.nStorno IS NULL OR o.nStorno = 0)' : ''
 
+    // Filter: Only "Aufträge" (AU...), not "Angebote" (AN...)
+    const hasCauftragsNr = await hasColumn(pool, orderTable, 'cAuftragsNr')
+    const orderTypeFilter = hasCauftragsNr ? `AND o.cAuftragsNr LIKE 'AU%'` : ''
+
     const hasNPosTyp = await hasColumn(pool, orderPosTable, 'nPosTyp')
     const articleFilter = hasNPosTyp
       ? 'op.nPosTyp = 1'
