@@ -26,40 +26,50 @@ export async function POST(request: NextRequest) {
     // Firmen suchen
     const prospects = await findProspects({ industry, region, limit })
 
-    // In MongoDB speichern
+    // Ergebnisse in DB speichern (Duplikate vermeiden via upsert)
     const { db } = await connectToDatabase()
     const collection = db.collection('cold_prospects')
-
-    // Bulk insert mit Duplikat-Schutz
-    const operations = prospects.map(p => ({
-      updateOne: {
-        filter: { website: p.website },
-        update: {
-          $set: {
-            ...p,
-            industry,
-            region,
-            status: 'new',
-            created_at: new Date(),
-            updated_at: new Date()
-          }
-        },
-        upsert: true
+    
+    const savedProspects = []
+    
+    for (const r of prospects) {
+      const prospectData = {
+        company_name: r.company_name,
+        website: r.website,
+        description: r.description || '',
+        industry: industry,
+        region: region,
+        status: 'new',
+        score: null,
+        analysis: null,
+        history: [],
+        hasReply: false,
+        lastReplyAt: null,
+        updated_at: new Date()
       }
-    }))
-
-    if (operations.length > 0) {
-      await collection.bulkWrite(operations)
+      
+      // Upsert: Update wenn existiert (via website), sonst Insert
+      const result = await collection.updateOne(
+        { website: r.website },
+        { 
+          $set: prospectData,
+          $setOnInsert: { created_at: new Date() }
+        },
+        { upsert: true }
+      )
+      
+      // Hole das gespeicherte Dokument
+      const savedDoc = await collection.findOne({ website: r.website })
+      savedProspects.push({
+        id: savedDoc!._id.toString(),
+        ...prospectData
+      })
     }
-
+    
     return NextResponse.json({
       ok: true,
-      count: prospects.length,
-      prospects: prospects.map(p => ({
-        ...p,
-        status: 'new',
-        id: p.website // Temporäre ID
-      }))
+      count: savedProspects.length,
+      prospects: savedProspects
     })
 
   } catch (error: any) {
