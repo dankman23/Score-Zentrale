@@ -198,6 +198,49 @@ async function handleRoute(request, { params }) {
     // Health
     if ((route === '/' || route === '/root') && method === 'GET') { return json({ message: 'Score Zentrale API online' }) }
     
+    // Debug Warmakquise SQL endpoint
+    if (route === '/debug/warmakquise-sql' && method === 'GET') {
+      try {
+        const pool = await getMssqlPool()
+        const result = await pool.request()
+          .input('minInactive', sql.Int, 4)
+          .input('maxInactive', sql.Int, 24)
+          .query(`
+            DECLARE @minInactiveMonths int = @minInactive;
+            DECLARE @maxInactiveMonths int = @maxInactive;
+            DECLARE @fromOldest date = DATEADD(MONTH, -@maxInactiveMonths, CAST(GETDATE() AS date));
+            DECLARE @toMostRecent date = DATEADD(MONTH, -@minInactiveMonths, CAST(GETDATE() AS date));
+            
+            SELECT 
+              @fromOldest AS fromOldest,
+              @toMostRecent AS toMostRecent,
+              CAST(GETDATE() AS date) AS today,
+              DATEDIFF(DAY, @toMostRecent, GETDATE()) AS daysSinceToMostRecent;
+            
+            SELECT TOP 10
+              o.kKunde,
+              COUNT(DISTINCT o.kAuftrag) AS ordersCount,
+              MAX(o.dErstellt) AS lastOrderDate,
+              DATEDIFF(DAY, MAX(o.dErstellt), GETDATE()) AS daysSinceLastOrder
+            FROM Verkauf.tAuftrag o
+            WHERE (o.nStorno IS NULL OR o.nStorno = 0)
+              AND o.cAuftragsNr LIKE 'AU%'
+            GROUP BY o.kKunde
+            HAVING MAX(o.dErstellt) >= @fromOldest 
+              AND MAX(o.dErstellt) <= @toMostRecent
+            ORDER BY MAX(o.dErstellt) DESC
+          `)
+        
+        return json({
+          ok: true,
+          dates: result.recordsets[0],
+          customers: result.recordsets[1]
+        })
+      } catch (error) {
+        return json({ ok: false, error: error.message }, { status: 500 })
+      }
+    }
+    
     // Debug SKU endpoint
     if (route === '/debug/sku' && method === 'GET') {
       try {
