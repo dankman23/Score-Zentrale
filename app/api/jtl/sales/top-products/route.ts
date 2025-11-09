@@ -32,9 +32,10 @@ export async function GET(request: NextRequest) {
     // Use name from order position (cName field in tAuftragPosition)
     const posNameField = await pickFirstExisting(pool, orderPosTable, ['cName', 'cArtikelName', 'cBezeichnung']) || null
     
-    // Check if cType column exists to filter only "Auftrag" (not "Angebot")
-    const hasCType = await hasColumn(pool, orderTable, 'cType')
-    const orderTypeFilter = hasCType ? `AND o.cType = 'Auftrag'` : ''
+    // Filter: Only count "Aufträge" (AU...), not "Angebote" (AN...)
+    // Use cAuftragsNr to distinguish (AU = Auftrag, AN = Angebot)
+    const hasCauftragsNr = await hasColumn(pool, orderTable, 'cAuftragsNr')
+    const orderTypeFilter = hasCauftragsNr ? `AND o.cAuftragsNr LIKE 'AU%'` : ''
     
     const query = `
       SELECT TOP ${limit}
