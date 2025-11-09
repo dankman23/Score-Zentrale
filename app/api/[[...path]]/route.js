@@ -249,7 +249,7 @@ async function handleRoute(request, { params }) {
           lastAddress AS (
             SELECT DISTINCT
                    o.kKunde,
-                   ${hasAuftragAdresse && hasAdresse ? `COALESCE(aa.kAdresse, o.kRechnungsAdresse)` : hasAuftragAdresse ? 'aa.kAdresse' : 'o.kRechnungsAdresse'} AS kAdresse
+                   aa.kAdresse
             FROM ${auftragTable} o
             JOIN maxDates md ON o.kKunde = md.kKunde AND o.dErstellt = md.maxDate
             ${hasAuftragAdresse ? `LEFT JOIN ${auftragAdresseTable} aa ON o.kAuftrag = aa.kAuftrag` : ''}
