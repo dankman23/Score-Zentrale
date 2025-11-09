@@ -249,20 +249,24 @@ async function handleRoute(request, { params }) {
           lastAddress AS (
             SELECT DISTINCT
                    o.kKunde,
-                   aa.kAdresse
+                   aa.kAdresse,
+                   ROW_NUMBER() OVER (PARTITION BY o.kKunde ORDER BY 
+                     CASE WHEN aa.nAdresseTyp = 1 THEN 0 ELSE 1 END,
+                     o.dErstellt DESC
+                   ) AS rn
             FROM ${auftragTable} o
             JOIN maxDates md ON o.kKunde = md.kKunde AND o.dErstellt = md.maxDate
             ${hasAuftragAdresse ? `LEFT JOIN ${auftragAdresseTable} aa ON o.kAuftrag = aa.kAuftrag` : ''}
           ),
           customerData AS (
             SELECT la.kKunde,
-                   ${hasCFirma ? 'a.cFirma' : 'NULL'} AS firma,
-                   ${hasCVorname ? 'a.cVorname' : 'NULL'} AS vorname,
-                   ${hasCNachname ? 'a.cNachname' : 'NULL'} AS nachname,
-                   ${hasCTel ? 'a.cTel' : 'NULL'} AS tel,
-                   ${hasCMail ? 'a.cMail' : 'NULL'} AS email
+                   ${hasCFirma ? 'COALESCE(a.cFirma, \'\')' : 'NULL'} AS firma,
+                   ${hasCVorname ? 'COALESCE(a.cVorname, \'\')' : 'NULL'} AS vorname,
+                   ${hasCNachname ? 'COALESCE(a.cNachname, \'\')' : 'NULL'} AS nachname,
+                   ${hasCTel ? 'COALESCE(a.cTel, \'\')' : 'NULL'} AS tel,
+                   ${hasCMail ? 'COALESCE(a.cMail, \'\')' : 'NULL'} AS email
             FROM lastAddress la
-            ${hasAdresse ? `LEFT JOIN ${adresseTable} a ON la.kAdresse = a.kAdresse` : ''}
+            ${hasAdresse ? `LEFT JOIN ${adresseTable} a ON la.kAdresse = a.kAdresse AND la.rn = 1` : ''}
           ),
           revenue AS (
             SELECT o.kKunde,
