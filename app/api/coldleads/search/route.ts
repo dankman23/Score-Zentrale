@@ -84,7 +84,13 @@ export async function GET(request: NextRequest) {
     const { db } = await connectToDatabase()
     const collection = db.collection('cold_prospects')
 
-    const filter = status !== 'all' ? { status } : {}
+    // Handle filter: "replied" means hasReply=true, otherwise filter by status
+    let filter = {}
+    if (status === 'replied') {
+      filter = { hasReply: true }
+    } else if (status !== 'all') {
+      filter = { status }
+    }
     
     const prospects = await collection
       .find(filter)
@@ -104,6 +110,9 @@ export async function GET(request: NextRequest) {
         status: p.status,
         score: p.score || null,
         analysis: p.analysis || null,
+        history: p.history || [],
+        hasReply: p.hasReply || false,
+        lastReplyAt: p.lastReplyAt || null,
         created_at: p.created_at
       }))
     })
