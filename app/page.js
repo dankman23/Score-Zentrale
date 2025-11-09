@@ -567,6 +567,20 @@ export default function App() {
   }
 
   // Kaltakquise Functions
+  // Load Cold Lead Stats
+  const loadColdLeadStats = async () => {
+    try {
+      const data = await getJson('/api/coldleads/stats')
+      setColdLeadStats({
+        unreadReplies: data.unreadReplies || 0,
+        recentReplies: data.recentReplies || 0,
+        awaitingFollowup: data.awaitingFollowup || 0
+      })
+    } catch (e) {
+      console.error('Failed to load cold lead stats:', e)
+    }
+  }
+
   const loadColdProspects = async () => {
     try {
       const res = await fetch(`/api/coldleads/search?status=${coldStatusFilter}&limit=100`)
