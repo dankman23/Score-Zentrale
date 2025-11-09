@@ -445,11 +445,22 @@ async function handleRoute(request, { params }) {
             updatedAt: new Date().toISOString()
           }
           doc.warmScore = scoreLead(doc, weights)
-          // Upsert by kKunde
+          // Upsert by kKunde - preserve notes, status, tags from existing
           const coll = dbConn.collection('leads')
           const existing = await coll.findOne({ kKunde: doc.kKunde })
           if (existing){
-            await coll.updateOne({ kKunde: doc.kKunde }, { $set: { ...doc, id: existing.id, createdAt: existing.createdAt, updatedAt: new Date().toISOString() } })
+            // Update nur JTL-Daten, behalte User-Daten (notes, status, tags)
+            await coll.updateOne({ kKunde: doc.kKunde }, { 
+              $set: { 
+                ...doc, 
+                id: existing.id, 
+                createdAt: existing.createdAt,
+                notes: existing.notes || [],      // Notizen beibehalten
+                status: existing.status || 'open', // Status beibehalten
+                tags: existing.tags || [],         // Tags beibehalten
+                updatedAt: new Date().toISOString() 
+              } 
+            })
             imported++
           } else {
             await coll.insertOne(doc)
