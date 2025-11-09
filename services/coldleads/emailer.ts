@@ -137,21 +137,6 @@ export async function generateEmail(options: EmailGenerationOptions): Promise<Ge
 }
 
 /**
- * Branchen-spezifische Email-Templates
- */
-function getIndustryTemplate(industry: string): string {
-  const templates: Record<string, string> = {
-    'Metallbau': 'Für Metallbau-Betriebe bieten wir speziell: Schleifbänder für Edelstahl (K80-K240), Fächerscheiben für Schweißnahtbearbeitung, und Trennscheiben für präzise Schnitte.',
-    'Stahlbau': 'Für Stahlbau benötigen Sie: Robuste Schleifbänder für Stahlbearbeitung, Schruppscheiben für grobe Arbeiten, und Finishing-Produkte für die Oberflächenveredelung.',
-    'Schreinerei': 'Für Tischlereien und Schreinereien: Schleifbänder für Holz (K60-K180), Schleifpapier in allen Körnungen, und Spezialprodukte für Möbeloberflächen.',
-    'Maschinenbau': 'Für Maschinenbau-Betriebe: Präzisions-Schleifmittel, Fächerscheiben für Bauteile, und Spezialprodukte für verschiedene Materialien.',
-    'Lackiererei': 'Für Lackierereien: Schleifprodukte zur Oberflächenvorbereitung, Finishing-Materialien, und Zwischenschliff-Lösungen.',
-  }
-  
-  return templates[industry] || 'Wir bieten ein komplettes Sortiment an Schleifbändern, Fächerscheiben, Trennscheiben und Spezialprodukten für Ihre Branche.'
-}
-
-/**
  * Versendet Email über SMTP
  */
 export async function sendEmail(to: string, subject: string, body: string) {
