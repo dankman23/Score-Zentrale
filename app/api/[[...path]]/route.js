@@ -265,11 +265,11 @@ async function handleRoute(request, { params }) {
             k.kKunde,
             ${hasKundenNr? 'k.cKundenNr' : "CAST(NULL AS nvarchar(50)) AS cKundenNr"},
             ${hasUSTID? 'k.cUSTID' : "CAST(NULL AS nvarchar(50)) AS cUSTID"},
-            ${hasKundeAdresse? `COALESCE(ka.${hasAdressFirma?'cFirma':hasAdressName?'cName':"''"},'')` : "CAST(NULL AS nvarchar(200))"} AS cFirma,
-            ${hasKundeAdresse && hasAdressName? 'ka.cName' : "CAST(NULL AS nvarchar(200)) AS cName"},
-            ${hasKundeAdresse && hasAdressVorname? 'ka.cVorname' : "CAST(NULL AS nvarchar(100)) AS cVorname"},
-            ${hasKundeAdresse && hasAdressMail? 'ka.cMail' : "CAST(NULL AS nvarchar(200)) AS cMail"},
-            ${hasKundeAdresse && hasAdressTel? 'ka.cTel' : "CAST(NULL AS nvarchar(100)) AS cTel"},
+            lb.firma AS cFirma,
+            lb.vorname AS cVorname,
+            lb.nachname AS cNachname,
+            lb.tel AS cTel,
+            lb.email AS cMail,
             o.ordersCount, o.lastOrderDate,
             r.totalRevenueNetto, r.totalRevenueBrutto,
             CASE 
@@ -280,7 +280,7 @@ async function handleRoute(request, { params }) {
           JOIN orders  o ON o.kKunde = k.kKunde
           JOIN revenue r ON r.kKunde = k.kKunde
           LEFT JOIN lastPlat lp ON lp.kKunde = k.kKunde
-          ${hasKundeAdresse? `LEFT JOIN ${kundeAdresseTable} ka ON k.kKunde = ka.kKunde AND ka.nStandard = 1` : ''}
+          LEFT JOIN lastBilling lb ON lb.kKunde = k.kKunde
           WHERE o.lastOrderDate >= @fromRecent
             AND (o.ordersCount >= @minOrders OR r.totalRevenueBrutto >= @minRevenue)
           ORDER BY r.totalRevenueBrutto DESC;`
