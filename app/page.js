@@ -1100,18 +1100,13 @@ export default function App() {
             {/* Sub-Navigation */}
             <ul className="nav nav-tabs mb-4">
               <li className="nav-item">
-                <a className={`nav-link ${marketingSub==='warmaquise'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setMarketingSub('warmaquise')}}>
-                  <i className="bi bi-people mr-1"/>Warmaquise
-                </a>
-              </li>
-              <li className="nav-item">
                 <a className={`nav-link ${marketingSub==='analytics'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setMarketingSub('analytics')}}>
-                  <i className="bi bi-graph-up mr-1"/>Analytics (GA4)
+                  <i className="bi bi-graph-up mr-1"/>Analytics
                 </a>
               </li>
               <li className="nav-item">
                 <a className={`nav-link ${marketingSub==='googleads'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setMarketingSub('googleads')}}>
-                  <i className="bi bi-megaphone mr-1"/>Google Ads
+                  <i className="bi bi-badge-ad mr-1"/>Google Ads
                 </a>
               </li>
             </ul>
