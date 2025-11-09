@@ -604,6 +604,142 @@ export default function App() {
       console.error('Failed to load cold lead stats:', e)
     }
   }
+  
+  // Autopilot Funktionen
+  const loadAutopilotStatus = async () => {
+    try {
+      const res = await fetch('/api/coldleads/autopilot/status')
+      const data = await res.json()
+      if (data.ok) {
+        setAutopilotState(data.state)
+        setAutopilotLimit(data.state.dailyLimit)
+      }
+    } catch (e) {
+      console.error('Load autopilot status failed:', e)
+    }
+  }
+  
+  const startAutopilot = async () => {
+    try {
+      const res = await fetch('/api/coldleads/autopilot/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dailyLimit: autopilotLimit })
+      })
+      const data = await res.json()
+      if (data.ok) {
+        setToast('Autopilot gestartet!')
+        loadAutopilotStatus()
+        // Starte Polling
+        startAutopilotPolling()
+      } else {
+        setToast('Fehler: ' + data.error)
+      }
+    } catch (e) {
+      setToast('Fehler beim Starten: ' + e.message)
+    }
+  }
+  
+  const stopAutopilot = async () => {
+    try {
+      const res = await fetch('/api/coldleads/autopilot/stop', { method: 'POST' })
+      const data = await res.json()
+      if (data.ok) {
+        setToast('Autopilot gestoppt')
+        loadAutopilotStatus()
+        // Stoppe Polling
+        stopAutopilotPolling()
+      } else {
+        setToast('Fehler: ' + data.error)
+      }
+    } catch (e) {
+      setToast('Fehler beim Stoppen: ' + e.message)
+    }
+  }
+  
+  const autopilotTick = async () => {
+    try {
+      const res = await fetch('/api/coldleads/autopilot/tick', { method: 'POST' })
+      const data = await res.json()
+      
+      if (data.ok) {
+        // Update Status nach jedem Tick
+        loadAutopilotStatus()
+        loadColdProspects()
+        loadColdLeadStats()
+        
+        if (data.action === 'email_sent') {
+          console.log('[Autopilot] Email gesendet an:', data.prospect.company_name)
+        } else if (data.action === 'limit_reached') {
+          setToast('Tages-Limit erreicht!')
+          stopAutopilot()
+        }
+      }
+    } catch (e) {
+      console.error('Autopilot tick failed:', e)
+    }
+  }
+  
+  const startAutopilotPolling = () => {
+    if (autopilotIntervalRef.current) return
+    
+    console.log('[Autopilot] Starting polling (60s interval)')
+    autopilotIntervalRef.current = setInterval(() => {
+      autopilotTick()
+    }, 60000) // Alle 60 Sekunden
+  }
+  
+  const stopAutopilotPolling = () => {
+    if (autopilotIntervalRef.current) {
+      clearInterval(autopilotIntervalRef.current)
+      autopilotIntervalRef.current = null
+      console.log('[Autopilot] Polling stopped')
+    }
+  }
+  
+  const sendFollowups = async () => {
+    try {
+      setColdLoading(true)
+      const res = await fetch('/api/coldleads/followup/check', { method: 'POST' })
+      const data = await res.json()
+      setColdLoading(false)
+      
+      if (data.ok) {
+        setToast(`Follow-ups versendet: ${data.sent}/${data.count}`)
+        loadColdProspects()
+      } else {
+        setToast('Fehler: ' + data.error)
+      }
+    } catch (e) {
+      setColdLoading(false)
+      setToast('Fehler: ' + e.message)
+    }
+  }
+  
+  const changeProspectStatus = async (prospectId, newStatus, oldStatus) => {
+    try {
+      const res = await fetch('/api/coldleads/status', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          id: prospectId, 
+          status: newStatus,
+          oldStatus
+        })
+      })
+      const data = await res.json()
+      
+      if (data.ok) {
+        setToast(`Status geändert zu: ${newStatus}`)
+        loadColdProspects()
+        loadColdStats()
+      } else {
+        setToast('Fehler: ' + data.error)
+      }
+    } catch (e) {
+      setToast('Fehler: ' + e.message)
+    }
+  }
 
   const loadColdProspects = async () => {
     try {
