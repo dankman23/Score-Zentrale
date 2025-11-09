@@ -715,52 +715,14 @@ export default function App() {
             <KpiTile title="Umsatz (BRUTTO)" value={fmtCurrency(ordersSplit?.gross_with_shipping)} sub="Aufträge mit Versand" demo={demoMode} />
           </div>
 
-          {/* Dritte Reihe: Beschaffung & Rohertragsmarge */}
+          {/* Zweite Reihe: Rohertragsmarge */}
           <div className="row">
-            <KpiTile 
-              title="Einkaufsbestellungen — Netto (Bestellwert)" 
-              value={fmtCurrency(purchaseOrders?.net)} 
-              sub={
-                <span>
-                  Brutto: {fmtCurrency(purchaseOrders?.gross)} | Quelle: Beschaffung → Bestellungen
-                  {purchaseOrders?.debug && (
-                    <span 
-                      className="ml-2" 
-                      style={{cursor:'help'}} 
-                      title={`Tabellen: ${purchaseOrders?.debug?.headerTable}, ${purchaseOrders?.debug?.posTable}\nDatum: ${purchaseOrders?.debug?.dateFieldUsed}`}
-                    >
-                      ⓘ
-                    </span>
-                  )}
-                </span>
-              } 
-              demo={demoMode} 
-            />
-            <KpiTile 
-              title="Ausgaben (Eingangsrechnungen) — Netto" 
-              value={fmtCurrency(expenses?.net)} 
-              sub={
-                <span>
-                  Brutto: {fmtCurrency(expenses?.gross)} | Quelle: Eingangsrechnungen {expenses?.debug?.source?.includes('fallback') ? '(Fallback: Bestellungen)' : ''}
-                  {expenses?.debug && (
-                    <span 
-                      className="ml-2" 
-                      style={{cursor:'help'}} 
-                      title={`Material: ${fmtCurrency(expenses?.cost_components?.material)} | Fracht: ${fmtCurrency(expenses?.cost_components?.freight)} | Other: ${fmtCurrency(expenses?.cost_components?.other)}\nTabellen: ${expenses?.debug?.headerTable}, ${expenses?.debug?.posTable}\nQuelle: ${expenses?.debug?.source}`}
-                    >
-                      ⓘ
-                    </span>
-                  )}
-                </span>
-              } 
-              demo={demoMode} 
-            />
             <KpiTile 
               title="Rohertragsmarge (Netto)" 
               value={fmtCurrency(margin?.margin_net_with_ship)} 
               sub={
                 <span>
-                  Umsatz: {fmtCurrency(margin?.revenue_net_with_ship)} | EK: {fmtCurrency(margin?.cost_net)} | Versand: {fmtCurrency(margin?.shipping_cost)}
+                  Umsatz: {fmtCurrency(margin?.revenue_net_with_ship)} | Ø EK: {fmtCurrency(margin?.cost_net)} | Versand: {fmtCurrency(margin?.shipping_cost)}
                   {margin?.cost_source && (
                     <span 
                       className="ml-2" 
