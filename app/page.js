@@ -97,6 +97,7 @@ export default function App() {
   const [generatedEmail, setGeneratedEmail] = useState(null)
   const [coldStatusFilter, setColdStatusFilter] = useState('all')
   const [coldStats, setColdStats] = useState({ total: 0, new: 0, analyzed: 0, contacted: 0 })
+  const [coldLeadStats, setColdLeadStats] = useState({ unreadReplies: 0, recentReplies: 0, awaitingFollowup: 0 })
 
   // Marketing → Warmaquise
   const [leads, setLeads] = useState([])
