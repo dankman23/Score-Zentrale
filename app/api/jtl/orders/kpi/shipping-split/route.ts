@@ -84,6 +84,7 @@ export async function GET(request: NextRequest) {
         INNER JOIN ${orderPosTable} op ON o.kAuftrag = op.kAuftrag
         WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
           ${stornoFilter}
+          ${orderTypeFilter}
           AND ${articleFilter}
         GROUP BY o.kAuftrag
       ),
@@ -96,6 +97,7 @@ export async function GET(request: NextRequest) {
         INNER JOIN ${orderPosTable} op ON o.kAuftrag = op.kAuftrag
         WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
           ${stornoFilter}
+          ${orderTypeFilter}
           AND ${shippingFilter}
         GROUP BY o.kAuftrag
       ),
@@ -111,6 +113,7 @@ export async function GET(request: NextRequest) {
         LEFT JOIN Shipping s ON o.kAuftrag = s.kAuftrag
         WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
           ${stornoFilter}
+          ${orderTypeFilter}
           AND (a.net_articles > 0 OR s.net_shipping > 0)
       )
       SELECT 
