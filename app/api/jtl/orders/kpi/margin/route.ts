@@ -215,6 +215,15 @@ export async function GET(request: NextRequest) {
     const historyPct = totalCost > 0 ? ((costFromHistory / totalCost) * 100).toFixed(1) : '0.0'
     const articlePct = totalCost > 0 ? ((costFromArticle / totalCost) * 100).toFixed(1) : '0.0'
 
+    // Calculate shipping
+    const shippingRevenue = parseFloat(shippingRow.shipping_revenue || 0)
+    const shippingCost = parseFloat(shippingRow.shipping_cost || 0)
+    
+    // Total with shipping
+    const revenueWithShipping = parseFloat(row.revenue_net || 0) + shippingRevenue
+    const costWithShipping = parseFloat(row.cost_net || 0) + shippingCost
+    const marginWithShipping = revenueWithShipping - costWithShipping
+
     return NextResponse.json({
       ok: true,
       period: { from, to },
