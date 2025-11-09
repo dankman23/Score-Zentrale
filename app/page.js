@@ -1077,12 +1077,12 @@ export default function App() {
               <div className="card-body p-0">
                 <div className="table-responsive" style={{maxHeight:420}}>
                   <table className="table table-dark table-hover table-sm mb-0">
-                    <thead className="thead-dark"><tr><th>Kategorie</th><th>Umsatz</th><th>Marge</th><th>Marge (mit Gebühren)</th></tr></thead>
+                    <thead className="thead-dark"><tr><th>Kategorie</th><th>Artikel</th><th>Umsatz (Netto)</th></tr></thead>
                     <tbody>
                       {(topCategories||[]).map((r,idx)=> (
-                        <tr key={idx}><td>{r.kategorie}</td><td>{fmtCurrency(r.umsatz)}</td><td>{fmtCurrency(r.marge)}</td><td>{fmtCurrency(r.marge_with_fees)}</td></tr>
+                        <tr key={idx}><td>{r.category||r.kategorie}</td><td>{r.items||'-'}</td><td>{fmtCurrency(r.revenue||r.umsatz)}</td></tr>
                       ))}
-                      {topCategories?.length===0 && <tr><td colSpan={4} className="text-center text-muted">Keine Daten</td></tr>}
+                      {topCategories?.length===0 && <tr><td colSpan={3} className="text-center text-muted">Keine Daten</td></tr>}
                     </tbody>
                   </table>
                 </div>
