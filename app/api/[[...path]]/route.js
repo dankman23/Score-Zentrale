@@ -186,8 +186,13 @@ async function handleRoute(request, { params }) {
         const hasUSTID = await hasColumn(pool, kundeTable, 'cUSTID')
         const hasKundenNr = await hasColumn(pool, kundeTable, 'cKundenNr')
         
-        // Check if tAuftragAdresse table exists
+        // Check if tAuftragAdresse table exists and has customer data fields
         const hasAuftragAdresse = await tableExists(pool, auftragAdresseTable)
+        const hasAACFirma = hasAuftragAdresse ? await hasColumn(pool, auftragAdresseTable, 'cFirma') : false
+        const hasAACVorname = hasAuftragAdresse ? await hasColumn(pool, auftragAdresseTable, 'cVorname') : false
+        const hasAACNachname = hasAuftragAdresse ? await hasColumn(pool, auftragAdresseTable, 'cNachname') : false
+        const hasAACTel = hasAuftragAdresse ? await hasColumn(pool, auftragAdresseTable, 'cTel') : false
+        const hasAACMail = hasAuftragAdresse ? await hasColumn(pool, auftragAdresseTable, 'cMail') : false
         
         // Check tAdresse columns (standard customer address table)
         const hasAdresse = await tableExists(pool, adresseTable)
