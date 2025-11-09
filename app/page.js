@@ -358,6 +358,25 @@ export default function App() {
       loadColdLeadStats()
     }
   }, [activeTab, coldStatusFilter])
+  
+  // Lade Autopilot Status beim Start
+  useEffect(() => {
+    loadAutopilotStatus()
+    
+    // Cleanup: Stoppe Polling beim Unmount
+    return () => {
+      stopAutopilotPolling()
+    }
+  }, [])
+  
+  // Starte/Stoppe Polling basierend auf Autopilot State
+  useEffect(() => {
+    if (autopilotState.running && !autopilotIntervalRef.current) {
+      startAutopilotPolling()
+    } else if (!autopilotState.running && autopilotIntervalRef.current) {
+      stopAutopilotPolling()
+    }
+  }, [autopilotState.running])
   useEffect(() => { 
     if (activeTab==='marketing' && marketingSub==='analytics') {
       console.log('[Analytics] Loading...', {analyticsDateRange})
