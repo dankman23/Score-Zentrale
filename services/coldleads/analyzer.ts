@@ -1,9 +1,10 @@
 /**
- * Kaltakquise - Phase 2: Analyzer (ROBUST mit Fallbacks)
- * Crawlt Website und analysiert - MIT MEHREREN FALLBACKS
+ * Kaltakquise - Phase 2: Analyzer (Erweitert & Intelligent)
+ * Crawlt Website gründlich und generiert intelligente Produktempfehlungen
  */
 
 import * as cheerio from 'cheerio'
+import { detectApplications, generateProductRecommendations, APPLICATIONS, type Application } from './product-catalog'
 
 interface AnalysisResult {
   company_info: {
@@ -11,7 +12,11 @@ interface AnalysisResult {
     description: string
     products: string[]
     services: string[]
-    surface_processing_indicators: string[]
+    detected_applications: Array<{
+      name: string
+      confidence: number
+      description: string
+    }>
     target_materials: string[]
   }
   contact_persons: Array<{
@@ -23,7 +28,12 @@ interface AnalysisResult {
     priority?: number
   }>
   needs_assessment: {
-    potential_products: string[]
+    potential_products: Array<{
+      name: string
+      category: string
+      reason: string
+      grain_sizes?: string[]
+    }>
     estimated_volume: 'low' | 'medium' | 'high'
     reasoning: string
     individual_hook: string
