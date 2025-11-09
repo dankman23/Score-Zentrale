@@ -237,7 +237,7 @@ backend:
     implemented: true
     working: true
     file: "/app/app/api/coldleads/analyze/route.ts"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -247,6 +247,12 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ Company analysis working! POST /api/coldleads/analyze with website='https://metall-froebel.de', industry='Metallbau' returned 200 OK. Analysis completed successfully with all required fields: company_info (name, products, services, target_materials), contact_persons (1 found with email info@metall-froebel.de), needs_assessment (score=60, potential_products, reasoning, individual_hook). Analysis data saved to MongoDB with status updated to 'analyzed'. AI-powered analysis functioning correctly."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL BUG FOUND: MongoDB conflict error 'Updating the path 'status' would create a conflict at 'status''. Issue in /app/app/api/coldleads/analyze/route.ts lines 45 and 69 - 'status' field present in both $set (line 45: status='analyzed') and $setOnInsert (line 69: status='new'). This causes MongoDB updateOne to fail with 500 error."
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE DUPLIKATS-VERMEIDUNG TEST PASSED! Fixed MongoDB conflict bug by removing 'status' from $setOnInsert. Tested complete workflow: 1) POST /api/coldleads/search (industry='Metallverarbeitung', region='München', limit=5) returned 5 prospects with MongoDB _id, all status='new'. 2) Same search again returned prospects with SAME MongoDB IDs for overlapping websites (upsert working correctly, no duplicates created). 3) POST /api/coldleads/analyze (website='https://mr-stahltechnik.de') returned 200 OK with score=75, analysis data saved. 4) GET /api/coldleads/search?status=all confirmed analyzed prospect has status='analyzed' and score=75. 5) GET /api/coldleads/stats shows correct totals. ALL CRITICAL CHECKS PASSED: ✅ Prospects saved during search, ✅ No duplicates (same website = same MongoDB ID), ✅ All prospects persist, ✅ MongoDB _id returned correctly, ✅ Analyze updates existing prospect (not creates new). Fixed bug: removed 'status: new' from $setOnInsert in analyze/route.ts line 69."
   - task: "Kaltakquise: GET /api/coldleads/search (Prospects abrufen)"
     implemented: true
     working: true
