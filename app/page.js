@@ -2254,7 +2254,7 @@ export default function App() {
         </div>
       )}
 
-      {activeTab!=='dashboard' && activeTab!=='outbound' && activeTab!=='sales' && activeTab!=='marketing' && activeTab!=='coldleads' && (
+      {activeTab!=='dashboard' && activeTab!=='outbound' && activeTab!=='sales' && activeTab!=='marketing' && activeTab!=='akquise' && (
         <div className="text-muted">Dieser Bereich ist für die nächste Iteration vorgesehen.</div>
       )}
 
