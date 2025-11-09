@@ -330,7 +330,7 @@ export default function App() {
   // Debounce search
   useEffect(() => { const t = setTimeout(()=>{ setQF(qTyping); setPageF(1) }, 300); return ()=>clearTimeout(t) }, [qTyping])
 
-  useEffect(() => { loadDateRangeAndAdjust(); fetchAll(); fetchSalesTables(); refreshProspects() }, [])
+  useEffect(() => { loadDateRangeAndAdjust(); fetchAll(); fetchSalesTables(); refreshProspects(); loadColdLeadStats() }, [])
   useEffect(() => { fetchAll(); fetchSalesTables() }, [from, to, limit])
   useEffect(() => { if (activeTab==='warmakquise') queryLeads() }, [activeTab, statusF, b2bF, minScoreF, qF, pageF, limitF, sortF, orderF])
   useEffect(() => { 
