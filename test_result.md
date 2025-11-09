@@ -556,7 +556,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All JTL Sales & Orders APIs tested and working"
+    - "Test GET /api/coldleads/stats returns unreadReplies, recentReplies, awaitingFollowup"
+    - "Test GET /api/coldleads/search?status=replied returns prospects with hasReply=true and history array"
+    - "Test GET /api/coldleads/inbox (may require IMAP credentials or return mock data)"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
