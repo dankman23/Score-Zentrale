@@ -756,11 +756,11 @@ export default function App() {
               demo={demoMode} 
             />
             <KpiTile 
-              title="Rohertragsmarge — Netto (ohne Versand)" 
-              value={fmtCurrency(margin?.margin_net)} 
+              title="Rohertragsmarge (Netto)" 
+              value={fmtCurrency(margin?.margin_net_with_ship)} 
               sub={
                 <span>
-                  Umsatz: {fmtCurrency(margin?.revenue_net_wo_ship)} | EK: {fmtCurrency(margin?.cost_net)}
+                  Umsatz: {fmtCurrency(margin?.revenue_net_with_ship)} | EK: {fmtCurrency(margin?.cost_net)} | Versand: {fmtCurrency(margin?.shipping_cost)}
                   {margin?.cost_source && (
                     <span 
                       className="ml-2" 
