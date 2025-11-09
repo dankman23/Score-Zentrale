@@ -45,6 +45,7 @@ export async function GET(request: NextRequest) {
       LEFT JOIN ${warenGruppeTable} wg ON a.kWarengruppe = wg.kWarengruppe
       WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
+        ${orderTypeFilter}
         AND ${articleFilter}
       GROUP BY wg.cName
       ORDER BY SUM(${netTotalExpr}) DESC
