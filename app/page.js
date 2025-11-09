@@ -117,7 +117,7 @@ export default function App() {
   const [noteFor, setNoteFor] = useState(null)
   const [noteText, setNoteText] = useState('')
   const [netlog, setNetlog] = useState([]) // request inspector
-  const [marketingSub, setMarketingSub] = useState('warmaquise') // warmaquise|analytics|googleads
+  const [marketingSub, setMarketingSub] = useState('analytics') // analytics|googleads
   
   // Analytics (GA4)
   const [analyticsMetrics, setAnalyticsMetrics] = useState(null)
