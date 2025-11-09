@@ -557,6 +557,17 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Added two new KPI tiles: 'Ausgaben (Lieferanten) - Netto' with Brutto sub and tooltip with cost breakdown, and 'Rohertragsmarge - Netto (ohne Versand)' with revenue/cost sub and cost source percentages tooltip. Integrated with /api/jtl/purchase/expenses and /api/jtl/orders/kpi/margin endpoints."
+  - task: "Kaltakquise UI Features (Navigation, Statistiken, Filter, Tabelle, Details, Widgets)"
+    implemented: true
+    working: true
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ KALTAKQUISE UI FEATURES TESTING COMPLETED SUCCESSFULLY! All 8/8 test areas PASSED: Navigation zu #kaltakquise (Kaltakquise-Tool Überschrift sichtbar), Statistik-Karten (Gesamt: 36, Neu: 33, Analysiert: 3, Kontaktiert: 0), Prospects-Status (36 Prospects vorhanden), Filter-Buttons (alle 5/5 gefunden: Alle, Neu, Analysiert, Kontaktiert, Antworten mit Badge), Prospects-Tabelle (alle 7/7 Spalten: FIRMA, WEBSITE, BRANCHE, REGION, SCORE, STATUS, AKTIONEN), Details-Accordion (3 Details-Buttons, Firmen-Info und Ansprechpartner sichtbar, Kontakt-Historie nicht sichtbar - normal), Dashboard-Widgets (Ungelesene Antworten: 0, Follow-up benötigt: 0). Minor: React hydration warnings und 404 für /api/prospects (expected). Kaltakquise UI vollständig funktional!"
 metadata:
   created_by: "main_agent"
   version: "1.1"
