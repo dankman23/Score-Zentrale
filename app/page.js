@@ -2001,6 +2001,9 @@ export default function App() {
                     <button className={`btn ${coldStatusFilter==='contacted'?'btn-success':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('contacted')}>
                       Kontaktiert ({coldStats.contacted})
                     </button>
+                    <button className={`btn ${coldStatusFilter==='replied'?'btn-warning':'btn-outline-warning'}`} onClick={()=>setColdStatusFilter('replied')}>
+                      <i className="bi bi-envelope-check mr-1"/>Antworten ({coldLeadStats.unreadReplies})
+                    </button>
                   </div>
                 </div>
               </div>
