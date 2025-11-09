@@ -240,6 +240,17 @@ async function handleRoute(request, { params }) {
             JOIN maxDates md ON o.kKunde = md.kKunde AND o.dErstellt = md.maxDate
             GROUP BY o.kKunde
           ),
+          lastBilling AS (
+            SELECT o.kKunde,
+                   ${hasRgFirma ? 'MAX(o.cRechnungsanschrift_Firma)' : 'NULL'} AS firma,
+                   ${hasRgVorname ? 'MAX(o.cRechnungsanschrift_Vorname)' : 'NULL'} AS vorname,
+                   ${hasRgNachname ? 'MAX(o.cRechnungsanschrift_Nachname)' : 'NULL'} AS nachname,
+                   ${hasRgTel ? 'MAX(o.cRechnungsanschrift_Tel)' : 'NULL'} AS tel,
+                   ${hasRgMail ? 'MAX(o.cRechnungsanschrift_EMail)' : 'NULL'} AS email
+            FROM ${auftragTable} o
+            JOIN maxDates md ON o.kKunde = md.kKunde AND o.dErstellt = md.maxDate
+            GROUP BY o.kKunde
+          ),
           revenue AS (
             SELECT o.kKunde,
                    SUM(${grossTotalExpr}) AS totalRevenueBrutto,
