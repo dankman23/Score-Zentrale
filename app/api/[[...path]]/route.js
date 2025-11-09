@@ -317,8 +317,8 @@ async function handleRoute(request, { params }) {
     // DELETE all leads (temporary for testing)
     if (route === '/leads/clear' && method === 'DELETE'){
       try {
-        const { db } = await connectToDatabase()
-        const result = await db.collection('leads').deleteMany({})
+        const dbConn = await connectToMongoDB()
+        const result = await dbConn.collection('leads').deleteMany({})
         return json({ ok: true, deleted: result.deletedCount })
       } catch (err) {
         return json({ ok: false, error: err.message }, { status: 500 })
