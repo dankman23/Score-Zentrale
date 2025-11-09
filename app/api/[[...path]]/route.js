@@ -193,18 +193,16 @@ async function handleRoute(request, { params }) {
               op.kAuftragPosition,
               op.kArtikel,
               a.cArtNr,
-              op.cName AS posName,
               op.fAnzahl,
               op.fVKNetto,
-              (op.fAnzahl * op.fVKNetto) AS netTotal,
-              op.nPosTyp
+              (op.fAnzahl * op.fVKNetto) AS netTotal
             FROM Verkauf.tAuftrag o
             INNER JOIN Verkauf.tAuftragPosition op ON o.kAuftrag = op.kAuftrag
             LEFT JOIN dbo.tArtikel a ON op.kArtikel = a.kArtikel
             WHERE a.cArtNr = @sku
               AND CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
               AND (o.nStorno IS NULL OR o.nStorno = 0)
-              AND op.nPosTyp = 1
+              AND op.kArtikel > 0
             ORDER BY o.dErstellt DESC
           `)
         
