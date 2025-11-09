@@ -190,6 +190,7 @@ async function handleRoute(request, { params }) {
               o.kAuftrag,
               o.cAuftragsNr,
               o.dErstellt,
+              o.cType,
               op.kAuftragPosition,
               op.kArtikel,
               a.cArtNr,
