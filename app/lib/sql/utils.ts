@@ -46,7 +46,7 @@ export async function firstExistingTable(pool: MssqlPool, candidates: string[]):
  * @param col Spaltenname
  * @returns true wenn Spalte existiert
  */
-export async function hasColumn(pool: ConnectionPool, fullName: string, col: string): Promise<boolean> {
+export async function hasColumn(pool: MssqlPool, fullName: string, col: string): Promise<boolean> {
   try {
     const r = await pool.request()
       .input('tbl', sql.NVarChar, fullName)
