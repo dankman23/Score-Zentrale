@@ -592,14 +592,19 @@ export default function App() {
       const data = await res.json()
       if (data.ok) {
         setColdProspects(data.prospects)
-        // Statistiken berechnen
-        const all = data.prospects
-        setColdStats({
-          total: all.length,
-          new: all.filter(p => p.status === 'new').length,
-          analyzed: all.filter(p => p.status === 'analyzed').length,
-          contacted: all.filter(p => p.status === 'contacted').length
-        })
+        // Statistiken berechnen - lade alle Prospects für korrekte Zählung
+        const allRes = await fetch(`/api/coldleads/search?status=all&limit=1000`)
+        const allData = await allRes.json()
+        if (allData.ok) {
+          const all = allData.prospects
+          setColdStats({
+            total: all.length,
+            new: all.filter(p => p.status === 'new').length,
+            analyzed: all.filter(p => p.status === 'analyzed').length,
+            contacted: all.filter(p => p.status === 'contacted').length,
+            replied: all.filter(p => p.hasReply === true).length
+          })
+        }
       }
     } catch (e) {
       console.error('Load prospects failed:', e)
