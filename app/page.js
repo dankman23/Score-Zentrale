@@ -2501,7 +2501,8 @@ export default function App() {
                 </div>
               </div>
             </div>
-          )}
+          )
+        }
 
           {/* Alte Ansichten entfernt - jetzt als Accordions in Tabelle */}
           {false && selectedProspect && selectedProspect.analysis && (
