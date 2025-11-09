@@ -30,7 +30,7 @@ export async function tableExists(pool: MssqlPool, fullName: string): Promise<bo
  * @param candidates Array von Tabellennamen (z.B. ["Einkauf.tEingangsrechnung", "dbo.tEingangsrechnung"])
  * @returns Name der ersten gefundenen Tabelle oder null
  */
-export async function firstExistingTable(pool: ConnectionPool, candidates: string[]): Promise<string | null> {
+export async function firstExistingTable(pool: MssqlPool, candidates: string[]): Promise<string | null> {
   for (const candidate of candidates) {
     if (await tableExists(pool, candidate)) {
       return candidate
