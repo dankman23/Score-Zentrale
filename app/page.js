@@ -2502,6 +2502,146 @@ export default function App() {
               </div>
             </div>
           )}
+
+          {/* Alte Ansichten entfernt - jetzt als Accordions in Tabelle */}
+          {false && selectedProspect && selectedProspect.analysis && (
+            <div className="card border-0 shadow-lg mt-4">
+              <div className="card-header bg-gradient-info text-white d-flex align-items-center justify-content-between">
+                <div className="d-flex align-items-center">
+                  <i className="bi bi-building-fill mr-2" style={{fontSize:'1.5rem'}}/>
+                  <div>
+                    <h5 className="mb-0">{selectedProspect.company_name}</h5>
+                    <small>{selectedProspect.website}</small>
+                  </div>
+                </div>
+                <button className="btn btn-sm btn-outline-light" onClick={() => setSelectedProspect(null)}>
+                  <i className="bi bi-x-lg"/>
+                </button>
+              </div>
+              <div className="card-body">
+                <div className="row mb-4">
+                  <div className="col-md-6">
+                    <div className="p-3 bg-light rounded h-100">
+                      <h6 className="text-primary mb-3"><i className="bi bi-info-circle mr-2"/>Firmen-Info</h6>
+                      <p className="mb-3">{selectedProspect.analysis.company_info.description}</p>
+                      {selectedProspect.analysis.company_info.products?.length > 0 && (
+                        <div>
+                          <strong className="text-muted small d-block mb-2">Produkte & Dienstleistungen:</strong>
+                          <div className="d-flex flex-wrap">
+                            {selectedProspect.analysis.company_info.products.map((p, i) => (
+                              <span key={i} className="badge badge-secondary mr-1 mb-1">{p}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="col-md-6">
+                    <div className="p-3 bg-light rounded h-100">
+                      <h6 className="text-success mb-3"><i className="bi bi-graph-up mr-2"/>Bedarfs-Assessment</h6>
+                      <div className="mb-3 d-flex align-items-center">
+                        <strong className="mr-2">Score:</strong> 
+                        <span className={`badge badge-${selectedProspect.score >= 70 ? 'success' : selectedProspect.score >= 50 ? 'info' : 'secondary'} px-3 py-2`} style={{fontSize:'1rem'}}>
+                          {selectedProspect.score}/100
+                        </span>
+                      </div>
+                      <p className="mb-3">{selectedProspect.analysis.needs_assessment.reasoning}</p>
+                      {selectedProspect.analysis.needs_assessment.potential_products?.length > 0 && (
+                        <div>
+                          <strong className="text-muted small d-block mb-2">Potenzielle SCORE-Produkte:</strong>
+                          <div className="d-flex flex-wrap">
+                            {selectedProspect.analysis.needs_assessment.potential_products.map((p, i) => (
+                              <span key={i} className="badge badge-success mr-1 mb-1">{p}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {selectedProspect.analysis.contact_persons?.length > 0 && (
+                  <div className="mb-4">
+                    <h6 className="text-warning mb-3"><i className="bi bi-people-fill mr-2"/>Ansprechpartner</h6>
+                    <div className="row">
+                      {selectedProspect.analysis.contact_persons.map((c, i) => (
+                        <div key={i} className="col-md-6 mb-3">
+                          <div className="card border-0 bg-light">
+                            <div className="card-body">
+                              <div className="d-flex align-items-start">
+                                <div className="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center mr-3" style={{width:50, height:50, fontSize:'1.5rem'}}>
+                                  <i className="bi bi-person-fill"/>
+                                </div>
+                                <div>
+                                  <h6 className="mb-1">{c.name}</h6>
+                                  <p className="text-muted small mb-1">{c.title}</p>
+                                  {c.email && <p className="mb-0 small"><i className="bi bi-envelope mr-1"/>{c.email}</p>}
+                                  {c.phone && <p className="mb-0 small"><i className="bi bi-telephone mr-1"/>{c.phone}</p>}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="d-flex justify-content-end pt-3 border-top">
+                  <button className="btn btn-success btn-lg" onClick={() => { setSelectedProspect(null); generateColdEmail(selectedProspect) }}>
+                    <i className="bi bi-envelope-fill mr-2"/>Email generieren
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Email-Vorschau als Accordion in Tabelle */}
+          {false && generatedEmail && (
+            <div className="card border-0 shadow-lg mt-4">
+              <div className="card-header bg-gradient-primary text-white d-flex align-items-center justify-content-between">
+                <div className="d-flex align-items-center">
+                  <i className="bi bi-envelope-fill mr-2" style={{fontSize:'1.5rem'}}/>
+                  <div>
+                    <h5 className="mb-0">Generierte Email</h5>
+                    <small>Bereit zum Versenden</small>
+                  </div>
+                </div>
+                <button className="btn btn-sm btn-outline-light" onClick={() => setGeneratedEmail(null)}>
+                  <i className="bi bi-x-lg"/>
+                </button>
+              </div>
+              <div className="card-body">
+                <div className="alert alert-info d-flex align-items-center mb-3">
+                  <i className="bi bi-person-circle mr-2" style={{fontSize:'1.5rem'}}/>
+                  <div>
+                    <strong>Empfänger:</strong> {generatedEmail.recipient}
+                  </div>
+                </div>
+                <div className="mb-3">
+                  <label className="font-weight-bold text-muted small mb-2">BETREFF:</label>
+                  <div className="p-3 bg-light rounded border">
+                    <strong>{generatedEmail.subject}</strong>
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <label className="font-weight-bold text-muted small mb-2">NACHRICHT:</label>
+                  <div className="p-3 bg-white rounded border" style={{whiteSpace:'pre-wrap', fontFamily:'system-ui', lineHeight:'1.8'}}>
+                    {generatedEmail.body}
+                  </div>
+                </div>
+                <div className="d-flex justify-content-between align-items-center pt-3 border-top">
+                  <button className="btn btn-outline-secondary" onClick={() => setGeneratedEmail(null)}>
+                    <i className="bi bi-x-circle mr-1"/>Abbrechen
+                  </button>
+                  <button className="btn btn-success btn-lg" onClick={sendColdEmail} disabled={coldLoading}>
+                    {coldLoading ? <><span className="spinner-border spinner-border-sm mr-2"/>Wird versendet...</> : <><i className="bi bi-send-fill mr-2"/>Jetzt versenden</>}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
