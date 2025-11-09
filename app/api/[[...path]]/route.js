@@ -246,26 +246,18 @@ async function handleRoute(request, { params }) {
             JOIN maxDates md ON o.kKunde = md.kKunde AND o.dErstellt = md.maxDate
             GROUP BY o.kKunde
           ),
-          lastOrderWithAddress AS (
+          customerData AS (
             SELECT o.kKunde,
-                   aa.kAdresse,
-                   o.dErstellt,
-                   ROW_NUMBER() OVER (PARTITION BY o.kKunde ORDER BY o.dErstellt DESC) AS rn
+                   ${hasAuftragAdresse ? 'MAX(aa.cFirma)' : 'NULL'} AS firma,
+                   ${hasAuftragAdresse ? 'MAX(aa.cVorname)' : 'NULL'} AS vorname,
+                   ${hasAuftragAdresse ? 'MAX(aa.cNachname)' : 'NULL'} AS nachname,
+                   ${hasAuftragAdresse ? 'MAX(aa.cTel)' : 'NULL'} AS tel,
+                   ${hasAuftragAdresse ? 'MAX(aa.cMail)' : 'NULL'} AS email
             FROM ${auftragTable} o
             JOIN maxDates md ON o.kKunde = md.kKunde
             ${hasAuftragAdresse ? `LEFT JOIN ${auftragAdresseTable} aa ON o.kAuftrag = aa.kAuftrag` : ''}
-            WHERE o.dErstellt IS NOT NULL
-          ),
-          customerData AS (
-            SELECT la.kKunde,
-                   ${hasCFirma ? 'COALESCE(a.cFirma, \'\')' : 'NULL'} AS firma,
-                   ${hasCVorname ? 'COALESCE(a.cVorname, \'\')' : 'NULL'} AS vorname,
-                   ${hasCNachname ? 'COALESCE(a.cNachname, \'\')' : 'NULL'} AS nachname,
-                   ${hasCTel ? 'COALESCE(a.cTel, \'\')' : 'NULL'} AS tel,
-                   ${hasCMail ? 'COALESCE(a.cMail, \'\')' : 'NULL'} AS email
-            FROM lastOrderWithAddress la
-            ${hasAdresse ? `LEFT JOIN ${adresseTable} a ON la.kAdresse = a.kAdresse` : ''}
-            WHERE la.rn = 1
+            WHERE o.dErstellt = md.maxDate
+            GROUP BY o.kKunde
           ),
           revenue AS (
             SELECT o.kKunde,
