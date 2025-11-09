@@ -136,18 +136,54 @@ function isPrivateEmail(email){
 function toISO(d){ try { return new Date(d).toISOString().slice(0,10) } catch(e){ return null } }
 
 function scoreLead(doc, weights){
-  const w1 = Number(weights?.w1 ?? process.env.WARM_W1 ?? 0.6)
-  const w2 = Number(weights?.w2 ?? process.env.WARM_W2 ?? 0.8)
-  const w3 = Number(weights?.w3 ?? process.env.WARM_W3 ?? 1.0)
-  const w4 = Number(weights?.w4 ?? process.env.WARM_W4 ?? 1.2)
+  // Warmakquise Score: Belohnt INAKTIVE Kunden mit hohem historischem Wert
+  // Sweet Spot: 4-12 Monate inaktiv
+  // 0 Punkte: < 4 Monate (zu aktiv) oder > 24 Monate (zu lange inaktiv)
+  
   const rev = Number(doc.totalRevenueNetto||0)
   const orders = Number(doc.ordersCount||0)
   const last = doc.lastOrder ? new Date(doc.lastOrder) : null
   const days = last ? Math.max(0, Math.floor((Date.now() - last.getTime())/86400000)) : 999
-  const recency = Math.max(0, 100 - Math.min(180, days) * (100/180))
-  let s = w1*Math.log1p(rev) + w2*orders + w3*recency + w4*(doc.isB2B?1:0)
-  if (!Number.isFinite(s)) s = 0
-  return Math.max(0, Math.min(100, s))
+  
+  // Inaktivitäts-Score (umgekehrte Recency):
+  // < 120 Tage (4 Monate): 0 Punkte (zu aktiv, kein Warmakquise-Kandidat)
+  // 120-365 Tage (4-12 Monate): 100 Punkte (PERFEKT für Warmakquise)
+  // 365-730 Tage (1-2 Jahre): 50 Punkte (noch OK)
+  // > 730 Tage (> 2 Jahre): 0 Punkte (zu lange inaktiv, wahrscheinlich verloren)
+  let inactivityScore = 0
+  if (days < 120) {
+    // Zu aktiv - kein Warmakquise-Kandidat
+    inactivityScore = 0
+  } else if (days >= 120 && days <= 365) {
+    // Sweet Spot: 4-12 Monate inaktiv
+    inactivityScore = 100
+  } else if (days > 365 && days <= 730) {
+    // 1-2 Jahre: Linear abfallend von 100 auf 50
+    inactivityScore = 100 - ((days - 365) / 365) * 50
+  } else {
+    // > 2 Jahre: Zu lange inaktiv
+    inactivityScore = Math.max(0, 50 - ((days - 730) / 365) * 50)
+  }
+  
+  // Umsatz-Score: Logarithmisch skaliert (0-30 Punkte)
+  // €1000 → ~21 Punkte, €10000 → ~28 Punkte, €50000 → ~32 Punkte
+  const revenueScore = Math.min(30, Math.log1p(rev) * 3)
+  
+  // Bestellungs-Score: Linear (0-20 Punkte)
+  // 10 Bestellungen → 10 Punkte, 20 Bestellungen → 20 Punkte
+  const orderScore = Math.min(20, orders)
+  
+  // B2B Bonus: +10 Punkte
+  const b2bBonus = doc.isB2B ? 10 : 0
+  
+  // Gesamt-Score: Inaktivität (0-100) * Qualitäts-Multiplikator
+  // Qualität = (Revenue + Orders + B2B) / 60 → max 1.0
+  const qualityMultiplier = Math.min(1.0, (revenueScore + orderScore + b2bBonus) / 60)
+  
+  let finalScore = inactivityScore * qualityMultiplier
+  
+  if (!Number.isFinite(finalScore)) finalScore = 0
+  return Math.round(Math.max(0, Math.min(100, finalScore)))
 }
 
 async function handleRoute(request, { params }) {
