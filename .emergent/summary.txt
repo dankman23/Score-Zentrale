@@ -1,50 +1,110 @@
 <analysis>
-The previous AI engineer embarked on building the Score Zentrale dashboard, initially focusing on a UI skeleton and minimal outbound features. The work progressed through several iterations of UI refinement, adopting Bootstrap 4.6 and a dark theme. A significant portion of the trajectory focused on integrating the JTL-Wawi SQL database. This involved resolving persistent connectivity issues, adapting SQL queries to the specific JTL database schema, implementing a robust article position filter, and developing precise margin calculation logic, including platform fees. Despite numerous attempts to fix JTL connectivity and data display, the user's latest feedback indicates persistent problems with both the hero image visibility and the dashboard data, suggesting that the core JTL data retrieval and UI rendering are still not fully functional.
+The trajectory outlines a multi-phase development effort for the Score Zentrale application. Initially, the AI engineer addressed Kaltakquise (Cold Acquisition) UI features like filter buttons and history display. A major focus then shifted to resolving critical data integrity issues: fixing Warmakquise customer name retrieval (due to incorrect JTL-Wawi SQL joins and schema misunderstandings) and rectifying Sales data discrepancies where the API overcounted sales by including offers alongside orders from JTL. Both involved extensive SQL debugging and schema exploration. Subsequently, the Kaltakquise system underwent significant refactoring, enhancing AI-driven prospect analysis and personalized email generation. The final phase introduced a comprehensive Kaltakquise autopilot system (search, analyze, send, follow-up, reply tracking) with a frontend control panel, which is currently experiencing a build error.
 </analysis>
 
 <product_requirements>
-The goal is to build a browser-based dashboard app, Score Zentrale, for SCORE Schleifwerkzeuge, displaying Sales (JTL-Wawi), Marketing (GA4 + Google Ads), and an Outbound Suite (Prospect Finder, Company Analyzer, Mail Composer). The frontend uses Next.js (App Router) + TypeScript, UI is Bootstrap 4.6 Grid with a dark theme and Score branding. The backend uses Next.js API Routes, Firebase (Firestore, Auth, Functions) for data (initially planned, then MongoDB used), and  for secrets. Authentication requires Google SSO + Email/Pass with role-based access (, , ). Key integrations include GA4, Google Ads, JTL-Wawi SQL, OpenAI, and LinkedIn. Firestore schema for , , , , , ,  was designed. MVP focus was on a Dashboard skeleton with minimal Outbound function (Prospect Form, simple Analysis stub) and mocks for external integrations. The UI underwent a significant redesign to a dark, professional Bootstrap 4.6 layout with specific navbar, hero, bottom tabbar, icon sidebar, and dark-themed components. JTL-Wawi integration was prioritized, requiring direct MS SQL connection to an external IP, with specific requirements for KPI calculation (revenue, orders, detailed margin with platform fees), top products/categories, and platform-specific timeseries, robustly handling SQL schema variations and login.
+The Score Zentrale is a Next.js full-stack dashboard integrating Sales (JTL-Wawi), Marketing (GA4, Google Ads, Cold/Warm Acquisition), and an Outbound Suite.
+- **Sales Dashboard**: Display JTL-Wawi KPIs (revenue, orders, margin), multi-select filters, adjust Umsatz Netto/Brutto to include shipping, redefine Rohertragsmarge, add charts, and show Umsatz Netto nach Plattform. Fix article names. The sales data had discrepancies with JTL, overcounting due to inclusion of offers (AN) instead of only orders (AU).
+- **Kaltakquise (Cold Acquisition)**: Use Google Search for prospects, AI analysis for needs/contacts, personalized SMTP email outreach. Implement email inbox/outbox for , add dashboard tile for unread replies, create customer history, and implement follow-up emails after 6 days. The system should automate search, analysis, and outreach with configurable limits, avoiding duplicates, and improving email content.
+- **Warmakquise (Warm Acquisition)**: Display customer name (instead of customer ID/email), include a calculated score, show phone number, and implement contact history. The score calculation needs to be refined to target inactive customers (e.g., last order 4-12 months ago) and exclude recently active ones. Customer data was missing accurate names, often showing IDs or emails due to incorrect JTL-Wawi SQL joins.
+- **UI/UX**: General UI improvements and conversion of detail/email views to accordions.
+- **Deployment**: Ensure the application is deployment-ready by removing hardcoded URLs and fixing build errors.
 </product_requirements>
 
 <key_technical_concepts>
-- **Next.js (App Router) & TypeScript**: Frontend and API routes.
-- **Bootstrap 4.6 Grid/Layout**: Primary UI framework, including CDN imports.
-- **MongoDB**: Database used for initial MVP data, replacing Firebase Firestore temporarily.
-- **MS SQL (JTL-Wawi)**: Direct database connection via  Node.js driver for JTL data.
-- **Chart.js**: For data visualization in dashboards.
-- **OpenAI**: Planned for Company Analyzer and Mail Composer (initially mocked).
-- **Environment Variables (.env)**: For managing secrets and API keys.
-- **Server-Side Rendering (SSR) / Client Components**: Next.js architecture.
+- **Next.js & TypeScript**: Full-stack framework.
+- **MongoDB**: Persistent storage for cold leads and application data.
+- **MS SQL (JTL-Wawi)**: Primary data source for Sales and customer data.
+- **Nodemailer & IMAP client**: Email sending (SMTP) and receiving (IMAP).
+- **Shadcn/UI & Tailwind CSS**: Frontend UI components and styling.
+- **AI/LLM (OpenAI)**: Used for prospect analysis and email generation.
+- **Kubernetes**: Deployment environment.
 </key_technical_concepts>
 
 <code_architecture>
-The application's directory structure is a standard Next.js setup:
 
--   **/app/app/api/[[...path]]/route.js**: This file serves as the primary backend API route handler. It manages MongoDB-based operations (prospects, analyzer, mailer) and now all JTL-Wawi SQL interactions. It has been heavily modified to include the  connection pool, various JTL sales endpoints (, , , , , , ), and complex SQL logic for margin calculation, article filtering, and platform detection, including runtime checks for SQL column existence.
--   **/app/app/layout.js**: Manages the global layout, including HTML structure, head tags (Bootstrap/Bootstrap Icons/Chart.js CDN, custom ), and the main Navbar, Hero-band, and horizontal sub-navigation.
--   **/app/app/page.js**: The main dashboard and outbound suite frontend. It contains the UI logic for KPI tiles, charts (using Chart.js), date range selection, prospect forms, tables, and the mail composer. It now uses the  and  utilities to fetch and process data from the JTL API endpoints.
--   **/app/public/styles/score-theme.css**: A newly created custom CSS file containing specific dark theme variables and styling rules for Bootstrap components, KPI cards, tables, navigation elements, and chart defaults, reflecting Score branding. It has been iterated on to adjust logo size, hero image visibility, and spacing.
--   **/app/public/images/logo_score_schleifwerkzeuge.png**: The Score branding logo.
--   **/app/public/images/Header.JPG**: The background image for the hero section, adjusted for visibility.
--   **/app/lib/db/mssql.ts**: A new server-only file creating a singleton connection pool for MS SQL, configured via  environment variables. This centralizes database connection management.
--   **/app/lib/api.ts**: A new utility for fetching JSON data, ensuring  caching and basic error handling.
--   **/app/lib/normalize.ts**: A new utility for robust data handling, including  (converting various API response formats into arrays) and  (sorting data by date).
--   **app/.env**: Contains critical environment variables for MongoDB connection, JTL-Wawi SQL credentials (, , , , ), and .
+
+-   ****:
+    -   **Importance**: Catch-all API route, handles dynamic backend endpoints including  (Warmakquise) and temporary debug routes.
+    -   **Changes**: Initially fixed SQL aggregate function error and attempted to fetch customer data for Warmakquise. Later extensively modified to correctly join  for , ,  for Warmakquise lead import. SQL filtering logic was adjusted to target customers inactive for 4-24 months and exclude offers (AN) from  calculation. MongoDB upsert logic was corrected to merge lead data ( for specific fields,  for removed fields) to preserve existing , , . Temporary MongoDB clear endpoint was added and then removed.
+-   ****:
+    -   **Importance**: Main frontend page, containing dashboard UI logic.
+    -   **Changes**: Modified to display Cold Leads statistics (unread replies), integrate filter buttons for Cold Leads (e.g., Ungelesene Antworten), and add a history display section within the Kaltakquise details. UI for the new Kaltakquise Autopilot Control Panel (start/stop, configuration) was added, and status badges were converted to interactive dropdowns.
+-   ****:
+    -   **Importance**: Defines overall page structure and main navigation.
+    -   **Changes**: Updated for the new navigation structure including Akquise with Kaltakquise and Warmakquise sub-tabs.
+-   ****:
+    -   **Importance**: Handles connection to JTL-Wawi MSSQL.
+    -   **Changes**: Fixed TypeScript  error. Note: The  file itself was not found during a debug attempt;  function was found to be defined directly in .
+-   ** & **:
+    -   **Importance**: API client and LLM interaction.
+    -   **Changes**: Removed hardcoded URLs, using environment variables for deployment.
+-   ****, ****, ****, ****, ****, ****, ****:
+    -   **Importance**: Sales data APIs.
+    -   **Changes**: All these APIs were modified to include a  filter in their SQL queries to correctly count only orders (Aufträge) and exclude offers (Angebote), resolving discrepancies with JTL-Wawi's reported sales figures.
+-   ** (New File)**:
+    -   **Importance**: API for fetching statistics on cold leads.
+    -   **Changes**: Created to provide data for the Ungelesene Antworten dashboard widget.
+-   ****:
+    -   **Importance**: API for searching prospects.
+    -   **Changes**: Modified to persist search results immediately into MongoDB (previously only temporary results were returned), using  and adding .
+-   ****:
+    -   **Importance**: API for AI-driven prospect analysis.
+    -   **Changes**: Adjusted to work with  in  and enhanced to incorporate a more sophisticated 3-stage analysis (web-scraping, AI application recognition, product mapping).
+-   ****:
+    -   **Importance**: API for sending cold emails.
+    -   **Changes**: Modified to use the new , log email history, and pass new structured analysis data to the  service for highly personalized email generation.
+-   ** &  (New Files)**:
+    -   **Importance**: Encapsulate SMTP sending and IMAP receiving logic.
+    -   **Changes**: Created to handle email functionality.
+-   ****:
+    -   **Importance**: Core logic for analyzing cold lead prospects.
+    -   **Changes**: Completely revamped to implement a 3-stage system: thorough web-scraping, AI recognition of applications, and product mapping to Score Schleifwerkzeuge offerings. Includes improved email extraction.
+-   ****:
+    -   **Importance**: Core logic for generating cold emails.
+    -   **Changes**: Reworked to leverage the rich structured data from the new  to create highly personalized, benefit-driven emails, concluding with a specific signature (Daniel Leismann). Old industry templates were removed.
+-   ** (New File)**:
+    -   **Importance**: Provides a structured catalog of products and their applications.
+    -   **Changes**: Created to support the enhanced AI analysis and product mapping in .
+-   ** (New File)**:
+    -   **Importance**: Defines strategies for automated prospect searching.
+    -   **Changes**: Created to integrate automated search logic into the autopilot system.
+-   ** (New Directory & Files)**:
+    -   **Importance**: Backend endpoints for the Kaltakquise autopilot system (start, stop, status, tick, config).
+    -   **Changes**: Created to manage the automated pipeline for searching, analyzing, sending emails, and handling follow-ups.
+-   ** (New File)**:
+    -   **Importance**: API to manually change the status of a cold lead.
+    -   **Changes**: Created for user control over prospect lifecycle.
+-   ****:
+    -   **Importance**: Stores environment variables.
+    -   **Changes**: Updated with JTL SQL, GA4, SMTP/IMAP credentials, cleaned up redundant entries.
+-   ****:
+    -   **Importance**: Manages project dependencies.
+    -   **Changes**: Added  and  (and their types) for email functionality.
 </code_architecture>
 
 <pending_tasks>
-- Investigate and fix the persistent JTL connectivity/login issues for the database pool.
-- Full implementation of the  and  using the OpenAI API.
-- Integration of GA4, Google Ads, and LinkedIn (currently mocked or placeholders).
-- Implementation of Firebase (Firestore, Auth, Functions) for core data persistence and authentication.
-- Automated frontend tests (klickpfade, responsiveness, charts, CSV, tabs, date range).
-- Refinement of UI elements (KPI card compactness, table row height, sum row in toplists, additional dashboard charts like Umsatz vs. Orders).
+- Full implementation of Google Ads and LinkedIn integrations (Google Ads needs Standard Access for Developer Token).
+- Implementation of Firebase (Firestore, Auth, Functions).
+- Further UI refinement (KPI card compactness, table row height, sum row).
+- Addressing persistent JTL data discrepancies for 03.11.2025 orders (if any remain after sales API fix).
+- **Frontend build error**: Resolve the syntax error in  after the Kaltakquise Autopilot UI implementation.
+- **Dynamic Filtering Logic**: Fully implement multi-select filter logic for Sales APIs (identified as a larger refactoring).
 </pending_tasks>
 
 <current_work>
-The immediate focus before this summary request was on resolving critical issues related to JTL-Wawi database integration and UI rendering. The AI engineer implemented runtime-safe SQL article filters using  to check for  column existence, aiming to eliminate SQL Error 207. A new  endpoint was created to determine the min/max available data period for UI defaulting. These SQL adjustments were applied across all JTL sales endpoints in . Concurrently, the hero image visibility was further refined in  by adjusting height, saturation, contrast, and overlay. On the frontend (), helper functions (, , ) were integrated to make charts robust against various API response formats and to display placeholders for empty data. However, the user's latest feedback (Sehe immer noch kein Hero Bild und auch keien Azhlen auf dem Dashboard? weiterhin die fehlermekldung) indicates that both the hero image and the dashboard data/charts are still not visible or are displaying error messages, suggesting that the previous fixes for JTL connectivity and UI rendering have not fully resolved the underlying issues. The JTL database connection, despite multiple password updates in  and  route adjustments for basic auth, seems to be failing for the main sales endpoints.
+Immediately before this summary request, the AI engineer was actively working on integrating the Kaltakquise (Cold Acquisition) Autopilot Control Panel into the frontend UI within .
+
+The work involved:
+1.  **Adding Autopilot States**: Introducing new  variables to manage the autopilot's status (e.g., , , ) and UI elements.
+2.  **Creating Autopilot Functions**: Implementing asynchronous functions (, , , ) to interact with the newly created backend  endpoints.
+3.  **Initializing Autopilot on Load**: Adding  hooks to load the autopilot's status and configuration when the page mounts.
+4.  **Building UI Elements**: Adding the visual components for the Autopilot Control Panel to the Kaltakquise section of . This includes buttons to start/stop the autopilot, input fields for configuration (like rate limits), and potentially a display for logs/status.
+5.  **Integrating Status Dropdowns and Follow-up Button**: Converting static status badges in the Prospects table into interactive dropdowns for manual status changes and adding a Follow-up button.
+
+The very last message indicates a  in  encountered during this frontend implementation, likely a syntax error preventing the application from compiling and running correctly on a desktop browser. The AI engineer was about to debug and fix this syntax issue.
 </current_work>
 
 <optional_next_step>
-Investigate why the hero image is still not visible and why dashboard data and error messages persist.
+Fix the identified build error (syntax error) in .
 </optional_next_step>
