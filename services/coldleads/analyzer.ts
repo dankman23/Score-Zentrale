@@ -223,7 +223,7 @@ async function crawlWebsite(url: string) {
 }
 
 /**
- * Extrahiert Kontakte
+ * Extrahiert Kontakte mit intelligenter Priorisierung
  */
 function extractContacts(html: string) {
   const $ = cheerio.load(html)
@@ -233,20 +233,55 @@ function extractContacts(html: string) {
   const emails = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || []
   const phones = text.match(/(\+49|0)\s*\(?\d{2,5}\)?[\s\-\/]*\d{3,}[\s\-]*\d*/g) || []
 
-  // Einkauf
-  const einkaufMatch = text.match(/einkauf[^\n]{0,100}?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i)
-  if (einkaufMatch) {
-    contacts.push({
-      name: 'Einkauf',
-      title: 'Einkaufsabteilung',
-      department: 'Einkauf',
-      email: einkaufMatch[1],
-      phone: phones[0] || null,
-      priority: 1
-    })
+  console.log(`[Analyzer] Found ${emails.length} emails, ${phones.length} phones`)
+
+  // Priorisierte Suche nach relevanten Kontakten
+  const searchPatterns = [
+    { regex: /einkauf[^\n]{0,150}?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i, name: 'Einkauf', dept: 'Einkauf', priority: 1 },
+    { regex: /vertrieb[^\n]{0,150}?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i, name: 'Vertrieb', dept: 'Vertrieb', priority: 2 },
+    { regex: /beschaffung[^\n]{0,150}?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i, name: 'Beschaffung', dept: 'Beschaffung', priority: 1 },
+    { regex: /geschäftsführung[^\n]{0,150}?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i, name: 'Geschäftsführung', dept: 'GF', priority: 2 },
+    { regex: /werkstatt[^\n]{0,150}?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i, name: 'Werkstatt', dept: 'Produktion', priority: 3 }
+  ]
+
+  for (const pattern of searchPatterns) {
+    const match = text.match(pattern.regex)
+    if (match && match[1]) {
+      contacts.push({
+        name: pattern.name,
+        title: `${pattern.dept}sabteilung`,
+        department: pattern.dept,
+        email: match[1],
+        phone: phones[0] || null,
+        priority: pattern.priority
+      })
+      console.log(`[Analyzer] Found targeted contact: ${pattern.name} - ${match[1]}`)
+    }
   }
 
-  // Fallback: Erste Email
+  // Filtere generische Emails aus (info@, kontakt@, etc.)
+  const genericPrefixes = ['info', 'kontakt', 'contact', 'mail', 'office', 'service', 'support']
+  const qualityEmails = emails.filter(email => {
+    const prefix = email.split('@')[0].toLowerCase()
+    return !genericPrefixes.includes(prefix)
+  })
+
+  console.log(`[Analyzer] Quality emails (non-generic): ${qualityEmails.length}`)
+
+  // Füge beste nicht-generische Email als Fallback hinzu
+  if (contacts.length === 0 && qualityEmails.length > 0) {
+    contacts.push({
+      name: 'Kontakt',
+      title: 'Ansprechpartner',
+      department: 'Allgemein',
+      email: qualityEmails[0],
+      phone: phones[0] || null,
+      priority: 4
+    })
+    console.log(`[Analyzer] Added fallback quality contact: ${qualityEmails[0]}`)
+  }
+
+  // Letzter Fallback: Erste Email (auch wenn generisch)
   if (contacts.length === 0 && emails.length > 0) {
     contacts.push({
       name: 'Kontakt',
@@ -254,9 +289,13 @@ function extractContacts(html: string) {
       department: 'Allgemein',
       email: emails[0],
       phone: phones[0] || null,
-      priority: 3
+      priority: 5
     })
+    console.log(`[Analyzer] Added generic fallback contact: ${emails[0]}`)
   }
 
-  return contacts.slice(0, 3)
+  // Sortiere nach Priorität
+  contacts.sort((a, b) => a.priority - b.priority)
+
+  return contacts.slice(0, 5) // Top 5 Kontakte
 }
