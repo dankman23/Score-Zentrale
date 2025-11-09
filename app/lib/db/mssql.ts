@@ -1,11 +1,11 @@
 import 'server-only'
-import sql, { ConnectionPool } from 'mssql'
+import sql from 'mssql'
 
-let pool: ConnectionPool | null = null
+let pool: sql.ConnectionPool | null = null
 let connectionAttempts = 0
 const MAX_RETRIES = 2
 
-export async function getMssqlPool(): Promise<ConnectionPool> {
+export async function getMssqlPool(): Promise<sql.ConnectionPool> {
   if (pool && pool.connected) return pool
   
   const encrypt = process.env.JTL_SQL_ENCRYPT === 'true'
