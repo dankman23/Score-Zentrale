@@ -406,7 +406,7 @@ async function handleRoute(request, { params }) {
           JOIN revenue r ON r.kKunde = k.kKunde
           LEFT JOIN lastPlat lp ON lp.kKunde = k.kKunde
           LEFT JOIN customerData cd ON cd.kKunde = k.kKunde
-          WHERE o.lastOrderDate >= @fromRecent
+          WHERE o.lastOrderDate >= @fromOldest AND o.lastOrderDate <= @toMostRecent
             AND (o.ordersCount >= @minOrders OR r.totalRevenueBrutto >= @minRevenue)
           ORDER BY r.totalRevenueBrutto DESC;`
 
