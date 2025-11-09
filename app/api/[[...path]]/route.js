@@ -275,9 +275,11 @@ async function handleRoute(request, { params }) {
       try{
         const pool = await getMssqlPool()
         const body = await request.json().catch(()=>({}))
-        const inactiveMonths = Number(body?.inactiveMonths ?? process.env.INACTIVE_MONTHS ?? 6)
+        // Warmakquise: Kunden die INAKTIV sind (nicht zu kürzlich gekauft)
+        const minInactiveMonths = Number(body?.minInactiveMonths ?? process.env.MIN_INACTIVE_MONTHS ?? 4) // Mindestens 4 Monate inaktiv
+        const maxInactiveMonths = Number(body?.maxInactiveMonths ?? process.env.MAX_INACTIVE_MONTHS ?? 24) // Maximal 24 Monate inaktiv
         const minOrders = Number(body?.minOrders ?? process.env.MIN_ORDERS ?? 2)
-        const minRevenue = Number(body?.minRevenue ?? process.env.MIN_REVENUE ?? 100)
+        const minRevenue = Number(body?.minRevenue ?? process.env.MIN_REVENUE ?? 1000)
         const limit = Math.max(1, Math.min( Number(body?.limit ?? 2000), 10000))
         const weights = body?.weights || {}
 
