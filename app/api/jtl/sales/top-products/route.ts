@@ -29,13 +29,13 @@ export async function GET(request: NextRequest) {
 
     const netTotalExpr = `(op.${netField} * op.${qtyField})`
 
-    // Check which name column exists in article table
-    const nameField = await pickFirstExisting(pool, articleTable, ['cName_DE', 'cName', 'cBeschreibung', 'cKurzBeschreibung']) || 'cArtNr'
+    // Use name from order position (cName field in tAuftragPosition)
+    const posNameField = await pickFirstExisting(pool, orderPosTable, ['cName', 'cArtikelName', 'cBezeichnung']) || null
     
     const query = `
       SELECT TOP ${limit}
         a.cArtNr AS sku,
-        a.${nameField} AS name,
+        ${posNameField ? `MAX(op.${posNameField})` : `a.cArtNr`} AS name,
         SUM(op.${qtyField}) AS quantity,
         SUM(${netTotalExpr}) AS revenue
       FROM ${orderTable} o
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
         AND ${articleFilter}
-      GROUP BY a.cArtNr, a.${nameField}
+      GROUP BY a.cArtNr
       ORDER BY SUM(${netTotalExpr}) DESC
     `
 
