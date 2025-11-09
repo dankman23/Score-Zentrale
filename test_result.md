@@ -734,6 +734,83 @@ agent_communication:
       - working: false
         agent: "testing"
         comment: "⚠️ Re-tested Purchase Expenses: GET /api/jtl/purchase/expenses?from=2025-11-01&to=2025-11-03 returns 404 ok:false with error: 'Keine Eingangsrechnungs- oder Bestellungs-Tabellen gefunden'. This is expected - the required database tables don't exist in this JTL-Wawi instance. Endpoint handles missing tables gracefully with proper error response."
+  - task: "JTL Sales: GET /api/jtl/sales/kpi (AU-Filter)"
+    implemented: true
+    working: true
+    file: "/app/app/api/jtl/sales/kpi/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ AU-Filter Test PASSED: GET /api/jtl/sales/kpi?from=2025-10-10&to=2025-11-09 returns 200 ok:true with 1892 orders, Net: 115,588.92 EUR, Gross: 115,588.92 EUR, Cost: 46,367.21 EUR, Margin: 69,221.72 EUR. Only AU-Aufträge counted, AN-Angebote excluded."
+  - task: "JTL Sales: GET /api/jtl/sales/timeseries (AU-Filter)"
+    implemented: true
+    working: true
+    file: "/app/app/api/jtl/sales/timeseries/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ AU-Filter Test PASSED: GET /api/jtl/sales/timeseries?from=2025-10-10&to=2025-11-09 returns 200 ok:true with 31 data points (one per day). First: 2025-10-10 (68 orders, 3,573.22 EUR), Last: 2025-11-09 (68 orders, 3,647.78 EUR). Only AU-Aufträge in timeseries."
+  - task: "JTL Sales: GET /api/jtl/sales/top-products (AU-Filter - CRITICAL)"
+    implemented: true
+    working: true
+    file: "/app/app/api/jtl/sales/top-products/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ AU-Filter Test PASSED - CRITICAL CHECK PASSED: GET /api/jtl/sales/top-products?limit=20&from=2025-10-10&to=2025-11-09 returns 200 ok:true with 20 products. **SKU 167676 shows exactly 5.0 pieces at 400.0 EUR** (NOT 35 pieces at 2750 EUR as before). Product: '10x STARCKE Schleifscheibe 942EE | 400 mm | Doppelseitig | Korn 40'. This confirms AU-Filter is working correctly - only Aufträge counted, Angebote excluded!"
+  - task: "JTL Sales: GET /api/jtl/sales/by-platform (AU-Filter)"
+    implemented: true
+    working: true
+    file: "/app/app/api/jtl/sales/by-platform/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ AU-Filter Test PASSED: GET /api/jtl/sales/by-platform?from=2025-10-10&to=2025-11-09 returns 200 ok:true with 18 platform groups. Top platforms: Platform 51 (841 orders, 38,589.99 EUR), Platform 2 (324 orders, 35,691.66 EUR), Platform 31 (426 orders, 19,264.51 EUR). Only AU-Aufträge grouped by platform."
+  - task: "JTL Sales: GET /api/jtl/sales/top-categories (AU-Filter)"
+    implemented: true
+    working: true
+    file: "/app/app/api/jtl/sales/top-categories/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ AU-Filter Test PASSED: GET /api/jtl/sales/top-categories?limit=10&from=2025-10-10&to=2025-11-09 returns 200 ok:true with 10 categories. Top categories: Auktion Lagerware (1487 items, 43,577.58 EUR), Lagerware (2597 items, 15,105.41 EUR), Klingspor Kernsortiment (201 items, 12,312.79 EUR). Only AU-Aufträge grouped by category."
+  - task: "JTL Orders: GET /api/jtl/orders/kpi/margin (AU-Filter)"
+    implemented: true
+    working: true
+    file: "/app/app/api/jtl/orders/kpi/margin/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ AU-Filter Test PASSED: GET /api/jtl/orders/kpi/margin?from=2025-10-10&to=2025-11-09 returns 200 ok:true with 1893 orders, Revenue: 115,600.98 EUR, Cost: 46,370.69 EUR, Margin: 69,230.29 EUR. Cost sources: Position 100%, History 0%, Article 0%. Only AU-Aufträge for margin calculation."
+  - task: "JTL Orders: GET /api/jtl/orders/kpi/shipping-split (AU-Filter)"
+    implemented: true
+    working: true
+    file: "/app/app/api/jtl/orders/kpi/shipping-split/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ AU-Filter Test PASSED: GET /api/jtl/orders/kpi/shipping-split?from=2025-10-10&to=2025-11-09 returns 200 ok:true with 1893 orders, Net w/o shipping: 115,600.98 EUR, Net with shipping: 115,600.98 EUR, Gross w/o shipping: 135,522.60 EUR, Gross with shipping: 135,522.60 EUR. Only AU-Aufträge for shipping split."
 
 agent_communication:
   - agent: "main"
