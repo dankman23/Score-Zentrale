@@ -385,6 +385,7 @@ async function handleRoute(request, { params }) {
             FROM ${auftragTable} o
             JOIN ${auftragPosTable} op ON op.kAuftrag = o.kAuftrag
             WHERE (COL_LENGTH('${auftragTable}','nStorno') IS NULL OR ISNULL(o.nStorno,0)=0)
+              AND o.cAuftragsNr LIKE 'AU%'  -- Nur Aufträge, keine Angebote
               AND (${articleWhere})
             GROUP BY o.kKunde
           )
