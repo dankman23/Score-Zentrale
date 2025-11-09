@@ -314,6 +314,17 @@ async function handleRoute(request, { params }) {
     }
 
     // ---------------- Leads (Warmakquise) ----------------
+    // DELETE all leads (temporary for testing)
+    if (route === '/leads/clear' && method === 'DELETE'){
+      try {
+        const { db } = await connectToDatabase()
+        const result = await db.collection('leads').deleteMany({})
+        return json({ ok: true, deleted: result.deletedCount })
+      } catch (err) {
+        return json({ ok: false, error: err.message }, { status: 500 })
+      }
+    }
+    
     if (route === '/leads/import' && method === 'POST'){
       try{
         const pool = await getMssqlPool()
