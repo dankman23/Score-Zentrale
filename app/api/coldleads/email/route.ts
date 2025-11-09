@@ -34,17 +34,21 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Email generieren
+    // Email generieren mit strukturierten Daten
     const contactPerson = prospect.analysis.contact_persons?.[0]
     
     const email = await generateEmail({
       company_name: prospect.company_name,
       contact_person: contactPerson?.name,
+      contact_department: contactPerson?.department,
       industry: prospect.industry,
       analysis: {
-        products: prospect.analysis.company_info.products || [],
-        needs: prospect.analysis.needs_assessment.potential_products || [],
-        reasoning: prospect.analysis.needs_assessment.individual_hook || prospect.analysis.needs_assessment.reasoning || `Unternehmen aus dem Bereich ${prospect.industry}`
+        detected_applications: prospect.analysis.company_info.detected_applications || [],
+        potential_products: prospect.analysis.needs_assessment.potential_products || [],
+        target_materials: prospect.analysis.company_info.target_materials || [],
+        estimated_volume: prospect.analysis.needs_assessment.estimated_volume || 'medium',
+        reasoning: prospect.analysis.needs_assessment.reasoning || '',
+        score: prospect.analysis.needs_assessment.score || 50
       }
     })
 
