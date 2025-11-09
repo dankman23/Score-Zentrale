@@ -19,18 +19,14 @@ export async function GET(request: NextRequest) {
     const pool = await getMssqlPool()
     const orderTable = 'Verkauf.tAuftrag'
     const orderPosTable = 'Verkauf.tAuftragPosition'
+
+    // Check if kPlattform exists in tAuftrag
+    const hasKPlattform = await hasColumn(pool, orderTable, 'kPlattform')
     
-    // Check if platform table exists
-    const platformTableCandidates = [
-      'Verkauf.tAuftrag_Plattform',
-      'dbo.tAuftrag_Plattform'
-    ]
-    const platformTable = await firstExistingTable(pool, platformTableCandidates)
-    
-    if (!platformTable) {
+    if (!hasKPlattform) {
       return NextResponse.json({
         ok: false,
-        error: 'Platform table not found'
+        error: 'kPlattform column not found in tAuftrag'
       }, { status: 404 })
     }
 
@@ -46,31 +42,18 @@ export async function GET(request: NextRequest) {
 
     const netTotalExpr = `(op.${netField} * op.${qtyField})`
 
-    // Check platform table structure
-    const hasCPlattform = await hasColumn(pool, platformTable, 'cPlattform')
-    const hasKPlattform = await hasColumn(pool, platformTable, 'kPlattform')
-    
-    if (!hasCPlattform && !hasKPlattform) {
-      return NextResponse.json({
-        ok: false,
-        error: 'Platform table missing cPlattform or kPlattform column'
-      }, { status: 500 })
-    }
-
-    const platformNameField = hasCPlattform ? 'cPlattform' : 'CAST(kPlattform AS VARCHAR(50))'
-
+    // Use kPlattform from tAuftrag table directly
     const query = `
       SELECT 
-        ${platformNameField} AS platform,
+        ISNULL(CAST(o.kPlattform AS VARCHAR(50)), 'Unbekannt') AS platform,
         COUNT(DISTINCT o.kAuftrag) AS orders,
         SUM(${netTotalExpr}) AS revenue_net
       FROM ${orderTable} o
       INNER JOIN ${orderPosTable} op ON o.kAuftrag = op.kAuftrag
-      LEFT JOIN ${platformTable} p ON o.kAuftrag = p.kAuftrag
       WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
         AND ${articleFilter}
-      GROUP BY ${platformNameField}
+      GROUP BY o.kPlattform
       ORDER BY SUM(${netTotalExpr}) DESC
     `
 
