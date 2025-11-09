@@ -287,7 +287,14 @@ export default function App() {
 
   const runImport = async () => {
     setImporting(true)
-    const r = await getJsonRaw('/api/leads/import', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({}) })
+    // Warmakquise: Kunden die mind. 4 Monate, max. 24 Monate inaktiv sind
+    const params = {
+      minInactiveMonths: 4,  // Mindestens 4 Monate seit letzter Bestellung
+      maxInactiveMonths: 24, // Maximal 24 Monate seit letzter Bestellung
+      minOrders: 2,          // Mindestens 2 Bestellungen
+      minRevenue: 1000       // Mindestens 1000 EUR Umsatz
+    }
+    const r = await getJsonRaw('/api/leads/import', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(params) })
     pushLog({ url:'/api/leads/import', status:r.status, ok:r.ok, ms:r.ms, error:r.error })
     setImporting(false)
     if (!r.ok) { setToast(`Import fehlgeschlagen: ${r.error}`); return }
