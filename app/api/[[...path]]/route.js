@@ -411,7 +411,8 @@ async function handleRoute(request, { params }) {
           ORDER BY r.totalRevenueBrutto DESC;`
 
         const res = await pool.request()
-          .input('pInactive', sql.Int, inactiveMonths)
+          .input('pMinInactive', sql.Int, minInactiveMonths)
+          .input('pMaxInactive', sql.Int, maxInactiveMonths)
           .input('pMinOrders', sql.Int, minOrders)
           .input('pMinRevenue', sql.Float, minRevenue)
           .input('pLimit', sql.Int, limit)
