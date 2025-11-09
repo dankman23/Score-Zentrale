@@ -1,4 +1,6 @@
-import sql, { ConnectionPool } from 'mssql'
+import sql from 'mssql'
+
+type MssqlPool = Awaited<ReturnType<typeof sql.connect>>
 
 /**
  * SQL-Utilitys für dynamische Schema-Erkennung
@@ -11,7 +13,7 @@ import sql, { ConnectionPool } from 'mssql'
  * @param fullName Voller Tabellenname (z.B. "Einkauf.tEingangsrechnung" oder "dbo.tArtikel")
  * @returns true wenn Tabelle existiert
  */
-export async function tableExists(pool: ConnectionPool, fullName: string): Promise<boolean> {
+export async function tableExists(pool: MssqlPool, fullName: string): Promise<boolean> {
   try {
     const r = await pool.request()
       .input('name', sql.NVarChar, fullName)
