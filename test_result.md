@@ -280,15 +280,18 @@ backend:
         comment: "✅ FINALER ROBUSTNESS-TEST PASSED! Email generation now working with ROBUST FALLBACK SYSTEM (template-based). Fixed duplicate getIndustryTemplate function in emailer.ts. Tested complete end-to-end workflow: POST /api/coldleads/email with website='https://mr-stahltechnik.de', send=false returned 200 OK. Email generated successfully with ALL required elements: ✅ Subject: 'Schleifwerkzeuge für MR Stahltechnik - Köln - Kostenvergleich', ✅ Body contains 'Schleifwerkzeuge', ✅ Body contains 'Score', ✅ Phone '0221-25999901' present, ✅ Email 'berres@score-schleifwerkzeuge.de' present, ✅ Jahresbedarfs-Angebot mentioned, ✅ Beratungstermin mentioned. Template-based email generation (personalization_score: 30) working perfectly without AI API dependency. NO 500 errors, NO AI-Fehler. System is ROBUST!"
   - task: "Kaltakquise: GET /api/coldleads/stats (Dashboard Widget)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/coldleads/stats/route.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Liefert Statistiken für Dashboard Widget: unreadReplies (hasReply=true, replyRead!=true), recentReplies (last 7 days), awaitingFollowup (contacted >6 days ago, keine Antwort, <2 follow-ups), byStatus Zählung."
+      - working: true
+        agent: "testing"
+        comment: "✅ Stats endpoint working perfectly! GET /api/coldleads/stats returns 200 OK with all required fields: unreadReplies=0, recentReplies=0, awaitingFollowup=0, byStatus={'new': 33, 'analyzed': 3}, total=36. All fields are correct data types (integers for counts, dict for byStatus). Endpoint correctly aggregates prospect statistics from MongoDB cold_prospects collection."
   - task: "Kaltakquise: GET /api/coldleads/inbox (IMAP Email Fetching)"
     implemented: true
     working: "NA"
