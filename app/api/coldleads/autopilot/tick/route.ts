@@ -58,18 +58,107 @@ export async function POST() {
     }
     
     // 2. Hole nächsten Prospect der analysiert aber noch nicht kontaktiert wurde
-    const nextProspect = await prospectsCollection.findOne({
+    let nextProspect = await prospectsCollection.findOne({
       status: 'analyzed',
       email_sent_at: { $exists: false }
     })
     
+    // Wenn keine analysierten Prospects vorhanden, suche neue Firmen
     if (!nextProspect) {
-      console.log('[Autopilot Tick] No analyzed prospects ready to contact')
-      return NextResponse.json({
-        ok: true,
-        action: 'no_prospects',
-        message: 'Keine analysierten Prospects bereit zum Kontaktieren'
+      console.log('[Autopilot Tick] No analyzed prospects, searching for new companies...')
+      
+      await stateCollection.updateOne(
+        { id: 'kaltakquise' },
+        { $set: { currentPhase: 'searching', lastActivity: new Date().toISOString() } }
+      )
+      
+      // Importiere Search-Strategy
+      const { getNextSearchQuery } = await import('../../../../../services/coldleads/search-strategy')
+      
+      // Hole letzte Such-Query aus State
+      const lastQuery = state.lastSearchQuery || null
+      const nextQuery = getNextSearchQuery(lastQuery)
+      
+      console.log(`[Autopilot Tick] Searching: ${nextQuery.industry} in ${nextQuery.region}`)
+      
+      // Führe Suche aus
+      const searchResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/coldleads/search`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nextQuery)
       })
+      
+      const searchResult = await searchResponse.json()
+      
+      if (!searchResult.ok || searchResult.count === 0) {
+        console.log('[Autopilot Tick] Search failed or no results')
+        
+        // Speichere Query trotzdem für nächste Rotation
+        await stateCollection.updateOne(
+          { id: 'kaltakquise' },
+          { 
+            $set: { 
+              lastSearchQuery: nextQuery,
+              currentPhase: 'idle',
+              lastActivity: new Date().toISOString()
+            } 
+          }
+        )
+        
+        return NextResponse.json({
+          ok: true,
+          action: 'search_no_results',
+          query: nextQuery
+        })
+      }
+      
+      console.log(`[Autopilot Tick] Found ${searchResult.count} new companies`)
+      
+      // Analysiere alle gefundenen Prospects
+      await stateCollection.updateOne(
+        { id: 'kaltakquise' },
+        { $set: { currentPhase: 'analyzing', lastActivity: new Date().toISOString() } }
+      )
+      
+      for (const prospect of searchResult.prospects) {
+        try {
+          console.log(`[Autopilot Tick] Analyzing ${prospect.company_name}...`)
+          
+          const analyzeResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/coldleads/analyze`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              website: prospect.website,
+              industry: nextQuery.industry
+            })
+          })
+          
+          await analyzeResponse.json()
+          
+        } catch (error) {
+          console.error(`[Autopilot Tick] Failed to analyze ${prospect.company_name}:`, error)
+        }
+      }
+      
+      // Speichere Query für nächste Rotation
+      await stateCollection.updateOne(
+        { id: 'kaltakquise' },
+        { $set: { lastSearchQuery: nextQuery, currentPhase: 'idle' } }
+      )
+      
+      // Hole nun ersten analysierten Prospect
+      nextProspect = await prospectsCollection.findOne({
+        status: 'analyzed',
+        email_sent_at: { $exists: false }
+      })
+      
+      if (!nextProspect) {
+        return NextResponse.json({
+          ok: true,
+          action: 'analyzed_but_not_ready',
+          message: 'Firmen gefunden und analysiert, aber noch nicht bereit'
+        })
+      }
     }
     
     console.log(`[Autopilot Tick] Processing prospect: ${nextProspect.company_name}`)
