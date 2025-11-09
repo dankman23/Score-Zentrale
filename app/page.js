@@ -708,18 +708,11 @@ export default function App() {
 
       {activeTab==='dashboard' && (
         <div>
-          {/* Oberste Reihe: nur Auftragsbasis */}
+          {/* Oberste Reihe: Aufträge (mit Versand) */}
           <div className="row">
             <KpiTile title="Bestellungen (Aufträge)" value={(ordersSplit?.orders??'-').toLocaleString?.('de-DE')||ordersSplit?.orders||'-'} sub="nach 'Erstellt am'" demo={demoMode} />
-            <KpiTile title="Umsatz (NETTO) — Aufträge" value={fmtCurrency(ordersSplit?.net_without_shipping)} sub={`mit Versand: ${fmtCurrency(ordersSplit?.net_with_shipping)}`} demo={demoMode} />
-            <KpiTile title="Umsatz (BRUTTO) — Aufträge" value={fmtCurrency(ordersSplit?.gross_without_shipping)} sub={`mit Versand: ${fmtCurrency(ordersSplit?.gross_with_shipping)}`} demo={demoMode} />
-          </div>
-
-          {/* Zweite Reihe: Rechnungsbasis (klar gekennzeichnet) */}
-          <div className="row">
-            <KpiTile title="Umsatz (Rechnungen)" value={fmtCurrency(kpi?.revenue)} sub="Quelle: Rechnungen" demo={demoMode} />
-            <KpiTile title="Marge (Rechnungen)" value={fmtCurrency(kpi?.margin)} sub="ohne Gebühren" demo={demoMode} />
-            <KpiTile title="Marge (mit Gebühren) — Rechnungen" value={fmtCurrency(kpiFees?.margin_with_fees)} sub="inkl. 1,50 € + 20% Plattformgebühr" demo={demoMode} />
+            <KpiTile title="Umsatz (NETTO)" value={fmtCurrency(ordersSplit?.net_with_shipping)} sub="Aufträge mit Versand" demo={demoMode} />
+            <KpiTile title="Umsatz (BRUTTO)" value={fmtCurrency(ordersSplit?.gross_with_shipping)} sub="Aufträge mit Versand" demo={demoMode} />
           </div>
 
           {/* Dritte Reihe: Beschaffung & Rohertragsmarge */}
