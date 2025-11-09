@@ -79,7 +79,7 @@ export function inclusiveDateWhere(alias: string, from: string, to: string, colP
  * @param candidates Array von Spaltennamen
  * @returns Name der ersten gefundenen Spalte oder null
  */
-export async function pickFirstExisting(pool: ConnectionPool, table: string, candidates: string[]): Promise<string | null> {
+export async function pickFirstExisting(pool: MssqlPool, table: string, candidates: string[]): Promise<string | null> {
   for (const c of candidates) {
     if (await hasColumn(pool, table, c)) {
       return c
