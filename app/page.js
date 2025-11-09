@@ -2231,18 +2231,26 @@ export default function App() {
                     <i className="bi bi-building text-primary mr-2"/>
                     <h5 className="mb-0">{coldProspects.length} Firmen gefunden</h5>
                   </div>
-                  <div className="btn-group btn-group-sm">
-                    <button className={`btn ${coldStatusFilter==='all'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('all')}>
-                      Alle ({coldStats.total})
+                  <div className="d-flex align-items-center">
+                    <button 
+                      className="btn btn-outline-warning btn-sm mr-2"
+                      onClick={sendFollowups}
+                      disabled={coldLoading}
+                    >
+                      <i className="bi bi-arrow-repeat mr-1"/>Follow-ups senden
                     </button>
-                    <button className={`btn ${coldStatusFilter==='new'?'btn-secondary':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('new')}>
-                      Neu ({coldStats.new})
-                    </button>
-                    <button className={`btn ${coldStatusFilter==='analyzed'?'btn-info':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('analyzed')}>
-                      Analysiert ({coldStats.analyzed})
-                    </button>
-                    <button className={`btn ${coldStatusFilter==='contacted'?'btn-success':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('contacted')}>
-                      Kontaktiert ({coldStats.contacted})
+                    <div className="btn-group btn-group-sm">
+                      <button className={`btn ${coldStatusFilter==='all'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('all')}>
+                        Alle ({coldStats.total})
+                      </button>
+                      <button className={`btn ${coldStatusFilter==='new'?'btn-secondary':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('new')}>
+                        Neu ({coldStats.new})
+                      </button>
+                      <button className={`btn ${coldStatusFilter==='analyzed'?'btn-info':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('analyzed')}>
+                        Analysiert ({coldStats.analyzed})
+                      </button>
+                      <button className={`btn ${coldStatusFilter==='contacted'?'btn-success':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('contacted')}>
+                        Kontaktiert ({coldStats.contacted})
                     </button>
                     <button className={`btn ${coldStatusFilter==='replied'?'btn-warning':'btn-outline-warning'}`} onClick={()=>setColdStatusFilter('replied')}>
                       <i className="bi bi-envelope-check mr-1"/>Antworten ({coldStats.replied || 0})
