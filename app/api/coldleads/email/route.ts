@@ -56,14 +56,25 @@ export async function POST(request: NextRequest) {
         email.body
       )
 
-      // Status aktualisieren
+      // Status aktualisieren & History hinzufügen
       await collection.updateOne(
         { website },
         {
           $set: {
             status: 'contacted',
             email_sent_at: new Date(),
-            updated_at: new Date()
+            updated_at: new Date(),
+            last_contact_date: new Date()
+          },
+          $push: {
+            history: {
+              type: 'email_sent',
+              date: new Date(),
+              to: contactPerson.email,
+              subject: email.subject,
+              body: email.body.substring(0, 500),
+              messageId: result.messageId
+            }
           }
         }
       )
