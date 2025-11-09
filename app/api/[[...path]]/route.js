@@ -175,7 +175,7 @@ async function handleRoute(request, { params }) {
         const articleCheck = await pool.request()
           .input('sku', sql.NVarChar, sku)
           .query(`
-            SELECT kArtikel, cArtNr, cName
+            SELECT kArtikel, cArtNr
             FROM dbo.tArtikel
             WHERE cArtNr = @sku
           `)
