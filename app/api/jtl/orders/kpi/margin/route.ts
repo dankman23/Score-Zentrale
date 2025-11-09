@@ -151,6 +151,20 @@ export async function GET(request: NextRequest) {
         END
       `
 
+    // Separate query for shipping costs
+    const shippingQuery = `
+      SELECT 
+        SUM(op.${vkNettoField} * op.${qtyField}) AS shipping_revenue,
+        SUM((${ekCascade}) * op.${qtyField}) AS shipping_cost
+      FROM ${orderTable} o
+      INNER JOIN ${orderPosTable} op ON o.kAuftrag = op.kAuftrag
+      LEFT JOIN ${articleTable} a ON op.kArtikel = a.kArtikel
+      ${historicalEkClause}
+      WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
+        ${stornoFilter}
+        AND NOT (${articleFilter})
+    `
+
     const query = `
       WITH OrderPositions AS (
         SELECT 
