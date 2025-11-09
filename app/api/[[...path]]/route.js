@@ -166,9 +166,10 @@ async function handleRoute(request, { params }) {
     if (route === '/debug/sku' && method === 'GET') {
       try {
         const pool = await getMssqlPool()
-        const sku = searchParams.get('sku') || '167676'
-        const from = searchParams.get('from') || '2025-10-10'
-        const to = searchParams.get('to') || '2025-11-09'
+        const urlParams = new URL(request.url).searchParams
+        const sku = urlParams.get('sku') || '167676'
+        const from = urlParams.get('from') || '2025-10-10'
+        const to = urlParams.get('to') || '2025-11-09'
         
         // Check how many articles have this SKU
         const articleCheck = await pool.request()
