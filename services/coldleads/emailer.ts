@@ -8,11 +8,23 @@ import { emergentGetJSON } from '../../lib/emergent-llm'
 interface EmailGenerationOptions {
   company_name: string
   contact_person?: string
+  contact_department?: string
   industry: string
   analysis: {
-    products: string[]
-    needs: string[]
+    detected_applications: Array<{
+      name: string
+      description: string
+    }>
+    potential_products: Array<{
+      name: string
+      category: string
+      reason: string
+      grain_sizes?: string[]
+    }>
+    target_materials: string[]
+    estimated_volume: 'low' | 'medium' | 'high'
     reasoning: string
+    score: number
   }
 }
 
