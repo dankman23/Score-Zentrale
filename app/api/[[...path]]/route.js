@@ -175,7 +175,6 @@ async function handleRoute(request, { params }) {
 
         // Resolve actual table names (schema differs by JTL version)
         const kundeTable = await firstExistingTable(pool, ['Kunde.tKunde','dbo.tKunde']) || 'dbo.tKunde'
-        const kundeAdresseTable = await firstExistingTable(pool, ['dbo.tKundenAdresse','Kunde.tKundenAdresse']) || 'dbo.tKundenAdresse'
         const auftragTable = await firstExistingTable(pool, ['Verkauf.tAuftrag','dbo.tAuftrag']) || 'dbo.tAuftrag'
         const auftragPosTable = await firstExistingTable(pool, ['Verkauf.tAuftragPosition','dbo.tAuftragPosition','dbo.tAuftragPos','Verkauf.tAuftragPos']) || 'dbo.tAuftragPosition'
         const plTable = await firstExistingTable(pool, ['dbo.tPlattform','tPlattform'])
@@ -185,13 +184,12 @@ async function handleRoute(request, { params }) {
         const hasUSTID = await hasColumn(pool, kundeTable, 'cUSTID')
         const hasKundenNr = await hasColumn(pool, kundeTable, 'cKundenNr')
         
-        // Check if tKundenAdresse exists for address data
-        const hasKundeAdresse = await tableExists(pool, kundeAdresseTable)
-        const hasAdressName = hasKundeAdresse ? await hasColumn(pool, kundeAdresseTable, 'cName') : false
-        const hasAdressVorname = hasKundeAdresse ? await hasColumn(pool, kundeAdresseTable, 'cVorname') : false
-        const hasAdressFirma = hasKundeAdresse ? await hasColumn(pool, kundeAdresseTable, 'cFirma') : false
-        const hasAdressTel = hasKundeAdresse ? await hasColumn(pool, kundeAdresseTable, 'cTel') : false
-        const hasAdressMail = hasKundeAdresse ? await hasColumn(pool, kundeAdresseTable, 'cMail') : false
+        // Check billing address fields in tAuftrag (guaranteed to exist!)
+        const hasRgFirma = await hasColumn(pool, auftragTable, 'cRechnungsanschrift_Firma')
+        const hasRgVorname = await hasColumn(pool, auftragTable, 'cRechnungsanschrift_Vorname')
+        const hasRgNachname = await hasColumn(pool, auftragTable, 'cRechnungsanschrift_Nachname')
+        const hasRgTel = await hasColumn(pool, auftragTable, 'cRechnungsanschrift_Tel')
+        const hasRgMail = await hasColumn(pool, auftragTable, 'cRechnungsanschrift_EMail')
 
         // Build robust position totals (handle qty/tax/alt columns)
         const posTable = auftragPosTable
