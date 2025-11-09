@@ -331,7 +331,7 @@ export default function App() {
 
   useEffect(() => { loadDateRangeAndAdjust(); fetchAll(); fetchSalesTables(); refreshProspects() }, [])
   useEffect(() => { fetchAll(); fetchSalesTables() }, [from, to, limit])
-  useEffect(() => { if (activeTab==='marketing' && marketingSub==='warmaquise') queryLeads() }, [activeTab, marketingSub, statusF, b2bF, minScoreF, qF, pageF, limitF, sortF, orderF])
+  useEffect(() => { if (activeTab==='warmakquise') queryLeads() }, [activeTab, statusF, b2bF, minScoreF, qF, pageF, limitF, sortF, orderF])
   useEffect(() => { if (activeTab==='kaltakquise') loadColdProspects() }, [activeTab, coldStatusFilter])
   useEffect(() => { 
     if (activeTab==='marketing' && marketingSub==='analytics') {
