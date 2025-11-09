@@ -35,31 +35,95 @@ interface GeneratedEmail {
 }
 
 /**
- * FALLBACK: Template-basierte Email-Generierung
+ * Intelligente, datenbasierte Email-Generierung
  */
 function generateTemplateEmail(options: EmailGenerationOptions): GeneratedEmail {
-  const industryTemplate = getIndustryTemplate(options.industry)
+  const { company_name, contact_person, contact_department, analysis, industry } = options
   
-  const subject = `Schleifwerkzeuge für ${options.company_name} - Kostenvergleich`
+  // 1. Ansprache generieren
+  let greeting = 'Sehr geehrte Damen und Herren'
+  if (contact_person) {
+    if (contact_department === 'Einkauf' || contact_department === 'Beschaffung') {
+      greeting = `Sehr geehrte Damen und Herren der ${contact_department}sabteilung`
+    } else if (contact_person !== 'Kontakt' && contact_person !== 'Allgemein') {
+      greeting = `Sehr geehrte/r ${contact_person}`
+    }
+  }
   
-  const body = `Sehr geehrte Damen und Herren${options.contact_person ? `, sehr geehrte/r ${options.contact_person}` : ''},
+  // 2. Betreff mit konkreter Anwendung
+  const mainApplication = analysis.detected_applications[0]?.name || industry
+  const subject = `Schleifwerkzeuge für ${mainApplication} bei ${company_name}`
+  
+  // 3. Einleitung basierend auf erkannten Anwendungen
+  let intro = `ich bin Daniel Leismann von Score Schleifwerkzeuge aus Köln. `
+  
+  if (analysis.detected_applications.length > 0) {
+    const apps = analysis.detected_applications.slice(0, 2).map(a => a.name).join(' und ')
+    intro += `Ich habe gesehen, dass Sie sich auf ${apps} spezialisiert haben.`
+  } else {
+    intro += `Als Unternehmen im Bereich ${industry} sind Sie sicher regelmäßig auf qualitativ hochwertige Schleifmittel angewiesen.`
+  }
+  
+  // 4. Spezifische Produktempfehlungen (Top 3-4)
+  const topProducts = analysis.potential_products.slice(0, 4)
+  let productSection = '\n\nFür Ihre Anwendungen empfehle ich Ihnen insbesondere:\n'
+  
+  topProducts.forEach(product => {
+    productSection += `\n• ${product.name}`
+    if (product.grain_sizes && product.grain_sizes.length > 0) {
+      productSection += ` (Körnungen: ${product.grain_sizes.join(', ')})`
+    }
+    productSection += `\n  ${product.reason}`
+  })
+  
+  // 5. Vorteile von Score Schleifwerkzeuge
+  const benefits = `\n\nWarum Score Schleifwerkzeuge?
 
-wir haben gesehen, dass Sie in der ${options.industry}-Branche tätig sind und möchten Ihnen gerne unser Schleifwerkzeug-Sortiment vorstellen.
+✓ 15 Jahre Erfahrung im Schleifmittel-Vertrieb
+✓ Direkter Zugang zu allen Top-Herstellern (Klingspor, VSM, Starcke, 3M, Bosch, Norton)
+✓ Beste Preise durch optimierte Beschaffungswege
+✓ Schnelle Lieferung innerhalb von 24-48 Stunden
+✓ Persönliche Beratung für Ihre spezifischen Anwendungen`
+  
+  // 6. Materialien-spezifische Expertise erwähnen
+  let materialExpertise = ''
+  if (analysis.target_materials.length > 0) {
+    const materials = analysis.target_materials.slice(0, 3).join(', ')
+    materialExpertise = `\n\nMit unserer langjährigen Erfahrung in der Bearbeitung von ${materials} können wir Sie optimal beraten und Ihnen die passenden Produkte für Ihre Anforderungen liefern.`
+  }
+  
+  // 7. Call-to-Action basierend auf Volumen
+  let cta = ''
+  if (analysis.estimated_volume === 'high') {
+    cta = '\n\nGerne erstelle ich Ihnen ein individuelles Angebot für Ihren Jahresbedarf. Bei größeren Mengen können wir Ihnen besonders attraktive Konditionen anbieten.'
+  } else {
+    cta = '\n\nGerne erstelle ich Ihnen ein unverbindliches Vergleichsangebot oder stehe für eine persönliche Beratung zur Verfügung.'
+  }
+  
+  // 8. Abschluss & Kontakt
+  const closing = `\n\nSie erreichen mich am besten telefonisch oder per E-Mail:
 
-Als erfahrener Partner mit 15 Jahren Expertise im Schleifmittel-Vertrieb haben wir Kontakte zu allen führenden Herstellern (Klingspor, VSM, Starke, 3M, Bosch) und können für jeden Bedarf die optimale Lösung bieten.
+📞 Telefon: 0221-25999901
+📧 E-Mail: leismann@score-schleifwerkzeuge.de
 
-${industryTemplate}
+Ich freue mich darauf, Sie kennenzulernen und Sie bei Ihren Projekten zu unterstützen.
 
-Gerne erstellen wir Ihnen ein unverbindliches Vergleichsangebot für Ihren Jahresbedarf oder vereinbaren einen kurzen Beratungstermin.
+Mit freundlichen Grüßen aus Köln
 
-Kontakt:
-- Telefon: 0221-25999901
-- E-Mail: berres@score-schleifwerkzeuge.de`
+Daniel Leismann
+Vertrieb & Kundenberatung
+Score Schleifwerkzeuge
+www.score-schleifwerkzeuge.de`
+  
+  // Zusammenstellung
+  const body = `${greeting},
+
+${intro}${productSection}${benefits}${materialExpertise}${cta}${closing}`
 
   return {
     subject,
     body,
-    personalization_score: 30 // Template hat niedrigere Personalisierung
+    personalization_score: analysis.detected_applications.length > 0 ? 85 : 60
   }
 }
 /**
