@@ -758,6 +758,43 @@ export default function App() {
             />
           </div>
 
+          {/* Dritte Reihe: Kaltakquise Stats */}
+          <div className="row mt-3">
+            <div className="col-md-4 mb-3">
+              <a href="#kaltakquise" style={{textDecoration: 'none', color: 'inherit'}} onClick={()=>setActiveTab('kaltakquise')}>
+                <div className="card kpi h-100 border-warning" style={{cursor: 'pointer'}}>
+                  <div className="card-body">
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div className="label mb-1 text-uppercase small">
+                        <i className="bi bi-envelope-exclamation mr-1"/>Ungelesene Antworten
+                      </div>
+                      {coldLeadStats.unreadReplies > 0 && <span className="badge badge-warning pulse">{coldLeadStats.unreadReplies}</span>}
+                    </div>
+                    <div className="value mb-0 text-warning">{coldLeadStats.unreadReplies || 0}</div>
+                    <div className="text-muted small mt-1">
+                      {coldLeadStats.recentReplies || 0} Antworten (7 Tage)
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div className="col-md-4 mb-3">
+              <a href="#kaltakquise" style={{textDecoration: 'none', color: 'inherit'}} onClick={()=>setActiveTab('kaltakquise')}>
+                <div className="card kpi h-100" style={{cursor: 'pointer'}}>
+                  <div className="card-body">
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div className="label mb-1 text-uppercase small">
+                        <i className="bi bi-clock-history mr-1"/>Follow-up benötigt
+                      </div>
+                    </div>
+                    <div className="value mb-0">{coldLeadStats.awaitingFollowup || 0}</div>
+                    <div className="text-muted small mt-1">Nach 6 Werktagen</div>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+
           {/* Neues Chart: Umsatz, Bestellungen & Marge über Zeitintervall */}
           <div className="row mt-3">
             <div className="col-12 mb-3">
