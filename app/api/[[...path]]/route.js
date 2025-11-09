@@ -161,6 +161,78 @@ async function handleRoute(request, { params }) {
 
     // Health
     if ((route === '/' || route === '/root') && method === 'GET') { return json({ message: 'Score Zentrale API online' }) }
+    
+    // Debug SKU endpoint
+    if (route === '/debug/sku' && method === 'GET') {
+      try {
+        const pool = await getMssqlPool()
+        const sku = searchParams.get('sku') || '167676'
+        const from = searchParams.get('from') || '2025-10-10'
+        const to = searchParams.get('to') || '2025-11-09'
+        
+        // Check how many articles have this SKU
+        const articleCheck = await pool.request()
+          .input('sku', sql.NVarChar, sku)
+          .query(`
+            SELECT kArtikel, cArtNr, cName
+            FROM dbo.tArtikel
+            WHERE cArtNr = @sku
+          `)
+        
+        // Get all order positions for this SKU
+        const positions = await pool.request()
+          .input('sku', sql.NVarChar, sku)
+          .input('from', sql.Date, from)
+          .input('to', sql.Date, to)
+          .query(`
+            SELECT 
+              o.kAuftrag,
+              o.cAuftragsNr,
+              o.dErstellt,
+              op.kAuftragPosition,
+              op.kArtikel,
+              a.cArtNr,
+              op.cName AS posName,
+              op.fAnzahl,
+              op.fVKNetto,
+              (op.fAnzahl * op.fVKNetto) AS netTotal,
+              op.nPosTyp
+            FROM Verkauf.tAuftrag o
+            INNER JOIN Verkauf.tAuftragPosition op ON o.kAuftrag = op.kAuftrag
+            LEFT JOIN dbo.tArtikel a ON op.kArtikel = a.kArtikel
+            WHERE a.cArtNr = @sku
+              AND CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
+              AND (o.nStorno IS NULL OR o.nStorno = 0)
+              AND op.nPosTyp = 1
+            ORDER BY o.dErstellt DESC
+          `)
+        
+        const totalQty = positions.recordset.reduce((sum, p) => sum + (parseFloat(p.fAnzahl) || 0), 0)
+        const totalRev = positions.recordset.reduce((sum, p) => sum + (parseFloat(p.netTotal) || 0), 0)
+        
+        return json({
+          ok: true,
+          sku,
+          period: { from, to },
+          articlesWithThisSku: articleCheck.recordset.length,
+          articles: articleCheck.recordset,
+          positionCount: positions.recordset.length,
+          totalQuantity: totalQty.toFixed(2),
+          totalRevenue: totalRev.toFixed(2),
+          positions: positions.recordset.map(p => ({
+            orderNumber: p.cAuftragsNr,
+            orderDate: p.dErstellt?.toISOString().slice(0, 10),
+            kArtikel: p.kArtikel,
+            posName: p.posName,
+            quantity: parseFloat(p.fAnzahl || 0).toFixed(2),
+            netPrice: parseFloat(p.fVKNetto || 0).toFixed(2),
+            netTotal: parseFloat(p.netTotal || 0).toFixed(2)
+          }))
+        })
+      } catch (error) {
+        return json({ ok: false, error: error.message }, { status: 500 })
+      }
+    }
 
     // ---------------- Leads (Warmakquise) ----------------
     if (route === '/leads/import' && method === 'POST'){
