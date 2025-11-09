@@ -196,29 +196,100 @@ function createMinimalAnalysis(websiteUrl: string, industry: string): AnalysisRe
 }
 
 /**
- * Crawlt Website
+ * Crawlt Website gründlicher - mit mehreren Seiten
  */
 async function crawlWebsite(url: string) {
+  console.log(`[Crawler] Starting comprehensive crawl of ${url}`)
+  
   try {
-    const response = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SCORE-Bot/1.0)' },
-      signal: AbortSignal.timeout(15000)
+    // 1. Hauptseite crawlen
+    const mainPage = await fetchPage(url)
+    const $ = cheerio.load(mainPage.html)
+    
+    // 2. Sammle alle internen Links
+    const links: string[] = []
+    $('a[href]').each((_, el) => {
+      const href = $(el).attr('href')
+      if (href) {
+        try {
+          const absoluteUrl = new URL(href, url).toString()
+          const mainDomain = new URL(url).hostname
+          const linkDomain = new URL(absoluteUrl).hostname
+          
+          // Nur interne Links von gleicher Domain
+          if (linkDomain === mainDomain) {
+            links.push(absoluteUrl)
+          }
+        } catch (e) {
+          // Ungültiger Link, ignorieren
+        }
+      }
     })
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`)
+    
+    console.log(`[Crawler] Found ${links.length} internal links`)
+    
+    // 3. Priorisiere interessante Seiten
+    const priorityKeywords = ['leistung', 'service', 'über-uns', 'about', 'produkt', 'fertigung', 'kontakt']
+    const priorityLinks = links.filter(link => 
+      priorityKeywords.some(kw => link.toLowerCase().includes(kw))
+    ).slice(0, 3) // Max 3 zusätzliche Seiten
+    
+    console.log(`[Crawler] Selected ${priorityLinks.length} priority pages to crawl`)
+    
+    // 4. Crawle zusätzliche Seiten
+    let combinedText = mainPage.text_content
+    
+    for (const link of priorityLinks) {
+      try {
+        const page = await fetchPage(link)
+        combinedText += ' ' + page.text_content
+        console.log(`[Crawler] Crawled: ${link} (+${page.text_content.length} chars)`)
+      } catch (e) {
+        console.log(`[Crawler] Failed to crawl ${link}:`, e)
+      }
     }
-
-    const html = await response.text()
-    const $ = cheerio.load(html)
-
-    $('script, style, nav, footer').remove()
-    const text = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 5000)
-
-    return { html, text_content: text, title: $('title').text() }
+    
+    console.log(`[Crawler] Total text content: ${combinedText.length} chars`)
+    
+    return { 
+      html: mainPage.html, 
+      text_content: combinedText.slice(0, 15000), // Mehr Text für bessere Analyse
+      title: mainPage.title 
+    }
+    
   } catch (error: any) {
-    console.error('[Crawler] Failed:', error.message)
+    console.error('[Crawler] Complete failure:', error.message)
     return { html: '', text_content: '', title: '' }
+  }
+}
+
+/**
+ * Fetched einzelne Seite
+ */
+async function fetchPage(url: string) {
+  const response = await fetch(url, {
+    headers: { 
+      'User-Agent': 'Mozilla/5.0 (compatible; SCORE-Bot/1.0)',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+    },
+    signal: AbortSignal.timeout(15000)
+  })
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`)
+  }
+
+  const html = await response.text()
+  const $ = cheerio.load(html)
+
+  // Entferne unnötige Elemente
+  $('script, style, nav, footer, header').remove()
+  const text = $('body').text().replace(/\s+/g, ' ').trim()
+
+  return { 
+    html, 
+    text_content: text, 
+    title: $('title').text() 
   }
 }
 
