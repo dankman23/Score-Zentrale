@@ -180,7 +180,7 @@ async function handleRoute(request, { params }) {
             WHERE cArtNr = @sku
           `)
         
-        // Get all order positions for this SKU
+        // Get all order positions for this SKU (ohne cType - existiert nicht)
         const positions = await pool.request()
           .input('sku', sql.NVarChar, sku)
           .input('from', sql.Date, from)
@@ -190,7 +190,6 @@ async function handleRoute(request, { params }) {
               o.kAuftrag,
               o.cAuftragsNr,
               o.dErstellt,
-              o.cType,
               op.kAuftragPosition,
               op.kArtikel,
               a.cArtNr,
