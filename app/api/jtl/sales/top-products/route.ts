@@ -32,6 +32,10 @@ export async function GET(request: NextRequest) {
     // Use name from order position (cName field in tAuftragPosition)
     const posNameField = await pickFirstExisting(pool, orderPosTable, ['cName', 'cArtikelName', 'cBezeichnung']) || null
     
+    // Check if cType column exists to filter only "Auftrag" (not "Angebot")
+    const hasCType = await hasColumn(pool, orderTable, 'cType')
+    const orderTypeFilter = hasCType ? `AND o.cType = 'Auftrag'` : ''
+    
     const query = `
       SELECT TOP ${limit}
         a.cArtNr AS sku,
@@ -44,6 +48,7 @@ export async function GET(request: NextRequest) {
       WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
         AND ${articleFilter}
+        ${orderTypeFilter}
       GROUP BY a.cArtNr
       ORDER BY SUM(${netTotalExpr}) DESC
     `
