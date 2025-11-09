@@ -1698,7 +1698,7 @@ export default function App() {
       )}
 
       {/* Kaltakquise */}
-      {activeTab==='coldleads' && (
+      {activeTab==='akquise' && (
         <div>
           <div className="d-flex align-items-center justify-content-between mb-4">
             <div>
