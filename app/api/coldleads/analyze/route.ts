@@ -66,7 +66,6 @@ export async function POST(request: NextRequest) {
           company_name: analysis.company_info.name,
           industry,
           region: '',
-          status: 'new',
           created_at: new Date()
         }
       },
