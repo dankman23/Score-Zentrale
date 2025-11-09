@@ -253,11 +253,11 @@ async function handleRoute(request, { params }) {
           ),
           customerData AS (
             SELECT o.kKunde,
-                   ${hasAuftragAdresse ? 'MAX(aa.cFirma)' : 'NULL'} AS firma,
-                   ${hasAuftragAdresse ? 'MAX(aa.cVorname)' : 'NULL'} AS vorname,
-                   ${hasAuftragAdresse ? 'MAX(aa.cNachname)' : 'NULL'} AS nachname,
-                   ${hasAuftragAdresse ? 'MAX(aa.cTel)' : 'NULL'} AS tel,
-                   ${hasAuftragAdresse ? 'MAX(aa.cMail)' : 'NULL'} AS email
+                   ${hasAACFirma ? 'MAX(aa.cFirma)' : 'NULL'} AS firma,
+                   ${hasAACVorname ? 'MAX(aa.cVorname)' : 'NULL'} AS vorname,
+                   ${hasAACNachname ? 'MAX(aa.cNachname)' : 'NULL'} AS nachname,
+                   ${hasAACTel ? 'MAX(aa.cTel)' : 'NULL'} AS tel,
+                   ${hasAACMail ? 'MAX(aa.cMail)' : 'NULL'} AS email
             FROM ${auftragTable} o
             JOIN maxDates md ON o.kKunde = md.kKunde
             ${hasAuftragAdresse ? `LEFT JOIN ${auftragAdresseTable} aa ON o.kAuftrag = aa.kAuftrag` : ''}
