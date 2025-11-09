@@ -166,6 +166,7 @@ export async function GET(request: NextRequest) {
       ${historicalEkClause}
       WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
+        ${orderTypeFilter}
         AND NOT (${articleFilter})
     `
 
