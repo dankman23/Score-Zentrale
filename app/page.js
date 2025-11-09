@@ -98,6 +98,18 @@ export default function App() {
   const [coldStatusFilter, setColdStatusFilter] = useState('all')
   const [coldStats, setColdStats] = useState({ total: 0, new: 0, analyzed: 0, contacted: 0, replied: 0 })
   const [coldLeadStats, setColdLeadStats] = useState({ unreadReplies: 0, recentReplies: 0, awaitingFollowup: 0 })
+  
+  // Autopilot
+  const [autopilotState, setAutopilotState] = useState({ 
+    running: false, 
+    dailyLimit: 50, 
+    dailyCount: 0, 
+    remaining: 50,
+    currentPhase: null,
+    lastActivity: null
+  })
+  const [autopilotLimit, setAutopilotLimit] = useState(50)
+  const autopilotIntervalRef = useRef(null)
 
   // Marketing → Warmaquise
   const [leads, setLeads] = useState([])
