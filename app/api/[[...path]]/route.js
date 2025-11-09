@@ -334,8 +334,10 @@ async function handleRoute(request, { params }) {
                       : `(${netTotalExpr}) * (1 + (CAST(${taxExpr} AS float)/100.0))`)
         const articleWhere = await getOnlyArticleWhere(pool, posTable, 'op')
 
-        const q = `DECLARE @inactiveMonths int = @pInactive;
-          DECLARE @fromRecent date = DATEADD(MONTH, -@inactiveMonths, CAST(GETDATE() AS date));
+        const q = `DECLARE @minInactiveMonths int = @pMinInactive;
+          DECLARE @maxInactiveMonths int = @pMaxInactive;
+          DECLARE @fromOldest date = DATEADD(MONTH, -@maxInactiveMonths, CAST(GETDATE() AS date));
+          DECLARE @toMostRecent date = DATEADD(MONTH, -@minInactiveMonths, CAST(GETDATE() AS date));
           DECLARE @minOrders int = @pMinOrders;
           DECLARE @minRevenue float = @pMinRevenue;
 
