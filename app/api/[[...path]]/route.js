@@ -286,14 +286,14 @@ async function handleRoute(request, { params }) {
 
         let imported = 0, skipped = 0
         for (const r of rows){
-          const name = r.cFirma?.trim() || `${r.cVorname||''} ${r.cNachname||''}`.trim()
-          const isB2B = !!( (r.cFirma && r.cFirma.trim().length>0) || (r.cUSTID && String(r.cUSTID).trim().length>0) ) && !isPrivateEmail(r.cEMail)
+          const name = r.cFirma?.trim() || r.cName?.trim() || `${r.cVorname||''}`.trim() || ''
+          const isB2B = !!( (r.cFirma && r.cFirma.trim().length>0) || (r.cUSTID && String(r.cUSTID).trim().length>0) ) && !isPrivateEmail(r.cMail)
           const doc = {
             id: uuidv4(),
             kKunde: r.kKunde,
             kundennr: r.cKundenNr,
             name,
-            contact: { phone: r.cTelefon||'', email: r.cEMail||'' },
+            contact: { phone: r.cTel||'', email: r.cMail||'' },
             isB2B,
             ordersCount: Number(r.ordersCount||0),
             lastOrder: toISO(r.lastOrderDate),
