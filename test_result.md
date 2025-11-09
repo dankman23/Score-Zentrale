@@ -308,15 +308,18 @@ backend:
         comment: "✅ Inbox endpoint working correctly! GET /api/coldleads/inbox returns 500 with ok=false and error='Authentication failed.' This is EXPECTED and ACCEPTABLE as per requirements - IMAP credentials may not be configured or may be invalid. Endpoint handles IMAP connection failures gracefully with proper error response structure. When IMAP is properly configured, endpoint will return 200 with fields: total (emails count), matched (matched with prospects), unmatched, replies (array). Error handling is robust."
   - task: "Kaltakquise: GET /api/coldleads/search mit replied Filter"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/coldleads/search/route.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Erweitert GET /api/coldleads/search um 'replied' Filter (hasReply=true). Response enthält jetzt auch history Array, hasReply, lastReplyAt."
+      - working: true
+        agent: "testing"
+        comment: "✅ Search with replied filter working perfectly! Tested both GET /api/coldleads/search?status=all and GET /api/coldleads/search?status=replied. Status=all returns 200 OK with 36 prospects, all containing NEW fields: history (array), hasReply (boolean), lastReplyAt (date or null). Status=replied returns 200 OK with count=0 and empty prospects array (expected - no replied prospects yet). Filter logic correctly implemented: 'replied' filters by hasReply=true, 'all' returns all prospects. All required fields present in response structure."
   - task: "JTL Ping (Basic Auth)"
   implemented: true
   working: "NA"
