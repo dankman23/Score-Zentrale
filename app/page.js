@@ -738,6 +738,47 @@ export default function App() {
             />
           </div>
 
+          {/* Neues Chart: Umsatz, Bestellungen & Marge über Zeitintervall */}
+          <div className="row mt-3">
+            <div className="col-12 mb-3">
+              <div className="card border-0 shadow-sm">
+                <div className="card-header bg-transparent border-0 d-flex align-items-center justify-content-between">
+                  <div className="d-flex align-items-center">
+                    <i className="bi bi-graph-up text-primary mr-2"/>
+                    <span className="font-weight-bold">Umsatz (Netto), Bestellungen & Marge</span>
+                  </div>
+                  {demoMode && <span className="badge badge-warning"><i className="bi bi-exclamation-triangle mr-1"/>Demo-Modus</span>}
+                </div>
+                <div className="card-body" style={{height: '350px'}}>
+                  {ts.length===0 ? (
+                    <div className="text-center text-muted py-5">
+                      <i className="bi bi-inbox" style={{fontSize:'3rem', opacity:0.3}}/>
+                      <p className="mt-2 mb-0">Keine Zeitreihen-Daten im gewählten Zeitraum</p>
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={ts}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                        <XAxis dataKey="date" stroke="#999" />
+                        <YAxis yAxisId="left" stroke="#0d6efd" />
+                        <YAxis yAxisId="right" orientation="right" stroke="#28a745" />
+                        <Tooltip 
+                          contentStyle={{backgroundColor: '#2d2d2d', border: '1px solid #444'}}
+                          formatter={(value, name) => {
+                            if (name === 'Umsatz Netto' || name === 'Marge') return `${parseFloat(value).toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €`
+                            return value
+                          }}
+                        />
+                        <Line yAxisId="left" type="monotone" dataKey="revenue" stroke="#0d6efd" strokeWidth={2} name="Umsatz Netto" dot={{fill: '#0d6efd'}} />
+                        <Line yAxisId="right" type="monotone" dataKey="orders" stroke="#28a745" strokeWidth={2} name="Bestellungen" dot={{fill: '#28a745'}} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="row mt-1">
             <div className="col-md-8 mb-3">
               <div className="card border-0 shadow-sm">
