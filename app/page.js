@@ -2007,7 +2007,8 @@ export default function App() {
                       Kontaktiert ({coldStats.contacted})
                     </button>
                     <button className={`btn ${coldStatusFilter==='replied'?'btn-warning':'btn-outline-warning'}`} onClick={()=>setColdStatusFilter('replied')}>
-                      <i className="bi bi-envelope-check mr-1"/>Antworten ({coldLeadStats.unreadReplies})
+                      <i className="bi bi-envelope-check mr-1"/>Antworten ({coldStats.replied || 0})
+                      {coldLeadStats.unreadReplies > 0 && <span className="badge badge-danger ml-1">{coldLeadStats.unreadReplies}</span>}
                     </button>
                   </div>
                 </div>
