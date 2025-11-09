@@ -192,12 +192,19 @@ export async function GET(request: NextRequest) {
       FROM OrderPositions
     `
 
-    const result = await pool.request()
-      .input('from', sql.Date, from)
-      .input('to', sql.Date, to)
-      .query(query)
+    const [result, shippingResult] = await Promise.all([
+      pool.request()
+        .input('from', sql.Date, from)
+        .input('to', sql.Date, to)
+        .query(query),
+      pool.request()
+        .input('from', sql.Date, from)
+        .input('to', sql.Date, to)
+        .query(shippingQuery)
+    ])
 
     const row = result.recordset[0] || {}
+    const shippingRow = shippingResult.recordset[0] || {}
 
     const totalCost = parseFloat(row.total_cost || 0)
     const costFromPosition = parseFloat(row.cost_from_position || 0)
