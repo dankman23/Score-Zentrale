@@ -347,11 +347,13 @@ async function handleRoute(request, { params }) {
                    MAX(o.dErstellt)          AS lastOrderDate
             FROM ${auftragTable} o
             WHERE (COL_LENGTH('${auftragTable}','nStorno') IS NULL OR ISNULL(o.nStorno,0)=0)
+              AND o.cAuftragsNr LIKE 'AU%'  -- Nur Aufträge, keine Angebote
             GROUP BY o.kKunde
           ),
           maxDates AS (
             SELECT kKunde, MAX(dErstellt) AS maxDate
-            FROM ${auftragTable}
+            FROM ${auftragTable} o
+            WHERE o.cAuftragsNr LIKE 'AU%'  -- Nur Aufträge, keine Angebote
             GROUP BY kKunde
           ),
           lastPlat AS (
