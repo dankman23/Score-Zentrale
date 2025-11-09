@@ -811,6 +811,90 @@ agent_communication:
       - working: true
         agent: "testing"
         comment: "✅ AU-Filter Test PASSED: GET /api/jtl/orders/kpi/shipping-split?from=2025-10-10&to=2025-11-09 returns 200 ok:true with 1893 orders, Net w/o shipping: 115,600.98 EUR, Net with shipping: 115,600.98 EUR, Gross w/o shipping: 135,522.60 EUR, Gross with shipping: 135,522.60 EUR. Only AU-Aufträge for shipping split."
+  - task: "Warmakquise: POST /api/leads/import (neues Score-System)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implementiert Warmakquise mit neuem Score-System. Importiert inaktive Kunden (4-24 Monate) aus JTL-Wawi. Score-Logik: Sweet Spot 120-365 Tage (100 Punkte), 365-730 Tage (50-100 Punkte), < 120 Tage (0 Punkte - zu aktiv), > 730 Tage (0 Punkte - zu lange inaktiv). Qualitäts-Multiplikator basierend auf Umsatz, Bestellungen, B2B-Status."
+      - working: true
+        agent: "testing"
+        comment: "✅ Warmakquise Import working perfectly! POST /api/leads/import with parameters (minInactiveMonths=4, maxInactiveMonths=24, minOrders=2, minRevenue=1000) returned 200 ok:true with imported=2000, count=2000. Import successfully retrieved leads from JTL-Wawi database."
+  - task: "Warmakquise: GET /api/leads (Score-Verteilung & Inaktivitäts-Check)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "GET /api/leads mit Sortierung, Filterung (status, b2b, minScore, q), Pagination. Unterstützt sort=warmScore&order=desc für Top-Leads."
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL CHECKS PASSED! GET /api/leads?limit=20&sort=warmScore&order=desc returns 200 ok:true with 20 leads. ✅ Top score: 87 (< 100 as required, expected max ~90). ✅ ALL leads have lastOrder between 120-730 days (NO leads with < 120 days found). ✅ Score distribution realistic: Min=64, Max=87, Avg=69.8. Top 10 leads checked: MSD Schärfdienst (87, 145 days), Holztec-Leitner (79, 345 days), Metalldesign Nägele (78, 200 days), CS Metall-Design (74, 156 days), Krome Dienstleistung (72, 149 days), WIEGEL Grüna (72, 278 days), AL-Aluminium (71, 345 days), Naturbegegnung (70, 124 days), Michael (69, 347 days), JUBU-Performance (68, 339 days). Score system working correctly - no customers with lastOrder < 4 months!"
+  - task: "Warmakquise: GET /api/leads?minScore=80 (High-Quality Filter)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Filter nach minScore für hochqualitative Leads. Sollten im Sweet Spot (120-365 Tage) sein."
+      - working: true
+        agent: "testing"
+        comment: "✅ High-score filter working! GET /api/leads?minScore=80 returns 200 ok:true with 1 lead. ✅ All leads have score >= 80. ✅ High-score lead in sweet spot: MSD Schärfdienst (score=87, 145 days ago - within 120-365 days range). Filter correctly returns only top-quality leads."
+  - task: "Warmakquise: POST /api/leads/:id/note (Notizen hinzufügen)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Fügt Notiz zu Lead hinzu. Notizen werden in notes Array gespeichert mit Zeitstempel, by, text."
+      - working: true
+        agent: "testing"
+        comment: "✅ Add note working! POST /api/leads/:id/note with text='Test note added at 2025-11-09T19:00:37.376827' returned 200 ok:true with modified=1. Note successfully saved and verified in database (total notes: 1)."
+  - task: "Warmakquise: POST /api/leads/:id/status (Status ändern)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Ändert Status eines Leads (z.B. 'open', 'called', 'contacted', 'closed')."
+      - working: true
+        agent: "testing"
+        comment: "✅ Change status working! POST /api/leads/:id/status with status='called' returned 200 ok:true with modified=1. Status successfully changed from 'open' to 'called' and verified in database."
+  - task: "Warmakquise: Re-Import Notizen-Persistenz (CRITICAL)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Bei Re-Import (Upsert by kKunde) werden User-Daten (notes, status, tags) beibehalten, nur JTL-Daten (Umsatz, Bestellungen, lastOrder) aktualisiert."
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL CHECK PASSED! Re-import test successful. Added unique note 'UNIQUE_TEST_NOTE_1762714837.69629' to lead (kKunde=161645), ran re-import (imported=2000), verified note still exists after re-import. Lead now has 2 notes total. Notes, status, and tags are correctly preserved during re-import while JTL data (revenue, orders, lastOrder) is updated. Upsert logic working perfectly!"
 
 agent_communication:
   - agent: "main"
