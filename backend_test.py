@@ -323,7 +323,7 @@ def run_all_tests():
 
 if __name__ == "__main__":
     try:
-        success = test_coldleads_workflow()
+        success = run_all_tests()
         exit(0 if success else 1)
     except KeyboardInterrupt:
         print("\n\nTest interrupted by user")
