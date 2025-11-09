@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     const netTotalExpr = `(op.${netField} * op.${qtyField})`
 
     // Check which name column exists in article table
-    const nameField = await pickFirstExisting(pool, articleTable, ['cName', 'cBeschreibung', 'cKurzBeschreibung']) || 'cArtNr'
+    const nameField = await pickFirstExisting(pool, articleTable, ['cName_DE', 'cName', 'cBeschreibung', 'cKurzBeschreibung']) || 'cArtNr'
     
     const query = `
       SELECT TOP ${limit}
