@@ -56,29 +56,28 @@ export async function POST(request: NextRequest) {
       updateData.match_type = matchResult.match_type
     }
 
+    // Upsert: Erstelle Dokument falls nicht vorhanden
     const result = await collection.updateOne(
       { website },
-      { $set: updateData },
-      { upsert: false }
+      { 
+        $set: updateData,
+        $setOnInsert: {
+          website,
+          company_name: analysis.company_info.name,
+          industry,
+          region: '',
+          status: 'new',
+          created_at: new Date()
+        }
+      },
+      { upsert: true }
     )
 
     console.log('[ColdLeads] DB Update result:', { 
       matched: result.matchedCount, 
-      modified: result.modifiedCount 
+      modified: result.modifiedCount,
+      upserted: result.upsertedCount
     })
-
-    if (result.matchedCount === 0) {
-      console.warn('[ColdLeads] WARNING: No document found for website:', website)
-      // Versuche trotzdem zu speichern
-      await collection.insertOne({
-        website,
-        company_name: analysis.company_info.name,
-        industry,
-        region: '',
-        ...updateData,
-        created_at: new Date()
-      })
-    }
 
     return NextResponse.json({
       ok: true,
