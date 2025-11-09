@@ -231,6 +231,12 @@ export async function GET(request: NextRequest) {
       revenue_net_wo_ship: parseFloat(row.revenue_net || 0).toFixed(2),
       cost_net: parseFloat(row.cost_net || 0).toFixed(2),
       margin_net: parseFloat(row.margin_net || 0).toFixed(2),
+      // Mit Versand
+      shipping_revenue: shippingRevenue.toFixed(2),
+      shipping_cost: shippingCost.toFixed(2),
+      revenue_net_with_ship: revenueWithShipping.toFixed(2),
+      cost_net_with_ship: costWithShipping.toFixed(2),
+      margin_net_with_ship: marginWithShipping.toFixed(2),
       cost_source: {
         from: {
           position_pct: parseFloat(positionPct),
