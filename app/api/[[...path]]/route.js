@@ -225,12 +225,18 @@ async function handleRoute(request, { params }) {
             WHERE (COL_LENGTH('${auftragTable}','nStorno') IS NULL OR ISNULL(o.nStorno,0)=0)
             GROUP BY o.kKunde
           ),
+          maxDates AS (
+            SELECT kKunde, MAX(dErstellt) AS maxDate
+            FROM ${auftragTable}
+            GROUP BY kKunde
+          ),
           lastPlat AS (
             SELECT o.kKunde,
                    MAX(o.dErstellt) AS lastDate,
-                   MAX(CASE WHEN o.dErstellt = (SELECT MAX(dErstellt) FROM ${auftragTable} WHERE kKunde=o.kKunde) THEN ISNULL(o.kPlattform, NULL) END) AS kPlattform,
-                   MAX(CASE WHEN o.dErstellt = (SELECT MAX(dErstellt) FROM ${auftragTable} WHERE kKunde=o.kKunde) THEN ISNULL(o.kShop, NULL) END) AS kShop
+                   MAX(ISNULL(o.kPlattform, NULL)) AS kPlattform,
+                   MAX(ISNULL(o.kShop, NULL)) AS kShop
             FROM ${auftragTable} o
+            JOIN maxDates md ON o.kKunde = md.kKunde AND o.dErstellt = md.maxDate
             GROUP BY o.kKunde
           ),
           revenue AS (
