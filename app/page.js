@@ -2161,6 +2161,41 @@ export default function App() {
                                       </div>
                                     </div>
                                   )}
+                                  
+                                  {/* Kontakt-Historie */}
+                                  {p.history && p.history.length > 0 && (
+                                    <div className="mt-3">
+                                      <h6 className="text-info mb-3"><i className="bi bi-clock-history mr-2"/>Kontakt-Historie</h6>
+                                      <div className="timeline">
+                                        {p.history.map((h, idx) => (
+                                          <div key={idx} className="timeline-item mb-3">
+                                            <div className="card bg-secondary border-0">
+                                              <div className="card-body p-3">
+                                                <div className="d-flex align-items-start">
+                                                  <div className={`${h.type === 'email_sent' ? 'bg-success' : 'bg-warning'} text-white rounded-circle d-flex align-items-center justify-content-center mr-3`} style={{width:40, height:40, minWidth:40}}>
+                                                    <i className={`bi bi-${h.type === 'email_sent' ? 'send-fill' : 'reply-fill'}`}/>
+                                                  </div>
+                                                  <div className="flex-grow-1">
+                                                    <div className="d-flex align-items-center justify-content-between mb-2">
+                                                      <h6 className="mb-0 text-white">
+                                                        {h.type === 'email_sent' ? '📧 Email versendet' : '💬 Antwort erhalten'}
+                                                      </h6>
+                                                      <span className="badge badge-light small">{new Date(h.date).toLocaleString('de-DE')}</span>
+                                                    </div>
+                                                    {h.to && <p className="text-muted small mb-1"><strong>An:</strong> {h.to}</p>}
+                                                    {h.from && <p className="text-muted small mb-1"><strong>Von:</strong> {h.from}</p>}
+                                                    {h.subject && <p className="text-white small mb-1"><strong>Betreff:</strong> {h.subject}</p>}
+                                                    {h.body && <p className="text-muted small mb-0" style={{whiteSpace:'pre-wrap'}}>{h.body.substring(0, 200)}{h.body.length > 200 ? '...' : ''}</p>}
+                                                    {h.text && <p className="text-muted small mb-0" style={{whiteSpace:'pre-wrap'}}>{h.text.substring(0, 200)}{h.text.length > 200 ? '...' : ''}</p>}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                                 )}
                               </td>
