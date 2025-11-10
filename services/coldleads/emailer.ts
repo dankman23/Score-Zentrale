@@ -203,14 +203,22 @@ export async function sendEmail(to: string, subject: string, body: string) {
     }
   })
 
-  // Email-Optionen mit BCC an Daniel Leismann
-  const mailOptions = {
+  // Email-Optionen mit Reply-To und BCC
+  const replyTo = process.env.SMTP_REPLY_TO || from
+  const bcc = process.env.SMTP_REPLY_TO || null // BCC an keyaccount@ für Archivierung
+  
+  const mailOptions: any = {
     from: `${fromName} <${from}>`,
     to,
-    bcc: 'leismann@score-schleifwerkzeuge.de', // Automatische BCC-Kopie
+    replyTo, // Antworten gehen an keyaccount@score-schleifwerkzeuge.de
     subject,
     text: body,
     html: body.replace(/\n/g, '<br>') // Einfaches HTML
+  }
+  
+  // BCC nur wenn gesetzt
+  if (bcc) {
+    mailOptions.bcc = bcc
   }
 
   try {
