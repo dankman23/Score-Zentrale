@@ -1113,27 +1113,6 @@ export default function App() {
     alert(`✅ Bulk-Analyse abgeschlossen!\n\n✓ Erfolgreich: ${successCount}\n✗ Fehler: ${errorCount}\n\n➡️ Wechsle zu "Analysiert" Tab`)
   }
 
-  // Prospect löschen
-  const deleteProspect = async (prospectId) => {
-    try {
-      const res = await fetch('/api/coldleads/delete', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prospect_id: prospectId })
-      })
-      const data = await res.json()
-      if (data.ok) {
-        console.log('Prospect deleted:', prospectId)
-        await loadColdProspects()
-        await loadColdLeadStats()
-      } else {
-        alert('Fehler beim Löschen: ' + data.error)
-      }
-    } catch (e) {
-      alert('Fehler beim Löschen: ' + e.message)
-    }
-  }
-
   // Alle neuen Prospects analysieren
   const bulkAnalyzeAllNew = async () => {
     const newProspects = coldProspects.filter(p => p.status === 'new')
