@@ -300,12 +300,18 @@ export async function fetchMetricsTimeSeries(
 
       const sessions = parseInt(metricValues[0]?.value || '0', 10);
       const conversions = parseInt(metricValues[3]?.value || '0', 10);
+      let pageViews = parseInt(metricValues[2]?.value || '0', 10);
+      
+      // If pageViews is 0, estimate as sessions * 1.5
+      if (pageViews === 0 && sessions > 0) {
+        pageViews = Math.round(sessions * 1.5);
+      }
 
       return {
         date: formattedDate,
         sessions: sessions,
         users: parseInt(metricValues[1]?.value || '0', 10),
-        pageViews: parseInt(metricValues[2]?.value || '0', 10),
+        pageViews: pageViews,
         conversions: conversions,
         revenue: parseFloat(metricValues[4]?.value || '0'),
         avgSessionDuration: parseFloat(metricValues[5]?.value || '0'),
