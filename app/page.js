@@ -2949,25 +2949,27 @@ export default function App() {
                     <div className="col-md-3">
                       <div className="card bg-white border-0">
                         <div className="card-body text-center py-3">
-                          <div className="h4 mb-1 font-weight-bold text-dark">{dachCrawlerStats.stats.completed_regions}</div>
-                          <div className="text-muted small">Regionen crawled</div>
-                          <div className="text-muted small">von {dachCrawlerStats.stats.total_regions}</div>
+                          <div className="h4 mb-1 font-weight-bold text-info">{dachCrawlerStats.stats.total_crawl_jobs}</div>
+                          <div className="text-muted small">Crawl-Jobs</div>
+                          <div className="text-muted" style={{fontSize:'0.7rem'}}>Region+Branche Kombinationen</div>
                         </div>
                       </div>
                     </div>
                     <div className="col-md-3">
                       <div className="card bg-white border-0">
                         <div className="card-body text-center py-3">
-                          <div className="h4 mb-1 font-weight-bold text-success">{dachCrawlerStats.stats.total_companies_found}</div>
+                          <div className="h4 mb-1 font-weight-bold text-success">{dachCrawlerStats.stats.completed_jobs}</div>
+                          <div className="text-muted small">Abgeschlossen</div>
+                          <div className="text-muted" style={{fontSize:'0.7rem'}}>vollständig durchsucht</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-3">
+                      <div className="card bg-white border-0">
+                        <div className="card-body text-center py-3">
+                          <div className="h4 mb-1 font-weight-bold text-warning">{dachCrawlerStats.stats.total_companies_found}</div>
                           <div className="text-muted small">Firmen gefunden</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-md-3">
-                      <div className="card bg-white border-0">
-                        <div className="card-body text-center py-3">
-                          <div className="h4 mb-1 font-weight-bold text-info">{dachCrawlerStats.stats.coverage_percentage}%</div>
-                          <div className="text-muted small">Abdeckung</div>
+                          <div className="text-muted" style={{fontSize:'0.7rem'}}>aus allen Crawls</div>
                         </div>
                       </div>
                     </div>
@@ -2976,6 +2978,7 @@ export default function App() {
                         <div className="card-body text-center py-3">
                           <div className="h4 mb-1 font-weight-bold text-primary">{dachCrawlerStats.stats.dach_prospects_in_db}</div>
                           <div className="text-muted small">In Datenbank</div>
+                          <div className="text-muted" style={{fontSize:'0.7rem'}}>bereit für Kontakt</div>
                         </div>
                       </div>
                     </div>
