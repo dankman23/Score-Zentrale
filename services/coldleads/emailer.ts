@@ -132,7 +132,7 @@ Score Schleifwerkzeuge`
   // Zusammenstellung
   const body = `${greeting},
 
-${intro}${productSection}${benefits}${materialExpertise}${cta}${closing}`
+${intro}${premiumIntro}${productSection}${materialExpertise}${cta}${closing}`
 
   return {
     subject,
