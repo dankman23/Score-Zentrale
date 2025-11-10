@@ -11,18 +11,28 @@ export async function fetchAnalyticsMetrics(
   const propertyId = getPropertyId();
 
   try {
+    // Try to get page views using eventCount with page_view filter
     const [response] = await client.runReport({
       property: `properties/${propertyId}`,
       dateRanges: [{ startDate, endDate }],
       metrics: [
         { name: 'sessions' },
         { name: 'totalUsers' },
-        { name: 'screenPageViews' },
+        { name: 'eventCount' }, // Use eventCount instead of screenPageViews
         { name: 'averageSessionDuration' },
         { name: 'bounceRate' },
         { name: 'conversions' },
         { name: 'totalRevenue' },
       ],
+      dimensionFilter: {
+        filter: {
+          fieldName: 'eventName',
+          stringFilter: {
+            matchType: 'EXACT' as const,
+            value: 'page_view'
+          }
+        }
+      },
     });
 
     // Default values if no data
