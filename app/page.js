@@ -1092,17 +1092,21 @@ export default function App() {
   // Alle neuen Prospects analysieren
   const bulkAnalyzeAllNew = async () => {
     const newProspects = coldProspects.filter(p => p.status === 'new')
-    if (newProspects.length === 0) return
-    
-    if (!confirm(`Möchten Sie wirklich ALLE ${newProspects.length} neuen Firmen analysieren?\n\nDies kann einige Minuten dauern.`)) {
+    if (newProspects.length === 0) {
+      alert('Keine neuen Firmen zum Analysieren vorhanden.')
       return
     }
     
+    if (!confirm(`Möchten Sie wirklich ALLE ${newProspects.length} neuen Firmen analysieren?\n\n⚠️ Dies kann ${Math.ceil(newProspects.length * 0.5)} Minuten dauern.\n\nFortschritt wird angezeigt.`)) {
+      return
+    }
+    
+    // Setze ausgewählte Prospects
     setSelectedProspectsForBulk(newProspects.map(p => p.id))
     
-    // Kurze Verzögerung damit UI sich aktualisiert
-    setTimeout(() => {
-      bulkAnalyzeProspects()
+    // Kurze Verzögerung damit UI sich aktualisiert, dann starte
+    setTimeout(async () => {
+      await bulkAnalyzeProspects()
     }, 100)
   }
 
