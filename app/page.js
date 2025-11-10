@@ -2824,33 +2824,33 @@ export default function App() {
                                 <option value="discarded">❌ Verworfen</option>
                               </select>
                             </td>
-                            <td className="align-middle text-right">
+                            <td className="align-middle text-right" style={{whiteSpace: 'nowrap'}}>
                               {p.status === 'new' && (
-                                <button className="btn btn-sm btn-info" onClick={() => analyzeProspect(p)} disabled={coldLoading}>
-                                  <i className="bi bi-search mr-1"/>{coldLoading ? 'Lädt...' : 'Analysieren'}
+                                <button className="btn btn-sm btn-info" onClick={() => analyzeProspect(p)} disabled={coldLoading} title="Analysieren">
+                                  <i className="bi bi-search"/>
                                 </button>
                               )}
                               {p.status === 'analyzed' && (
-                                <>
-                                  <button className="btn btn-sm btn-outline-info mr-1" onClick={(e) => { 
+                                <div className="btn-group btn-group-sm">
+                                  <button className="btn btn-outline-info" onClick={(e) => { 
                                     e.stopPropagation(); 
                                     console.log('Details clicked for:', p.company_name, 'Has analysis:', !!p.analysis);
                                     setSelectedProspect(selectedProspect?.website === p.website ? null : p) 
-                                  }} disabled={coldLoading}>
-                                    <i className={`bi bi-chevron-${selectedProspect?.website === p.website ? 'up' : 'down'} mr-1`}/>Details
+                                  }} disabled={coldLoading} title="Details anzeigen">
+                                    <i className={`bi bi-chevron-${selectedProspect?.website === p.website ? 'up' : 'down'}`}/>
                                   </button>
                                   {!p.analysis && (
-                                    <button className="btn btn-sm btn-warning mr-1" onClick={() => analyzeProspect(p)} disabled={coldLoading}>
-                                      <i className="bi bi-arrow-repeat mr-1"/>Erneut
+                                    <button className="btn btn-warning" onClick={() => analyzeProspect(p)} disabled={coldLoading} title="Erneut analysieren">
+                                      <i className="bi bi-arrow-repeat"/>
                                     </button>
                                   )}
-                                  <button className="btn btn-sm btn-success" onClick={(e) => { e.stopPropagation(); if (generatedEmail?.website === p.website) { setGeneratedEmail(null) } else { generateColdEmail(p) } }} disabled={coldLoading}>
-                                    <i className={`bi bi-${generatedEmail?.website === p.website ? 'x-circle' : 'envelope'} mr-1`}/>{generatedEmail?.website === p.website ? 'Schließen' : 'Email'}
+                                  <button className="btn btn-success" onClick={(e) => { e.stopPropagation(); if (generatedEmail?.website === p.website) { setGeneratedEmail(null) } else { generateColdEmail(p) } }} disabled={coldLoading} title={generatedEmail?.website === p.website ? 'Schließen' : 'Email generieren'}>
+                                    <i className={`bi bi-${generatedEmail?.website === p.website ? 'x-circle' : 'envelope'}`}/>
                                   </button>
-                                </>
+                                </div>
                               )}
                               {p.status === 'contacted' && (
-                                <span className="badge badge-pill badge-success px-3"><i className="bi bi-check-circle mr-1"/>Versendet</span>
+                                <span className="badge badge-pill badge-success"><i className="bi bi-check-circle"/></span>
                               )}
                             </td>
                           </tr>
