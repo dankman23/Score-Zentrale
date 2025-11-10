@@ -571,6 +571,28 @@ agent_communication:
       - working: true
         agent: "testing"
         comment: "✅ DACH Stats endpoint working perfectly! GET /api/coldleads/dach/stats returns 200 OK with complete structure: ok=true, stats object with all required fields (total_regions=47, completed_regions, pending_regions, total_companies_found, coverage_percentage, dach_prospects_in_db), country_breakdown for DE/AT/CH with all required fields (regions_completed, total_regions, companies_found), top_industries array, last_updated timestamp. Initially: total_regions=47, completed_regions=0, after crawls shows updated counts. All DACH countries (DE/AT/CH) present with proper structure."
+  - task: "JTL Articles: GET /api/jtl/articles/list (Artikel-Browser mit Filter & Pagination)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/jtl/articles/list/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Neue List-API mit Filter (search, hersteller, warengruppe), Pagination (page, limit) und Sortierung (sortBy, sortOrder). Query-Builder mit $or für Text-Suche über cArtNr, cName, cBarcode, cHerstellerName. Pagination mit skip/limit. Formatierte Artikel zurückgeben inkl. pagination Info."
+  - task: "JTL Articles: GET /api/jtl/articles/filters (Filter-Optionen für Artikel-Browser)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/jtl/articles/filters/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Lädt verfügbare Filter-Optionen aus MongoDB articles Collection. Aggregiert unique Hersteller und Warengruppen mit Anzahl (count). Returned Top 100 von jedem Filter sortiert nach count DESC."
 frontend:
   - task: "Hero sichtbar + abgeschwächt (Overlay, Shield)"
     implemented: true
