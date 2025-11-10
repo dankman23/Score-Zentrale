@@ -1,73 +1,90 @@
 <analysis>
-Der KI-Ingenieur hat die Score Zentrale von Grund auf neu entwickelt und kontinuierlich verbessert. Die Arbeit umfasste die Behebung kritischer Datenintegritätsprobleme (JTL-Wawi), die Verfeinerung von Verkaufsmetriken (inkl. Versandkosten, Rohertragsmarge), die Erweiterung des Dashboards um neue KPIs (Top 5 Plattformen/Hersteller) und die umfassende Überarbeitung des Analytics-Moduls (Expand/Collapse, Info-Pages, Beileger-Tracking). Ein Schwerpunkt lag auf der Kaltakquise, die von AI-gestützter Analyse und personalisierter E-Mail-Generierung bis hin zu Autopilot-Funktionen und einem Glossar-System reicht. Die Kommunikation konzentrierte sich auf detaillierte Feature-Implementierung und Bugfixing, insbesondere bei GA4-Daten, Email-Konfiguration und UI-Layout. Der aktuelle Fokus liegt auf der Neugestaltung der Kaltakquise-Suchmechanik durch ein systematisches DACH-Crawling.
+The AI engineer's work, passed to me, involved significant enhancements to the Score Zentrale application. Initially, the focus was on implementing a structured DACH-Crawling system for cold lead acquisition. This involved creating new API endpoints and integrating them into the frontend. A major challenge during this phase was debugging Google Custom Search API configuration, ultimately resolving a subtle typo in the Engine ID and ensuring correct API Key and Custom Search API activation. Following the crawling implementation, the AI engineer refined the DACH-Crawling logic based on user feedback, expanding industry lists and improving coverage tracking. The work then shifted to making the application more robust for future forks by addressing memory issues, creating knowledge documentation, and streamlining deployment. Finally, a substantial feature for importing and managing 300,000+ JTL articles was initiated and largely completed, including schema discovery, batch import, and frontend integration.
 </analysis>
 <product_requirements>
-Die Score Zentrale ist ein Next.js-Dashboard zur Integration von Sales (JTL-Wawi), Marketing (GA4, Google Ads, Kalt-/Warmakquise) und einer Outbound-Suite.
-- **Sales Dashboard**: Anzeige von JTL-Wawi KPIs (Umsatz Netto/Brutto inkl. Versand, Rohertragsmarge exkl. Versand), Multi-Select-Filter, Top 5 Plattformen/Hersteller mit dynamischer Namenszuordnung und Margin-Prozent, sortierbare Tabellen. Behebung von Dateninkonsistenzen (Angebote, Artikelnamen).
-- **Kaltakquise (Cold Acquisition)**: AI-gestützte Google-Suche für Prospects, detaillierte AI-Analyse (Firmengröße, Haupttätigkeit), personalisierte SMTP-E-Mail-Outreach (ohne Körnungen, Pferd-Erwähnung, persönlicher Satz, verbesserter CTA), E-Mail-Posteingang/-ausgang (mit BCC an Leismann), Kundenhistorie, Follow-up-E-Mails. Automatisierung mit konfigurierbaren Limits und Duplikatsvermeidung. Glossar-Integration für Anwendungen, Kategorien, Materialien, Maschinentypen.
-- **Warmakquise (Warm Acquisition)**: Anzeige von Kundennamen, berechneter Score für inaktive Kunden, Telefonnummer, Kontakthistorie.
-- **UI/UX**: Allgemeine UI-Verbesserungen, Konvertierung von Detailansichten zu Akkordeons. Implementierung von Expand/Collapse-Funktionalität für diverse Datenquellen im Analytics-Dashboard, Info-Pages und Beileger-Tracking. Anpassung des Kaltakquise-Layouts für bessere Responsivität.
-- **Deployment**: Sicherstellung der Deployment-Bereitschaft durch Entfernen von Hardcoded-URLs und Behebung von Build-Fehlern.
+The Score Zentrale is a Next.js dashboard integrating Sales (JTL-Wawi), Marketing (GA4, Google Ads, Cold/Warm Acquisition), and an Outbound suite.
+
+*   **Sales Dashboard**: Displays JTL-Wawi KPIs (Net/Gross revenue incl. shipping, gross profit margin excl. shipping), multi-select filters, Top 5 platforms/manufacturers with dynamic naming and margin percentages, sortable tables. Addresses data inconsistencies.
+*   **Cold Acquisition (Kaltakquise)**: Features AI-powered Google search for prospects, detailed AI analysis (company size, main activity), personalized SMTP email outreach (mentioning specific manufacturers, improved CTA, BCC to Leismann), email inbox/outbox, customer history, and follow-up emails. Includes automation, duplicate prevention, and glossary integration for applications, categories, materials, and machine types.
+    *   **New**: A systematic DACH-Crawling system was implemented to replace unstructured Google search, focusing on Germany, Austria, and Switzerland (DACH regions) for structured industry prospecting. This includes improved coverage logic and expanded industry lists.
+*   **Warm Acquisition (Warmakquise)**: Displays customer names, calculated scores for inactive customers, phone numbers, and contact history.
+*   **UI/UX**: General UI improvements, conversion of detail views to accordions, expand/collapse functionality in analytics, info pages, and package insert tracking. Cold acquisition layout adapted for responsiveness.
+*   **JTL Article Import**: Import of over 300,000 JTL articles (excluding bill of materials/sets) with key fields (Name, Product Group, Manufacturer, Prices, Features). On-demand import with progress tracking, stored in MongoDB with performance-optimized indices. A new Produkte (Products) section was added to the UI.
+*   **Deployment & Stability**: Ensures deployment readiness by removing hardcoded URLs, fixing build errors, improving API stability (memory optimization, caching), and creating comprehensive documentation (, , , , ) for future agent handovers.
 </product_requirements>
 <key_technical_concepts>
-- **Next.js & TypeScript**: Full-stack Framework.
-- **MongoDB**: NoSQL-Datenbank für Kaltakquise- und App-Daten.
-- **MS SQL (JTL-Wawi)**: Relationale Datenbank für Sales- und Kundendaten.
-- **Nodemailer & IMAP client**: E-Mail-Versand (SMTP) und Empfang (IMAP).
-- **Shadcn/UI & Tailwind CSS**: UI-Komponentenbibliothek und CSS-Framework.
-- **AI/LLM (OpenAI via )**: Prospektanalyse, E-Mail-Generierung, Glossar-Matching.
-- **Google Analytics 4 (GA4)**: Webanalyse-Datenquelle.
+- **Next.js & TypeScript**: Full-stack framework.
+- **MongoDB**: NoSQL database for cold lead and app data, now also for imported JTL articles.
+- **MS SQL (JTL-Wawi)**: Relational database for Sales and customer data.
+- **Nodemailer & IMAP client**: Email sending (SMTP) and receiving (IMAP).
+- **Shadcn/UI & Tailwind CSS**: UI components and CSS framework.
+- **AI/LLM (OpenAI via )**: Prospect analysis, email generation, glossary matching.
+- **Google Analytics 4 (GA4)**: Web analytics data source.
+- **Google Custom Search API**: For structured web scraping in DACH-Crawling.
 </key_technical_concepts>
 <code_architecture>
 
+
 -   ****:
     -   **Importance**: Main frontend, dashboard UI, Kaltakquise-Logik, Analytics-Darstellung.
-    -   **Changes**: Implementierte expand/collapse für Produktseiten; fügte UI für Info Pages und Beileger-Sektion hinzu; aktualisierte  zum Aufruf neuer APIs; verbesserte KPI-Darstellung für  (Nutzung von ); fixierte Navigations-Bug in Kaltakquise (Filter-Buttons); implementierte E-Mail-Inbox-Anzeige; passte Layout des Kaltakquise-Moduls an (kompaktere Aktionsbuttons, ); fügte Glossar-Tab im Marketing-Bereich hinzu.
--   ****:
-    -   **Importance**: Zentrale Logik für GA4-Datenabfrage.
-    -   **Changes**: Implementierte ,  und  Funktionen; behob einen Bug, bei dem  0 zurückgab (Workaround mit ); aktualisierte Timeseries-Funktion mit dieser Logik; korrigierte Filter für Kategorie- und Produktseiten. Wurde auch nach  kopiert, um Importpfadprobleme zu beheben.
+    -   **Changes**:
+        -   Integrated DACH-Crawling UI: added a new DACH-Crawler tab within the Kaltakquise section, including new state variables, functions (, ), and UI elements (form for country/region/industry, status display).
+        -   Expanded Kaltakquise industry selection based on PDF.
+        -   Integrated JTL Article Import UI: added a new Produkte tab with state variables (, , , ), functions (, , , ), and UI elements (KPI cards for article counts, Import starten button, status messages). A navigation link for Produkte was added to the main navigation.
 -   ** (New)**:
-    -   **Importance**: API-Endpunkt zum Abrufen von Daten für spezifische Info Pages.
-    -   **Changes**: Neu erstellt, um  aus  aufzurufen.
+    -   **Importance**: Core logic for structured DACH-region crawling using Google Custom Search.
+    -   **Changes**: Initial implementation for systematic crawling. Integrated  (similar to ) for web scraping. Expanded predefined industry lists based on user input and PDF analysis. Updated crawl logic to handle per-region/industry tracking rather than simple region count for coverage.
 -   ** (New)**:
-    -   **Importance**: API-Endpunkt zum Abrufen von Daten für die Erfolg von Beileger-Sektion (QR-Code Traffic).
-    -   **Changes**: Neu erstellt, um  aus  aufzurufen.
--   ****:
-    -   **Importance**: Handles IMAP connection for email inbox.
-    -   **Changes**: Keine direkten Codeänderungen, aber die Konfiguration in  wurde angepasst, um die Authentifizierung zu ermöglichen.
--   ****:
-    -   **Importance**: Kernlogik für die Analyse von Prospekt-Websites.
-    -   **Changes**: Erweiterte Analyse um Firmengröße und Haupttätigkeit; verbesserte Kontakt-Extraktion (E-Mail, Telefon); entfernte granularere Produktdetails; verbesserte Crawler-Logik und Glossar-Matching (Case-Insensitivität).
--   ****:
-    -   **Importance**: Generierung und Versand von Kaltakquise-E-Mails.
-    -   **Changes**: Reworked Email-Generierung für persönliche Ansprache, Erwähnung spezifischer Hersteller (z.B. Pferd), vereinfachte Produktlisten (ohne Körnungen); hinzugefügt BCC an ; hinzugefügt Reply-To Header.
--   ****:
-    -   **Importance**: Generischer E-Mail-Client.
-    -   **Changes**: Hinzugefügt BCC-Option, um Konsistenz zu gewährleisten.
--   ****:
-    -   **Importance**: API für die Analyse von Cold Leads.
-    -   **Changes**: Integrierte die  Logik.
--   ****:
-    -   **Importance**: API für die E-Mail-Generierung.
-    -   **Changes**: Integrierte die  Logik.
+    -   **Importance**: API endpoint to initiate and manage the DACH-region crawl.
+    -   **Changes**: New file created. Uses  to perform searches and store prospects.
 -   ** (New)**:
-    -   **Importance**: Verwaltet die definierten Anwendungs-, Kategorie-, Material- und Maschinentypen-Listen für das Glossar.
-    -   **Changes**: Neu erstellt, um die statischen Glossar-Daten zu speichern und Funktionen zum Abrufen bereitzustellen.
+    -   **Importance**: API endpoint to check the ongoing status of the DACH crawl.
+    -   **Changes**: New file created.
 -   ** (New)**:
-    -   **Importance**: API-Endpunkt für das Glossar-Frontend.
-    -   **Changes**: Neu erstellt, um die Glossar-Daten bereitzustellen.
--   ** (New)**:
-    -   **Importance**: Neue, verbesserte Version des Analyzers basierend auf dem detaillierten Briefing.
-    -   **Changes**: Neu erstellt, um erweiterte Parsing-Logik, Kontaktpriorisierung und Glossar-Mapping zu implementieren.
--   ** (New)**:
-    -   **Importance**: Neue, verbesserte Version des Emailers basierend auf dem detaillierten Briefing.
-    -   **Changes**: Neu erstellt, um die neue E-Mail-Struktur (Anrede, Einstieg, Nutzenpunkte, Angebot, CTA, Signatur) und Betreffvarianten zu generieren.
--   ** (New)**:
-    -   **Importance**: Initiale Datei für ein strukturiertes Crawling-System für DACH-Regionen.
-    -   **Changes**: Neu erstellt, um die Grundlage für ein systematischeres Prospekt-Sourcing zu legen.
+    -   **Importance**: API endpoint to retrieve statistics about the DACH crawl (e.g., total regions, completed regions, top industries).
+    -   **Changes**: New file created. Initial implementation of aggregated statistics. Later refined to track statistics per region and industry combination, providing more accurate coverage information. Import paths () were debugged and fixed.
 -   ****:
-    -   **Importance**: Umgebungsvariablen für Datenbank- und E-Mail-Konfiguration.
-    -   **Changes**: Bereinigt Duplikate und widersprüchliche SMTP/IMAP-Einstellungen; aktualisiert SMTP_FROM, SMTP_USER, SMTP_PASSWORD, IMAP_USER, IMAP_PASSWORD, REPLY_TO_EMAIL auf die neuen  und  Adressen.
+    -   **Importance**: Manages defined application, category, material, and machine type lists for the glossary.
+    -   **Changes**: Added a new branchen (industries) category and populated it with industry terms extracted from the user-provided PDF.
+-   ****:
+    -   **Importance**: Environment variables for database, email, and API configurations.
+    -   **Changes**:  and  were updated multiple times during debugging to correctly configure Google Custom Search API, resolving a typo in the Engine ID and ensuring the correct API Key was used.  for Next.js was added/updated to increase memory limit ().
+-   ** (New)**:
+    -   **Importance**: Provides an example of required environment variables for easy setup for new deployments/agents.
+    -   **Changes**: New file created, listing all necessary environment variables.
+-   ** (New)**:
+    -   **Importance**: Central knowledge base for JTL-Wawi API specifics to prevent knowledge loss across development cycles.
+    -   **Changes**: New file created and populated with schema information and important findings about JTL-Wawi's  table (e.g.,  does not exist, use ,  for article type filtering).
+-   ** (New)**:
+    -   **Importance**: A guide to ensure the application is ready for new forks/deployments.
+    -   **Changes**: New file created, outlining steps and best practices for deployment.
+-   ** (New)**:
+    -   **Importance**: Central entry point for a new agent to quickly understand the project and access key documentation.
+    -   **Changes**: New file created, pointing to , , .
+-   ** (New)**:
+    -   **Importance**: Main project README.
+    -   **Changes**: New file created as a primary entry point.
+-   ** (New)**:
+    -   **Importance**: API endpoint to dynamically retrieve the schema of the  table from the JTL-Wawi database.
+    -   **Changes**: New file created to help debug and understand the  structure without making assumptions. Corrected  import and function calls ().
+-   ** (New)**:
+    -   **Importance**: API endpoint to count importable JTL articles based on specified criteria (e.g., not bill-of-materials, actual articles).
+    -   **Changes**: New file created, accurately reporting 166,854 importable articles.
+-   ** (New)**:
+    -   **Importance**: API endpoint to initiate the batch import of JTL articles into MongoDB.
+    -   **Changes**: New file created, implementing batch processing and upsert logic to handle duplicates.
+-   ** (New)**:
+    -   **Importance**: API endpoint to get the current status and statistics of the article import process.
+    -   **Changes**: New file created to track progress and report statistics.
+-   ** (New)**:
+    -   **Importance**: API endpoint to retrieve a paginated and filterable list of imported JTL articles from MongoDB.
+    -   **Changes**: New file created for browsing articles.
+-   ** (New)**:
+    -   **Importance**: API endpoint to fetch filter options (e.g., manufacturers, product groups) for the article list.
+    -   **Changes**: New file created.
+-   ** (New)**:
+    -   **Importance**: API endpoint specifically for importing article features (Merkmale) from JTL-Wawi.
+    -   **Changes**: New file created, built upon understanding , ,  tables.
 </code_architecture>
 <pending_tasks>
 - Full implementation of Google Ads and LinkedIn integrations (Google Ads needs Standard Access).
@@ -75,14 +92,20 @@ Die Score Zentrale ist ein Next.js-Dashboard zur Integration von Sales (JTL-Wawi
 - Further UI refinement (KPI card compactness, table row height, sum row).
 - Addressing persistent JTL data discrepancies for 03.11.2025 orders (if any remain after sales API fix).
 - Implement charts for Traffic Sources and other tables in Analytics.
-- Implement more robust manufacturer detection in Kaltakquise analyzer.
-- Complete the structured DACH-Crawling system as discussed in the latest messages.
+- Complete the structured DACH-Crawling system, particularly full pagination for exhaustive searches.
+- Frontend development for the JTL article browser (list, filter, and display article details).
+- Full implementation of the JTL article features () import.
 </pending_tasks>
 <current_work>
-Unmittelbar vor dieser Zusammenfassung begann der KI-Ingenieur mit der Implementierung eines **systematischen DACH-Crawling-Systems** für die Kaltakquise. Der Nutzer hatte festgestellt, dass die bestehende Google-Suche unstrukturiert ist und oft zu ungenauen Branchenzuordnungen führt, und suchte eine methodische Lösung für die Abdeckung von Deutschland, Österreich und der Schweiz (DACH).
+Immediately before this summary request, the AI engineer had successfully completed a **full import of approximately 167,000 JTL articles** into MongoDB. This extensive import process was initiated in the background via a shell script () and was being tracked through dedicated API endpoints ().
 
-Der KI-Ingenieur hat eine neue Service-Datei namens  erstellt. Dies ist der erste Schritt zur Entwicklung eines strukturierten Branchen-Verzeichnis-Crawling-Ansatzes, der die aktuellen Mängel der Prospektsuche beheben soll. Die Arbeit in dieser Datei hat gerade erst begonnen. Der Agent war dabei, eine finale Zusammenfassung des Lösungskonzepts für den DACH-Crawler zu erstellen, als die Anfrage für diese Gesamtübersicht kam.
+Concurrently with the background import, the AI engineer had started implementing two related features as requested by the user:
+1.  **List API with Filter & Pagination**: A new API endpoint  was created to allow retrieval of imported articles with pagination and filtering capabilities.
+2.  **Filter Options API**: A companion API endpoint  was created to provide dynamic filter options (e.g., manufacturers, product groups) from the imported data.
+3.  **Features (Merkmale) Import API**: The initial structure for  was created after successfully identifying the relevant JTL tables (, , ) for article features.
+
+The full import had just completed, and the AI engineer was in the process of updating the handover documentation to reflect these new capabilities. The immediate next steps were to focus on the frontend integration for the article browser and to finalize the features import.
 </current_work>
 <optional_next_step>
-Weiterentwicklung und Implementierung des systematischen DACH-Crawling-Systems in .
+Update all important handover documentation files to reflect the completed JTL article import.
 </optional_next_step>
