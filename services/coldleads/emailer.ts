@@ -86,26 +86,30 @@ function generateTemplateEmail(options: EmailGenerationOptions): GeneratedEmail 
   let intro = `ich bin Daniel Leismann von Score Schleifwerkzeuge aus Köln.\n\n`
   intro += `${personalOpening} – genau die Bereiche, in denen unsere hochwertigen Schleifwerkzeuge Ihre Prozesse optimal unterstützen können.`
   
-  // 4. Premium-Hersteller und Produktkategorien
+  // 4. Premium-Hersteller erwähnen (inkl. PFERD bei Herstellern!)
+  const isManufacturer = companyInfo?.business_type === 'manufacturer' || companyInfo?.business_type === 'mixed'
   const categories = new Set<string>()
   analysis.potential_products.forEach(p => {
     if (p.category) categories.add(p.category)
   })
   const categoryList = Array.from(categories).slice(0, 3).join(', ')
   
-  let premiumIntro = ''
-  if (categoryList) {
-    premiumIntro = `\n\nDa Ihre Anwendungen ${categoryList} erfordern, arbeiten wir mit den führenden Premium-Herstellern wie Klingspor, 3M, Norton, VSM und Starcke zusammen. Durch unsere langjährigen und exzellenten Beziehungen zu diesen Herstellern können wir Ihnen optimale Konditionen und schnellste Verfügbarkeit garantieren.`
+  let premiumIntro = '\n\n**Unsere Premium-Hersteller**'
+  if (isManufacturer) {
+    // Bei Herstellern auch Pferd erwähnen
+    premiumIntro += `\nWir arbeiten ausschließlich mit den führenden Herstellern zusammen: **Klingspor, 3M, Norton, VSM, Pferd, Starcke und Bosch**. Durch unsere langjährigen und exzellenten Beziehungen zu diesen Herstellern können wir Ihnen optimale Konditionen und schnellste Verfügbarkeit garantieren.`
+  } else {
+    premiumIntro += `\nWir arbeiten mit den führenden Premium-Herstellern wie **Klingspor, 3M, Norton, VSM und Starcke** zusammen und garantieren Ihnen optimale Konditionen und schnellste Verfügbarkeit.`
   }
   
-  // 5. Spezifische Produktempfehlungen (Top 3-4) - OHNE Körnungen
-  const topProducts = analysis.potential_products.slice(0, 4)
-  let productSection = '\n\nBasierend auf Ihre Anwendungsbereiche bieten wir Ihnen folgende Produktkategorien an:\n'
-  
-  topProducts.forEach(product => {
-    productSection += `\n• **${product.name}** (${product.category})`
-    productSection += `\n  → ${product.reason}`
-  })
+  // 5. KEINE detaillierte Produktliste! Nur kurzer Satz
+  let productSection = ''
+  if (categories.size > 0) {
+    const catList = Array.from(categories).slice(0, 4).join(', ')
+    productSection = `\n\n**Ihre Produktbereiche**\nBasierend auf Ihre Anforderungen können wir Sie insbesondere in folgenden Bereichen unterstützen: ${catList}.\n\nGerne erstellen wir Ihnen ein maßgeschneidertes Angebot, das exakt auf Ihre Bedürfnisse zugeschnitten ist.`
+  } else {
+    productSection = `\n\nGerne erstellen wir Ihnen ein maßgeschneidertes Angebot, das exakt auf Ihre Bedürfnisse zugeschnitten ist.`
+  }
   
   // 5. Vorteile von Score Schleifwerkzeuge
   const benefits = `\n\nWarum Score Schleifwerkzeuge?
