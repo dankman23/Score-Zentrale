@@ -432,7 +432,7 @@ export default function App() {
   }, [activeTab])
 
   useEffect(() => {
-    const applyHash = () => { const h=(window.location.hash||'#dashboard').replace('#',''); if (['dashboard','sales','marketing','kaltakquise','warmakquise','outbound'].includes(h)) setActiveTab(h) }
+    const applyHash = () => { const h=(window.location.hash||'#dashboard').replace('#',''); if (['dashboard','sales','marketing','kaltakquise','warmakquise','outbound','produkte'].includes(h)) setActiveTab(h) }
     applyHash(); window.addEventListener('hashchange', applyHash)
     return () => window.removeEventListener('hashchange', applyHash)
   }, [])
