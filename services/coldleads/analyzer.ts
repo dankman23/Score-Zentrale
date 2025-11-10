@@ -207,25 +207,27 @@ function identifyBusinessType(text: string, fullText: string) {
   let traderScore = 0
   let serviceScore = 0
   
-  manufacturerKeywords.forEach(kw => { if (text.includes(kw)) manufacturerScore++ })
+  manufacturerKeywords.forEach(kw => { if (text.includes(kw)) manufacturerScore += 2 }) // Höhere Gewichtung!
   traderKeywords.forEach(kw => { if (text.includes(kw)) traderScore++ })
   serviceKeywords.forEach(kw => { if (text.includes(kw)) serviceScore++ })
   
-  // Bestimme Haupttyp
-  if (manufacturerScore > traderScore && manufacturerScore > serviceScore) {
-    result.type = 'manufacturer'
-    result.isManufacturer = true
-    result.mainActivity = 'Hersteller'
+  // Bestimme Haupttyp mit klarer Priorisierung
+  if (manufacturerScore >= 2) { // Mindestens 1 Hersteller-Keyword gefunden
+    if (traderScore > 0) {
+      result.type = 'mixed'
+      result.isManufacturer = true
+      result.mainActivity = 'Hersteller und Handel'
+    } else {
+      result.type = 'manufacturer'
+      result.isManufacturer = true
+      result.mainActivity = 'Hersteller'
+    }
   } else if (traderScore > manufacturerScore && traderScore > serviceScore) {
     result.type = 'trader'
     result.mainActivity = 'Handel/Vertrieb'
-  } else if (serviceScore > 0) {
+  } else {
     result.type = 'service'
     result.mainActivity = 'Dienstleister'
-  } else if (manufacturerScore > 0 && traderScore > 0) {
-    result.type = 'mixed'
-    result.isManufacturer = true
-    result.mainActivity = 'Hersteller und Handel'
   }
   
   // Extrahiere konkrete Produkte/Dienstleistungen - VERBESSERT
