@@ -3823,19 +3823,28 @@ export default function App() {
                                 <div className="btn-group btn-group-sm">
                                   <button className="btn btn-outline-info" onClick={(e) => { 
                                     e.stopPropagation(); 
-                                    console.log('Details clicked for:', p.company_name, 'Has analysis:', !!p.analysis);
                                     setSelectedProspect(selectedProspect?.website === p.website ? null : p) 
                                   }} disabled={coldLoading} title="Details anzeigen">
                                     <i className={`bi bi-chevron-${selectedProspect?.website === p.website ? 'up' : 'down'}`}/>
                                   </button>
-                                  {!p.analysis && (
+                                  {(!p.analysis_v3 && !p.analysis) && (
                                     <button className="btn btn-warning" onClick={() => analyzeProspect(p)} disabled={coldLoading} title="Erneut analysieren">
                                       <i className="bi bi-arrow-repeat"/>
                                     </button>
                                   )}
-                                  <button className="btn btn-success" onClick={(e) => { e.stopPropagation(); if (generatedEmail?.website === p.website) { setGeneratedEmail(null) } else { generateColdEmail(p) } }} disabled={coldLoading} title={generatedEmail?.website === p.website ? 'Schließen' : 'Email generieren'}>
-                                    <i className={`bi bi-${generatedEmail?.website === p.website ? 'x-circle' : 'envelope'}`}/>
-                                  </button>
+                                  {p.email_sequence && (
+                                    <button 
+                                      className="btn btn-success" 
+                                      onClick={(e) => { 
+                                        e.stopPropagation(); 
+                                        setShowEmailPreview(showEmailPreview?.website === p.website ? null : p)
+                                      }} 
+                                      disabled={coldLoading} 
+                                      title="Email-Vorschau (alle 3 Mails)"
+                                    >
+                                      <i className={`bi bi-${showEmailPreview?.website === p.website ? 'x-circle' : 'envelope-check'}`}/>
+                                    </button>
+                                  )}
                                 </div>
                               )}
                               {p.status === 'contacted' && (
