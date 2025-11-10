@@ -573,26 +573,32 @@ agent_communication:
         comment: "✅ DACH Stats endpoint working perfectly! GET /api/coldleads/dach/stats returns 200 OK with complete structure: ok=true, stats object with all required fields (total_regions=47, completed_regions, pending_regions, total_companies_found, coverage_percentage, dach_prospects_in_db), country_breakdown for DE/AT/CH with all required fields (regions_completed, total_regions, companies_found), top_industries array, last_updated timestamp. Initially: total_regions=47, completed_regions=0, after crawls shows updated counts. All DACH countries (DE/AT/CH) present with proper structure."
   - task: "JTL Articles: GET /api/jtl/articles/list (Artikel-Browser mit Filter & Pagination)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/jtl/articles/list/route.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Neue List-API mit Filter (search, hersteller, warengruppe), Pagination (page, limit) und Sortierung (sortBy, sortOrder). Query-Builder mit $or für Text-Suche über cArtNr, cName, cBarcode, cHerstellerName. Pagination mit skip/limit. Formatierte Artikel zurückgeben inkl. pagination Info."
+      - working: true
+        agent: "testing"
+        comment: "✅ JTL Articles List API working perfectly! All 5/5 comprehensive tests PASSED: (1) Default list (page=1, limit=10) returns 200 OK with 10 articles from total 41,861, all required fields present (kArtikel, cArtNr, cName, cHerstellerName, cWarengruppenName, fVKNetto, fEKNetto, margin_percent), (2) Text search 'schleif' returns 200 OK with 5 articles from 15,025 matches, all articles contain 'schleif' in cArtNr/cName/cBarcode, (3) Manufacturer filter '3M' returns 200 OK with 5 articles from 13,374 total, all articles have cHerstellerName='3M', (4) Pagination test: Page 1 (limit=25) has hasNext=true, Page 2 has hasPrev=true, no overlapping kArtikel IDs between pages. All response structures valid: ok=true, articles array, pagination object (page, limit, total, totalPages, hasNext, hasPrev), filters object. MongoDB integration working with 41,861 articles imported."
   - task: "JTL Articles: GET /api/jtl/articles/filters (Filter-Optionen für Artikel-Browser)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/jtl/articles/filters/route.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Lädt verfügbare Filter-Optionen aus MongoDB articles Collection. Aggregiert unique Hersteller und Warengruppen mit Anzahl (count). Returned Top 100 von jedem Filter sortiert nach count DESC."
+      - working: true
+        agent: "testing"
+        comment: "✅ JTL Articles Filters API working perfectly! GET /api/jtl/articles/filters returns 200 OK with complete structure: ok=true, hersteller array (13 manufacturers with name/count), warengruppen array (35 product groups with name/count). All required fields present and valid structure. MongoDB aggregation working correctly - unique values with counts sorted by count DESC. Sample manufacturers: 3M, KLINGSPOR, PFERD, etc. Sample warengruppen: Schleifscheiben, Trennscheiben, Schleifbänder, etc. Filter options ready for frontend integration."
 frontend:
   - task: "Hero sichtbar + abgeschwächt (Overlay, Shield)"
     implemented: true
