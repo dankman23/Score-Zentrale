@@ -52,47 +52,67 @@ const DACH_REGIONS = {
   ]
 }
 
-// Branchen-Mapping mit Suchbegriffen (aus bestehendem Prospector übernommen + erweitert)
+// Branchen-Mapping mit Suchbegriffen (aus PDF "Relevante Branchen für Schleifwerkzeuge")
 const INDUSTRY_KEYWORDS = {
-  // Metallverarbeitung & Stahlbau
-  'Metallverarbeitung': ['metallbau', 'metallverarbeitung', 'blechbearbeitung', 'stahlverarbeitung'],
-  'Stahlbau': ['stahlbau', 'stahlkonstruktion', 'metallkonstruktion'],
-  'Maschinenbau': ['maschinenbau', 'anlagenbau', 'sondermaschinenbau'],
-  'Werkzeugbau': ['werkzeugbau', 'formenbau', 'vorrichtungsbau'],
-  'Schlosserei': ['schlosserei', 'metallbau', 'bauschlosserei'],
-  'Schweißtechnik': ['schweißtechnik', 'schweißbetrieb', 'schweißerei'],
+  // 🚗 Automobilindustrie & Fahrzeugbau
+  'Automobilindustrie': ['automobilindustrie', 'fahrzeugbau', 'automobilzulieferer', 'kfz industrie'],
+  'Karosseriebau': ['karosseriebau', 'karosseriewerkstatt', 'blechbearbeitung fahrzeug', 'autolackierung'],
+  'KFZ-Werkstatt': ['kfz werkstatt', 'autowerkstatt', 'kfz reparatur', 'fahrzeugreparatur'],
   
-  // Holzverarbeitung
-  'Schreinerei': ['schreinerei', 'tischlerei', 'möbelbau', 'holzverarbeitung'],
-  'Möbelbau': ['möbelbau', 'möbelherstellung', 'innenausbau'],
+  // 🔩 Metallverarbeitung & Stahlbau
+  'Metallverarbeitung': ['metallverarbeitung', 'metallbau', 'blechbearbeitung', 'stahlverarbeitung'],
+  'Schlosserei': ['schlosserei', 'bauschlosserei', 'metallbau', 'schlossereibetrieb'],
+  'Stahlbau': ['stahlbau', 'stahlkonstruktion', 'metallkonstruktion', 'profilbearbeitung'],
+  'Schweißtechnik': ['schweißtechnik', 'schweißbetrieb', 'schweißerei', 'schweißnahtbearbeitung'],
   
-  // Automotive & Karosserie
-  'Automobilindustrie': ['kfz', 'automobilzulieferer', 'fahrzeugbau'],
-  'Karosseriebau': ['karosseriebau', 'karosseriewerkstatt', 'autolackierung'],
-  'KFZ-Werkstatt': ['kfz werkstatt', 'autowerkstatt', 'kfz reparatur'],
+  // ⚙️ Maschinen- und Apparatebau
+  'Maschinenbau': ['maschinenbau', 'sondermaschinenbau', 'präzisionsmaschinenbau'],
+  'Apparatebau': ['apparatebau', 'anlagenbau', 'behälterbau', 'rohrbau'],
+  'Werkzeugbau': ['werkzeugbau', 'formenbau', 'vorrichtungsbau', 'stanzerei'],
   
-  // Oberflächentechnik
-  'Oberflächentechnik': ['oberflächenbehandlung', 'oberflächenveredelung'],
+  // ✈️ Luft- und Raumfahrt
+  'Luftfahrt': ['luftfahrt', 'flugzeugbau', 'flugzeugwartung', 'triebwerksbau'],
+  'Raumfahrt': ['raumfahrt', 'aerospace', 'luftfahrtindustrie'],
+  
+  // 🚢 Schiff- und Bahnindustrie
+  'Schiffbau': ['schiffbau', 'werft', 'marinebau', 'bootsbau'],
+  'Bahnindustrie': ['bahnindustrie', 'schienenfahrzeugbau', 'gleisbau', 'zugbau'],
+  
+  // 🪵 Holz- und Möbelindustrie
+  'Holzverarbeitung': ['holzverarbeitung', 'holzbearbeitung', 'sägewerk'],
+  'Schreinerei': ['schreinerei', 'tischlerei', 'schreinereibetrieb'],
+  'Möbelindustrie': ['möbelindustrie', 'möbelbau', 'möbelherstellung', 'innenausbau'],
+  'Parkettverlegung': ['parkett', 'parkettverlegung', 'bodenleger'],
+  
+  // 🔥 Gießereien und Schmieden
+  'Gießerei': ['gießerei', 'metallguss', 'gussteile', 'eisengießerei'],
+  'Schmiede': ['schmiede', 'schmiedebetrieb', 'metallschmiede', 'kunstschmiede'],
+  
+  // 🎨 Maler- und Ausbauhandwerk
+  'Malerhandwerk': ['malerhandwerk', 'malerbetrieb', 'maler lackierer'],
+  'Trockenbau': ['trockenbau', 'innenausbau', 'gipskartonbau'],
+  'Stuckateur': ['stuckateur', 'stukkateur', 'putzarbeiten'],
+  
+  // 🎨 Oberflächentechnik
+  'Oberflächentechnik': ['oberflächentechnik', 'oberflächenbehandlung', 'oberflächenveredelung'],
   'Lackiererei': ['lackiererei', 'industrielackierung', 'pulverbeschichtung'],
-  'Galvanik': ['galvanik', 'galvanisierung', 'verzinkerei'],
+  'Galvanik': ['galvanik', 'galvanisierung', 'verzinkerei', 'verchromung'],
   
-  // Glas & Stein
-  'Glasverarbeitung': ['glasverarbeitung', 'glastechnik', 'glaserei'],
-  'Steinmetz': ['steinmetz', 'steinbearbeitung', 'natursteinbearbeitung'],
+  // 💎 Glas, Stein & Keramik
+  'Glasverarbeitung': ['glasverarbeitung', 'glastechnik', 'glaserei', 'glasschleiferei'],
+  'Steinmetz': ['steinmetz', 'steinbearbeitung', 'natursteinbearbeitung', 'marmorbearbeitung'],
   
-  // Dental & Medizin
-  'Dentallabor': ['dentallabor', 'zahntechnik', 'dentaltechnik'],
+  // 🦷 Dental & Medizintechnik
+  'Dentallabor': ['dentallabor', 'zahntechnik', 'dentaltechnik', 'zahnersatz'],
   
-  // Schmuck & Gravur
-  'Schmuckherstellung': ['goldschmied', 'schmuckherstellung', 'juwelier'],
-  'Gravurbetrieb': ['gravur', 'gravierwerkstatt', 'lasergravur'],
+  // 💍 Schmuck & Gravur
+  'Schmuckherstellung': ['goldschmied', 'schmuckherstellung', 'juwelier', 'schmuckwerkstatt'],
+  'Gravurbetrieb': ['gravur', 'gravierwerkstatt', 'lasergravur', 'gravierdienst'],
   
-  // Kunststoff
+  // 🔧 Kunststoff & Sonstige
   'Kunststoffverarbeitung': ['kunststoffverarbeitung', 'kunststofftechnik', 'spritzguss'],
-  
-  // Sonstige
-  'Modellbau': ['modellbau', 'prototypenbau'],
-  'Messerschmiede': ['messerschmiede', 'messermacher']
+  'Modellbau': ['modellbau', 'prototypenbau', 'modellbauer'],
+  'Messerschmiede': ['messerschmiede', 'messermacher', 'messerherstellung']
 }
 
 /**
