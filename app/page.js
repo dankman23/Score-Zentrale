@@ -2382,11 +2382,18 @@ export default function App() {
                                           <div>
                                             <strong className="text-muted small d-block mb-2">Potenzielle Produkte:</strong>
                                             <div className="d-flex flex-wrap">
-                                              {p.analysis.needs_assessment.potential_products.map((prod, idx) => (
-                                                <span key={idx} className="badge badge-success mr-1 mb-1">
-                                                  {typeof prod === 'string' ? prod : prod.name || JSON.stringify(prod)}
-                                                </span>
-                                              ))}
+                                              {p.analysis.needs_assessment.potential_products.map((prod, idx) => {
+                                                const displayText = typeof prod === 'string' 
+                                                  ? prod 
+                                                  : prod.name 
+                                                    ? `${prod.name} (${prod.category || 'Allgemein'})`
+                                                    : JSON.stringify(prod)
+                                                return (
+                                                  <span key={idx} className="badge badge-success mr-1 mb-1" title={prod.reason || ''}>
+                                                    {displayText}
+                                                  </span>
+                                                )
+                                              })}
                                             </div>
                                           </div>
                                         )}
