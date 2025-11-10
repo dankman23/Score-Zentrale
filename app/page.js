@@ -986,10 +986,11 @@ export default function App() {
                     <div className="small">
                       {topManufacturers.slice(0, 5).map((m, i) => (
                         <div key={i} className="d-flex justify-content-between mb-1 pb-1" style={{borderBottom: i < 4 ? '1px solid var(--line)' : 'none'}}>
-                          <span className="text-truncate" style={{maxWidth: '120px'}}>{m.manufacturer}</span>
-                          <span>
+                          <span className="text-truncate" style={{maxWidth: '100px'}}>{m.manufacturer}</span>
+                          <span className="text-nowrap">
                             <strong>{fmtCurrency(m.revenue)}</strong>
                             <span className="text-success ml-2">+{fmtCurrency(m.margin)}</span>
+                            <span className="text-muted ml-1">({m.marginPct}%)</span>
                           </span>
                         </div>
                       ))}
