@@ -161,18 +161,17 @@ export async function GET(request: NextRequest) {
       `
 
     // Separate query for shipping costs
+    // Versand hat keinen EK (keine Wareneinkaufskosten), also EK = 0
     const shippingQuery = `
       SELECT 
         SUM(op.${vkNettoField} * op.${qtyField}) AS shipping_revenue,
-        SUM((${ekCascade}) * op.${qtyField}) AS shipping_cost
+        0 AS shipping_cost
       FROM ${orderTable} o
       INNER JOIN ${orderPosTable} op ON o.kAuftrag = op.kAuftrag
-      LEFT JOIN ${articleTable} a ON op.kArtikel = a.kArtikel
-      ${historicalEkClause}
       WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
         ${orderTypeFilter}
-        AND NOT (${articleFilter})
+        AND ${shippingFilter}
     `
 
     const query = `
