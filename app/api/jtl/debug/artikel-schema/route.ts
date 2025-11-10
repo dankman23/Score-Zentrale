@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { connectToMSSQL } from '@/lib/db/mssql'
+import { getMssqlPool } from '@/lib/db/mssql'
 
 /**
  * GET /api/jtl/debug/artikel-schema
@@ -10,7 +10,7 @@ import { connectToMSSQL } from '@/lib/db/mssql'
  */
 export async function GET(request: NextRequest) {
   try {
-    const pool = await connectToMSSQL()
+    const pool = await getMssqlPool()
 
     // 1. Schema abrufen
     const schemaResult = await pool.request().query(`
