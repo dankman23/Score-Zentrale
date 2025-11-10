@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     console.log(`[AnalyzeV3] Email sequence generated`)
     
     // Step 3: Save to MongoDB
-    const db = await getMongoDb()
+    const db = await connectToMongoDB()
     const prospectsCollection = db.collection('prospects')
     
     const now = new Date()
