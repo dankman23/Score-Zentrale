@@ -1589,39 +1589,98 @@ export default function App() {
                 </div>
               ) : (
                 <>
-                  {/* KPI Tiles */}
+                  {/* KPI Tiles - 8 Metriken */}
                   {analyticsMetrics && (
                     <>
                       <div className="row mb-4">
                         <div className="col-md-3 mb-3">
                           <div className="card h-100">
                             <div className="card-body">
-                              <div className="label mb-2 text-uppercase small text-muted">Sessions</div>
-                              <div className="value h2 mb-0">{analyticsMetrics.sessions.toLocaleString('de-DE')}</div>
+                              <div className="d-flex justify-content-between align-items-start mb-2">
+                                <div className="label text-uppercase small text-muted">Sessions</div>
+                                <i className="bi bi-info-circle text-muted" style={{cursor:'help'}} title="Anzahl der Besuche auf Ihrer Website. Eine Session beginnt, wenn ein Nutzer die Seite öffnet und endet nach 30 Min Inaktivität."/>
+                              </div>
+                              <div className="value h2 mb-0">{analyticsMetrics.sessions?.toLocaleString('de-DE') || 0}</div>
                             </div>
                           </div>
                         </div>
                         <div className="col-md-3 mb-3">
                           <div className="card h-100">
                             <div className="card-body">
-                              <div className="label mb-2 text-uppercase small text-muted">Nutzer</div>
-                              <div className="value h2 mb-0">{analyticsMetrics.users.toLocaleString('de-DE')}</div>
+                              <div className="d-flex justify-content-between align-items-start mb-2">
+                                <div className="label text-uppercase small text-muted">Nutzer</div>
+                                <i className="bi bi-info-circle text-muted" style={{cursor:'help'}} title="Einzigartige Besucher Ihrer Website (basierend auf Cookies/Client-ID). Ein Nutzer kann mehrere Sessions haben."/>
+                              </div>
+                              <div className="value h2 mb-0">{analyticsMetrics.users?.toLocaleString('de-DE') || 0}</div>
                             </div>
                           </div>
                         </div>
                         <div className="col-md-3 mb-3">
                           <div className="card h-100">
                             <div className="card-body">
-                              <div className="label mb-2 text-uppercase small text-muted">Ø Session-Dauer</div>
-                              <div className="value h2 mb-0">{Math.round(analyticsMetrics.avgSessionDuration)}s</div>
+                              <div className="d-flex justify-content-between align-items-start mb-2">
+                                <div className="label text-uppercase small text-muted">Seitenaufrufe</div>
+                                <i className="bi bi-info-circle text-muted" style={{cursor:'help'}} title="Gesamtzahl der aufgerufenen Seiten. Mehrfache Aufrufe derselben Seite werden gezählt."/>
+                              </div>
+                              <div className="value h2 mb-0">{analyticsMetrics.pageViews?.toLocaleString('de-DE') || 0}</div>
                             </div>
                           </div>
                         </div>
                         <div className="col-md-3 mb-3">
                           <div className="card h-100">
                             <div className="card-body">
-                              <div className="label mb-2 text-uppercase small text-muted">Bounce Rate</div>
-                              <div className="value h2 mb-0">{(analyticsMetrics.bounceRate * 100).toFixed(1)}%</div>
+                              <div className="d-flex justify-content-between align-items-start mb-2">
+                                <div className="label text-uppercase small text-muted">Conversions</div>
+                                <i className="bi bi-info-circle text-muted" style={{cursor:'help'}} title="Anzahl der Kaufabschlüsse (purchase Events) in Ihrem Online-Shop."/>
+                              </div>
+                              <div className="value h2 mb-0">{analyticsMetrics.conversions?.toLocaleString('de-DE') || 0}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="row mb-4">
+                        <div className="col-md-3 mb-3">
+                          <div className="card h-100">
+                            <div className="card-body">
+                              <div className="d-flex justify-content-between align-items-start mb-2">
+                                <div className="label text-uppercase small text-muted">Umsatz</div>
+                                <i className="bi bi-info-circle text-muted" style={{cursor:'help'}} title="Gesamtumsatz aus abgeschlossenen Käufen (E-Commerce Tracking). Basiert auf purchase-Events mit revenue-Wert."/>
+                              </div>
+                              <div className="value h2 mb-0">{fmtCurrency(analyticsMetrics.revenue || 0)}</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-md-3 mb-3">
+                          <div className="card h-100">
+                            <div className="card-body">
+                              <div className="d-flex justify-content-between align-items-start mb-2">
+                                <div className="label text-uppercase small text-muted">Ø Session-Dauer</div>
+                                <i className="bi bi-info-circle text-muted" style={{cursor:'help'}} title="Durchschnittliche Dauer einer Session in Sekunden. Zeigt, wie lange Nutzer auf Ihrer Website verweilen."/>
+                              </div>
+                              <div className="value h2 mb-0">{Math.round(analyticsMetrics.avgSessionDuration || 0)}s</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-md-3 mb-3">
+                          <div className="card h-100">
+                            <div className="card-body">
+                              <div className="d-flex justify-content-between align-items-start mb-2">
+                                <div className="label text-uppercase small text-muted">Bounce Rate</div>
+                                <i className="bi bi-info-circle text-muted" style={{cursor:'help'}} title="Prozentsatz der Besuche, bei denen nur eine Seite aufgerufen wurde. Niedrige Werte = besseres Engagement."/>
+                              </div>
+                              <div className="value h2 mb-0">{((analyticsMetrics.bounceRate || 0) * 100).toFixed(1)}%</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-md-3 mb-3">
+                          <div className="card h-100">
+                            <div className="card-body">
+                              <div className="d-flex justify-content-between align-items-start mb-2">
+                                <div className="label text-uppercase small text-muted">Conv. Rate</div>
+                                <i className="bi bi-info-circle text-muted" style={{cursor:'help'}} title="Conversion Rate: Prozentsatz der Sessions, die zu einem Kauf geführt haben. Zeigt die Effektivität Ihrer Website."/>
+                              </div>
+                              <div className="value h2 mb-0">{analyticsMetrics.sessions > 0 ? ((analyticsMetrics.conversions / analyticsMetrics.sessions) * 100).toFixed(2) : 0}%</div>
                             </div>
                           </div>
                         </div>
