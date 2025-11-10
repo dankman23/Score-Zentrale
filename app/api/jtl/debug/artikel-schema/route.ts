@@ -27,9 +27,7 @@ export async function GET(request: NextRequest) {
     // 2. Artikel-Typen zählen
     const countResult = await pool.request().query(`
       SELECT 
-        COUNT(*) as total,
-        SUM(CASE WHEN nAktiv = 1 THEN 1 ELSE 0 END) as aktiv,
-        SUM(CASE WHEN nAktiv = 0 THEN 1 ELSE 0 END) as inaktiv
+        COUNT(*) as total
       FROM tArtikel
     `)
 
