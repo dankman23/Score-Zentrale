@@ -4,6 +4,64 @@
  */
 
 export const GLOSSARY = {
+  // Relevante Branchen für Schleifwerkzeuge (aus PDF)
+  branchen: [
+    // Automobilindustrie & Fahrzeugbau
+    'Automobilindustrie', 'Fahrzeugbau', 'Karosseriebau', 'KFZ-Werkstatt', 
+    'Automobilzulieferer', 'Nutzfahrzeugbau', 'Fahrzeugreparatur',
+    
+    // Metallverarbeitung & Stahlbau
+    'Metallverarbeitung', 'Metallbau', 'Schlosserei', 'Bauschlosserei',
+    'Stahlbau', 'Stahlkonstruktion', 'Schweißtechnik', 'Schweißbetrieb',
+    'Blechbearbeitung', 'Profilbearbeitung',
+    
+    // Maschinen- und Apparatebau
+    'Maschinenbau', 'Sondermaschinenbau', 'Apparatebau', 'Anlagenbau',
+    'Behälterbau', 'Rohrbau', 'Werkzeugbau', 'Formenbau', 'Vorrichtungsbau',
+    
+    // Luft- und Raumfahrt
+    'Luftfahrt', 'Flugzeugbau', 'Flugzeugwartung', 'Triebwerksbau',
+    'Raumfahrt', 'Aerospace', 'Luftfahrtindustrie',
+    
+    // Schiff- und Bahnindustrie
+    'Schiffbau', 'Werft', 'Marinebau', 'Bootsbau',
+    'Bahnindustrie', 'Schienenfahrzeugbau', 'Gleisbau', 'Zugbau',
+    
+    // Holz- und Möbelindustrie
+    'Holzverarbeitung', 'Holzbearbeitung', 'Schreinerei', 'Tischlerei',
+    'Möbelindustrie', 'Möbelbau', 'Möbelherstellung', 'Innenausbau',
+    'Parkettverlegung', 'Parkettleger', 'Bodenleger',
+    
+    // Gießereien und Schmieden
+    'Gießerei', 'Metallguss', 'Gussteile', 'Eisengießerei',
+    'Schmiede', 'Schmiedebetrieb', 'Kunstschmiede', 'Metallschmiede',
+    
+    // Maler- und Ausbauhandwerk
+    'Malerhandwerk', 'Malerbetrieb', 'Maler und Lackierer',
+    'Trockenbau', 'Gipskartonbau', 'Stuckateur', 'Stukkateur', 'Putzarbeiten',
+    
+    // Oberflächentechnik
+    'Oberflächentechnik', 'Oberflächenbehandlung', 'Oberflächenveredelung',
+    'Lackiererei', 'Industrielackierung', 'Pulverbeschichtung',
+    'Galvanik', 'Galvanisierung', 'Verzinkerei', 'Verchromung',
+    
+    // Glas, Stein & Keramik
+    'Glasverarbeitung', 'Glastechnik', 'Glaserei', 'Glasschleiferei',
+    'Steinmetz', 'Steinbearbeitung', 'Natursteinbearbeitung', 'Marmorbearbeitung',
+    
+    // Dental & Medizintechnik
+    'Dentallabor', 'Zahntechnik', 'Dentaltechnik', 'Zahnersatz',
+    
+    // Schmuck & Gravur
+    'Goldschmied', 'Schmuckherstellung', 'Juwelier', 'Schmuckwerkstatt',
+    'Gravur', 'Gravierwerkstatt', 'Lasergravur', 'Gravierdienst',
+    
+    // Kunststoff & Sonstige
+    'Kunststoffverarbeitung', 'Kunststofftechnik', 'Spritzguss',
+    'Modellbau', 'Prototypenbau', 'Modellbauer',
+    'Messerschmiede', 'Messermacher', 'Messerherstellung'
+  ],
+
   anwendungen: [
     'Abrichten', 'Anfasen', 'Anrauen', 'Anschleifen', 'Aufrauen', 'Bürsten',
     'Definiertes Schliffbild', 'Egalisieren', 'Entgraten', 'Entlacken', 'Entrosten',
