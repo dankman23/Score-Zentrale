@@ -1089,17 +1089,51 @@ export default function App() {
     }
   }
 
-  const loadArtikel = async () => {
+  // Lädt verfügbare Filter-Optionen
+  const loadArtikelFilters = async () => {
     try {
-      const res = await fetch('/api/jtl/articles/import/status')
+      const res = await fetch('/api/jtl/articles/filters')
       const data = await res.json()
       if (data.ok) {
-        // Für jetzt einfach die letzten importierten anzeigen
-        // Später: Richtige List-API mit Filter & Pagination
-        setArtikelList(data.lastImported || [])
+        setAvailableHerstellerArtikel(data.hersteller || [])
+        setAvailableWarengruppenArtikel(data.warengruppen || [])
+      }
+    } catch (e) {
+      console.error('Error loading artikel filters:', e)
+    }
+  }
+
+  // Lädt Artikel-Liste mit Filter & Pagination
+  const loadArtikelList = async () => {
+    setArtikelLoading(true)
+    try {
+      const params = new URLSearchParams({
+        page: String(artikelPage),
+        limit: String(artikelPerPage),
+        sortBy: artikelSortBy,
+        sortOrder: artikelSortOrder
+      })
+
+      if (artikelFilter.search) params.append('search', artikelFilter.search)
+      if (artikelFilter.hersteller) params.append('hersteller', artikelFilter.hersteller)
+      if (artikelFilter.warengruppe) params.append('warengruppe', artikelFilter.warengruppe)
+
+      const res = await fetch('/api/jtl/articles/list?' + params.toString())
+      const data = await res.json()
+      
+      if (data.ok) {
+        setArtikelList(data.articles || [])
+        setArtikelTotal(data.pagination?.total || 0)
+        setArtikelTotalPages(data.pagination?.totalPages || 0)
+      } else {
+        console.error('Error loading articles:', data.error)
+        setArtikelList([])
       }
     } catch (e) {
       console.error('Error loading artikel:', e)
+      setArtikelList([])
+    } finally {
+      setArtikelLoading(false)
     }
   }
 
