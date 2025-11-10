@@ -254,36 +254,81 @@ def test_email_v3_send(prospect_id=None):
         log_test("❌ TEST 2 FAILED: email-v3/send has issues")
     
     return success
+
+def test_followup_auto():
+    """
+    Test 3: GET /api/coldleads/followup/auto (Auto Follow-up Check)
     
-    # Check pagination structure
-    pagination = data["pagination"]
-    required_pagination_fields = ["page", "limit", "total", "totalPages", "hasNext", "hasPrev"]
-    for field in required_pagination_fields:
-        if field not in pagination:
-            print(f"❌ Missing pagination field: {field}")
-            return False
+    Erwartung:
+    - 200 OK mit { ok: true }
+    - Response enthält sent, errors, timestamp
+    - API läuft ohne Crash
+    - Falls keine fällig: sent=0, errors=0
+    """
+    log_test("=" * 60)
+    log_test("TEST 3: GET /api/coldleads/followup/auto (Auto Follow-up Check)")
+    log_test("=" * 60)
     
-    # Check filters structure
-    filters = data["filters"]
-    if not isinstance(filters, dict):
-        print(f"❌ filters is not an object")
+    status, response = test_api_endpoint('GET', '/coldleads/followup/auto')
+    
+    if status is None:
+        log_test("❌ CRITICAL: API request failed completely")
         return False
     
-    # Check article structure if articles exist
-    if len(data["articles"]) > 0:
-        first_article = data["articles"][0]
-        required_article_fields = ["kArtikel", "cArtNr", "cName", "cHerstellerName", "cWarengruppenName", "fVKNetto", "fEKNetto", "margin_percent"]
-        for field in required_article_fields:
-            if field not in first_article:
-                print(f"❌ Missing article field: {field}")
-                return False
+    success = True
     
-    print(f"✅ List response structure valid")
-    print(f"📊 Articles count: {len(data['articles'])}")
-    print(f"📊 Total articles: {pagination['total']}")
-    print(f"📊 Page: {pagination['page']}, Limit: {pagination['limit']}")
+    if status != 200:
+        log_test(f"❌ Expected status 200, got {status}")
+        success = False
+    else:
+        log_test("✅ Status 200 OK")
     
-    return True
+    if isinstance(response, dict):
+        # Check required fields
+        required_fields = ['ok', 'sent', 'errors', 'timestamp']
+        for field in required_fields:
+            if field in response:
+                log_test(f"✅ Response has {field}: {response[field]}")
+                
+                # Validate field types
+                if field == 'ok' and isinstance(response[field], bool):
+                    log_test(f"✅ {field} is boolean")
+                elif field in ['sent', 'errors'] and isinstance(response[field], int):
+                    log_test(f"✅ {field} is integer")
+                elif field == 'timestamp' and isinstance(response[field], str):
+                    log_test(f"✅ {field} is string (ISO format)")
+                    # Try to parse timestamp
+                    try:
+                        datetime.fromisoformat(response[field].replace('Z', '+00:00'))
+                        log_test(f"✅ Timestamp is valid ISO format")
+                    except:
+                        log_test(f"⚠️  Timestamp format might be non-standard")
+            else:
+                log_test(f"❌ Response missing {field}")
+                success = False
+        
+        # Check if response makes sense
+        if response.get('ok') == True:
+            sent = response.get('sent', 0)
+            errors = response.get('errors', 0)
+            log_test(f"✅ Follow-up results: {sent} sent, {errors} errors")
+            
+            if sent == 0 and errors == 0:
+                log_test("✅ No follow-ups due (expected for fresh system)")
+            elif sent > 0:
+                log_test(f"✅ {sent} follow-ups sent successfully")
+            elif errors > 0:
+                log_test(f"⚠️  {errors} follow-up errors (may be expected)")
+        else:
+            log_test("❌ Response ok=false")
+            success = False
+    
+    if success:
+        log_test("✅ TEST 3 PASSED: followup/auto working correctly")
+    else:
+        log_test("❌ TEST 3 FAILED: followup/auto has issues")
+    
+    return success
 
 def test_search_functionality(data: Dict[str, Any], search_term: str) -> bool:
     """Test if search results contain the search term"""
