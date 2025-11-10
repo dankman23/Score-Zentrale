@@ -227,27 +227,38 @@ function identifyBusinessType(text: string, fullText: string) {
     result.mainActivity = 'Hersteller und Handel'
   }
   
-  // Extrahiere konkrete Produkte/Dienstleistungen
+  // Extrahiere konkrete Produkte/Dienstleistungen - VERBESSERT
   const productPatterns = [
-    /(?:herstell(?:en|ung)|produzi(?:eren|ert)|fertigung) (?:von )?([a-zäöüß\s,-]{5,50})/gi,
-    /(?:unser(?:e)? produkt(?:e)?:|angebot:)\s*([a-zäöüß\s,-]{10,100})/gi,
-    /(?:spezialisiert auf|expertise in|schwerpunkt)\s*([a-zäöüß\s,-]{10,80})/gi
+    /(?:herstell(?:en|ung|t)|produzi(?:eren|ert)|fertigung|fertigen) (?:von |für )?([A-ZÄÖÜ][a-zäöüß\s,\-]{8,45})/g,
+    /(?:produkte?:|angebot:|leistungen?:)\s*([A-ZÄÖÜ][a-zäöüß\s,\-]{8,45})/g,
+    /(?:spezialisiert auf|expertise (?:in|für)|schwerpunkt|kernkompetenz)\s*([A-ZÄÖÜ][a-zäöüß\s,\-]{8,45})/g
   ]
+  
+  const foundProducts = new Set<string>()
   
   productPatterns.forEach(pattern => {
     const matches = fullText.matchAll(pattern)
     for (const match of matches) {
       if (match[1]) {
-        const cleaned = match[1].trim().replace(/\s+/g, ' ')
-        if (cleaned.length > 5 && cleaned.length < 60) {
-          result.products.push(cleaned)
+        let cleaned = match[1].trim()
+        // Entferne trailing Satzzeichen und Artikel
+        cleaned = cleaned.replace(/[,.\-:;!?]+$/, '').trim()
+        cleaned = cleaned.replace(/^(der|die|das|den|dem|des|ein|eine|eines)\s+/i, '')
+        cleaned = cleaned.replace(/\s+/g, ' ')
+        
+        // Filter: Mindestlänge, keine reinen Zahlen, keine sehr kurzen Wörter
+        if (cleaned.length >= 10 && cleaned.length <= 50 && !/^\d+$/.test(cleaned)) {
+          // Filter zu generische Begriffe aus
+          const generic = ['unternehmen', 'firma', 'betrieb', 'gesellschaft', 'gmbh', 'ag']
+          if (!generic.some(g => cleaned.toLowerCase().includes(g))) {
+            foundProducts.add(cleaned)
+          }
         }
       }
     }
   })
   
-  // Dedupliziere und limitiere
-  result.products = [...new Set(result.products)].slice(0, 5)
+  result.products = Array.from(foundProducts).slice(0, 5)
   
   return result
 }
