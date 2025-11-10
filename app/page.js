@@ -2635,6 +2635,182 @@ export default function App() {
         </div>
       )}
 
+      {/* Glossar (eigener Tab) */}
+      {activeTab==='glossar' && (
+        <div>
+          <h3 className="mb-4"><i className="bi bi-book mr-2"/>Produkt-Glossar</h3>
+          
+          <div className="alert alert-info mb-4">
+            <i className="bi bi-info-circle mr-2"/>
+            <strong>Kontrolliertes Vokabular</strong> für die Kaltakquise-Analyse. Diese Begriffe werden automatisch auf Firmen-Websites erkannt.
+          </div>
+
+          {/* Sub-Tabs für Glossar-Kategorien */}
+          <ul className="nav nav-pills mb-4">
+            <li className="nav-item">
+              <a className={`nav-link ${glossarSub==='anwendungen'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setGlossarSub('anwendungen')}}>
+                <i className="bi bi-tools mr-1"/>Anwendungen <span className="badge badge-light ml-1">71</span>
+              </a>
+            </li>
+            <li className="nav-item ml-2">
+              <a className={`nav-link ${glossarSub==='kategorien'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setGlossarSub('kategorien')}}>
+                <i className="bi bi-grid mr-1"/>Kategorien <span className="badge badge-light ml-1">88</span>
+              </a>
+            </li>
+            <li className="nav-item ml-2">
+              <a className={`nav-link ${glossarSub==='werkstoffe'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setGlossarSub('werkstoffe')}}>
+                <i className="bi bi-layers mr-1"/>Werkstoffe <span className="badge badge-light ml-1">90</span>
+              </a>
+            </li>
+            <li className="nav-item ml-2">
+              <a className={`nav-link ${glossarSub==='maschinen'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setGlossarSub('maschinen')}}>
+                <i className="bi bi-gear mr-1"/>Maschinentypen <span className="badge badge-light ml-1">62</span>
+              </a>
+            </li>
+            <li className="nav-item ml-2">
+              <a className={`nav-link ${glossarSub==='branchen'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setGlossarSub('branchen')}}>
+                <i className="bi bi-building mr-1"/>Branchen <span className="badge badge-light ml-1">8</span>
+              </a>
+            </li>
+          </ul>
+
+          {/* Glossar Content */}
+          <div className="card">
+            <div className="card-body">
+              <div className="mb-3">
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  placeholder="Begriffe durchsuchen..."
+                  value={glossarSearch}
+                  onChange={(e) => setGlossarSearch(e.target.value)}
+                />
+              </div>
+
+              {glossarSub === 'anwendungen' && (
+                <div>
+                  <h5 className="mb-3">Anwendungen (71 Begriffe)</h5>
+                  <div className="alert alert-secondary">
+                    <small>Abrichten, Anfasen, Anrauen, Anschleifen, Aufrauen, Bürsten, Definiertes Schliffbild, Egalisieren, Entgraten, Entlacken, Entrosten, Entzundern, Feilen, Feinschleifen, Flachschleifen, Fräsen, Gleitschleifen, Glätten, Gravieren, Hochglanzpolieren, Hochglanzverdichten, Honen, Kalibrieren, Kantenbrechen, Kantenverrunden, Läppen, Materialabtragung, Materialtrennung, Mattieren, Oberflächenfinish, Oberflächenveredelung, Oberflächenvorbereitung, Polieren, Raspeln, Reinigen, Rundschleifen, Satinieren, Säubern, Schärfen, Schleifen, Schruppschleifen, Schwabbeln, Schweißnahtbearbeitung, Schweißnahtvorbereitung, Strukturieren, Superfinish, Trennen, Trowalisieren, Innenrundschleifen, Kehlnahtbearbeitung, Besäumen, Feinschliff, Grobschliff, Mittelschliff, Nachschliff, Vorschliff, Glättung, Gravur, Kantenverrundung, Mattierung, Politur, Reinigung, Schliff, Schruppschliff, Strukturierung, Nassschliff, Nassschleifen, Flächenbearbeitung, Kantenbearbeitung</small>
+                  </div>
+                </div>
+              )}
+
+              {glossarSub === 'kategorien' && (
+                <div>
+                  <h5 className="mb-3">Produktkategorien (88 Begriffe)</h5>
+                  <div className="alert alert-secondary" style={{maxHeight: '400px', overflowY: 'auto'}}>
+                    <small>Schleifbänder, Schleifpapier / Schleifrollen / Schleifbögen, Schleifscheiben / Schleifblätter, Trennscheiben, Fächerscheiben, Fiberscheiben, Diamanttrennscheiben, Spezielle Schleifscheiben, Vliesprodukte, Fräser / Frässtifte, Technische Bürsten, Schleifstifte, Schleifsteine, Fächerschleifer / Schleifmops, Feilen, Fächerräder / Schleifräder / Schleifwalzen, Graphitbelag, Klettbelag, Schleifteller / Schleifmittelträger, Sonstige Schleif-, Trenn- und Bohrwerkzeuge, Schruppscheiben, Polierscheiben, Schleifbockscheiben, Grobreinigungsscheiben, Gitterscheiben, Vliesscheiben, Kompaktscheiben, Schnellwechselscheiben, Schleiftöpfe, Vliesbänder, Vliesstifte, Vliesräder, und weitere...</small>
+                  </div>
+                </div>
+              )}
+
+              {glossarSub === 'werkstoffe' && (
+                <div>
+                  <h5 className="mb-3">Werkstoffe (90 Begriffe)</h5>
+                  <div className="alert alert-secondary" style={{maxHeight: '400px', overflowY: 'auto'}}>
+                    <small>Aluguss, Aluminium, Bleche, Chromstahl, Nickelstahl, Chrome, Edelstahl, Guss, Hochlegierte Stähle, Kohlenstoffstahl, Legierte Stähle, Legierungen, Leichtmetalle, NE-Metalle, Sandwichmaterial, Stahl, Titan, Abrasive Materialien, Beton, Glas, Granit, Keramik, Marmor, Naturstein, Holz, Kunststoff, und weitere...</small>
+                  </div>
+                </div>
+              )}
+
+              {glossarSub === 'maschinen' && (
+                <div>
+                  <h5 className="mb-3">Maschinentypen (62 Begriffe)</h5>
+                  <div className="alert alert-secondary" style={{maxHeight: '400px', overflowY: 'auto'}}>
+                    <small>Schleifklotz, Handpad, Handfeile, Exzenterschleifer, Schwingschleifer, Dreieckschleifer, Bandschleifer, Geradschleifer, Winkelschleifer, Poliermaschine, Satiniermaschine, Breitbandschleifmaschine, Kantenschleifmaschine, Schleifbock, CNC-Schleifmaschine, Roboter-Schleifanlage, und weitere...</small>
+                  </div>
+                </div>
+              )}
+
+              {glossarSub === 'branchen' && (
+                <div>
+                  <h5 className="mb-3">Relevante Branchen (8 Hauptbranchen)</h5>
+                  <div className="alert alert-info mb-3">
+                    <i className="bi bi-info-circle mr-2"/>
+                    Diese Branchen sind primäre Zielgruppen für Schleif-, Trenn- und Polierwerkzeuge im DACH-Raum.
+                  </div>
+                  <div className="row">
+                    <div className="col-md-6 mb-3">
+                      <div className="card bg-dark border-secondary">
+                        <div className="card-body">
+                          <h6 className="text-primary"><i className="bi bi-car-front mr-2"/>Automobilindustrie</h6>
+                          <p className="text-muted small mb-0">Fahrzeug- und Karosseriebau</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <div className="card bg-dark border-secondary">
+                        <div className="card-body">
+                          <h6 className="text-primary"><i className="bi bi-wrench mr-2"/>Metallverarbeitung</h6>
+                          <p className="text-muted small mb-0">Schlosserei & Stahlbau</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <div className="card bg-dark border-secondary">
+                        <div className="card-body">
+                          <h6 className="text-primary"><i className="bi bi-gear mr-2"/>Maschinen- und Apparatebau</h6>
+                          <p className="text-muted small mb-0">inkl. Behälter- und Rohrbau</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <div className="card bg-dark border-secondary">
+                        <div className="card-body">
+                          <h6 className="text-primary"><i className="bi bi-airplane mr-2"/>Luft- und Raumfahrt</h6>
+                          <p className="text-muted small mb-0">Flugzeugbau, -wartung</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <div className="card bg-dark border-secondary">
+                        <div className="card-body">
+                          <h6 className="text-primary"><i className="bi bi-train-front mr-2"/>Schiff- und Bahnindustrie</h6>
+                          <p className="text-muted small mb-0">Schiffbau, Schienenfahrzeuge</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <div className="card bg-dark border-secondary">
+                        <div className="card-body">
+                          <h6 className="text-primary"><i className="bi bi-tree mr-2"/>Holz- und Möbelindustrie</h6>
+                          <p className="text-muted small mb-0">Innenausbau, Parkett</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <div className="card bg-dark border-secondary">
+                        <div className="card-body">
+                          <h6 className="text-primary"><i className="bi bi-hammer mr-2"/>Gießereien und Schmieden</h6>
+                          <p className="text-muted small mb-0">Metallguss, Schmiedearbeiten</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <div className="card bg-dark border-secondary">
+                        <div className="card-body">
+                          <h6 className="text-primary"><i className="bi bi-paint-bucket mr-2"/>Maler- und Ausbauhandwerk</h6>
+                          <p className="text-muted small mb-0">Trockenbau, Ausbau</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="alert alert-secondary mt-3">
+                    <h6 className="mb-2">📊 Branchenfamilien (Cluster)</h6>
+                    <ul className="mb-0">
+                      <li><strong>Metallbau / Apparate-/Maschinenbau:</strong> Schlossereibetriebe, Stahlbau, Anlagen- und Behälterbau</li>
+                      <li><strong>Fahrzeug- und Schienenbau:</strong> Automobilhersteller, Nutzfahrzeuge, Schienen- und Schiffbaubetriebe</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Warmakquise */}
       {activeTab==='warmakquise' && (
         <div>
