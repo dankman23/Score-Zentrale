@@ -405,3 +405,141 @@ export async function fetchTopProductPages(
     throw new Error('Failed to fetch top product pages');
   }
 }
+
+/**
+ * Fetch info pages (pages ending with -info/)
+ */
+export async function fetchInfoPages(
+  startDate: string = '30daysAgo',
+  endDate: string = 'today'
+): Promise<PageMetrics[]> {
+  const client = getAnalyticsClient();
+  const propertyId = getPropertyId();
+
+  try {
+    const [response] = await client.runReport({
+      property: `properties/${propertyId}`,
+      dateRanges: [{ startDate, endDate }],
+      dimensions: [
+        { name: 'pagePath' },
+        { name: 'pageTitle' },
+      ],
+      metrics: [
+        { name: 'sessions' },
+        { name: 'totalUsers' },
+        { name: 'userEngagementDuration' },
+      ],
+      dimensionFilter: {
+        filter: {
+          fieldName: 'pagePath',
+          stringFilter: {
+            matchType: 'CONTAINS' as const,
+            value: '-info/' // Info-Seiten enthalten "-info/"
+          }
+        }
+      },
+      orderBys: [
+        { metric: { metricName: 'sessions' }, desc: true }
+      ],
+    });
+
+    if (!response.rows || response.rows.length === 0) {
+      return [];
+    }
+
+    return response.rows.map(row => {
+      const dimensionValues = row.dimensionValues || [];
+      const metricValues = row.metricValues || [];
+
+      const pageViews = parseInt(metricValues[0]?.value || '0', 10);
+      const totalUsers = parseInt(metricValues[1]?.value || '0', 10);
+      const userEngagementDuration = parseFloat(metricValues[2]?.value || '0');
+      
+      return {
+        pagePath: dimensionValues[0]?.value || '',
+        pageTitle: dimensionValues[1]?.value || '',
+        pageViews: pageViews,
+        uniquePageViews: totalUsers,
+        avgTimeOnPage: totalUsers > 0 ? userEngagementDuration / totalUsers : 0,
+      };
+    });
+  } catch (error) {
+    console.error('Error fetching info pages:', error);
+    throw new Error('Failed to fetch info pages');
+  }
+}
+
+/**
+ * Fetch Beileger success metrics (pages under /account/ path)
+ */
+export async function fetchBeilegerMetrics(
+  startDate: string = '30daysAgo',
+  endDate: string = 'today'
+): Promise<{ totalVisits: number; uniqueVisitors: number; pages: PageMetrics[] }> {
+  const client = getAnalyticsClient();
+  const propertyId = getPropertyId();
+
+  try {
+    const [response] = await client.runReport({
+      property: `properties/${propertyId}`,
+      dateRanges: [{ startDate, endDate }],
+      dimensions: [
+        { name: 'pagePath' },
+        { name: 'pageTitle' },
+      ],
+      metrics: [
+        { name: 'sessions' },
+        { name: 'totalUsers' },
+        { name: 'userEngagementDuration' },
+      ],
+      dimensionFilter: {
+        filter: {
+          fieldName: 'pagePath',
+          stringFilter: {
+            matchType: 'BEGINS_WITH' as const,
+            value: '/account/' // Beileger führt zu /account/ Seiten
+          }
+        }
+      },
+      orderBys: [
+        { metric: { metricName: 'sessions' }, desc: true }
+      ],
+    });
+
+    if (!response.rows || response.rows.length === 0) {
+      return { totalVisits: 0, uniqueVisitors: 0, pages: [] };
+    }
+
+    let totalVisits = 0;
+    let totalUsers = 0;
+
+    const pages = response.rows.map(row => {
+      const dimensionValues = row.dimensionValues || [];
+      const metricValues = row.metricValues || [];
+
+      const pageViews = parseInt(metricValues[0]?.value || '0', 10);
+      const users = parseInt(metricValues[1]?.value || '0', 10);
+      const userEngagementDuration = parseFloat(metricValues[2]?.value || '0');
+      
+      totalVisits += pageViews;
+      totalUsers += users;
+
+      return {
+        pagePath: dimensionValues[0]?.value || '',
+        pageTitle: dimensionValues[1]?.value || '',
+        pageViews: pageViews,
+        uniquePageViews: users,
+        avgTimeOnPage: users > 0 ? userEngagementDuration / users : 0,
+      };
+    });
+
+    return {
+      totalVisits,
+      uniqueVisitors: totalUsers,
+      pages
+    };
+  } catch (error) {
+    console.error('Error fetching Beileger metrics:', error);
+    throw new Error('Failed to fetch Beileger metrics');
+  }
+}
