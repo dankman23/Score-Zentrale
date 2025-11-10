@@ -618,6 +618,17 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Analytics Dashboard erweitert: (1) 8 KPI Tiles mit Info-Buttons und Hover-Erklärungen (Sessions, Nutzer, Seitenaufrufe, Conversions, Umsatz, Ø Session-Dauer, Bounce Rate, Conv. Rate), (2) Product Pages mit expand/collapse (Top 10 initial, bis zu 100 beim Ausklappen), (3) Neue Sektion 'Info-Seiten Performance' mit Tabelle aller Info-Seiten (-info/ URLs), (4) Neue Sektion 'Erfolg von Beileger' mit Gesamtsumme (totalVisits, uniqueVisitors) und Detailtabelle für alle /account/ Seiten. Alle Sektionen vor 'Top 100 Alle Seiten' platziert. loadAnalytics aktualisiert um Info Pages und Beileger APIs zu laden."
+  - task: "DACH Crawler Frontend UI (Tab, Form, Stats, Progress Table)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Neu implementiert: DACH-Crawler UI im Kaltakquise-Modul. (1) Neuer Tab 'DACH-Crawler' neben 'Google-Suche' mit grüner Gradient-Card, (2) Dropdown-Formular: Land (DE/AT/CH) → Region (alle Bundesländer/Kantone) → Branche (5 Kategorien) → Limit → 'Start Crawl' Button, (3) Live-Statistiken: 4 KPI-Cards (Regionen crawled, Firmen gefunden, Abdeckung %, In Datenbank), (4) Fortschritts-Tabelle mit letzten Crawls (Land, Region, Branche, Status Badge, Gefunden, Datum). State-Variablen: dachCrawlerForm, dachCrawlerStats, dachCrawlerProgress, dachCrawlerLoading. Funktionen: loadDachStats(), loadDachProgress(), startDachCrawl(). Integration mit bestehenden cold_prospects."
 metadata:
   created_by: "main_agent"
   version: "1.1"
