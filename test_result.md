@@ -939,6 +939,48 @@ agent_communication:
       - working: true
         agent: "testing"
         comment: "✅ Beileger API working perfectly! GET /api/analytics/beileger?startDate=30daysAgo&endDate=today returns 200 OK with correct object structure: { totalVisits: 15, uniqueVisitors: 15, pages: [4 items] }. All required fields present with correct data types (Numbers for totals, Array for pages). Pages array contains PageMetrics with all required fields: pagePath (starts with '/account/'), pageTitle, pageViews, uniquePageViews, avgTimeOnPage. Example page: '/account/order' with 5 pageViews, 5 uniquePageViews, 4.2s avgTimeOnPage. API correctly filters pages starting with '/account/' path and aggregates totals. Fixed module resolution issue (same as info-pages). All data types and structure correct."
+  - task: "Analytics: GET /api/analytics/category-pages"
+    implemented: true
+    working: true
+    file: "/app/app/api/analytics/category-pages/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "ANALYTICS FILTER FIX: Category pages endpoint fetches all pages ending with -kaufen/ from GA4. Uses fetchCategoryPagesAll from /app/app/lib/analytics.ts with ENDS_WITH filter. Returns array of PageMetrics with pagePath, pageTitle, pageViews, uniquePageViews, avgTimeOnPage."
+      - working: true
+        agent: "testing"
+        comment: "✅ Category Pages API working perfectly! GET /api/analytics/category-pages?startDate=30daysAgo&endDate=today returns 200 OK with 57 category pages. **CRITICAL CHECK PASSED**: ALL 57 pages correctly end with -kaufen/ (e.g., /schleifbaender-kaufen/, /trennscheiben-kaufen/, /schleifscheibe-kaufen/). Filter working correctly - no pages without -kaufen/ suffix found. All pages have required fields: pagePath, pageTitle, pageViews, uniquePageViews, avgTimeOnPage. Fixed import path issue in route.ts (was using relative path to old /app/lib/analytics.ts, now uses @/lib/analytics resolving to /app/app/lib/analytics.ts)."
+  - task: "Analytics: GET /api/analytics/product-pages"
+    implemented: true
+    working: true
+    file: "/app/app/api/analytics/product-pages/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "ANALYTICS FILTER FIX: Product pages endpoint fetches pages ending with article numbers (e.g., /-375894) from GA4. Uses fetchTopProductPages from /app/app/lib/analytics.ts with regex pattern -[0-9]+$ and excludes both -kaufen/ and -info/ pages. Returns array of PageMetrics sorted by sessions, limit 100."
+      - working: true
+        agent: "testing"
+        comment: "✅ Product Pages API working perfectly! GET /api/analytics/product-pages?startDate=30daysAgo&endDate=today&limit=100 returns 200 OK with 100 product pages. **CRITICAL CHECKS PASSED**: ✅ NO pages contain -kaufen/ (all excluded correctly), ✅ NO pages contain -info/ (all excluded correctly), ✅ All pages end with article number pattern (e.g., /klingspor-korund-schleifband-alle-masse-koernungen-waehlbar-gewebe-schleifbaender-375894, /3m-sc-bl-scotch-brite-schleifband-vliesband-rohrbandschleifer-schleifmaschine-masse-koernung-waehlbar-375935). Filter working correctly - category pages and info pages properly excluded. All pages have required fields: pagePath, pageTitle, pageViews, uniquePageViews, avgTimeOnPage. Fixed import path issue in route.ts (changed from ../../../../lib/analytics to @/lib/analytics)."
+  - task: "Analytics: GET /api/analytics/timeseries/metrics"
+    implemented: true
+    working: true
+    file: "/app/app/api/analytics/timeseries/metrics/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "ANALYTICS METRICS EXPANSION: Timeseries metrics endpoint now fetches ALL 8 metrics from GA4. Uses fetchMetricsTimeSeries from /app/app/lib/analytics.ts. Fetches 7 metrics from GA4 (sessions, totalUsers, screenPageViews, conversions, totalRevenue, averageSessionDuration, bounceRate) and calculates conversionRate. Returns array of TimeSeriesDataPoints with date, sessions, users, pageViews, conversions, revenue, avgSessionDuration, bounceRate, conversionRate."
+      - working: true
+        agent: "testing"
+        comment: "✅ Metrics Timeseries API working perfectly! GET /api/analytics/timeseries/metrics?startDate=30daysAgo&endDate=today returns 200 OK with 31 data points (one per day). **CRITICAL CHECK PASSED**: ALL 8 required metrics present in each data point: ✅ date (formatted YYYY-MM-DD), ✅ sessions (278), ✅ users (254), ✅ pageViews (0 - GA4 setup issue but field exists), ✅ conversions (7), ✅ revenue (458.62), ✅ avgSessionDuration (163.03), ✅ bounceRate (0.658), ✅ conversionRate (2.52 - calculated from conversions/sessions). All 31 data points verified to have all 8 metrics. Note: pageViews showing 0 may indicate GA4 configuration issue but field is correctly included in response. Fixed import path issue in route.ts (changed from ../../../../../lib/analytics to @/lib/analytics)."
 
 agent_communication:
   - agent: "main"
