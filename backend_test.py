@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 
 # Base URL from environment
-BASE_URL = "https://sales-acq-hub.preview.emergentagent.com/api"
+BASE_URL = "https://sales-dashboard-179.preview.emergentagent.com/api"
 
 # Test date range (last 30 days as specified)
 FROM_DATE = "2025-10-10"
