@@ -3046,6 +3046,78 @@ export default function App() {
           </div>
           )}
 
+          {/* EMAIL POSTEINGANG */}
+          {showInbox && (
+            <div className="card mb-4">
+              <div className="card-header bg-transparent d-flex align-items-center justify-content-between">
+                <h5 className="mb-0"><i className="bi bi-inbox-fill mr-2"/>Email-Posteingang</h5>
+                <div>
+                  <button className="btn btn-sm btn-info mr-2" onClick={loadInbox} disabled={inboxLoading}>
+                    <i className="bi bi-arrow-repeat mr-1"/>{inboxLoading ? 'Lädt...' : 'Aktualisieren'}
+                  </button>
+                  <button className="btn btn-sm btn-outline-secondary" onClick={()=>setShowInbox(false)}>
+                    <i className="bi bi-x-lg"/>
+                  </button>
+                </div>
+              </div>
+              <div className="card-body p-0">
+                {inboxLoading ? (
+                  <div className="p-5 text-center">
+                    <div className="spinner-border text-info" role="status">
+                      <span className="sr-only">Loading...</span>
+                    </div>
+                  </div>
+                ) : inboxEmails.length === 0 ? (
+                  <div className="p-5 text-center text-muted">
+                    <i className="bi bi-inbox" style={{fontSize:'3rem', opacity:0.3}}/>
+                    <p className="mt-3">Keine Emails im Posteingang</p>
+                    <button className="btn btn-sm btn-info" onClick={loadInbox}>
+                      Jetzt laden
+                    </button>
+                  </div>
+                ) : (
+                  <div className="table-responsive">
+                    <table className="table table-hover mb-0">
+                      <thead className="thead-light">
+                        <tr>
+                          <th><i className="bi bi-person mr-1"/>Von</th>
+                          <th><i className="bi bi-envelope mr-1"/>Betreff</th>
+                          <th><i className="bi bi-calendar mr-1"/>Datum</th>
+                          <th className="text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {inboxEmails.map((email, i) => (
+                          <tr key={i} style={{cursor:'pointer'}}>
+                            <td className="font-weight-bold">{email.from || 'Unbekannt'}</td>
+                            <td>
+                              <div className={email.seen ? 'text-muted' : 'font-weight-bold'}>
+                                {email.subject || '(Kein Betreff)'}
+                              </div>
+                              {email.text && (
+                                <div className="small text-muted text-truncate" style={{maxWidth:400}}>
+                                  {email.text.substring(0, 100)}...
+                                </div>
+                              )}
+                            </td>
+                            <td className="text-muted small">{email.date ? new Date(email.date).toLocaleString('de-DE') : '-'}</td>
+                            <td className="text-center">
+                              {email.seen ? (
+                                <span className="badge badge-secondary">Gelesen</span>
+                              ) : (
+                                <span className="badge badge-primary">Neu</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Alte Ansichten entfernt - jetzt als Accordions in Tabelle */}
           {false && selectedProspect && selectedProspect.analysis && (
             <div className="card border-0 shadow-lg mt-4">
