@@ -69,13 +69,7 @@ export async function POST(request: Request) {
     }
     
     // Versende Email
-    await sendEmail({
-      from: `"${SCORE_CONFIG.sender.display_name}" <${SCORE_CONFIG.sender.email}>`,
-      to: recipientEmail,
-      bcc: SCORE_CONFIG.company.email_main, // BCC an Leismann
-      subject: mailData.subject,
-      text: mailData.body
-    })
+    await sendEmail(recipientEmail, mailData.subject, mailData.body, mailData.body)
     
     console.log(`[EmailV3] Mail ${mail_number} sent to ${recipientEmail}`)
     
