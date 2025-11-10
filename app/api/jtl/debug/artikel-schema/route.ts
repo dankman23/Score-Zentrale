@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { connectToMSSQL } from '../../../../../lib/db/mssql'
+import { connectToMSSQL } from '@/lib/db/mssql'
 
 /**
  * GET /api/jtl/debug/artikel-schema
