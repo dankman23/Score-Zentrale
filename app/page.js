@@ -985,29 +985,104 @@ export default function App() {
   }
 
   const analyzeProspect = async (prospect) => {
-    if (!confirm(`Firma "${prospect.company_name}" jetzt analysieren? (Nutzt OpenAI)`)) return
+    if (coldLoading) return
     setColdLoading(true)
     try {
       const res = await fetch('/api/coldleads/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ website: prospect.website, industry: prospect.industry })
+        body: JSON.stringify({ 
+          website: prospect.website, 
+          industry: prospect.industry,
+          region: prospect.region,
+          company_name: prospect.company_name
+        })
       })
       const data = await res.json()
       if (data.ok) {
-        setSelectedProspect({ ...prospect, analysis: data.analysis })
-        alert('Analyse abgeschlossen! Score: ' + data.analysis.needs_assessment.score)
-        // Refresh list
-        const list = await fetch('/api/coldleads/search?limit=50')
-        const listData = await list.json()
-        if (listData.ok) setColdProspects(listData.prospects)
+        await loadColdLeadStats()
+        alert('✅ Analyse abgeschlossen! Prospect wurde auf "Analysiert" gesetzt.')
       } else {
-        alert('Fehler: ' + data.error)
+        alert('❌ Fehler: ' + (data.error || 'Unbekannter Fehler'))
       }
-    } catch (e) {
-      alert('Fehler: ' + e.message)
+    } catch (err) {
+      console.error(err)
+      alert('❌ Fehler beim Analysieren: ' + err.message)
+    } finally {
+      setColdLoading(false)
     }
-    setColdLoading(false)
+  }
+
+  // Bulk-Analyse für ausgewählte Prospects
+  const bulkAnalyzeProspects = async () => {
+    if (selectedProspectsForBulk.length === 0) return
+    
+    setBulkAnalyzing(true)
+    setBulkAnalyzeProgress({ current: 0, total: selectedProspectsForBulk.length })
+    
+    let successCount = 0
+    let errorCount = 0
+    
+    for (let i = 0; i < selectedProspectsForBulk.length; i++) {
+      const prospectId = selectedProspectsForBulk[i]
+      const prospect = coldProspects.find(p => p.id === prospectId)
+      
+      if (!prospect) continue
+      
+      try {
+        const res = await fetch('/api/coldleads/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            website: prospect.website, 
+            industry: prospect.industry,
+            region: prospect.region,
+            company_name: prospect.company_name
+          })
+        })
+        const data = await res.json()
+        if (data.ok) {
+          successCount++
+        } else {
+          errorCount++
+        }
+      } catch (err) {
+        console.error(`Error analyzing ${prospect.company_name}:`, err)
+        errorCount++
+      }
+      
+      setBulkAnalyzeProgress({ current: i + 1, total: selectedProspectsForBulk.length })
+      
+      // Kleine Pause zwischen Anfragen
+      await new Promise(resolve => setTimeout(resolve, 500))
+    }
+    
+    // Stats neu laden
+    await loadColdLeadStats()
+    
+    // Reset
+    setBulkAnalyzing(false)
+    setSelectedProspectsForBulk([])
+    setBulkAnalyzeProgress({ current: 0, total: 0 })
+    
+    alert(`✅ Bulk-Analyse abgeschlossen!\n\n✓ Erfolgreich: ${successCount}\n✗ Fehler: ${errorCount}`)
+  }
+
+  // Alle neuen Prospects analysieren
+  const bulkAnalyzeAllNew = async () => {
+    const newProspects = coldProspects.filter(p => p.status === 'new')
+    if (newProspects.length === 0) return
+    
+    if (!confirm(`Möchten Sie wirklich ALLE ${newProspects.length} neuen Firmen analysieren?\n\nDies kann einige Minuten dauern.`)) {
+      return
+    }
+    
+    setSelectedProspectsForBulk(newProspects.map(p => p.id))
+    
+    // Kurze Verzögerung damit UI sich aktualisiert
+    setTimeout(() => {
+      bulkAnalyzeProspects()
+    }, 100)
   }
 
   const generateColdEmail = async (prospect) => {
