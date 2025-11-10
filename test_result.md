@@ -901,6 +901,28 @@ agent_communication:
       - working: true
         agent: "testing"
         comment: "✅ CRITICAL CHECK PASSED! Re-import test successful. Added unique note 'UNIQUE_TEST_NOTE_1762714837.69629' to lead (kKunde=161645), ran re-import (imported=2000), verified note still exists after re-import. Lead now has 2 notes total. Notes, status, and tags are correctly preserved during re-import while JTL data (revenue, orders, lastOrder) is updated. Upsert logic working perfectly!"
+  - task: "Analytics: GET /api/analytics/info-pages"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/analytics/info-pages/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW API Endpoint: Fetches info pages (pages containing '-info/' in path) from GA4 with metrics (sessions, totalUsers, userEngagementDuration). Uses fetchInfoPages from /app/lib/analytics.ts. Returns array of PageMetrics."
+  - task: "Analytics: GET /api/analytics/beileger"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/analytics/beileger/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW API Endpoint: Fetches Beileger success metrics (all pages under /account/ path) from GA4. Returns { totalVisits, uniqueVisitors, pages[] } with aggregated totals and page-level breakdown. Uses fetchBeilegerMetrics from /app/lib/analytics.ts."
 
 agent_communication:
   - agent: "main"
