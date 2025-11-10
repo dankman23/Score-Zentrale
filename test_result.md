@@ -645,12 +645,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Test POST /api/coldleads/dach/crawl with country=DE, region=Nordrhein-Westfalen, industry=Metallverarbeitung, limit=20 - should return {ok, count, prospects[], progress, nextRegion}"
-    - "Test GET /api/coldleads/dach/stats - should return {ok, stats: {total_regions, completed_regions, pending_regions, total_companies_found, coverage_percentage, dach_prospects_in_db}, country_breakdown, top_industries}"
-    - "Test GET /api/coldleads/dach/status - should return {ok, stats, progress[]} with last 50 crawl entries"
-    - "Verify DACH crawler stores prospects in cold_prospects with source='DACH Crawler: {Verzeichnis}'"
-    - "Verify DACH crawler tracks progress in dach_crawl_progress collection with all required fields"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
