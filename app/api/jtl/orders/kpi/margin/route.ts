@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     const hasCauftragsNr = await hasColumn(pool, orderTable, 'cAuftragsNr')
     const orderTypeFilter = hasCauftragsNr ? `AND o.cAuftragsNr LIKE 'AU%'` : ''
 
-    // Artikel-Filter
+    // Artikel-Filter (nur Artikel, keine Versandkosten)
     const hasNPosTyp = await hasColumn(pool, orderPosTable, 'nPosTyp')
     const articleFilter = hasNPosTyp 
       ? 'op.nPosTyp = 1'
@@ -50,6 +50,11 @@ export async function GET(request: NextRequest) {
          AND ISNULL(op.cName,'') NOT LIKE 'Gutschein%' 
          AND ISNULL(op.cName,'') NOT LIKE 'Rabatt%' 
          AND ISNULL(op.cName,'') NOT LIKE 'Pfand%'`
+    
+    // Versand-Filter (Positionen OHNE Artikelnummer = Versandkosten)
+    const shippingFilter = hasNPosTyp
+      ? 'op.nPosTyp = 3'  // Typ 3 = Versand
+      : `(op.kArtikel = 0 OR op.kArtikel IS NULL)`  // Keine Artikelnummer
 
     // Positionsfelder
     const qtyField = await pickFirstExisting(pool, orderPosTable, ['fAnzahl', 'nAnzahl', 'fMenge']) || 'fAnzahl'
