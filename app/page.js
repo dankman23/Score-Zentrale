@@ -2744,21 +2744,24 @@ export default function App() {
                       <i className="bi bi-arrow-repeat mr-1"/>Follow-ups senden
                     </button>
                     <div className="btn-group btn-group-sm">
-                      <button className={`btn ${coldStatusFilter==='all'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('all')}>
-                        Alle ({coldStats.total})
+                      <button className={`btn ${coldStatusFilter==='all'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('all'); setShowColdProspectDetails(null)}}>
+                        <i className="bi bi-list mr-1"/>Alle ({coldStats.total})
                       </button>
-                      <button className={`btn ${coldStatusFilter==='new'?'btn-secondary':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('new')}>
-                        Neu ({coldStats.new})
+                      <button className={`btn ${coldStatusFilter==='new'?'btn-secondary':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('new'); setShowColdProspectDetails(null)}}>
+                        🆕 Neu ({coldStats.new})
                       </button>
-                      <button className={`btn ${coldStatusFilter==='analyzed'?'btn-info':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('analyzed')}>
-                        Analysiert ({coldStats.analyzed})
+                      <button className={`btn ${coldStatusFilter==='analyzed'?'btn-info':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('analyzed'); setShowColdProspectDetails(null)}}>
+                        🔍 Analysiert ({coldStats.analyzed})
                       </button>
-                      <button className={`btn ${coldStatusFilter==='contacted'?'btn-success':'btn-outline-secondary'}`} onClick={()=>setColdStatusFilter('contacted')}>
-                        Kontaktiert ({coldStats.contacted})
+                      <button className={`btn ${coldStatusFilter==='contacted'?'btn-success':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('contacted'); setShowColdProspectDetails(null)}}>
+                        📧 Kontaktiert ({coldStats.contacted})
                     </button>
-                    <button className={`btn ${coldStatusFilter==='replied'?'btn-warning':'btn-outline-warning'}`} onClick={()=>setColdStatusFilter('replied')}>
+                    <button className={`btn ${coldStatusFilter==='replied'?'btn-warning':'btn-outline-warning'}`} onClick={()=>{setColdStatusFilter('replied'); setShowColdProspectDetails(null)}}>
                       <i className="bi bi-envelope-check mr-1"/>Antworten ({coldStats.replied || 0})
                       {coldLeadStats.unreadReplies > 0 && <span className="badge badge-danger ml-1">{coldLeadStats.unreadReplies}</span>}
+                    </button>
+                    <button className={`btn btn-outline-info`} onClick={()=>setShowInbox(!showInbox)}>
+                      <i className="bi bi-inbox-fill mr-1"/>Posteingang
                     </button>
                   </div>
                 </div>
