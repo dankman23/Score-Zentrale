@@ -3847,8 +3847,8 @@ export default function App() {
                           {/* Details Accordion */}
                           {selectedProspect?.website === p.website && (
                             <tr key={`details-${i}`}>
-                              <td colSpan="7" className="p-0">
-                                {!p.analysis ? (
+                              <td colSpan={coldStatusFilter === 'new' && p.status === 'new' ? 8 : 7} className="p-0">
+                                {(!p.analysis_v3 && !p.analysis) ? (
                                   <div className="bg-warning text-dark p-4">
                                     <div className="d-flex align-items-center justify-content-between">
                                       <div className="d-flex align-items-center">
