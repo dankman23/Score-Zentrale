@@ -1,7 +1,7 @@
 export const runtime = 'nodejs'
 
 import { NextResponse } from 'next/server'
-import { connectToMongoDB } from '@/lib/mongodb'
+import { connectToMongoDB } from '../../../../lib/mongodb'
 import { analyzeCompanyV3 } from '@/services/coldleads/analyzer-v3'
 import { generateEmailSequenceV3 } from '@/services/coldleads/emailer-v3'
 import { SCORE_CONFIG } from '@/lib/score-coldleads-config'
