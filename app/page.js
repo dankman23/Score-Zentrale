@@ -2083,7 +2083,12 @@ export default function App() {
                     <div className="card mb-4">
                       <div className="card-header bg-transparent border-0">
                         <div className="d-flex justify-content-between align-items-center">
-                          <h5 className="mb-0"><i className="bi bi-envelope-check mr-2"/>Erfolg von Beileger</h5>
+                          <div>
+                            <h5 className="mb-0"><i className="bi bi-qr-code mr-2"/>Erfolg von Beileger (QR Code)</h5>
+                            <div className="small text-muted mt-1">
+                              <i className="bi bi-info-circle mr-1"/>Nur Direct Traffic zu /account/ (Besucher vom QR Code ohne Referrer)
+                            </div>
+                          </div>
                           <div className="d-flex gap-3">
                             <div className="text-right">
                               <div className="small text-muted">Gesamt Besuche</div>
