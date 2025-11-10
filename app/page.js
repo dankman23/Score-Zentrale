@@ -988,7 +988,8 @@ export default function App() {
     if (coldLoading) return
     setColdLoading(true)
     try {
-      const res = await fetch('/api/coldleads/analyze', {
+      // Nutze neue V3 API
+      const res = await fetch('/api/coldleads/analyze-v3', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -1001,7 +1002,7 @@ export default function App() {
       const data = await res.json()
       if (data.ok) {
         await loadColdLeadStats()
-        alert('✅ Analyse abgeschlossen! Prospect wurde auf "Analysiert" gesetzt.')
+        alert(`✅ Analyse abgeschlossen!\n\nScore: ${data.analysis.confidence_overall}%\nKontakt: ${data.analysis.contact_person.email || 'Nicht gefunden'}\nMarken: ${data.analysis.recommended_brands.join(', ')}`)
       } else {
         alert('❌ Fehler: ' + (data.error || 'Unbekannter Fehler'))
       }
