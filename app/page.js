@@ -137,7 +137,9 @@ export default function App() {
   const [noteFor, setNoteFor] = useState(null)
   const [noteText, setNoteText] = useState('')
   const [netlog, setNetlog] = useState([]) // request inspector
-  const [marketingSub, setMarketingSub] = useState('analytics') // analytics|googleads
+  const [marketingSub, setMarketingSub] = useState('analytics') // analytics|googleads|glossar
+  const [glossarSub, setGlossarSub] = useState('anwendungen') // anwendungen|kategorien|werkstoffe|maschinen
+  const [glossarSearch, setGlossarSearch] = useState('')
   
   // Analytics (GA4)
   const [analyticsMetrics, setAnalyticsMetrics] = useState(null)
