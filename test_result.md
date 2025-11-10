@@ -574,6 +574,17 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ KALTAKQUISE UI FEATURES TESTING COMPLETED SUCCESSFULLY! All 8/8 test areas PASSED: Navigation zu #kaltakquise (Kaltakquise-Tool Überschrift sichtbar), Statistik-Karten (Gesamt: 36, Neu: 33, Analysiert: 3, Kontaktiert: 0), Prospects-Status (36 Prospects vorhanden), Filter-Buttons (alle 5/5 gefunden: Alle, Neu, Analysiert, Kontaktiert, Antworten mit Badge), Prospects-Tabelle (alle 7/7 Spalten: FIRMA, WEBSITE, BRANCHE, REGION, SCORE, STATUS, AKTIONEN), Details-Accordion (3 Details-Buttons, Firmen-Info und Ansprechpartner sichtbar, Kontakt-Historie nicht sichtbar - normal), Dashboard-Widgets (Ungelesene Antworten: 0, Follow-up benötigt: 0). Minor: React hydration warnings und 404 für /api/prospects (expected). Kaltakquise UI vollständig funktional!"
+  - task: "Analytics Dashboard Erweiterung (8 KPIs, Product Pages Expand/Collapse, Info Pages, Beileger)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Analytics Dashboard erweitert: (1) 8 KPI Tiles mit Info-Buttons und Hover-Erklärungen (Sessions, Nutzer, Seitenaufrufe, Conversions, Umsatz, Ø Session-Dauer, Bounce Rate, Conv. Rate), (2) Product Pages mit expand/collapse (Top 10 initial, bis zu 100 beim Ausklappen), (3) Neue Sektion 'Info-Seiten Performance' mit Tabelle aller Info-Seiten (-info/ URLs), (4) Neue Sektion 'Erfolg von Beileger' mit Gesamtsumme (totalVisits, uniqueVisitors) und Detailtabelle für alle /account/ Seiten. Alle Sektionen vor 'Top 100 Alle Seiten' platziert. loadAnalytics aktualisiert um Info Pages und Beileger APIs zu laden."
 metadata:
   created_by: "main_agent"
   version: "1.1"
