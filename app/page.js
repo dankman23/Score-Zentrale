@@ -1079,16 +1079,16 @@ export default function App() {
     console.log('Lade Stats und Prospects neu...')
     await loadColdLeadStats()
     
-    // Prospects neu laden - nutze die richtige Funktion
-    await loadColdProspects()
+    // Wechsle zum "Analysiert" Tab ZUERST
+    setColdStatusFilter('analyzed')
+    
+    // Prospects mit explizitem 'analyzed' Filter laden
+    await loadColdProspects('analyzed')
     
     // Reset
     setBulkAnalyzing(false)
     setSelectedProspectsForBulk([])
     setBulkAnalyzeProgress({ current: 0, total: 0 })
-    
-    // Wechsle zum "Analysiert" Tab um Ergebnisse zu sehen
-    setColdStatusFilter('analyzed')
     
     alert(`✅ Bulk-Analyse abgeschlossen!\n\n✓ Erfolgreich: ${successCount}\n✗ Fehler: ${errorCount}\n\n➡️ Wechsle zu "Analysiert" Tab`)
   }
