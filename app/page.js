@@ -3700,6 +3700,21 @@ export default function App() {
                       {coldProspects.map((p, i) => (
                         <>
                           <tr key={`row-${i}`} style={{cursor: p.status === 'analyzed' ? 'pointer' : 'default'}}>
+                            {coldStatusFilter === 'new' && p.status === 'new' && (
+                              <td className="align-middle">
+                                <input 
+                                  type="checkbox"
+                                  checked={selectedProspectsForBulk.includes(p.id)}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setSelectedProspectsForBulk([...selectedProspectsForBulk, p.id])
+                                    } else {
+                                      setSelectedProspectsForBulk(selectedProspectsForBulk.filter(id => id !== p.id))
+                                    }
+                                  }}
+                                />
+                              </td>
+                            )}
                             <td className="align-middle font-weight-bold text-white">{p.company_name || 'Unbekannt'}</td>
                             <td className="align-middle"><a href={p.website} target="_blank" rel="noopener" className="text-info text-truncate d-inline-block" style={{maxWidth:250}}>{p.website}</a></td>
                             <td className="align-middle"><span className="badge badge-light">{p.industry}</span></td>
