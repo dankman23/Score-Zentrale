@@ -1468,16 +1468,32 @@ export default function App() {
                   <table className="table table-dark table-hover table-sm mb-0">
                     <thead className="thead-dark">
                       <tr>
-                        <th>Hersteller</th>
-                        <th>Bestellungen</th>
-                        <th>Umsatz (Netto)</th>
-                        <th>Kosten</th>
-                        <th>Marge (Netto)</th>
-                        <th>Marge %</th>
+                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'manufacturer', direction: sortBy.field==='manufacturer' && sortBy.direction==='asc'?'desc':'asc'})}>
+                          Hersteller {sortBy.field==='manufacturer' && (sortBy.direction==='asc'?'↑':'↓')}
+                        </th>
+                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'orders', direction: sortBy.field==='orders' && sortBy.direction==='asc'?'desc':'asc'})}>
+                          Bestellungen {sortBy.field==='orders' && (sortBy.direction==='asc'?'↑':'↓')}
+                        </th>
+                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'revenue', direction: sortBy.field==='revenue' && sortBy.direction==='asc'?'desc':'asc'})}>
+                          Umsatz (Netto) {sortBy.field==='revenue' && (sortBy.direction==='asc'?'↑':'↓')}
+                        </th>
+                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'cost', direction: sortBy.field==='cost' && sortBy.direction==='asc'?'desc':'asc'})}>
+                          Kosten {sortBy.field==='cost' && (sortBy.direction==='asc'?'↑':'↓')}
+                        </th>
+                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'margin', direction: sortBy.field==='margin' && sortBy.direction==='asc'?'desc':'asc'})}>
+                          Marge (Netto) {sortBy.field==='margin' && (sortBy.direction==='asc'?'↑':'↓')}
+                        </th>
+                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'marginPct', direction: sortBy.field==='marginPct' && sortBy.direction==='asc'?'desc':'asc'})}>
+                          Marge % {sortBy.field==='marginPct' && (sortBy.direction==='asc'?'↑':'↓')}
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {(topManufacturers||[]).map((m,idx)=> (
+                      {[...(topManufacturers||[])].sort((a,b)=>{
+                        const aVal = sortBy.field==='manufacturer' ? a[sortBy.field] : parseFloat(a[sortBy.field])
+                        const bVal = sortBy.field==='manufacturer' ? b[sortBy.field] : parseFloat(b[sortBy.field])
+                        return sortBy.direction==='asc' ? (aVal>bVal?1:-1) : (aVal<bVal?1:-1)
+                      }).map((m,idx)=> (
                         <tr key={idx}>
                           <td>{m.manufacturer}</td>
                           <td>{m.orders}</td>
