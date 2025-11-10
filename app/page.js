@@ -446,6 +446,20 @@ export default function App() {
 
   useEffect(() => { renderCharts() }, [ts, tsFees, platTs, stacked])
 
+  // Produkte: Filter-Optionen beim Tab-Wechsel laden
+  useEffect(() => {
+    if (activeTab === 'produkte' && produkteTab === 'browser') {
+      loadArtikelFilters()
+    }
+  }, [activeTab, produkteTab])
+
+  // Produkte: Artikel-Liste laden wenn Filter oder Seite sich ändert
+  useEffect(() => {
+    if (activeTab === 'produkte' && produkteTab === 'browser' && artikelImportProgress.imported > 0) {
+      loadArtikelList()
+    }
+  }, [activeTab, produkteTab, artikelPage, artikelPerPage, artikelFilter, artikelSortBy, artikelSortOrder])
+
   const renderCharts = () => {
     if (!window.Chart) return
     // Umsatz vs Marge (with fees)
