@@ -24,7 +24,9 @@ export async function GET(request: NextRequest) {
     const orderTypeFilter = hasCauftragsNr ? `AND o.cAuftragsNr LIKE 'AU%'` : ''
 
     const hasNPosTyp = await hasColumn(pool, orderPosTable, 'nPosTyp')
-    const articleFilter = hasNPosTyp ? 'op.nPosTyp = 1' : `op.kArtikel > 0`
+    const articleFilter = hasNPosTyp 
+      ? '(op.nPosTyp = 1 OR op.nPosTyp = 3)'  // Artikel (1) UND Versand (3)
+      : `1=1`  // Alle Positionen einbeziehen
 
     const qtyField = await pickFirstExisting(pool, orderPosTable, ['fAnzahl', 'nAnzahl', 'fMenge']) || 'fAnzahl'
     const netField = await pickFirstExisting(pool, orderPosTable, ['fVKNetto', 'fPreis']) || 'fVKNetto'
