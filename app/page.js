@@ -2308,6 +2308,30 @@ export default function App() {
               )}
             </div>
           )}
+
+          {/* Glossar Tab */}
+          {marketingSub==='glossar' && (
+            <div>
+              <h3 className="mb-4">Marketing Glossar</h3>
+              
+              <div className="alert alert-info">
+                <i className="bi bi-info-circle mr-2"/>
+                Das Marketing Glossar ist derzeit in Entwicklung. Hier werden wichtige Marketing-Begriffe und Definitionen verfügbar sein.
+              </div>
+              
+              <div className="card">
+                <div className="card-body">
+                  <h5>Kommende Features:</h5>
+                  <ul className="mb-0">
+                    <li>Umfassende Marketing-Begriffe und Definitionen</li>
+                    <li>Suchfunktion für schnelles Auffinden</li>
+                    <li>Kategorisierung nach Themenbereichen</li>
+                    <li>Praktische Beispiele und Anwendungsfälle</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
