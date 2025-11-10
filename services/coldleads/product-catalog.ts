@@ -284,51 +284,55 @@ export function detectApplications(text: string, industry: string): Application[
 
 /**
  * Generiert Produktempfehlungen basierend auf erkannten Anwendungen
+ * NUR KATEGORIEN - KEINE KÖRNUNGEN!
  */
 export function generateProductRecommendations(applications: Application[]): {
-  products: Array<Product & { reason: string }>
+  products: Array<{ name: string, category: string, reason: string }>
   estimated_volume: 'low' | 'medium' | 'high'
 } {
-  const productMap = new Map<string, { product: Product, applications: string[], score: number }>()
+  const categoryMap = new Map<string, { category: string, applications: string[], score: number }>()
   
   // Sammle alle Produkte für alle Anwendungen
   for (const app of applications) {
     const products = getProductsForApplication(app.id)
     
     for (const product of products) {
-      if (!productMap.has(product.id)) {
-        productMap.set(product.id, {
-          product,
+      // Gruppiere nach KATEGORIE (ohne Körnungen/Details)
+      if (!categoryMap.has(product.category)) {
+        categoryMap.set(product.category, {
+          category: product.category,
           applications: [],
           score: 0
         })
       }
       
-      const entry = productMap.get(product.id)!
-      entry.applications.push(app.name)
+      const entry = categoryMap.get(product.category)!
+      if (!entry.applications.includes(app.name)) {
+        entry.applications.push(app.name)
+      }
       entry.score += 1
     }
   }
   
-  // Sortiere nach Score (wie viele Anwendungen das Produkt abdeckt)
-  const sortedProducts = Array.from(productMap.values())
+  // Sortiere nach Score
+  const sortedCategories = Array.from(categoryMap.values())
     .sort((a, b) => b.score - a.score)
-    .slice(0, 8) // Top 8 Produkte
+    .slice(0, 5) // Top 5 Kategorien
   
-  // Erstelle Empfehlungen mit Begründung
-  const recommendations = sortedProducts.map(entry => ({
-    ...entry.product,
-    reason: `Benötigt für: ${entry.applications.join(', ')}`
+  // Erstelle simple Empfehlungen: NUR Kategorienamen
+  const recommendations = sortedCategories.map(entry => ({
+    name: entry.category, // Nur Kategoriename!
+    category: entry.category,
+    reason: `Für ${entry.applications.slice(0, 3).join(', ')}`
   }))
   
-  // Schätze Volumen basierend auf Anzahl Anwendungen und Produkt-Typen
-  const highVolumeProducts = recommendations.filter(p => p.typical_volume === 'high').length
+  // Schätze Volumen basierend auf Anzahl Anwendungen
   const totalApplications = applications.length
   
   let estimated_volume: 'low' | 'medium' | 'high' = 'low'
-  if (highVolumeProducts >= 3 || totalApplications >= 4) {
+  if (totalApplications >= 4) {
     estimated_volume = 'high'
-  } else if (highVolumeProducts >= 1 || totalApplications >= 2) {
+  } else if (totalApplications >= 2) {
     estimated_volume = 'medium'
   }
   
