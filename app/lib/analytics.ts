@@ -342,7 +342,70 @@ export async function fetchPageTimeSeries(
 }
 
 /**
- * Fetch top product detail pages (filter by URL pattern)
+ * Fetch category pages (ending with -kaufen/)
+ */
+export async function fetchCategoryPagesAll(
+  startDate: string = '30daysAgo',
+  endDate: string = 'today'
+): Promise<PageMetrics[]> {
+  const client = getAnalyticsClient();
+  const propertyId = getPropertyId();
+
+  try {
+    const [response] = await client.runReport({
+      property: `properties/${propertyId}`,
+      dateRanges: [{ startDate, endDate }],
+      dimensions: [
+        { name: 'pagePath' },
+        { name: 'pageTitle' },
+      ],
+      metrics: [
+        { name: 'sessions' },
+        { name: 'totalUsers' },
+        { name: 'userEngagementDuration' },
+      ],
+      dimensionFilter: {
+        filter: {
+          fieldName: 'pagePath',
+          stringFilter: {
+            matchType: 'ENDS_WITH' as const,
+            value: '-kaufen/' // Kategorieseiten enden mit "-kaufen/"
+          }
+        }
+      },
+      orderBys: [
+        { metric: { metricName: 'sessions' }, desc: true }
+      ],
+    });
+
+    if (!response.rows || response.rows.length === 0) {
+      return [];
+    }
+
+    return response.rows.map(row => {
+      const dimensionValues = row.dimensionValues || [];
+      const metricValues = row.metricValues || [];
+
+      const pageViews = parseInt(metricValues[0]?.value || '0', 10);
+      const totalUsers = parseInt(metricValues[1]?.value || '0', 10);
+      const userEngagementDuration = parseFloat(metricValues[2]?.value || '0');
+      
+      return {
+        pagePath: dimensionValues[0]?.value || '',
+        pageTitle: dimensionValues[1]?.value || '',
+        pageViews: pageViews,
+        uniquePageViews: totalUsers,
+        avgTimeOnPage: totalUsers > 0 ? userEngagementDuration / totalUsers : 0,
+      };
+    });
+  } catch (error) {
+    console.error('Error fetching category pages:', error);
+    throw new Error('Failed to fetch category pages');
+  }
+}
+
+/**
+ * Fetch top product detail pages (ending with article number, excluding -kaufen/ and -info/)
  */
 export async function fetchTopProductPages(
   startDate: string = '30daysAgo',
@@ -366,12 +429,40 @@ export async function fetchTopProductPages(
         { name: 'userEngagementDuration' },
       ],
       dimensionFilter: {
-        filter: {
-          fieldName: 'pagePath',
-          stringFilter: {
-            matchType: 'CONTAINS' as const,
-            value: '-kaufen/' // Produktseiten enthalten "-kaufen/"
-          }
+        andGroup: {
+          expressions: [
+            {
+              filter: {
+                fieldName: 'pagePath',
+                stringFilter: {
+                  matchType: 'PARTIAL_REGEXP' as const,
+                  value: '-[0-9]+$' // Endet mit Bindestrich und Artikelnummer
+                }
+              }
+            },
+            {
+              notExpression: {
+                filter: {
+                  fieldName: 'pagePath',
+                  stringFilter: {
+                    matchType: 'CONTAINS' as const,
+                    value: '-kaufen/'
+                  }
+                }
+              }
+            },
+            {
+              notExpression: {
+                filter: {
+                  fieldName: 'pagePath',
+                  stringFilter: {
+                    matchType: 'CONTAINS' as const,
+                    value: '-info/'
+                  }
+                }
+              }
+            }
+          ]
         }
       },
       orderBys: [
