@@ -887,6 +887,63 @@ export default function App() {
     setColdLoading(false)
   }
 
+  // DACH Crawler Funktionen
+  const loadDachStats = async () => {
+    try {
+      const res = await fetch('/api/coldleads/dach/stats')
+      const data = await res.json()
+      if (data.ok) {
+        setDachCrawlerStats(data)
+      }
+    } catch (e) {
+      console.error('Error loading DACH stats:', e)
+    }
+  }
+
+  const loadDachProgress = async () => {
+    try {
+      const res = await fetch('/api/coldleads/dach/status')
+      const data = await res.json()
+      if (data.ok) {
+        setDachCrawlerProgress(data.progress)
+      }
+    } catch (e) {
+      console.error('Error loading DACH progress:', e)
+    }
+  }
+
+  const startDachCrawl = async () => {
+    if (!dachCrawlerForm.region || !dachCrawlerForm.industry) {
+      alert('Bitte Region und Branche auswählen')
+      return
+    }
+    
+    if (!confirm(`DACH-Crawling starten für:\n${dachCrawlerForm.country} / ${dachCrawlerForm.region} / ${dachCrawlerForm.industry}?\n\nDies kann einige Minuten dauern.`)) {
+      return
+    }
+
+    setDachCrawlerLoading(true)
+    try {
+      const res = await fetch('/api/coldleads/dach/crawl', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dachCrawlerForm)
+      })
+      const data = await res.json()
+      if (data.ok) {
+        alert(`✅ ${data.count} Firmen gefunden!\n\nStatus: ${data.progress.status}\nRegion: ${data.progress.region}`)
+        loadDachStats()
+        loadDachProgress()
+        loadColdProspects()
+      } else {
+        alert('❌ Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('❌ Fehler: ' + e.message)
+    }
+    setDachCrawlerLoading(false)
+  }
+
   const analyzeProspect = async (prospect) => {
     if (!confirm(`Firma "${prospect.company_name}" jetzt analysieren? (Nutzt OpenAI)`)) return
     setColdLoading(true)
