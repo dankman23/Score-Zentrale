@@ -49,21 +49,34 @@ export async function GET(request: NextRequest) {
     const netExpr = `(op.${netField} * op.${qtyField})`
     const costExpr = `(op.${costField} * op.${qtyField})`
 
+    // Try to get platform names from tPlattform table
+    let platformNameQuery = ''
+    const hasTPlattform = await hasColumn(pool, 'dbo.tPlattform', 'kPlattform')
+    
+    if (hasTPlattform) {
+      platformNameQuery = 'LEFT JOIN dbo.tPlattform p ON o.kPlattform = p.kPlattform'
+    }
+    
+    const platformSelect = hasTPlattform 
+      ? 'ISNULL(p.cName, CAST(o.kPlattform AS VARCHAR(50)))'
+      : 'CAST(o.kPlattform AS VARCHAR(50))'
+
     const query = `
       SELECT TOP ${limit}
-        ISNULL(p.cName, CAST(o.kPlattform AS VARCHAR(50))) AS platform,
+        ${platformSelect} AS platform,
+        o.kPlattform AS platform_id,
         COUNT(DISTINCT o.kAuftrag) AS orders,
         SUM(${netExpr}) AS revenue,
         SUM(${costExpr}) AS cost,
         SUM(${netExpr}) - SUM(${costExpr}) AS margin
       FROM ${orderTable} o
       INNER JOIN ${orderPosTable} op ON o.kAuftrag = op.kAuftrag
-      LEFT JOIN dbo.tPlattform p ON o.kPlattform = p.kPlattform
+      ${platformNameQuery}
       WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
         ${orderTypeFilter}
         AND ${articleFilter}
-      GROUP BY ISNULL(p.cName, CAST(o.kPlattform AS VARCHAR(50)))
+      GROUP BY o.kPlattform${hasTPlattform ? ', p.cName' : ''}
       ORDER BY revenue DESC
     `
 
