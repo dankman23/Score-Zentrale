@@ -1446,10 +1446,24 @@ export default function App() {
                         return sortBy.direction==='asc' ? (aVal>bVal?1:-1) : (aVal<bVal?1:-1)
                       }).map((p,idx)=> {
                         const platformNames = {
-                          '51': 'Onlineshop',
-                          '31': 'eBay',
-                          '54': 'Amazon',
-                          '2': 'Intern'
+                          '1': 'Direktvertrieb',
+                          '2': 'Onlineshop',
+                          '8': 'Otto',
+                          '31': 'ebay.de',
+                          '32': 'ebay.com',
+                          '34': 'ebay.co.uk',
+                          '36': 'ebay.at',
+                          '38': 'ebay.fr',
+                          '39': 'ebay.it',
+                          '42': 'ebay.es',
+                          '43': 'ebay.ch',
+                          '44': 'ebay.ie',
+                          '51': 'Amazon.de',
+                          '54': 'Amazon.fr',
+                          '56': 'Amazon.it',
+                          '57': 'Amazon.es',
+                          '60': 'Amazon.nl',
+                          '65': 'Amazon.com.be'
                         }
                         const name = platformNames[p.platform] || `Plattform #${p.platform}`
                         return (
