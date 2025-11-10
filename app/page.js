@@ -2407,6 +2407,7 @@ export default function App() {
               </div>
             </div>
           </div>
+          )}
 
           {/* Ergebnis-Tabelle - moderner */}
           {coldProspects.length > 0 && (
