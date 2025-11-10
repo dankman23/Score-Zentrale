@@ -2,17 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchCategoryPages } from '../../../../lib/analytics'
-
-// Defined category pages
-const CATEGORY_PATHS = [
-  '/schleifbaender-kaufen/',
-  '/schleifpapier-kaufen/',
-  '/schleifscheibe-kaufen/',
-  '/trennscheiben-kaufen/',
-  '/faecherscheibe-kaufen/',
-  '/fiberscheiben-kaufen/',
-]
+import { fetchCategoryPagesAll } from '@/lib/analytics'
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,7 +10,8 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('startDate') || '30daysAgo'
     const endDate = searchParams.get('endDate') || 'today'
 
-    const pages = await fetchCategoryPages(CATEGORY_PATHS, startDate, endDate)
+    // Fetch all category pages (ending with -kaufen/)
+    const pages = await fetchCategoryPagesAll(startDate, endDate)
     
     return NextResponse.json(pages)
   } catch (error: any) {
