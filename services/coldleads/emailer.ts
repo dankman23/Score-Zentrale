@@ -64,9 +64,21 @@ function generateTemplateEmail(options: EmailGenerationOptions): GeneratedEmail 
     intro += `Ich bin auf Ihr Unternehmen aufmerksam geworden, da Sie im Bereich ${industry} tätig sind – genau die Branche, in der wir unsere Kunden optimal mit hochwertigen Schleifmitteln unterstützen.`
   }
   
-  // 4. Spezifische Produktempfehlungen (Top 3-4)
+  // 4. Premium-Hersteller und Produktkategorien
+  const categories = new Set<string>()
+  analysis.potential_products.forEach(p => {
+    if (p.category) categories.add(p.category)
+  })
+  const categoryList = Array.from(categories).slice(0, 3).join(', ')
+  
+  let premiumIntro = ''
+  if (categoryList) {
+    premiumIntro = `\n\nDa Ihre Anwendungen ${categoryList} erfordern, arbeiten wir mit den führenden Premium-Herstellern wie Klingspor, 3M, Norton, VSM und Starcke zusammen. Durch unsere langjährigen und exzellenten Beziehungen zu diesen Herstellern können wir Ihnen optimale Konditionen und schnellste Verfügbarkeit garantieren.`
+  }
+  
+  // 5. Spezifische Produktempfehlungen (Top 3-4)
   const topProducts = analysis.potential_products.slice(0, 4)
-  let productSection = '\n\nFür Ihre Anwendungen empfehle ich Ihnen insbesondere:\n'
+  let productSection = '\n\nFür Ihren konkreten Bedarf würde ich Ihnen sehr gerne ein Angebot unterbreiten für:\n'
   
   topProducts.forEach(product => {
     productSection += `\n• ${product.name}`
