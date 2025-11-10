@@ -79,64 +79,55 @@ async function robustAnalyze(websiteData: any, industry: string): Promise<any> {
 }
 
 /**
- * Intelligente Anwendungs-basierte Analyse mit Produkt-Katalog
+ * Keyword-basierte Analyse (ROBUST fallback - funktioniert immer)
  */
 function createKeywordAnalysis(websiteData: any, industry: string): any {
-  const text = (websiteData.text_content || '').toLowerCase()
+  const text = websiteData.text_content.toLowerCase()
+  const fullText = websiteData.text_content // Original für bessere Extraktion
   const title = websiteData.title || ''
   
-  console.log('[Analyzer] Detecting applications from website content...')
+  // === 1. FIRMEN-KERNGESCHÄFT IDENTIFIZIEREN ===
+  const businessType = identifyBusinessType(text, fullText)
+  const companySize = estimateCompanySize(text, fullText)
   
-  // 1. Erkenne Anwendungen basierend auf Website-Content
-  const detectedApps = detectApplications(text, industry)
-  console.log(`[Analyzer] Detected ${detectedApps.length} applications:`, 
-    detectedApps.map(a => `${a.name} (confidence: ${(a as any).confidence})`))
-  
-  // 2. Generiere Produktempfehlungen
+  // === 2. MATERIALIEN & ANWENDUNGEN DETECTIEREN ===
+  const detectedApps = detectApplications(text)
   const recommendations = generateProductRecommendations(detectedApps)
-  console.log(`[Analyzer] Generated ${recommendations.products.length} product recommendations`)
   
-  // 3. Sammle alle Materialien
+  // === 3. SCORE BERECHNEN ===
+  let score = 50 // Basis
+  score += detectedApps.length * 15
+  score += (recommendations.products.length > 0 ? 20 : 0)
+  score += (businessType.isManufacturer ? 15 : 0) // Hersteller höher bewerten
+  score = Math.min(score, 95)
+  
+  // === 4. MATERIALIEN FINDEN ===
   const materials = new Set<string>()
-  detectedApps.forEach(app => app.materials.forEach(m => materials.add(m)))
+  const materialKeywords = ['stahl', 'edelstahl', 'aluminium', 'metall', 'holz', 'kunststoff', 'glas', 'keramik', 'titan', 'messing', 'kupfer']
+  materialKeywords.forEach(mat => {
+    if (text.includes(mat)) materials.add(mat)
+  })
   
-  // 4. Berechne Score
-  let score = 40 // Basis-Score
-  
-  // Score basierend auf Anzahl erkannter Anwendungen
-  score += detectedApps.length * 10
-  
-  // Score-Bonus für high-volume Produkte
-  const highVolumeProducts = recommendations.products.filter(p => p.typical_volume === 'high').length
-  score += highVolumeProducts * 5
-  
-  // Score-Bonus für klare Metallverarbeitung
-  if (detectedApps.some(a => ['metal_grinding', 'welding_prep', 'welding_finishing'].includes(a.id))) {
-    score += 15
+  // === 5. REASONING ERWEITERN ===
+  const reasoning = []
+  if (businessType.mainActivity) {
+    reasoning.push(businessType.mainActivity)
   }
-  
-  score = Math.min(score, 100)
-  
-  // 5. Erstelle Reasoning
-  const reasoning: string[] = []
-  
+  if (businessType.products.length > 0) {
+    reasoning.push(`Produkte/Leistungen: ${businessType.products.slice(0, 3).join(', ')}`)
+  }
   if (detectedApps.length > 0) {
-    const appNames = detectedApps.slice(0, 3).map(a => a.name).join(', ')
-    reasoning.push(`Erkannte Anwendungen: ${appNames}`)
+    reasoning.push(`Anwendungsbereiche: ${detectedApps.map(a => a.name).join(', ')}`)
   }
-  
-  if (recommendations.estimated_volume === 'high') {
-    reasoning.push('Hoher geschätzter Bedarf an Schleifmitteln')
-  } else if (recommendations.estimated_volume === 'medium') {
-    reasoning.push('Mittlerer geschätzter Bedarf an Schleifmitteln')
-  }
-  
   if (materials.size > 0) {
-    reasoning.push(`Bearbeitete Materialien: ${Array.from(materials).join(', ')}`)
+    reasoning.push(`Materialien: ${Array.from(materials).join(', ')}`)
+  }
+  if (companySize.estimate) {
+    reasoning.push(`Firmengröße: ${companySize.estimate}`)
   }
   
-  // 6. Erstelle Individual Hook
-  let hook = `Unternehmen im Bereich ${industry}`
+  // === 6. PERSÖNLICHEN HOOK GENERIEREN ===
+  let hook = businessType.mainActivity || `Potenzial im Bereich ${industry}`
   if (detectedApps.length > 0) {
     hook = `Spezialisiert auf ${detectedApps[0].name}`
   }
@@ -147,8 +138,11 @@ function createKeywordAnalysis(websiteData: any, industry: string): any {
       description: reasoning.length > 0 
         ? `${reasoning[0]}. ${reasoning.slice(1).join('. ')}.`
         : `Unternehmen im Bereich ${industry}`,
-      products: [],
-      services: [],
+      products: businessType.products,
+      services: businessType.services,
+      business_type: businessType.type, // 'manufacturer', 'trader', 'service', 'mixed'
+      main_activity: businessType.mainActivity,
+      company_size: companySize,
       detected_applications: detectedApps.map(a => ({
         name: a.name,
         confidence: (a as any).confidence || 0,
@@ -161,7 +155,7 @@ function createKeywordAnalysis(websiteData: any, industry: string): any {
         name: p.name,
         category: p.category,
         reason: p.reason,
-        grain_sizes: p.grain_sizes
+        // Entferne grain_sizes!
       })),
       estimated_volume: recommendations.estimated_volume,
       reasoning: reasoning.join('. ') + '.',
@@ -169,6 +163,171 @@ function createKeywordAnalysis(websiteData: any, industry: string): any {
       score: score
     }
   }
+}
+
+/**
+ * Identifiziert Geschäftstyp und Kernaktivitäten
+ */
+function identifyBusinessType(text: string, fullText: string) {
+  const result = {
+    type: 'unknown' as 'manufacturer' | 'trader' | 'service' | 'mixed' | 'unknown',
+    mainActivity: '',
+    products: [] as string[],
+    services: [] as string[],
+    isManufacturer: false
+  }
+  
+  // HERSTELLER-Indikatoren
+  const manufacturerKeywords = [
+    'herstell', 'produzi', 'fertigung', 'fabrik', 'werk', 
+    'eigene produktion', 'in-house', 'manufaktur', 'montage',
+    'entwicklung und fertigung', 'konstruktion', 'maschinenpark'
+  ]
+  
+  // HÄNDLER-Indikatoren
+  const traderKeywords = [
+    'handel', 'vertrieb', 'verkauf', 'handelsunternehmen',
+    'großhandel', 'einzelhandel', 'lieferant', 'vertriebspartner'
+  ]
+  
+  // DIENSTLEISTUNGS-Indikatoren
+  const serviceKeywords = [
+    'dienstleistung', 'service', 'wartung', 'reparatur',
+    'beratung', 'planung', 'installation', 'montageservice'
+  ]
+  
+  let manufacturerScore = 0
+  let traderScore = 0
+  let serviceScore = 0
+  
+  manufacturerKeywords.forEach(kw => { if (text.includes(kw)) manufacturerScore++ })
+  traderKeywords.forEach(kw => { if (text.includes(kw)) traderScore++ })
+  serviceKeywords.forEach(kw => { if (text.includes(kw)) serviceScore++ })
+  
+  // Bestimme Haupttyp
+  if (manufacturerScore > traderScore && manufacturerScore > serviceScore) {
+    result.type = 'manufacturer'
+    result.isManufacturer = true
+    result.mainActivity = 'Hersteller'
+  } else if (traderScore > manufacturerScore && traderScore > serviceScore) {
+    result.type = 'trader'
+    result.mainActivity = 'Handel/Vertrieb'
+  } else if (serviceScore > 0) {
+    result.type = 'service'
+    result.mainActivity = 'Dienstleister'
+  } else if (manufacturerScore > 0 && traderScore > 0) {
+    result.type = 'mixed'
+    result.isManufacturer = true
+    result.mainActivity = 'Hersteller und Handel'
+  }
+  
+  // Extrahiere konkrete Produkte/Dienstleistungen
+  const productPatterns = [
+    /(?:herstell(?:en|ung)|produzi(?:eren|ert)|fertigung) (?:von )?([a-zäöüß\s,-]{5,50})/gi,
+    /(?:unser(?:e)? produkt(?:e)?:|angebot:)\s*([a-zäöüß\s,-]{10,100})/gi,
+    /(?:spezialisiert auf|expertise in|schwerpunkt)\s*([a-zäöüß\s,-]{10,80})/gi
+  ]
+  
+  productPatterns.forEach(pattern => {
+    const matches = fullText.matchAll(pattern)
+    for (const match of matches) {
+      if (match[1]) {
+        const cleaned = match[1].trim().replace(/\s+/g, ' ')
+        if (cleaned.length > 5 && cleaned.length < 60) {
+          result.products.push(cleaned)
+        }
+      }
+    }
+  })
+  
+  // Dedupliziere und limitiere
+  result.products = [...new Set(result.products)].slice(0, 5)
+  
+  return result
+}
+
+/**
+ * Schätzt Firmengröße
+ */
+function estimateCompanySize(text: string, fullText: string) {
+  const result = {
+    estimate: 'Unbekannt',
+    confidence: 'low' as 'low' | 'medium' | 'high',
+    indicators: [] as string[]
+  }
+  
+  // Direkte Mitarbeiter-Angaben
+  const employeeMatches = fullText.match(/(\d+)\s*(?:mitarbeiter|beschäftigte|angestellte)/i)
+  if (employeeMatches) {
+    const count = parseInt(employeeMatches[1])
+    if (count < 50) {
+      result.estimate = 'Klein (< 50 MA)'
+    } else if (count < 250) {
+      result.estimate = 'Mittel (50-250 MA)'
+    } else {
+      result.estimate = 'Groß (> 250 MA)'
+    }
+    result.confidence = 'high'
+    result.indicators.push(`${count} Mitarbeiter angegeben`)
+    return result
+  }
+  
+  // Indirekte Indikatoren
+  let sizeScore = 0
+  
+  // Klein-Indikatoren
+  if (text.includes('familienunternehmen') || text.includes('inhabergeführt')) {
+    sizeScore -= 2
+    result.indicators.push('Familienunternehmen/inhabergeführt')
+  }
+  if (text.includes('meisterbetrieb') || text.includes('handwerksbetrieb')) {
+    sizeScore -= 2
+    result.indicators.push('Handwerksbetrieb')
+  }
+  
+  // Mittel-Indikatoren
+  if (text.includes('standort') && !text.includes('standorte')) {
+    sizeScore += 0
+  }
+  if (text.match(/\d+ jahre? erfahrung/i)) {
+    sizeScore += 1
+    result.indicators.push('Langjährige Erfahrung')
+  }
+  
+  // Groß-Indikatoren
+  if (text.includes('standorte') || text.includes('niederlassungen')) {
+    sizeScore += 3
+    result.indicators.push('Mehrere Standorte')
+  }
+  if (text.includes('konzern') || text.includes('unternehmensgruppe')) {
+    sizeScore += 4
+    result.indicators.push('Konzern/Unternehmensgruppe')
+  }
+  if (text.includes('weltweit') || text.includes('international')) {
+    sizeScore += 2
+    result.indicators.push('Internationale Tätigkeit')
+  }
+  if (text.includes('iso') || text.includes('zertifizierung')) {
+    sizeScore += 1
+    result.indicators.push('Zertifizierungen')
+  }
+  
+  // Schätzung basierend auf Score
+  if (sizeScore <= -2) {
+    result.estimate = 'Klein (< 50 MA)'
+    result.confidence = 'medium'
+  } else if (sizeScore >= 4) {
+    result.estimate = 'Groß (> 250 MA)'
+    result.confidence = 'medium'
+  } else if (sizeScore >= 1) {
+    result.estimate = 'Mittel (50-250 MA)'
+    result.confidence = 'medium'
+  } else {
+    result.estimate = 'Klein bis Mittel'
+    result.confidence = 'low'
+  }
+  
+  return result
 }
 
 /**
