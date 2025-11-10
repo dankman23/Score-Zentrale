@@ -118,15 +118,16 @@ function generateTemplateEmail(options: EmailGenerationOptions): GeneratedEmail 
   }
   
   // 7. Call-to-Action mit Kontaktoptionen
-  let cta = '\n\nGerne würde ich Ihnen ein auf Ihren Bedarf zugeschnittenes Angebot erstellen. Sie haben zwei Möglichkeiten:\n\n'
-  cta += '1️⃣ **Persönlicher Kontakt & Beratungstermin**\n'
-  cta += '   Rufen Sie mich gerne direkt an oder schreiben Sie mir eine E-Mail – ich nehme mir Zeit für eine individuelle Beratung.\n\n'
-  cta += '2️⃣ **Schriftliche Anfrage über unser Business-Portal**\n'
-  cta += '   Teilen Sie uns Ihren Bedarf bequem online mit:\n'
-  cta += '   🔗 https://score-schleifwerkzeuge.de/business'
+  let cta = '\n\n**Wie geht es weiter?**\n\n'
+  cta += 'Ich würde mich sehr freuen, Sie persönlich kennenzulernen und gemeinsam mit Ihnen die optimalen Schleifwerkzeuge für Ihre Anwendungen zu finden.\n\n'
+  cta += '**Kontaktieren Sie mich direkt:**\n'
+  cta += '📞 **Telefon:** 0221-25999901\n'
+  cta += '📧 **E-Mail:** leismann@score-schleifwerkzeuge.de\n\n'
+  cta += 'Alternativ können Sie auch über unser **Business-Portal** eine Anfrage stellen:\n'
+  cta += '🔗 https://score-schleifwerkzeuge.de/business'
   
   if (analysis.estimated_volume === 'high') {
-    cta += '\n\nBei größeren Mengen können wir Ihnen besonders attraktive Konditionen und individuelle Rahmenverträge anbieten.'
+    cta += '\n\n💡 **Tipp für größere Mengen:** Wir bieten attraktive Mengenrabatte und können individuelle Rahmenverträge mit Festpreisen vereinbaren.'
   }
   
   // 8. Abschluss & Kontakt
