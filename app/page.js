@@ -927,7 +927,7 @@ export default function App() {
               value={fmtCurrency(margin?.margin_net_with_ship)} 
               sub={
                 <span>
-                  Umsatz: {fmtCurrency(margin?.revenue_net_with_ship)} | Ø EK: {fmtCurrency(margin?.cost_net)} | Versand: {fmtCurrency(margin?.shipping_cost)}
+                  Umsatz: {fmtCurrency(margin?.revenue_net_with_ship)} | Ø EK: {fmtCurrency(margin?.cost_net)} | Versand: {fmtCurrency(margin?.shipping_revenue)}
                   {margin?.cost_source && (
                     <span 
                       className="ml-2" 
