@@ -1857,11 +1857,6 @@ export default function App() {
                   <i className="bi bi-badge-ad mr-1"/>Google Ads
                 </a>
               </li>
-              <li className="nav-item">
-                <a className={`nav-link ${marketingSub==='glossar'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setMarketingSub('glossar'); loadGlossary()}}>
-                  <i className="bi bi-book mr-1"/>Glossar
-                </a>
-              </li>
             </ul>
           </div>
 
