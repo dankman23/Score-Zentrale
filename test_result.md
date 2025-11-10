@@ -1129,5 +1129,40 @@ agent_communication:
     message: "ANALYTICS FILTER & METRICS UPDATE: Fixed category/product pages filter swap issue. Category pages now correctly filter for pages ENDING with -kaufen/ (ENDS_WITH). Product pages now correctly filter for pages ending with article numbers (regex -[0-9]+$) and EXCLUDE both -kaufen/ and -info/ pages. Timeseries metrics expanded from 4 to 8 metrics: added pageViews (screenPageViews), conversions, revenue (totalRevenue), and conversionRate (calculated). Updated /app/app/lib/analytics.ts with correct implementations. Ready for backend testing of 3 Analytics endpoints."
   - agent: "testing"
     message: "🎉 ANALYTICS FILTER & METRICS UPDATE TESTING COMPLETED - ALL 3/3 TESTS PASSED! Results: ✅ TEST 1 (Category Pages): GET /api/analytics/category-pages?startDate=30daysAgo&endDate=today returns 200 OK with 57 category pages. ALL pages correctly end with -kaufen/ (e.g., /schleifbaender-kaufen/, /trennscheiben-kaufen/). Filter working perfectly. ✅ TEST 2 (Product Pages): GET /api/analytics/product-pages?startDate=30daysAgo&endDate=today&limit=100 returns 200 OK with 100 product pages. **CRITICAL CHECKS PASSED**: NO pages contain -kaufen/, NO pages contain -info/, ALL pages end with article number pattern (e.g., /-375894, /-375935). Filter correctly excludes category and info pages. ✅ TEST 3 (Metrics Timeseries): GET /api/analytics/timeseries/metrics?startDate=30daysAgo&endDate=today returns 200 OK with 31 data points. **ALL 8 METRICS PRESENT**: date, sessions (278), users (254), pageViews (0 - GA4 issue but field exists), conversions (7), revenue (458.62), avgSessionDuration (163.03), bounceRate (0.658), conversionRate (2.52). All 31 data points verified. **FIXED IMPORT PATH ISSUE**: Routes were importing from old /app/lib/analytics.ts instead of updated /app/app/lib/analytics.ts. Changed imports from relative paths to @/lib/analytics in product-pages and timeseries/metrics routes. All Analytics filters and metrics working correctly!"
+  - task: "Kaltakquise V3: POST /api/coldleads/analyze-v3"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/coldleads/analyze-v3/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Neue V3-Analyze API implementiert. Nutzt analyzer-v3.ts (Multi-Page Crawl, LLM, Glossar-Mapping) und emailer-v3.ts (3 Mails generieren). Speichert analysis_v3, email_sequence, followup_schedule in MongoDB."
+  - task: "Kaltakquise V3: POST /api/coldleads/email-v3/send"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/coldleads/email-v3/send/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Email-Versand API mit Follow-up Scheduling. Kann Mail 1, 2 oder 3 versenden. Updated followup_schedule in MongoDB (mail_1_sent_at, mail_2_scheduled, etc). BCC an leismann@score-schleifwerkzeuge.de."
+  - task: "Kaltakquise V3: GET /api/coldleads/followup/auto"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/coldleads/followup/auto/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Auto-Follow-up Cron-Job. Prüft fällige Follow-ups (mail_2_scheduled <= now, mail_3_scheduled <= now) und versendet automatisch. Updates followup_schedule nach Versand."
+
+agent_communication:
   - agent: "main"
-    message: "JTL ARTICLES SYSTEM IMPLEMENTIERT: Neue Artikel-Browser APIs für JTL-Wawi Integration. Backend: 2 neue API-Endpunkte (GET /api/jtl/articles/list mit Filter/Pagination/Sortierung, GET /api/jtl/articles/filters für Filter-Optionen). List-API unterstützt Text-Suche (search), Hersteller-Filter (hersteller), Warengruppen-Filter (warengruppe), Pagination (page, limit) und Sortierung (sortBy, sortOrder). Filter-API lädt verfügbare Hersteller und Warengruppen aus MongoDB articles Collection. Bitte beide Backend-Endpunkte testen: (1) GET /api/jtl/articles/list mit verschiedenen Parametern, (2) GET /api/jtl/articles/filters für Filter-Optionen. Erwartung: 200 mit ok:true und korrekter Datenstruktur."
+    message: "Kaltakquise V3 System vollständig implementiert (Analyzer, Emailer, APIs, UI). Bereit für Backend-Tests. Bitte testen: analyze-v3 (mit Test-Website), email-v3/send (Mail 1 versenden), followup/auto (Check-Funktion)."
