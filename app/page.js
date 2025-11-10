@@ -147,6 +147,15 @@ export default function App() {
   const [glossarSub, setGlossarSub] = useState('anwendungen') // anwendungen|kategorien|werkstoffe|maschinen
   const [glossarSearch, setGlossarSearch] = useState('')
   
+  // Produkte (Artikel-Import)
+  const [produkteTab, setProdukteTab] = useState('import') // import | browser
+  const [artikelImportRunning, setArtikelImportRunning] = useState(false)
+  const [artikelImportProgress, setArtikelImportProgress] = useState({ imported: 0, total: 166854 })
+  const [artikelList, setArtikelList] = useState([])
+  const [artikelFilter, setArtikelFilter] = useState({ search: '', hersteller: '', warengruppe: '' })
+  const [artikelPage, setArtikelPage] = useState(1)
+  const [artikelPerPage] = useState(50)
+  
   // Analytics (GA4)
   const [analyticsMetrics, setAnalyticsMetrics] = useState(null)
   const [analyticsTrafficSources, setAnalyticsTrafficSources] = useState([])
