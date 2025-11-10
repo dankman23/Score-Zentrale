@@ -2,8 +2,8 @@ export const runtime = 'nodejs'
 
 import { NextResponse } from 'next/server'
 import { connectToMongoDB } from '../../../../../lib/mongodb'
-import { sendEmail } from '@/lib/email-client'
-import { SCORE_CONFIG } from '@/lib/score-coldleads-config'
+import { sendEmail } from '../../../../../lib/email-client'
+import { SCORE_CONFIG } from '../../../../../lib/score-coldleads-config'
 
 /**
  * POST /api/coldleads/email-v3/send
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
       }, { status: 400 })
     }
     
-    // Versende Email
+    // Versende Email (sendEmail erwartet: to, subject, htmlBody, textBody)
     await sendEmail(recipientEmail, mailData.subject, mailData.body, mailData.body)
     
     console.log(`[EmailV3] Mail ${mail_number} sent to ${recipientEmail}`)
