@@ -12,6 +12,13 @@ interface AnalysisResult {
     description: string
     products: string[]
     services: string[]
+    business_type?: 'manufacturer' | 'trader' | 'service' | 'mixed' | 'unknown'
+    main_activity?: string
+    company_size?: {
+      estimate: string
+      confidence: 'low' | 'medium' | 'high'
+      indicators: string[]
+    }
     detected_applications: Array<{
       name: string
       confidence: number
@@ -32,7 +39,6 @@ interface AnalysisResult {
       name: string
       category: string
       reason: string
-      grain_sizes?: string[]
     }>
     estimated_volume: 'low' | 'medium' | 'high'
     reasoning: string
