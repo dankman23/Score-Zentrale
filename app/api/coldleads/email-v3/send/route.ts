@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       }, { status: 400 })
     }
     
-    const db = await getMongoDb()
+    const db = await connectToMongoDB()
     const prospectsCollection = db.collection('prospects')
     
     // Lade Prospect
