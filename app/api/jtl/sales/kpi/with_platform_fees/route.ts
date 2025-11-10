@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const stornoFilter = hasNStorno ? 'AND (o.nStorno IS NULL OR o.nStorno = 0)' : ''
 
     const hasNPosTyp = await hasColumn(pool, orderPosTable, 'nPosTyp')
-    const articleFilter = hasNPosTyp ? 'op.nPosTyp = 1' : `op.kArtikel > 0`
+    const articleFilter = hasNPosTyp ? '(op.nPosTyp = 1 OR op.nPosTyp = 3)' : `1=1`  // Alle Positionen einbeziehen
     const feeFilter = hasNPosTyp ? 'op.nPosTyp = 3' : `op.cName LIKE '%Gebühr%' OR op.cName LIKE '%Fee%'`
 
     const qtyField = await pickFirstExisting(pool, orderPosTable, ['fAnzahl', 'nAnzahl', 'fMenge']) || 'fAnzahl'
