@@ -1830,7 +1830,7 @@ export default function App() {
                             </tr>
                           </thead>
                           <tbody>
-                            {sortData(analyticsCategoryPages, categorySort.field, categorySort.order).map((page, i) => (
+                            {sortData(analyticsCategoryPages, categorySort.field, categorySort.order).slice(0, showAllCategories ? undefined : 10).map((page, i) => (
                               <tr key={i} 
                                   style={{cursor: 'pointer'}} 
                                   className={selectedCategoryPage?.pagePath === page.pagePath ? 'table-active' : ''}
@@ -1849,6 +1849,16 @@ export default function App() {
                               </tr>
                             ))}
                           </tbody>
+                          {analyticsCategoryPages.length > 10 && (
+                            <tfoot>
+                              <tr>
+                                <td colSpan={4} className="text-center" style={{cursor:'pointer', padding:'12px'}} onClick={()=>setShowAllCategories(!showAllCategories)}>
+                                  <i className={`bi bi-chevron-${showAllCategories?'up':'down'} mr-2`}/>
+                                  {showAllCategories ? 'Weniger anzeigen' : `${analyticsCategoryPages.length - 10} weitere anzeigen`}
+                                </td>
+                              </tr>
+                            </tfoot>
+                          )}
                         </table>
                       </div>
                     </div>
