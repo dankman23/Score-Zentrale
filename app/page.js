@@ -1029,6 +1029,26 @@ export default function App() {
     }
   }
 
+  const deleteProspect = async (prospectId) => {
+    try {
+      const res = await fetch('/api/coldleads/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: prospectId })
+      })
+      const data = await res.json()
+      if (data.ok) {
+        setToast('Prospect erfolgreich gelöscht')
+        loadColdProspects()
+        loadColdLeadStats()
+      } else {
+        setToast('Fehler beim Löschen: ' + data.error)
+      }
+    } catch (e) {
+      setToast('Fehler beim Löschen: ' + e.message)
+    }
+  }
+
   // Bulk-Analyse für ausgewählte Prospects
   const bulkAnalyzeProspects = async () => {
     if (selectedProspectsForBulk.length === 0) return
