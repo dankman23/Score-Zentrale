@@ -1,28 +1,239 @@
 #!/usr/bin/env python3
 """
-DACH-Crawler Backend API Testing
-Comprehensive testing of the 3 new DACH-Crawler endpoints
+JTL Articles Browser APIs Testing
+Tests the 2 new JTL Articles Browser APIs according to German requirements.
 """
 
 import requests
 import json
-import time
-from datetime import datetime
+import sys
+from typing import Dict, Any, List
 
-# Configuration
+# Base URL from environment
 BASE_URL = "https://jt-article-hub.preview.emergentagent.com"
-API_BASE = f"{BASE_URL}/api"
 
-def log_test(test_name, status, details=""):
-    """Log test results with timestamp"""
-    timestamp = datetime.now().strftime("%H:%M:%S")
-    status_icon = "✅" if status == "PASS" else "❌" if status == "FAIL" else "⚠️"
-    print(f"[{timestamp}] {status_icon} {test_name}: {status}")
-    if details:
-        print(f"    {details}")
-    print()
+def test_api_endpoint(url: str, expected_status: int = 200, description: str = "") -> Dict[str, Any]:
+    """Test an API endpoint and return results"""
+    print(f"\n🧪 Testing: {description}")
+    print(f"📍 URL: {url}")
+    
+    try:
+        response = requests.get(url, timeout=30)
+        print(f"📊 Status: {response.status_code}")
+        
+        if response.status_code == expected_status:
+            try:
+                data = response.json()
+                print(f"✅ Response received successfully")
+                return {"success": True, "data": data, "status": response.status_code}
+            except json.JSONDecodeError:
+                print(f"❌ Invalid JSON response")
+                return {"success": False, "error": "Invalid JSON", "status": response.status_code}
+        else:
+            print(f"❌ Unexpected status code: {response.status_code}")
+            try:
+                error_data = response.json()
+                return {"success": False, "error": error_data, "status": response.status_code}
+            except:
+                return {"success": False, "error": response.text, "status": response.status_code}
+                
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Request failed: {str(e)}")
+        return {"success": False, "error": str(e), "status": 0}
 
-def test_dach_stats_endpoint():
+def validate_filters_response(data: Dict[str, Any]) -> bool:
+    """Validate filters API response structure"""
+    print("\n🔍 Validating filters response structure...")
+    
+    # Check required fields
+    required_fields = ["ok", "hersteller", "warengruppen"]
+    for field in required_fields:
+        if field not in data:
+            print(f"❌ Missing required field: {field}")
+            return False
+    
+    # Check ok field
+    if data["ok"] != True:
+        print(f"❌ ok field is not true: {data['ok']}")
+        return False
+    
+    # Check hersteller array
+    if not isinstance(data["hersteller"], list):
+        print(f"❌ hersteller is not an array")
+        return False
+    
+    # Check warengruppen array
+    if not isinstance(data["warengruppen"], list):
+        print(f"❌ warengruppen is not an array")
+        return False
+    
+    # Check hersteller structure if not empty
+    if len(data["hersteller"]) > 0:
+        first_hersteller = data["hersteller"][0]
+        if not isinstance(first_hersteller, dict) or "name" not in first_hersteller or "count" not in first_hersteller:
+            print(f"❌ Invalid hersteller structure: {first_hersteller}")
+            return False
+    
+    # Check warengruppen structure if not empty
+    if len(data["warengruppen"]) > 0:
+        first_warengruppe = data["warengruppen"][0]
+        if not isinstance(first_warengruppe, dict) or "name" not in first_warengruppe or "count" not in first_warengruppe:
+            print(f"❌ Invalid warengruppen structure: {first_warengruppe}")
+            return False
+    
+    print(f"✅ Filters response structure valid")
+    print(f"📊 Hersteller count: {len(data['hersteller'])}")
+    print(f"📊 Warengruppen count: {len(data['warengruppen'])}")
+    
+    return True
+
+def validate_list_response(data: Dict[str, Any], expected_max_articles: int = None) -> bool:
+    """Validate list API response structure"""
+    print("\n🔍 Validating list response structure...")
+    
+    # Check required fields
+    required_fields = ["ok", "articles", "pagination", "filters"]
+    for field in required_fields:
+        if field not in data:
+            print(f"❌ Missing required field: {field}")
+            return False
+    
+    # Check ok field
+    if data["ok"] != True:
+        print(f"❌ ok field is not true: {data['ok']}")
+        return False
+    
+    # Check articles array
+    if not isinstance(data["articles"], list):
+        print(f"❌ articles is not an array")
+        return False
+    
+    # Check max articles limit
+    if expected_max_articles and len(data["articles"]) > expected_max_articles:
+        print(f"❌ Too many articles returned: {len(data['articles'])} > {expected_max_articles}")
+        return False
+    
+    # Check pagination structure
+    pagination = data["pagination"]
+    required_pagination_fields = ["page", "limit", "total", "totalPages", "hasNext", "hasPrev"]
+    for field in required_pagination_fields:
+        if field not in pagination:
+            print(f"❌ Missing pagination field: {field}")
+            return False
+    
+    # Check filters structure
+    filters = data["filters"]
+    if not isinstance(filters, dict):
+        print(f"❌ filters is not an object")
+        return False
+    
+    # Check article structure if articles exist
+    if len(data["articles"]) > 0:
+        first_article = data["articles"][0]
+        required_article_fields = ["kArtikel", "cArtNr", "cName", "cHerstellerName", "cWarengruppenName", "fVKNetto", "fEKNetto", "margin_percent"]
+        for field in required_article_fields:
+            if field not in first_article:
+                print(f"❌ Missing article field: {field}")
+                return False
+    
+    print(f"✅ List response structure valid")
+    print(f"📊 Articles count: {len(data['articles'])}")
+    print(f"📊 Total articles: {pagination['total']}")
+    print(f"📊 Page: {pagination['page']}, Limit: {pagination['limit']}")
+    
+    return True
+
+def test_search_functionality(data: Dict[str, Any], search_term: str) -> bool:
+    """Test if search results contain the search term"""
+    print(f"\n🔍 Validating search results for term: '{search_term}'")
+    
+    if len(data["articles"]) == 0:
+        print(f"⚠️ No articles found for search term '{search_term}'")
+        return True  # Empty results are acceptable
+    
+    # Check if articles contain search term
+    search_term_lower = search_term.lower()
+    valid_articles = 0
+    
+    for article in data["articles"]:
+        article_matches = False
+        
+        # Check cArtNr
+        if "cArtNr" in article and article["cArtNr"] and search_term_lower in str(article["cArtNr"]).lower():
+            article_matches = True
+        
+        # Check cName
+        if "cName" in article and article["cName"] and search_term_lower in str(article["cName"]).lower():
+            article_matches = True
+        
+        # Check cBarcode
+        if "cBarcode" in article and article["cBarcode"] and search_term_lower in str(article["cBarcode"]).lower():
+            article_matches = True
+        
+        if article_matches:
+            valid_articles += 1
+        else:
+            print(f"❌ Article does not contain search term: {article.get('cArtNr', 'N/A')} - {article.get('cName', 'N/A')}")
+    
+    if valid_articles == len(data["articles"]):
+        print(f"✅ All {valid_articles} articles contain search term '{search_term}'")
+        return True
+    else:
+        print(f"❌ Only {valid_articles}/{len(data['articles'])} articles contain search term")
+        return False
+
+def test_manufacturer_filter(data: Dict[str, Any], manufacturer: str) -> bool:
+    """Test if all articles are from the specified manufacturer"""
+    print(f"\n🔍 Validating manufacturer filter for: '{manufacturer}'")
+    
+    if len(data["articles"]) == 0:
+        print(f"⚠️ No articles found for manufacturer '{manufacturer}'")
+        return True  # Empty results are acceptable
+    
+    valid_articles = 0
+    
+    for article in data["articles"]:
+        if article.get("cHerstellerName") == manufacturer:
+            valid_articles += 1
+        else:
+            print(f"❌ Article from wrong manufacturer: {article.get('cHerstellerName', 'N/A')} (expected: {manufacturer})")
+    
+    if valid_articles == len(data["articles"]):
+        print(f"✅ All {valid_articles} articles are from manufacturer '{manufacturer}'")
+        return True
+    else:
+        print(f"❌ Only {valid_articles}/{len(data['articles'])} articles are from correct manufacturer")
+        return False
+
+def test_pagination_differences(page1_data: Dict[str, Any], page2_data: Dict[str, Any]) -> bool:
+    """Test if page 1 and page 2 have different articles"""
+    print(f"\n🔍 Validating pagination differences between page 1 and page 2")
+    
+    page1_ids = set()
+    page2_ids = set()
+    
+    # Collect kArtikel IDs from page 1
+    for article in page1_data["articles"]:
+        if "kArtikel" in article:
+            page1_ids.add(article["kArtikel"])
+    
+    # Collect kArtikel IDs from page 2
+    for article in page2_data["articles"]:
+        if "kArtikel" in article:
+            page2_ids.add(article["kArtikel"])
+    
+    # Check for overlaps
+    overlap = page1_ids.intersection(page2_ids)
+    
+    if len(overlap) == 0:
+        print(f"✅ No overlapping articles between pages (Page 1: {len(page1_ids)} IDs, Page 2: {len(page2_ids)} IDs)")
+        return True
+    else:
+        print(f"❌ Found {len(overlap)} overlapping articles between pages")
+        print(f"Overlapping IDs: {list(overlap)[:5]}...")  # Show first 5
+        return False
+
+def main():
     """
     Test 1: GET /api/coldleads/dach/stats (Dashboard-Statistiken)
     Expected: 200 OK with complete stats structure
