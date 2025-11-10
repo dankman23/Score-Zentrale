@@ -215,17 +215,20 @@ async function crawlAustriaRegion(
   
   console.log(`[AT Crawler] Searching ${region} for ${industry}`)
   
-  const sources = [
-    { domain: 'herold.at', name: 'Herold.at' },
-    { domain: 'firmenabc.at', name: 'FirmenABC.at' }
+  const searchQueries = [
+    `${keywords[0]} ${region} site:herold.at OR site:firmenabc.at "impressum"`,
+    `${keywords[0]} ${region} site:.at "firma" OR "unternehmen"`
   ]
   
-  for (const source of sources) {
+  for (const query of searchQueries) {
     try {
-      const query = `site:${source.domain} ${keywords[0]} ${region}`
-      const searchResults = await performGoogleSearch(query, Math.ceil(limit / sources.length))
+      const searchResults = await performGoogleSearch(query, Math.ceil(limit / searchQueries.length))
       
       for (const result of searchResults) {
+        let sourceName = 'Google'
+        if (result.link.includes('herold.at')) sourceName = 'Herold.at'
+        else if (result.link.includes('firmenabc.at')) sourceName = 'FirmenABC.at'
+        
         leads.push({
           name: result.title,
           website: result.link,
@@ -234,14 +237,14 @@ async function crawlAustriaRegion(
           region: region,
           country: 'AT',
           industry: industry,
-          source: source.name
+          source: sourceName
         })
       }
       
       await new Promise(resolve => setTimeout(resolve, 1000))
       
     } catch (error) {
-      console.error(`[AT Crawler] Error with ${source.name}:`, error)
+      console.error(`[AT Crawler] Error with query "${query}":`, error)
     }
   }
   
@@ -261,17 +264,20 @@ async function crawlSwitzerlandRegion(
   
   console.log(`[CH Crawler] Searching ${region} for ${industry}`)
   
-  const sources = [
-    { domain: 'local.ch', name: 'local.ch' },
-    { domain: 'search.ch', name: 'search.ch' }
+  const searchQueries = [
+    `${keywords[0]} ${region} site:local.ch OR site:search.ch "kontakt"`,
+    `${keywords[0]} ${region} site:.ch "firma" OR "unternehmen"`
   ]
   
-  for (const source of sources) {
+  for (const query of searchQueries) {
     try {
-      const query = `site:${source.domain} ${keywords[0]} ${region}`
-      const searchResults = await performGoogleSearch(query, Math.ceil(limit / sources.length))
+      const searchResults = await performGoogleSearch(query, Math.ceil(limit / searchQueries.length))
       
       for (const result of searchResults) {
+        let sourceName = 'Google'
+        if (result.link.includes('local.ch')) sourceName = 'local.ch'
+        else if (result.link.includes('search.ch')) sourceName = 'search.ch'
+        
         leads.push({
           name: result.title,
           website: result.link,
@@ -280,14 +286,14 @@ async function crawlSwitzerlandRegion(
           region: region,
           country: 'CH',
           industry: industry,
-          source: source.name
+          source: sourceName
         })
       }
       
       await new Promise(resolve => setTimeout(resolve, 1000))
       
     } catch (error) {
-      console.error(`[CH Crawler] Error with ${source.name}:`, error)
+      console.error(`[CH Crawler] Error with query "${query}":`, error)
     }
   }
   
