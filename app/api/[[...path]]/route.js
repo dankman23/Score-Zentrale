@@ -617,6 +617,121 @@ async function handleRoute(request, { params }) {
       return cors(res)
     }
 
+    // --------------- Kaltakquise V3 APIs ---------------
+    
+    // V3 API: POST /api/coldleads/analyze-v3
+    if (route === '/coldleads/analyze-v3' && method === 'POST') {
+      try {
+        const body = await request.json()
+        const { website, company_name, industry, region } = body
+        
+        if (!website) {
+          return json({ ok: false, error: 'Website URL required' }, { status: 400 })
+        }
+        
+        // Mock analysis response for testing
+        const mockAnalysis = {
+          company: company_name || 'Test Company',
+          url: website,
+          branch_guess: [industry || 'Metallverarbeitung'],
+          applications: [
+            { term: 'Schleifen', evidence: 'Schleifarbeiten identifiziert' },
+            { term: 'Polieren', evidence: 'Polierverfahren erkannt' }
+          ],
+          materials: [
+            { term: 'Edelstahl', evidence: 'Edelstahlbearbeitung' },
+            { term: 'Aluminium', evidence: 'Aluminiumverarbeitung' }
+          ],
+          machines: [
+            { term: 'Winkelschleifer', evidence: 'Winkelschleifer-Einsatz' }
+          ],
+          product_categories: [
+            { term: 'Schleifscheiben', evidence: 'Schleifscheiben-Bedarf' }
+          ],
+          contact_person: {
+            name: 'Max Mustermann',
+            role: 'Geschäftsführer',
+            email: 'info@test.de',
+            confidence: 0.7
+          },
+          confidence_overall: 75,
+          notes: 'Mock-Analyse für Testing. Konfidenz: 75%',
+          recommended_brands: ['Klingspor', '3M', 'Norton']
+        }
+        
+        const mockEmailSequence = {
+          mail_1: {
+            subject: 'Schleifwerkzeuge für ' + (company_name || 'Ihr Unternehmen'),
+            body: 'Sehr geehrte Damen und Herren,\n\nwir haben gesehen, dass Sie mit Metallbearbeitung arbeiten. Dafür haben wir passende Schleifwerkzeuge auf Lager.\n\nBeste Grüße\nDaniel von Score Schleifwerkzeuge',
+            word_count: 35
+          },
+          mail_2: {
+            subject: 'Nachfrage: Schleifwerkzeuge',
+            body: 'Hallo,\n\nvor einigen Tagen hatte ich Ihnen geschrieben. Bei Interesse können Sie gerne anrufen.\n\nBeste Grüße',
+            word_count: 25
+          },
+          mail_3: {
+            subject: 'Kurzer Anruf zu Schleifwerkzeugen?',
+            body: 'Hallo,\n\nfalls Interesse besteht: Darf ich Sie kurz anrufen?\n\nBeste Grüße',
+            word_count: 18
+          },
+          crm_tags: ['Metallverarbeitung', 'Schleifen', 'Edelstahl', 'Klingspor']
+        }
+        
+        return json({
+          ok: true,
+          analysis: mockAnalysis,
+          email_sequence: mockEmailSequence,
+          message: 'Analysis complete (mock data for testing)'
+        })
+        
+      } catch (error) {
+        console.error('[AnalyzeV3] Error:', error)
+        return json({ ok: false, error: error.message || 'Analysis failed' }, { status: 500 })
+      }
+    }
+    
+    // V3 API: POST /api/coldleads/email-v3/send
+    if (route === '/coldleads/email-v3/send' && method === 'POST') {
+      try {
+        const body = await request.json()
+        const { prospect_id, mail_number = 1 } = body
+        
+        if (!prospect_id) {
+          return json({ ok: false, error: 'prospect_id required' }, { status: 400 })
+        }
+        
+        // Mock response for testing
+        return json({
+          ok: true,
+          message: `Mail ${mail_number} sent successfully (mock)`,
+          recipient: 'test@example.com',
+          subject: `Test Mail ${mail_number} Subject`
+        })
+        
+      } catch (error) {
+        console.error('[EmailV3] Error:', error)
+        return json({ ok: false, error: error.message || 'Email send failed' }, { status: 500 })
+      }
+    }
+    
+    // V3 API: GET /api/coldleads/followup/auto
+    if (route === '/coldleads/followup/auto' && method === 'GET') {
+      try {
+        // Mock response for testing
+        return json({
+          ok: true,
+          sent: 0,
+          errors: 0,
+          timestamp: new Date().toISOString()
+        })
+        
+      } catch (error) {
+        console.error('[AutoFollowup] Error:', error)
+        return json({ ok: false, error: error.message || 'Auto-followup failed' }, { status: 500 })
+      }
+    }
+
     // --------------- Existing routes below (JTL sales/orders etc.) ---------------
 
     // Keep other existing logic by importing from earlier code (omitted here for brevity in this snippet)
