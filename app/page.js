@@ -3872,9 +3872,22 @@ export default function App() {
                             </td>
                             <td className="align-middle text-right" style={{whiteSpace: 'nowrap'}}>
                               {p.status === 'new' && (
-                                <button className="btn btn-sm btn-info" onClick={() => analyzeProspect(p)} disabled={coldLoading} title="Analysieren">
-                                  <i className="bi bi-search"/>
-                                </button>
+                                <div className="btn-group btn-group-sm">
+                                  <button className="btn btn-primary" onClick={() => analyzeProspect(p)} disabled={coldLoading}>
+                                    <i className="bi bi-search mr-1"/>Analysieren
+                                  </button>
+                                  <button 
+                                    className="btn btn-danger" 
+                                    onClick={(e) => { 
+                                      e.stopPropagation(); 
+                                      if (confirm(`${p.company_name} wirklich löschen?`)) deleteProspect(p.id)
+                                    }} 
+                                    disabled={coldLoading} 
+                                    title="Löschen"
+                                  >
+                                    <i className="bi bi-trash"/>
+                                  </button>
+                                </div>
                               )}
                               {p.status === 'analyzed' && (
                                 <div className="btn-group btn-group-sm">
