@@ -4892,12 +4892,12 @@ export default function App() {
                                   <tr key={artikel.kArtikel}>
                                     <td className="font-weight-bold text-primary">{artikel.cArtNr}</td>
                                     <td>
-                                      <div className="text-truncate" style={{maxWidth: '350px'}} title={artikel.cName}>
-                                        {artikel.cName}
+                                      <div className="text-truncate font-weight-bold" style={{maxWidth: '350px'}} title={artikel.cName || artikel.cKurzBeschreibung}>
+                                        {artikel.cName || artikel.cKurzBeschreibung || 'Kein Name'}
                                       </div>
-                                      {artikel.cKurzBeschreibung && (
+                                      {artikel.cKurzBeschreibung && artikel.cName !== artikel.cKurzBeschreibung && (
                                         <small className="text-muted text-truncate d-block" style={{maxWidth: '350px'}}>
-                                          {artikel.cKurzBeschreibung}
+                                          {artikel.cKurzBeschreibung.substring(0, 100)}...
                                         </small>
                                       )}
                                     </td>
