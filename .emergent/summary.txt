@@ -1,110 +1,88 @@
 <analysis>
-The trajectory outlines a multi-phase development effort for the Score Zentrale application. Initially, the AI engineer addressed Kaltakquise (Cold Acquisition) UI features like filter buttons and history display. A major focus then shifted to resolving critical data integrity issues: fixing Warmakquise customer name retrieval (due to incorrect JTL-Wawi SQL joins and schema misunderstandings) and rectifying Sales data discrepancies where the API overcounted sales by including offers alongside orders from JTL. Both involved extensive SQL debugging and schema exploration. Subsequently, the Kaltakquise system underwent significant refactoring, enhancing AI-driven prospect analysis and personalized email generation. The final phase introduced a comprehensive Kaltakquise autopilot system (search, analyze, send, follow-up, reply tracking) with a frontend control panel, which is currently experiencing a build error.
+Der KI-Ingenieur hat die Score Zentrale von Grund auf neu entwickelt und kontinuierlich verbessert. Die Arbeit umfasste die Behebung kritischer Datenintegritätsprobleme (JTL-Wawi), die Verfeinerung von Verkaufsmetriken (inkl. Versandkosten, Rohertragsmarge), die Erweiterung des Dashboards um neue KPIs (Top 5 Plattformen/Hersteller) und die umfassende Überarbeitung des Analytics-Moduls (Expand/Collapse, Info-Pages, Beileger-Tracking). Ein Schwerpunkt lag auf der Kaltakquise, die von AI-gestützter Analyse und personalisierter E-Mail-Generierung bis hin zu Autopilot-Funktionen und einem Glossar-System reicht. Die Kommunikation konzentrierte sich auf detaillierte Feature-Implementierung und Bugfixing, insbesondere bei GA4-Daten, Email-Konfiguration und UI-Layout. Der aktuelle Fokus liegt auf der Neugestaltung der Kaltakquise-Suchmechanik durch ein systematisches DACH-Crawling.
 </analysis>
-
 <product_requirements>
-The Score Zentrale is a Next.js full-stack dashboard integrating Sales (JTL-Wawi), Marketing (GA4, Google Ads, Cold/Warm Acquisition), and an Outbound Suite.
-- **Sales Dashboard**: Display JTL-Wawi KPIs (revenue, orders, margin), multi-select filters, adjust Umsatz Netto/Brutto to include shipping, redefine Rohertragsmarge, add charts, and show Umsatz Netto nach Plattform. Fix article names. The sales data had discrepancies with JTL, overcounting due to inclusion of offers (AN) instead of only orders (AU).
-- **Kaltakquise (Cold Acquisition)**: Use Google Search for prospects, AI analysis for needs/contacts, personalized SMTP email outreach. Implement email inbox/outbox for , add dashboard tile for unread replies, create customer history, and implement follow-up emails after 6 days. The system should automate search, analysis, and outreach with configurable limits, avoiding duplicates, and improving email content.
-- **Warmakquise (Warm Acquisition)**: Display customer name (instead of customer ID/email), include a calculated score, show phone number, and implement contact history. The score calculation needs to be refined to target inactive customers (e.g., last order 4-12 months ago) and exclude recently active ones. Customer data was missing accurate names, often showing IDs or emails due to incorrect JTL-Wawi SQL joins.
-- **UI/UX**: General UI improvements and conversion of detail/email views to accordions.
-- **Deployment**: Ensure the application is deployment-ready by removing hardcoded URLs and fixing build errors.
+Die Score Zentrale ist ein Next.js-Dashboard zur Integration von Sales (JTL-Wawi), Marketing (GA4, Google Ads, Kalt-/Warmakquise) und einer Outbound-Suite.
+- **Sales Dashboard**: Anzeige von JTL-Wawi KPIs (Umsatz Netto/Brutto inkl. Versand, Rohertragsmarge exkl. Versand), Multi-Select-Filter, Top 5 Plattformen/Hersteller mit dynamischer Namenszuordnung und Margin-Prozent, sortierbare Tabellen. Behebung von Dateninkonsistenzen (Angebote, Artikelnamen).
+- **Kaltakquise (Cold Acquisition)**: AI-gestützte Google-Suche für Prospects, detaillierte AI-Analyse (Firmengröße, Haupttätigkeit), personalisierte SMTP-E-Mail-Outreach (ohne Körnungen, Pferd-Erwähnung, persönlicher Satz, verbesserter CTA), E-Mail-Posteingang/-ausgang (mit BCC an Leismann), Kundenhistorie, Follow-up-E-Mails. Automatisierung mit konfigurierbaren Limits und Duplikatsvermeidung. Glossar-Integration für Anwendungen, Kategorien, Materialien, Maschinentypen.
+- **Warmakquise (Warm Acquisition)**: Anzeige von Kundennamen, berechneter Score für inaktive Kunden, Telefonnummer, Kontakthistorie.
+- **UI/UX**: Allgemeine UI-Verbesserungen, Konvertierung von Detailansichten zu Akkordeons. Implementierung von Expand/Collapse-Funktionalität für diverse Datenquellen im Analytics-Dashboard, Info-Pages und Beileger-Tracking. Anpassung des Kaltakquise-Layouts für bessere Responsivität.
+- **Deployment**: Sicherstellung der Deployment-Bereitschaft durch Entfernen von Hardcoded-URLs und Behebung von Build-Fehlern.
 </product_requirements>
-
 <key_technical_concepts>
-- **Next.js & TypeScript**: Full-stack framework.
-- **MongoDB**: Persistent storage for cold leads and application data.
-- **MS SQL (JTL-Wawi)**: Primary data source for Sales and customer data.
-- **Nodemailer & IMAP client**: Email sending (SMTP) and receiving (IMAP).
-- **Shadcn/UI & Tailwind CSS**: Frontend UI components and styling.
-- **AI/LLM (OpenAI)**: Used for prospect analysis and email generation.
-- **Kubernetes**: Deployment environment.
+- **Next.js & TypeScript**: Full-stack Framework.
+- **MongoDB**: NoSQL-Datenbank für Kaltakquise- und App-Daten.
+- **MS SQL (JTL-Wawi)**: Relationale Datenbank für Sales- und Kundendaten.
+- **Nodemailer & IMAP client**: E-Mail-Versand (SMTP) und Empfang (IMAP).
+- **Shadcn/UI & Tailwind CSS**: UI-Komponentenbibliothek und CSS-Framework.
+- **AI/LLM (OpenAI via )**: Prospektanalyse, E-Mail-Generierung, Glossar-Matching.
+- **Google Analytics 4 (GA4)**: Webanalyse-Datenquelle.
 </key_technical_concepts>
-
 <code_architecture>
 
-
 -   ****:
-    -   **Importance**: Catch-all API route, handles dynamic backend endpoints including  (Warmakquise) and temporary debug routes.
-    -   **Changes**: Initially fixed SQL aggregate function error and attempted to fetch customer data for Warmakquise. Later extensively modified to correctly join  for , ,  for Warmakquise lead import. SQL filtering logic was adjusted to target customers inactive for 4-24 months and exclude offers (AN) from  calculation. MongoDB upsert logic was corrected to merge lead data ( for specific fields,  for removed fields) to preserve existing , , . Temporary MongoDB clear endpoint was added and then removed.
+    -   **Importance**: Main frontend, dashboard UI, Kaltakquise-Logik, Analytics-Darstellung.
+    -   **Changes**: Implementierte expand/collapse für Produktseiten; fügte UI für Info Pages und Beileger-Sektion hinzu; aktualisierte  zum Aufruf neuer APIs; verbesserte KPI-Darstellung für  (Nutzung von ); fixierte Navigations-Bug in Kaltakquise (Filter-Buttons); implementierte E-Mail-Inbox-Anzeige; passte Layout des Kaltakquise-Moduls an (kompaktere Aktionsbuttons, ); fügte Glossar-Tab im Marketing-Bereich hinzu.
 -   ****:
-    -   **Importance**: Main frontend page, containing dashboard UI logic.
-    -   **Changes**: Modified to display Cold Leads statistics (unread replies), integrate filter buttons for Cold Leads (e.g., Ungelesene Antworten), and add a history display section within the Kaltakquise details. UI for the new Kaltakquise Autopilot Control Panel (start/stop, configuration) was added, and status badges were converted to interactive dropdowns.
+    -   **Importance**: Zentrale Logik für GA4-Datenabfrage.
+    -   **Changes**: Implementierte ,  und  Funktionen; behob einen Bug, bei dem  0 zurückgab (Workaround mit ); aktualisierte Timeseries-Funktion mit dieser Logik; korrigierte Filter für Kategorie- und Produktseiten. Wurde auch nach  kopiert, um Importpfadprobleme zu beheben.
+-   ** (New)**:
+    -   **Importance**: API-Endpunkt zum Abrufen von Daten für spezifische Info Pages.
+    -   **Changes**: Neu erstellt, um  aus  aufzurufen.
+-   ** (New)**:
+    -   **Importance**: API-Endpunkt zum Abrufen von Daten für die Erfolg von Beileger-Sektion (QR-Code Traffic).
+    -   **Changes**: Neu erstellt, um  aus  aufzurufen.
 -   ****:
-    -   **Importance**: Defines overall page structure and main navigation.
-    -   **Changes**: Updated for the new navigation structure including Akquise with Kaltakquise and Warmakquise sub-tabs.
+    -   **Importance**: Handles IMAP connection for email inbox.
+    -   **Changes**: Keine direkten Codeänderungen, aber die Konfiguration in  wurde angepasst, um die Authentifizierung zu ermöglichen.
 -   ****:
-    -   **Importance**: Handles connection to JTL-Wawi MSSQL.
-    -   **Changes**: Fixed TypeScript  error. Note: The  file itself was not found during a debug attempt;  function was found to be defined directly in .
--   ** & **:
-    -   **Importance**: API client and LLM interaction.
-    -   **Changes**: Removed hardcoded URLs, using environment variables for deployment.
--   ****, ****, ****, ****, ****, ****, ****:
-    -   **Importance**: Sales data APIs.
-    -   **Changes**: All these APIs were modified to include a  filter in their SQL queries to correctly count only orders (Aufträge) and exclude offers (Angebote), resolving discrepancies with JTL-Wawi's reported sales figures.
--   ** (New File)**:
-    -   **Importance**: API for fetching statistics on cold leads.
-    -   **Changes**: Created to provide data for the Ungelesene Antworten dashboard widget.
+    -   **Importance**: Kernlogik für die Analyse von Prospekt-Websites.
+    -   **Changes**: Erweiterte Analyse um Firmengröße und Haupttätigkeit; verbesserte Kontakt-Extraktion (E-Mail, Telefon); entfernte granularere Produktdetails; verbesserte Crawler-Logik und Glossar-Matching (Case-Insensitivität).
 -   ****:
-    -   **Importance**: API for searching prospects.
-    -   **Changes**: Modified to persist search results immediately into MongoDB (previously only temporary results were returned), using  and adding .
+    -   **Importance**: Generierung und Versand von Kaltakquise-E-Mails.
+    -   **Changes**: Reworked Email-Generierung für persönliche Ansprache, Erwähnung spezifischer Hersteller (z.B. Pferd), vereinfachte Produktlisten (ohne Körnungen); hinzugefügt BCC an ; hinzugefügt Reply-To Header.
 -   ****:
-    -   **Importance**: API for AI-driven prospect analysis.
-    -   **Changes**: Adjusted to work with  in  and enhanced to incorporate a more sophisticated 3-stage analysis (web-scraping, AI application recognition, product mapping).
+    -   **Importance**: Generischer E-Mail-Client.
+    -   **Changes**: Hinzugefügt BCC-Option, um Konsistenz zu gewährleisten.
 -   ****:
-    -   **Importance**: API for sending cold emails.
-    -   **Changes**: Modified to use the new , log email history, and pass new structured analysis data to the  service for highly personalized email generation.
--   ** &  (New Files)**:
-    -   **Importance**: Encapsulate SMTP sending and IMAP receiving logic.
-    -   **Changes**: Created to handle email functionality.
+    -   **Importance**: API für die Analyse von Cold Leads.
+    -   **Changes**: Integrierte die  Logik.
 -   ****:
-    -   **Importance**: Core logic for analyzing cold lead prospects.
-    -   **Changes**: Completely revamped to implement a 3-stage system: thorough web-scraping, AI recognition of applications, and product mapping to Score Schleifwerkzeuge offerings. Includes improved email extraction.
+    -   **Importance**: API für die E-Mail-Generierung.
+    -   **Changes**: Integrierte die  Logik.
+-   ** (New)**:
+    -   **Importance**: Verwaltet die definierten Anwendungs-, Kategorie-, Material- und Maschinentypen-Listen für das Glossar.
+    -   **Changes**: Neu erstellt, um die statischen Glossar-Daten zu speichern und Funktionen zum Abrufen bereitzustellen.
+-   ** (New)**:
+    -   **Importance**: API-Endpunkt für das Glossar-Frontend.
+    -   **Changes**: Neu erstellt, um die Glossar-Daten bereitzustellen.
+-   ** (New)**:
+    -   **Importance**: Neue, verbesserte Version des Analyzers basierend auf dem detaillierten Briefing.
+    -   **Changes**: Neu erstellt, um erweiterte Parsing-Logik, Kontaktpriorisierung und Glossar-Mapping zu implementieren.
+-   ** (New)**:
+    -   **Importance**: Neue, verbesserte Version des Emailers basierend auf dem detaillierten Briefing.
+    -   **Changes**: Neu erstellt, um die neue E-Mail-Struktur (Anrede, Einstieg, Nutzenpunkte, Angebot, CTA, Signatur) und Betreffvarianten zu generieren.
+-   ** (New)**:
+    -   **Importance**: Initiale Datei für ein strukturiertes Crawling-System für DACH-Regionen.
+    -   **Changes**: Neu erstellt, um die Grundlage für ein systematischeres Prospekt-Sourcing zu legen.
 -   ****:
-    -   **Importance**: Core logic for generating cold emails.
-    -   **Changes**: Reworked to leverage the rich structured data from the new  to create highly personalized, benefit-driven emails, concluding with a specific signature (Daniel Leismann). Old industry templates were removed.
--   ** (New File)**:
-    -   **Importance**: Provides a structured catalog of products and their applications.
-    -   **Changes**: Created to support the enhanced AI analysis and product mapping in .
--   ** (New File)**:
-    -   **Importance**: Defines strategies for automated prospect searching.
-    -   **Changes**: Created to integrate automated search logic into the autopilot system.
--   ** (New Directory & Files)**:
-    -   **Importance**: Backend endpoints for the Kaltakquise autopilot system (start, stop, status, tick, config).
-    -   **Changes**: Created to manage the automated pipeline for searching, analyzing, sending emails, and handling follow-ups.
--   ** (New File)**:
-    -   **Importance**: API to manually change the status of a cold lead.
-    -   **Changes**: Created for user control over prospect lifecycle.
--   ****:
-    -   **Importance**: Stores environment variables.
-    -   **Changes**: Updated with JTL SQL, GA4, SMTP/IMAP credentials, cleaned up redundant entries.
--   ****:
-    -   **Importance**: Manages project dependencies.
-    -   **Changes**: Added  and  (and their types) for email functionality.
+    -   **Importance**: Umgebungsvariablen für Datenbank- und E-Mail-Konfiguration.
+    -   **Changes**: Bereinigt Duplikate und widersprüchliche SMTP/IMAP-Einstellungen; aktualisiert SMTP_FROM, SMTP_USER, SMTP_PASSWORD, IMAP_USER, IMAP_PASSWORD, REPLY_TO_EMAIL auf die neuen  und  Adressen.
 </code_architecture>
-
 <pending_tasks>
-- Full implementation of Google Ads and LinkedIn integrations (Google Ads needs Standard Access for Developer Token).
+- Full implementation of Google Ads and LinkedIn integrations (Google Ads needs Standard Access).
 - Implementation of Firebase (Firestore, Auth, Functions).
 - Further UI refinement (KPI card compactness, table row height, sum row).
 - Addressing persistent JTL data discrepancies for 03.11.2025 orders (if any remain after sales API fix).
-- **Frontend build error**: Resolve the syntax error in  after the Kaltakquise Autopilot UI implementation.
-- **Dynamic Filtering Logic**: Fully implement multi-select filter logic for Sales APIs (identified as a larger refactoring).
+- Implement charts for Traffic Sources and other tables in Analytics.
+- Implement more robust manufacturer detection in Kaltakquise analyzer.
+- Complete the structured DACH-Crawling system as discussed in the latest messages.
 </pending_tasks>
-
 <current_work>
-Immediately before this summary request, the AI engineer was actively working on integrating the Kaltakquise (Cold Acquisition) Autopilot Control Panel into the frontend UI within .
+Unmittelbar vor dieser Zusammenfassung begann der KI-Ingenieur mit der Implementierung eines **systematischen DACH-Crawling-Systems** für die Kaltakquise. Der Nutzer hatte festgestellt, dass die bestehende Google-Suche unstrukturiert ist und oft zu ungenauen Branchenzuordnungen führt, und suchte eine methodische Lösung für die Abdeckung von Deutschland, Österreich und der Schweiz (DACH).
 
-The work involved:
-1.  **Adding Autopilot States**: Introducing new  variables to manage the autopilot's status (e.g., , , ) and UI elements.
-2.  **Creating Autopilot Functions**: Implementing asynchronous functions (, , , ) to interact with the newly created backend  endpoints.
-3.  **Initializing Autopilot on Load**: Adding  hooks to load the autopilot's status and configuration when the page mounts.
-4.  **Building UI Elements**: Adding the visual components for the Autopilot Control Panel to the Kaltakquise section of . This includes buttons to start/stop the autopilot, input fields for configuration (like rate limits), and potentially a display for logs/status.
-5.  **Integrating Status Dropdowns and Follow-up Button**: Converting static status badges in the Prospects table into interactive dropdowns for manual status changes and adding a Follow-up button.
-
-The very last message indicates a  in  encountered during this frontend implementation, likely a syntax error preventing the application from compiling and running correctly on a desktop browser. The AI engineer was about to debug and fix this syntax issue.
+Der KI-Ingenieur hat eine neue Service-Datei namens  erstellt. Dies ist der erste Schritt zur Entwicklung eines strukturierten Branchen-Verzeichnis-Crawling-Ansatzes, der die aktuellen Mängel der Prospektsuche beheben soll. Die Arbeit in dieser Datei hat gerade erst begonnen. Der Agent war dabei, eine finale Zusammenfassung des Lösungskonzepts für den DACH-Crawler zu erstellen, als die Anfrage für diese Gesamtübersicht kam.
 </current_work>
-
 <optional_next_step>
-Fix the identified build error (syntax error) in .
+Weiterentwicklung und Implementierung des systematischen DACH-Crawling-Systems in .
 </optional_next_step>

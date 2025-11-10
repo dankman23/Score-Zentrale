@@ -14,7 +14,7 @@ import sys
 from datetime import datetime, timedelta
 
 # Base URL from environment
-BASE_URL = "https://sales-dashboard-179.preview.emergentagent.com/api"
+BASE_URL = "https://score-zentrale-2.preview.emergentagent.com/api"
 
 # Color codes for output
 GREEN = '\033[92m'

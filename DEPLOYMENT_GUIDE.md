@@ -49,8 +49,8 @@ In Emergent Dashboard diese Variablen konfigurieren:
 MONGO_URL=<emergent-mongodb-connection-string>
 
 # App URLs
-NEXT_PUBLIC_BASE_URL=https://sales-dashboard-179.preview.emergentagent.com
-CORS_ORIGINS=https://sales-dashboard-179.preview.emergentagent.com
+NEXT_PUBLIC_BASE_URL=https://score-zentrale-2.preview.emergentagent.com
+CORS_ORIGINS=https://score-zentrale-2.preview.emergentagent.com
 
 # MS SQL (JTL-Wawi) - WICHTIG: Echte Werte einsetzen!
 JTL_SQL_HOST=<sql.server.public.ip>
@@ -96,37 +96,37 @@ node healthcheck.js
 
 **1. SQL Connectivity:**
 ```bash
-curl https://sales-dashboard-179.preview.emergentagent.com/api/jtl/ping
+curl https://score-zentrale-2.preview.emergentagent.com/api/jtl/ping
 # Erwartung: {"ok":true,"server":"...","hasNPosTyp":false}
 ```
 
 **2. Orders KPI (Stichtag):**
 ```bash
-curl "https://sales-dashboard-179.preview.emergentagent.com/api/jtl/orders/kpi/shipping-split?from=2025-11-03&to=2025-11-03"
+curl "https://score-zentrale-2.preview.emergentagent.com/api/jtl/orders/kpi/shipping-split?from=2025-11-03&to=2025-11-03"
 # Erwartung: {"ok":true,"orders":>0,...}
 ```
 
 **3. Diagnostics:**
 ```bash
-curl "https://sales-dashboard-179.preview.emergentagent.com/api/jtl/orders/diag/day?date=2025-11-03"
+curl "https://score-zentrale-2.preview.emergentagent.com/api/jtl/orders/diag/day?date=2025-11-03"
 # Erwartung: {"ok":true,"totals":{"orders":71,"gross":"7077.67"},...}
 ```
 
 **4. Expenses:**
 ```bash
-curl "https://sales-dashboard-179.preview.emergentagent.com/api/jtl/purchase/expenses?from=2024-01-01&to=2024-12-31"
+curl "https://score-zentrale-2.preview.emergentagent.com/api/jtl/purchase/expenses?from=2024-01-01&to=2024-12-31"
 # Erwartung: {"ok":true,"invoices":>0,"net":"...","gross":"..."}
 ```
 
 **5. Margin:**
 ```bash
-curl "https://sales-dashboard-179.preview.emergentagent.com/api/jtl/orders/kpi/margin?from=2025-11-01&to=2025-11-05"
+curl "https://score-zentrale-2.preview.emergentagent.com/api/jtl/orders/kpi/margin?from=2025-11-01&to=2025-11-05"
 # Erwartung: {"ok":true,"margin_net":"...","cost_source":{...}}
 ```
 
 **6. Warmakquise Import:**
 ```bash
-curl -X POST https://sales-dashboard-179.preview.emergentagent.com/api/leads/import \
+curl -X POST https://score-zentrale-2.preview.emergentagent.com/api/leads/import \
   -H "Content-Type: application/json" \
   -d '{"limit":200}'
 # Erwartung: {"ok":true,"imported":>0}
