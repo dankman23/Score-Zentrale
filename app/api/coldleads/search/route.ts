@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
       ok: true,
       count: prospects.length,
       prospects: prospects.map(p => ({
-        id: p._id.toString(),
+        id: p.id || p._id.toString(),
         company_name: p.company_name,
         website: p.website,
         industry: p.industry,
@@ -120,6 +120,9 @@ export async function GET(request: NextRequest) {
         status: p.status,
         score: p.score || null,
         analysis: p.analysis || null,
+        analysis_v3: p.analysis_v3 || null,
+        email_sequence: p.email_sequence || null,
+        followup_schedule: p.followup_schedule || null,
         history: p.history || [],
         hasReply: p.hasReply || false,
         lastReplyAt: p.lastReplyAt || null,
