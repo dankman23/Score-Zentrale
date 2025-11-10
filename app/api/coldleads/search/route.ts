@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50')
 
     const { db } = await connectToDatabase()
-    const collection = db.collection('cold_prospects')
+    const collection = db.collection('prospects')
 
     // Handle filter: "replied" means hasReply=true, otherwise filter by status
     let filter = {}
