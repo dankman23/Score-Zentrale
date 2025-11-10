@@ -954,10 +954,9 @@ export default function App() {
                           '51': 'Onlineshop',
                           '31': 'eBay',
                           '54': 'Amazon',
-                          '2': 'Intern',
-                          '60': 'Idealo'
+                          '2': 'Intern'
                         }
-                        const name = platformNames[p.platform] || `#${p.platform}`
+                        const name = platformNames[p.platform] || `Plattform #${p.platform}`
                         return (
                           <div key={i} className="d-flex justify-content-between mb-1 pb-1" style={{borderBottom: i < 4 ? '1px solid var(--line)' : 'none'}}>
                             <span className="text-truncate" style={{maxWidth: '100px'}}>{name}</span>
