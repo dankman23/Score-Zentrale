@@ -71,13 +71,7 @@ export async function GET() {
         const recipientEmail = prospect.analysis_v3?.contact_person?.email
         if (!recipientEmail || !prospect.email_sequence?.mail_3) continue
         
-        await sendEmail({
-          from: `"${SCORE_CONFIG.sender.display_name}" <${SCORE_CONFIG.sender.email}>`,
-          to: recipientEmail,
-          bcc: SCORE_CONFIG.company.email_main,
-          subject: prospect.email_sequence.mail_3.subject,
-          text: prospect.email_sequence.mail_3.body
-        })
+        await sendEmail(recipientEmail, prospect.email_sequence.mail_3.subject, prospect.email_sequence.mail_3.body, prospect.email_sequence.mail_3.body)
         
         await prospectsCollection.updateOne(
           { id: prospect.id },
