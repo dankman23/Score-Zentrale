@@ -20,6 +20,8 @@ export async function fetchAnalyticsMetrics(
         { name: 'screenPageViews' },
         { name: 'averageSessionDuration' },
         { name: 'bounceRate' },
+        { name: 'conversions' },
+        { name: 'totalRevenue' },
       ],
     });
 
