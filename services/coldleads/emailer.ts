@@ -92,16 +92,13 @@ function generateTemplateEmail(options: EmailGenerationOptions): GeneratedEmail 
     premiumIntro = `\n\nDa Ihre Anwendungen ${categoryList} erfordern, arbeiten wir mit den führenden Premium-Herstellern wie Klingspor, 3M, Norton, VSM und Starcke zusammen. Durch unsere langjährigen und exzellenten Beziehungen zu diesen Herstellern können wir Ihnen optimale Konditionen und schnellste Verfügbarkeit garantieren.`
   }
   
-  // 5. Spezifische Produktempfehlungen (Top 3-4)
+  // 5. Spezifische Produktempfehlungen (Top 3-4) - OHNE Körnungen
   const topProducts = analysis.potential_products.slice(0, 4)
-  let productSection = '\n\nFür Ihren konkreten Bedarf würde ich Ihnen sehr gerne ein Angebot unterbreiten für:\n'
+  let productSection = '\n\nBasierend auf Ihre Anwendungsbereiche bieten wir Ihnen folgende Produktkategorien an:\n'
   
   topProducts.forEach(product => {
-    productSection += `\n• ${product.name}`
-    if (product.grain_sizes && product.grain_sizes.length > 0) {
-      productSection += ` (Körnungen: ${product.grain_sizes.join(', ')})`
-    }
-    productSection += `\n  ${product.reason}`
+    productSection += `\n• **${product.name}** (${product.category})`
+    productSection += `\n  → ${product.reason}`
   })
   
   // 5. Vorteile von Score Schleifwerkzeuge
