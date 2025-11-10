@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """
-JTL Articles Browser APIs Testing
-Tests the 2 new JTL Articles Browser APIs according to German requirements.
+Kaltakquise V3 System Backend Testing
+Tests the 3 new V3 APIs according to German specifications
 """
 
 import requests
 import json
-import sys
-from typing import Dict, Any, List
+import time
+import os
+from datetime import datetime
 
-# Base URL from environment
-BASE_URL = "https://jt-article-hub.preview.emergentagent.com"
+# Get base URL from environment
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://jt-article-hub.preview.emergentagent.com')
+API_BASE = f"{BASE_URL}/api"
 
 def test_api_endpoint(url: str, expected_status: int = 200, description: str = "") -> Dict[str, Any]:
     """Test an API endpoint and return results"""
