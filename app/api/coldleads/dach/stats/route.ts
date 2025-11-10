@@ -18,29 +18,33 @@ export async function GET(request: NextRequest) {
     // Gesamt-Statistiken
     const allProgress = await progressCollection.find({}).toArray()
     
+    // VERBESSERTE LOGIK: Zähle Kombinationen (Region + Branche), nicht nur Regionen
     const totalRegions = 47 // 16 DE + 9 AT + 22 CH
-    const completedRegions = allProgress.filter(p => p.status === 'completed').length
+    const totalIndustries = 25 // Anzahl der Branchen im System
+    const totalCombinations = totalRegions * totalIndustries // z.B. 47 * 25 = 1175 mögliche Kombinationen
+    
+    const completedCombinations = allProgress.filter(p => p.status === 'completed').length
     const totalCompanies = allProgress.reduce((sum, p) => sum + (p.companies_found || 0), 0)
 
     // Länder-Breakdown
     const countryStats = {
       DE: {
-        regions_completed: allProgress.filter(p => p.country === 'DE' && p.status === 'completed').length,
-        total_regions: 16,
+        crawl_jobs: allProgress.filter(p => p.country === 'DE').length,
+        completed_jobs: allProgress.filter(p => p.country === 'DE' && p.status === 'completed').length,
         companies_found: allProgress
           .filter(p => p.country === 'DE')
           .reduce((sum, p) => sum + (p.companies_found || 0), 0)
       },
       AT: {
-        regions_completed: allProgress.filter(p => p.country === 'AT' && p.status === 'completed').length,
-        total_regions: 9,
+        crawl_jobs: allProgress.filter(p => p.country === 'AT').length,
+        completed_jobs: allProgress.filter(p => p.country === 'AT' && p.status === 'completed').length,
         companies_found: allProgress
           .filter(p => p.country === 'AT')
           .reduce((sum, p) => sum + (p.companies_found || 0), 0)
       },
       CH: {
-        regions_completed: allProgress.filter(p => p.country === 'CH' && p.status === 'completed').length,
-        total_regions: 22,
+        crawl_jobs: allProgress.filter(p => p.country === 'CH').length,
+        completed_jobs: allProgress.filter(p => p.country === 'CH' && p.status === 'completed').length,
         companies_found: allProgress
           .filter(p => p.country === 'CH')
           .reduce((sum, p) => sum + (p.companies_found || 0), 0)
