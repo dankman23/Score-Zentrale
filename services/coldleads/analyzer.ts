@@ -97,7 +97,7 @@ function createKeywordAnalysis(websiteData: any, industry: string): any {
   const companySize = estimateCompanySize(text, fullText)
   
   // === 2. MATERIALIEN & ANWENDUNGEN DETECTIEREN ===
-  const detectedApps = detectApplications(text)
+  const detectedApps = detectApplications(text, industry)
   const recommendations = generateProductRecommendations(detectedApps)
   
   // === 3. SCORE BERECHNEN ===
