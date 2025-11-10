@@ -667,7 +667,9 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "JTL Articles: GET /api/jtl/articles/list (Artikel-Browser mit Filter & Pagination)"
+    - "JTL Articles: GET /api/jtl/articles/filters (Filter-Optionen für Artikel-Browser)"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
