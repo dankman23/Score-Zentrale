@@ -1757,7 +1757,7 @@ export default function App() {
                             </tr>
                           </thead>
                           <tbody>
-                            {sortData(analyticsTrafficSources, trafficSort.field, trafficSort.order).map((src, i) => (
+                            {sortData(analyticsTrafficSources, trafficSort.field, trafficSort.order).slice(0, showAllTraffic ? undefined : 10).map((src, i) => (
                               <tr key={i}>
                                 <td><strong>{src.source}</strong> / {src.medium}</td>
                                 <td className="text-right">{src.sessions.toLocaleString('de-DE')}</td>
@@ -1766,6 +1766,16 @@ export default function App() {
                               </tr>
                             ))}
                           </tbody>
+                          {analyticsTrafficSources.length > 10 && (
+                            <tfoot>
+                              <tr>
+                                <td colSpan={4} className="text-center" style={{cursor:'pointer', padding:'12px'}} onClick={()=>setShowAllTraffic(!showAllTraffic)}>
+                                  <i className={`bi bi-chevron-${showAllTraffic?'up':'down'} mr-2`}/>
+                                  {showAllTraffic ? 'Weniger anzeigen' : `${analyticsTrafficSources.length - 10} weitere anzeigen`}
+                                </td>
+                              </tr>
+                            </tfoot>
+                          )}
                         </table>
                       </div>
                     </div>
