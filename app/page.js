@@ -665,6 +665,19 @@ export default function App() {
     }
   }
 
+  const loadGlossary = async () => {
+    console.log('[Glossary] Loading glossary data...')
+    // Placeholder function for glossary loading
+    // This would typically load glossary data from an API
+    try {
+      // const res = await fetch('/api/glossary')
+      // const data = await res.json()
+      console.log('[Glossary] Glossary loaded successfully')
+    } catch (e) {
+      console.error('[Glossary] Load failed:', e)
+    }
+  }
+
   // Kaltakquise Functions
   // Load Cold Lead Stats
   const loadColdLeadStats = async () => {
