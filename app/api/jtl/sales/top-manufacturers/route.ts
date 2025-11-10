@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
     const orderTable = 'Verkauf.tAuftrag'
     const orderPosTable = 'Verkauf.tAuftragPosition'
     const articleTable = 'dbo.tArtikel'
+    const manufacturerTable = 'dbo.tHersteller'
 
     const hasNStorno = await hasColumn(pool, orderTable, 'nStorno')
     const stornoFilter = hasNStorno ? 'AND (o.nStorno IS NULL OR o.nStorno = 0)' : ''
@@ -37,15 +38,12 @@ export async function GET(request: NextRequest) {
     const netField = await pickFirstExisting(pool, orderPosTable, ['fVKNetto', 'fPreis']) || 'fVKNetto'
     const costField = await pickFirstExisting(pool, orderPosTable, ['fEKNetto', 'fEK']) || 'fEKNetto'
 
-    // Hersteller-Feld
-    const manufacturerField = await pickFirstExisting(pool, articleTable, ['cHersteller', 'cMarke']) || 'cHersteller'
-
     const netExpr = `(op.${netField} * op.${qtyField})`
     const costExpr = `(op.${costField} * op.${qtyField})`
 
     const query = `
       SELECT TOP ${limit}
-        ISNULL(a.${manufacturerField}, 'Unbekannt') AS manufacturer,
+        ISNULL(h.cName, 'Unbekannt') AS manufacturer,
         COUNT(DISTINCT o.kAuftrag) AS orders,
         SUM(${netExpr}) AS revenue,
         SUM(${costExpr}) AS cost,
@@ -53,11 +51,12 @@ export async function GET(request: NextRequest) {
       FROM ${orderTable} o
       INNER JOIN ${orderPosTable} op ON o.kAuftrag = op.kAuftrag
       LEFT JOIN ${articleTable} a ON op.kArtikel = a.kArtikel
+      LEFT JOIN ${manufacturerTable} h ON a.kHersteller = h.kHersteller
       WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
         ${orderTypeFilter}
         AND ${articleFilter}
-      GROUP BY a.${manufacturerField}
+      GROUP BY h.cName
       ORDER BY revenue DESC
     `
 
