@@ -167,18 +167,19 @@ export async function POST() {
     
     console.log(`[Autopilot Tick] Processing prospect: ${nextProspect.company_name}`)
     
-    // 3. Sende Email
+    // 3. Sende Email (Mail 1 - Erstansprache)
     await stateCollection.updateOne(
       { id: 'kaltakquise' },
       { $set: { currentPhase: 'sending_email', lastActivity: new Date().toISOString() } }
     )
     
-    const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/coldleads/email`, {
+    // Nutze neue V3 Email-Send API
+    const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/coldleads/email-v3/send`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        website: nextProspect.website,
-        send: true
+        prospect_id: nextProspect.id,
+        mail_number: 1  // Erstansprache
       })
     })
     
@@ -189,7 +190,7 @@ export async function POST() {
       
       // Markiere Prospect als fehlgeschlagen
       await prospectsCollection.updateOne(
-        { _id: nextProspect._id },
+        { id: nextProspect.id },
         { 
           $set: { 
             email_error: emailResult.error,
@@ -205,6 +206,8 @@ export async function POST() {
         prospect: nextProspect.company_name
       })
     }
+    
+    console.log(`[Autopilot] Email sent to ${nextProspect.company_name}, follow-ups scheduled`)
     
     // 4. Update Counters
     await stateCollection.updateOne(
