@@ -103,6 +103,8 @@ export default function App() {
   const [coldLeadStats, setColdLeadStats] = useState({ unreadReplies: 0, recentReplies: 0, awaitingFollowup: 0 })
   const [showColdProspectDetails, setShowColdProspectDetails] = useState(null)
   const [showInbox, setShowInbox] = useState(false)
+  const [inboxEmails, setInboxEmails] = useState([])
+  const [inboxLoading, setInboxLoading] = useState(false)
   
   // Autopilot
   const [autopilotState, setAutopilotState] = useState({ 
