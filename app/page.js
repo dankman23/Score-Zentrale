@@ -94,6 +94,9 @@ export default function App() {
   // Kaltakquise
   const [coldLeadsTab, setColdLeadsTab] = useState('search')
   const [coldSearchForm, setColdSearchForm] = useState({ industry: '', region: '', limit: 10 })
+  const [selectedProspectsForBulk, setSelectedProspectsForBulk] = useState([])
+  const [bulkAnalyzing, setBulkAnalyzing] = useState(false)
+  const [bulkAnalyzeProgress, setBulkAnalyzeProgress] = useState({ current: 0, total: 0 })
   const [coldProspects, setColdProspects] = useState([])
   const [coldLoading, setColdLoading] = useState(false)
   const [selectedProspect, setSelectedProspect] = useState(null)
