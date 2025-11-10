@@ -999,6 +999,103 @@ export default function App() {
     setColdLoading(false)
   }
 
+  // Artikel-Import Funktionen
+  const loadArtikelStatus = async () => {
+    try {
+      const res = await fetch('/api/jtl/articles/import/status')
+      const data = await res.json()
+      if (data.ok) {
+        setArtikelImportProgress({ imported: data.imported, total: 166854 })
+      }
+    } catch (e) {
+      console.error('Error loading artikel status:', e)
+    }
+  }
+
+  const startArtikelImport = async () => {
+    if (artikelImportRunning) return
+    
+    if (!confirm('Artikel-Import starten?\n\nDies importiert alle 166.854 Artikel aus JTL-Wawi in die Score Zentrale.\nDauer: ca. 5-10 Minuten.\n\nFortfahren?')) {
+      return
+    }
+
+    setArtikelImportRunning(true)
+    setArtikelImportProgress({ imported: 0, total: 166854 })
+
+    let offset = 0
+    const batchSize = 1000
+    let totalImported = 0
+
+    try {
+      // Erster Batch mit fullImport=true
+      const firstRes = await fetch('/api/jtl/articles/import/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ batchSize, offset: 0, fullImport: true })
+      })
+      const firstData = await firstRes.json()
+      
+      if (!firstData.ok) {
+        alert('❌ Fehler beim ersten Batch: ' + firstData.error)
+        setArtikelImportRunning(false)
+        return
+      }
+
+      totalImported += firstData.imported
+      setArtikelImportProgress({ imported: totalImported, total: 166854 })
+      offset = firstData.nextOffset
+
+      // Loop durch alle weiteren Batches
+      while (offset && offset < 166854) {
+        const res = await fetch('/api/jtl/articles/import/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ batchSize, offset, fullImport: false })
+        })
+        const data = await res.json()
+
+        if (!data.ok) {
+          console.error('Import error at offset', offset, ':', data.error)
+          break
+        }
+
+        totalImported += data.imported
+        setArtikelImportProgress({ imported: totalImported, total: 166854 })
+
+        if (data.finished || !data.nextOffset) {
+          break
+        }
+
+        offset = data.nextOffset
+
+        // Kleine Pause zwischen Batches
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
+
+      alert(`✅ Import abgeschlossen!\n\n${totalImported} Artikel wurden importiert.`)
+      loadArtikelStatus()
+      
+    } catch (e) {
+      alert('❌ Fehler beim Import: ' + e.message)
+    } finally {
+      setArtikelImportRunning(false)
+    }
+  }
+
+  const loadArtikel = async () => {
+    try {
+      const res = await fetch('/api/jtl/articles/import/status')
+      const data = await res.json()
+      if (data.ok) {
+        // Für jetzt einfach die letzten importierten anzeigen
+        // Später: Richtige List-API mit Filter & Pagination
+        setArtikelList(data.lastImported || [])
+      }
+    } catch (e) {
+      console.error('Error loading artikel:', e)
+    }
+  }
+
   const sendColdEmail = async () => {
     if (!confirm('Email jetzt wirklich versenden?')) return
     setColdLoading(true)
