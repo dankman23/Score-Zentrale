@@ -673,9 +673,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "JTL Articles: GET /api/jtl/articles/list (Artikel-Browser mit Filter & Pagination)"
-    - "JTL Articles: GET /api/jtl/articles/filters (Filter-Optionen für Artikel-Browser)"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -695,6 +693,10 @@ agent_communication:
     message: "✅ JTL endpoints re-test after filter fix SUCCESSFUL! All 4/4 requested endpoints now working: GET /api/jtl/ping (200 ok:true), GET /api/jtl/sales/date-range (200 ok:true with minDate/maxDate), GET /api/jtl/sales/kpi (200 ok:true with revenue/orders/margin data), GET /api/jtl/sales/platform-timeseries (200 with 22 data points). Filter fix completely resolved the previous 500 errors - all endpoints now return proper 200 responses with expected data."
   - agent: "testing"
     message: "✅ NEW SHIPPING-SPLIT ENDPOINT + REGRESSION TESTS COMPLETED! All 4/4 tests PASSED: 1) GET /api/jtl/orders/kpi/shipping-split?month=2025-10 (200 ok:true with all required fields), 2) GET /api/jtl/orders/kpi/shipping-split?from=2025-10-01&to=2025-10-31 (200 ok:true with all required fields), 3) REGRESSION /api/jtl/sales/kpi (200 ok:true), 4) REGRESSION /api/jtl/sales/platform-timeseries (200 array with 22 items). Fixed SQL column alias issue in shipping-split endpoint during testing. New endpoint working correctly with expected response structure: ok, period.from/to, orders, net.with_shipping/without_shipping, gross.with_shipping/without_shipping. No regressions detected."
+  - agent: "main"
+    message: "JTL ARTICLES BROWSER APIs IMPLEMENTIERT: 2 neue Endpunkte für Artikel-Browser mit umfassender Filter- und Pagination-Funktionalität. (1) GET /api/jtl/articles/filters - Liefert verfügbare Filter-Optionen (Hersteller, Warengruppen) aus MongoDB articles Collection mit Aggregation und Count. (2) GET /api/jtl/articles/list - Artikel-Liste mit Filter (search, hersteller, warengruppe), Pagination (page, limit), Sortierung (sortBy, sortOrder). Text-Suche über cArtNr, cName, cBarcode, cHerstellerName mit $or Query. Bitte beide Endpunkte gemäß deutscher Test-Spezifikation testen: Filters API (200 OK mit hersteller/warengruppen Arrays), List API mit verschiedenen Szenarien (Default, Text-Suche 'schleif', Hersteller-Filter, Pagination). Erwartung: ca. 167.000 Artikel in MongoDB importiert."
+  - agent: "testing"
+    message: "✅ JTL ARTICLES BROWSER APIs TESTING COMPLETED SUCCESSFULLY! All 5/5 comprehensive tests PASSED according to German requirements: (1) GET /api/jtl/articles/filters returns 200 OK with perfect structure: ok=true, hersteller array (13 manufacturers), warengruppen array (35 product groups), all with name/count fields. (2) GET /api/jtl/articles/list default (page=1, limit=10) returns 200 OK with 10 articles from 41,861 total, all required fields present. (3) Text search 'schleif' returns 200 OK with 5 articles from 15,025 matches, all contain 'schleif' in cArtNr/cName/cBarcode. (4) Manufacturer filter '3M' returns 200 OK with 5 articles from 13,374 total, all have cHerstellerName='3M'. (5) Pagination test: Page 1 hasNext=true, Page 2 hasPrev=true, no overlapping kArtikel IDs between pages. MongoDB integration working perfectly with 41,861 articles imported. All response structures valid: articles array, pagination object (page, limit, total, totalPages, hasNext, hasPrev), filters object. APIs ready for frontend integration!"
   - task: "JTL Orders: GET /api/jtl/orders/diag/day"
     implemented: true
     working: true
