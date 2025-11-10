@@ -1699,7 +1699,7 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* KPI Charts mit Tabs */}
+                      {/* KPI Charts mit Tabs - ALLE 8 Metriken */}
                       {metricsTimeSeries.length > 0 && (
                         <div className="card mb-4">
                           <div className="card-header bg-transparent border-0 pb-0">
@@ -1715,6 +1715,21 @@ export default function App() {
                                 </a>
                               </li>
                               <li className="nav-item">
+                                <a className={`nav-link ${selectedKpiMetric==='pageViews'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSelectedKpiMetric('pageViews')}}>
+                                  Seitenaufrufe
+                                </a>
+                              </li>
+                              <li className="nav-item">
+                                <a className={`nav-link ${selectedKpiMetric==='conversions'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSelectedKpiMetric('conversions')}}>
+                                  Conversions
+                                </a>
+                              </li>
+                              <li className="nav-item">
+                                <a className={`nav-link ${selectedKpiMetric==='revenue'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSelectedKpiMetric('revenue')}}>
+                                  Umsatz
+                                </a>
+                              </li>
+                              <li className="nav-item">
                                 <a className={`nav-link ${selectedKpiMetric==='avgSessionDuration'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSelectedKpiMetric('avgSessionDuration')}}>
                                   Ø Session-Dauer
                                 </a>
@@ -1722,6 +1737,11 @@ export default function App() {
                               <li className="nav-item">
                                 <a className={`nav-link ${selectedKpiMetric==='bounceRate'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSelectedKpiMetric('bounceRate')}}>
                                   Bounce Rate
+                                </a>
+                              </li>
+                              <li className="nav-item">
+                                <a className={`nav-link ${selectedKpiMetric==='conversionRate'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSelectedKpiMetric('conversionRate')}}>
+                                  Conv. Rate
                                 </a>
                               </li>
                             </ul>
