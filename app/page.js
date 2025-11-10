@@ -539,12 +539,14 @@ export default function App() {
       
       console.log('[Analytics] Fetching APIs...')
       // Parallel laden
-      const [metricsRes, sourcesRes, topPagesRes, categoryRes, productRes, timeSeriesRes] = await Promise.all([
+      const [metricsRes, sourcesRes, topPagesRes, categoryRes, productRes, infoRes, beilegerRes, timeSeriesRes] = await Promise.all([
         fetch(`/api/analytics/metrics?${dateParam}`),
         fetch(`/api/analytics/traffic-sources?${dateParam}&limit=1000`),
         fetch(`/api/analytics/top-pages?${dateParam}&limit=100`),
         fetch(`/api/analytics/category-pages?${dateParam}`),
         fetch(`/api/analytics/product-pages?${dateParam}&limit=100`),
+        fetch(`/api/analytics/info-pages?${dateParam}`),
+        fetch(`/api/analytics/beileger?${dateParam}`),
         fetch(`/api/analytics/timeseries/metrics?${dateParam}`)
       ])
       
@@ -556,6 +558,8 @@ export default function App() {
       if (!topPagesRes.ok) throw new Error(`Top Pages API failed: ${topPagesRes.status}`)
       if (!categoryRes.ok) throw new Error(`Category Pages API failed: ${categoryRes.status}`)
       if (!productRes.ok) throw new Error(`Product Pages API failed: ${productRes.status}`)
+      if (!infoRes.ok) throw new Error(`Info Pages API failed: ${infoRes.status}`)
+      if (!beilegerRes.ok) throw new Error(`Beileger API failed: ${beilegerRes.status}`)
       if (!timeSeriesRes.ok) throw new Error(`Time Series API failed: ${timeSeriesRes.status}`)
       
       const metrics = await metricsRes.json()
@@ -563,15 +567,19 @@ export default function App() {
       const topPages = await topPagesRes.json()
       const category = await categoryRes.json()
       const product = await productRes.json()
+      const info = await infoRes.json()
+      const beileger = await beilegerRes.json()
       const timeSeries = await timeSeriesRes.json()
       
-      console.log('[Analytics] Consolidating pages...', {topPages: topPages.length, category: category.length, product: product.length})
+      console.log('[Analytics] Consolidating pages...', {topPages: topPages.length, category: category.length, product: product.length, info: info.length})
       
       setAnalyticsMetrics(metrics)
       setAnalyticsTrafficSources(sources)
       setAnalyticsTopPages(consolidatePages(topPages))
       setAnalyticsCategoryPages(consolidatePages(category))
       setAnalyticsProductPages(consolidatePages(product))
+      setAnalyticsInfoPages(consolidatePages(info))
+      setAnalyticsBeilegerData(beileger)
       setMetricsTimeSeries(timeSeries)
       
       console.log('[Analytics] Done!')
