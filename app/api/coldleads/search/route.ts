@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     // Ergebnisse in DB speichern (Duplikate vermeiden via upsert)
     const { db } = await connectToDatabase()
-    const collection = db.collection('cold_prospects')
+    const collection = db.collection('prospects')
     
     const savedProspects = []
     
