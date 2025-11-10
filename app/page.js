@@ -1045,30 +1045,48 @@ export default function App() {
         const data = await res.json()
         if (data.ok) {
           successCount++
+          console.log(`✓ ${prospect.company_name}: Score ${data.analysis.confidence_overall}%`)
         } else {
           errorCount++
-          console.error(`Error analyzing ${prospect.company_name}:`, data.error)
+          console.error(`✗ ${prospect.company_name}:`, data.error)
         }
       } catch (err) {
-        console.error(`Error analyzing ${prospect.company_name}:`, err)
+        console.error(`✗ ${prospect.company_name}:`, err)
         errorCount++
       }
       
       setBulkAnalyzeProgress({ current: i + 1, total: selectedProspectsForBulk.length })
       
       // Kleine Pause zwischen Anfragen
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 1000))
     }
     
-    // Stats neu laden
+    // WICHTIG: Stats UND Prospects-Liste neu laden
+    console.log('Lade Stats und Prospects neu...')
     await loadColdLeadStats()
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    // Prospects neu laden um aktualisierte Status zu sehen
+    try {
+      const res = await fetch('/api/coldleads/stats')
+      const data = await res.json()
+      if (data.ok && data.prospects) {
+        setColdProspects(data.prospects)
+        console.log(`Prospects aktualisiert: ${data.prospects.length} total`)
+      }
+    } catch (e) {
+      console.error('Error reloading prospects:', e)
+    }
     
     // Reset
     setBulkAnalyzing(false)
     setSelectedProspectsForBulk([])
     setBulkAnalyzeProgress({ current: 0, total: 0 })
     
-    alert(`✅ Bulk-Analyse abgeschlossen!\n\n✓ Erfolgreich: ${successCount}\n✗ Fehler: ${errorCount}`)
+    // Wechsle zum "Analysiert" Tab um Ergebnisse zu sehen
+    setColdStatusFilter('analyzed')
+    
+    alert(`✅ Bulk-Analyse abgeschlossen!\n\n✓ Erfolgreich: ${successCount}\n✗ Fehler: ${errorCount}\n\n➡️ Wechsle zu "Analysiert" Tab`)
   }
 
   // Alle neuen Prospects analysieren
