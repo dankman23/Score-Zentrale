@@ -101,6 +101,8 @@ export default function App() {
   const [coldStatusFilter, setColdStatusFilter] = useState('all')
   const [coldStats, setColdStats] = useState({ total: 0, new: 0, analyzed: 0, contacted: 0, replied: 0 })
   const [coldLeadStats, setColdLeadStats] = useState({ unreadReplies: 0, recentReplies: 0, awaitingFollowup: 0 })
+  const [showColdProspectDetails, setShowColdProspectDetails] = useState(null)
+  const [showInbox, setShowInbox] = useState(false)
   
   // Autopilot
   const [autopilotState, setAutopilotState] = useState({ 
