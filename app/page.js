@@ -3765,13 +3765,13 @@ export default function App() {
                             />
                           </th>
                         )}
-                        <th className="border-0" style={{minWidth: '200px'}}><i className="bi bi-building mr-1"/>Firma</th>
-                        <th className="border-0" style={{minWidth: '220px'}}><i className="bi bi-globe mr-1"/>Website</th>
-                        <th className="border-0" style={{minWidth: '140px'}}><i className="bi bi-briefcase mr-1"/>Branche</th>
-                        <th className="border-0" style={{minWidth: '120px'}}><i className="bi bi-geo-alt mr-1"/>Region</th>
-                        <th className="border-0 text-center" style={{minWidth: '100px'}}><i className="bi bi-star mr-1"/>Score</th>
-                        <th className="border-0 text-center" style={{minWidth: '140px'}}>Status</th>
-                        <th className="border-0 text-right" style={{minWidth: '200px'}}>Aktionen</th>
+                        <th className="border-0" style={{width: '180px'}}><i className="bi bi-building mr-1"/>Firma</th>
+                        <th className="border-0" style={{width: '200px'}}><i className="bi bi-globe mr-1"/>Website</th>
+                        <th className="border-0" style={{width: '120px'}}><i className="bi bi-briefcase mr-1"/>Branche</th>
+                        <th className="border-0" style={{width: '100px'}}><i className="bi bi-geo-alt mr-1"/>Region</th>
+                        <th className="border-0 text-center" style={{width: '80px'}}><i className="bi bi-star mr-1"/>Score</th>
+                        <th className="border-0 text-center" style={{width: '110px'}}>Status</th>
+                        <th className="border-0 text-right" style={{width: '150px'}}>Aktionen</th>
                       </tr>
                     </thead>
                     <tbody>
