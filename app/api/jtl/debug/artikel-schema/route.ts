@@ -36,14 +36,8 @@ export async function GET(request: NextRequest) {
       SELECT TOP 5
         kArtikel,
         cArtNr,
-        cName,
-        nAktiv,
-        kHersteller,
-        kArtikelGruppe,
-        fVKNetto,
-        fEKNetto
+        cName
       FROM tArtikel
-      WHERE nAktiv = 1
       ORDER BY kArtikel DESC
     `)
 
