@@ -1007,17 +1007,8 @@ export default function App() {
         // WICHTIG: Stats UND Prospects-Liste neu laden
         await loadColdLeadStats()
         
-        // Prospects neu laden um Status-Änderung zu sehen
-        try {
-          const statsRes = await fetch('/api/coldleads/stats')
-          const statsData = await statsRes.json()
-          if (statsData.ok && statsData.prospects) {
-            setColdProspects(statsData.prospects)
-            console.log(`Prospects aktualisiert: ${statsData.prospects.length} total`)
-          }
-        } catch (e) {
-          console.error('Error reloading prospects:', e)
-        }
+        // Prospects neu laden - nutze die richtige Funktion
+        await loadColdProspects()
         
         // Wechsle zum "Analysiert" Tab
         setColdStatusFilter('analyzed')
