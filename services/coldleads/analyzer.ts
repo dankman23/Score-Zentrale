@@ -185,9 +185,10 @@ function identifyBusinessType(text: string, fullText: string) {
   
   // HERSTELLER-Indikatoren
   const manufacturerKeywords = [
-    'herstell', 'produzi', 'fertigung', 'fabrik', 'werk', 
-    'eigene produktion', 'in-house', 'manufaktur', 'montage',
-    'entwicklung und fertigung', 'konstruktion', 'maschinenpark'
+    'herstell', 'produzi', 'fertigung', 'fabrik', 'werk', 'produktion',
+    'eigene produktion', 'in-house', 'manufaktur', 'montage', 'fabrizier',
+    'entwicklung und fertigung', 'konstruktion', 'maschinenpark',
+    'produzent', 'erzeugen', 'anfertigung', 'gewerbe', 'industriell'
   ]
   
   // HÄNDLER-Indikatoren
