@@ -14,34 +14,38 @@ from datetime import datetime
 BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://jt-article-hub.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
-def test_api_endpoint(url: str, expected_status: int = 200, description: str = "") -> Dict[str, Any]:
-    """Test an API endpoint and return results"""
-    print(f"\n🧪 Testing: {description}")
-    print(f"📍 URL: {url}")
+def log_test(message):
+    """Log test messages with timestamp"""
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    print(f"[{timestamp}] {message}")
+
+def test_api_endpoint(method, endpoint, data=None, expected_status=200):
+    """Generic API test function"""
+    url = f"{API_BASE}{endpoint}"
+    log_test(f"Testing {method} {endpoint}")
     
     try:
-        response = requests.get(url, timeout=30)
-        print(f"📊 Status: {response.status_code}")
-        
-        if response.status_code == expected_status:
-            try:
-                data = response.json()
-                print(f"✅ Response received successfully")
-                return {"success": True, "data": data, "status": response.status_code}
-            except json.JSONDecodeError:
-                print(f"❌ Invalid JSON response")
-                return {"success": False, "error": "Invalid JSON", "status": response.status_code}
+        if method == 'GET':
+            response = requests.get(url, timeout=30)
+        elif method == 'POST':
+            response = requests.post(url, json=data, timeout=30)
         else:
-            print(f"❌ Unexpected status code: {response.status_code}")
-            try:
-                error_data = response.json()
-                return {"success": False, "error": error_data, "status": response.status_code}
-            except:
-                return {"success": False, "error": response.text, "status": response.status_code}
-                
-    except requests.exceptions.RequestException as e:
-        print(f"❌ Request failed: {str(e)}")
-        return {"success": False, "error": str(e), "status": 0}
+            raise ValueError(f"Unsupported method: {method}")
+        
+        log_test(f"Response Status: {response.status_code}")
+        
+        # Try to parse JSON response
+        try:
+            json_response = response.json()
+            log_test(f"Response JSON: {json.dumps(json_response, indent=2, ensure_ascii=False)}")
+            return response.status_code, json_response
+        except:
+            log_test(f"Response Text: {response.text[:500]}")
+            return response.status_code, response.text
+            
+    except Exception as e:
+        log_test(f"ERROR: {str(e)}")
+        return None, str(e)
 
 def validate_filters_response(data: Dict[str, Any]) -> bool:
     """Validate filters API response structure"""
