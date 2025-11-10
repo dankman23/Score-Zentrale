@@ -673,7 +673,10 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Kaltakquise V3: POST /api/coldleads/analyze-v3 (Komplett-Analyse mit Glossar, LLM, Email-Gen)"
+    - "Kaltakquise V3: POST /api/coldleads/email-v3/send (Email-Versand + Follow-up Scheduling)"
+    - "Kaltakquise V3: GET /api/coldleads/followup/auto (Auto Follow-up Check & Send)"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
