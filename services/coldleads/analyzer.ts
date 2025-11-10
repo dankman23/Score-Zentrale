@@ -346,13 +346,17 @@ function createMinimalAnalysis(websiteUrl: string, industry: string): AnalysisRe
       description: `Unternehmen im Bereich ${industry}`,
       products: [],
       services: [],
-      surface_processing_indicators: [],
+      detected_applications: [],
       target_materials: []
     },
     contact_persons: [],
     needs_assessment: {
-      potential_products: ['Schleifmittel allgemein'],
-      estimated_volume: 'medium',
+      potential_products: [{
+        name: 'Schleifmittel allgemein',
+        category: 'Allgemein',
+        reason: 'Branchenbasierte Empfehlung'
+      }],
+      estimated_volume: 'medium' as 'medium',
       reasoning: `Branche ${industry} deutet auf möglichen Bedarf hin.`,
       individual_hook: `Unternehmen aus ${industry}`,
       score: 40
