@@ -209,7 +209,7 @@ export default function App() {
     setLoading(true); setError(''); setDemoMode(false)
     try {
       const started = performance.now()
-      const [k1, k2, t1, t2, osRaw, poRaw, expRaw, marginRaw] = await Promise.all([
+      const [k1, k2, t1, t2, osRaw, poRaw, expRaw, marginRaw, topPlatRaw, topManufRaw] = await Promise.all([
         getJson(`/api/jtl/sales/kpi?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/kpi/with_platform_fees?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/timeseries?from=${from}&to=${to}`),
@@ -217,7 +217,9 @@ export default function App() {
         getJson(`/api/jtl/orders/kpi/shipping-split?from=${from}&to=${to}`),
         getJsonRaw(`/api/jtl/purchase/orders?from=${from}&to=${to}`),
         getJsonRaw(`/api/jtl/purchase/expenses?from=${from}&to=${to}`),
-        getJson(`/api/jtl/orders/kpi/margin?from=${from}&to=${to}`)
+        getJson(`/api/jtl/orders/kpi/margin?from=${from}&to=${to}`),
+        getJson(`/api/jtl/sales/top-platforms?from=${from}&to=${to}&limit=5`),
+        getJson(`/api/jtl/sales/top-manufacturers?from=${from}&to=${to}&limit=5`)
       ])
       
       // Map Sales API field names to what frontend expects
