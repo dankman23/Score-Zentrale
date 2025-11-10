@@ -1031,7 +1031,7 @@ export default function App() {
       if (!prospect) continue
       
       try {
-        const res = await fetch('/api/coldleads/analyze', {
+        const res = await fetch('/api/coldleads/analyze-v3', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
@@ -1046,6 +1046,7 @@ export default function App() {
           successCount++
         } else {
           errorCount++
+          console.error(`Error analyzing ${prospect.company_name}:`, data.error)
         }
       } catch (err) {
         console.error(`Error analyzing ${prospect.company_name}:`, err)
