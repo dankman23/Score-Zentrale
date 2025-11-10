@@ -34,13 +34,13 @@ export async function POST(request: Request) {
     
     console.log(`[AnalyzeV3] Email sequence generated`)
     
-    // Step 3: Save to MongoDB
+    // Step 3: Save to MongoDB (with upsert)
     const db = await connectToMongoDB()
     const prospectsCollection = db.collection('prospects')
     
     const now = new Date()
     
-    // Update Prospect mit V3-Daten
+    // Update or Insert Prospect mit V3-Daten
     const updateResult = await prospectsCollection.updateOne(
       { website },
       {
@@ -48,6 +48,8 @@ export async function POST(request: Request) {
           company_name: analysis.company,
           status: 'analyzed',
           score: analysis.confidence_overall,
+          industry: industry || analysis.branch_guess[0] || 'Unbekannt',
+          region: region || 'Deutschland',
           
           // V3 Analysis Data
           analysis_v3: {
@@ -81,19 +83,16 @@ export async function POST(request: Request) {
           },
           
           updated_at: now
+        },
+        $setOnInsert: {
+          id: `prospect_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          created_at: now
         }
       },
-      { upsert: false }
+      { upsert: true }
     )
     
-    if (updateResult.matchedCount === 0) {
-      return NextResponse.json({
-        ok: false,
-        error: 'Prospect not found in database'
-      }, { status: 404 })
-    }
-    
-    console.log(`[AnalyzeV3] Saved to MongoDB`)
+    console.log(`[AnalyzeV3] Saved to MongoDB (${updateResult.upsertedCount > 0 ? 'created' : 'updated'})`)
     
     return NextResponse.json({
       ok: true,
