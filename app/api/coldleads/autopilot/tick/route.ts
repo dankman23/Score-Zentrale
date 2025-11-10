@@ -23,7 +23,7 @@ export async function POST() {
   try {
     const db = await connectToMongoDB()
     const stateCollection = db.collection('autopilot_state')
-    const prospectsCollection = db.collection('cold_prospects')
+    const prospectsCollection = db.collection('prospects')
     
     // 1. Prüfe Autopilot State
     const state = await stateCollection.findOne({ id: 'kaltakquise' })
