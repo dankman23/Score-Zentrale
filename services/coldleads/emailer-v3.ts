@@ -8,7 +8,7 @@
  */
 
 import { getEmailSignature, SCORE_CONFIG, selectValuePropositions } from '@/lib/score-coldleads-config'
-import { callEmergentLLM } from '@/lib/emergent-llm'
+import { emergentChatCompletion } from '@/lib/emergent-llm'
 import type { AnalyzerV3Result } from './analyzer-v3'
 
 export interface EmailV3Result {
