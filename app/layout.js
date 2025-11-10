@@ -63,6 +63,7 @@ export default function RootLayout({ children }) {
                   <li className="nav-item"><a className="nav-link" href="#dashboard"><i className="bi bi-speedometer2"/>Dashboard</a></li>
                   <li className="nav-item"><a className="nav-link" href="#sales"><i className="bi bi-bar-chart"/>Sales</a></li>
                   <li className="nav-item"><a className="nav-link" href="#marketing"><i className="bi bi-bullseye"/>Marketing</a></li>
+                  <li className="nav-item"><a className="nav-link" href="#glossar"><i className="bi bi-book"/>Glossar</a></li>
                   <li className="nav-item"><a className="nav-link" href="#kaltakquise"><i className="bi bi-search"/>Kaltakquise</a></li>
                   <li className="nav-item"><a className="nav-link" href="#warmakquise"><i className="bi bi-people"/>Warmakquise</a></li>
                   <li className="nav-item"><a className="nav-link" href="#produkte"><i className="bi bi-box-seam"/>Produkte</a></li>
