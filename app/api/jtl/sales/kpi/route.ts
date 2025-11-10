@@ -30,11 +30,12 @@ export async function GET(request: NextRequest) {
 
     const qtyField = await pickFirstExisting(pool, orderPosTable, ['fAnzahl', 'nAnzahl', 'fMenge']) || 'fAnzahl'
     const netField = await pickFirstExisting(pool, orderPosTable, ['fVKNetto', 'fPreis']) || 'fVKNetto'
+    const grossField = await pickFirstExisting(pool, orderPosTable, ['fVKBrutto', 'fVK']) || 'fVKBrutto'
     const costField = await pickFirstExisting(pool, orderPosTable, ['fEKNetto', 'fEK']) || 'fEKNetto'
     
     // Berechne Umsatz, Kosten und Marge
     const netTotalExpr = `(op.${netField} * op.${qtyField})`
-    const grossTotalExpr = netTotalExpr // Vereinfachung: verwenden erstmal Netto als Gross
+    const grossTotalExpr = `(op.${grossField} * op.${qtyField})`
     const costTotalExpr = `(op.${costField} * op.${qtyField})`
 
     const query = `
