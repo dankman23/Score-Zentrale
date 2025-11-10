@@ -1034,18 +1034,18 @@ export default function App() {
       const res = await fetch('/api/coldleads/delete', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: prospectId })
+        body: JSON.stringify({ prospect_id: prospectId })
       })
       const data = await res.json()
       if (data.ok) {
-        setToast('Prospect erfolgreich gelöscht')
-        loadColdProspects()
-        loadColdLeadStats()
+        console.log('Prospect deleted:', prospectId)
+        await loadColdProspects()
+        await loadColdLeadStats()
       } else {
-        setToast('Fehler beim Löschen: ' + data.error)
+        alert('Fehler beim Löschen: ' + data.error)
       }
     } catch (e) {
-      setToast('Fehler beim Löschen: ' + e.message)
+      alert('Fehler beim Löschen: ' + e.message)
     }
   }
 
