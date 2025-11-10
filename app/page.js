@@ -446,7 +446,14 @@ export default function App() {
 
   useEffect(() => { renderCharts() }, [ts, tsFees, platTs, stacked])
 
-  // Produkte: Filter-Optionen beim Tab-Wechsel laden
+  // Produkte: Import-Status beim Tab-Wechsel laden
+  useEffect(() => {
+    if (activeTab === 'produkte') {
+      loadArtikelStatus()
+    }
+  }, [activeTab])
+
+  // Produkte: Filter-Optionen beim Browser-Tab laden
   useEffect(() => {
     if (activeTab === 'produkte' && produkteTab === 'browser') {
       loadArtikelFilters()
@@ -458,7 +465,7 @@ export default function App() {
     if (activeTab === 'produkte' && produkteTab === 'browser' && artikelImportProgress.imported > 0) {
       loadArtikelList()
     }
-  }, [activeTab, produkteTab, artikelPage, artikelPerPage, artikelFilter, artikelSortBy, artikelSortOrder])
+  }, [activeTab, produkteTab, artikelPage, artikelPerPage, artikelFilter.search, artikelFilter.hersteller, artikelFilter.warengruppe, artikelSortBy, artikelSortOrder])
 
   const renderCharts = () => {
     if (!window.Chart) return
