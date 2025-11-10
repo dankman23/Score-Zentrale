@@ -203,10 +203,11 @@ export async function sendEmail(to: string, subject: string, body: string) {
     }
   })
 
-  // Email-Optionen
+  // Email-Optionen mit BCC an Daniel Leismann
   const mailOptions = {
     from: `${fromName} <${from}>`,
     to,
+    bcc: 'leismann@score-schleifwerkzeuge.de', // Automatische BCC-Kopie
     subject,
     text: body,
     html: body.replace(/\n/g, '<br>') // Einfaches HTML
