@@ -1074,19 +1074,9 @@ export default function App() {
     // WICHTIG: Stats UND Prospects-Liste neu laden
     console.log('Lade Stats und Prospects neu...')
     await loadColdLeadStats()
-    await new Promise(resolve => setTimeout(resolve, 1000))
     
-    // Prospects neu laden um aktualisierte Status zu sehen
-    try {
-      const res = await fetch('/api/coldleads/stats')
-      const data = await res.json()
-      if (data.ok && data.prospects) {
-        setColdProspects(data.prospects)
-        console.log(`Prospects aktualisiert: ${data.prospects.length} total`)
-      }
-    } catch (e) {
-      console.error('Error reloading prospects:', e)
-    }
+    // Prospects neu laden - nutze die richtige Funktion
+    await loadColdProspects()
     
     // Reset
     setBulkAnalyzing(false)
