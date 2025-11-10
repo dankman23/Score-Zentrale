@@ -4,6 +4,7 @@ export const maxDuration = 60
 
 import { NextRequest, NextResponse } from 'next/server'
 import { analyzeCompany } from '../../../../services/coldleads/analyzer'
+import { analyzeCompanyV2 } from '../../../../services/coldleads/analyzer-v2'
 import { connectToDatabase } from '../../../lib/api'
 
 /**
