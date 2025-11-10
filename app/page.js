@@ -1393,6 +1393,91 @@ export default function App() {
               </div>
             </div>
           )}
+
+          {salesTab==='platforms' && (
+            <div className="card">
+              <div className="card-header d-flex justify-content-between align-items-center">
+                <span>Top-Plattformen nach Umsatz & Marge</span>
+                <button className="btn btn-outline-primary btn-sm" onClick={()=>exportCSV(topPlatforms, 'top-plattformen.csv')}>CSV</button>
+              </div>
+              <div className="card-body p-0">
+                <div className="table-responsive" style={{maxHeight:420}}>
+                  <table className="table table-dark table-hover table-sm mb-0">
+                    <thead className="thead-dark">
+                      <tr>
+                        <th>Plattform</th>
+                        <th>Bestellungen</th>
+                        <th>Umsatz (Netto)</th>
+                        <th>Kosten</th>
+                        <th>Marge (Netto)</th>
+                        <th>Marge %</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(topPlatforms||[]).map((p,idx)=> {
+                        const platformNames = {
+                          '51': 'Onlineshop',
+                          '31': 'eBay',
+                          '54': 'Amazon',
+                          '2': 'Intern'
+                        }
+                        const name = platformNames[p.platform] || `Plattform #${p.platform}`
+                        return (
+                          <tr key={idx}>
+                            <td>{name}</td>
+                            <td>{p.orders}</td>
+                            <td>{fmtCurrency(p.revenue)}</td>
+                            <td>{fmtCurrency(p.cost)}</td>
+                            <td className="text-success">{fmtCurrency(p.margin)}</td>
+                            <td>{p.marginPct}%</td>
+                          </tr>
+                        )
+                      })}
+                      {topPlatforms?.length===0 && <tr><td colSpan={6} className="text-center text-muted">Keine Daten</td></tr>}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {salesTab==='manufacturers' && (
+            <div className="card">
+              <div className="card-header d-flex justify-content-between align-items-center">
+                <span>Top-Hersteller nach Umsatz & Marge</span>
+                <button className="btn btn-outline-primary btn-sm" onClick={()=>exportCSV(topManufacturers, 'top-hersteller.csv')}>CSV</button>
+              </div>
+              <div className="card-body p-0">
+                <div className="table-responsive" style={{maxHeight:420}}>
+                  <table className="table table-dark table-hover table-sm mb-0">
+                    <thead className="thead-dark">
+                      <tr>
+                        <th>Hersteller</th>
+                        <th>Bestellungen</th>
+                        <th>Umsatz (Netto)</th>
+                        <th>Kosten</th>
+                        <th>Marge (Netto)</th>
+                        <th>Marge %</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(topManufacturers||[]).map((m,idx)=> (
+                        <tr key={idx}>
+                          <td>{m.manufacturer}</td>
+                          <td>{m.orders}</td>
+                          <td>{fmtCurrency(m.revenue)}</td>
+                          <td>{fmtCurrency(m.cost)}</td>
+                          <td className="text-success">{fmtCurrency(m.margin)}</td>
+                          <td>{m.marginPct}%</td>
+                        </tr>
+                      ))}
+                      {topManufacturers?.length===0 && <tr><td colSpan={6} className="text-center text-muted">Keine Daten</td></tr>}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
