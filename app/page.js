@@ -1405,16 +1405,32 @@ export default function App() {
                   <table className="table table-dark table-hover table-sm mb-0">
                     <thead className="thead-dark">
                       <tr>
-                        <th>Plattform</th>
-                        <th>Bestellungen</th>
-                        <th>Umsatz (Netto)</th>
-                        <th>Kosten</th>
-                        <th>Marge (Netto)</th>
-                        <th>Marge %</th>
+                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'platform', direction: sortBy.field==='platform' && sortBy.direction==='asc'?'desc':'asc'})}>
+                          Plattform {sortBy.field==='platform' && (sortBy.direction==='asc'?'↑':'↓')}
+                        </th>
+                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'orders', direction: sortBy.field==='orders' && sortBy.direction==='asc'?'desc':'asc'})}>
+                          Bestellungen {sortBy.field==='orders' && (sortBy.direction==='asc'?'↑':'↓')}
+                        </th>
+                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'revenue', direction: sortBy.field==='revenue' && sortBy.direction==='asc'?'desc':'asc'})}>
+                          Umsatz (Netto) {sortBy.field==='revenue' && (sortBy.direction==='asc'?'↑':'↓')}
+                        </th>
+                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'cost', direction: sortBy.field==='cost' && sortBy.direction==='asc'?'desc':'asc'})}>
+                          Kosten {sortBy.field==='cost' && (sortBy.direction==='asc'?'↑':'↓')}
+                        </th>
+                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'margin', direction: sortBy.field==='margin' && sortBy.direction==='asc'?'desc':'asc'})}>
+                          Marge (Netto) {sortBy.field==='margin' && (sortBy.direction==='asc'?'↑':'↓')}
+                        </th>
+                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'marginPct', direction: sortBy.field==='marginPct' && sortBy.direction==='asc'?'desc':'asc'})}>
+                          Marge % {sortBy.field==='marginPct' && (sortBy.direction==='asc'?'↑':'↓')}
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {(topPlatforms||[]).map((p,idx)=> {
+                      {[...(topPlatforms||[])].sort((a,b)=>{
+                        const aVal = sortBy.field==='platform' ? a[sortBy.field] : parseFloat(a[sortBy.field])
+                        const bVal = sortBy.field==='platform' ? b[sortBy.field] : parseFloat(b[sortBy.field])
+                        return sortBy.direction==='asc' ? (aVal>bVal?1:-1) : (aVal<bVal?1:-1)
+                      }).map((p,idx)=> {
                         const platformNames = {
                           '51': 'Onlineshop',
                           '31': 'eBay',
