@@ -313,14 +313,16 @@ async function performGoogleSearch(
     url.searchParams.set('cx', engineId!)
     url.searchParams.set('q', query)
     url.searchParams.set('num', Math.min(limit, 10).toString())
-    url.searchParams.set('gl', 'de')
-    url.searchParams.set('lr', 'lang_de')
+    
+    console.log('[DACH Crawler] Google Search Query:', query)
+    console.log('[DACH Crawler] Using Engine ID:', engineId)
     
     const response = await fetch(url.toString())
     const data = await response.json()
     
     if (!response.ok) {
       console.error('[DACH Crawler] Google API Error:', data.error?.message)
+      console.error('[DACH Crawler] Full Error:', JSON.stringify(data, null, 2))
       return []
     }
     
