@@ -83,9 +83,22 @@ curl http://localhost:3000/api/coldleads/dach/stats
 - Kontakthistorie
 - Follow-up-Management
 
-### 5. Marketing
-- Glossar-Management (5 Versionen)
+### 5. Glossar-Verwaltung
+- 6 Kategorien: Anwendungen, Kategorien, Werkstoffe, Maschinen, Branchen, Machine Types
+- Versions-Management (5 Versionen)
 - Website-Content-Publikation
+- PDF-basierte Branchen-Datenbank
+
+### 6. Produkte-Verwaltung (JTL-Artikel)
+- **Artikel-Import:** 166.854+ Artikel aus JTL-Wawi in MongoDB
+- **Artikel-Browser:** Vollständige Liste mit Filter & Pagination
+- **Filter:** Text-Suche, Hersteller (13), Warengruppen (35)
+- **Daten:** Artikelnummer, Name, Preise, Marge, Lagerbestand
+- **Performance:** Batch-Import, indizierte Suche
+
+### 7. Marketing
+- Analytics Dashboard Integration
+- Google Ads Kampagnen-Verwaltung
 
 ## 🔐 Environment Variables
 
