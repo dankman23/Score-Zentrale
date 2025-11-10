@@ -290,27 +290,52 @@ async function crawlSwitzerlandRegion(
 }
 
 /**
- * Führt Google-Suche aus (nutzt bestehende Google Custom Search API)
+ * Führt Google-Suche aus (nutzt Google Custom Search API direkt)
  */
 async function performGoogleSearch(
   query: string,
   limit: number
 ): Promise<Array<{ title: string; link: string; snippet: string }>> {
   
+  const apiKey = process.env.GOOGLE_SEARCH_API_KEY
+  const engineId = process.env.GOOGLE_SEARCH_ENGINE_ID
+  const useMockData = !apiKey || !engineId || process.env.USE_MOCK_COLDLEADS === 'true'
+  
+  // Falls Google API nicht konfiguriert, leere Ergebnisse zurückgeben
+  if (useMockData) {
+    console.log('[DACH Crawler] Google API not configured, returning empty results')
+    return []
+  }
+  
   try {
-    // Nutze die bestehende Google Search aus dem prospector
-    const { searchGoogle } = await import('./prospector')
+    const url = new URL('https://www.googleapis.com/customsearch/v1')
+    url.searchParams.set('key', apiKey!)
+    url.searchParams.set('cx', engineId!)
+    url.searchParams.set('q', query)
+    url.searchParams.set('num', Math.min(limit, 10).toString())
+    url.searchParams.set('gl', 'de')
+    url.searchParams.set('lr', 'lang_de')
     
-    const results = await searchGoogle(query, limit)
+    const response = await fetch(url.toString())
+    const data = await response.json()
     
-    return results.map(r => ({
-      title: r.title,
-      link: r.link,
-      snippet: r.snippet || ''
-    }))
+    if (!response.ok) {
+      console.error('[DACH Crawler] Google API Error:', data.error?.message)
+      return []
+    }
+    
+    if (data.items && Array.isArray(data.items)) {
+      return data.items.map((item: any) => ({
+        title: item.title,
+        link: item.link,
+        snippet: item.snippet || ''
+      }))
+    }
+    
+    return []
     
   } catch (error) {
-    console.error('[Google Search] Error:', error)
+    console.error('[DACH Crawler] Error:', error)
     return []
   }
 }
