@@ -1914,7 +1914,7 @@ export default function App() {
                             </tr>
                           </thead>
                           <tbody>
-                            {sortData(analyticsProductPages, productSort.field, productSort.order).slice(0, 100).map((page, i) => (
+                            {sortData(analyticsProductPages, productSort.field, productSort.order).slice(0, showAllProducts ? 100 : 10).map((page, i) => (
                               <tr key={i}
                                   style={{cursor: 'pointer'}}
                                   className={selectedProductPage?.pagePath === page.pagePath ? 'table-active' : ''}
@@ -1934,6 +1934,16 @@ export default function App() {
                               </tr>
                             ))}
                           </tbody>
+                          {analyticsProductPages.length > 10 && (
+                            <tfoot>
+                              <tr>
+                                <td colSpan={5} className="text-center" style={{cursor:'pointer', padding:'12px'}} onClick={()=>setShowAllProducts(!showAllProducts)}>
+                                  <i className={`bi bi-chevron-${showAllProducts?'up':'down'} mr-2`}/>
+                                  {showAllProducts ? 'Weniger anzeigen' : `${analyticsProductPages.length - 10} weitere anzeigen (bis zu ${Math.min(analyticsProductPages.length, 100)})`}
+                                </td>
+                              </tr>
+                            </tfoot>
+                          )}
                         </table>
                       </div>
                     </div>
