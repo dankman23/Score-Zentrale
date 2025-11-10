@@ -124,16 +124,20 @@ export async function POST() {
         try {
           console.log(`[Autopilot Tick] Analyzing ${prospect.company_name}...`)
           
-          const analyzeResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/coldleads/analyze`, {
+          // Nutze neue V3-Analyze API
+          const analyzeResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/coldleads/analyze-v3`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               website: prospect.website,
-              industry: nextQuery.industry
+              company_name: prospect.company_name,
+              industry: nextQuery.industry,
+              region: nextQuery.region
             })
           })
           
-          await analyzeResponse.json()
+          const result = await analyzeResponse.json()
+          console.log(`[Autopilot] ${prospect.company_name}: ${result.ok ? 'OK' : 'FAILED'}`)
           
         } catch (error) {
           console.error(`[Autopilot Tick] Failed to analyze ${prospect.company_name}:`, error)
