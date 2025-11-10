@@ -607,22 +607,26 @@ export async function fetchInfoPages(
 }
 
 /**
- * Fetch Beileger success metrics (pages under /account/ path)
+ * Fetch Beileger success metrics (Direct traffic to /account/ pages - from QR code)
+ * Only counts visitors who came directly (no referrer) to /account/ pages
  */
 export async function fetchBeilegerMetrics(
   startDate: string = '30daysAgo',
   endDate: string = 'today'
-): Promise<{ totalVisits: number; uniqueVisitors: number; pages: PageMetrics[] }> {
+): Promise<{ totalVisits: number; uniqueVisitors: number; pages: PageMetrics[]; directTrafficOnly: boolean }> {
   const client = getAnalyticsClient();
   const propertyId = getPropertyId();
 
   try {
+    // Get Direct traffic to /account/ pages (likely from QR code)
     const [response] = await client.runReport({
       property: `properties/${propertyId}`,
       dateRanges: [{ startDate, endDate }],
       dimensions: [
         { name: 'pagePath' },
         { name: 'pageTitle' },
+        { name: 'sessionSource' },
+        { name: 'sessionMedium' },
       ],
       metrics: [
         { name: 'sessions' },
@@ -630,12 +634,36 @@ export async function fetchBeilegerMetrics(
         { name: 'userEngagementDuration' },
       ],
       dimensionFilter: {
-        filter: {
-          fieldName: 'pagePath',
-          stringFilter: {
-            matchType: 'BEGINS_WITH' as const,
-            value: '/account/' // Beileger führt zu /account/ Seiten
-          }
+        andGroup: {
+          expressions: [
+            {
+              filter: {
+                fieldName: 'pagePath',
+                stringFilter: {
+                  matchType: 'BEGINS_WITH' as const,
+                  value: '/account/' // Beileger führt zu /account/ Seiten
+                }
+              }
+            },
+            {
+              filter: {
+                fieldName: 'sessionSource',
+                stringFilter: {
+                  matchType: 'EXACT' as const,
+                  value: '(direct)' // Nur Direct Traffic (QR Code hat keinen Referrer)
+                }
+              }
+            },
+            {
+              filter: {
+                fieldName: 'sessionMedium',
+                stringFilter: {
+                  matchType: 'EXACT' as const,
+                  value: '(none)'
+                }
+              }
+            }
+          ]
         }
       },
       orderBys: [
@@ -644,36 +672,57 @@ export async function fetchBeilegerMetrics(
     });
 
     if (!response.rows || response.rows.length === 0) {
-      return { totalVisits: 0, uniqueVisitors: 0, pages: [] };
+      return { totalVisits: 0, uniqueVisitors: 0, pages: [], directTrafficOnly: true };
     }
 
     let totalVisits = 0;
     let totalUsers = 0;
 
-    const pages = response.rows.map(row => {
+    // Group by pagePath (aggregate across sources)
+    const pageMap = new Map<string, any>();
+    
+    response.rows.forEach(row => {
       const dimensionValues = row.dimensionValues || [];
       const metricValues = row.metricValues || [];
-
+      
+      const pagePath = dimensionValues[0]?.value || '';
+      const pageTitle = dimensionValues[1]?.value || '';
       const pageViews = parseInt(metricValues[0]?.value || '0', 10);
       const users = parseInt(metricValues[1]?.value || '0', 10);
       const userEngagementDuration = parseFloat(metricValues[2]?.value || '0');
       
+      if (pageMap.has(pagePath)) {
+        const existing = pageMap.get(pagePath);
+        existing.pageViews += pageViews;
+        existing.uniquePageViews += users;
+        existing.totalDuration += userEngagementDuration;
+      } else {
+        pageMap.set(pagePath, {
+          pagePath,
+          pageTitle,
+          pageViews,
+          uniquePageViews: users,
+          totalDuration: userEngagementDuration,
+        });
+      }
+      
       totalVisits += pageViews;
       totalUsers += users;
-
-      return {
-        pagePath: dimensionValues[0]?.value || '',
-        pageTitle: dimensionValues[1]?.value || '',
-        pageViews: pageViews,
-        uniquePageViews: users,
-        avgTimeOnPage: users > 0 ? userEngagementDuration / users : 0,
-      };
     });
+
+    const pages = Array.from(pageMap.values()).map(p => ({
+      pagePath: p.pagePath,
+      pageTitle: p.pageTitle,
+      pageViews: p.pageViews,
+      uniquePageViews: p.uniquePageViews,
+      avgTimeOnPage: p.uniquePageViews > 0 ? p.totalDuration / p.uniquePageViews : 0,
+    }));
 
     return {
       totalVisits,
       uniqueVisitors: totalUsers,
-      pages
+      pages,
+      directTrafficOnly: true, // Flag to indicate we're tracking direct traffic only
     };
   } catch (error) {
     console.error('Error fetching Beileger metrics:', error);
