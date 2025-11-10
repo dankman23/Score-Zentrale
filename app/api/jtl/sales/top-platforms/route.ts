@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
         ${stornoFilter}
         ${orderTypeFilter}
         AND ${articleFilter}
-      GROUP BY o.kPlattform, p.cName
+      GROUP BY ISNULL(p.cName, CAST(o.kPlattform AS VARCHAR(50)))
       ORDER BY revenue DESC
     `
 
