@@ -51,13 +51,8 @@ export async function GET(request: NextRequest) {
          AND ISNULL(op.cName,'') NOT LIKE 'Pfand%'`
 
     const shippingFilter = hasNPosTyp
-      ? 'op.nPosTyp IN (3,4)'
-      : `(ISNULL(op.cName,'') LIKE 'Versand%' 
-          OR ISNULL(op.cArtNr,'') LIKE 'VERSAND%' 
-          OR ISNULL(op.cName,'') LIKE '%Shipping%' 
-          OR ISNULL(op.cName,'') LIKE 'Fracht%' 
-          OR ISNULL(op.cName,'') LIKE 'Porto%' 
-          OR ISNULL(op.cName,'') LIKE 'Transport%')`
+      ? 'op.nPosTyp = 3'  // Typ 3 = Versand
+      : `(op.kArtikel = 0 OR op.kArtikel IS NULL)`  // Keine Artikelnummer = Versand
 
     // Positionsfelder
     const qtyField = await pickFirstExisting(pool, orderPosTable, ['fAnzahl', 'nAnzahl', 'fMenge']) || 'fAnzahl'
