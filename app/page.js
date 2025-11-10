@@ -2541,8 +2541,8 @@ export default function App() {
             </div>
           )}
 
-          {/* Glossar Tab */}
-          {marketingSub==='glossar' && (
+          {/* Glossar Tab - REMOVED (moved to main menu) */}
+          {false && marketingSub==='glossar' && (
             <div>
               <h3 className="mb-4"><i className="bi bi-book mr-2"/>Produkt-Glossar</h3>
               
