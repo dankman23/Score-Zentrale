@@ -172,38 +172,34 @@ async function crawlGermanyRegion(
   
   console.log(`[DE Crawler] Searching ${region} for ${keywords.join(', ')}`)
   
-  // Verschiedene Verzeichnisse durchsuchen
-  const sources = [
-    { domain: 'gelbeseiten.de', name: 'Gelbe Seiten' },
-    { domain: 'firmenabc.de', name: 'FirmenABC' },
-    { domain: '11880.com', name: '11880.com' }
-  ]
-  
-  for (const source of sources) {
-    try {
-      // Google Custom Search mit site: Operator
-      const query = `site:${source.domain} ${keywords[0]} ${region}`
-      const searchResults = await performGoogleSearch(query, Math.ceil(limit / sources.length))
-      
-      for (const result of searchResults) {
-        leads.push({
-          name: result.title,
-          website: result.link,
-          address: result.snippet,
-          city: region,
-          region: region,
-          country: 'DE',
-          industry: industry,
-          source: source.name
-        })
+  // Direkte Firmen-Suche (NICHT über Verzeichnisse)
+  try {
+    // Suche nach echten Firmen-Websites mit Impressum/Kontakt
+    const query = `${keywords[0]} ${region} (impressum OR kontakt) -site:gelbeseiten.de -site:wlw.de -site:lehrer-online.de -site:schule-bw.de`
+    const searchResults = await performGoogleSearch(query, limit)
+    
+    for (const result of searchResults) {
+      // Filtere Blacklist zusätzlich
+      const url = result.link.toLowerCase()
+      if (blacklistedDomains.some(domain => url.includes(domain))) {
+        console.log(`[DE Crawler] Filtered blacklisted: ${result.link}`)
+        continue
       }
       
-      // Rate limiting
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-    } catch (error) {
-      console.error(`[DE Crawler] Error with ${source.name}:`, error)
+      leads.push({
+        name: result.title,
+        website: result.link,
+        address: result.snippet,
+        city: region,
+        region: region,
+        country: 'DE',
+        industry: industry,
+        source: 'Google Organic'
+      })
     }
+    
+  } catch (error) {
+    console.error(`[DE Crawler] Search error:`, error)
   }
   
   return leads.slice(0, limit)
