@@ -3082,34 +3082,62 @@ export default function App() {
                       onChange={e => setDachCrawlerForm({...dachCrawlerForm, industry: e.target.value})}
                     >
                       <option value="">-- Wählen --</option>
-                      <optgroup label="🔩 Metall & Stahl">
-                        <option value="Metallverarbeitung">Metallverarbeitung</option>
-                        <option value="Stahlbau">Stahlbau</option>
-                        <option value="Maschinenbau">Maschinenbau</option>
-                        <option value="Werkzeugbau">Werkzeugbau</option>
-                        <option value="Schlosserei">Schlosserei</option>
-                        <option value="Schweißtechnik">Schweißtechnik</option>
-                      </optgroup>
-                      <optgroup label="🪵 Holz & Möbel">
-                        <option value="Schreinerei">Schreinerei</option>
-                        <option value="Möbelbau">Möbelbau</option>
-                      </optgroup>
-                      <optgroup label="🚗 Automotive">
+                      <optgroup label="🚗 Automobilindustrie & Fahrzeugbau">
                         <option value="Automobilindustrie">Automobilindustrie</option>
                         <option value="Karosseriebau">Karosseriebau</option>
                         <option value="KFZ-Werkstatt">KFZ-Werkstatt</option>
                       </optgroup>
-                      <optgroup label="🎨 Oberflächen">
+                      <optgroup label="🔩 Metallverarbeitung & Stahlbau">
+                        <option value="Metallverarbeitung">Metallverarbeitung</option>
+                        <option value="Schlosserei">Schlosserei</option>
+                        <option value="Stahlbau">Stahlbau</option>
+                        <option value="Schweißtechnik">Schweißtechnik</option>
+                      </optgroup>
+                      <optgroup label="⚙️ Maschinen- und Apparatebau">
+                        <option value="Maschinenbau">Maschinenbau</option>
+                        <option value="Apparatebau">Apparatebau (Behälter/Rohrbau)</option>
+                        <option value="Werkzeugbau">Werkzeugbau</option>
+                      </optgroup>
+                      <optgroup label="✈️ Luft- und Raumfahrt">
+                        <option value="Luftfahrt">Luftfahrt (Flugzeugbau)</option>
+                        <option value="Raumfahrt">Raumfahrt</option>
+                      </optgroup>
+                      <optgroup label="🚢 Schiff- und Bahnindustrie">
+                        <option value="Schiffbau">Schiffbau</option>
+                        <option value="Bahnindustrie">Bahnindustrie</option>
+                      </optgroup>
+                      <optgroup label="🪵 Holz- und Möbelindustrie">
+                        <option value="Holzverarbeitung">Holzverarbeitung</option>
+                        <option value="Schreinerei">Schreinerei/Tischlerei</option>
+                        <option value="Möbelindustrie">Möbelindustrie</option>
+                        <option value="Parkettverlegung">Parkettverlegung</option>
+                      </optgroup>
+                      <optgroup label="🔥 Gießereien und Schmieden">
+                        <option value="Gießerei">Gießerei</option>
+                        <option value="Schmiede">Schmiede</option>
+                      </optgroup>
+                      <optgroup label="🏗️ Maler- und Ausbauhandwerk">
+                        <option value="Malerhandwerk">Malerhandwerk</option>
+                        <option value="Trockenbau">Trockenbau</option>
+                        <option value="Stuckateur">Stuckateur</option>
+                      </optgroup>
+                      <optgroup label="🎨 Oberflächentechnik">
                         <option value="Oberflächentechnik">Oberflächentechnik</option>
                         <option value="Lackiererei">Lackiererei</option>
                         <option value="Galvanik">Galvanik</option>
                       </optgroup>
-                      <optgroup label="🔬 Spezial">
+                      <optgroup label="💎 Glas, Stein & Keramik">
                         <option value="Glasverarbeitung">Glasverarbeitung</option>
                         <option value="Steinmetz">Steinmetz</option>
+                      </optgroup>
+                      <optgroup label="🦷 Dental & Medizintechnik">
                         <option value="Dentallabor">Dentallabor</option>
+                      </optgroup>
+                      <optgroup label="💍 Schmuck & Gravur">
                         <option value="Schmuckherstellung">Schmuckherstellung</option>
                         <option value="Gravurbetrieb">Gravurbetrieb</option>
+                      </optgroup>
+                      <optgroup label="🔧 Kunststoff & Sonstige">
                         <option value="Kunststoffverarbeitung">Kunststoffverarbeitung</option>
                         <option value="Modellbau">Modellbau</option>
                         <option value="Messerschmiede">Messerschmiede</option>
