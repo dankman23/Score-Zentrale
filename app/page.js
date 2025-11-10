@@ -97,6 +97,7 @@ export default function App() {
   const [selectedProspectsForBulk, setSelectedProspectsForBulk] = useState([])
   const [bulkAnalyzing, setBulkAnalyzing] = useState(false)
   const [bulkAnalyzeProgress, setBulkAnalyzeProgress] = useState({ current: 0, total: 0 })
+  const [showEmailPreview, setShowEmailPreview] = useState(null)
   const [coldProspects, setColdProspects] = useState([])
   const [coldLoading, setColdLoading] = useState(false)
   const [selectedProspect, setSelectedProspect] = useState(null)
