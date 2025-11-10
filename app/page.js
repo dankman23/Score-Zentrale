@@ -4163,57 +4163,154 @@ export default function App() {
                       </div>
 
                       {/* Artikel-Tabelle */}
-                      <div className="table-responsive">
-                        <table className="table table-hover">
-                          <thead>
-                            <tr>
-                              <th>Art.-Nr.</th>
-                              <th>Name</th>
-                              <th>Hersteller</th>
-                              <th>Warengruppe</th>
-                              <th className="text-right">VK Netto</th>
-                              <th className="text-right">EK Netto</th>
-                              <th className="text-right">Marge %</th>
-                              <th>Importiert</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {artikelList.length === 0 ? (
+                      {artikelLoading ? (
+                        <div className="text-center py-5">
+                          <div className="spinner-border text-primary" role="status">
+                            <span className="sr-only">Lädt...</span>
+                          </div>
+                          <p className="text-muted mt-2">Artikel werden geladen...</p>
+                        </div>
+                      ) : (
+                        <div className="table-responsive">
+                          <table className="table table-hover table-sm">
+                            <thead className="thead-light">
                               <tr>
-                                <td colSpan="8" className="text-center text-muted py-4">
-                                  <i className="bi bi-inbox mr-2"/>Keine Artikel gefunden
-                                </td>
+                                <th>Art.-Nr.</th>
+                                <th>Name</th>
+                                <th>Hersteller</th>
+                                <th>Warengruppe</th>
+                                <th className="text-right">VK Netto</th>
+                                <th className="text-right">EK Netto</th>
+                                <th className="text-right">Marge %</th>
+                                <th className="text-center">Bestand</th>
                               </tr>
-                            ) : (
-                              artikelList.map(artikel => (
-                                <tr key={artikel.kArtikel}>
-                                  <td className="font-weight-bold">{artikel.cArtNr}</td>
-                                  <td>{artikel.cName}</td>
-                                  <td>{artikel.cHerstellerName || '-'}</td>
-                                  <td><span className="badge badge-secondary">{artikel.cWarengruppenName || '-'}</span></td>
-                                  <td className="text-right">{parseFloat(artikel.fVKNetto || 0).toFixed(2)} €</td>
-                                  <td className="text-right">{parseFloat(artikel.fEKNetto || 0).toFixed(2)} €</td>
-                                  <td className="text-right">
-                                    <span className={`badge badge-${artikel.margin_percent > 30 ? 'success' : artikel.margin_percent > 15 ? 'warning' : 'danger'}`}>
-                                      {artikel.margin_percent}%
-                                    </span>
-                                  </td>
-                                  <td className="small text-muted">
-                                    {new Date(artikel.imported_at).toLocaleDateString('de-DE')}
+                            </thead>
+                            <tbody>
+                              {artikelList.length === 0 ? (
+                                <tr>
+                                  <td colSpan="8" className="text-center text-muted py-4">
+                                    <i className="bi bi-inbox mr-2" style={{fontSize: '2rem'}}/>
+                                    <div>Keine Artikel gefunden</div>
+                                    <small>Versuchen Sie andere Filter</small>
                                   </td>
                                 </tr>
-                              ))
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
+                              ) : (
+                                artikelList.map(artikel => (
+                                  <tr key={artikel.kArtikel}>
+                                    <td className="font-weight-bold text-primary">{artikel.cArtNr}</td>
+                                    <td>
+                                      <div className="text-truncate" style={{maxWidth: '350px'}} title={artikel.cName}>
+                                        {artikel.cName}
+                                      </div>
+                                      {artikel.cKurzBeschreibung && (
+                                        <small className="text-muted text-truncate d-block" style={{maxWidth: '350px'}}>
+                                          {artikel.cKurzBeschreibung}
+                                        </small>
+                                      )}
+                                    </td>
+                                    <td>
+                                      <span className="badge badge-light">{artikel.cHerstellerName || '-'}</span>
+                                    </td>
+                                    <td>
+                                      <span className="badge badge-secondary">{artikel.cWarengruppenName || '-'}</span>
+                                    </td>
+                                    <td className="text-right font-weight-bold">
+                                      {parseFloat(artikel.fVKNetto || 0).toFixed(2)} €
+                                    </td>
+                                    <td className="text-right text-muted">
+                                      {parseFloat(artikel.fEKNetto || 0).toFixed(2)} €
+                                    </td>
+                                    <td className="text-right">
+                                      <span className={`badge badge-${artikel.margin_percent > 30 ? 'success' : artikel.margin_percent > 15 ? 'warning' : 'danger'}`}>
+                                        {artikel.margin_percent}%
+                                      </span>
+                                    </td>
+                                    <td className="text-center">
+                                      <span className={`badge ${artikel.nLagerbestand > 0 ? 'badge-success' : 'badge-secondary'}`}>
+                                        {artikel.nLagerbestand || 0}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
 
-                      {/* Info: Nur letzte 5 Artikel */}
-                      <div className="alert alert-info mt-3 small mb-0">
-                        <i className="bi bi-info-circle mr-2"/>
-                        Aktuell werden die letzten 5 importierten Artikel angezeigt. 
-                        Vollständige Liste mit Filter & Pagination folgt in Kürze.
-                      </div>
+                      {/* Pagination */}
+                      {!artikelLoading && artikelList.length > 0 && (
+                        <div className="d-flex justify-content-between align-items-center mt-3">
+                          <div className="text-muted small">
+                            Zeige Artikel {((artikelPage - 1) * artikelPerPage) + 1} bis {Math.min(artikelPage * artikelPerPage, artikelTotal)} von {artikelTotal.toLocaleString()}
+                          </div>
+                          <nav>
+                            <ul className="pagination pagination-sm mb-0">
+                              <li className={`page-item ${artikelPage === 1 ? 'disabled' : ''}`}>
+                                <button 
+                                  className="page-link" 
+                                  onClick={() => setArtikelPage(1)}
+                                  disabled={artikelPage === 1}
+                                >
+                                  <i className="bi bi-chevron-double-left"/>
+                                </button>
+                              </li>
+                              <li className={`page-item ${artikelPage === 1 ? 'disabled' : ''}`}>
+                                <button 
+                                  className="page-link" 
+                                  onClick={() => setArtikelPage(artikelPage - 1)}
+                                  disabled={artikelPage === 1}
+                                >
+                                  <i className="bi bi-chevron-left"/>
+                                </button>
+                              </li>
+                              
+                              {/* Page Numbers */}
+                              {[...Array(Math.min(5, artikelTotalPages))].map((_, i) => {
+                                let pageNum;
+                                if (artikelTotalPages <= 5) {
+                                  pageNum = i + 1;
+                                } else if (artikelPage <= 3) {
+                                  pageNum = i + 1;
+                                } else if (artikelPage >= artikelTotalPages - 2) {
+                                  pageNum = artikelTotalPages - 4 + i;
+                                } else {
+                                  pageNum = artikelPage - 2 + i;
+                                }
+                                return (
+                                  <li key={i} className={`page-item ${pageNum === artikelPage ? 'active' : ''}`}>
+                                    <button 
+                                      className="page-link" 
+                                      onClick={() => setArtikelPage(pageNum)}
+                                    >
+                                      {pageNum}
+                                    </button>
+                                  </li>
+                                );
+                              })}
+
+                              <li className={`page-item ${artikelPage === artikelTotalPages ? 'disabled' : ''}`}>
+                                <button 
+                                  className="page-link" 
+                                  onClick={() => setArtikelPage(artikelPage + 1)}
+                                  disabled={artikelPage === artikelTotalPages}
+                                >
+                                  <i className="bi bi-chevron-right"/>
+                                </button>
+                              </li>
+                              <li className={`page-item ${artikelPage === artikelTotalPages ? 'disabled' : ''}`}>
+                                <button 
+                                  className="page-link" 
+                                  onClick={() => setArtikelPage(artikelTotalPages)}
+                                  disabled={artikelPage === artikelTotalPages}
+                                >
+                                  <i className="bi bi-chevron-double-right"/>
+                                </button>
+                              </li>
+                            </ul>
+                          </nav>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
