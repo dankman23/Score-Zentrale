@@ -2262,15 +2262,16 @@ export default function App() {
           </div>
 
           {/* Suchformular - mit Dropdowns */}
-          <div className="card border-0 shadow-sm mb-4">
-            <div className="card-body">
-              <div className="d-flex align-items-center mb-3">
-                <i className="bi bi-search text-primary mr-2" style={{fontSize:'1.5rem'}}/>
-                <div>
-                  <h5 className="mb-0">Neue Firmen finden</h5>
-                  <small className="text-muted">Durchsuche das Web nach passenden B2B-Kunden</small>
+          {coldStatusFilter === 'all' && (
+            <div className="card border-0 shadow-sm mb-4">
+              <div className="card-body">
+                <div className="d-flex align-items-center mb-3">
+                  <i className="bi bi-search text-primary mr-2" style={{fontSize:'1.5rem'}}/>
+                  <div>
+                    <h5 className="mb-0">Neue Firmen finden</h5>
+                    <small className="text-muted">Durchsuche das Web nach passenden B2B-Kunden</small>
+                  </div>
                 </div>
-              </div>
               <div className="row">
                 <div className="col-md-4 mb-2">
                   <label className="small text-muted mb-1">Branche *</label>
