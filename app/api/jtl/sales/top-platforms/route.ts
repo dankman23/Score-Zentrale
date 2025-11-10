@@ -51,18 +51,19 @@ export async function GET(request: NextRequest) {
 
     const query = `
       SELECT TOP ${limit}
-        ISNULL(CAST(o.kPlattform AS VARCHAR(50)), 'Unbekannt') AS platform,
+        ISNULL(p.cName, CAST(o.kPlattform AS VARCHAR(50))) AS platform,
         COUNT(DISTINCT o.kAuftrag) AS orders,
         SUM(${netExpr}) AS revenue,
         SUM(${costExpr}) AS cost,
         SUM(${netExpr}) - SUM(${costExpr}) AS margin
       FROM ${orderTable} o
       INNER JOIN ${orderPosTable} op ON o.kAuftrag = op.kAuftrag
+      LEFT JOIN dbo.tPlattform p ON o.kPlattform = p.kPlattform
       WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
         ${orderTypeFilter}
         AND ${articleFilter}
-      GROUP BY o.kPlattform
+      GROUP BY o.kPlattform, p.cName
       ORDER BY revenue DESC
     `
 
