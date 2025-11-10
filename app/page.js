@@ -544,6 +544,15 @@ export default function App() {
       ])
       
       console.log('[Analytics] Parsing responses...')
+      
+      // Check for errors first
+      if (!metricsRes.ok) throw new Error(`Metrics API failed: ${metricsRes.status}`)
+      if (!sourcesRes.ok) throw new Error(`Traffic Sources API failed: ${sourcesRes.status}`)
+      if (!topPagesRes.ok) throw new Error(`Top Pages API failed: ${topPagesRes.status}`)
+      if (!categoryRes.ok) throw new Error(`Category Pages API failed: ${categoryRes.status}`)
+      if (!productRes.ok) throw new Error(`Product Pages API failed: ${productRes.status}`)
+      if (!timeSeriesRes.ok) throw new Error(`Time Series API failed: ${timeSeriesRes.status}`)
+      
       const metrics = await metricsRes.json()
       const sources = await sourcesRes.json()
       const topPages = await topPagesRes.json()
