@@ -250,6 +250,8 @@ export default function App() {
       setPurchaseOrders(poRaw?.ok ? poRaw.data : null)
       setExpenses(expRaw?.ok ? expRaw.data : null)
       setMargin(marginRaw?.ok ? marginRaw : null) // marginRaw is also full response
+      setTopPlatforms(topPlatRaw?.ok ? topPlatRaw.platforms : [])
+      setTopManufacturers(topManufRaw?.ok ? topManufRaw.manufacturers : [])
       pushLog({ url:'/api/jtl/orders/kpi/shipping-split', status:200, ok:true, ms: Math.round(performance.now()-started) })
       if (isDegradedFlag) {
         const ksum = Number(mappedK1?.revenue||0) + Number(mappedK1?.orders||0) + Number(mappedK1?.margin||0)
