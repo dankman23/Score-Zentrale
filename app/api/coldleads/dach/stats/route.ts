@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getCrawlStatistics } from '../../../../../../services/coldleads/dach-crawler'
+import { getCrawlStatistics } from '@/services/coldleads/dach-crawler'
 import { connectToDatabase } from '@/lib/api'
 
 /**
