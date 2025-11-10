@@ -301,7 +301,7 @@ async function crawlSwitzerlandRegion(
 }
 
 /**
- * Führt Google-Suche aus (nutzt Google Custom Search API direkt)
+ * Führt Google-Suche aus (GLEICHE METHODE wie funktionierender Prospector)
  */
 async function performGoogleSearch(
   query: string,
@@ -319,25 +319,27 @@ async function performGoogleSearch(
   }
   
   try {
+    // EXAKT wie im funktionierenden Prospector
     const url = new URL('https://www.googleapis.com/customsearch/v1')
     url.searchParams.set('key', apiKey!)
     url.searchParams.set('cx', engineId!)
     url.searchParams.set('q', query)
     url.searchParams.set('num', Math.min(limit, 10).toString())
+    url.searchParams.set('gl', 'de') // Germany
+    url.searchParams.set('lr', 'lang_de') // German
     
-    console.log('[DACH Crawler] Google Search Query:', query)
-    console.log('[DACH Crawler] Using Engine ID:', engineId)
+    console.log('[DACH Crawler] Query:', query)
     
     const response = await fetch(url.toString())
     const data = await response.json()
     
     if (!response.ok) {
-      console.error('[DACH Crawler] Google API Error:', data.error?.message)
-      console.error('[DACH Crawler] Full Error:', JSON.stringify(data, null, 2))
+      console.error('[DACH Crawler] Google API Error:', data.error?.message || 'Unknown')
       return []
     }
     
     if (data.items && Array.isArray(data.items)) {
+      console.log(`[DACH Crawler] Found ${data.items.length} results`)
       return data.items.map((item: any) => ({
         title: item.title,
         link: item.link,
@@ -345,10 +347,11 @@ async function performGoogleSearch(
       }))
     }
     
+    console.log('[DACH Crawler] No results found')
     return []
     
   } catch (error) {
-    console.error('[DACH Crawler] Error:', error)
+    console.error('[DACH Crawler] Exception:', error)
     return []
   }
 }
