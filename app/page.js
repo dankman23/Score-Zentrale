@@ -61,6 +61,8 @@ export default function App() {
   const [purchaseOrders, setPurchaseOrders] = useState(null)
   const [expenses, setExpenses] = useState(null)
   const [margin, setMargin] = useState(null)
+  const [topPlatforms, setTopPlatforms] = useState([])
+  const [topManufacturers, setTopManufacturers] = useState([])
   const [ts, setTs] = useState([])
   const [tsFees, setTsFees] = useState([])
   const [platTs, setPlatTs] = useState([])
