@@ -74,12 +74,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       stats: {
-        total_regions: totalRegions,
-        completed_regions: completedRegions,
-        pending_regions: totalRegions - completedRegions,
+        total_crawl_jobs: allProgress.length,
+        completed_jobs: completedCombinations,
         total_companies_found: totalCompanies,
-        coverage_percentage: Math.round((completedRegions / totalRegions) * 100),
-        dach_prospects_in_db: dachProspects
+        dach_prospects_in_db: dachProspects,
+        // Hinweis: "Abdeckung" bezieht sich auf durchgeführte Crawl-Jobs (Region + Branche Kombinationen)
+        note: "Jeder Job = 1 Region + 1 Branche. Für vollständige Abdeckung müsste jede Region für jede relevante Branche gecrawlt werden."
       },
       country_breakdown: countryStats,
       top_industries: topIndustries,
