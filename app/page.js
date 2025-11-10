@@ -949,15 +949,26 @@ export default function App() {
                   </div>
                   {topPlatforms && topPlatforms.length > 0 ? (
                     <div className="small">
-                      {topPlatforms.slice(0, 5).map((p, i) => (
-                        <div key={i} className="d-flex justify-content-between mb-1 pb-1" style={{borderBottom: i < 4 ? '1px solid var(--line)' : 'none'}}>
-                          <span className="text-muted">#{p.platform}</span>
-                          <span>
-                            <strong>{fmtCurrency(p.revenue)}</strong>
-                            <span className="text-success ml-2">+{fmtCurrency(p.margin)}</span>
-                          </span>
-                        </div>
-                      ))}
+                      {topPlatforms.slice(0, 5).map((p, i) => {
+                        const platformNames = {
+                          '51': 'Onlineshop',
+                          '31': 'eBay',
+                          '54': 'Amazon',
+                          '2': 'Intern',
+                          '60': 'Idealo'
+                        }
+                        const name = platformNames[p.platform] || `#${p.platform}`
+                        return (
+                          <div key={i} className="d-flex justify-content-between mb-1 pb-1" style={{borderBottom: i < 4 ? '1px solid var(--line)' : 'none'}}>
+                            <span className="text-truncate" style={{maxWidth: '100px'}}>{name}</span>
+                            <span className="text-nowrap">
+                              <strong>{fmtCurrency(p.revenue)}</strong>
+                              <span className="text-success ml-2">+{fmtCurrency(p.margin)}</span>
+                              <span className="text-muted ml-1">({p.marginPct}%)</span>
+                            </span>
+                          </div>
+                        )
+                      })}
                     </div>
                   ) : (
                     <div className="text-muted small">Keine Daten</div>
