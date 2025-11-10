@@ -30,12 +30,16 @@ export async function GET(request: NextRequest) {
 
     const qtyField = await pickFirstExisting(pool, orderPosTable, ['fAnzahl', 'nAnzahl', 'fMenge']) || 'fAnzahl'
     const netField = await pickFirstExisting(pool, orderPosTable, ['fVKNetto', 'fPreis']) || 'fVKNetto'
-    const grossField = await pickFirstExisting(pool, orderPosTable, ['fVKBrutto', 'fVK']) || 'fVKBrutto'
     const costField = await pickFirstExisting(pool, orderPosTable, ['fEKNetto', 'fEK']) || 'fEKNetto'
+    
+    // MwSt-Satz Feld für Brutto-Berechnung
+    const taxField = await pickFirstExisting(pool, orderPosTable, ['fMwSt', 'fMwStSatz', 'fSteuersatz']) || null
     
     // Berechne Umsatz, Kosten und Marge
     const netTotalExpr = `(op.${netField} * op.${qtyField})`
-    const grossTotalExpr = `(op.${grossField} * op.${qtyField})`
+    const grossTotalExpr = taxField 
+      ? `(op.${netField} * op.${qtyField} * (1 + op.${taxField}/100))` 
+      : `(op.${netField} * op.${qtyField} * 1.19)`  // Fallback: 19% MwSt
     const costTotalExpr = `(op.${costField} * op.${qtyField})`
 
     const query = `
