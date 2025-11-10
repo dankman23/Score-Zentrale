@@ -7,6 +7,8 @@ export interface AnalyticsMetrics {
   pageViews: number;
   avgSessionDuration: number;
   bounceRate: number;
+  conversions: number;
+  revenue: number;
 }
 
 export interface TrafficSource {
