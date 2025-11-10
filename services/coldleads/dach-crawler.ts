@@ -147,6 +147,7 @@ export async function crawlDACHRegion(
 
 /**
  * Deutschland: Gelbe Seiten / 11880 / WLW scrapen
+ * Nutzt Google Custom Search mit site: Operatoren
  */
 async function crawlGermanyRegion(
   region: string,
@@ -154,18 +155,46 @@ async function crawlGermanyRegion(
   limit: number
 ): Promise<CompanyLead[]> {
   
-  // Für MVP: Simulierte Daten
-  // In Produktion: Echtes Scraping mit Playwright
-  
   const leads: CompanyLead[] = []
   const keywords = INDUSTRY_KEYWORDS[industry as keyof typeof INDUSTRY_KEYWORDS] || [industry.toLowerCase()]
   
   console.log(`[DE Crawler] Searching ${region} for ${keywords.join(', ')}`)
   
-  // Simuliere Fund von Unternehmen
-  // In Produktion würde hier das echte Scraping stattfinden
+  // Verschiedene Verzeichnisse durchsuchen
+  const sources = [
+    { domain: 'gelbeseiten.de', name: 'Gelbe Seiten' },
+    { domain: 'firmenabc.de', name: 'FirmenABC' },
+    { domain: '11880.com', name: '11880.com' }
+  ]
   
-  return leads
+  for (const source of sources) {
+    try {
+      // Google Custom Search mit site: Operator
+      const query = `site:${source.domain} ${keywords[0]} ${region}`
+      const searchResults = await performGoogleSearch(query, Math.ceil(limit / sources.length))
+      
+      for (const result of searchResults) {
+        leads.push({
+          name: result.title,
+          website: result.link,
+          address: result.snippet,
+          city: region,
+          region: region,
+          country: 'DE',
+          industry: industry,
+          source: source.name
+        })
+      }
+      
+      // Rate limiting
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+    } catch (error) {
+      console.error(`[DE Crawler] Error with ${source.name}:`, error)
+    }
+  }
+  
+  return leads.slice(0, limit)
 }
 
 /**
@@ -177,8 +206,41 @@ async function crawlAustriaRegion(
   limit: number
 ): Promise<CompanyLead[]> {
   const leads: CompanyLead[] = []
-  console.log(`[AT Crawler] Searching ${region}`)
-  return leads
+  const keywords = INDUSTRY_KEYWORDS[industry as keyof typeof INDUSTRY_KEYWORDS] || [industry.toLowerCase()]
+  
+  console.log(`[AT Crawler] Searching ${region} for ${industry}`)
+  
+  const sources = [
+    { domain: 'herold.at', name: 'Herold.at' },
+    { domain: 'firmenabc.at', name: 'FirmenABC.at' }
+  ]
+  
+  for (const source of sources) {
+    try {
+      const query = `site:${source.domain} ${keywords[0]} ${region}`
+      const searchResults = await performGoogleSearch(query, Math.ceil(limit / sources.length))
+      
+      for (const result of searchResults) {
+        leads.push({
+          name: result.title,
+          website: result.link,
+          address: result.snippet,
+          city: region,
+          region: region,
+          country: 'AT',
+          industry: industry,
+          source: source.name
+        })
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+    } catch (error) {
+      console.error(`[AT Crawler] Error with ${source.name}:`, error)
+    }
+  }
+  
+  return leads.slice(0, limit)
 }
 
 /**
@@ -190,8 +252,67 @@ async function crawlSwitzerlandRegion(
   limit: number
 ): Promise<CompanyLead[]> {
   const leads: CompanyLead[] = []
-  console.log(`[CH Crawler] Searching ${region}`)
-  return leads
+  const keywords = INDUSTRY_KEYWORDS[industry as keyof typeof INDUSTRY_KEYWORDS] || [industry.toLowerCase()]
+  
+  console.log(`[CH Crawler] Searching ${region} for ${industry}`)
+  
+  const sources = [
+    { domain: 'local.ch', name: 'local.ch' },
+    { domain: 'search.ch', name: 'search.ch' }
+  ]
+  
+  for (const source of sources) {
+    try {
+      const query = `site:${source.domain} ${keywords[0]} ${region}`
+      const searchResults = await performGoogleSearch(query, Math.ceil(limit / sources.length))
+      
+      for (const result of searchResults) {
+        leads.push({
+          name: result.title,
+          website: result.link,
+          address: result.snippet,
+          city: region,
+          region: region,
+          country: 'CH',
+          industry: industry,
+          source: source.name
+        })
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+    } catch (error) {
+      console.error(`[CH Crawler] Error with ${source.name}:`, error)
+    }
+  }
+  
+  return leads.slice(0, limit)
+}
+
+/**
+ * Führt Google-Suche aus (nutzt bestehende Google Custom Search API)
+ */
+async function performGoogleSearch(
+  query: string,
+  limit: number
+): Promise<Array<{ title: string; link: string; snippet: string }>> {
+  
+  try {
+    // Nutze die bestehende Google Search aus dem prospector
+    const { searchGoogle } = await import('./prospector')
+    
+    const results = await searchGoogle(query, limit)
+    
+    return results.map(r => ({
+      title: r.title,
+      link: r.link,
+      snippet: r.snippet || ''
+    }))
+    
+  } catch (error) {
+    console.error('[Google Search] Error:', error)
+    return []
+  }
 }
 
 /**
