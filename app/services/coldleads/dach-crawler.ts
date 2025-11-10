@@ -52,24 +52,47 @@ const DACH_REGIONS = {
   ]
 }
 
-// Branchen-Mapping mit Suchbegriffen
+// Branchen-Mapping mit Suchbegriffen (aus bestehendem Prospector übernommen + erweitert)
 const INDUSTRY_KEYWORDS = {
-  'Metallverarbeitung': [
-    'metallbau', 'metallverarbeitung', 'stahlbau', 'blechbearbeitung',
-    'maschinenbau', 'schweißtechnik', 'schlosserei'
-  ],
-  'Schreinerei': [
-    'schreinerei', 'tischlerei', 'möbelbau', 'holzverarbeitung'
-  ],
-  'Automobilindustrie': [
-    'kfz', 'autolackierung', 'karosseriebau', 'fahrzeugbau'
-  ],
-  'Oberflächentechnik': [
-    'pulverbeschichtung', 'lackiererei', 'galvanik', 'oberflächenbehandlung'
-  ],
-  'Werkzeugbau': [
-    'werkzeugbau', 'formenbau', 'stanzerei'
-  ]
+  // Metallverarbeitung & Stahlbau
+  'Metallverarbeitung': ['metallbau', 'metallverarbeitung', 'blechbearbeitung', 'stahlverarbeitung'],
+  'Stahlbau': ['stahlbau', 'stahlkonstruktion', 'metallkonstruktion'],
+  'Maschinenbau': ['maschinenbau', 'anlagenbau', 'sondermaschinenbau'],
+  'Werkzeugbau': ['werkzeugbau', 'formenbau', 'vorrichtungsbau'],
+  'Schlosserei': ['schlosserei', 'metallbau', 'bauschlosserei'],
+  'Schweißtechnik': ['schweißtechnik', 'schweißbetrieb', 'schweißerei'],
+  
+  // Holzverarbeitung
+  'Schreinerei': ['schreinerei', 'tischlerei', 'möbelbau', 'holzverarbeitung'],
+  'Möbelbau': ['möbelbau', 'möbelherstellung', 'innenausbau'],
+  
+  // Automotive & Karosserie
+  'Automobilindustrie': ['kfz', 'automobilzulieferer', 'fahrzeugbau'],
+  'Karosseriebau': ['karosseriebau', 'karosseriewerkstatt', 'autolackierung'],
+  'KFZ-Werkstatt': ['kfz werkstatt', 'autowerkstatt', 'kfz reparatur'],
+  
+  // Oberflächentechnik
+  'Oberflächentechnik': ['oberflächenbehandlung', 'oberflächenveredelung'],
+  'Lackiererei': ['lackiererei', 'industrielackierung', 'pulverbeschichtung'],
+  'Galvanik': ['galvanik', 'galvanisierung', 'verzinkerei'],
+  
+  // Glas & Stein
+  'Glasverarbeitung': ['glasverarbeitung', 'glastechnik', 'glaserei'],
+  'Steinmetz': ['steinmetz', 'steinbearbeitung', 'natursteinbearbeitung'],
+  
+  // Dental & Medizin
+  'Dentallabor': ['dentallabor', 'zahntechnik', 'dentaltechnik'],
+  
+  // Schmuck & Gravur
+  'Schmuckherstellung': ['goldschmied', 'schmuckherstellung', 'juwelier'],
+  'Gravurbetrieb': ['gravur', 'gravierwerkstatt', 'lasergravur'],
+  
+  // Kunststoff
+  'Kunststoffverarbeitung': ['kunststoffverarbeitung', 'kunststofftechnik', 'spritzguss'],
+  
+  // Sonstige
+  'Modellbau': ['modellbau', 'prototypenbau'],
+  'Messerschmiede': ['messerschmiede', 'messermacher']
 }
 
 /**
