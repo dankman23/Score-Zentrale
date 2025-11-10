@@ -147,7 +147,7 @@ export async function crawlDACHRegion(
 
 /**
  * Deutschland: Gelbe Seiten / 11880 / WLW scrapen
- * Nutzt Google Custom Search mit site: Operatoren
+ * Nutzt Google Custom Search wie der funktionierende Prospector
  */
 async function crawlGermanyRegion(
   region: string,
@@ -160,20 +160,25 @@ async function crawlGermanyRegion(
   
   console.log(`[DE Crawler] Searching ${region} for ${keywords.join(', ')}`)
   
-  // Verschiedene Verzeichnisse durchsuchen
-  const sources = [
-    { domain: 'gelbeseiten.de', name: 'Gelbe Seiten' },
-    { domain: 'firmenabc.de', name: 'FirmenABC' },
-    { domain: '11880.com', name: '11880.com' }
+  // Mehrere Suchanfragen mit verschiedenen Keywords und Domains
+  const searchQueries = [
+    `${keywords[0]} ${region} site:gelbeseiten.de OR site:firmenabc.de "impressum"`,
+    `${keywords[0]} ${region} site:11880.com OR site:wlw.de "kontakt"`,
+    `${keywords[1] || keywords[0]} ${region} site:.de "firma" OR "unternehmen"`
   ]
   
-  for (const source of sources) {
+  for (const query of searchQueries) {
     try {
-      // Google Custom Search mit site: Operator
-      const query = `site:${source.domain} ${keywords[0]} ${region}`
-      const searchResults = await performGoogleSearch(query, Math.ceil(limit / sources.length))
+      const searchResults = await performGoogleSearch(query, Math.ceil(limit / searchQueries.length))
       
       for (const result of searchResults) {
+        // Bestimme Quelle aus URL
+        let sourceName = 'Google'
+        if (result.link.includes('gelbeseiten.de')) sourceName = 'Gelbe Seiten'
+        else if (result.link.includes('firmenabc.de')) sourceName = 'FirmenABC'
+        else if (result.link.includes('11880.com')) sourceName = '11880.com'
+        else if (result.link.includes('wlw.de')) sourceName = 'WLW'
+        
         leads.push({
           name: result.title,
           website: result.link,
@@ -182,7 +187,7 @@ async function crawlGermanyRegion(
           region: region,
           country: 'DE',
           industry: industry,
-          source: source.name
+          source: sourceName
         })
       }
       
@@ -190,7 +195,7 @@ async function crawlGermanyRegion(
       await new Promise(resolve => setTimeout(resolve, 1000))
       
     } catch (error) {
-      console.error(`[DE Crawler] Error with ${source.name}:`, error)
+      console.error(`[DE Crawler] Error with query "${query}":`, error)
     }
   }
   
