@@ -2786,17 +2786,17 @@ export default function App() {
                 </div>
               </div>
               <div className="card-body p-0">
-                <div className="table-responsive">
-                  <table className="table table-hover mb-0">
+                <div className="table-responsive" style={{overflowX: 'auto'}}>
+                  <table className="table table-hover mb-0" style={{minWidth: '1200px'}}>
                     <thead className="thead-light">
                       <tr>
-                        <th className="border-0"><i className="bi bi-building mr-1"/>Firma</th>
-                        <th className="border-0"><i className="bi bi-globe mr-1"/>Website</th>
-                        <th className="border-0"><i className="bi bi-briefcase mr-1"/>Branche</th>
-                        <th className="border-0"><i className="bi bi-geo-alt mr-1"/>Region</th>
-                        <th className="border-0 text-center"><i className="bi bi-star mr-1"/>Score</th>
-                        <th className="border-0 text-center">Status</th>
-                        <th className="border-0 text-right">Aktionen</th>
+                        <th className="border-0" style={{minWidth: '200px'}}><i className="bi bi-building mr-1"/>Firma</th>
+                        <th className="border-0" style={{minWidth: '180px'}}><i className="bi bi-globe mr-1"/>Website</th>
+                        <th className="border-0" style={{minWidth: '120px'}}><i className="bi bi-briefcase mr-1"/>Branche</th>
+                        <th className="border-0" style={{minWidth: '120px'}}><i className="bi bi-geo-alt mr-1"/>Region</th>
+                        <th className="border-0 text-center" style={{minWidth: '80px'}}><i className="bi bi-star mr-1"/>Score</th>
+                        <th className="border-0 text-center" style={{minWidth: '120px'}}>Status</th>
+                        <th className="border-0 text-right" style={{minWidth: '180px'}}>Aktionen</th>
                       </tr>
                     </thead>
                     <tbody>
