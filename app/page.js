@@ -142,7 +142,7 @@ export default function App() {
   const [analyticsCategoryPages, setAnalyticsCategoryPages] = useState([])
   const [analyticsProductPages, setAnalyticsProductPages] = useState([])
   const [analyticsInfoPages, setAnalyticsInfoPages] = useState([])
-  const [analyticsBeilegerPages, setAnalyticsBeilegerPages] = useState([])
+  const [analyticsBeilegerData, setAnalyticsBeilegerData] = useState(null)
   const [analyticsLoading, setAnalyticsLoading] = useState(false)
   const [analyticsDateRange, setAnalyticsDateRange] = useState('30daysAgo')
   const [trafficSort, setTrafficSort] = useState({ field: 'sessions', order: 'desc' })
