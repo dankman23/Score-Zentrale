@@ -3793,10 +3793,20 @@ export default function App() {
                                 />
                               </td>
                             )}
-                            <td className="align-middle font-weight-bold text-white">{p.company_name || 'Unbekannt'}</td>
-                            <td className="align-middle"><a href={p.website} target="_blank" rel="noopener" className="text-info text-truncate d-inline-block" style={{maxWidth:250}}>{p.website}</a></td>
-                            <td className="align-middle"><span className="badge badge-light">{p.industry}</span></td>
-                            <td className="align-middle text-white">{p.region}</td>
+                            <td className="align-middle">
+                              <div className="text-white font-weight-bold text-truncate" style={{maxWidth:'170px'}} title={p.company_name}>
+                                {p.company_name || 'Unbekannt'}
+                              </div>
+                            </td>
+                            <td className="align-middle">
+                              <a href={p.website} target="_blank" rel="noopener" className="text-info text-truncate d-inline-block small" style={{maxWidth:'190px'}} title={p.website}>
+                                {p.website.replace('https://','').replace('http://','').replace('www.','')}
+                              </a>
+                            </td>
+                            <td className="align-middle">
+                              <span className="badge badge-light small">{p.industry}</span>
+                            </td>
+                            <td className="align-middle small text-white">{p.region}</td>
                             <td className="align-middle text-center">{p.score ? <span className={`badge badge-${p.score>=70?'success':p.score>=50?'info':'secondary'}`}>{p.score}/100</span> : <span className="text-muted">-</span>}</td>
                             <td className="align-middle text-center">
                               <select 
