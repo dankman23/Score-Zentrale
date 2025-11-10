@@ -65,13 +65,20 @@ export async function GET(request: NextRequest) {
       .input('to', sql.Date, to)
       .query(query)
 
-    const manufacturers = result.recordset.map(row => ({
-      manufacturer: row.manufacturer || 'Unbekannt',
-      orders: row.orders || 0,
-      revenue: parseFloat(row.revenue || 0).toFixed(2),
-      cost: parseFloat(row.cost || 0).toFixed(2),
-      margin: parseFloat(row.margin || 0).toFixed(2)
-    }))
+    const manufacturers = result.recordset.map(row => {
+      const revenue = parseFloat(row.revenue || 0)
+      const margin = parseFloat(row.margin || 0)
+      const marginPct = revenue > 0 ? ((margin / revenue) * 100).toFixed(1) : '0.0'
+      
+      return {
+        manufacturer: row.manufacturer || 'Unbekannt',
+        orders: row.orders || 0,
+        revenue: revenue.toFixed(2),
+        cost: parseFloat(row.cost || 0).toFixed(2),
+        margin: margin.toFixed(2),
+        marginPct
+      }
+    })
 
     return NextResponse.json({
       ok: true,
