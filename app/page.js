@@ -924,10 +924,10 @@ export default function App() {
           <div className="row">
             <KpiTile 
               title="Rohertragsmarge (Netto)" 
-              value={fmtCurrency(margin?.margin_net_with_ship)} 
+              value={fmtCurrency((parseFloat(margin?.margin_net_with_ship || 0) - parseFloat(margin?.shipping_revenue || 0)).toFixed(2))} 
               sub={
                 <span>
-                  Umsatz: {fmtCurrency(margin?.revenue_net_with_ship)} | Ø EK: {fmtCurrency(margin?.cost_net)} | Versand: {fmtCurrency(margin?.shipping_revenue)}
+                  Umsatz: {fmtCurrency(margin?.revenue_net_with_ship)} | Ø EK: {fmtCurrency(margin?.cost_net)} | Versand: {fmtCurrency(margin?.shipping_revenue)} (abgezogen)
                   {margin?.cost_source && (
                     <span 
                       className="ml-2" 
