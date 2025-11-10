@@ -25,12 +25,34 @@ export async function POST(request: NextRequest) {
 
     console.log(`[ColdLeads] Analyzing: ${website} (force: ${force})`)
 
-    // 1. Analyse durchführen
-    const analysis = await analyzeCompany(website, industry)
+    // 1. Analyse durchführen - V2 mit Fallback auf V1
+    let analysis
+    let useV2 = true // Feature flag für V2
+    
+    try {
+      if (useV2) {
+        console.log('[ColdLeads] Using Analyzer V2')
+        const analysisV2 = await analyzeCompanyV2(website, industry)
+        
+        // Konvertiere V2 Format zu V1 Format für Kompatibilität
+        analysis = {
+          company_info: analysisV2.company_profile,
+          contact_persons: analysisV2.contact.found ? [analysisV2.contact] : [],
+          needs_assessment: analysisV2.assessment,
+          glossary_terms: analysisV2.company_profile.mapped_terms // NEU!
+        }
+      } else {
+        analysis = await analyzeCompany(website, industry)
+      }
+    } catch (error) {
+      console.error('[ColdLeads] V2 failed, falling back to V1:', error)
+      analysis = await analyzeCompany(website, industry)
+    }
+    
     console.log('[ColdLeads] Analysis complete:', { 
       companyName: analysis.company_info.name,
-      score: analysis.needs_assessment.score,
-      contactsFound: analysis.contact_persons.length 
+      score: analysis.needs_assessment.score || analysis.needs_assessment.relevance_score,
+      contactsFound: analysis.contact_persons?.length || (analysis.contact_persons ? 1 : 0)
     })
 
     // JTL-Customer-Matching temporarily disabled
