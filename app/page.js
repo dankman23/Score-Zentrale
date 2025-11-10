@@ -1002,8 +1002,27 @@ export default function App() {
       })
       const data = await res.json()
       if (data.ok) {
+        console.log(`✓ ${prospect.company_name}: Score ${data.analysis.confidence_overall}%`)
+        
+        // WICHTIG: Stats UND Prospects-Liste neu laden
         await loadColdLeadStats()
-        alert(`✅ Analyse abgeschlossen!\n\nScore: ${data.analysis.confidence_overall}%\nKontakt: ${data.analysis.contact_person.email || 'Nicht gefunden'}\nMarken: ${data.analysis.recommended_brands.join(', ')}`)
+        
+        // Prospects neu laden um Status-Änderung zu sehen
+        try {
+          const statsRes = await fetch('/api/coldleads/stats')
+          const statsData = await statsRes.json()
+          if (statsData.ok && statsData.prospects) {
+            setColdProspects(statsData.prospects)
+            console.log(`Prospects aktualisiert: ${statsData.prospects.length} total`)
+          }
+        } catch (e) {
+          console.error('Error reloading prospects:', e)
+        }
+        
+        // Wechsle zum "Analysiert" Tab
+        setColdStatusFilter('analyzed')
+        
+        alert(`✅ Analyse abgeschlossen!\n\nScore: ${data.analysis.confidence_overall}%\nKontakt: ${data.analysis.contact_person.email || 'Nicht gefunden'}\nMarken: ${data.analysis.recommended_brands.join(', ')}\n\n➡️ Wechsle zu "Analysiert" Tab`)
       } else {
         alert('❌ Fehler: ' + (data.error || 'Unbekannter Fehler'))
       }
