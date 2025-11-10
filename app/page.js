@@ -4014,6 +4014,103 @@ export default function App() {
                                     </div>
                                   )}
                                   
+                                  {/* Email Preview */}
+                                  {showEmailPreview?.website === p.website && p.email_sequence && (
+                                    <div className="mt-4 border-top pt-4">
+                                      <h5 className="text-white mb-3">
+                                        <i className="bi bi-envelope-check mr-2"/>Email-Vorschau (3 Mails)
+                                      </h5>
+                                      
+                                      {/* Mail 1 */}
+                                      <div className="card bg-secondary border-success border-2 mb-3">
+                                        <div className="card-header bg-success text-white">
+                                          <strong>Mail 1 - Erstansprache</strong>
+                                          <span className="badge badge-light ml-2">{p.email_sequence.mail_1.word_count} Wörter</span>
+                                        </div>
+                                        <div className="card-body">
+                                          <div className="mb-2">
+                                            <small className="text-muted">Betreff:</small>
+                                            <div className="text-white font-weight-bold">{p.email_sequence.mail_1.subject}</div>
+                                          </div>
+                                          <div className="mb-2">
+                                            <small className="text-muted">An:</small>
+                                            <div className="text-info">{p.analysis_v3?.contact_person?.email || 'Nicht gefunden'}</div>
+                                          </div>
+                                          <div className="bg-dark p-3 rounded" style={{whiteSpace: 'pre-wrap', fontSize: '0.9rem'}}>
+                                            {p.email_sequence.mail_1.body}
+                                          </div>
+                                          <div className="mt-2">
+                                            <button 
+                                              className="btn btn-sm btn-success"
+                                              onClick={async () => {
+                                                if (!confirm('Mail 1 jetzt versenden?')) return
+                                                try {
+                                                  const res = await fetch('/api/coldleads/email-v3/send', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ prospect_id: p.id, mail_number: 1 })
+                                                  })
+                                                  const data = await res.json()
+                                                  if (data.ok) {
+                                                    alert('✅ Mail 1 versendet! Follow-up 1 in 5 Tagen geplant.')
+                                                    await loadColdLeadStats()
+                                                  } else {
+                                                    alert('❌ Fehler: ' + data.error)
+                                                  }
+                                                } catch (e) {
+                                                  alert('❌ Fehler: ' + e.message)
+                                                }
+                                              }}
+                                            >
+                                              <i className="bi bi-send mr-1"/>Jetzt versenden
+                                            </button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Mail 2 */}
+                                      <div className="card bg-secondary border-warning border-2 mb-3">
+                                        <div className="card-header bg-warning text-dark">
+                                          <strong>Mail 2 - Follow-up 1 (nach 5 Tagen)</strong>
+                                          <span className="badge badge-light ml-2">{p.email_sequence.mail_2.word_count} Wörter</span>
+                                        </div>
+                                        <div className="card-body">
+                                          <div className="mb-2">
+                                            <small className="text-muted">Betreff:</small>
+                                            <div className="text-white font-weight-bold">{p.email_sequence.mail_2.subject}</div>
+                                          </div>
+                                          <div className="bg-dark p-3 rounded" style={{whiteSpace: 'pre-wrap', fontSize: '0.9rem'}}>
+                                            {p.email_sequence.mail_2.body}
+                                          </div>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Mail 3 */}
+                                      <div className="card bg-secondary border-info border-2 mb-3">
+                                        <div className="card-header bg-info text-white">
+                                          <strong>Mail 3 - Follow-up 2 (nach 12 Tagen)</strong>
+                                          <span className="badge badge-light ml-2">{p.email_sequence.mail_3.word_count} Wörter</span>
+                                        </div>
+                                        <div className="card-body">
+                                          <div className="mb-2">
+                                            <small className="text-muted">Betreff:</small>
+                                            <div className="text-white font-weight-bold">{p.email_sequence.mail_3.subject}</div>
+                                          </div>
+                                          <div className="bg-dark p-3 rounded" style={{whiteSpace: 'pre-wrap', fontSize: '0.9rem'}}>
+                                            {p.email_sequence.mail_3.body}
+                                          </div>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* CRM Tags */}
+                                      {p.email_sequence.crm_tags && p.email_sequence.crm_tags.length > 0 && (
+                                        <div className="alert alert-info">
+                                          <small><strong>CRM-Tags:</strong> {p.email_sequence.crm_tags.join(', ')}</small>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                  
                                   <div className="row">
                                     <div className="col-md-6 mb-3">
                                       <div className="p-3 bg-secondary rounded">
