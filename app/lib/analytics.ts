@@ -230,7 +230,7 @@ export async function fetchCategoryPages(
 }
 
 /**
- * Fetch overall metrics time series
+ * Fetch overall metrics time series - ALL 8 METRICS
  */
 export async function fetchMetricsTimeSeries(
   startDate: string = '30daysAgo',
@@ -247,8 +247,11 @@ export async function fetchMetricsTimeSeries(
       metrics: [
         { name: 'sessions' },
         { name: 'totalUsers' },
-        { name: 'bounceRate' },
+        { name: 'screenPageViews' },
+        { name: 'conversions' },
+        { name: 'totalRevenue' },
         { name: 'averageSessionDuration' },
+        { name: 'bounceRate' },
       ],
       orderBys: [{ dimension: { dimensionName: 'date' }, desc: false }],
     });
@@ -265,12 +268,19 @@ export async function fetchMetricsTimeSeries(
       // Format date as YYYY-MM-DD
       const formattedDate = `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`;
 
+      const sessions = parseInt(metricValues[0]?.value || '0', 10);
+      const conversions = parseInt(metricValues[3]?.value || '0', 10);
+
       return {
         date: formattedDate,
-        sessions: parseInt(metricValues[0]?.value || '0', 10),
+        sessions: sessions,
         users: parseInt(metricValues[1]?.value || '0', 10),
-        bounceRate: parseFloat(metricValues[2]?.value || '0'),
-        avgSessionDuration: parseFloat(metricValues[3]?.value || '0'),
+        pageViews: parseInt(metricValues[2]?.value || '0', 10),
+        conversions: conversions,
+        revenue: parseFloat(metricValues[4]?.value || '0'),
+        avgSessionDuration: parseFloat(metricValues[5]?.value || '0'),
+        bounceRate: parseFloat(metricValues[6]?.value || '0'),
+        conversionRate: sessions > 0 ? (conversions / sessions) * 100 : 0,
       };
     });
   } catch (error) {
