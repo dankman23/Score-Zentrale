@@ -1957,6 +1957,92 @@ export default function App() {
                     </div>
                   </div>
 
+                  {/* Info-Seiten */}
+                  {analyticsInfoPages.length > 0 && (
+                    <div className="card mb-4">
+                      <div className="card-header bg-transparent border-0">
+                        <h5 className="mb-0"><i className="bi bi-info-circle mr-2"/>Info-Seiten Performance</h5>
+                      </div>
+                      <div className="card-body p-0">
+                        <div className="table-responsive">
+                          <table className="table table-dark table-hover table-sm mb-0">
+                            <thead>
+                              <tr>
+                                <th>Seite</th>
+                                <th className="text-right">Impressionen</th>
+                                <th className="text-right">Besucher</th>
+                                <th className="text-right">Ø Verweildauer (Sek.)</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {analyticsInfoPages.map((page, i) => (
+                                <tr key={i}>
+                                  <td>
+                                    <div className="font-weight-bold">{page.pageTitle || page.pagePath}</div>
+                                    <div className="small text-muted">{page.pagePath}</div>
+                                  </td>
+                                  <td className="text-right">{page.pageViews.toLocaleString('de-DE')}</td>
+                                  <td className="text-right">{page.uniquePageViews.toLocaleString('de-DE')}</td>
+                                  <td className="text-right">{Math.round(page.avgTimeOnPage)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Erfolg von Beileger */}
+                  {analyticsBeilegerData && (
+                    <div className="card mb-4">
+                      <div className="card-header bg-transparent border-0">
+                        <div className="d-flex justify-content-between align-items-center">
+                          <h5 className="mb-0"><i className="bi bi-envelope-check mr-2"/>Erfolg von Beileger</h5>
+                          <div className="d-flex gap-3">
+                            <div className="text-right">
+                              <div className="small text-muted">Gesamt Besuche</div>
+                              <div className="h5 mb-0 text-success">{analyticsBeilegerData.totalVisits?.toLocaleString('de-DE') || 0}</div>
+                            </div>
+                            <div className="text-right ml-3">
+                              <div className="small text-muted">Unique Besucher</div>
+                              <div className="h5 mb-0 text-info">{analyticsBeilegerData.uniqueVisitors?.toLocaleString('de-DE') || 0}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {analyticsBeilegerData.pages && analyticsBeilegerData.pages.length > 0 && (
+                        <div className="card-body p-0">
+                          <div className="table-responsive">
+                            <table className="table table-dark table-hover table-sm mb-0">
+                              <thead>
+                                <tr>
+                                  <th>Account-Seite</th>
+                                  <th className="text-right">Impressionen</th>
+                                  <th className="text-right">Besucher</th>
+                                  <th className="text-right">Ø Verweildauer (Sek.)</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {analyticsBeilegerData.pages.map((page, i) => (
+                                  <tr key={i}>
+                                    <td>
+                                      <div className="font-weight-bold small">{page.pageTitle || page.pagePath}</div>
+                                      <div className="small text-muted">{page.pagePath}</div>
+                                    </td>
+                                    <td className="text-right">{page.pageViews.toLocaleString('de-DE')}</td>
+                                    <td className="text-right">{page.uniquePageViews.toLocaleString('de-DE')}</td>
+                                    <td className="text-right">{Math.round(page.avgTimeOnPage)}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Top 100 Alle Seiten */}
                   <div className="card">
                     <div className="card-header bg-transparent border-0">
