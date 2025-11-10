@@ -3875,6 +3875,259 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Produkte (Artikel-Import & Browser) */}
+      {activeTab==='produkte' && (
+        <div>
+          <div className="d-flex align-items-center justify-content-between mb-4">
+            <div>
+              <h2 className="mb-1"><i className="bi bi-box-seam mr-2"/>Produkte</h2>
+              <p className="text-muted small mb-0">Artikel aus JTL-Wawi importieren & verwalten</p>
+            </div>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="btn-group mb-4 w-100">
+            <button 
+              className={`btn ${produkteTab === 'import' ? 'btn-primary' : 'btn-outline-secondary'}`}
+              onClick={() => { setProdukteTab('import'); loadArtikelStatus(); }}
+            >
+              <i className="bi bi-download mr-2"/>Import
+            </button>
+            <button 
+              className={`btn ${produkteTab === 'browser' ? 'btn-primary' : 'btn-outline-secondary'}`}
+              onClick={() => { setProdukteTab('browser'); loadArtikel(); }}
+            >
+              <i className="bi bi-grid mr-2"/>Artikel-Browser
+            </button>
+          </div>
+
+          {/* Import Tab */}
+          {produkteTab === 'import' && (
+            <div>
+              <div className="card border-0 shadow-sm mb-4">
+                <div className="card-body">
+                  <h5 className="mb-3"><i className="bi bi-database mr-2"/>Artikel-Import aus JTL-Wawi</h5>
+                  
+                  {/* Status-Übersicht */}
+                  <div className="row mb-4">
+                    <div className="col-md-3">
+                      <div className="card bg-light">
+                        <div className="card-body text-center py-3">
+                          <div className="h3 mb-1 text-primary font-weight-bold">166.854</div>
+                          <div className="text-muted small">Gesamt importierbar</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-3">
+                      <div className="card bg-light">
+                        <div className="card-body text-center py-3">
+                          <div className="h3 mb-1 text-success font-weight-bold">{artikelImportProgress.imported.toLocaleString()}</div>
+                          <div className="text-muted small">Bereits importiert</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-3">
+                      <div className="card bg-light">
+                        <div className="card-body text-center py-3">
+                          <div className="h3 mb-1 text-info font-weight-bold">
+                            {((artikelImportProgress.imported / artikelImportProgress.total) * 100).toFixed(1)}%
+                          </div>
+                          <div className="text-muted small">Fortschritt</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-3">
+                      <div className="card bg-light">
+                        <div className="card-body text-center py-3">
+                          <div className="h3 mb-1 text-warning font-weight-bold">
+                            {(166854 - artikelImportProgress.imported).toLocaleString()}
+                          </div>
+                          <div className="text-muted small">Noch zu importieren</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  {artikelImportRunning && (
+                    <div className="mb-4">
+                      <div className="d-flex justify-content-between mb-2">
+                        <span className="text-muted small">Import läuft...</span>
+                        <span className="small font-weight-bold">
+                          {artikelImportProgress.imported.toLocaleString()} / {artikelImportProgress.total.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="progress" style={{height: '25px'}}>
+                        <div 
+                          className="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                          style={{width: `${(artikelImportProgress.imported / artikelImportProgress.total) * 100}%`}}
+                        >
+                          {((artikelImportProgress.imported / artikelImportProgress.total) * 100).toFixed(1)}%
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Import Info */}
+                  <div className="alert alert-info">
+                    <h6 className="alert-heading"><i className="bi bi-info-circle mr-2"/>Was wird importiert?</h6>
+                    <ul className="mb-0 small">
+                      <li><strong>Basis-Daten:</strong> Artikelnummer, Name, Beschreibung, Barcode</li>
+                      <li><strong>Preise & Marge:</strong> VK Netto, EK Netto, UVP, berechnete Marge</li>
+                      <li><strong>Zuordnungen:</strong> Hersteller (mit Name), Warengruppe (mit Name)</li>
+                      <li><strong>Lagerbestand:</strong> Aktueller Bestand, Mindestbestellmenge</li>
+                      <li><strong>Filter:</strong> Nur aktive Artikel, keine Stücklisten, keine Varianten-Kinder</li>
+                    </ul>
+                  </div>
+
+                  {/* Import Button */}
+                  <div className="text-center">
+                    <button 
+                      className="btn btn-lg btn-success px-5"
+                      onClick={startArtikelImport}
+                      disabled={artikelImportRunning}
+                    >
+                      {artikelImportRunning ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm mr-2"/>
+                          Import läuft... ({((artikelImportProgress.imported / artikelImportProgress.total) * 100).toFixed(0)}%)
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-download mr-2"/>
+                          Artikel-Import starten
+                        </>
+                      )}
+                    </button>
+                    <p className="text-muted small mt-2 mb-0">
+                      <i className="bi bi-clock mr-1"/>Geschätzte Dauer: 5-10 Minuten
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Browser Tab */}
+          {produkteTab === 'browser' && (
+            <div>
+              <div className="card border-0 shadow-sm">
+                <div className="card-body">
+                  <h5 className="mb-3"><i className="bi bi-grid mr-2"/>Artikel-Browser</h5>
+                  
+                  {artikelImportProgress.imported === 0 ? (
+                    <div className="text-center py-5">
+                      <i className="bi bi-inbox" style={{fontSize: '4rem', color: '#ccc'}}/>
+                      <h4 className="mt-3 text-muted">Noch keine Artikel importiert</h4>
+                      <p className="text-muted">Gehen Sie zum Import-Tab und starten Sie den Artikel-Import.</p>
+                      <button 
+                        className="btn btn-primary"
+                        onClick={() => setProdukteTab('import')}
+                      >
+                        <i className="bi bi-download mr-2"/>Zum Import
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      {/* Filter */}
+                      <div className="row mb-3">
+                        <div className="col-md-4">
+                          <input 
+                            type="text"
+                            className="form-control"
+                            placeholder="🔍 Suche: Artikelnummer, Name..."
+                            value={artikelFilter.search}
+                            onChange={(e) => setArtikelFilter({...artikelFilter, search: e.target.value})}
+                          />
+                        </div>
+                        <div className="col-md-3">
+                          <select 
+                            className="form-control"
+                            value={artikelFilter.hersteller}
+                            onChange={(e) => setArtikelFilter({...artikelFilter, hersteller: e.target.value})}
+                          >
+                            <option value="">Alle Hersteller</option>
+                            {/* TODO: Dynamisch aus DB laden */}
+                          </select>
+                        </div>
+                        <div className="col-md-3">
+                          <select 
+                            className="form-control"
+                            value={artikelFilter.warengruppe}
+                            onChange={(e) => setArtikelFilter({...artikelFilter, warengruppe: e.target.value})}
+                          >
+                            <option value="">Alle Warengruppen</option>
+                            {/* TODO: Dynamisch aus DB laden */}
+                          </select>
+                        </div>
+                        <div className="col-md-2">
+                          <button className="btn btn-outline-primary btn-block" onClick={loadArtikel}>
+                            <i className="bi bi-arrow-repeat mr-1"/>Aktualisieren
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Artikel-Tabelle */}
+                      <div className="table-responsive">
+                        <table className="table table-hover">
+                          <thead>
+                            <tr>
+                              <th>Art.-Nr.</th>
+                              <th>Name</th>
+                              <th>Hersteller</th>
+                              <th>Warengruppe</th>
+                              <th className="text-right">VK Netto</th>
+                              <th className="text-right">EK Netto</th>
+                              <th className="text-right">Marge %</th>
+                              <th>Importiert</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {artikelList.length === 0 ? (
+                              <tr>
+                                <td colSpan="8" className="text-center text-muted py-4">
+                                  <i className="bi bi-inbox mr-2"/>Keine Artikel gefunden
+                                </td>
+                              </tr>
+                            ) : (
+                              artikelList.map(artikel => (
+                                <tr key={artikel.kArtikel}>
+                                  <td className="font-weight-bold">{artikel.cArtNr}</td>
+                                  <td>{artikel.cName}</td>
+                                  <td>{artikel.cHerstellerName || '-'}</td>
+                                  <td><span className="badge badge-secondary">{artikel.cWarengruppenName || '-'}</span></td>
+                                  <td className="text-right">{parseFloat(artikel.fVKNetto || 0).toFixed(2)} €</td>
+                                  <td className="text-right">{parseFloat(artikel.fEKNetto || 0).toFixed(2)} €</td>
+                                  <td className="text-right">
+                                    <span className={`badge badge-${artikel.margin_percent > 30 ? 'success' : artikel.margin_percent > 15 ? 'warning' : 'danger'}`}>
+                                      {artikel.margin_percent}%
+                                    </span>
+                                  </td>
+                                  <td className="small text-muted">
+                                    {new Date(artikel.imported_at).toLocaleDateString('de-DE')}
+                                  </td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Info: Nur letzte 5 Artikel */}
+                      <div className="alert alert-info mt-3 small mb-0">
+                        <i className="bi bi-info-circle mr-2"/>
+                        Aktuell werden die letzten 5 importierten Artikel angezeigt. 
+                        Vollständige Liste mit Filter & Pagination folgt in Kürze.
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
