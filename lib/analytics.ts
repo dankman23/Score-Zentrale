@@ -47,6 +47,8 @@ export async function fetchAnalyticsMetrics(
       pageViews: parseInt(metricValues[2]?.value || '0', 10),
       avgSessionDuration: parseFloat(metricValues[3]?.value || '0'),
       bounceRate: parseFloat(metricValues[4]?.value || '0'),
+      conversions: parseInt(metricValues[5]?.value || '0', 10),
+      revenue: parseFloat(metricValues[6]?.value || '0'),
     };
   } catch (error) {
     console.error('Error fetching analytics metrics:', error);
