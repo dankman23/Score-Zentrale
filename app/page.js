@@ -536,7 +536,7 @@ export default function App() {
       // Parallel laden
       const [metricsRes, sourcesRes, topPagesRes, categoryRes, productRes, timeSeriesRes] = await Promise.all([
         fetch(`/api/analytics/metrics?${dateParam}`),
-        fetch(`/api/analytics/traffic-sources?${dateParam}&limit=10`),
+        fetch(`/api/analytics/traffic-sources?${dateParam}&limit=1000`),
         fetch(`/api/analytics/top-pages?${dateParam}&limit=100`),
         fetch(`/api/analytics/category-pages?${dateParam}`),
         fetch(`/api/analytics/product-pages?${dateParam}&limit=100`),
