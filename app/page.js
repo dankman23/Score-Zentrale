@@ -141,12 +141,17 @@ export default function App() {
   const [analyticsTopPages, setAnalyticsTopPages] = useState([])
   const [analyticsCategoryPages, setAnalyticsCategoryPages] = useState([])
   const [analyticsProductPages, setAnalyticsProductPages] = useState([])
+  const [analyticsInfoPages, setAnalyticsInfoPages] = useState([])
+  const [analyticsBeilegerPages, setAnalyticsBeilegerPages] = useState([])
   const [analyticsLoading, setAnalyticsLoading] = useState(false)
   const [analyticsDateRange, setAnalyticsDateRange] = useState('30daysAgo')
   const [trafficSort, setTrafficSort] = useState({ field: 'sessions', order: 'desc' })
   const [categorySort, setCategorySort] = useState({ field: 'pageViews', order: 'desc' })
   const [productSort, setProductSort] = useState({ field: 'pageViews', order: 'desc' })
   const [allPagesSort, setAllPagesSort] = useState({ field: 'pageViews', order: 'desc' })
+  const [showAllTraffic, setShowAllTraffic] = useState(false)
+  const [showAllCategories, setShowAllCategories] = useState(false)
+  const [showAllProducts, setShowAllProducts] = useState(false)
   
   // Charts
   const [metricsTimeSeries, setMetricsTimeSeries] = useState([])
