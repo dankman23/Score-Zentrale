@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
       contact_person: contactPerson?.name,
       contact_department: contactPerson?.department,
       industry: prospect.industry,
+      company_info: prospect.analysis.company_info, // NEU: Firmeninfos für persönlichen Satz
       analysis: {
         detected_applications: prospect.analysis.company_info.detected_applications || [],
         potential_products: prospect.analysis.needs_assessment.potential_products || [],
