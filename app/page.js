@@ -106,6 +106,12 @@ export default function App() {
   const [inboxEmails, setInboxEmails] = useState([])
   const [inboxLoading, setInboxLoading] = useState(false)
   
+  // DACH Crawler
+  const [dachCrawlerForm, setDachCrawlerForm] = useState({ country: 'DE', region: '', industry: '', limit: 20 })
+  const [dachCrawlerStats, setDachCrawlerStats] = useState(null)
+  const [dachCrawlerProgress, setDachCrawlerProgress] = useState([])
+  const [dachCrawlerLoading, setDachCrawlerLoading] = useState(false)
+  
   // Autopilot
   const [autopilotState, setAutopilotState] = useState({ 
     running: false, 
