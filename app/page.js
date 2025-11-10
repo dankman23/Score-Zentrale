@@ -977,7 +977,7 @@ export default function App() {
               </div>
             </div>
             <div className="col-md-4 mb-3">
-              <div className="card kpi h-100">
+              <div className="card kpi h-100" style={{cursor: 'pointer'}} onClick={() => { setActiveTab('sales'); setSalesTab('manufacturers'); }}>
                 <div className="card-body">
                   <div className="label mb-2 text-uppercase small">
                     <i className="bi bi-building mr-1"/>TOP 5 Hersteller
