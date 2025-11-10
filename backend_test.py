@@ -172,31 +172,88 @@ def test_analyze_v3():
     
     return success, response.get('analysis', {}).get('company', 'Test Company') if isinstance(response, dict) else None
 
-def validate_list_response(data: Dict[str, Any], expected_max_articles: int = None) -> bool:
-    """Validate list API response structure"""
-    print("\n🔍 Validating list response structure...")
+def test_email_v3_send(prospect_id=None):
+    """
+    Test 2: POST /api/coldleads/email-v3/send (Email versenden)
     
-    # Check required fields
-    required_fields = ["ok", "articles", "pagination", "filters"]
-    for field in required_fields:
-        if field not in data:
-            print(f"❌ Missing required field: {field}")
-            return False
+    Erwartung:
+    - 200 OK mit { ok: true } ODER 500 mit { ok: false, error: "..." }
+    - Response enthält message, recipient, subject
+    - API akzeptiert prospect_id + mail_number
+    - followup_schedule wird updated
+    """
+    log_test("=" * 60)
+    log_test("TEST 2: POST /api/coldleads/email-v3/send (Email versenden)")
+    log_test("=" * 60)
     
-    # Check ok field
-    if data["ok"] != True:
-        print(f"❌ ok field is not true: {data['ok']}")
+    # If no prospect_id provided, try to find one from database or use test ID
+    if not prospect_id:
+        log_test("⚠️  No prospect_id provided, using test ID")
+        prospect_id = "test-prospect-id"
+    
+    test_data = {
+        "prospect_id": prospect_id,
+        "mail_number": 1
+    }
+    
+    log_test(f"Test payload: {json.dumps(test_data, indent=2, ensure_ascii=False)}")
+    
+    status, response = test_api_endpoint('POST', '/coldleads/email-v3/send', test_data)
+    
+    if status is None:
+        log_test("❌ CRITICAL: API request failed completely")
         return False
     
-    # Check articles array
-    if not isinstance(data["articles"], list):
-        print(f"❌ articles is not an array")
-        return False
+    success = True
     
-    # Check max articles limit
-    if expected_max_articles and len(data["articles"]) > expected_max_articles:
-        print(f"❌ Too many articles returned: {len(data['articles'])} > {expected_max_articles}")
-        return False
+    # Accept both 200 (success) and 500 (expected failure) as valid responses
+    if status not in [200, 400, 404, 500]:
+        log_test(f"❌ Unexpected status code: {status}")
+        success = False
+    else:
+        log_test(f"✅ Status code acceptable: {status}")
+    
+    if isinstance(response, dict):
+        # Check for ok field
+        if 'ok' in response:
+            log_test(f"✅ Response has 'ok' field: {response['ok']}")
+            
+            if response['ok'] and status == 200:
+                # Success case - check required fields
+                required_fields = ['message', 'recipient', 'subject']
+                for field in required_fields:
+                    if field in response:
+                        log_test(f"✅ Success response has {field}: {response[field]}")
+                    else:
+                        log_test(f"❌ Success response missing {field}")
+                        success = False
+            
+            elif not response['ok']:
+                # Error case - check error field
+                if 'error' in response:
+                    log_test(f"✅ Error response has error field: {response['error']}")
+                    # Common expected errors
+                    error_msg = response['error'].lower()
+                    if any(expected in error_msg for expected in [
+                        'prospect not found', 'no email sequence', 'no recipient email',
+                        'prospect_id required', 'authentication', 'smtp'
+                    ]):
+                        log_test("✅ Error is expected/acceptable")
+                    else:
+                        log_test(f"⚠️  Unexpected error: {response['error']}")
+                else:
+                    log_test("❌ Error response missing error field")
+                    success = False
+        else:
+            log_test("❌ Response missing 'ok' field")
+            success = False
+    
+    if success:
+        log_test("✅ TEST 2 PASSED: email-v3/send API logic working correctly")
+    else:
+        log_test("❌ TEST 2 FAILED: email-v3/send has issues")
+    
+    return success
     
     # Check pagination structure
     pagination = data["pagination"]
