@@ -31,21 +31,10 @@ export async function GET(request: NextRequest) {
       FROM tArtikel
     `)
 
-    // 3. Sample Artikel
-    const sampleResult = await pool.request().query(`
-      SELECT TOP 5
-        kArtikel,
-        cArtNr,
-        cName
-      FROM tArtikel
-      ORDER BY kArtikel DESC
-    `)
-
     return NextResponse.json({
       ok: true,
       schema: schemaResult.recordset,
       counts: countResult.recordset[0],
-      sample: sampleResult.recordset,
       note: 'Schema und Statistiken für tArtikel'
     })
 
