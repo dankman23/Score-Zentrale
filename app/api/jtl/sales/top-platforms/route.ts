@@ -36,15 +36,22 @@ export async function GET(request: NextRequest) {
     const netField = await pickFirstExisting(pool, orderPosTable, ['fVKNetto', 'fPreis']) || 'fVKNetto'
     const costField = await pickFirstExisting(pool, orderPosTable, ['fEKNetto', 'fEK']) || 'fEKNetto'
 
-    // Platform-Feld
-    const platformField = await pickFirstExisting(pool, orderTable, ['cPlattform', 'cVersandart']) || 'cPlattform'
+    // Check if kPlattform exists
+    const hasKPlattform = await hasColumn(pool, orderTable, 'kPlattform')
+    
+    if (!hasKPlattform) {
+      return NextResponse.json({
+        ok: false,
+        error: 'kPlattform column not found in tAuftrag'
+      }, { status: 404 })
+    }
 
     const netExpr = `(op.${netField} * op.${qtyField})`
     const costExpr = `(op.${costField} * op.${qtyField})`
 
     const query = `
       SELECT TOP ${limit}
-        ISNULL(o.${platformField}, 'Unbekannt') AS platform,
+        ISNULL(CAST(o.kPlattform AS VARCHAR(50)), 'Unbekannt') AS platform,
         COUNT(DISTINCT o.kAuftrag) AS orders,
         SUM(${netExpr}) AS revenue,
         SUM(${costExpr}) AS cost,
@@ -55,7 +62,7 @@ export async function GET(request: NextRequest) {
         ${stornoFilter}
         ${orderTypeFilter}
         AND ${articleFilter}
-      GROUP BY o.${platformField}
+      GROUP BY o.kPlattform
       ORDER BY revenue DESC
     `
 
