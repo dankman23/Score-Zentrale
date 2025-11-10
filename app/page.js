@@ -3079,11 +3079,38 @@ export default function App() {
                       onChange={e => setDachCrawlerForm({...dachCrawlerForm, industry: e.target.value})}
                     >
                       <option value="">-- Wählen --</option>
-                      <option value="Metallverarbeitung">Metallverarbeitung</option>
-                      <option value="Schreinerei">Schreinerei</option>
-                      <option value="Automobilindustrie">Automobilindustrie</option>
-                      <option value="Oberflächentechnik">Oberflächentechnik</option>
-                      <option value="Werkzeugbau">Werkzeugbau</option>
+                      <optgroup label="🔩 Metall & Stahl">
+                        <option value="Metallverarbeitung">Metallverarbeitung</option>
+                        <option value="Stahlbau">Stahlbau</option>
+                        <option value="Maschinenbau">Maschinenbau</option>
+                        <option value="Werkzeugbau">Werkzeugbau</option>
+                        <option value="Schlosserei">Schlosserei</option>
+                        <option value="Schweißtechnik">Schweißtechnik</option>
+                      </optgroup>
+                      <optgroup label="🪵 Holz & Möbel">
+                        <option value="Schreinerei">Schreinerei</option>
+                        <option value="Möbelbau">Möbelbau</option>
+                      </optgroup>
+                      <optgroup label="🚗 Automotive">
+                        <option value="Automobilindustrie">Automobilindustrie</option>
+                        <option value="Karosseriebau">Karosseriebau</option>
+                        <option value="KFZ-Werkstatt">KFZ-Werkstatt</option>
+                      </optgroup>
+                      <optgroup label="🎨 Oberflächen">
+                        <option value="Oberflächentechnik">Oberflächentechnik</option>
+                        <option value="Lackiererei">Lackiererei</option>
+                        <option value="Galvanik">Galvanik</option>
+                      </optgroup>
+                      <optgroup label="🔬 Spezial">
+                        <option value="Glasverarbeitung">Glasverarbeitung</option>
+                        <option value="Steinmetz">Steinmetz</option>
+                        <option value="Dentallabor">Dentallabor</option>
+                        <option value="Schmuckherstellung">Schmuckherstellung</option>
+                        <option value="Gravurbetrieb">Gravurbetrieb</option>
+                        <option value="Kunststoffverarbeitung">Kunststoffverarbeitung</option>
+                        <option value="Modellbau">Modellbau</option>
+                        <option value="Messerschmiede">Messerschmiede</option>
+                      </optgroup>
                     </select>
                   </div>
 
