@@ -59,9 +59,9 @@ function generateTemplateEmail(options: EmailGenerationOptions): GeneratedEmail 
   
   if (analysis.detected_applications.length > 0) {
     const apps = analysis.detected_applications.slice(0, 2).map(a => a.name).join(' und ')
-    intro += `Ich habe gesehen, dass Sie sich auf ${apps} spezialisiert haben.`
+    intro += `Ich bin auf Sie aufmerksam geworden, da Sie sich auf ${apps} spezialisiert haben – genau die Anwendungen, für die wir die passenden Schleifwerkzeuge anbieten.`
   } else {
-    intro += `Als Unternehmen im Bereich ${industry} sind Sie sicher regelmäßig auf qualitativ hochwertige Schleifmittel angewiesen.`
+    intro += `Ich bin auf Ihr Unternehmen aufmerksam geworden, da Sie im Bereich ${industry} tätig sind – genau die Branche, in der wir unsere Kunden optimal mit hochwertigen Schleifmitteln unterstützen.`
   }
   
   // 4. Spezifische Produktempfehlungen (Top 3-4)
