@@ -206,9 +206,8 @@ ${content.combined_text.substring(0, 8000)}
 Nur JSON, keine Erklärungen.`
 
   try {
-    const response = await callEmergentLLM([
-      { role: 'user', content: prompt }
-    ], {
+    const response = await emergentChatCompletion({
+      messages: [{ role: 'user', content: prompt }],
       model: 'gpt-4o',
       temperature: 0.3,
       max_tokens: 1000
