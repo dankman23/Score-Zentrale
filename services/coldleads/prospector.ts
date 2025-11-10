@@ -55,8 +55,27 @@ export async function findProspects(options: ProspectorOptions): Promise<Prospec
       throw new Error(`Google Search API Error: ${data.error?.message || 'Unknown error'}`)
     }
 
+    // Blacklist: Verzeichnisse, Schulen, Plattformen
+    const blacklistedDomains = [
+      'gelbenseiten.de', 'gelbeseiten.de',
+      'wlw.de', 'wer-liefert-was.de',
+      'lehrer-online.de', 'lehreronline.de',
+      'schule-bw.de', 'schulewirtschaft.de',
+      'wikipedia.org', 'youtube.com',
+      'facebook.com', 'linkedin.com',
+      'xing.com', 'kununu.com',
+      'indeed.de', 'stepstone.de'
+    ]
+    
     if (data.items && Array.isArray(data.items)) {
       for (const item of data.items) {
+        // Filter blacklisted domains
+        const itemUrl = item.link?.toLowerCase() || ''
+        if (blacklistedDomains.some(domain => itemUrl.includes(domain))) {
+          console.log(`[Prospector] Filtered blacklisted domain: ${item.link}`)
+          continue
+        }
+        
         // Extrahiere Firmennamen aus Titel
         const companyName = extractCompanyName(item.title)
         
