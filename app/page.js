@@ -914,7 +914,7 @@ export default function App() {
             <KpiTile title="Umsatz (BRUTTO)" value={fmtCurrency(ordersSplit?.gross_with_shipping)} sub="Aufträge mit Versand" demo={demoMode} />
           </div>
 
-          {/* Zweite Reihe: Rohertragsmarge */}
+          {/* Zweite Reihe: Rohertragsmarge + Top 5 */}
           <div className="row">
             <KpiTile 
               title="Rohertragsmarge (Netto)" 
@@ -935,6 +935,54 @@ export default function App() {
               } 
               demo={demoMode} 
             />
+            <div className="col-md-4 mb-3">
+              <div className="card kpi h-100">
+                <div className="card-body">
+                  <div className="label mb-2 text-uppercase small">
+                    <i className="bi bi-shop mr-1"/>TOP 5 Plattformen
+                  </div>
+                  {topPlatforms && topPlatforms.length > 0 ? (
+                    <div className="small">
+                      {topPlatforms.slice(0, 5).map((p, i) => (
+                        <div key={i} className="d-flex justify-content-between mb-1 pb-1" style={{borderBottom: i < 4 ? '1px solid var(--line)' : 'none'}}>
+                          <span className="text-muted">#{p.platform}</span>
+                          <span>
+                            <strong>{fmtCurrency(p.revenue)}</strong>
+                            <span className="text-success ml-2">+{fmtCurrency(p.margin)}</span>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-muted small">Keine Daten</div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="col-md-4 mb-3">
+              <div className="card kpi h-100">
+                <div className="card-body">
+                  <div className="label mb-2 text-uppercase small">
+                    <i className="bi bi-building mr-1"/>TOP 5 Hersteller
+                  </div>
+                  {topManufacturers && topManufacturers.length > 0 ? (
+                    <div className="small">
+                      {topManufacturers.slice(0, 5).map((m, i) => (
+                        <div key={i} className="d-flex justify-content-between mb-1 pb-1" style={{borderBottom: i < 4 ? '1px solid var(--line)' : 'none'}}>
+                          <span className="text-truncate" style={{maxWidth: '120px'}}>{m.manufacturer}</span>
+                          <span>
+                            <strong>{fmtCurrency(m.revenue)}</strong>
+                            <span className="text-success ml-2">+{fmtCurrency(m.margin)}</span>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-muted small">Keine Daten</div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Dritte Reihe: Kaltakquise Stats */}
