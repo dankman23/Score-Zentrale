@@ -20,8 +20,8 @@ export async function GET(request: NextRequest) {
     
     // VERBESSERTE LOGIK: Zähle Kombinationen (Region + Branche), nicht nur Regionen
     const totalRegions = 47 // 16 DE + 9 AT + 22 CH
-    const totalIndustries = 25 // Anzahl der Branchen im System
-    const totalCombinations = totalRegions * totalIndustries // z.B. 47 * 25 = 1175 mögliche Kombinationen
+    const totalIndustries = 38 // Anzahl der Branchen im System (aus PDF)
+    const totalCombinations = totalRegions * totalIndustries // z.B. 47 * 38 = 1786 mögliche Kombinationen
     
     const completedCombinations = allProgress.filter(p => p.status === 'completed').length
     const totalCompanies = allProgress.reduce((sum, p) => sum + (p.companies_found || 0), 0)
