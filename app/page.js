@@ -218,8 +218,8 @@ export default function App() {
         getJsonRaw(`/api/jtl/purchase/orders?from=${from}&to=${to}`),
         getJsonRaw(`/api/jtl/purchase/expenses?from=${from}&to=${to}`),
         getJson(`/api/jtl/orders/kpi/margin?from=${from}&to=${to}`),
-        getJson(`/api/jtl/sales/top-platforms?from=${from}&to=${to}&limit=5`),
-        getJson(`/api/jtl/sales/top-manufacturers?from=${from}&to=${to}&limit=5`)
+        getJson(`/api/jtl/sales/top-platforms?from=${from}&to=${to}&limit=100`),
+        getJson(`/api/jtl/sales/top-manufacturers?from=${from}&to=${to}&limit=100`)
       ])
       
       // Map Sales API field names to what frontend expects
