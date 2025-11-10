@@ -593,9 +593,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Test GET /api/coldleads/stats returns unreadReplies, recentReplies, awaitingFollowup"
-    - "Test GET /api/coldleads/search?status=replied returns prospects with hasReply=true and history array"
-    - "Test GET /api/coldleads/inbox (may require IMAP credentials or return mock data)"
+    - "Test GET /api/analytics/info-pages?startDate=30daysAgo&endDate=today - returns array of info pages (-info/ URLs) with pageViews, uniquePageViews, avgTimeOnPage"
+    - "Test GET /api/analytics/beileger?startDate=30daysAgo&endDate=today - returns { totalVisits, uniqueVisitors, pages[] } for /account/ path"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
