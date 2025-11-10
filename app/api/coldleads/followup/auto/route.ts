@@ -11,7 +11,7 @@ import { SCORE_CONFIG } from '@/lib/score-coldleads-config'
  */
 export async function GET() {
   try {
-    const db = await getMongoDb()
+    const db = await connectToMongoDB()
     const prospectsCollection = db.collection('prospects')
     const now = new Date()
     
