@@ -2931,6 +2931,226 @@ export default function App() {
           </div>
           )}
 
+          {/* DACH Crawler Formular */}
+          {coldLeadsTab === 'dach' && (
+            <div className="card border-0 shadow-sm mb-4" style={{background:'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'}}>
+              <div className="card-body">
+                <div className="d-flex align-items-center mb-3">
+                  <i className="bi bi-globe-europe-africa text-white mr-2" style={{fontSize:'1.5rem'}}/>
+                  <div>
+                    <h5 className="mb-0 text-white">Systematisches DACH-Crawling</h5>
+                    <small className="text-white-50">Durchsuche strukturiert Firmenverzeichnisse in Deutschland, Österreich und Schweiz</small>
+                  </div>
+                </div>
+
+                {/* Statistiken */}
+                {dachCrawlerStats && (
+                  <div className="row mb-4">
+                    <div className="col-md-3">
+                      <div className="card bg-white border-0">
+                        <div className="card-body text-center py-3">
+                          <div className="h4 mb-1 font-weight-bold text-dark">{dachCrawlerStats.stats.completed_regions}</div>
+                          <div className="text-muted small">Regionen crawled</div>
+                          <div className="text-muted small">von {dachCrawlerStats.stats.total_regions}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-3">
+                      <div className="card bg-white border-0">
+                        <div className="card-body text-center py-3">
+                          <div className="h4 mb-1 font-weight-bold text-success">{dachCrawlerStats.stats.total_companies_found}</div>
+                          <div className="text-muted small">Firmen gefunden</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-3">
+                      <div className="card bg-white border-0">
+                        <div className="card-body text-center py-3">
+                          <div className="h4 mb-1 font-weight-bold text-info">{dachCrawlerStats.stats.coverage_percentage}%</div>
+                          <div className="text-muted small">Abdeckung</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-3">
+                      <div className="card bg-white border-0">
+                        <div className="card-body text-center py-3">
+                          <div className="h4 mb-1 font-weight-bold text-primary">{dachCrawlerStats.stats.dach_prospects_in_db}</div>
+                          <div className="text-muted small">In Datenbank</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Crawler Form */}
+                <div className="row">
+                  <div className="col-md-3 mb-2">
+                    <label className="small text-white mb-1">Land *</label>
+                    <select 
+                      className="form-control" 
+                      value={dachCrawlerForm.country}
+                      onChange={e => setDachCrawlerForm({...dachCrawlerForm, country: e.target.value, region: ''})}
+                    >
+                      <option value="DE">🇩🇪 Deutschland</option>
+                      <option value="AT">🇦🇹 Österreich</option>
+                      <option value="CH">🇨🇭 Schweiz</option>
+                    </select>
+                  </div>
+
+                  <div className="col-md-3 mb-2">
+                    <label className="small text-white mb-1">Region/Bundesland *</label>
+                    <select 
+                      className="form-control" 
+                      value={dachCrawlerForm.region}
+                      onChange={e => setDachCrawlerForm({...dachCrawlerForm, region: e.target.value})}
+                    >
+                      <option value="">-- Wählen --</option>
+                      {dachCrawlerForm.country === 'DE' && (
+                        <>
+                          <option value="Baden-Württemberg">Baden-Württemberg</option>
+                          <option value="Bayern">Bayern</option>
+                          <option value="Berlin">Berlin</option>
+                          <option value="Brandenburg">Brandenburg</option>
+                          <option value="Bremen">Bremen</option>
+                          <option value="Hamburg">Hamburg</option>
+                          <option value="Hessen">Hessen</option>
+                          <option value="Mecklenburg-Vorpommern">Mecklenburg-Vorpommern</option>
+                          <option value="Niedersachsen">Niedersachsen</option>
+                          <option value="Nordrhein-Westfalen">Nordrhein-Westfalen</option>
+                          <option value="Rheinland-Pfalz">Rheinland-Pfalz</option>
+                          <option value="Saarland">Saarland</option>
+                          <option value="Sachsen">Sachsen</option>
+                          <option value="Sachsen-Anhalt">Sachsen-Anhalt</option>
+                          <option value="Schleswig-Holstein">Schleswig-Holstein</option>
+                          <option value="Thüringen">Thüringen</option>
+                        </>
+                      )}
+                      {dachCrawlerForm.country === 'AT' && (
+                        <>
+                          <option value="Burgenland">Burgenland</option>
+                          <option value="Kärnten">Kärnten</option>
+                          <option value="Niederösterreich">Niederösterreich</option>
+                          <option value="Oberösterreich">Oberösterreich</option>
+                          <option value="Salzburg">Salzburg</option>
+                          <option value="Steiermark">Steiermark</option>
+                          <option value="Tirol">Tirol</option>
+                          <option value="Vorarlberg">Vorarlberg</option>
+                          <option value="Wien">Wien</option>
+                        </>
+                      )}
+                      {dachCrawlerForm.country === 'CH' && (
+                        <>
+                          <option value="Zürich">Zürich</option>
+                          <option value="Bern">Bern</option>
+                          <option value="Luzern">Luzern</option>
+                          <option value="Uri">Uri</option>
+                          <option value="Schwyz">Schwyz</option>
+                          <option value="Obwalden">Obwalden</option>
+                          <option value="Nidwalden">Nidwalden</option>
+                          <option value="Glarus">Glarus</option>
+                          <option value="Zug">Zug</option>
+                          <option value="Freiburg">Freiburg</option>
+                          <option value="Solothurn">Solothurn</option>
+                          <option value="Basel-Stadt">Basel-Stadt</option>
+                          <option value="Basel-Landschaft">Basel-Landschaft</option>
+                          <option value="Schaffhausen">Schaffhausen</option>
+                          <option value="Appenzell Ausserrhoden">Appenzell Ausserrhoden</option>
+                          <option value="Appenzell Innerrhoden">Appenzell Innerrhoden</option>
+                          <option value="St. Gallen">St. Gallen</option>
+                          <option value="Graubünden">Graubünden</option>
+                          <option value="Aargau">Aargau</option>
+                          <option value="Thurgau">Thurgau</option>
+                          <option value="Tessin">Tessin</option>
+                          <option value="Waadt">Waadt</option>
+                          <option value="Wallis">Wallis</option>
+                          <option value="Neuenburg">Neuenburg</option>
+                          <option value="Genf">Genf</option>
+                          <option value="Jura">Jura</option>
+                        </>
+                      )}
+                    </select>
+                  </div>
+
+                  <div className="col-md-3 mb-2">
+                    <label className="small text-white mb-1">Branche *</label>
+                    <select 
+                      className="form-control" 
+                      value={dachCrawlerForm.industry}
+                      onChange={e => setDachCrawlerForm({...dachCrawlerForm, industry: e.target.value})}
+                    >
+                      <option value="">-- Wählen --</option>
+                      <option value="Metallverarbeitung">Metallverarbeitung</option>
+                      <option value="Schreinerei">Schreinerei</option>
+                      <option value="Automobilindustrie">Automobilindustrie</option>
+                      <option value="Oberflächentechnik">Oberflächentechnik</option>
+                      <option value="Werkzeugbau">Werkzeugbau</option>
+                    </select>
+                  </div>
+
+                  <div className="col-md-1 mb-2">
+                    <label className="small text-white mb-1">Limit</label>
+                    <input 
+                      type="number" 
+                      className="form-control" 
+                      value={dachCrawlerForm.limit}
+                      onChange={e => setDachCrawlerForm({...dachCrawlerForm, limit: parseInt(e.target.value) || 20})}
+                      min="5"
+                      max="50"
+                    />
+                  </div>
+
+                  <div className="col-md-2 mb-2">
+                    <label className="small text-white mb-1">&nbsp;</label>
+                    <button 
+                      className="btn btn-light btn-block font-weight-bold" 
+                      onClick={startDachCrawl}
+                      disabled={dachCrawlerLoading || !dachCrawlerForm.region || !dachCrawlerForm.industry}
+                    >
+                      {dachCrawlerLoading ? <><span className="spinner-border spinner-border-sm mr-2"/>Crawle...</> : <><i className="bi bi-play-fill mr-1"/>Start Crawl</>}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Progress Tabelle */}
+                {dachCrawlerProgress.length > 0 && (
+                  <div className="mt-4">
+                    <h6 className="text-white mb-3"><i className="bi bi-list-task mr-2"/>Letzte Crawls</h6>
+                    <div className="table-responsive" style={{maxHeight: '300px', overflowY: 'auto'}}>
+                      <table className="table table-sm table-dark">
+                        <thead>
+                          <tr>
+                            <th>Land</th>
+                            <th>Region</th>
+                            <th>Branche</th>
+                            <th>Status</th>
+                            <th>Gefunden</th>
+                            <th>Datum</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {dachCrawlerProgress.map((p, i) => (
+                            <tr key={i}>
+                              <td>{p.country === 'DE' ? '🇩🇪' : p.country === 'AT' ? '🇦🇹' : '🇨🇭'}</td>
+                              <td>{p.region}</td>
+                              <td>{p.industry}</td>
+                              <td>
+                                <span className={`badge badge-${p.status === 'completed' ? 'success' : p.status === 'in_progress' ? 'warning' : p.status === 'failed' ? 'danger' : 'secondary'}`}>
+                                  {p.status}
+                                </span>
+                              </td>
+                              <td>{p.companies_found}</td>
+                              <td className="small">{p.last_updated ? new Date(p.last_updated).toLocaleString('de-DE') : '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Ergebnis-Tabelle - moderner */}
           {coldProspects.length > 0 && (
             <div className="card border-0 shadow-sm">
