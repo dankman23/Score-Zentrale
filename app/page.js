@@ -3864,11 +3864,14 @@ export default function App() {
                                   }} disabled={coldLoading} title="Details anzeigen">
                                     <i className={`bi bi-chevron-${selectedProspect?.website === p.website ? 'up' : 'down'}`}/>
                                   </button>
-                                  {(!p.analysis_v3 && !p.analysis) && (
-                                    <button className="btn btn-warning" onClick={() => analyzeProspect(p)} disabled={coldLoading} title="Erneut analysieren">
-                                      <i className="bi bi-arrow-repeat"/>
-                                    </button>
-                                  )}
+                                  <button 
+                                    className="btn btn-warning" 
+                                    onClick={(e) => { e.stopPropagation(); analyzeProspect(p) }} 
+                                    disabled={coldLoading} 
+                                    title="Erneut analysieren"
+                                  >
+                                    <i className="bi bi-arrow-repeat"/>
+                                  </button>
                                   {p.email_sequence && (
                                     <button 
                                       className="btn btn-success" 
@@ -3877,11 +3880,22 @@ export default function App() {
                                         setShowEmailPreview(showEmailPreview?.website === p.website ? null : p)
                                       }} 
                                       disabled={coldLoading} 
-                                      title="Email-Vorschau (alle 3 Mails)"
+                                      title="Email-Vorschau & Versand"
                                     >
-                                      <i className={`bi bi-${showEmailPreview?.website === p.website ? 'x-circle' : 'envelope-check'}`}/>
+                                      <i className={`bi bi-${showEmailPreview?.website === p.website ? 'x-circle' : 'envelope'}`}/>
                                     </button>
                                   )}
+                                  <button 
+                                    className="btn btn-danger" 
+                                    onClick={(e) => { 
+                                      e.stopPropagation(); 
+                                      if (confirm(`${p.company_name} wirklich löschen?`)) deleteProspect(p.id)
+                                    }} 
+                                    disabled={coldLoading} 
+                                    title="Löschen"
+                                  >
+                                    <i className="bi bi-trash"/>
+                                  </button>
                                 </div>
                               )}
                               {p.status === 'contacted' && (
