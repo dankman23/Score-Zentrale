@@ -33,6 +33,8 @@ export async function fetchAnalyticsMetrics(
         pageViews: 0,
         avgSessionDuration: 0,
         bounceRate: 0,
+        conversions: 0,
+        revenue: 0,
       };
     }
 
