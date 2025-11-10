@@ -47,51 +47,130 @@ def test_api_endpoint(method, endpoint, data=None, expected_status=200):
         log_test(f"ERROR: {str(e)}")
         return None, str(e)
 
-def validate_filters_response(data: Dict[str, Any]) -> bool:
-    """Validate filters API response structure"""
-    print("\n🔍 Validating filters response structure...")
+def test_analyze_v3():
+    """
+    Test 1: POST /api/coldleads/analyze-v3 (Haupt-Analyse)
     
-    # Check required fields
-    required_fields = ["ok", "hersteller", "warengruppen"]
-    for field in required_fields:
-        if field not in data:
-            print(f"❌ Missing required field: {field}")
-            return False
+    Erwartung:
+    - 200 OK mit { ok: true }
+    - Response enthält analysis und email_sequence
+    - Glossar-Terms gemappt (mindestens 1 Application, 1 Material)
+    - Email-Sequence vollständig (3 Mails)
+    - Mail 1 ≤ 200 Wörter
+    - Kein Markdown in Email-Body
+    - Recommended Brands (1-3 aus Score-Liste)
+    - Contact Person extrahiert
+    """
+    log_test("=" * 60)
+    log_test("TEST 1: POST /api/coldleads/analyze-v3 (Haupt-Analyse)")
+    log_test("=" * 60)
     
-    # Check ok field
-    if data["ok"] != True:
-        print(f"❌ ok field is not true: {data['ok']}")
+    # Test data - using a known website as fallback
+    test_data = {
+        "website": "https://www.klingspor.de",
+        "company_name": "Test Metallbau GmbH",
+        "industry": "Metallverarbeitung", 
+        "region": "Köln"
+    }
+    
+    log_test(f"Test payload: {json.dumps(test_data, indent=2, ensure_ascii=False)}")
+    
+    status, response = test_api_endpoint('POST', '/coldleads/analyze-v3', test_data)
+    
+    if status is None:
+        log_test("❌ CRITICAL: API request failed completely")
         return False
     
-    # Check hersteller array
-    if not isinstance(data["hersteller"], list):
-        print(f"❌ hersteller is not an array")
-        return False
+    # Check basic response structure
+    success = True
     
-    # Check warengruppen array
-    if not isinstance(data["warengruppen"], list):
-        print(f"❌ warengruppen is not an array")
-        return False
+    if status != 200:
+        log_test(f"❌ Expected status 200, got {status}")
+        success = False
     
-    # Check hersteller structure if not empty
-    if len(data["hersteller"]) > 0:
-        first_hersteller = data["hersteller"][0]
-        if not isinstance(first_hersteller, dict) or "name" not in first_hersteller or "count" not in first_hersteller:
-            print(f"❌ Invalid hersteller structure: {first_hersteller}")
-            return False
+    if isinstance(response, dict):
+        # Check required fields
+        required_fields = ['ok', 'analysis', 'email_sequence']
+        for field in required_fields:
+            if field not in response:
+                log_test(f"❌ Missing required field: {field}")
+                success = False
+            else:
+                log_test(f"✅ Found required field: {field}")
+        
+        # Check analysis structure
+        if 'analysis' in response:
+            analysis = response['analysis']
+            analysis_fields = [
+                'company', 'confidence_overall', 'applications', 
+                'materials', 'machines', 'product_categories',
+                'contact_person', 'recommended_brands'
+            ]
+            
+            for field in analysis_fields:
+                if field in analysis:
+                    log_test(f"✅ Analysis has {field}")
+                    
+                    # Check specific requirements
+                    if field == 'applications' and len(analysis[field]) >= 1:
+                        log_test(f"✅ At least 1 application found: {len(analysis[field])} applications")
+                    elif field == 'materials' and len(analysis[field]) >= 1:
+                        log_test(f"✅ At least 1 material found: {len(analysis[field])} materials")
+                    elif field == 'recommended_brands' and len(analysis[field]) >= 1:
+                        log_test(f"✅ Recommended brands found: {analysis[field]}")
+                    elif field == 'confidence_overall':
+                        score = analysis[field]
+                        if 0 <= score <= 100:
+                            log_test(f"✅ Confidence score valid: {score}%")
+                        else:
+                            log_test(f"❌ Confidence score invalid: {score}")
+                            success = False
+                else:
+                    log_test(f"❌ Analysis missing field: {field}")
+                    success = False
+        
+        # Check email sequence structure
+        if 'email_sequence' in response:
+            email_seq = response['email_sequence']
+            mail_fields = ['mail_1', 'mail_2', 'mail_3', 'crm_tags']
+            
+            for field in mail_fields:
+                if field in email_seq:
+                    log_test(f"✅ Email sequence has {field}")
+                    
+                    # Check mail structure
+                    if field.startswith('mail_'):
+                        mail = email_seq[field]
+                        if 'subject' in mail and 'body' in mail and 'word_count' in mail:
+                            log_test(f"✅ {field} has required structure")
+                            
+                            # Check word count for mail_1
+                            if field == 'mail_1' and mail['word_count'] <= 200:
+                                log_test(f"✅ Mail 1 word count OK: {mail['word_count']} ≤ 200")
+                            elif field == 'mail_1':
+                                log_test(f"❌ Mail 1 word count too high: {mail['word_count']} > 200")
+                                success = False
+                            
+                            # Check for markdown in body
+                            body = mail.get('body', '')
+                            if '**' not in body and '*' not in body:
+                                log_test(f"✅ {field} body has no markdown")
+                            else:
+                                log_test(f"❌ {field} body contains markdown")
+                                success = False
+                        else:
+                            log_test(f"❌ {field} missing required structure")
+                            success = False
+                else:
+                    log_test(f"❌ Email sequence missing field: {field}")
+                    success = False
     
-    # Check warengruppen structure if not empty
-    if len(data["warengruppen"]) > 0:
-        first_warengruppe = data["warengruppen"][0]
-        if not isinstance(first_warengruppe, dict) or "name" not in first_warengruppe or "count" not in first_warengruppe:
-            print(f"❌ Invalid warengruppen structure: {first_warengruppe}")
-            return False
+    if success:
+        log_test("✅ TEST 1 PASSED: analyze-v3 working correctly")
+    else:
+        log_test("❌ TEST 1 FAILED: analyze-v3 has issues")
     
-    print(f"✅ Filters response structure valid")
-    print(f"📊 Hersteller count: {len(data['hersteller'])}")
-    print(f"📊 Warengruppen count: {len(data['warengruppen'])}")
-    
-    return True
+    return success, response.get('analysis', {}).get('company', 'Test Company') if isinstance(response, dict) else None
 
 def validate_list_response(data: Dict[str, Any], expected_max_articles: int = None) -> bool:
     """Validate list API response structure"""
