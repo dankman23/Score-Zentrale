@@ -936,6 +936,8 @@ agent_communication:
 
 agent_communication:
   - agent: "main"
+    message: "ANALYTICS DASHBOARD ERWEITERUNG: Implementiert fehlende Analytics-Features: (1) Product Pages expand/collapse (Top 10 initial, bis zu 100), (2) Info-Seiten Sektion mit neuer API /api/analytics/info-pages (filtert -info/ URLs), (3) 'Erfolg von Beileger' Sektion mit neuer API /api/analytics/beileger (summiert alle /account/ Besuche). Beide neue APIs in /app/lib/analytics.ts hinzugefügt (fetchInfoPages, fetchBeilegerMetrics). Frontend in /app/app/page.js erweitert: loadAnalytics lädt neue APIs, UI zeigt Info Pages Tabelle und Beileger mit Gesamtsumme + Details vor 'Top 100 Alle Seiten'. Bereit für Backend-Testing der 2 neuen Analytics APIs."
+  - agent: "main"
     message: "Please re-run backend tests for JTL Orders endpoints: diag/day and KPI shipping-split for 2025-11-03. Expect no schema errors and JSON with fields; record values."
   - agent: "testing"
     message: "✅ JTL ORDERS DIAGNOSTICS AND KPI TESTING COMPLETED! All 3/3 tests PASSED: 1) GET /api/jtl/orders/diag/day?date=2025-11-03 (200 ok:true with totals.orders=77, totals.gross=13018.87, rows array with 77 items), 2) GET /api/jtl/orders/kpi/shipping-split?from=2025-11-03&to=2025-11-03 (200 ok:true with all required flat fields: orders=77, net_without_shipping=11306.82, net_with_shipping=11306.82, gross_without_shipping=13018.87, gross_with_shipping=13018.87), 3) SANITY GET /api/jtl/orders/timeseries?from=2025-11-01&to=2025-11-03 (200 ok:true with grain='day' and 3 rows). Fixed kPlattform column issue in diagnostics endpoint by simplifying platform detection logic. All endpoints stable and returning expected data structures."
