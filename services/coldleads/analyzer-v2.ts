@@ -98,24 +98,9 @@ export async function analyzeCompanyV2(
 
 /**
  * Crawlt Website strukturiert nach Scraping-Pfad
+ * VERBESSERTES Crawling mit besserem Text-Extraktion
  */
 async function crawlWebsiteStructured(url: string) {
-  // Pfade in Reihenfolge: /leistungen | /produkte | /fertigung | /maschinen | /referenzen | /projekte | /impressum | /kontakt | /team
-  const paths = [
-    '', // Homepage
-    '/leistungen',
-    '/produkte',
-    '/fertigung',
-    '/maschinen',
-    '/referenzen',
-    '/projekte',
-    '/impressum',
-    '/kontakt',
-    '/team',
-    '/ueber-uns',
-    '/about'
-  ]
-  
   const result = {
     leistungen: '',
     produkte: '',
@@ -127,28 +112,68 @@ async function crawlWebsiteStructured(url: string) {
     team: ''
   }
   
-  // Vereinfachtes Crawling - in Produktion würde man hier Playwright/Cheerio verwenden
-  // Für MVP: Simuliere mit Homepage-Content
   try {
+    // Hole Homepage
     const response = await fetch(url, { 
-      headers: { 'User-Agent': 'Mozilla/5.0' },
-      signal: AbortSignal.timeout(10000)
+      headers: { 
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+      },
+      signal: AbortSignal.timeout(15000)
     })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+    
     const html = await response.text()
     
-    // Extrahiere Text (sehr vereinfacht)
-    const text = html
+    // Bessere Text-Extraktion
+    let text = html
+      // Remove scripts und styles
       .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
       .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+      // Remove comments
+      .replace(/<!--[\s\S]*?-->/g, '')
+      // Konvertiere common HTML entities
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      // Ersetze <br>, <p>, <div> mit Leerzeichen
+      .replace(/<br\s*\/?>/gi, ' ')
+      .replace(/<\/p>/gi, ' ')
+      .replace(/<\/div>/gi, ' ')
+      .replace(/<\/li>/gi, ' ')
+      .replace(/<\/h[1-6]>/gi, '. ')
+      // Entferne alle Tags
       .replace(/<[^>]+>/g, ' ')
+      // Cleanup whitespace
       .replace(/\s+/g, ' ')
       .trim()
     
-    // Verteile auf Bereiche (vereinfacht)
-    result.leistungen = text
-    result.produkte = text
-    result.impressum = text
-    result.kontakt = text
+    // Extrahiere Meta-Informationen
+    const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/i)
+    const metaDescMatch = html.match(/<meta[^>]*name="description"[^>]*content="([^"]*)"[^>]*>/i)
+    
+    const title = titleMatch ? titleMatch[1] : ''
+    const metaDesc = metaDescMatch ? metaDescMatch[1] : ''
+    
+    // Kombiniere Text
+    const fullText = [title, metaDesc, text].join(' ')
+    
+    // Verteile auf Bereiche
+    result.leistungen = fullText
+    result.produkte = fullText
+    result.fertigung = fullText
+    result.maschinen = fullText
+    result.referenzen = fullText
+    result.impressum = fullText
+    result.kontakt = fullText
+    result.team = fullText
+    
+    console.log(`[AnalyzerV2] Crawled ${url}: ${fullText.length} chars`)
     
   } catch (error) {
     console.error('[AnalyzerV2] Crawl error:', error)
