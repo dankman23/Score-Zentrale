@@ -2383,7 +2383,9 @@ export default function App() {
                                             <strong className="text-muted small d-block mb-2">Potenzielle Produkte:</strong>
                                             <div className="d-flex flex-wrap">
                                               {p.analysis.needs_assessment.potential_products.map((prod, idx) => (
-                                                <span key={idx} className="badge badge-success mr-1 mb-1">{prod}</span>
+                                                <span key={idx} className="badge badge-success mr-1 mb-1">
+                                                  {typeof prod === 'string' ? prod : prod.name || JSON.stringify(prod)}
+                                                </span>
                                               ))}
                                             </div>
                                           </div>
