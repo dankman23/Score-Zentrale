@@ -878,12 +878,15 @@ export default function App() {
     }
   }
 
-  const loadColdProspects = async () => {
+  const loadColdProspects = async (filterOverride = null) => {
     try {
-      const res = await fetch(`/api/coldleads/search?status=${coldStatusFilter}&limit=100`)
+      const filterToUse = filterOverride || coldStatusFilter
+      const res = await fetch(`/api/coldleads/search?status=${filterToUse}&limit=200`)
       const data = await res.json()
       if (data.ok) {
         setColdProspects(data.prospects)
+        console.log(`Loaded ${data.prospects.length} prospects with status: ${filterToUse}`)
+        
         // Statistiken berechnen - lade alle Prospects für korrekte Zählung
         const allRes = await fetch(`/api/coldleads/search?status=all&limit=1000`)
         const allData = await allRes.json()
@@ -896,10 +899,11 @@ export default function App() {
             contacted: all.filter(p => p.status === 'contacted').length,
             replied: all.filter(p => p.hasReply === true).length
           })
+          console.log(`Stats: ${all.length} total, ${all.filter(p => p.status === 'analyzed').length} analyzed`)
         }
       }
     } catch (e) {
-      console.error('Load prospects failed:', e)
+      console.error('loadColdProspects error:', e)
     }
   }
 
