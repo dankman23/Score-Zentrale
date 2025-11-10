@@ -1027,6 +1027,10 @@ export default function App() {
       const data = await res.json()
       if (data.ok) {
         setArtikelImportProgress({ imported: data.imported, total: 166854 })
+        // Wenn Import läuft, Status in 2 Sekunden erneut prüfen
+        if (data.running) {
+          setTimeout(loadArtikelStatus, 2000)
+        }
       }
     } catch (e) {
       console.error('Error loading artikel status:', e)
