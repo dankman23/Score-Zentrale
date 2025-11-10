@@ -104,28 +104,30 @@ function generateTemplateEmail(options: EmailGenerationOptions): GeneratedEmail 
     materialExpertise = `\n\nMit unserer langjährigen Erfahrung in der Bearbeitung von ${materials} können wir Sie optimal beraten und Ihnen die passenden Produkte für Ihre Anforderungen liefern.`
   }
   
-  // 7. Call-to-Action basierend auf Volumen
-  let cta = ''
+  // 7. Call-to-Action mit Kontaktoptionen
+  let cta = '\n\nGerne würde ich Ihnen ein auf Ihren Bedarf zugeschnittenes Angebot erstellen. Sie haben zwei Möglichkeiten:\n\n'
+  cta += '1️⃣ **Persönlicher Kontakt & Beratungstermin**\n'
+  cta += '   Rufen Sie mich gerne direkt an oder schreiben Sie mir eine E-Mail – ich nehme mir Zeit für eine individuelle Beratung.\n\n'
+  cta += '2️⃣ **Schriftliche Anfrage über unser Business-Portal**\n'
+  cta += '   Teilen Sie uns Ihren Bedarf bequem online mit:\n'
+  cta += '   🔗 https://score-schleifwerkzeuge.de/business'
+  
   if (analysis.estimated_volume === 'high') {
-    cta = '\n\nGerne erstelle ich Ihnen ein individuelles Angebot für Ihren Jahresbedarf. Bei größeren Mengen können wir Ihnen besonders attraktive Konditionen anbieten.'
-  } else {
-    cta = '\n\nGerne erstelle ich Ihnen ein unverbindliches Vergleichsangebot oder stehe für eine persönliche Beratung zur Verfügung.'
+    cta += '\n\nBei größeren Mengen können wir Ihnen besonders attraktive Konditionen und individuelle Rahmenverträge anbieten.'
   }
   
   // 8. Abschluss & Kontakt
-  const closing = `\n\nSie erreichen mich am besten telefonisch oder per E-Mail:
-
-📞 Telefon: 0221-25999901
+  const closing = `\n\n📞 Telefon: 0221-25999901
 📧 E-Mail: leismann@score-schleifwerkzeuge.de
+🌐 Website: www.score-schleifwerkzeuge.de
 
-Ich freue mich darauf, Sie kennenzulernen und Sie bei Ihren Projekten zu unterstützen.
+Ich freue mich darauf, Sie kennenzulernen und Sie bei Ihren Projekten zu unterstützen!
 
 Mit freundlichen Grüßen aus Köln
 
 Daniel Leismann
 Vertrieb & Kundenberatung
-Score Schleifwerkzeuge
-www.score-schleifwerkzeuge.de`
+Score Schleifwerkzeuge`
   
   // Zusammenstellung
   const body = `${greeting},
