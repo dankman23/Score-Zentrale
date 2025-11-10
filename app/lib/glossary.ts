@@ -114,30 +114,37 @@ export function mapToGlossary(text: string): {
     machines: [] as string[]
   }
 
-  // Anwendungen
+  // Anwendungen - mit besserer Worterkennung
   for (const term of GLOSSARY.anwendungen) {
-    if (lowerText.includes(term.toLowerCase())) {
+    const termLower = term.toLowerCase()
+    // Ganze Wörter oder Wortteile matchen
+    if (lowerText.includes(termLower)) {
       result.applications.push(term)
     }
   }
 
-  // Kategorien
+  // Kategorien - spezielle Behandlung für zusammengesetzte Begriffe
   for (const term of GLOSSARY.kategorien) {
-    if (lowerText.includes(term.toLowerCase())) {
+    const termLower = term.toLowerCase()
+    // Entferne Slashes für besseres Matching
+    const termSimplified = termLower.replace(/\s*\/\s*/g, ' ')
+    if (lowerText.includes(termLower) || lowerText.includes(termSimplified)) {
       result.categories.push(term)
     }
   }
 
   // Werkstoffe
   for (const term of GLOSSARY.werkstoffe) {
-    if (lowerText.includes(term.toLowerCase())) {
+    const termLower = term.toLowerCase()
+    if (lowerText.includes(termLower)) {
       result.materials.push(term)
     }
   }
 
   // Maschinentypen
   for (const term of GLOSSARY.maschinentypen) {
-    if (lowerText.includes(term.toLowerCase())) {
+    const termLower = term.toLowerCase()
+    if (lowerText.includes(termLower)) {
       result.machines.push(term)
     }
   }
