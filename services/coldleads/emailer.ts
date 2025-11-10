@@ -40,14 +40,20 @@ interface GeneratedEmail {
 function generateTemplateEmail(options: EmailGenerationOptions): GeneratedEmail {
   const { company_name, contact_person, contact_department, analysis, industry } = options
   
-  // 1. Ansprache generieren
+  // 1. Ansprache generieren - MIT NAMEN wenn vorhanden
   let greeting = 'Sehr geehrte Damen und Herren'
-  if (contact_person) {
-    if (contact_department === 'Einkauf' || contact_department === 'Beschaffung') {
-      greeting = `Sehr geehrte Damen und Herren der ${contact_department}sabteilung`
-    } else if (contact_person !== 'Kontakt' && contact_person !== 'Allgemein') {
-      greeting = `Sehr geehrte/r ${contact_person}`
+  if (contact_person && contact_person !== 'Kontakt' && contact_person !== 'Allgemein') {
+    // Wenn wir einen echten Namen haben
+    if (contact_person.includes(' ')) {
+      // Vollständiger Name: "Max Mustermann" → "Sehr geehrter Herr Mustermann"
+      const lastName = contact_person.split(' ').pop()
+      greeting = `Sehr geehrte Damen und Herren, sehr geehrter Herr ${lastName}, sehr geehrte Frau ${lastName}`
+    } else {
+      // Nur Abteilung/Rolle
+      greeting = `Sehr geehrte Damen und Herren`
     }
+  } else if (contact_department && (contact_department === 'Einkauf' || contact_department === 'Beschaffung')) {
+    greeting = `Sehr geehrte Damen und Herren der ${contact_department}sabteilung`
   }
   
   // 2. Betreff mit konkreter Anwendung oder Firmenbezug
