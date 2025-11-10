@@ -50,19 +50,35 @@ function generateTemplateEmail(options: EmailGenerationOptions): GeneratedEmail 
     }
   }
   
-  // 2. Betreff mit konkreter Anwendung
-  const mainApplication = analysis.detected_applications[0]?.name || industry
-  const subject = `Schleifwerkzeuge für ${mainApplication} bei ${company_name}`
+  // 2. Betreff mit konkreter Anwendung oder Firmenbezug
+  const mainApplication = analysis.detected_applications[0]?.name
+  const subject = mainApplication 
+    ? `Hochwertige Schleifwerkzeuge für ${mainApplication} – Angebot für ${company_name}`
+    : `Schleifwerkzeuge-Lieferant für ${company_name}`
   
-  // 3. Einleitung basierend auf erkannten Anwendungen
-  let intro = `ich bin Daniel Leismann von Score Schleifwerkzeuge aus Köln. `
+  // 3. PERSÖNLICHER SATZ ZUR FIRMA
+  let personalOpening = ''
+  const companyInfo = (options as any).company_info
   
-  if (analysis.detected_applications.length > 0) {
+  if (companyInfo?.main_activity && companyInfo?.products && companyInfo.products.length > 0) {
+    // Beste Variante: Spezifische Produkte bekannt
+    const mainProduct = companyInfo.products[0]
+    personalOpening = `Ich habe gesehen, dass Sie als ${companyInfo.main_activity} im Bereich ${mainProduct} tätig sind`
+  } else if (companyInfo?.main_activity) {
+    // Gute Variante: Geschäftstyp bekannt
+    personalOpening = `Ich habe gesehen, dass Sie als ${companyInfo.main_activity} tätig sind`
+  } else if (analysis.detected_applications.length > 0) {
+    // Fallback: Anwendungen erkannt
     const apps = analysis.detected_applications.slice(0, 2).map(a => a.name).join(' und ')
-    intro += `Ich bin auf Sie aufmerksam geworden, da Sie sich auf ${apps} spezialisiert haben – genau die Anwendungen, für die wir die passenden Schleifwerkzeuge anbieten.`
+    personalOpening = `Ich bin auf Sie aufmerksam geworden, da Sie sich auf ${apps} spezialisieren`
   } else {
-    intro += `Ich bin auf Ihr Unternehmen aufmerksam geworden, da Sie im Bereich ${industry} tätig sind – genau die Branche, in der wir unsere Kunden optimal mit hochwertigen Schleifmitteln unterstützen.`
+    // Minimaler Fallback
+    personalOpening = `Ich bin auf Ihr Unternehmen im Bereich ${industry} aufmerksam geworden`
   }
+  
+  // 4. Einleitung mit persönlichem Bezug
+  let intro = `ich bin Daniel Leismann von Score Schleifwerkzeuge aus Köln.\n\n`
+  intro += `${personalOpening} – genau die Bereiche, in denen unsere hochwertigen Schleifwerkzeuge Ihre Prozesse optimal unterstützen können.`
   
   // 4. Premium-Hersteller und Produktkategorien
   const categories = new Set<string>()
