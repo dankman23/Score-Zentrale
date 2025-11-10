@@ -330,74 +330,73 @@ def test_followup_auto():
     
     return success
 
-def test_search_functionality(data: Dict[str, Any], search_term: str) -> bool:
-    """Test if search results contain the search term"""
-    print(f"\n🔍 Validating search results for term: '{search_term}'")
+def main():
+    """Run all V3 API tests in sequence"""
+    log_test("🚀 STARTING KALTAKQUISE V3 SYSTEM BACKEND TESTING")
+    log_test(f"Base URL: {BASE_URL}")
+    log_test(f"API Base: {API_BASE}")
+    log_test("")
     
-    if len(data["articles"]) == 0:
-        print(f"⚠️ No articles found for search term '{search_term}'")
-        return True  # Empty results are acceptable
+    results = []
     
-    # Check if articles contain search term
-    search_term_lower = search_term.lower()
-    valid_articles = 0
+    # Test 1: analyze-v3 (most important)
+    try:
+        result1, company_name = test_analyze_v3()
+        results.append(("analyze-v3", result1))
+    except Exception as e:
+        log_test(f"❌ TEST 1 EXCEPTION: {str(e)}")
+        results.append(("analyze-v3", False))
+        company_name = None
     
-    for article in data["articles"]:
-        article_matches = False
-        
-        # Check cArtNr
-        if "cArtNr" in article and article["cArtNr"] and search_term_lower in str(article["cArtNr"]).lower():
-            article_matches = True
-        
-        # Check cName
-        if "cName" in article and article["cName"] and search_term_lower in str(article["cName"]).lower():
-            article_matches = True
-        
-        # Check cBarcode
-        if "cBarcode" in article and article["cBarcode"] and search_term_lower in str(article["cBarcode"]).lower():
-            article_matches = True
-        
-        if article_matches:
-            valid_articles += 1
-        else:
-            print(f"❌ Article does not contain search term: {article.get('cArtNr', 'N/A')} - {article.get('cName', 'N/A')}")
+    log_test("")
     
-    if valid_articles == len(data["articles"]):
-        print(f"✅ All {valid_articles} articles contain search term '{search_term}'")
-        return True
+    # Test 2: email-v3/send (optional if prospect available)
+    try:
+        result2 = test_email_v3_send()
+        results.append(("email-v3/send", result2))
+    except Exception as e:
+        log_test(f"❌ TEST 2 EXCEPTION: {str(e)}")
+        results.append(("email-v3/send", False))
+    
+    log_test("")
+    
+    # Test 3: followup/auto (should always run)
+    try:
+        result3 = test_followup_auto()
+        results.append(("followup/auto", result3))
+    except Exception as e:
+        log_test(f"❌ TEST 3 EXCEPTION: {str(e)}")
+        results.append(("followup/auto", False))
+    
+    # Summary
+    log_test("")
+    log_test("=" * 60)
+    log_test("KALTAKQUISE V3 TESTING SUMMARY")
+    log_test("=" * 60)
+    
+    passed = 0
+    total = len(results)
+    
+    for test_name, success in results:
+        status = "✅ PASSED" if success else "❌ FAILED"
+        log_test(f"{test_name}: {status}")
+        if success:
+            passed += 1
+    
+    log_test("")
+    log_test(f"OVERALL RESULT: {passed}/{total} tests passed")
+    
+    if passed == total:
+        log_test("🎉 ALL TESTS PASSED - V3 System working correctly!")
+    elif passed >= 2:
+        log_test("⚠️  MOSTLY WORKING - Some issues found but core functionality OK")
     else:
-        print(f"❌ Only {valid_articles}/{len(data['articles'])} articles contain search term")
-        return False
-
-def test_manufacturer_filter(data: Dict[str, Any], manufacturer: str) -> bool:
-    """Test if all articles are from the specified manufacturer"""
-    print(f"\n🔍 Validating manufacturer filter for: '{manufacturer}'")
+        log_test("❌ CRITICAL ISSUES - V3 System needs attention")
     
-    if len(data["articles"]) == 0:
-        print(f"⚠️ No articles found for manufacturer '{manufacturer}'")
-        return True  # Empty results are acceptable
+    log_test("")
+    log_test("Testing completed at " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     
-    valid_articles = 0
-    
-    for article in data["articles"]:
-        if article.get("cHerstellerName") == manufacturer:
-            valid_articles += 1
-        else:
-            print(f"❌ Article from wrong manufacturer: {article.get('cHerstellerName', 'N/A')} (expected: {manufacturer})")
-    
-    if valid_articles == len(data["articles"]):
-        print(f"✅ All {valid_articles} articles are from manufacturer '{manufacturer}'")
-        return True
-    else:
-        print(f"❌ Only {valid_articles}/{len(data['articles'])} articles are from correct manufacturer")
-        return False
-
-def test_pagination_differences(page1_data: Dict[str, Any], page2_data: Dict[str, Any]) -> bool:
-    """Test if page 1 and page 2 have different articles"""
-    print(f"\n🔍 Validating pagination differences between page 1 and page 2")
-    
-    page1_ids = set()
-    page2_ids = set()
+    return passed, total
     
     # Collect kArtikel IDs from page 1
     for article in page1_data["articles"]:
