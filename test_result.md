@@ -648,6 +648,8 @@ test_plan:
 
 agent_communication:
   - agent: "main"
+    message: "DACH-CRAWLER SYSTEM IMPLEMENTIERT: Systematisches Firmenverzeichnis-Crawling für Deutschland, Österreich und Schweiz. Backend: 3 neue API-Endpunkte (POST /api/coldleads/dach/crawl, GET /api/coldleads/dach/status, GET /api/coldleads/dach/stats), Service-Datei /app/services/coldleads/dach-crawler.ts mit strukturiertem Crawling-Framework (47 DACH-Regionen, 5 Branchen). Frontend: Neuer 'DACH-Crawler' Tab im Kaltakquise-Modul mit Form (Land/Region/Branche), Live-Statistiken und Progress-Tabelle. Bitte alle 3 Backend-Endpunkte umfassend testen: (1) POST crawl mit verschiedenen Parametern, (2) GET stats für Dashboard-Daten, (3) GET status für Progress-Anzeige. MongoDB Collections: cold_prospects (mit Source-Tag) und dach_crawl_progress (Tracking). Google Search API kann leer sein (dann 0 Results expected), aber Endpoints müssen 200 OK zurückgeben und richtige Struktur haben."
+  - agent: "main"
     message: "Bitte zuerst Backend-Tests für neue JTL-Endpunkte ausführen. Erwartung: 200 mit ok:true oder 500 mit ok:false, aber keine unhandled errors. Danach gebe ich Go für UI-Tests."
   - agent: "testing"
     message: "✅ JTL Backend smoke tests completed successfully! Fixed critical variable hoisting bug in route.js (method used before declaration). All 8/8 endpoints tested: GET /api/ (200), GET /api/root (200), GET /api/jtl/ping (200 ok:true), GET /api/jtl/sales/* endpoints (500 ok:false with proper error handling for missing nPosTyp column), GET /api/prospects (200). No routing failures or unhandled errors. All endpoints return proper JSON responses as expected."
