@@ -612,6 +612,23 @@ export default function App() {
     }
   }
 
+  const loadInbox = async () => {
+    setInboxLoading(true)
+    try {
+      const res = await fetch('/api/coldleads/inbox')
+      const data = await res.json()
+      if (data.emails) {
+        setInboxEmails(data.emails)
+      } else if (data.error) {
+        console.error('Inbox error:', data.error)
+      }
+    } catch (e) {
+      console.error('Inbox load failed:', e)
+    } finally {
+      setInboxLoading(false)
+    }
+  }
+
   const loadGoogleAds = async () => {
     setGoogleAdsLoading(true)
     try {
