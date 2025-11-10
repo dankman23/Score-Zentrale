@@ -11,19 +11,26 @@ export async function fetchAnalyticsMetrics(
   const propertyId = getPropertyId();
 
   try {
-    // Try to get page views using eventCount with page_view filter
+    // First request: Get main metrics
     const [response] = await client.runReport({
       property: `properties/${propertyId}`,
       dateRanges: [{ startDate, endDate }],
       metrics: [
         { name: 'sessions' },
         { name: 'totalUsers' },
-        { name: 'eventCount' }, // Use eventCount instead of screenPageViews
         { name: 'averageSessionDuration' },
         { name: 'bounceRate' },
         { name: 'conversions' },
         { name: 'totalRevenue' },
       ],
+    });
+
+    // Second request: Get page views specifically (eventCount for page_view events)
+    const [pageViewResponse] = await client.runReport({
+      property: `properties/${propertyId}`,
+      dateRanges: [{ startDate, endDate }],
+      dimensions: [{ name: 'eventName' }],
+      metrics: [{ name: 'eventCount' }],
       dimensionFilter: {
         filter: {
           fieldName: 'eventName',
@@ -51,14 +58,20 @@ export async function fetchAnalyticsMetrics(
     const row = response.rows[0];
     const metricValues = row.metricValues || [];
 
+    // Extract page views from second request
+    let pageViews = 0;
+    if (pageViewResponse.rows && pageViewResponse.rows.length > 0) {
+      pageViews = parseInt(pageViewResponse.rows[0].metricValues?.[0]?.value || '0', 10);
+    }
+
     return {
       sessions: parseInt(metricValues[0]?.value || '0', 10),
       users: parseInt(metricValues[1]?.value || '0', 10),
-      pageViews: parseInt(metricValues[2]?.value || '0', 10),
-      avgSessionDuration: parseFloat(metricValues[3]?.value || '0'),
-      bounceRate: parseFloat(metricValues[4]?.value || '0'),
-      conversions: parseInt(metricValues[5]?.value || '0', 10),
-      revenue: parseFloat(metricValues[6]?.value || '0'),
+      pageViews: pageViews,
+      avgSessionDuration: parseFloat(metricValues[2]?.value || '0'),
+      bounceRate: parseFloat(metricValues[3]?.value || '0'),
+      conversions: parseInt(metricValues[4]?.value || '0', 10),
+      revenue: parseFloat(metricValues[5]?.value || '0'),
     };
   } catch (error) {
     console.error('Error fetching analytics metrics:', error);
