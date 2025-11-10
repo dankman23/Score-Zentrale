@@ -1345,7 +1345,9 @@ export default function App() {
           </div>
           <ul className="nav nav-tabs mb-3">
             <li className="nav-item"><a className={`nav-link ${salesTab==='products'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSalesTab('products')}}>Top-Produkte</a></li>
-            <li className="nav-item"><a className={`nav-link ${salesTab==='categories'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSalesTab('categories')}}>Top-Kategorien</a></li>
+            <li className="nav-item"><a className={`nav-link ${salesTab==='categories'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSalesTab('categories')}}>Top-Warengruppen</a></li>
+            <li className="nav-item"><a className={`nav-link ${salesTab==='platforms'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSalesTab('platforms')}}>Top-Plattformen</a></li>
+            <li className="nav-item"><a className={`nav-link ${salesTab==='manufacturers'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setSalesTab('manufacturers')}}>Top-Hersteller</a></li>
           </ul>
 
           {salesTab==='products' && (
