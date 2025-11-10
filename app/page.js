@@ -2669,15 +2669,22 @@ export default function App() {
                                   </div>
                                   <div className="mb-3">
                                     <label className="font-weight-bold small mb-2">BETREFF:</label>
-                                    <div className="p-3 bg-white text-dark rounded">
-                                      <strong>{generatedEmail.subject}</strong>
-                                    </div>
+                                    <input 
+                                      type="text" 
+                                      className="form-control" 
+                                      value={generatedEmail.subject} 
+                                      onChange={(e)=>setGeneratedEmail({...generatedEmail, subject: e.target.value})}
+                                    />
                                   </div>
                                   <div className="mb-3">
                                     <label className="font-weight-bold small mb-2">NACHRICHT:</label>
-                                    <div className="p-3 bg-white text-dark rounded" style={{whiteSpace:'pre-wrap', maxHeight:400, overflowY:'auto'}}>
-                                      {generatedEmail.body}
-                                    </div>
+                                    <textarea 
+                                      className="form-control" 
+                                      rows="15" 
+                                      value={generatedEmail.body}
+                                      onChange={(e)=>setGeneratedEmail({...generatedEmail, body: e.target.value})}
+                                      style={{fontFamily:'monospace', fontSize:'0.9rem'}}
+                                    />
                                   </div>
                                   <div className="d-flex justify-content-end">
                                     <button className="btn btn-success btn-lg" onClick={sendColdEmail} disabled={coldLoading}>
