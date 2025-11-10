@@ -4085,40 +4085,79 @@ export default function App() {
                     </div>
                   ) : (
                     <div>
-                      {/* Filter */}
+                      {/* Filter & Stats */}
+                      <div className="row mb-3">
+                        <div className="col-md-12">
+                          <div className="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                              <span className="text-muted small">
+                                <strong>{artikelTotal.toLocaleString()}</strong> Artikel gefunden
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-muted small mr-2">Pro Seite:</span>
+                              <select 
+                                className="form-control form-control-sm d-inline-block"
+                                style={{width: 'auto'}}
+                                value={artikelPerPage}
+                                onChange={(e) => { setArtikelPerPage(parseInt(e.target.value)); setArtikelPage(1); }}
+                              >
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
                       <div className="row mb-3">
                         <div className="col-md-4">
                           <input 
                             type="text"
                             className="form-control"
-                            placeholder="🔍 Suche: Artikelnummer, Name..."
+                            placeholder="🔍 Suche: Artikelnummer, Name, Barcode..."
                             value={artikelFilter.search}
-                            onChange={(e) => setArtikelFilter({...artikelFilter, search: e.target.value})}
+                            onChange={(e) => { setArtikelFilter({...artikelFilter, search: e.target.value}); setArtikelPage(1); }}
                           />
                         </div>
                         <div className="col-md-3">
                           <select 
                             className="form-control"
                             value={artikelFilter.hersteller}
-                            onChange={(e) => setArtikelFilter({...artikelFilter, hersteller: e.target.value})}
+                            onChange={(e) => { setArtikelFilter({...artikelFilter, hersteller: e.target.value}); setArtikelPage(1); }}
                           >
                             <option value="">Alle Hersteller</option>
-                            {/* TODO: Dynamisch aus DB laden */}
+                            {availableHerstellerArtikel.map(h => (
+                              <option key={h.name} value={h.name}>
+                                {h.name} ({h.count})
+                              </option>
+                            ))}
                           </select>
                         </div>
                         <div className="col-md-3">
                           <select 
                             className="form-control"
                             value={artikelFilter.warengruppe}
-                            onChange={(e) => setArtikelFilter({...artikelFilter, warengruppe: e.target.value})}
+                            onChange={(e) => { setArtikelFilter({...artikelFilter, warengruppe: e.target.value}); setArtikelPage(1); }}
                           >
                             <option value="">Alle Warengruppen</option>
-                            {/* TODO: Dynamisch aus DB laden */}
+                            {availableWarengruppenArtikel.map(w => (
+                              <option key={w.name} value={w.name}>
+                                {w.name} ({w.count})
+                              </option>
+                            ))}
                           </select>
                         </div>
                         <div className="col-md-2">
-                          <button className="btn btn-outline-primary btn-block" onClick={loadArtikel}>
-                            <i className="bi bi-arrow-repeat mr-1"/>Aktualisieren
+                          <button 
+                            className="btn btn-outline-secondary btn-block" 
+                            onClick={() => {
+                              setArtikelFilter({ search: '', hersteller: '', warengruppe: '' })
+                              setArtikelPage(1)
+                            }}
+                          >
+                            <i className="bi bi-x-circle mr-1"/>Filter zurücksetzen
                           </button>
                         </div>
                       </div>
