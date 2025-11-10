@@ -156,15 +156,21 @@ export default function App() {
   // Charts
   const [metricsTimeSeries, setMetricsTimeSeries] = useState([])
   const [selectedKpiMetric, setSelectedKpiMetric] = useState('sessions')
+  const [showTrafficChart, setShowTrafficChart] = useState(false)
   const [showCategoryChart, setShowCategoryChart] = useState(false)
   const [showProductChart, setShowProductChart] = useState(false)
   const [showAllPagesChart, setShowAllPagesChart] = useState(false)
+  const [showInfoChart, setShowInfoChart] = useState(false)
+  const [selectedTrafficSource, setSelectedTrafficSource] = useState(null)
   const [selectedCategoryPage, setSelectedCategoryPage] = useState(null)
   const [selectedProductPage, setSelectedProductPage] = useState(null)
   const [selectedAllPage, setSelectedAllPage] = useState(null)
+  const [selectedInfoPage, setSelectedInfoPage] = useState(null)
+  const [trafficSourceTimeSeries, setTrafficSourceTimeSeries] = useState([])
   const [categoryPageTimeSeries, setCategoryPageTimeSeries] = useState([])
   const [productPageTimeSeries, setProductPageTimeSeries] = useState([])
   const [allPageTimeSeries, setAllPageTimeSeries] = useState([])
+  const [infoPageTimeSeries, setInfoPageTimeSeries] = useState([])
   
   // Google Ads
   const [googleAdsCampaigns, setGoogleAdsCampaigns] = useState([])
