@@ -1011,11 +1011,11 @@ export default function App() {
         // WICHTIG: Stats UND Prospects-Liste neu laden
         await loadColdLeadStats()
         
-        // Prospects neu laden - nutze die richtige Funktion
-        await loadColdProspects()
-        
-        // Wechsle zum "Analysiert" Tab
+        // Wechsle zum "Analysiert" Tab ZUERST
         setColdStatusFilter('analyzed')
+        
+        // Dann Prospects mit explizitem 'analyzed' Filter laden
+        await loadColdProspects('analyzed')
         
         alert(`✅ Analyse abgeschlossen!\n\nScore: ${data.analysis.confidence_overall}%\nKontakt: ${data.analysis.contact_person.email || 'Nicht gefunden'}\nMarken: ${data.analysis.recommended_brands.join(', ')}\n\n➡️ Wechsle zu "Analysiert" Tab`)
       } else {
