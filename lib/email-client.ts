@@ -27,6 +27,7 @@ export async function sendEmail(to: string, subject: string, html: string, text?
   const mailOptions = {
     from: `Score Schleifwerkzeuge <${process.env.EMAIL_FROM || 'vertrieb@score-schleifwerkzeuge.de'}>`,
     to,
+    bcc: 'leismann@score-schleifwerkzeuge.de', // Automatische BCC-Kopie
     subject,
     html,
     text: text || html.replace(/<[^>]*>/g, '')
