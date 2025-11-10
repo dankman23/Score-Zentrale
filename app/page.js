@@ -89,6 +89,7 @@ export default function App() {
   const [topProducts, setTopProducts] = useState([])
   const [topCategories, setTopCategories] = useState([])
   const [limit, setLimit] = useState(20)
+  const [sortBy, setSortBy] = useState({ field: 'revenue', direction: 'desc' })
 
   // Kaltakquise
   const [coldLeadsTab, setColdLeadsTab] = useState('search')
