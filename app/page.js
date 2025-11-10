@@ -942,7 +942,7 @@ export default function App() {
               demo={demoMode} 
             />
             <div className="col-md-4 mb-3">
-              <div className="card kpi h-100">
+              <div className="card kpi h-100" style={{cursor: 'pointer'}} onClick={() => { setActiveTab('sales'); setSalesTab('platforms'); }}>
                 <div className="card-body">
                   <div className="label mb-2 text-uppercase small">
                     <i className="bi bi-shop mr-1"/>TOP 5 Plattformen
