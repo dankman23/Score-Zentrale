@@ -3593,17 +3593,104 @@ export default function App() {
                 </div>
               </div>
               <div className="card-body p-0">
-                <div className="table-responsive" style={{overflowX: 'auto'}}>
-                  <table className="table table-hover mb-0" style={{minWidth: '1200px'}}>
-                    <thead className="thead-light">
+                {/* Bulk-Analyse Controls (nur bei "Neu" Tab) */}
+                {coldStatusFilter === 'new' && coldProspects.filter(p => p.status === 'new').length > 0 && (
+                  <div className="p-3 bg-dark border-bottom">
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div className="d-flex align-items-center">
+                        <input 
+                          type="checkbox"
+                          className="mr-2"
+                          checked={selectedProspectsForBulk.length === coldProspects.filter(p => p.status === 'new').length}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedProspectsForBulk(coldProspects.filter(p => p.status === 'new').map(p => p.id))
+                            } else {
+                              setSelectedProspectsForBulk([])
+                            }
+                          }}
+                        />
+                        <span className="text-muted small">
+                          {selectedProspectsForBulk.length > 0 
+                            ? `${selectedProspectsForBulk.length} ausgewählt` 
+                            : 'Alle auswählen'
+                          }
+                        </span>
+                      </div>
+                      <div className="btn-group btn-group-sm">
+                        <button 
+                          className="btn btn-info"
+                          onClick={bulkAnalyzeProspects}
+                          disabled={selectedProspectsForBulk.length === 0 || bulkAnalyzing}
+                        >
+                          {bulkAnalyzing ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm mr-2"/>
+                              Analysiere {bulkAnalyzeProgress.current}/{bulkAnalyzeProgress.total}...
+                            </>
+                          ) : (
+                            <>
+                              <i className="bi bi-search mr-1"/>
+                              Ausgewählte analysieren ({selectedProspectsForBulk.length})
+                            </>
+                          )}
+                        </button>
+                        <button 
+                          className="btn btn-primary"
+                          onClick={bulkAnalyzeAllNew}
+                          disabled={bulkAnalyzing}
+                        >
+                          {bulkAnalyzing ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm mr-2"/>
+                              {bulkAnalyzeProgress.current}/{bulkAnalyzeProgress.total}
+                            </>
+                          ) : (
+                            <>
+                              <i className="bi bi-magic mr-1"/>
+                              Alle Neu analysieren ({coldProspects.filter(p => p.status === 'new').length})
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    {bulkAnalyzing && (
+                      <div className="progress mt-2" style={{height: '6px'}}>
+                        <div 
+                          className="progress-bar progress-bar-striped progress-bar-animated bg-info" 
+                          style={{width: `${(bulkAnalyzeProgress.current / bulkAnalyzeProgress.total) * 100}%`}}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="table-responsive" style={{maxHeight: '70vh', overflowY: 'auto', overflowX: 'auto'}}>
+                  <table className="table table-hover mb-0">
+                    <thead className="thead-light sticky-top">
                       <tr>
+                        {coldStatusFilter === 'new' && (
+                          <th className="border-0" style={{width: '40px'}}>
+                            <input 
+                              type="checkbox"
+                              checked={selectedProspectsForBulk.length === coldProspects.filter(p => p.status === 'new').length && coldProspects.filter(p => p.status === 'new').length > 0}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedProspectsForBulk(coldProspects.filter(p => p.status === 'new').map(p => p.id))
+                                } else {
+                                  setSelectedProspectsForBulk([])
+                                }
+                              }}
+                            />
+                          </th>
+                        )}
                         <th className="border-0" style={{minWidth: '200px'}}><i className="bi bi-building mr-1"/>Firma</th>
-                        <th className="border-0" style={{minWidth: '180px'}}><i className="bi bi-globe mr-1"/>Website</th>
-                        <th className="border-0" style={{minWidth: '120px'}}><i className="bi bi-briefcase mr-1"/>Branche</th>
+                        <th className="border-0" style={{minWidth: '220px'}}><i className="bi bi-globe mr-1"/>Website</th>
+                        <th className="border-0" style={{minWidth: '140px'}}><i className="bi bi-briefcase mr-1"/>Branche</th>
                         <th className="border-0" style={{minWidth: '120px'}}><i className="bi bi-geo-alt mr-1"/>Region</th>
-                        <th className="border-0 text-center" style={{minWidth: '80px'}}><i className="bi bi-star mr-1"/>Score</th>
-                        <th className="border-0 text-center" style={{minWidth: '120px'}}>Status</th>
-                        <th className="border-0 text-right" style={{minWidth: '180px'}}>Aktionen</th>
+                        <th className="border-0 text-center" style={{minWidth: '100px'}}><i className="bi bi-star mr-1"/>Score</th>
+                        <th className="border-0 text-center" style={{minWidth: '140px'}}>Status</th>
+                        <th className="border-0 text-right" style={{minWidth: '200px'}}>Aktionen</th>
                       </tr>
                     </thead>
                     <tbody>
