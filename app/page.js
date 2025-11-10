@@ -3865,6 +3865,145 @@ export default function App() {
                                   </div>
                                 ) : (
                                 <div className="bg-dark border-top border-bottom p-4">
+                                  {/* V3 Analysis Display */}
+                                  {p.analysis_v3 && (
+                                    <div className="mb-4">
+                                      <div className="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 className="text-white mb-0">
+                                          <i className="bi bi-star-fill text-warning mr-2"/>
+                                          Analyse-Ergebnis V3
+                                        </h5>
+                                        <span className={`badge badge-lg badge-${p.score >= 70 ? 'success' : p.score >= 50 ? 'info' : 'secondary'} px-3 py-2`} style={{fontSize: '1.1rem'}}>
+                                          Score: {p.score}/100
+                                        </span>
+                                      </div>
+                                      
+                                      {/* Recommended Brands */}
+                                      {p.analysis_v3.recommended_brands && p.analysis_v3.recommended_brands.length > 0 && (
+                                        <div className="alert alert-info mb-3">
+                                          <strong><i className="bi bi-award mr-2"/>Empfohlene Marken:</strong> {p.analysis_v3.recommended_brands.join(', ')}
+                                        </div>
+                                      )}
+                                      
+                                      <div className="row">
+                                        {/* Applications */}
+                                        {p.analysis_v3.applications && p.analysis_v3.applications.length > 0 && (
+                                          <div className="col-md-6 mb-3">
+                                            <div className="card bg-secondary border-0">
+                                              <div className="card-body">
+                                                <h6 className="text-primary mb-3"><i className="bi bi-tools mr-2"/>Anwendungen ({p.analysis_v3.applications.length})</h6>
+                                                <div className="d-flex flex-wrap">
+                                                  {p.analysis_v3.applications.slice(0, 7).map((app, idx) => (
+                                                    <span key={idx} className="badge badge-primary mr-1 mb-1" title={app.evidence}>
+                                                      {app.term}
+                                                    </span>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+                                        
+                                        {/* Materials */}
+                                        {p.analysis_v3.materials && p.analysis_v3.materials.length > 0 && (
+                                          <div className="col-md-6 mb-3">
+                                            <div className="card bg-secondary border-0">
+                                              <div className="card-body">
+                                                <h6 className="text-warning mb-3"><i className="bi bi-layers mr-2"/>Werkstoffe ({p.analysis_v3.materials.length})</h6>
+                                                <div className="d-flex flex-wrap">
+                                                  {p.analysis_v3.materials.slice(0, 6).map((mat, idx) => (
+                                                    <span key={idx} className="badge badge-warning mr-1 mb-1" title={mat.evidence}>
+                                                      {mat.term}
+                                                    </span>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+                                        
+                                        {/* Machines */}
+                                        {p.analysis_v3.machines && p.analysis_v3.machines.length > 0 && (
+                                          <div className="col-md-6 mb-3">
+                                            <div className="card bg-secondary border-0">
+                                              <div className="card-body">
+                                                <h6 className="text-success mb-3"><i className="bi bi-gear mr-2"/>Maschinentypen ({p.analysis_v3.machines.length})</h6>
+                                                <div className="d-flex flex-wrap">
+                                                  {p.analysis_v3.machines.slice(0, 5).map((mach, idx) => (
+                                                    <span key={idx} className="badge badge-success mr-1 mb-1" title={mach.evidence}>
+                                                      {mach.term}
+                                                    </span>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+                                        
+                                        {/* Product Categories */}
+                                        {p.analysis_v3.product_categories && p.analysis_v3.product_categories.length > 0 && (
+                                          <div className="col-md-6 mb-3">
+                                            <div className="card bg-secondary border-0">
+                                              <div className="card-body">
+                                                <h6 className="text-info mb-3"><i className="bi bi-grid mr-2"/>Produkt-Kategorien ({p.analysis_v3.product_categories.length})</h6>
+                                                <div className="d-flex flex-wrap">
+                                                  {p.analysis_v3.product_categories.slice(0, 6).map((cat, idx) => (
+                                                    <span key={idx} className="badge badge-info mr-1 mb-1" title={cat.evidence}>
+                                                      {cat.term}
+                                                    </span>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                      
+                                      {/* Contact Person */}
+                                      {p.analysis_v3.contact_person && p.analysis_v3.contact_person.email && (
+                                        <div className="card bg-secondary border-0 mt-3">
+                                          <div className="card-body">
+                                            <h6 className="text-warning mb-3"><i className="bi bi-person-fill mr-2"/>Ansprechpartner</h6>
+                                            <div className="d-flex align-items-start">
+                                              <div className="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center mr-3" style={{width:50, height:50}}>
+                                                <i className="bi bi-person-fill" style={{fontSize:'1.5rem'}}/>
+                                              </div>
+                                              <div>
+                                                <h6 className="mb-1 text-white">{p.analysis_v3.contact_person.name}</h6>
+                                                <p className="text-muted small mb-1">{p.analysis_v3.contact_person.role}</p>
+                                                {p.analysis_v3.contact_person.email && (
+                                                  <p className="mb-0 small text-white">
+                                                    <i className="bi bi-envelope mr-1"/>
+                                                    <a href={`mailto:${p.analysis_v3.contact_person.email}`} className="text-info">
+                                                      {p.analysis_v3.contact_person.email}
+                                                    </a>
+                                                  </p>
+                                                )}
+                                                {p.analysis_v3.contact_person.phone && (
+                                                  <p className="mb-0 small text-white mt-1">
+                                                    <i className="bi bi-telephone mr-1"/>{p.analysis_v3.contact_person.phone}
+                                                  </p>
+                                                )}
+                                                <div className="mt-2">
+                                                  <span className="badge badge-secondary">
+                                                    Konfidenz: {Math.round(p.analysis_v3.contact_person.confidence * 100)}%
+                                                  </span>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+                                      
+                                      {/* Notes */}
+                                      {p.analysis_v3.notes && (
+                                        <div className="alert alert-secondary mt-3 mb-0">
+                                          <small><i className="bi bi-info-circle mr-2"/>{p.analysis_v3.notes}</small>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                  
                                   <div className="row">
                                     <div className="col-md-6 mb-3">
                                       <div className="p-3 bg-secondary rounded">
