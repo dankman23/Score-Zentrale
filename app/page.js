@@ -2312,22 +2312,85 @@ export default function App() {
           {/* Glossar Tab */}
           {marketingSub==='glossar' && (
             <div>
-              <h3 className="mb-4">Marketing Glossar</h3>
+              <h3 className="mb-4"><i className="bi bi-book mr-2"/>Produkt-Glossar</h3>
               
-              <div className="alert alert-info">
+              <div className="alert alert-info mb-4">
                 <i className="bi bi-info-circle mr-2"/>
-                Das Marketing Glossar ist derzeit in Entwicklung. Hier werden wichtige Marketing-Begriffe und Definitionen verfügbar sein.
+                <strong>Kontrolliertes Vokabular</strong> für die Kaltakquise-Analyse. Diese Begriffe werden automatisch auf Firmen-Websites erkannt.
               </div>
-              
+
+              {/* Sub-Tabs für Glossar-Kategorien */}
+              <ul className="nav nav-pills mb-4">
+                <li className="nav-item">
+                  <a className={`nav-link ${glossarSub==='anwendungen'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setGlossarSub('anwendungen')}}>
+                    <i className="bi bi-tools mr-1"/>Anwendungen <span className="badge badge-light ml-1">71</span>
+                  </a>
+                </li>
+                <li className="nav-item ml-2">
+                  <a className={`nav-link ${glossarSub==='kategorien'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setGlossarSub('kategorien')}}>
+                    <i className="bi bi-grid mr-1"/>Kategorien <span className="badge badge-light ml-1">88</span>
+                  </a>
+                </li>
+                <li className="nav-item ml-2">
+                  <a className={`nav-link ${glossarSub==='werkstoffe'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setGlossarSub('werkstoffe')}}>
+                    <i className="bi bi-layers mr-1"/>Werkstoffe <span className="badge badge-light ml-1">90</span>
+                  </a>
+                </li>
+                <li className="nav-item ml-2">
+                  <a className={`nav-link ${glossarSub==='maschinen'?'active':''}`} href="#" onClick={(e)=>{e.preventDefault(); setGlossarSub('maschinen')}}>
+                    <i className="bi bi-gear mr-1"/>Maschinentypen <span className="badge badge-light ml-1">62</span>
+                  </a>
+                </li>
+              </ul>
+
+              {/* Glossar Content */}
               <div className="card">
                 <div className="card-body">
-                  <h5>Kommende Features:</h5>
-                  <ul className="mb-0">
-                    <li>Umfassende Marketing-Begriffe und Definitionen</li>
-                    <li>Suchfunktion für schnelles Auffinden</li>
-                    <li>Kategorisierung nach Themenbereichen</li>
-                    <li>Praktische Beispiele und Anwendungsfälle</li>
-                  </ul>
+                  <div className="mb-3">
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      placeholder="Begriffe durchsuchen..."
+                      value={glossarSearch}
+                      onChange={(e) => setGlossarSearch(e.target.value)}
+                    />
+                  </div>
+
+                  {glossarSub === 'anwendungen' && (
+                    <div>
+                      <h5 className="mb-3">Anwendungen (71 Begriffe)</h5>
+                      <div className="alert alert-secondary">
+                        <small>Abrichten, Anfasen, Anrauen, Anschleifen, Aufrauen, Bürsten, Definiertes Schliffbild, Egalisieren, Entgraten, Entlacken, Entrosten, Entzundern, Feilen, Feinschleifen, Flachschleifen, Fräsen, Gleitschleifen, Glätten, Gravieren, Hochglanzpolieren, Hochglanzverdichten, Honen, Kalibrieren, Kantenbrechen, Kantenverrunden, Läppen, Materialabtragung, Materialtrennung, Mattieren, Oberflächenfinish, Oberflächenveredelung, Oberflächenvorbereitung, Polieren, Raspeln, Reinigen, Rundschleifen, Satinieren, Säubern, Schärfen, Schleifen, Schruppschleifen, Schwabbeln, Schweißnahtbearbeitung, Schweißnahtvorbereitung, Strukturieren, Superfinish, Trennen, Trowalisieren, Innenrundschleifen, Kehlnahtbearbeitung, Besäumen, Feinschliff, Grobschliff, Mittelschliff, Nachschliff, Vorschliff, Glättung, Gravur, Kantenverrundung, Mattierung, Politur, Reinigung, Schliff, Schruppschliff, Strukturierung, Nassschliff, Nassschleifen, Flächenbearbeitung, Kantenbearbeitung</small>
+                      </div>
+                    </div>
+                  )}
+
+                  {glossarSub === 'kategorien' && (
+                    <div>
+                      <h5 className="mb-3">Produktkategorien (88 Begriffe)</h5>
+                      <div className="alert alert-secondary" style={{maxHeight: '400px', overflowY: 'auto'}}>
+                        <small>Schleifbänder, Schleifpapier / Schleifrollen / Schleifbögen, Schleifscheiben / Schleifblätter, Trennscheiben, Fächerscheiben, Fiberscheiben, Diamanttrennscheiben, Spezielle Schleifscheiben, Vliesprodukte, Fräser / Frässtifte, Technische Bürsten, Schleifstifte, Schleifsteine, Fächerschleifer / Schleifmops, Feilen, Fächerräder / Schleifräder / Schleifwalzen, Graphitbelag, Klettbelag, Schleifteller / Schleifmittelträger, Sonstige Schleif-, Trenn- und Bohrwerkzeuge, Schruppscheiben, Polierscheiben, Schleifbockscheiben, Grobreinigungsscheiben, Gitterscheiben, Vliesscheiben, Kompaktscheiben, Schnellwechselscheiben, Schleiftöpfe, Vliesbänder, Vliesstifte, Vliesräder, und weitere...</small>
+                      </div>
+                    </div>
+                  )}
+
+                  {glossarSub === 'werkstoffe' && (
+                    <div>
+                      <h5 className="mb-3">Werkstoffe (90 Begriffe)</h5>
+                      <div className="alert alert-secondary" style={{maxHeight: '400px', overflowY: 'auto'}}>
+                        <small>Aluguss, Aluminium, Bleche, Chromstahl, Nickelstahl, Chrome, Edelstahl, Guss, Hochlegierte Stähle, Kohlenstoffstahl, Legierte Stähle, Legierungen, Leichtmetalle, NE-Metalle, Sandwichmaterial, Stahl, Titan, Abrasive Materialien, Beton, Glas, Granit, Keramik, Marmor, Naturstein, Holz, Kunststoff, und weitere...</small>
+                      </div>
+                    </div>
+                  )}
+
+                  {glossarSub === 'maschinen' && (
+                    <div>
+                      <h5 className="mb-3">Maschinentypen (62 Begriffe)</h5>
+                      <div className="alert alert-secondary" style={{maxHeight: '400px', overflowY: 'auto'}}>
+                        <small>Schleifklotz, Handpad, Handfeile, Exzenterschleifer, Schwingschleifer, Dreieckschleifer, Bandschleifer, Geradschleifer, Winkelschleifer, Poliermaschine, Satiniermaschine, Breitbandschleifmaschine, Kantenschleifmaschine, Schleifbock, CNC-Schleifmaschine, Roboter-Schleifanlage, und weitere...</small>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
