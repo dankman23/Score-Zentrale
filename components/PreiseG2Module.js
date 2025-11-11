@@ -171,7 +171,7 @@ export default function PreiseG2Module({ formeln }) {
                 <input type="number" step="1" className="form-control form-control-sm" value={g2Params.aa_threshold} onChange={e => updateParam('aa_threshold', e.target.value)} />
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* EK-Eingabe */}
