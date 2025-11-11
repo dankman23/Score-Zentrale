@@ -31,10 +31,11 @@ html,body{background:var(--app-bg);color:var(--txt);}
 .app-tabbar .nav-link{color:var(--muted);padding:.6rem .75rem;} 
 .app-tabbar .nav-link.active{color:#111;background:var(--accent);border-radius:14px;} 
 .subnav-icons{border-top:0;padding:.25rem .35rem}
-.subnav-icons .nav-link{color:var(--muted);padding:.35rem .6rem;margin-right:.25rem;border-radius:10px;display:inline-flex;align-items:center;gap:.5rem}
+.subnav-icons .nav-link{color:#ffffff;padding:.35rem .6rem;margin-right:.25rem;border-radius:10px;display:inline-flex;align-items:center;gap:.5rem;font-weight:500;text-shadow:0 1px 3px rgba(0,0,0,0.5)}
 .subnav-icons .nav-link .bi{font-size:1.05rem}
-.subnav-icons .nav-link.active{background:var(--accent);color:#111}
-.brand-title{font-weight:800;letter-spacing:.6px}
+.subnav-icons .nav-link.active{background:var(--accent);color:#111;text-shadow:none}
+.subnav-icons .nav-link:hover{color:var(--accent);text-shadow:0 1px 4px rgba(246,177,10,0.4)}
+.brand-title{font-weight:800;letter-spacing:.6px;color:#ffffff;text-shadow:0 2px 6px rgba(0,0,0,0.6)}
 .chartjs-render-monitor{filter:contrast(1.02);} 
 
 /* Gradient-Header für Karten */
