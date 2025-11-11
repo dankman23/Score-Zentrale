@@ -652,68 +652,175 @@ def test_autopilot_tick():
     return success
 
 def main():
-    """Run all V3 API tests in sequence"""
-    log_test("🚀 STARTING KALTAKQUISE V3 SYSTEM BACKEND TESTING")
+    """Run all Kaltakquise tests in priority order"""
+    log_test("🚀 STARTING KALTAKQUISE COMPLETE MODULE BACKEND TESTING")
     log_test(f"Base URL: {BASE_URL}")
     log_test(f"API Base: {API_BASE}")
+    log_test("")
+    log_test("Testing according to German specifications:")
+    log_test("KRITISCHE TESTS (Priorität 1): DELETE, analyze-v3, email-v3/send")
+    log_test("WICHTIGE TESTS (Priorität 2): search prospects, search companies, stats")
+    log_test("AUTOPILOT TESTS (Priorität 3): status, tick")
     log_test("")
     
     results = []
     
-    # Test 1: analyze-v3 (most important)
+    # KRITISCHE TESTS (Priorität 1)
+    log_test("🔴 STARTING CRITICAL TESTS (Priority 1)")
+    log_test("")
+    
+    # Critical Test 1: DELETE endpoint (recently fixed import path)
     try:
-        result1, company_name = test_analyze_v3()
-        results.append(("analyze-v3", result1))
+        result1 = test_delete_prospect()
+        results.append(("DELETE /api/coldleads/delete", result1))
     except Exception as e:
-        log_test(f"❌ TEST 1 EXCEPTION: {str(e)}")
-        results.append(("analyze-v3", False))
+        log_test(f"❌ CRITICAL TEST 1 EXCEPTION: {str(e)}")
+        results.append(("DELETE /api/coldleads/delete", False))
+    
+    log_test("")
+    
+    # Critical Test 2: analyze-v3 (main analysis)
+    try:
+        result2, company_name = test_analyze_v3()
+        results.append(("POST /api/coldleads/analyze-v3", result2))
+    except Exception as e:
+        log_test(f"❌ CRITICAL TEST 2 EXCEPTION: {str(e)}")
+        results.append(("POST /api/coldleads/analyze-v3", False))
         company_name = None
     
     log_test("")
     
-    # Test 2: email-v3/send (optional if prospect available)
+    # Critical Test 3: email-v3/send (with send=false)
     try:
-        result2 = test_email_v3_send()
-        results.append(("email-v3/send", result2))
+        result3 = test_email_v3_send()
+        results.append(("POST /api/coldleads/email-v3/send", result3))
     except Exception as e:
-        log_test(f"❌ TEST 2 EXCEPTION: {str(e)}")
-        results.append(("email-v3/send", False))
+        log_test(f"❌ CRITICAL TEST 3 EXCEPTION: {str(e)}")
+        results.append(("POST /api/coldleads/email-v3/send", False))
     
     log_test("")
     
-    # Test 3: followup/auto (should always run)
+    # WICHTIGE TESTS (Priorität 2)
+    log_test("🟡 STARTING IMPORTANT TESTS (Priority 2)")
+    log_test("")
+    
+    # Important Test 4: Get analyzed prospects
     try:
-        result3 = test_followup_auto()
-        results.append(("followup/auto", result3))
+        result4 = test_search_prospects()
+        results.append(("GET /api/coldleads/search?status=analyzed", result4))
     except Exception as e:
-        log_test(f"❌ TEST 3 EXCEPTION: {str(e)}")
-        results.append(("followup/auto", False))
+        log_test(f"❌ IMPORTANT TEST 4 EXCEPTION: {str(e)}")
+        results.append(("GET /api/coldleads/search?status=analyzed", False))
+    
+    log_test("")
+    
+    # Important Test 5: Search new companies
+    try:
+        result5 = test_search_new_companies()
+        results.append(("POST /api/coldleads/search", result5))
+    except Exception as e:
+        log_test(f"❌ IMPORTANT TEST 5 EXCEPTION: {str(e)}")
+        results.append(("POST /api/coldleads/search", False))
+    
+    log_test("")
+    
+    # Important Test 6: Dashboard statistics
+    try:
+        result6 = test_dashboard_stats()
+        results.append(("GET /api/coldleads/stats", result6))
+    except Exception as e:
+        log_test(f"❌ IMPORTANT TEST 6 EXCEPTION: {str(e)}")
+        results.append(("GET /api/coldleads/stats", False))
+    
+    log_test("")
+    
+    # AUTOPILOT TESTS (Priorität 3)
+    log_test("🟢 STARTING AUTOPILOT TESTS (Priority 3)")
+    log_test("")
+    
+    # Autopilot Test 7: Status
+    try:
+        result7 = test_autopilot_status()
+        results.append(("GET /api/coldleads/autopilot/status", result7))
+    except Exception as e:
+        log_test(f"❌ AUTOPILOT TEST 7 EXCEPTION: {str(e)}")
+        results.append(("GET /api/coldleads/autopilot/status", False))
+    
+    log_test("")
+    
+    # Autopilot Test 8: Tick simulation
+    try:
+        result8 = test_autopilot_tick()
+        results.append(("POST /api/coldleads/autopilot/tick", result8))
+    except Exception as e:
+        log_test(f"❌ AUTOPILOT TEST 8 EXCEPTION: {str(e)}")
+        results.append(("POST /api/coldleads/autopilot/tick", False))
     
     # Summary
     log_test("")
-    log_test("=" * 60)
-    log_test("KALTAKQUISE V3 TESTING SUMMARY")
-    log_test("=" * 60)
+    log_test("=" * 80)
+    log_test("KALTAKQUISE COMPLETE MODULE TESTING SUMMARY")
+    log_test("=" * 80)
     
     passed = 0
     total = len(results)
+    critical_passed = 0
+    critical_total = 3
     
-    for test_name, success in results:
-        status = "✅ PASSED" if success else "❌ FAILED"
-        log_test(f"{test_name}: {status}")
-        if success:
-            passed += 1
+    log_test("CRITICAL TESTS (Priority 1):")
+    for i in range(3):
+        if i < len(results):
+            test_name, success = results[i]
+            status = "✅ PASSED" if success else "❌ FAILED"
+            log_test(f"  {test_name}: {status}")
+            if success:
+                passed += 1
+                critical_passed += 1
+    
+    log_test("")
+    log_test("IMPORTANT TESTS (Priority 2):")
+    for i in range(3, 6):
+        if i < len(results):
+            test_name, success = results[i]
+            status = "✅ PASSED" if success else "❌ FAILED"
+            log_test(f"  {test_name}: {status}")
+            if success:
+                passed += 1
+    
+    log_test("")
+    log_test("AUTOPILOT TESTS (Priority 3):")
+    for i in range(6, 8):
+        if i < len(results):
+            test_name, success = results[i]
+            status = "✅ PASSED" if success else "❌ FAILED"
+            log_test(f"  {test_name}: {status}")
+            if success:
+                passed += 1
     
     log_test("")
     log_test(f"OVERALL RESULT: {passed}/{total} tests passed")
+    log_test(f"CRITICAL TESTS: {critical_passed}/{critical_total} passed")
+    
+    if critical_passed == critical_total:
+        log_test("🎉 ALL CRITICAL TESTS PASSED - Kaltakquise module working correctly!")
+    elif critical_passed >= 2:
+        log_test("⚠️  MOSTLY CRITICAL WORKING - Some critical issues found")
+    else:
+        log_test("❌ CRITICAL ISSUES - Kaltakquise module needs immediate attention")
     
     if passed == total:
-        log_test("🎉 ALL TESTS PASSED - V3 System working correctly!")
-    elif passed >= 2:
-        log_test("⚠️  MOSTLY WORKING - Some issues found but core functionality OK")
+        log_test("🎉 ALL TESTS PASSED - Complete Kaltakquise system working perfectly!")
+    elif passed >= 6:
+        log_test("⚠️  MOSTLY WORKING - Some minor issues found but core functionality OK")
     else:
-        log_test("❌ CRITICAL ISSUES - V3 System needs attention")
+        log_test("❌ SIGNIFICANT ISSUES - Multiple components need attention")
     
+    log_test("")
+    log_test("IMPORTANT NOTES:")
+    log_test("- MongoDB Collection: 'prospects' (NOT 'cold_prospects')")
+    log_test("- For analyze-v3: Website should exist and be crawlable")
+    log_test("- For email-v3: Check analysis_v3 and email_sequence are saved correctly")
+    log_test("- Expected structure after analyze-v3: analysis_v3 + email_sequence objects")
     log_test("")
     log_test("Testing completed at " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     
