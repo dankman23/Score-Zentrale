@@ -257,15 +257,19 @@ export default function PreiseModule() {
 
             {/* Regler */}
             <div className="card mb-2">
-              <div className="card-header py-1 d-flex justify-content-between align-items-center">
-                <small className="mb-0 font-weight-bold">Konfiguration</small>
+              <div className="card-header py-1 d-flex justify-content-between align-items-center" style={{cursor: 'pointer'}} onClick={() => setConfigExpanded(!configExpanded)}>
+                <small className="mb-0 font-weight-bold">
+                  <i className={`bi bi-chevron-${configExpanded ? 'up' : 'down'} mr-2`}/>
+                  Konfiguration {!configExpanded && '(klicken zum Ausklappen)'}
+                </small>
                 {reglerEdited && (
-                  <button className="btn btn-xs btn-warning py-0 px-2" onClick={speichernRegler}>
+                  <button className="btn btn-xs btn-warning py-0 px-2" onClick={(e) => { e.stopPropagation(); speichernRegler(); }}>
                     <i className="bi bi-save mr-1"/>Speichern
                   </button>
                 )}
               </div>
-              <div className="card-body py-2">
+              {configExpanded && (
+                <div className="card-body py-2">
                 {/* Kosten - variabel */}
                 <div className="mb-2">
                   <div className="bg-warning text-dark font-weight-bold px-2 py-1 mb-1" style={{fontSize: '0.85rem'}}>
