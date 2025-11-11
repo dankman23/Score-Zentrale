@@ -53,9 +53,19 @@ export async function GET(request: NextRequest) {
       .limit(5)
       .toArray()
 
+    // Prüfe ob Import läuft (last_updated in den letzten 30 Sekunden)
+    const thirtySecondsAgo = new Date(Date.now() - 30000)
+    const recentlyUpdated = await articlesCollection.countDocuments({
+      last_updated: { $gte: thirtySecondsAgo }
+    })
+    const isRunning = recentlyUpdated > 0 && totalImported < 166854
+
     return NextResponse.json({
       ok: true,
       imported: totalImported,
+      running: isRunning,
+      target: 166854,
+      percentage: ((totalImported / 166854) * 100).toFixed(1),
       statistics: {
         ...statistics,
         durchschnitt_vk: statistics.durchschnitt_vk?.toFixed(2) || '0.00',
