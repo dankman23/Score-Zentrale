@@ -389,18 +389,18 @@ export default function PreiseModule() {
             </div>
 
             {/* EK-Eingabe */}
-            <div className="card mb-3 border-primary">
-              <div className="card-header bg-primary text-white py-2">
-                <h6 className="mb-0">EK-Eingabe</h6>
+            <div className="card mb-2 border-primary">
+              <div className="card-header bg-primary text-white py-1">
+                <small className="mb-0 font-weight-bold">EK-Eingabe</small>
               </div>
-              <div className="card-body py-3">
+              <div className="card-body py-2">
                 <div className="row align-items-end">
                   <div className="col-md-8">
-                    <label className="font-weight-bold small">EK-Stück netto (€)</label>
+                    <label className="font-weight-bold" style={{fontSize: '0.85rem'}}>EK-Stück netto (€)</label>
                     <input 
                       type="number" 
                       step="0.01"
-                      className="form-control" 
+                      className="form-control form-control-sm" 
                       placeholder="z.B. 10.50"
                       value={ek}
                       onChange={(e) => setEk(e.target.value)}
@@ -409,11 +409,11 @@ export default function PreiseModule() {
                   </div>
                   <div className="col-md-4">
                     <button 
-                      className="btn btn-warning btn-block font-weight-bold" 
+                      className="btn btn-warning btn-sm btn-block font-weight-bold" 
                       onClick={berechnePreise}
                       disabled={loading || !ek}
                     >
-                      {loading ? <span className="spinner-border spinner-border-sm mr-2"/> : <i className="bi bi-calculator mr-2"/>}
+                      {loading ? <span className="spinner-border spinner-border-sm mr-1"/> : <i className="bi bi-calculator mr-1"/>}
                       Berechnen
                     </button>
                   </div>
@@ -425,24 +425,24 @@ export default function PreiseModule() {
             {ergebnisse.length > 0 && (
               <div>
                 {/* Plattformpreis */}
-                <div className="card border-primary mb-3">
-                  <div className="card-header bg-primary text-white py-2">
-                    <h6 className="mb-0">Netto Plattformpreis (eBay/Amazon)</h6>
+                <div className="card border-primary mb-2">
+                  <div className="card-header bg-primary text-white py-1">
+                    <small className="mb-0 font-weight-bold">Netto Plattformpreis (eBay/Amazon)</small>
                   </div>
-                  <div className="card-body text-center py-3">
-                    <div className="h2 font-weight-bold text-primary mb-0">
+                  <div className="card-body text-center py-2">
+                    <div className="h3 font-weight-bold text-primary mb-0">
                       {(ergebnisse[0]?.vk_netto || 0).toFixed(2)} €
                     </div>
-                    <small className="text-muted">pro Stück (netto)</small>
+                    <small className="text-muted" style={{fontSize: '0.75rem'}}>pro Stück (netto)</small>
                   </div>
                 </div>
 
                 {/* Shop-Staffelpreise */}
                 <div className="card border-success">
-                  <div className="card-header bg-success text-white py-2">
-                    <h6 className="mb-0">Netto Shop Staffelpreise (SHOP - 8%)</h6>
+                  <div className="card-header bg-success text-white py-1">
+                    <small className="mb-0 font-weight-bold">Netto Shop Staffelpreise (SHOP - 8%)</small>
                   </div>
-                  <div className="card-body py-3">
+                  <div className="card-body py-2">
                     <div className="table-responsive">
                       <table className="table table-sm table-bordered text-center mb-0">
                         <thead className="thead-light">
