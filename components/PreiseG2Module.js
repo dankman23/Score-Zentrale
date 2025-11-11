@@ -201,61 +201,42 @@ export default function PreiseG2Module({ formeln }) {
         {/* Ergebnisse */}
         {ergebnisse.length > 0 && (
           <div>
-            {/* Beide Preise nebeneinander */}
-            <div className="row mb-2">
-              <div className="col-md-6">
-                <div className="card border-primary">
-                  <div className="card-header bg-primary text-white py-1">
-                    <small className="mb-0 font-weight-bold">Plattformpreis (netto)</small>
-                  </div>
-                  <div className="card-body text-center py-2">
-                    <div className="h4 font-weight-bold text-primary mb-0">
-                      {plattformpreis.toFixed(2)} €
-                    </div>
-                    <small className="text-muted" style={{fontSize: '0.7rem'}}>pro Stück</small>
-                  </div>
-                </div>
+            {/* Plattformpreis */}
+            <div className="card border-primary mb-2">
+              <div className="card-header bg-primary text-white py-1">
+                <small className="mb-0 font-weight-bold">Netto Plattformpreis (g2)</small>
               </div>
-              <div className="col-md-6">
-                <div className="card border-success">
-                  <div className="card-header bg-success text-white py-1">
-                    <small className="mb-0 font-weight-bold">Shoppreis (shp_fac={(g2Params.shp_fac*100).toFixed(0)}%)</small>
-                  </div>
-                  <div className="card-body text-center py-2">
-                    <div className="h4 font-weight-bold text-success mb-0">
-                      {shoppreis.toFixed(2)} €
-                    </div>
-                    <small className="text-muted" style={{fontSize: '0.7rem'}}>pro Stück</small>
-                  </div>
+              <div className="card-body text-center py-2">
+                <div className="h3 font-weight-bold text-primary mb-0">
+                  {plattformpreis.toFixed(2)} €
                 </div>
+                <small className="text-muted" style={{fontSize: '0.75rem'}}>pro Stück (netto)</small>
               </div>
             </div>
 
-            {/* Staffelpreise */}
-            <div className="card border-info">
-              <div className="card-header bg-info text-white py-1">
-                <small className="mb-0 font-weight-bold">Shop-Staffelpreise</small>
+            {/* Shop-Staffelpreise */}
+            <div className="card border-success">
+              <div className="card-header bg-success text-white py-1">
+                <small className="mb-0 font-weight-bold">Netto Shop Staffelpreise (shp_fac = {(g2Params.shp_fac*100).toFixed(0)}%)</small>
               </div>
               <div className="card-body py-2">
                 <div className="table-responsive">
-                  <table className="table table-sm table-bordered text-center mb-0" style={{fontSize: '0.85rem'}}>
+                  <table className="table table-sm table-bordered text-center mb-0" style={{fontSize: '0.9rem'}}>
                     <thead className="thead-light">
-                      <tr style={{fontSize: '0.75rem'}}>
-                        <th className="py-1">Staffel</th>
-                        <th className="py-1">Paket-EK</th>
-                        <th className="py-1">Shop/Stück</th>
+                      <tr className="font-weight-bold" style={{fontSize: '0.8rem'}}>
+                        {ergebnisse.map(e => (
+                          <th key={e.staffel} className="py-1 px-1">{e.staffel}</th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody>
-                      {ergebnisse.map((erg, idx) => (
-                        <tr key={idx}>
-                          <td className="font-weight-bold py-1">{erg.staffel}</td>
-                          <td className="text-muted py-1">{erg.paket_ek.toFixed(2)} €</td>
-                          <td className="text-success font-weight-bold py-1">
-                            {erg.shop_unit.toFixed(2)} €
+                      <tr>
+                        {ergebnisse.map(e => (
+                          <td key={e.staffel} className="font-weight-bold text-success py-1 px-1">
+                            {e.shop_unit.toFixed(2)} €
                           </td>
-                        </tr>
-                      ))}
+                        ))}
+                      </tr>
                     </tbody>
                   </table>
                 </div>
