@@ -10,6 +10,7 @@ export default function PreiseG2Module({ formeln }) {
   const [shoppreis, setShoppreis] = useState(0)
   const [loading, setLoading] = useState(false)
   const [configEdited, setConfigEdited] = useState(false)
+  const [configExpanded, setConfigExpanded] = useState(false)
 
   // g2-Parameter (artikelspezifisch)
   const [g2Params, setG2Params] = useState({
