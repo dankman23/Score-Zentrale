@@ -163,7 +163,7 @@ export default function PreiseModule() {
             {/* Regler */}
             <div className="card mb-4">
               <div className="card-header d-flex justify-content-between align-items-center">
-                <h5 className="mb-0">Regler & Kosten</h5>
+                <h5 className="mb-0">Konfiguration</h5>
                 {reglerEdited && (
                   <button className="btn btn-sm btn-warning" onClick={speichernRegler}>
                     <i className="bi bi-save mr-1"/>Änderungen speichern
@@ -171,84 +171,150 @@ export default function PreiseModule() {
                 )}
               </div>
               <div className="card-body">
-                <div className="row">
-                  <div className="col-md-3 mb-3">
-                    <label className="small text-muted">Kosten variabel</label>
-                    <input 
-                      type="number" 
-                      className="form-control" 
-                      value={currentFormel.regler.kosten_variabel}
-                      onChange={(e) => updateRegler('kosten_variabel', e.target.value)}
-                    />
+                {/* Kosten - variabel */}
+                <div className="mb-4">
+                  <div className="bg-warning text-dark font-weight-bold px-3 py-2 mb-3" style={{fontSize: '1.1rem'}}>
+                    Kosten - variabel
                   </div>
-                  <div className="col-md-3 mb-3">
-                    <label className="small text-muted">Kosten statisch</label>
-                    <input 
-                      type="number" 
-                      className="form-control" 
-                      value={currentFormel.regler.kosten_statisch}
-                      onChange={(e) => updateRegler('kosten_statisch', e.target.value)}
-                    />
+                  <div className="row">
+                    <div className="col-md-4 mb-3">
+                      <label className="font-weight-bold">Mwst.</label>
+                      <div className="input-group">
+                        <input 
+                          type="number" 
+                          step="0.01"
+                          className="form-control" 
+                          value={(currentFormel.regler.mwst * 100).toFixed(2)}
+                          onChange={(e) => updateRegler('mwst', parseFloat(e.target.value) / 100)}
+                        />
+                        <div className="input-group-append">
+                          <span className="input-group-text">%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-4 mb-3">
+                      <label className="font-weight-bold">Ebay/Amazon</label>
+                      <div className="input-group">
+                        <input 
+                          type="number" 
+                          step="0.01"
+                          className="form-control" 
+                          value={(currentFormel.regler.ebay_amazon * 100).toFixed(2)}
+                          onChange={(e) => updateRegler('ebay_amazon', parseFloat(e.target.value) / 100)}
+                        />
+                        <div className="input-group-append">
+                          <span className="input-group-text">%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-4 mb-3">
+                      <label className="font-weight-bold">Paypal</label>
+                      <div className="input-group">
+                        <input 
+                          type="number" 
+                          step="0.01"
+                          className="form-control" 
+                          value={(currentFormel.regler.paypal * 100).toFixed(2)}
+                          onChange={(e) => updateRegler('paypal', parseFloat(e.target.value) / 100)}
+                        />
+                        <div className="input-group-append">
+                          <span className="input-group-text">%</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="col-md-3 mb-3">
-                    <label className="small text-muted">MwSt. (z.B. 0.19)</label>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      className="form-control" 
-                      value={currentFormel.regler.mwst}
-                      onChange={(e) => updateRegler('mwst', e.target.value)}
-                    />
+                </div>
+
+                {/* Kosten - statisch */}
+                <div className="mb-4">
+                  <div className="bg-warning text-dark font-weight-bold px-3 py-2 mb-3" style={{fontSize: '1.1rem'}}>
+                    Kosten - statisch
                   </div>
-                  <div className="col-md-3 mb-3">
-                    <label className="small text-muted">eBay/Amazon (z.B. 0.25)</label>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      className="form-control" 
-                      value={currentFormel.regler.ebay_amazon}
-                      onChange={(e) => updateRegler('ebay_amazon', e.target.value)}
-                    />
+                  <div className="row">
+                    <div className="col-md-6 mb-3">
+                      <label className="font-weight-bold">Paypal Fix</label>
+                      <input 
+                        type="number" 
+                        step="0.01"
+                        className="form-control" 
+                        value={currentFormel.regler.paypal_fix}
+                        onChange={(e) => updateRegler('paypal_fix', e.target.value)}
+                      />
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <label className="font-weight-bold">Fixkosten Beitrag</label>
+                      <input 
+                        type="number" 
+                        step="0.01"
+                        className="form-control" 
+                        value={currentFormel.regler.fixkosten_beitrag}
+                        onChange={(e) => updateRegler('fixkosten_beitrag', e.target.value)}
+                      />
+                    </div>
                   </div>
-                  <div className="col-md-3 mb-3">
-                    <label className="small text-muted">PayPal</label>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      className="form-control" 
-                      value={currentFormel.regler.paypal}
-                      onChange={(e) => updateRegler('paypal', e.target.value)}
-                    />
+                </div>
+
+                {/* Regler */}
+                <div className="mb-4">
+                  <div className="bg-light text-dark font-weight-bold px-3 py-2 mb-3" style={{fontSize: '1.1rem'}}>
+                    Regler
                   </div>
-                  <div className="col-md-3 mb-3">
-                    <label className="small text-muted">PayPal Fix</label>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      className="form-control" 
-                      value={currentFormel.regler.paypal_fix}
-                      onChange={(e) => updateRegler('paypal_fix', e.target.value)}
-                    />
-                  </div>
-                  <div className="col-md-3 mb-3">
-                    <label className="small text-muted">Gewinn Regler 2c</label>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      className="form-control" 
-                      value={currentFormel.regler.gewinn_regler_2c}
-                      onChange={(e) => updateRegler('gewinn_regler_2c', e.target.value)}
-                    />
-                  </div>
-                  <div className="col-md-3 mb-3">
-                    <label className="small text-muted">Prozent Aufschlag</label>
-                    <input 
-                      type="number" 
-                      step="0.1"
-                      className="form-control" 
-                      value={currentFormel.regler.prozent_aufschlag}
-                      onChange={(e) => updateRegler('prozent_aufschlag', e.target.value)}
-                    />
+                  <div className="row">
+                    <div className="col-md mb-3">
+                      <label className="font-weight-bold small">Gewinn Regler 1 a</label>
+                      <input 
+                        type="number" 
+                        step="0.01"
+                        className="form-control" 
+                        value={currentFormel.regler.gewinn_regler_1a}
+                        onChange={(e) => updateRegler('gewinn_regler_1a', e.target.value)}
+                      />
+                    </div>
+                    <div className="col-md mb-3">
+                      <label className="font-weight-bold small">Gewinn Regler 2 c</label>
+                      <input 
+                        type="number" 
+                        step="0.01"
+                        className="form-control" 
+                        value={currentFormel.regler.gewinn_regler_2c}
+                        onChange={(e) => updateRegler('gewinn_regler_2c', e.target.value)}
+                      />
+                    </div>
+                    <div className="col-md mb-3">
+                      <label className="font-weight-bold small">Gewinn Regler 3 e</label>
+                      <input 
+                        type="number" 
+                        step="0.01"
+                        className="form-control" 
+                        value={currentFormel.regler.gewinn_regler_3e}
+                        onChange={(e) => updateRegler('gewinn_regler_3e', e.target.value)}
+                      />
+                    </div>
+                    <div className="col-md mb-3">
+                      <label className="font-weight-bold small">Prozent Aufschlag</label>
+                      <div className="input-group">
+                        <input 
+                          type="number" 
+                          step="0.01"
+                          className="form-control" 
+                          value={(currentFormel.regler.prozent_aufschlag * 100).toFixed(2)}
+                          onChange={(e) => updateRegler('prozent_aufschlag', parseFloat(e.target.value) / 100)}
+                        />
+                        <div className="input-group-append">
+                          <span className="input-group-text">%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md mb-3">
+                      <label className="font-weight-bold small">A.A. Threshold</label>
+                      <input 
+                        type="number" 
+                        step="1"
+                        className="form-control" 
+                        value={currentFormel.regler.aa_threshold}
+                        onChange={(e) => updateRegler('aa_threshold', e.target.value)}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
