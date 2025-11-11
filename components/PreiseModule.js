@@ -404,10 +404,7 @@ export default function PreiseModule() {
         )}
 
         {tab === 'neue_2025' && (
-          <div className="alert alert-warning">
-            <i className="bi bi-info-circle mr-2"/>
-            Neue Preisformeln ab November 2025 werden hier implementiert.
-          </div>
+          <PreiseG2Module />
         )}
       </div>
     </div>
