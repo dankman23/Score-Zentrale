@@ -1,39 +1,36 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-export default function PreiseG2Module() {
+export default function PreiseG2Module({ formeln }) {
+  const [warengruppe, setWarengruppe] = useState('lagerware')
   const [ekInput, setEkInput] = useState('')
-  const [ekInputPer, setEkInputPer] = useState('VE')
-  const [veSize, setVeSize] = useState(10)
-  const [tierSet, setTierSet] = useState('Standard')
-  const [showAb1, setShowAb1] = useState(true)
-  const [prettyRound, setPrettyRound] = useState(true)
   const [ergebnisse, setErgebnisse] = useState([])
   const [plattformpreis, setPlattformpreis] = useState(0)
+  const [shoppreis, setShoppreis] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [configEdited, setConfigEdited] = useState(false)
 
-  // Default Parameter
-  const [params, setParams] = useState({
-    c: 1.07,
-    a: 0.81,
-    pa: 0.35,
-    fixcost1: 0,
+  // g2-Parameter (artikelspezifisch)
+  const [g2Params, setG2Params] = useState({
+    gstart_ek: 12,
+    gneu_ek: 100,
+    gneu_vk: 189,
+    fixcost1: 0.35,
     fixcost2: 1.4,
     varpct1: 0.25,
     varpct2: 0.02,
     aufschlag: 1.08,
-    gstart_ek: 50,
-    gneu_ek: 150,
-    gneu_vk: 180,
-    k: 1.0,
     shp_fac: 0.92,
     aa_threshold: 18
   })
 
   const berechneG2 = async () => {
-    if (!ekInput) return
+    if (!ekInput || !formeln || formeln.length === 0) return
     
+    const selectedFormel = formeln.find(f => f.sheet === warengruppe)
+    if (!selectedFormel) return
+
     setLoading(true)
     try {
       const res = await fetch('/api/preise/g2/berechnen', {
@@ -41,14 +38,16 @@ export default function PreiseG2Module() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ek: parseFloat(ekInput),
-          params,
+          warengruppe_regler: selectedFormel.regler,
+          g2_params: g2Params,
           staffel_mengen: [1, 5, 10, 20, 50, 100, 200, 500]
         })
       })
       const data = await res.json()
       if (data.ok) {
         setErgebnisse(data.ergebnisse || [])
-        setPlattformpreis(data.plattformpreis_unit || 0)
+        setPlattformpreis(data.plattform_unit || 0)
+        setShoppreis(data.shop_unit || 0)
       } else {
         alert('Fehler: ' + data.error)
       }
@@ -59,7 +58,27 @@ export default function PreiseG2Module() {
   }
 
   const updateParam = (key, value) => {
-    setParams({ ...params, [key]: parseFloat(value) || 0 })
+    setG2Params({ ...g2Params, [key]: parseFloat(value) || 0 })
+    setConfigEdited(true)
+  }
+
+  const speichernConfig = async () => {
+    try {
+      const res = await fetch('/api/preise/g2/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          warengruppe,
+          params: g2Params
+        })
+      })
+      if (res.ok) {
+        alert('✅ Konfiguration gespeichert!')
+        setConfigEdited(false)
+      }
+    } catch (e) {
+      alert('Fehler: ' + e.message)
+    }
   }
 
   return (
