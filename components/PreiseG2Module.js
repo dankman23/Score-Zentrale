@@ -200,23 +200,40 @@ export default function PreiseG2Module({ formeln }) {
         {/* Ergebnisse */}
         {ergebnisse.length > 0 && (
           <div>
-            {/* Plattformpreis */}
-            <div className="card border-primary mb-2">
-              <div className="card-header bg-primary text-white py-1">
-                <small className="mb-0 font-weight-bold">Netto Plattformpreis (Einzelstück)</small>
-              </div>
-              <div className="card-body text-center py-2">
-                <div className="h4 font-weight-bold text-primary mb-0">
-                  {plattformpreis.toFixed(2)} €
+            {/* Beide Preise nebeneinander */}
+            <div className="row mb-2">
+              <div className="col-md-6">
+                <div className="card border-primary">
+                  <div className="card-header bg-primary text-white py-1">
+                    <small className="mb-0 font-weight-bold">Plattformpreis (netto)</small>
+                  </div>
+                  <div className="card-body text-center py-2">
+                    <div className="h4 font-weight-bold text-primary mb-0">
+                      {plattformpreis.toFixed(2)} €
+                    </div>
+                    <small className="text-muted" style={{fontSize: '0.7rem'}}>pro Stück</small>
+                  </div>
                 </div>
-                <small className="text-muted" style={{fontSize: '0.7rem'}}>pro Stück (netto)</small>
+              </div>
+              <div className="col-md-6">
+                <div className="card border-success">
+                  <div className="card-header bg-success text-white py-1">
+                    <small className="mb-0 font-weight-bold">Shoppreis (shp_fac={(g2Params.shp_fac*100).toFixed(0)}%)</small>
+                  </div>
+                  <div className="card-body text-center py-2">
+                    <div className="h4 font-weight-bold text-success mb-0">
+                      {shoppreis.toFixed(2)} €
+                    </div>
+                    <small className="text-muted" style={{fontSize: '0.7rem'}}>pro Stück</small>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Shop-Staffelpreise */}
-            <div className="card border-success">
-              <div className="card-header bg-success text-white py-1">
-                <small className="mb-0 font-weight-bold">Shop-Staffelpreise (shp_fac = {(params.shp_fac * 100).toFixed(0)}%)</small>
+            {/* Staffelpreise */}
+            <div className="card border-info">
+              <div className="card-header bg-info text-white py-1">
+                <small className="mb-0 font-weight-bold">Shop-Staffelpreise</small>
               </div>
               <div className="card-body py-2">
                 <div className="table-responsive">
@@ -225,7 +242,6 @@ export default function PreiseG2Module({ formeln }) {
                       <tr style={{fontSize: '0.75rem'}}>
                         <th className="py-1">Staffel</th>
                         <th className="py-1">Paket-EK</th>
-                        <th className="py-1">Shop-Paket</th>
                         <th className="py-1">Shop/Stück</th>
                       </tr>
                     </thead>
@@ -234,7 +250,6 @@ export default function PreiseG2Module({ formeln }) {
                         <tr key={idx}>
                           <td className="font-weight-bold py-1">{erg.staffel}</td>
                           <td className="text-muted py-1">{erg.paket_ek.toFixed(2)} €</td>
-                          <td className="py-1">{erg.shop_paket.toFixed(2)} €</td>
                           <td className="text-success font-weight-bold py-1">
                             {erg.shop_unit.toFixed(2)} €
                           </td>
