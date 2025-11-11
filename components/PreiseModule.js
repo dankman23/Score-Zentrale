@@ -172,14 +172,14 @@ export default function PreiseModule() {
               </div>
               <div className="card-body">
                 {/* Kosten - variabel */}
-                <div className="mb-4">
-                  <div className="bg-warning text-dark font-weight-bold px-3 py-2 mb-3" style={{fontSize: '1.1rem'}}>
+                <div className="mb-3">
+                  <div className="bg-warning text-dark font-weight-bold px-3 py-2 mb-2" style={{fontSize: '0.95rem'}}>
                     Kosten - variabel
                   </div>
                   <div className="row">
-                    <div className="col-md-4 mb-3">
-                      <label className="font-weight-bold">Mwst.</label>
-                      <div className="input-group">
+                    <div className="col-md-4 mb-2">
+                      <label className="font-weight-bold small">Mwst.</label>
+                      <div className="input-group input-group-sm">
                         <input 
                           type="number" 
                           step="0.01"
@@ -192,9 +192,9 @@ export default function PreiseModule() {
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-4 mb-3">
-                      <label className="font-weight-bold">Ebay/Amazon</label>
-                      <div className="input-group">
+                    <div className="col-md-4 mb-2">
+                      <label className="font-weight-bold small">Ebay/Amazon</label>
+                      <div className="input-group input-group-sm">
                         <input 
                           type="number" 
                           step="0.01"
@@ -207,9 +207,9 @@ export default function PreiseModule() {
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-4 mb-3">
-                      <label className="font-weight-bold">Paypal</label>
-                      <div className="input-group">
+                    <div className="col-md-4 mb-2">
+                      <label className="font-weight-bold small">Paypal</label>
+                      <div className="input-group input-group-sm">
                         <input 
                           type="number" 
                           step="0.01"
@@ -226,27 +226,27 @@ export default function PreiseModule() {
                 </div>
 
                 {/* Kosten - statisch */}
-                <div className="mb-4">
-                  <div className="bg-warning text-dark font-weight-bold px-3 py-2 mb-3" style={{fontSize: '1.1rem'}}>
+                <div className="mb-3">
+                  <div className="bg-warning text-dark font-weight-bold px-3 py-2 mb-2" style={{fontSize: '0.95rem'}}>
                     Kosten - statisch
                   </div>
                   <div className="row">
-                    <div className="col-md-6 mb-3">
-                      <label className="font-weight-bold">Paypal Fix</label>
+                    <div className="col-md-6 mb-2">
+                      <label className="font-weight-bold small">Paypal Fix</label>
                       <input 
                         type="number" 
                         step="0.01"
-                        className="form-control" 
+                        className="form-control form-control-sm" 
                         value={currentFormel.regler.paypal_fix}
                         onChange={(e) => updateRegler('paypal_fix', e.target.value)}
                       />
                     </div>
-                    <div className="col-md-6 mb-3">
-                      <label className="font-weight-bold">Fixkosten Beitrag</label>
+                    <div className="col-md-6 mb-2">
+                      <label className="font-weight-bold small">Fixkosten Beitrag</label>
                       <input 
                         type="number" 
                         step="0.01"
-                        className="form-control" 
+                        className="form-control form-control-sm" 
                         value={currentFormel.regler.fixkosten_beitrag}
                         onChange={(e) => updateRegler('fixkosten_beitrag', e.target.value)}
                       />
@@ -255,44 +255,44 @@ export default function PreiseModule() {
                 </div>
 
                 {/* Regler */}
-                <div className="mb-4">
-                  <div className="bg-light text-dark font-weight-bold px-3 py-2 mb-3" style={{fontSize: '1.1rem'}}>
+                <div className="mb-3">
+                  <div className="bg-light text-dark font-weight-bold px-3 py-2 mb-2" style={{fontSize: '0.95rem'}}>
                     Regler
                   </div>
                   <div className="row">
-                    <div className="col-md mb-3">
+                    <div className="col mb-2">
                       <label className="font-weight-bold small">Gewinn Regler 1 a</label>
                       <input 
                         type="number" 
                         step="0.01"
-                        className="form-control" 
+                        className="form-control form-control-sm" 
                         value={currentFormel.regler.gewinn_regler_1a}
                         onChange={(e) => updateRegler('gewinn_regler_1a', e.target.value)}
                       />
                     </div>
-                    <div className="col-md mb-3">
+                    <div className="col mb-2">
                       <label className="font-weight-bold small">Gewinn Regler 2 c</label>
                       <input 
                         type="number" 
                         step="0.01"
-                        className="form-control" 
+                        className="form-control form-control-sm" 
                         value={currentFormel.regler.gewinn_regler_2c}
                         onChange={(e) => updateRegler('gewinn_regler_2c', e.target.value)}
                       />
                     </div>
-                    <div className="col-md mb-3">
+                    <div className="col mb-2">
                       <label className="font-weight-bold small">Gewinn Regler 3 e</label>
                       <input 
                         type="number" 
                         step="0.01"
-                        className="form-control" 
+                        className="form-control form-control-sm" 
                         value={currentFormel.regler.gewinn_regler_3e}
                         onChange={(e) => updateRegler('gewinn_regler_3e', e.target.value)}
                       />
                     </div>
-                    <div className="col-md mb-3">
+                    <div className="col mb-2">
                       <label className="font-weight-bold small">Prozent Aufschlag</label>
-                      <div className="input-group">
+                      <div className="input-group input-group-sm">
                         <input 
                           type="number" 
                           step="0.01"
@@ -305,12 +305,12 @@ export default function PreiseModule() {
                         </div>
                       </div>
                     </div>
-                    <div className="col-md mb-3">
+                    <div className="col mb-2">
                       <label className="font-weight-bold small">A.A. Threshold</label>
                       <input 
                         type="number" 
                         step="1"
-                        className="form-control" 
+                        className="form-control form-control-sm" 
                         value={currentFormel.regler.aa_threshold}
                         onChange={(e) => updateRegler('aa_threshold', e.target.value)}
                       />
@@ -321,18 +321,18 @@ export default function PreiseModule() {
             </div>
 
             {/* EK-Eingabe */}
-            <div className="card mb-4 border-primary">
-              <div className="card-header bg-primary text-white">
-                <h5 className="mb-0">EK-Eingabe</h5>
+            <div className="card mb-3 border-primary">
+              <div className="card-header bg-primary text-white py-2">
+                <h6 className="mb-0">EK-Eingabe</h6>
               </div>
-              <div className="card-body">
+              <div className="card-body py-3">
                 <div className="row align-items-end">
                   <div className="col-md-8">
-                    <label className="font-weight-bold">EK-Stück netto (€)</label>
+                    <label className="font-weight-bold small">EK-Stück netto (€)</label>
                     <input 
                       type="number" 
                       step="0.01"
-                      className="form-control form-control-lg" 
+                      className="form-control" 
                       placeholder="z.B. 10.50"
                       value={ek}
                       onChange={(e) => setEk(e.target.value)}
@@ -341,7 +341,7 @@ export default function PreiseModule() {
                   </div>
                   <div className="col-md-4">
                     <button 
-                      className="btn btn-primary btn-lg btn-block" 
+                      className="btn btn-warning btn-block font-weight-bold" 
                       onClick={berechnePreise}
                       disabled={loading || !ek}
                     >
@@ -358,36 +358,36 @@ export default function PreiseModule() {
               <div>
                 {/* Plattformpreis */}
                 <div className="card border-primary mb-3">
-                  <div className="card-header bg-primary text-white">
-                    <h5 className="mb-0">Netto Plattformpreis (eBay/Amazon)</h5>
+                  <div className="card-header bg-primary text-white py-2">
+                    <h6 className="mb-0">Netto Plattformpreis (eBay/Amazon)</h6>
                   </div>
-                  <div className="card-body text-center">
-                    <div className="display-4 font-weight-bold text-primary">
+                  <div className="card-body text-center py-3">
+                    <div className="h2 font-weight-bold text-primary mb-0">
                       {(ergebnisse[0]?.vk_netto || 0).toFixed(2)} €
                     </div>
-                    <div className="text-muted">pro Stück (netto)</div>
+                    <small className="text-muted">pro Stück (netto)</small>
                   </div>
                 </div>
 
                 {/* Shop-Staffelpreise */}
                 <div className="card border-success">
-                  <div className="card-header bg-success text-white">
-                    <h5 className="mb-0">Netto Shop Staffelpreise (mit {currentFormel?.regler?.aa_threshold || 18}% Rabatt)</h5>
+                  <div className="card-header bg-success text-white py-2">
+                    <h6 className="mb-0">Netto Shop Staffelpreise (SHOP - 8%)</h6>
                   </div>
-                  <div className="card-body">
+                  <div className="card-body py-3">
                     <div className="table-responsive">
-                      <table className="table table-striped table-bordered text-center">
-                        <thead className="thead-dark">
-                          <tr>
+                      <table className="table table-sm table-bordered text-center mb-0">
+                        <thead className="thead-light">
+                          <tr className="font-weight-bold">
                             {ergebnisse.map(e => (
-                              <th key={e.ve} className="font-weight-bold">{e.ve}</th>
+                              <th key={e.ve} className="py-2">{e.ve}</th>
                             ))}
                           </tr>
                         </thead>
                         <tbody>
                           <tr>
                             {ergebnisse.map(e => (
-                              <td key={e.ve} className="font-weight-bold h5 text-success">
+                              <td key={e.ve} className="font-weight-bold text-success" style={{fontSize: '1.1rem'}}>
                                 {(e.vk_shop_netto || 0).toFixed(2)} €
                               </td>
                             ))}
