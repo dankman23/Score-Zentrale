@@ -5078,6 +5078,15 @@ export default function App() {
                                         {artikel.nLagerbestand || 0}
                                       </span>
                                     </td>
+                                    <td className="text-center">
+                                      <button 
+                                        className="btn btn-sm btn-info"
+                                        onClick={() => startePreisvergleich(artikel)}
+                                        title="Preisvergleich starten"
+                                      >
+                                        <i className="bi bi-search"/>
+                                      </button>
+                                    </td>
                                   </tr>
                                 ))
                               )}
