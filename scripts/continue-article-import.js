@@ -56,6 +56,12 @@ async function continueImport() {
       totalImported += data.imported
       console.log(`✅ ${data.imported} Artikel importiert (Gesamt: ${data.total})`)
       
+      // Stoppe wenn Ziel erreicht
+      if (data.total >= TARGET_COUNT) {
+        console.log(`\n🎉 Ziel erreicht! ${data.total} Artikel importiert (Limit: ${TARGET_COUNT})`)
+        break
+      }
+      
       if (data.finished) {
         console.log(`\n🎉 Import abgeschlossen!`)
         console.log(`📊 Insgesamt ${data.total} Artikel importiert`)
