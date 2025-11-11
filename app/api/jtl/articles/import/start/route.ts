@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     // Artikel mit allen Joins abrufen
     const result = await pool.request().query(`
-      SELECT TOP ${batchSize}
+      SELECT 
         a.kArtikel,
         a.cArtNr,
         a.cBarcode,
@@ -69,9 +69,10 @@ export async function POST(request: NextRequest) {
       WHERE a.cAktiv = 'Y'
         AND a.kStueckliste = 0
         AND (a.nIstVater = 1 OR a.kVaterArtikel = 0)
-        AND a.kArtikel > ${lastKArtikel}
       
       ORDER BY a.kArtikel
+      OFFSET ${offset} ROWS
+      FETCH NEXT ${batchSize} ROWS ONLY
     `)
 
     const articles = result.recordset
