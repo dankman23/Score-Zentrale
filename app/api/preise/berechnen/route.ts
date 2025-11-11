@@ -52,9 +52,17 @@ function berechnePreis(ek: number, regler: any, ve: number) {
     prozent_aufschlag
   } = regler
 
-  // Basis-Check
-  if (kosten_variabel === 0 || kosten_statisch === 0) {
-    return { ve, vk_netto: 0, vk_brutto: 0, vk_shop_netto: 0, vk_shop_brutto: 0 }
+  // Basis-Check - mit Gewinn-Prozenten initialisiert
+  if (!kosten_variabel || !kosten_statisch) {
+    return { 
+      ve, 
+      vk_netto: 0, 
+      vk_brutto: 0, 
+      vk_shop_netto: 0, 
+      vk_shop_brutto: 0,
+      gewinn_prozent_vk: 0,
+      gewinn_prozent_ek: 0
+    }
   }
 
   // Basis-Berechnung (vereinfacht, G17=1 Modus)
@@ -63,14 +71,18 @@ function berechnePreis(ek: number, regler: any, ve: number) {
   const basispreis = (ek * kosten_variabel) + kosten_statisch
 
   // Standard-Modus: Basis * (1 + MwSt) * (1 + eBay/Amazon)
-  const vk_netto = ((basispreis * (1 + mwst)) * (1 + ebay_amazon)) * gewinn_regler_2c * prozent_aufschlag
+  const vk_netto = ((basispreis * (1 + (mwst || 0))) * (1 + (ebay_amazon || 0))) * (gewinn_regler_2c || 1) * (prozent_aufschlag || 1)
   
   // VK brutto = VK netto * (1 + MwSt)
-  const vk_brutto = vk_netto * (1 + mwst)
+  const vk_brutto = vk_netto * (1 + (mwst || 0))
   
   // Shop-Preis (8% Rabatt)
   const vk_shop_netto = vk_netto * 0.92
   const vk_shop_brutto = vk_brutto * 0.92
+
+  // Gewinn-Prozente berechnen
+  const gewinn_prozent_vk = vk_netto > 0 ? ((vk_netto - ek) / vk_netto) * 100 : 0
+  const gewinn_prozent_ek = ek > 0 ? ((vk_netto - ek) / ek) * 100 : 0
 
   return {
     ve,
@@ -78,7 +90,7 @@ function berechnePreis(ek: number, regler: any, ve: number) {
     vk_brutto: parseFloat(vk_brutto.toFixed(2)),
     vk_shop_netto: parseFloat(vk_shop_netto.toFixed(2)),
     vk_shop_brutto: parseFloat(vk_shop_brutto.toFixed(2)),
-    gewinn_prozent_vk: ek > 0 ? parseFloat((((vk_netto - ek) / vk_netto) * 100).toFixed(2)) : 0,
-    gewinn_prozent_ek: ek > 0 ? parseFloat((((vk_netto - ek) / ek) * 100).toFixed(2)) : 0
+    gewinn_prozent_vk: parseFloat(gewinn_prozent_vk.toFixed(2)),
+    gewinn_prozent_ek: parseFloat(gewinn_prozent_ek.toFixed(2))
   }
 }
