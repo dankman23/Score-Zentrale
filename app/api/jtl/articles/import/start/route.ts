@@ -88,12 +88,16 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Artikel in MongoDB speichern
+    // Artikel in MongoDB speichern mit Upsert
+    // $set: Felder, die bei jedem Update überschrieben werden (JTL-Daten)
+    // $setOnInsert: Felder nur beim ersten Insert (z.B. imported_at)
+    // Zusätzliche custom Felder (die hier angehängt wurden) bleiben erhalten!
     const bulkOps = articles.map(article => ({
       updateOne: {
         filter: { kArtikel: article.kArtikel },
         update: {
           $set: {
+            // Basis-Daten (immer aktualisieren)
             kArtikel: article.kArtikel,
             cArtNr: article.cArtNr || '',
             cName: article.cName || article.cArtNr || 'Unbenannt',
@@ -101,35 +105,38 @@ export async function POST(request: NextRequest) {
             cBarcode: article.cBarcode || '',
             cHAN: article.cHAN || '',
             
-            // Preise
+            // Preise (immer aktualisieren)
             fVKNetto: parseFloat(article.fVKNetto) || 0,
             fEKNetto: parseFloat(article.fEKNetto) || 0,
             fUVP: parseFloat(article.fUVP) || 0,
             margin_percent: article.fVKNetto > 0 
-              ? ((article.fVKNetto - article.fEKNetto) / article.fVKNetto * 100).toFixed(2)
+              ? parseFloat(((article.fVKNetto - article.fEKNetto) / article.fVKNetto * 100).toFixed(2))
               : 0,
             
-            // Lager
+            // Lager (immer aktualisieren)
             nLagerbestand: parseFloat(article.nLagerbestand) || 0,
             nMindestbestellmaenge: parseFloat(article.nMindestbestellmaenge) || 0,
             fGewicht: parseFloat(article.fGewicht) || 0,
             
-            // Zuordnungen
+            // Zuordnungen (immer aktualisieren)
             kWarengruppe: article.kWarengruppe || 0,
             cWarengruppenName: article.cWarengruppenName || 'Keine Kategorie',
             kHersteller: article.kHersteller || 0,
             cHerstellerName: article.cHerstellerName || 'Kein Hersteller',
             kSteuerklasse: article.kSteuerklasse || 0,
             
-            // Flags
+            // Flags (immer aktualisieren)
             cAktiv: article.cAktiv === 'Y',
             nIstVater: article.nIstVater === 1,
             kVaterArtikel: article.kVaterArtikel || 0,
-            
-            // Meta
             dErstelldatum: article.dErstelldatum,
-            imported_at: new Date(),
+            
+            // Update-Timestamp
             last_updated: new Date()
+          },
+          $setOnInsert: {
+            // Nur beim ersten Insert setzen
+            imported_at: new Date()
           }
         },
         upsert: true
