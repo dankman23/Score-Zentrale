@@ -17,6 +17,7 @@ export default function PreiseModule() {
   const [vergleichEk, setVergleichEk] = useState('10')
   const [selectedFormeln, setSelectedFormeln] = useState(['lagerware', 'klingspor_fremdlager'])
   const [vergleichData, setVergleichData] = useState([])
+  const [vergleichModus, setVergleichModus] = useState('plattform') // 'plattform' oder 'shop'
 
   const sheets = [
     { id: 'lagerware', name: 'Lagerware' },
