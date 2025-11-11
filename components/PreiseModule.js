@@ -311,12 +311,12 @@ export default function PreiseModule() {
                         {ergebnisse.map(e => (
                           <tr key={e.ve}>
                             <td><strong>{e.ve}</strong></td>
-                            <td>{e.vk_netto.toFixed(2)}</td>
-                            <td>{e.vk_brutto.toFixed(2)}</td>
-                            <td>{e.vk_shop_netto.toFixed(2)}</td>
-                            <td>{e.vk_shop_brutto.toFixed(2)}</td>
-                            <td><span className="badge badge-success">{e.gewinn_prozent_vk.toFixed(1)}%</span></td>
-                            <td><span className="badge badge-info">{e.gewinn_prozent_ek.toFixed(1)}%</span></td>
+                            <td>{(e.vk_netto || 0).toFixed(2)}</td>
+                            <td>{(e.vk_brutto || 0).toFixed(2)}</td>
+                            <td>{(e.vk_shop_netto || 0).toFixed(2)}</td>
+                            <td>{(e.vk_shop_brutto || 0).toFixed(2)}</td>
+                            <td><span className="badge badge-success">{(e.gewinn_prozent_vk || 0).toFixed(1)}%</span></td>
+                            <td><span className="badge badge-info">{(e.gewinn_prozent_ek || 0).toFixed(1)}%</span></td>
                           </tr>
                         ))}
                       </tbody>
