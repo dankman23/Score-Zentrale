@@ -140,61 +140,28 @@ export default function PreiseG2Module() {
         </div>
 
         {/* EK-Eingabe */}
-        <div className="card mb-3 border-primary">
-          <div className="card-header bg-primary text-white py-2">
-            <h6 className="mb-0">EK-Eingabe</h6>
+        <div className="card mb-2 border-primary">
+          <div className="card-header bg-primary text-white py-1">
+            <small className="mb-0 font-weight-bold">EK-Eingabe (pro Stück)</small>
           </div>
-          <div className="card-body py-3">
+          <div className="card-body py-2">
             <div className="row">
-              <div className="col-md-3 mb-2">
-                <label className="small font-weight-bold">EK-Wert</label>
+              <div className="col-md-8">
                 <input 
                   type="number" 
                   step="0.01" 
-                  className="form-control" 
-                  placeholder="z.B. 24.10"
+                  className="form-control form-control-sm" 
+                  placeholder="z.B. 2.41"
                   value={ekInput}
                   onChange={e => setEkInput(e.target.value)}
+                  onKeyPress={e => e.key === 'Enter' && berechneG2()}
                 />
               </div>
-              <div className="col-md-2 mb-2">
-                <label className="small font-weight-bold">Eingabe je</label>
-                <select className="form-control" value={ekInputPer} onChange={e => setEkInputPer(e.target.value)}>
-                  <option value="VE">VE</option>
-                  <option value="Stück">Stück</option>
-                </select>
-              </div>
-              <div className="col-md-2 mb-2">
-                <label className="small font-weight-bold">VE-Größe</label>
-                <input type="number" className="form-control" value={veSize} onChange={e => setVeSize(parseInt(e.target.value))} />
-              </div>
-              <div className="col-md-2 mb-2">
-                <label className="small font-weight-bold">Tier-Set</label>
-                <select className="form-control" value={tierSet} onChange={e => setTierSet(e.target.value)}>
-                  <option value="Basis">Basis</option>
-                  <option value="Standard">Standard</option>
-                  <option value="High">High</option>
-                </select>
-              </div>
-              <div className="col-md-3 mb-2 d-flex align-items-end">
-                <button className="btn btn-warning btn-block font-weight-bold" onClick={berechneG2} disabled={loading || !ekInput}>
-                  {loading ? <span className="spinner-border spinner-border-sm mr-2"/> : <i className="bi bi-calculator mr-2"/>}
+              <div className="col-md-4">
+                <button className="btn btn-warning btn-sm btn-block font-weight-bold" onClick={berechneG2} disabled={loading || !ekInput}>
+                  {loading ? <span className="spinner-border spinner-border-sm mr-1"/> : <i className="bi bi-calculator mr-1"/>}
                   Berechnen
                 </button>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-md-6">
-                <div className="custom-control custom-checkbox">
-                  <input type="checkbox" className="custom-control-input" id="showAb1" checked={showAb1} onChange={e => setShowAb1(e.target.checked)} />
-                  <label className="custom-control-label small" htmlFor="showAb1">"ab 1" Zeile anzeigen (+2%)</label>
-                </div>
-              </div>
-              <div className="col-md-6">
-                <div className="custom-control custom-checkbox">
-                  <input type="checkbox" className="custom-control-input" id="prettyRound" checked={prettyRound} onChange={e => setPrettyRound(e.target.checked)} />
-                  <label className="custom-control-label small" htmlFor="prettyRound">Schöne Rundung (große Mengen)</label>
-                </div>
               </div>
             </div>
           </div>
