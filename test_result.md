@@ -585,6 +585,20 @@ agent_communication:
       - working: true
         agent: "testing"
         comment: "✅ JTL Articles List API working perfectly! All 5/5 comprehensive tests PASSED: (1) Default list (page=1, limit=10) returns 200 OK with 10 articles from total 41,861, all required fields present (kArtikel, cArtNr, cName, cHerstellerName, cWarengruppenName, fVKNetto, fEKNetto, margin_percent), (2) Text search 'schleif' returns 200 OK with 5 articles from 15,025 matches, all articles contain 'schleif' in cArtNr/cName/cBarcode, (3) Manufacturer filter '3M' returns 200 OK with 5 articles from 13,374 total, all articles have cHerstellerName='3M', (4) Pagination test: Page 1 (limit=25) has hasNext=true, Page 2 has hasPrev=true, no overlapping kArtikel IDs between pages. All response structures valid: ok=true, articles array, pagination object (page, limit, total, totalPages, hasNext, hasPrev), filters object. MongoDB integration working with 41,861 articles imported."
+  - task: "JTL Articles: POST /api/jtl/articles/import/start (Artikel-Import Verbesserung)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/jtl/articles/import/start/route.ts"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "Nur 5.598 Artikel importiert statt 166.855. Bei neuem Import wurden alte Artikel gelöscht statt aktualisiert. Zusätzliche Daten, die an Produkte angehängt wurden, gehen verloren."
+      - working: "NA"
+        agent: "main"
+        comment: "KRITISCHE FIXES: (1) fullImport löscht KEINE Artikel mehr - Kommentar hinzugefügt dass Upsert verwendet wird. (2) $setOnInsert für imported_at - schützt Original-Timestamp bei Updates. (3) Custom-Felder die nicht in $set sind bleiben automatisch erhalten durch MongoDB upsert. (4) Continue-Import-Skript erstellt (/app/scripts/continue-article-import.js) um Import fortzusetzen. Import läuft aktuell im Hintergrund (PID 2335) und importiert alle 166.855 Artikel in Batches von 2000."
   - task: "JTL Articles: GET /api/jtl/articles/filters (Filter-Optionen für Artikel-Browser)"
     implemented: true
     working: true
