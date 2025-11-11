@@ -1169,10 +1169,12 @@ export default function App() {
       const res = await fetch('/api/jtl/articles/import/status')
       const data = await res.json()
       if (data.ok) {
-        setArtikelImportProgress({ imported: data.imported, total: 166854 })
-        // Wenn Import läuft, Status in 2 Sekunden erneut prüfen
+        setArtikelImportProgress({ imported: data.imported, total: data.target || 166854 })
+        setArtikelImportRunning(data.running || false)
+        
+        // Wenn Import läuft, Status in 3 Sekunden erneut prüfen
         if (data.running) {
-          setTimeout(loadArtikelStatus, 2000)
+          setTimeout(loadArtikelStatus, 3000)
         }
       }
     } catch (e) {
