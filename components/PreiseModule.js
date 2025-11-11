@@ -416,6 +416,142 @@ export default function PreiseModule() {
         {tab === 'neue_2025' && (
           <PreiseG2Module />
         )}
+
+        {tab === 'vergleich' && (
+          <div>
+            {/* EK-Eingabe für Vergleich */}
+            <div className="card mb-3 border-info">
+              <div className="card-header bg-info text-white py-2">
+                <h6 className="mb-0">EK für Vergleich</h6>
+              </div>
+              <div className="card-body py-3">
+                <div className="row">
+                  <div className="col-md-6">
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      className="form-control" 
+                      placeholder="EK in €"
+                      value={vergleichEk}
+                      onChange={e => setVergleichEk(e.target.value)}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <button className="btn btn-info btn-block font-weight-bold" onClick={async () => {
+                      if (!vergleichEk || formeln.length === 0) return
+                      const ek = parseFloat(vergleichEk)
+                      const comparisons = []
+                      
+                      for (const formel of formeln) {
+                        if (selectedFormeln.includes(formel.sheet)) {
+                          const res = await fetch('/api/preise/berechnen', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              ek,
+                              regler: formel.regler,
+                              ve_staffeln: [1]
+                            })
+                          })
+                          const data = await res.json()
+                          if (data.ok && data.ergebnisse.length > 0) {
+                            comparisons.push({
+                              name: formel.name,
+                              sheet: formel.sheet,
+                              plattform: data.ergebnisse[0].vk_netto,
+                              shop: data.ergebnisse[0].vk_shop_netto
+                            })
+                          }
+                        }
+                      }
+                      setVergleichData(comparisons)
+                    }}>
+                      <i className="bi bi-calculator mr-2"/>Vergleich berechnen
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Formeln auswählen */}
+            <div className="card mb-3">
+              <div className="card-header py-2">
+                <h6 className="mb-0">Formeln für Vergleich auswählen</h6>
+              </div>
+              <div className="card-body py-2">
+                <div className="row">
+                  {formeln.map(f => (
+                    <div className="col-md-3 mb-2" key={f.sheet}>
+                      <div className="custom-control custom-checkbox">
+                        <input 
+                          type="checkbox" 
+                          className="custom-control-input" 
+                          id={`check_${f.sheet}`}
+                          checked={selectedFormeln.includes(f.sheet)}
+                          onChange={e => {
+                            if (e.target.checked) {
+                              setSelectedFormeln([...selectedFormeln, f.sheet])
+                            } else {
+                              setSelectedFormeln(selectedFormeln.filter(s => s !== f.sheet))
+                            }
+                          }}
+                        />
+                        <label className="custom-control-label small" htmlFor={`check_${f.sheet}`}>
+                          {f.name}
+                        </label>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Vergleichstabelle */}
+            {vergleichData.length > 0 && (
+              <div className="card border-success mb-3">
+                <div className="card-header bg-success text-white py-2">
+                  <h6 className="mb-0">Preisvergleich bei EK = {vergleichEk}€</h6>
+                </div>
+                <div className="card-body p-0">
+                  <div className="table-responsive">
+                    <table className="table table-striped table-sm mb-0">
+                      <thead className="thead-light">
+                        <tr>
+                          <th>Warengruppe</th>
+                          <th className="text-right">Plattformpreis (netto)</th>
+                          <th className="text-right">Shop-Preis (netto)</th>
+                          <th className="text-right">Differenz</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {vergleichData.map((d, idx) => (
+                          <tr key={idx}>
+                            <td className="font-weight-bold">{d.name}</td>
+                            <td className="text-right">{d.plattform.toFixed(2)} €</td>
+                            <td className="text-right text-success font-weight-bold">{d.shop.toFixed(2)} €</td>
+                            <td className="text-right text-muted">{(d.plattform - d.shop).toFixed(2)} €</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Liniendiagramm */}
+            {vergleichData.length > 0 && (
+              <div className="card border-info">
+                <div className="card-header bg-info text-white py-2">
+                  <h6 className="mb-0">Preisverlauf (EK → VK)</h6>
+                </div>
+                <div className="card-body">
+                  <canvas id="vergleichChart" style={{maxHeight: '400px'}}></canvas>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
