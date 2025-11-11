@@ -29,6 +29,8 @@ def test_api_endpoint(method, endpoint, data=None, expected_status=200):
             response = requests.get(url, timeout=30)
         elif method == 'POST':
             response = requests.post(url, json=data, timeout=30)
+        elif method == 'DELETE':
+            response = requests.delete(url, json=data, timeout=30)
         else:
             raise ValueError(f"Unsupported method: {method}")
         
