@@ -461,12 +461,17 @@ export default function App() {
 
   useEffect(() => { renderCharts() }, [ts, tsFees, platTs, stacked])
 
-  // Produkte: Import-Status beim Tab-Wechsel laden
+  // Produkte: Import-Status beim Tab-Wechsel laden UND beim ersten Laden
   useEffect(() => {
     if (activeTab === 'produkte') {
       loadArtikelStatus()
     }
   }, [activeTab])
+
+  // Produkte: Import-Status initial laden (nur einmal beim Mount)
+  useEffect(() => {
+    loadArtikelStatus()
+  }, [])
 
   // Produkte: Filter-Optionen beim Browser-Tab laden
   useEffect(() => {
