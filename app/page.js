@@ -5030,12 +5030,13 @@ export default function App() {
                                 <th className="text-right">EK Netto</th>
                                 <th className="text-right">Marge %</th>
                                 <th className="text-center">Bestand</th>
+                                <th className="text-center">Preisvergleich</th>
                               </tr>
                             </thead>
                             <tbody>
                               {artikelList.length === 0 ? (
                                 <tr>
-                                  <td colSpan="8" className="text-center text-muted py-4">
+                                  <td colSpan="9" className="text-center text-muted py-4">
                                     <i className="bi bi-inbox mr-2" style={{fontSize: '2rem'}}/>
                                     <div>Keine Artikel gefunden</div>
                                     <small>Versuchen Sie andere Filter</small>
