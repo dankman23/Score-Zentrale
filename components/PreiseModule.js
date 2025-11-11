@@ -444,18 +444,18 @@ export default function PreiseModule() {
                   </div>
                   <div className="card-body py-2">
                     <div className="table-responsive">
-                      <table className="table table-sm table-bordered text-center mb-0">
+                      <table className="table table-sm table-bordered text-center mb-0" style={{fontSize: '0.9rem'}}>
                         <thead className="thead-light">
-                          <tr className="font-weight-bold">
+                          <tr className="font-weight-bold" style={{fontSize: '0.8rem'}}>
                             {ergebnisse.map(e => (
-                              <th key={e.ve} className="py-2">{e.ve}</th>
+                              <th key={e.ve} className="py-1 px-1">{e.ve}</th>
                             ))}
                           </tr>
                         </thead>
                         <tbody>
                           <tr>
                             {ergebnisse.map(e => (
-                              <td key={e.ve} className="font-weight-bold text-success" style={{fontSize: '1.1rem'}}>
+                              <td key={e.ve} className="font-weight-bold text-success py-1 px-1">
                                 {(e.vk_shop_netto || 0).toFixed(2)} €
                               </td>
                             ))}
