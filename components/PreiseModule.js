@@ -12,12 +12,15 @@ export default function PreiseModule() {
   const [ergebnisse, setErgebnisse] = useState([])
   const [loading, setLoading] = useState(false)
   const [reglerEdited, setReglerEdited] = useState(false)
+  const [configExpanded, setConfigExpanded] = useState(false)
   
   // Vergleich-Tab
   const [vergleichEk, setVergleichEk] = useState('10')
   const [selectedFormeln, setSelectedFormeln] = useState(['lagerware', 'klingspor_fremdlager'])
   const [vergleichData, setVergleichData] = useState([])
   const [vergleichModus, setVergleichModus] = useState('plattform') // 'plattform' oder 'shop'
+  const [vergleichG2Enabled, setVergleichG2Enabled] = useState(false)
+  const [vergleichG2Warengruppe, setVergleichG2Warengruppe] = useState('lagerware')
 
   const sheets = [
     { id: 'lagerware', name: 'Lagerware' },
