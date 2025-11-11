@@ -5159,7 +5159,122 @@ export default function App() {
                                       </button>
                                     </td>
                                   </tr>
-                                ))
+
+                                  {/* Aufklappbare Präsenz-Details */}
+                                  {expandedArtikel === artikel.kArtikel && (
+                                    <tr>
+                                      <td colSpan="10" className="bg-light">
+                                        {loadingPresence ? (
+                                          <div className="text-center py-3">
+                                            <span className="spinner-border spinner-border-sm mr-2"/>Lade Präsenz-Daten...
+                                          </div>
+                                        ) : artikelPresence ? (
+                                          <div className="py-2 px-3">
+                                            <h6 className="mb-2"><i className="bi bi-info-circle mr-2"/>Artikel-Präsenz</h6>
+                                            
+                                            {/* Zusammenfassung */}
+                                            <div className="row mb-3">
+                                              <div className="col-md-2">
+                                                <div className="card bg-white">
+                                                  <div className="card-body text-center py-2">
+                                                    <div className="h5 mb-0 text-primary">{artikelPresence.summary.in_stuecklisten}</div>
+                                                    <small className="text-muted">Stücklisten</small>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <div className="col-md-2">
+                                                <div className="card bg-white">
+                                                  <div className="card-body text-center py-2">
+                                                    <div className="h5 mb-0 text-warning">{artikelPresence.summary.auf_ebay}</div>
+                                                    <small className="text-muted">eBay</small>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <div className="col-md-2">
+                                                <div className="card bg-white">
+                                                  <div className="card-body text-center py-2">
+                                                    <div className="h5 mb-0 text-info">{artikelPresence.summary.auf_amazon}</div>
+                                                    <small className="text-muted">Amazon</small>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <div className="col-md-2">
+                                                <div className="card bg-white">
+                                                  <div className="card-body text-center py-2">
+                                                    <div className="h5 mb-0 text-success">{artikelPresence.summary.in_shops}</div>
+                                                    <small className="text-muted">Shops</small>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <div className="col-md-2">
+                                                <div className="card bg-white">
+                                                  <div className="card-body text-center py-2">
+                                                    <div className="h5 mb-0 text-secondary">{artikelPresence.summary.in_verkaufskanaelen}</div>
+                                                    <small className="text-muted">Verkaufskanäle</small>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <div className="col-md-2">
+                                                <div className="card bg-primary text-white">
+                                                  <div className="card-body text-center py-2">
+                                                    <div className="h5 mb-0">{artikelPresence.summary.gesamt_praesenz}</div>
+                                                    <small>Gesamt</small>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+
+                                            {/* Details */}
+                                            {artikelPresence.presence.stuecklisten.length > 0 && (
+                                              <div className="mb-2">
+                                                <strong className="text-primary">In Stücklisten ({artikelPresence.presence.stuecklisten.length}):</strong>
+                                                <ul className="small mb-0">
+                                                  {artikelPresence.presence.stuecklisten.slice(0, 5).map((s, i) => (
+                                                    <li key={i}>{s.cVaterName} ({s.cVaterArtNr}) - Menge: {s.fMenge}</li>
+                                                  ))}
+                                                </ul>
+                                              </div>
+                                            )}
+
+                                            {artikelPresence.presence.ebay_angebote.length > 0 && (
+                                              <div className="mb-2">
+                                                <strong className="text-warning">eBay-Angebote ({artikelPresence.presence.ebay_angebote.length}):</strong>
+                                                <ul className="small mb-0">
+                                                  {artikelPresence.presence.ebay_angebote.slice(0, 3).map((e, i) => (
+                                                    <li key={i}>{e.Title} - {e.Platform} - {e.Price}€</li>
+                                                  ))}
+                                                </ul>
+                                              </div>
+                                            )}
+
+                                            {artikelPresence.presence.amazon_angebote.length > 0 && (
+                                              <div className="mb-2">
+                                                <strong className="text-info">Amazon-Angebote ({artikelPresence.presence.amazon_angebote.length}):</strong>
+                                                <ul className="small mb-0">
+                                                  {artikelPresence.presence.amazon_angebote.slice(0, 3).map((a, i) => (
+                                                    <li key={i}>ASIN: {a.ASIN} - {a.Platform} - {a.Price}€</li>
+                                                  ))}
+                                                </ul>
+                                              </div>
+                                            )}
+
+                                            {artikelPresence.presence.online_shops.length > 0 && (
+                                              <div className="mb-2">
+                                                <strong className="text-success">Online-Shops ({artikelPresence.presence.online_shops.length}):</strong>
+                                                <ul className="small mb-0">
+                                                  {artikelPresence.presence.online_shops.map((s, i) => (
+                                                    <li key={i}>{s.ShopName} - <a href={s.ArtikelURL} target="_blank">{s.ArtikelURL?.substring(0, 50)}...</a></li>
+                                                  ))}
+                                                </ul>
+                                              </div>
+                                            )}
+                                          </div>
+                                        ) : null}
+                                      </td>
+                                    </tr>
+                                  )}
+                                </>
+                              ))
                               )}
                             </tbody>
                           </table>
