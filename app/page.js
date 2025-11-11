@@ -4194,14 +4194,14 @@ export default function App() {
                                     </div>
                                   )}
                                   
-                                  {/* Alte Analysis Format (falls vorhanden) */}
-                                  {p.analysis && !p.analysis_v3 && (
+                                  {/* Alte Analysis Format - Mit Safe Guards */}
+                                  {p.analysis && !p.analysis_v3 && p.analysis.company_info && (
                                     <div className="row">
                                       <div className="col-md-6 mb-3">
                                         <div className="p-3 bg-secondary rounded">
                                           <h6 className="text-primary mb-3"><i className="bi bi-info-circle mr-2"/>Firmen-Info (Old)</h6>
-                                          <p className="text-white mb-3">{p.analysis.company_info?.description || 'Keine Beschreibung'}</p>
-                                          {p.analysis.company_info?.products?.length > 0 && (
+                                          <p className="text-white mb-3">{p.analysis.company_info.description || 'Keine Beschreibung'}</p>
+                                          {p.analysis.company_info.products?.length > 0 && (
                                           <div>
                                             <strong className="text-muted small d-block mb-2">Produkte:</strong>
                                             <div className="d-flex flex-wrap">
