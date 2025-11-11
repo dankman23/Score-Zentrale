@@ -355,38 +355,46 @@ export default function PreiseModule() {
 
             {/* VK-Ergebnisse */}
             {ergebnisse.length > 0 && (
-              <div className="card border-success">
-                <div className="card-header bg-success text-white">
-                  <h5 className="mb-0">Berechnete Preise (Staffelpreise)</h5>
+              <div>
+                {/* Plattformpreis */}
+                <div className="card border-primary mb-3">
+                  <div className="card-header bg-primary text-white">
+                    <h5 className="mb-0">Netto Plattformpreis (eBay/Amazon)</h5>
+                  </div>
+                  <div className="card-body text-center">
+                    <div className="display-4 font-weight-bold text-primary">
+                      {(ergebnisse[0]?.vk_netto || 0).toFixed(2)} €
+                    </div>
+                    <div className="text-muted">pro Stück (netto)</div>
+                  </div>
                 </div>
-                <div className="card-body">
-                  <div className="table-responsive">
-                    <table className="table table-striped table-sm">
-                      <thead>
-                        <tr>
-                          <th>VE</th>
-                          <th>VK netto (€)</th>
-                          <th>VK brutto (€)</th>
-                          <th>VK Shop netto (€)</th>
-                          <th>VK Shop brutto (€)</th>
-                          <th>Gewinn % (zu VK)</th>
-                          <th>Gewinn % (zu EK)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {ergebnisse.map(e => (
-                          <tr key={e.ve}>
-                            <td><strong>{e.ve}</strong></td>
-                            <td>{(e.vk_netto || 0).toFixed(2)}</td>
-                            <td>{(e.vk_brutto || 0).toFixed(2)}</td>
-                            <td>{(e.vk_shop_netto || 0).toFixed(2)}</td>
-                            <td>{(e.vk_shop_brutto || 0).toFixed(2)}</td>
-                            <td><span className="badge badge-success">{(e.gewinn_prozent_vk || 0).toFixed(1)}%</span></td>
-                            <td><span className="badge badge-info">{(e.gewinn_prozent_ek || 0).toFixed(1)}%</span></td>
+
+                {/* Shop-Staffelpreise */}
+                <div className="card border-success">
+                  <div className="card-header bg-success text-white">
+                    <h5 className="mb-0">Netto Shop Staffelpreise (mit {currentFormel?.regler?.aa_threshold || 18}% Rabatt)</h5>
+                  </div>
+                  <div className="card-body">
+                    <div className="table-responsive">
+                      <table className="table table-striped table-bordered text-center">
+                        <thead className="thead-dark">
+                          <tr>
+                            {ergebnisse.map(e => (
+                              <th key={e.ve} className="font-weight-bold">{e.ve}</th>
+                            ))}
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            {ergebnisse.map(e => (
+                              <td key={e.ve} className="font-weight-bold h5 text-success">
+                                {(e.vk_shop_netto || 0).toFixed(2)} €
+                              </td>
+                            ))}
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </div>
