@@ -1,295 +1,320 @@
-# 🚀 Fork-Ready Guide für Score Zentrale
+# 🔧 FORK-READY GUIDE - Score Zentrale
 
-## ✅ Nach dem Forken - Checkliste für neue Agents
-
-Dieses Dokument stellt sicher, dass die Score Zentrale nach dem Forken **sofort funktioniert**.
+**Version:** 2.0  
+**Letzte Aktualisierung:** 11.11.2025  
+**Status:** ✅ Produktionsbereit
 
 ---
 
-## 📋 Schritt 1: Umgebungsvariablen prüfen
+## 📋 Pre-Deployment Checkliste
 
-Alle erforderlichen Keys sind in `/app/.env`. Prüfe:
+### 1. Environment Setup
+
+**Datei:** `/app/.env`
 
 ```bash
-# Öffne .env
-cat /app/.env
-```
+# MongoDB (WICHTIG: Läuft lokal)
+MONGO_URL=mongodb://localhost:27017/score_zentrale
 
-### ✅ Muss vorhanden sein:
-```bash
-# MongoDB (LOKAL - nicht ändern!)
-MONGO_URL=mongodb://localhost:27017
-DB_NAME=score_zentrale
-
-# JTL-Wawi MS SQL (Produktiv-Datenbank)
-MSSQL_HOST=162.55.235.45
+# JTL-Wawi MSSQL Connection
+MSSQL_HOST=localhost
 MSSQL_PORT=1433
-MSSQL_DATABASE=eazybusinesstest
 MSSQL_USER=sa
-MSSQL_PASSWORD=[vorhanden]
+MSSQL_PASSWORD=<SECRET>
+MSSQL_DATABASE=eazybusiness
+MSSQL_ENCRYPT=false
+MSSQL_TRUST_SERVER_CERTIFICATE=true
+
+# Email (SMTP für Kaltakquise)
+SMTP_HOST=smtp.strato.de
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=daniel@score-schleifwerkzeuge.de
+SMTP_PASS=<SECRET>
+SMTP_FROM="Daniel von Score Schleifwerkzeuge <daniel@score-schleifwerkzeuge.de>"
+
+# Google Custom Search (für Kaltakquise)
+GOOGLE_SEARCH_ENGINE_ID=<ID>
+GOOGLE_SEARCH_API_KEY=<KEY>
 
 # Google Analytics 4
-GA4_PROPERTY_ID=[vorhanden]
-GA4_PRIVATE_KEY=[vorhanden]
-GA4_CLIENT_EMAIL=[vorhanden]
+GA4_PROPERTY_ID=<ID>
+GA4_CREDENTIALS=<JSON_KEY_BASE64>
 
-# Google Search API (für DACH-Crawler)
-GOOGLE_SEARCH_API_KEY=[vorhanden]
-GOOGLE_SEARCH_ENGINE_ID=0146da4031f5e42a3
+# Google Ads
+GOOGLE_ADS_CLIENT_ID=<ID>
+GOOGLE_ADS_CLIENT_SECRET=<SECRET>
+GOOGLE_ADS_REFRESH_TOKEN=<TOKEN>
+GOOGLE_ADS_DEVELOPER_TOKEN=<TOKEN>
+GOOGLE_ADS_CUSTOMER_ID=<ID>
 
-# E-Mail (SMTP/IMAP für Kaltakquise)
-SMTP_HOST=mail.score-schleifwerkzeuge.de
-SMTP_PORT=587
-SMTP_USER=[vorhanden]
-SMTP_PASSWORD=[vorhanden]
-SMTP_FROM=[vorhanden]
-REPLY_TO_EMAIL=[vorhanden]
-
-IMAP_HOST=mail.score-schleifwerkzeuge.de
+# IMAP (Email-Inbox für Kaltakquise)
+IMAP_HOST=imap.strato.de
 IMAP_PORT=993
-IMAP_USER=[vorhanden]
-IMAP_PASSWORD=[vorhanden]
-
-# OpenAI (für Kaltakquise-Analyse)
-OPENAI_API_KEY=[vorhanden]
+IMAP_USER=daniel@score-schleifwerkzeuge.de
+IMAP_PASS=<SECRET>
+IMAP_TLS=true
 
 # Next.js
-NEXT_PUBLIC_BASE_URL=[Auto-configured]
-```
+NEXT_PUBLIC_BASE_URL=https://score-zentrale.emergentagent.com
+NEXT_PUBLIC_DEGRADED=0
+NODE_OPTIONS=--max-old-space-size=1024
 
-**⚠️ NIEMALS ändern:**
-- `MONGO_URL` → Muss `mongodb://localhost:27017` bleiben!
-- `NEXT_PUBLIC_BASE_URL` → Wird automatisch gesetzt
-
----
-
-## 🔧 Schritt 2: Services starten
-
-```bash
-# Prüfe Status
-sudo supervisorctl status
-
-# Expected output:
-# mongodb     RUNNING
-# nextjs      RUNNING
-```
-
-Falls nicht:
-```bash
-sudo supervisorctl restart all
+# Emergent LLM Key (wird automatisch gesetzt)
+EMERGENT_API_KEY=<AUTO>
 ```
 
 ---
 
-## 🧪 Schritt 3: Health-Check
+### 2. MongoDB Collections Setup
 
+**KRITISCH:** Korrekte Collection-Namen verwenden!
+
+```javascript
+// ✅ KORREKT
+db.collection('prospects')      // Kaltakquise
+db.collection('articles')       // JTL-Artikel
+db.collection('autopilot_state')// Autopilot
+
+// ❌ FALSCH (Legacy)
+db.collection('cold_prospects') // Veraltet!
+```
+
+**Collections erstellen (falls nicht vorhanden):**
 ```bash
-# Test JTL-API
-curl http://localhost:3000/api/jtl/sales/date-range
+mongo score_zentrale
+db.createCollection('prospects')
+db.createCollection('articles')
+db.createCollection('autopilot_state')
 
-# Expected: {"ok":true,"min":"2021-02-05","max":"YYYY-MM-DD"}
-
-# Test Analytics
-curl http://localhost:3000/api/analytics/metrics?startDate=30daysAgo&endDate=today
-
-# Expected: {"sessions":..., "users":...}
-
-# Test DACH-Crawler
-curl http://localhost:3000/api/coldleads/dach/stats
-
-# Expected: {"ok":true,"stats":{...}}
+db.prospects.createIndex({ "website": 1 }, { unique: true })
+db.articles.createIndex({ "kArtikel": 1 }, { unique: true })
 ```
 
 ---
 
-## 📚 Schritt 4: JTL-API-Wissen lesen
+### 3. JTL-Wawi Connection Test
 
-**WICHTIG:** Lies zuerst `/app/JTL_API_KNOWLEDGE.md`!
+```bash
+curl http://localhost:3000/api/jtl/articles/count
 
-Dieses Dokument enthält:
-- Schema-Struktur aller JTL-Tabellen
-- Bekannte Datenqualitäts-Issues
-- Query-Patterns und Best Practices
-- Performance-Tipps
-- Debugging-Queries
-
-**OHNE dieses Wissen wirst du Fehler machen!**
+# Expected Output:
+{
+  "ok": true,
+  "counts": {
+    "gesamt": 318549,
+    "importierbar": 166855
+  }
+}
+```
 
 ---
 
-## 🗄️ Schritt 5: MongoDB Collections prüfen
+### 4. Kaltakquise V3 System
 
+#### **Komponenten:**
+
+**Analyzer V3:**
+- Multi-Page Crawl (7 Seiten: Home, Leistungen, Produkte, Referenzen, Team, Kontakt, Impressum)
+- OpenAI GPT-4o LLM-Analyse
+- Glossar-Mapping (311 Begriffe: 71 Anwendungen, 90 Werkstoffe, 62 Maschinen, 88 Kategorien)
+- Contact Extraction mit Confidence
+- Brand Matching (10 Score-Partner)
+
+**Emailer V3:**
+- 3 Mails: Erstansprache + Follow-up 1 (5d) + Follow-up 2 (12d)
+- Plain Text (kein Markdown)
+- Wortlimits: ≤180, ≤110, ≤90
+- Personalisiert (Anrede, Website-Bezug, Marken)
+- BCC an leismann@score-schleifwerkzeuge.de
+
+**Auto-Follow-ups:**
+- Automatisch via Cron-Job
+- Prüft täglich fällige Follow-ups
+- Versendet Mail 2 & 3 automatisch
+
+#### **Blacklist (Verzeichnisse filtern):**
+```javascript
+// In prospector.ts & dach-crawler.ts
+const blacklistedDomains = [
+  'gelbenseiten.de', 'gelbeseiten.de',
+  'wlw.de', 'wer-liefert-was.de',
+  'lehrer-online.de', 'schulewirtschaft.de',
+  'wikipedia.org', 'youtube.com',
+  'facebook.com', 'linkedin.com',
+  'indeed.de', 'stepstone.de'
+]
+```
+
+#### **Testing:**
 ```bash
-# MongoDB Shell öffnen
-mongosh mongodb://localhost:27017/score_zentrale
+# 1. Einzelne Analyse
+curl -X POST http://localhost:3000/api/coldleads/analyze-v3 \
+  -H "Content-Type: application/json" \
+  -d '{"website":"https://example.com","company_name":"Test","industry":"Metallverarbeitung"}'
 
-# Collections anzeigen
-show collections
+# 2. Email versenden
+curl -X POST http://localhost:3000/api/coldleads/email-v3/send \
+  -H "Content-Type: application/json" \
+  -d '{"prospect_id":"...","mail_number":1}'
+
+# 3. Auto-Follow-ups prüfen
+curl http://localhost:3000/api/coldleads/followup/auto
+```
+
+---
+
+### 5. JTL Artikel-Import
+
+**Full-Import starten:**
+```bash
+# Import ALLE 166.855 Artikel
+curl -X POST http://localhost:3000/api/jtl/articles/import/start \
+  -H "Content-Type: application/json" \
+  -d '{"batchSize":2000,"offset":0}'
+
+# Loop bis fertig (siehe /tmp/full_import.sh)
+```
+
+**Status prüfen:**
+```bash
+curl http://localhost:3000/api/jtl/articles/import/status
 
 # Expected:
-# - cold_prospects (Kaltakquise-Firmen)
-# - dach_crawl_progress (DACH-Crawler-Status)
-# - glossary_v1 (Glossar-Versionen)
-
-# Test Query
-db.cold_prospects.countDocuments()
+{
+  "ok": true,
+  "imported": 166855
+}
 ```
 
 ---
 
-## ⚙️ Schritt 6: Konfigurationen validieren
+### 6. Autopilot Setup
 
-### Google Search API testen:
+**Autopilot nutzt V3-APIs:**
+- Suche → `/api/coldleads/search`
+- Analyse → `/api/coldleads/analyze-v3`
+- Email → `/api/coldleads/email-v3/send`
+
+**Starten:**
 ```bash
-curl "https://www.googleapis.com/customsearch/v1?key=${GOOGLE_SEARCH_API_KEY}&cx=${GOOGLE_SEARCH_ENGINE_ID}&q=test&num=1"
-
-# Expected: JSON mit "items" Array
-# Falls 400: API Key oder Engine ID falsch!
+curl -X POST http://localhost:3000/api/coldleads/autopilot/start \
+  -H "Content-Type: application/json" \
+  -d '{"dailyLimit":50}'
 ```
 
-### MSSQL Connection testen:
+**Optional: Cron-Job für Auto-Follow-ups**
 ```bash
+# /etc/cron.d/score-followups
+0 10 * * * curl -s http://localhost:3000/api/coldleads/followup/auto
+```
+
+---
+
+## 🚨 Bekannte Issues & Fixes
+
+### Issue 1: Import-Pfade in API-Routes
+**Problem:** `@/` Aliases funktionieren nicht in nested routes
+**Fix:** Relative Pfade verwenden:
+```javascript
+// ❌ FALSCH
+import { foo } from '@/lib/bar'
+
+// ✅ RICHTIG
+import { foo } from '../../../../lib/bar'
+```
+
+### Issue 2: MongoDB Collection Names
+**Problem:** Alte Code nutzt `cold_prospects`
+**Fix:** Überall auf `prospects` ändern
+
+### Issue 3: Analysis Format
+**Problem:** Mix aus `analysis` (alt) und `analysis_v3` (neu)
+**Fix:** Immer beide prüfen:
+```javascript
+if (p.analysis_v3) {
+  // V3 Format
+} else if (p.analysis) {
+  // Legacy Format
+}
+```
+
+---
+
+## ✅ Post-Deployment Tests
+
+### 1. Basis-Funktionalität
+```bash
+# Health Check
 curl http://localhost:3000/api/health/schema
 
-# Expected: Liste aller JTL-Tabellen
+# MongoDB Connection
+curl http://localhost:3000/api/coldleads/stats
+
+# JTL Connection
+curl http://localhost:3000/api/jtl/sales/kpi
 ```
 
----
-
-## 🚨 Häufige Probleme nach dem Forken
-
-### Problem 1: "504 Gateway Timeout"
-**Ursache:** Next.js Memory-Issue  
-**Lösung:**
+### 2. Kaltakquise V3
 ```bash
-sudo supervisorctl restart nextjs
+# Analyse testen
+curl -X POST http://localhost:3000/api/coldleads/analyze-v3 \
+  -d '{"website":"https://www.klingspor.de"}'
+
+# Prüfen ob in DB
+curl http://localhost:3000/api/coldleads/search?status=analyzed
 ```
 
-### Problem 2: "Cannot connect to MongoDB"
-**Ursache:** MongoDB nicht gestartet  
-**Lösung:**
+### 3. Frontend
+- Öffne `http://localhost:3000`
+- Gehe zu Kaltakquise → Bulk-Analyse testen
+- Gehe zu Produkte → Artikel-Browser testen
+- Gehe zu Glossar → Branchen prüfen
+
+---
+
+## 📊 Performance-Tipps
+
+### MongoDB Indices
+```javascript
+// Prospects
+db.prospects.createIndex({ "status": 1 })
+db.prospects.createIndex({ "score": -1 })
+db.prospects.createIndex({ "created_at": -1 })
+
+// Articles
+db.articles.createIndex({ "cHerstellerName": 1 })
+db.articles.createIndex({ "cWarengruppenName": 1 })
+db.articles.createIndex({ "cName": "text" })
+```
+
+### Next.js Memory
 ```bash
-sudo supervisorctl restart mongodb
-sleep 3
-sudo supervisorctl restart nextjs
+# In .env
+NODE_OPTIONS=--max-old-space-size=1024
 ```
 
-### Problem 3: "MSSQL connection failed"
-**Ursache:** Firewall oder falsche Credentials  
-**Lösung:**
-1. Prüfe `/app/.env` → MSSQL_* Variablen
-2. Teste Verbindung:
-```bash
-curl http://localhost:3000/api/jtl/sales/date-range
-```
-Falls Fehler: Kontaktiere Admin für JTL-Credentials
+---
 
-### Problem 4: "Google Search API 400 Bad Request"
-**Ursache:** API Key oder Engine ID falsch  
-**Lösung:**
-1. Gehe zu: https://programmablesearchengine.google.com/
-2. Kopiere Engine ID: `0146da4031f5e42a3` (GENAU SO!)
-3. Update `.env` wenn nötig
-4. Restart: `sudo supervisorctl restart nextjs`
+## 🔐 Security Checklist
+
+- [ ] `.env` nie committen
+- [ ] MongoDB Password ändern
+- [ ] MSSQL Password ändern
+- [ ] SMTP Password ändern
+- [ ] Google API Keys rotieren
+- [ ] Firewall: Nur Port 3000 öffnen
 
 ---
 
-## 📊 Schritt 7: Dashboard prüfen
+## 📞 Support
 
-```bash
-# Screenshot vom Dashboard
-curl http://localhost:3000/ > /dev/null
-
-# Öffne im Browser:
-# http://localhost:3000
-```
-
-**Erwartete Sections:**
-1. ✅ Sales Dashboard (JTL-Wawi)
-2. ✅ Analytics (GA4)
-3. ✅ Kaltakquise (mit DACH-Crawler Tab)
-4. ✅ Warmakquise
-5. ✅ Marketing (Glossar)
+Bei Problemen:
+1. Prüfe Supervisor-Logs: `sudo supervisorctl tail -f nextjs`
+2. Prüfe MongoDB: `mongo score_zentrale`
+3. Prüfe JTL-Connection: `curl http://localhost:3000/api/jtl/articles/count`
+4. Prüfe Test-Results: `cat /app/test_result.md`
 
 ---
 
-## 🔐 Wichtige Sicherheits-Hinweise
-
-1. **NIEMALS `.env` in Git committen!**
-2. **NIEMALS API Keys im Code hardcoden!**
-3. **MSSQL-Credentials sind produktiv!** → Vorsicht bei Writes
-4. **MongoDB ist lokal** → Daten gehen bei Neustart verloren (außer persistiert)
-
----
-
-## 📝 Best Practices für neue Agents
-
-### 1. Lies immer zuerst die Wissensdatenbanken:
-- `/app/JTL_API_KNOWLEDGE.md` → JTL-Wawi Schema & Queries
-- `/app/DEPLOYMENT_GUIDE.md` → Deployment-Details
-- `/app/SCHEMA_MONITORING.md` → Schema-Validierung
-- `/app/ROBUSTNESS_GUARANTEE.md` → Fehlerbehandlung
-- `/app/KALTAKQUISE_ANLEITUNG.md` → Kaltakquise-System
-
-### 2. Teste IMMER nach Änderungen:
-```bash
-# JTL-APIs
-curl http://localhost:3000/api/jtl/sales/kpi?from=2025-11-01&to=2025-11-10
-
-# Analytics
-curl http://localhost:3000/api/analytics/metrics?startDate=7daysAgo&endDate=today
-
-# DACH-Crawler
-curl -X POST http://localhost:3000/api/coldleads/dach/crawl \
-  -H "Content-Type: application/json" \
-  -d '{"country":"DE","region":"Bayern","industry":"Metallverarbeitung","limit":5}'
-```
-
-### 3. Memory-Management:
-- Node.js Memory-Limit: **1024MB** (in package.json)
-- Bei Memory-Warnings: `sudo supervisorctl restart nextjs`
-- Für langsame Queries: Caching nutzen (siehe JTL_API_KNOWLEDGE.md)
-
-### 4. Fehlerbehandlung:
-- Alle APIs haben `ok: true/false` Response
-- Bei `ok: false` → Prüfe `error` Feld
-- Logs: `tail -f /var/log/supervisor/nextjs.out.log`
-
----
-
-## 🎯 Schnell-Referenz
-
-| Task | Command |
-|------|---------|
-| Server Status | `sudo supervisorctl status` |
-| Server Restart | `sudo supervisorctl restart all` |
-| Logs anzeigen | `tail -f /var/log/supervisor/nextjs.out.log` |
-| MongoDB Shell | `mongosh mongodb://localhost:27017/score_zentrale` |
-| Health-Check | `curl http://localhost:3000/api/health/schema` |
-| .env prüfen | `cat /app/.env \| grep -v "^#"` |
-
----
-
-## 🆘 Support
-
-Falls nach dieser Checkliste noch Probleme bestehen:
-
-1. Prüfe **alle** Logs:
-   ```bash
-   tail -n 200 /var/log/supervisor/nextjs.out.log
-   ```
-
-2. Validiere Schema:
-   ```bash
-   curl http://localhost:3000/api/health/schema
-   ```
-
-3. Teste einzelne APIs isoliert (siehe Schritt 3)
-
-4. Konsultiere Wissensdatenbanken (siehe Schritt 4)
-
----
-
-**Version:** 1.0  
-**Für:** Alle geforkten Score Zentrale Instanzen  
-**Zuletzt aktualisiert:** 10.11.2025
+**Version 2.0 - Kaltakquise V3 System - Ready for Production! 🚀**
