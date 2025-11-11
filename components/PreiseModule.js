@@ -495,7 +495,7 @@ export default function PreiseModule() {
         )}
 
         {tab === 'neue_2025' && (
-          <PreiseG2Module />
+          <PreiseG2Module formeln={formeln} />
         )}
 
         {tab === 'vergleich' && (
