@@ -1,73 +1,76 @@
 <analysis>
-The AI engineer's trajectory involved enhancing the Score Zentrale application through several major features. Initially, a structured DACH-Crawling system was implemented, followed by a substantial JTL Article Import feature to handle over 166,000 articles, complete with UI for filtering and pagination. Significant effort was dedicated to improving the application's stability and documentation for future handovers. The most extensive work centered on a complete overhaul of the Kaltakquise (Cold Acquisition) tool, driven by a detailed ChatGPT prompt. This refactor included UI improvements, new V3 analysis and email generation services (using OpenAI GPT-4o), new APIs, and an upgrade to the existing autopilot. Throughout these phases, the AI engineer engaged in continuous debugging of API routes, frontend display issues, and data synchronization, culminating in fixes for prospect analysis display and MongoDB collection consistency before beginning the requested documentation for the fork transition.
+The AI engineer's work involved significant enhancements across two core application modules: Kaltakquise (Cold Acquisition) and JTL Article Import, alongside the initial implementation of a new Preise (Pricing) module. Key debugging efforts focused on resolving frontend syntax errors, rectifying inconsistent MongoDB collection usage, and fixing import path discrepancies in API routes. For the JTL import, the strategy evolved from an inefficient OFFSET-based approach to a robust cursor-based pagination to ensure full and accurate article import with real-time status. The pricing module involved analyzing complex Excel formulas, implementing new backend APIs for calculation and formula management, and integrating a new UI tab. The engineer consistently communicated progress, sought user clarification, and addressed critical issues like MongoDB connection failures. The work is currently paused on monitoring the JTL import, with a new pricing module UI awaiting final debugging.
 </analysis>
+
 <product_requirements>
-The Score Zentrale is a Next.js dashboard integrating Sales (JTL-Wawi), Marketing (GA4, Google Ads, Cold/Warm Acquisition), and an Outbound suite. The core problem is to provide comprehensive business intelligence and automation for sales and marketing processes. This includes: a Sales Dashboard with JTL-Wawi KPIs and filters; an AI-powered Cold Acquisition system for structured prospecting (DACH-Crawling), detailed AI analysis, personalized email outreach (initial + two follow-ups) with automation, and glossary integration; a Warm Acquisition module for inactive customers; general UI/UX improvements; and a JTL Article Import system for over 300,000 articles into MongoDB with frontend browsing capabilities. The application also requires deployment readiness, stability, memory optimization, and comprehensive documentation for future development.
+The Score Zentrale is a Next.js application designed as a comprehensive dashboard for sales and marketing. Its primary goal is to provide business intelligence and automation capabilities. Key features include:
+1.  **Sales Dashboard:** Displaying JTL-Wawi KPIs with filtering options.
+2.  **AI-powered Cold Acquisition System (Kaltakquise):**
+    *   Structured prospecting via DACH-Crawling.
+    *   Detailed AI-driven prospect analysis (V3).
+    *   Personalized email outreach (initial + two follow-ups) with automation (Autopilot).
+    *   Integration with a glossary for AI analysis.
+    *   UI improvements for responsiveness and usability (e.g., bulk analysis, delete prospect buttons, compact table layout).
+    *   Lead quality improvements through blacklisting undesirable domains.
+3.  **Warm Acquisition Module:** For engaging inactive customers (planned, not yet implemented).
+4.  **JTL Article Import System:**
+    *   Import of over 300,000 articles (specifically ~166,855) into MongoDB.
+    *   Frontend browsing capabilities for imported articles with filtering and pagination.
+    *   Ensuring article data integrity and preservation of additional fields during updates.
+    *   Real-time status display for import progress.
+5.  **Pricing Module (Preise):**
+    *   Implement price calculation based on complex Excel formulas.
+    *   New UI with tabs for Alte PB and Neue ab 2025-11 (Old/New Price Formulas).
+    *   Editable regulators and input for purchase price (EK) to automatically calculate selling prices (VKs).
+6.  **General Requirements:** UI/UX improvements, deployment readiness, stability, memory optimization, and comprehensive documentation for future development.
 </product_requirements>
+
 <key_technical_concepts>
--   **Next.js & TypeScript**: Full-stack framework.
--   **MongoDB**: NoSQL database for cold lead and imported JTL articles.
--   **MS SQL (JTL-Wawi)**: Relational database for Sales and customer data.
--   **Shadcn/UI & Tailwind CSS**: UI components and CSS framework.
--   **AI/LLM (OpenAI GPT-4o via )**: Prospect analysis, email generation, glossary matching.
--   **Google Custom Search API**: For structured web scraping in DACH-Crawling.
+-   **Next.js & TypeScript**: Full-stack framework for the application.
+-   **MongoDB**: NoSQL database for cold leads and JTL articles.
+-   **MS SQL (JTL-Wawi)**: Relational database for sales and customer data.
+-   **Shadcn/UI & Tailwind CSS**: UI components and styling framework.
+-   **AI/LLM (OpenAI GPT-4o via )**: For prospect analysis, email generation, and glossary mapping.
+-   **Google Custom Search API**: Utilized for structured web scraping in DACH-Crawling.
+-   **Cursor-based Pagination**: Advanced technique for robust data import without missing entries.
 </key_technical_concepts>
+
 <code_architecture>
 
--   ****: Main frontend, dashboard UI, Kaltakquise, JTL Articles.
-    -   **Importance**: Central client-side component for user interaction and data display.
-    -   **Changes**:
-        -   Integrated DACH-Crawling and JTL Article Import UIs.
-        -   Extensive Kaltakquise overhaul: UI fixes for responsiveness, added bulk analysis, delete prospect buttons.
-        -   Implemented  data display logic, with backward compatibility.
-        -   Added email preview for the 3-mail sequence.
-        -   Fixed data synchronization issues for prospect lists and stats after analysis.
-        -   Relocated Glossar UI section to a top-level tab.
+
+**Key Files and Changes:**
+-   ****: Main frontend dashboard.
+    -   **Importance**: Central UI for user interaction, displays Kaltakquise, JTL Articles, and now Preise.
+    -   **Changes**: Fixed a syntax error (missing  and extraneous ). Updated  logic for consistent MongoDB collection usage. Added Preise to hash-based navigation. Integrated  component.
 -   ****: Global layout and navigation.
-    -   **Importance**: Defines the main navigation structure of the application.
-    -   **Changes**: Added Produkte and Glossar to the main navigation (hero-band and mobile tabbar).
--   ** (NEW)**: API endpoint for V3 prospect analysis.
-    -   **Importance**: Handles requests for detailed LLM-driven company analysis.
-    -   **Changes**: Initial creation, fixed relative import paths and MongoDB collection usage.
--   ** (NEW)**: API for bulk prospect analysis.
--   ** (NEW)**: API for generating V3 cold emails.
--   ** (NEW)**: API for deleting prospects.
--   ****: API for searching/listing prospects.
-    -   **Importance**: Core API for fetching prospects in the Kaltakquise section.
-    -   **Changes**: Fixed to consistently use the  MongoDB collection (instead of ) and updated response to include V3 analysis fields.
--   ****: Autopilot core logic.
-    -   **Importance**: Automates prospect analysis and email sending.
-    -   **Changes**: Upgraded to use  and  and fixed MongoDB collection name.
+    -   **Importance**: Defines the main navigation structure.
+    -   **Changes**: Added Preise to the main navigation menu.
+-   ****: API for deleting cold lead prospects.
+    -   **Importance**: Critical for managing prospect data.
+    -   **Changes**: Corrected the relative import path for .
 -   ****: API to initiate JTL article import.
-    -   **Importance**: Handles the bulk import of JTL articles into MongoDB.
-    -   **Changes**: Debugged  field mapping and import restart logic for full import.
--   ** (NEW)**: Service for V3 prospect analysis.
-    -   **Importance**: Implements detailed LLM-driven website parsing and glossary mapping.
-    -   **Changes**: Initial creation, debugging of LLM calls and relative imports.
--   ** (NEW)**: Service for V3 email generation.
-    -   **Importance**: Implements LLM-driven generation of personalized 3-part email sequences.
-    -   **Changes**: Initial creation, debugging of LLM calls and relative imports.
--   ****: Core logic for DACH crawling.
-    -   **Importance**: Systematically crawls specific regions and industries for leads.
-    -   **Changes**: Added blacklisting for undesirable domains (e.g., yellow pages) to improve lead quality.
--   ****: Prospecting service.
-    -   **Importance**: Performs Google searches for leads.
-    -   **Changes**: Added blacklisting logic for undesirable websites.
--   ****: Manages glossary terms.
-    -   **Importance**: Provides controlled vocabulary for AI analysis.
-    -   **Changes**: Added branchen (industries) category from user-provided PDF.
--   ** (NEW)**: Centralized configuration for cold leads.
--   ****: Main project documentation.
-    -   **Importance**: Provides an overview of the application's features.
-    -   **Changes**: Updated to include the new Produkte-Verwaltung feature.
--   ****: JTL-Wawi API knowledge base.
-    -   **Importance**: Documents specifics of the JTL-Wawi API for development.
--   ****: Deployment readiness guide.
--   ****: Project entry point for new agents.
--   ****: Testing protocol and results.
-    -   **Importance**: Records test cases and outcomes for continuous integration.
-    -   **Changes**: Continuously updated to reflect backend testing of Kaltakquise V3 and JTL Article Import.
+    -   **Importance**: Handles bulk import of articles.
+    -   **Changes**: Modified to prevent deletion of all articles on  with . Updated  operations to use  for preserving additional fields and switched from OFFSET-based to cursor-based pagination logic using .
+-   ****: API to check JTL article import status.
+    -   **Importance**: Provides real-time import progress.
+    -   **Changes**: Extended the API to return , , and  based on recent changes in article count.
+-   ** (NEW)**: New API for continuing JTL article import using cursor-based pagination.
+    -   **Importance**: Ensures robust and complete import of all articles by avoiding the pitfalls of OFFSET.
+    -   **Changes**: Initial creation, implementing the  logic.
+-   ** (NEW)**: API to manage pricing formulas.
+    -   **Importance**: Backend endpoint for fetching and potentially saving pricing formulas.
+    -   **Changes**: Initial creation.
+-   ** (NEW)**: API for calculating prices.
+    -   **Importance**: Handles the core logic of price calculation based on input and formulas.
+    -   **Changes**: Initial creation, implemented calculation logic, debugged  on undefined, missing return values, and static costs logic.
+-   ** (NEW)**: React component for the pricing module UI.
+    -   **Importance**: Frontend display for price calculation with inputs and results.
+    -   **Changes**: Initial creation, defensive checks added for  values.
+-   **🔄 JTL-Artikel Import wird fortgesetzt... (NEW)**: Script to automate article import.
+    -   **Importance**: Manages the continuous import of articles in batches.
+    -   **Changes**: Initial creation, adapted to call the new  endpoint.
 </code_architecture>
+
 <pending_tasks>
 -   Full implementation of Google Ads and LinkedIn integrations (Google Ads needs Standard Access).
 -   Implementation of Firebase (Firestore, Auth, Functions).
@@ -76,20 +79,21 @@ The Score Zentrale is a Next.js dashboard integrating Sales (JTL-Wawi), Marketin
 -   Implement charts for Traffic Sources and other tables in Analytics.
 -   Complete the structured DACH-Crawling system, particularly full pagination for exhaustive searches.
 -   Full implementation of the JTL article features () import.
--   Ensure full import of all ~167,000 JTL articles is completed and verified.
+-   Complete the documentation for fork transitions based on user request.
+-   Debug the frontend of the Preise module, as it currently shows a spinner despite the API working.
 </pending_tasks>
+
 <current_work>
-Immediately before this summary request, the AI engineer was engaged in two main areas: debugging the Kaltakquise (Cold Acquisition) system and initiating documentation.
-For **Kaltakquise**, critical issues were addressed:
-1.  **Analysis Display & Status Update**: Prospects were not consistently moving to the Analysiert tab after analysis, and analysis details were not displaying correctly. This was traced to inconsistent usage of MongoDB collections ( vs. ) in  and , which have now been fixed to consistently use the  collection. The frontend logic in  for  was also adjusted to correctly refresh prospect lists based on the active filter after analysis.
-2.  **UI Layout**: The Kaltakquise table layout in  was made more compact to improve the accessibility of action buttons and overall responsiveness.
-3.  **New Features**: Prospect deletion () and a bulk analysis button were implemented.
-4.  **Lead Quality**: A blacklisting mechanism was added to  and  to filter out undesirable websites (e.g., yellow pages).
-
-For the **JTL Article Import**, the user reported that only a fraction of articles (~41k of ~167k) were imported and that article names were incorrect. The name display issue ( vs. ) in  was reviewed, and a full import process () was re-initiated to ensure all articles are imported into MongoDB with correct data.
-
-The very last action taken was to begin documenting the current state of the application for fork transitions based on a direct user request.
+Immediately before this summary request, the AI engineer was focused on two major tasks:
+1.  **JTL Article Import Debugging:** The user reported incomplete article imports (~5.5k out of ~166k) and issues with data integrity. The engineer identified and fixed the root cause, which was inefficient OFFSET-based pagination in the  import API. A new  API endpoint and script using **cursor-based pagination ()** were implemented to robustly import all articles. The import is currently running in the background, showing **107,700 out of 166,854 articles imported (64.5%)**. Real-time import status was also enhanced. The user explicitly requested to wait for this import to finish.
+2.  **Pricing Module (Preise) Implementation:** A new feature to calculate prices based on complex Excel formulas was initiated. This involved:
+    *   Creating new API routes ( and ).
+    *   Integrating Preise into the application's navigation (, ).
+    *   Developing a new frontend component ().
+    *   Debugging early calculation errors in the  API (e.g.,  on undefined, missing return values for ).
+    *   Debugging frontend loading issues, which included restarting a crashed MongoDB instance. Despite the backend API now working, the frontend UI for Preise currently displays a loading spinner, indicating an unresolved client-side issue, potentially related to server stability (high CPU usage) or rendering.
 </current_work>
+
 <optional_next_step>
-Continue documenting the complete current state of the application for fork transitions.
+Monitor the JTL article import until it is fully completed.
 </optional_next_step>
