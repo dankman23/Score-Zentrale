@@ -23,13 +23,11 @@ export async function POST(request: NextRequest) {
     const { db } = await connectToDatabase()
     const articlesCollection = db.collection('articles')
 
-    console.log(`[Articles Import] Starting batch import: offset=${offset}, size=${batchSize}`)
+    console.log(`[Articles Import] Starting batch import: offset=${offset}, size=${batchSize}, fullImport=${fullImport}`)
 
-    // Bei Full-Import: Collection leeren
-    if (fullImport && offset === 0) {
-      await articlesCollection.deleteMany({})
-      console.log('[Articles Import] Cleared existing articles')
-    }
+    // WICHTIG: Bei fullImport werden Artikel NICHT gelöscht, sondern nur aktualisiert!
+    // Dies bewahrt zusätzliche Felder, die hier an Produkte angehängt wurden.
+    // MongoDB upsert: true sorgt für Update bei existierenden und Insert bei neuen Artikeln.
 
     // Artikel mit allen Joins abrufen
     const result = await pool.request().query(`
