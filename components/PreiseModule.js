@@ -229,19 +229,19 @@ export default function PreiseModule() {
             </div>
 
             {/* Regler */}
-            <div className="card mb-4">
-              <div className="card-header d-flex justify-content-between align-items-center">
-                <h5 className="mb-0">Konfiguration</h5>
+            <div className="card mb-2">
+              <div className="card-header py-1 d-flex justify-content-between align-items-center">
+                <small className="mb-0 font-weight-bold">Konfiguration</small>
                 {reglerEdited && (
-                  <button className="btn btn-sm btn-warning" onClick={speichernRegler}>
-                    <i className="bi bi-save mr-1"/>Änderungen speichern
+                  <button className="btn btn-xs btn-warning py-0 px-2" onClick={speichernRegler}>
+                    <i className="bi bi-save mr-1"/>Speichern
                   </button>
                 )}
               </div>
-              <div className="card-body">
+              <div className="card-body py-2">
                 {/* Kosten - variabel */}
-                <div className="mb-3">
-                  <div className="bg-warning text-dark font-weight-bold px-3 py-2 mb-2" style={{fontSize: '0.95rem'}}>
+                <div className="mb-2">
+                  <div className="bg-warning text-dark font-weight-bold px-2 py-1 mb-1" style={{fontSize: '0.85rem'}}>
                     Kosten - variabel
                   </div>
                   <div className="row">
