@@ -112,15 +112,19 @@ export default function PreiseG2Module({ formeln }) {
 
         {/* g2-Parameter */}
         <div className="card mb-2">
-          <div className="card-header py-1 d-flex justify-content-between">
-            <small className="mb-0 font-weight-bold">g2-Parameter (artikelspezifisch)</small>
+          <div className="card-header py-1 d-flex justify-content-between align-items-center" style={{cursor: 'pointer'}} onClick={() => setConfigExpanded(!configExpanded)}>
+            <small className="mb-0 font-weight-bold">
+              <i className={`bi bi-chevron-${configExpanded ? 'up' : 'down'} mr-2`}/>
+              g2-Parameter (artikelspezifisch) {!configExpanded && '(klicken zum Ausklappen)'}
+            </small>
             {configEdited && (
-              <button className="btn btn-xs btn-warning py-0 px-2" onClick={speichernConfig}>
+              <button className="btn btn-xs btn-warning py-0 px-2" onClick={(e) => { e.stopPropagation(); speichernConfig(); }}>
                 <i className="bi bi-save mr-1"/>Speichern
               </button>
             )}
           </div>
-          <div className="card-body py-2">
+          {configExpanded && (
+            <div className="card-body py-2">
             <div className="row">
               <div className="col-md-3 mb-1">
                 <label style={{fontSize: '0.7rem'}}>gstart_ek</label>
