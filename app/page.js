@@ -5205,6 +5205,112 @@ export default function App() {
                   )}
                 </div>
               </div>
+
+              {/* Preisvergleich Modal */}
+              {preisvergleichArtikel && (
+                <div className="modal fade show d-block" style={{backgroundColor: 'rgba(0,0,0,0.5)'}}>
+                  <div className="modal-dialog modal-lg">
+                    <div className="modal-content">
+                      <div className="modal-header bg-info text-white">
+                        <h5 className="modal-title">
+                          <i className="bi bi-search mr-2"/>Preisvergleich: {preisvergleichArtikel.cArtNr}
+                        </h5>
+                        <button className="close text-white" onClick={() => setPreisvergleichArtikel(null)}>
+                          <span>&times;</span>
+                        </button>
+                      </div>
+                      <div className="modal-body">
+                        {/* Unser Produkt */}
+                        <div className="card border-primary mb-3">
+                          <div className="card-header bg-primary text-white py-2">
+                            <strong>Unser Produkt</strong>
+                          </div>
+                          <div className="card-body py-2">
+                            <div className="row">
+                              <div className="col-md-8">
+                                <strong>{preisvergleichArtikel.cName}</strong><br/>
+                                <small className="text-muted">
+                                  EAN: {preisvergleichArtikel.cBarcode || 'N/A'} | 
+                                  MPN: {preisvergleichArtikel.cHAN || 'N/A'}
+                                </small>
+                              </div>
+                              <div className="col-md-4 text-right">
+                                <div className="h4 text-primary mb-0">
+                                  {parseFloat(preisvergleichArtikel.fVKNetto).toFixed(2)} €
+                                </div>
+                                <small className="text-muted">VK netto</small>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Ladebalken */}
+                        {preisvergleichLoading && (
+                          <div className="text-center py-4">
+                            <div className="spinner-border text-info mb-2"/>
+                            <p className="text-muted">Suche Wettbewerbspreise...</p>
+                          </div>
+                        )}
+
+                        {/* Ergebnisse */}
+                        {!preisvergleichLoading && preisvergleichErgebnisse.length > 0 && (
+                          <div className="card border-success">
+                            <div className="card-header bg-success text-white py-2">
+                              <strong>{preisvergleichErgebnisse.length} Wettbewerbspreise gefunden</strong>
+                            </div>
+                            <div className="card-body p-0">
+                              <div className="table-responsive" style={{maxHeight: '400px'}}>
+                                <table className="table table-sm table-hover mb-0">
+                                  <thead className="thead-light">
+                                    <tr>
+                                      <th>Shop</th>
+                                      <th>VE</th>
+                                      <th className="text-right">Preis gesamt</th>
+                                      <th className="text-right">Preis pro Stück</th>
+                                      <th>Link</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {preisvergleichErgebnisse.map((erg, idx) => (
+                                      <tr key={idx}>
+                                        <td><strong>{erg.shop}</strong></td>
+                                        <td>
+                                          <span className="badge badge-info">{erg.ve} Stk</span>
+                                        </td>
+                                        <td className="text-right">{erg.preis.toFixed(2)} €</td>
+                                        <td className="text-right font-weight-bold text-success">
+                                          {erg.preis_pro_stueck.toFixed(2)} €
+                                        </td>
+                                        <td>
+                                          <a href={erg.url} target="_blank" className="btn btn-sm btn-outline-info">
+                                            <i className="bi bi-box-arrow-up-right"/>
+                                          </a>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {!preisvergleichLoading && preisvergleichErgebnisse.length === 0 && (
+                          <div className="alert alert-warning">
+                            <i className="bi bi-exclamation-triangle mr-2"/>
+                            Keine Wettbewerbspreise gefunden. Versuchen Sie es später erneut.
+                          </div>
+                        )}
+                      </div>
+                      <div className="modal-footer">
+                        <button className="btn btn-secondary" onClick={() => setPreisvergleichArtikel(null)}>
+                          Schließen
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
