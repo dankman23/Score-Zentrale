@@ -45,33 +45,91 @@ export default function PreiseG2Module({ formeln }) {
 
   return (
     <div>
-      <select className="form-control mb-2" value={warengruppe} onChange={e => setWarengruppe(e.target.value)}>
-        <option value="lagerware">Lagerware</option>
-        <option value="klingspor_fremdlager">Klingspor</option>
-      </select>
+      <div className="card mb-2 border-warning">
+        <div className="card-header bg-warning text-dark py-1">
+          <small className="font-weight-bold">Warengruppe (Regler 1a, 2c, 3e)</small>
+        </div>
+        <div className="card-body py-2">
+          <select className="form-control form-control-sm" value={warengruppe} onChange={e => setWarengruppe(e.target.value)}>
+            <option value="lagerware">Lagerware</option>
+            <option value="klingspor_fremdlager">Klingspor Fremdlager</option>
+            <option value="abverkauf">Abverkauf</option>
+            <option value="lagerware_guenstiger_ek">Lagerware günstiger EK</option>
+            <option value="pferd_fremdlager">Pferd Fremdlager</option>
+            <option value="plastimex_fremdlager">Plastimex Fremdlager</option>
+            <option value="alle_konfektion">Alle Konfektion</option>
+          </select>
+        </div>
+      </div>
       
-      <div className="input-group mb-2">
-        <input 
-          type="number" 
-          className="form-control" 
-          placeholder="EK"
-          value={ekInput}
-          onChange={e => setEkInput(e.target.value)}
-        />
-        <div className="input-group-append">
-          <button className="btn btn-warning" onClick={berechne} disabled={loading}>
-            Berechnen
-          </button>
+      <div className="card mb-2 border-primary">
+        <div className="card-header bg-primary text-white py-1">
+          <small className="font-weight-bold">EK-Eingabe (pro Stück)</small>
+        </div>
+        <div className="card-body py-2">
+          <div className="row">
+            <div className="col-md-8">
+              <input 
+                type="number" 
+                step="0.01"
+                className="form-control form-control-sm" 
+                placeholder="z.B. 10.50"
+                value={ekInput}
+                onChange={e => setEkInput(e.target.value)}
+                onKeyPress={e => e.key === 'Enter' && berechne()}
+              />
+            </div>
+            <div className="col-md-4">
+              <button className="btn btn-warning btn-sm btn-block font-weight-bold" onClick={berechne} disabled={loading || !ekInput}>
+                {loading ? <span className="spinner-border spinner-border-sm mr-1"/> : <i className="bi bi-calculator mr-1"/>}
+                Berechnen
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
       {ergebnisse.length > 0 && (
         <div>
-          <div className="alert alert-primary">Plattform: {plattformpreis.toFixed(2)} €</div>
-          <table className="table table-sm">
-            <thead><tr>{ergebnisse.map(e => <th key={e.staffel}>{e.staffel}</th>)}</tr></thead>
-            <tbody><tr>{ergebnisse.map(e => <td key={e.staffel}>{e.shop_unit.toFixed(2)} €</td>)}</tr></tbody>
-          </table>
+          <div className="card border-primary mb-2">
+            <div className="card-header bg-primary text-white py-1">
+              <small className="font-weight-bold">Netto Plattformpreis (g2)</small>
+            </div>
+            <div className="card-body text-center py-2">
+              <div className="h3 font-weight-bold text-primary mb-0">
+                {plattformpreis.toFixed(2)} €
+              </div>
+              <small className="text-muted" style={{fontSize: '0.75rem'}}>pro Stück (netto)</small>
+            </div>
+          </div>
+
+          <div className="card border-success">
+            <div className="card-header bg-success text-white py-1">
+              <small className="font-weight-bold">Netto Shop Staffelpreise (shp_fac = {(g2Params.shp_fac*100).toFixed(0)}%)</small>
+            </div>
+            <div className="card-body py-2">
+              <div className="table-responsive">
+                <table className="table table-sm table-bordered text-center mb-0" style={{fontSize: '0.9rem'}}>
+                  <thead className="thead-light">
+                    <tr className="font-weight-bold" style={{fontSize: '0.8rem'}}>
+                      {ergebnisse.map(e => (
+                        <th key={e.staffel} className="py-1 px-1">{e.staffel}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      {ergebnisse.map(e => (
+                        <td key={e.staffel} className="font-weight-bold text-success py-1 px-1">
+                          {e.shop_unit.toFixed(2)} €
+                        </td>
+                      ))}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
