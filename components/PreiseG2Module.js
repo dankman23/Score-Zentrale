@@ -69,16 +69,16 @@ export default function PreiseG2Module() {
 
   return (
     <div className="card">
-      <div className="card-header">
-        <h2 className="mb-0"><i className="bi bi-calculator-fill mr-2"/>Neue Preisberechnung (g2)</h2>
+      <div className="card-header py-2">
+        <h5 className="mb-0"><i className="bi bi-calculator-fill mr-2"/>Neue Preisberechnung (g2)</h5>
       </div>
-      <div className="card-body">
+      <div className="card-body py-2">
         {/* Regler kompakt */}
-        <div className="card mb-3">
-          <div className="card-header py-2">
-            <h6 className="mb-0">Regler & Parameter</h6>
+        <div className="card mb-2">
+          <div className="card-header py-1">
+            <small className="mb-0 font-weight-bold">Regler & Parameter</small>
           </div>
-          <div className="card-body py-3">
+          <div className="card-body py-2">
             <div className="row">
               <div className="col-md-2 mb-2">
                 <label className="small font-weight-bold">Regler a</label>
