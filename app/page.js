@@ -4273,9 +4273,11 @@ export default function App() {
                                       </div>
                                     </div>
                                   )}
+                                </div>
+                              )}
                                   
-                                  {/* Kontakt-Historie */}
-                                  {p.history && p.history.length > 0 && (
+                              {/* Kontakt-Historie */}
+                              {p.history && p.history.length > 0 && (
                                     <div className="mt-3">
                                       <h6 className="text-info mb-3"><i className="bi bi-clock-history mr-2"/>Kontakt-Historie</h6>
                                       <div className="timeline">
