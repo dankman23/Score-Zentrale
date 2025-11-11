@@ -269,22 +269,7 @@ export default function PreiseModule() {
                     Kosten - variabel
                   </div>
                   <div className="row">
-                    <div className="col-md-4 mb-2">
-                      <label className="font-weight-bold" style={{fontSize: '0.8rem'}}>Mwst.</label>
-                      <div className="input-group input-group-sm">
-                        <input 
-                          type="number" 
-                          step="0.01"
-                          className="form-control form-control-sm" 
-                          value={(currentFormel.regler.mwst * 100).toFixed(2)}
-                          onChange={(e) => updateRegler('mwst', parseFloat(e.target.value) / 100)}
-                        />
-                        <div className="input-group-append">
-                          <span className="input-group-text">%</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-md-4 mb-2">
+                    <div className="col-md-6 mb-2">
                       <label className="font-weight-bold" style={{fontSize: '0.8rem'}}>Ebay/Amazon</label>
                       <div className="input-group input-group-sm">
                         <input 
@@ -299,7 +284,7 @@ export default function PreiseModule() {
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-4 mb-2">
+                    <div className="col-md-6 mb-2">
                       <label className="font-weight-bold" style={{fontSize: '0.8rem'}}>Paypal</label>
                       <div className="input-group input-group-sm">
                         <input 
