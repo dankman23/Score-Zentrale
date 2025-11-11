@@ -4246,8 +4246,9 @@ export default function App() {
                                       </div>
                                     </div>
                                   </div>
+                                  )}
                                   
-                                  {p.analysis.contact_persons?.length > 0 && (
+                                  {p.analysis && p.analysis.contact_persons?.length > 0 && (
                                     <div className="mt-3">
                                       <h6 className="text-warning mb-3"><i className="bi bi-people-fill mr-2"/>Ansprechpartner (Old)</h6>
                                       <div className="row">
