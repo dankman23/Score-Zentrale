@@ -87,72 +87,83 @@ export default function PreiseG2Module({ formeln }) {
         <h5 className="mb-0"><i className="bi bi-calculator-fill mr-2"/>Neue Preisberechnung (g2)</h5>
       </div>
       <div className="card-body py-2">
-        {/* Regler kompakt */}
+        {/* Warengruppe auswählen */}
+        <div className="card mb-2 border-warning">
+          <div className="card-header bg-warning text-dark py-1">
+            <small className="mb-0 font-weight-bold">Warengruppe (Regler 1a, 2c, 3e)</small>
+          </div>
+          <div className="card-body py-2">
+            <select 
+              className="form-control form-control-sm" 
+              value={warengruppe}
+              onChange={e => setWarengruppe(e.target.value)}
+            >
+              <option value="lagerware">Lagerware</option>
+              <option value="klingspor_fremdlager">Klingspor Fremdlager</option>
+              <option value="abverkauf">Abverkauf</option>
+              <option value="lagerware_guenstiger_ek">Lagerware günstiger EK</option>
+              <option value="pferd_fremdlager">Pferd Fremdlager</option>
+              <option value="plastimex_fremdlager">Plastimex Fremdlager</option>
+              <option value="alle_konfektion">Alle Konfektion</option>
+            </select>
+          </div>
+        </div>
+
+        {/* g2-Parameter */}
         <div className="card mb-2">
-          <div className="card-header py-1">
-            <small className="mb-0 font-weight-bold">Regler & Parameter</small>
+          <div className="card-header py-1 d-flex justify-content-between">
+            <small className="mb-0 font-weight-bold">g2-Parameter (artikelspezifisch)</small>
+            {configEdited && (
+              <button className="btn btn-xs btn-warning py-0 px-2" onClick={speichernConfig}>
+                <i className="bi bi-save mr-1"/>Speichern
+              </button>
+            )}
           </div>
           <div className="card-body py-2">
             <div className="row">
-              <div className="col-md-2 mb-1">
-                <label style={{fontSize: '0.7rem'}}>c</label>
-                <input type="number" step="0.01" className="form-control form-control-sm" value={params.c} onChange={e => updateParam('c', e.target.value)} />
-              </div>
-              <div className="col-md-2 mb-1">
-                <label style={{fontSize: '0.7rem'}}>a</label>
-                <input type="number" step="0.01" className="form-control form-control-sm" value={params.a} onChange={e => updateParam('a', e.target.value)} />
-              </div>
-              <div className="col-md-2 mb-1">
-                <label style={{fontSize: '0.7rem'}}>pa</label>
-                <input type="number" step="0.01" className="form-control form-control-sm" value={params.pa} onChange={e => updateParam('pa', e.target.value)} />
-              </div>
-              <div className="col-md-2 mb-1">
-                <label style={{fontSize: '0.7rem'}}>fixcost1</label>
-                <input type="number" step="0.1" className="form-control form-control-sm" value={params.fixcost1} onChange={e => updateParam('fixcost1', e.target.value)} />
-              </div>
-              <div className="col-md-2 mb-1">
-                <label style={{fontSize: '0.7rem'}}>fixcost2</label>
-                <input type="number" step="0.1" className="form-control form-control-sm" value={params.fixcost2} onChange={e => updateParam('fixcost2', e.target.value)} />
-              </div>
-              <div className="col-md-2 mb-1">
-                <label style={{fontSize: '0.7rem'}}>aufschlag</label>
-                <input type="number" step="0.01" className="form-control form-control-sm" value={params.aufschlag} onChange={e => updateParam('aufschlag', e.target.value)} />
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-md-2 mb-1">
-                <label style={{fontSize: '0.7rem'}}>varpct1</label>
-                <input type="number" step="0.01" className="form-control form-control-sm" value={params.varpct1} onChange={e => updateParam('varpct1', e.target.value)} />
-              </div>
-              <div className="col-md-2 mb-1">
-                <label style={{fontSize: '0.7rem'}}>varpct2</label>
-                <input type="number" step="0.01" className="form-control form-control-sm" value={params.varpct2} onChange={e => updateParam('varpct2', e.target.value)} />
-              </div>
-              <div className="col-md-2 mb-1">
-                <label style={{fontSize: '0.7rem'}}>shp_fac</label>
-                <input type="number" step="0.01" className="form-control form-control-sm" value={params.shp_fac} onChange={e => updateParam('shp_fac', e.target.value)} />
-              </div>
-              <div className="col-md-2 mb-1">
+              <div className="col-md-3 mb-1">
                 <label style={{fontSize: '0.7rem'}}>gstart_ek</label>
-                <input type="number" step="1" className="form-control form-control-sm" value={params.gstart_ek} onChange={e => updateParam('gstart_ek', e.target.value)} />
+                <input type="number" step="1" className="form-control form-control-sm" value={g2Params.gstart_ek} onChange={e => updateParam('gstart_ek', e.target.value)} />
               </div>
-              <div className="col-md-2 mb-1">
+              <div className="col-md-3 mb-1">
                 <label style={{fontSize: '0.7rem'}}>gneu_ek</label>
-                <input type="number" step="1" className="form-control form-control-sm" value={params.gneu_ek} onChange={e => updateParam('gneu_ek', e.target.value)} />
+                <input type="number" step="1" className="form-control form-control-sm" value={g2Params.gneu_ek} onChange={e => updateParam('gneu_ek', e.target.value)} />
               </div>
-              <div className="col-md-2 mb-1">
+              <div className="col-md-3 mb-1">
                 <label style={{fontSize: '0.7rem'}}>gneu_vk</label>
-                <input type="number" step="1" className="form-control form-control-sm" value={params.gneu_vk} onChange={e => updateParam('gneu_vk', e.target.value)} />
+                <input type="number" step="1" className="form-control form-control-sm" value={g2Params.gneu_vk} onChange={e => updateParam('gneu_vk', e.target.value)} />
+              </div>
+              <div className="col-md-3 mb-1">
+                <label style={{fontSize: '0.7rem'}}>fixcost1 (pa)</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" value={g2Params.fixcost1} onChange={e => updateParam('fixcost1', e.target.value)} />
               </div>
             </div>
             <div className="row">
               <div className="col-md-3 mb-1">
-                <label style={{fontSize: '0.7rem'}}>k (Steuerfaktor)</label>
-                <input type="number" step="0.01" className="form-control form-control-sm" value={params.k} onChange={e => updateParam('k', e.target.value)} />
+                <label style={{fontSize: '0.7rem'}}>fixcost2</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" value={g2Params.fixcost2} onChange={e => updateParam('fixcost2', e.target.value)} />
               </div>
               <div className="col-md-3 mb-1">
-                <label style={{fontSize: '0.7rem'}}>A.A. Threshold</label>
-                <input type="number" step="1" className="form-control form-control-sm" value={params.aa_threshold} onChange={e => updateParam('aa_threshold', e.target.value)} />
+                <label style={{fontSize: '0.7rem'}}>varpct1 (eba)</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" value={g2Params.varpct1} onChange={e => updateParam('varpct1', e.target.value)} />
+              </div>
+              <div className="col-md-3 mb-1">
+                <label style={{fontSize: '0.7rem'}}>varpct2 (paypal)</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" value={g2Params.varpct2} onChange={e => updateParam('varpct2', e.target.value)} />
+              </div>
+              <div className="col-md-3 mb-1">
+                <label style={{fontSize: '0.7rem'}}>aufschlag</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" value={g2Params.aufschlag} onChange={e => updateParam('aufschlag', e.target.value)} />
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-4 mb-1">
+                <label style={{fontSize: '0.7rem'}}>shp_fac (Shop-Faktor)</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" value={g2Params.shp_fac} onChange={e => updateParam('shp_fac', e.target.value)} />
+              </div>
+              <div className="col-md-4 mb-1">
+                <label style={{fontSize: '0.7rem'}}>aa_threshold</label>
+                <input type="number" step="1" className="form-control form-control-sm" value={g2Params.aa_threshold} onChange={e => updateParam('aa_threshold', e.target.value)} />
               </div>
             </div>
           </div>
