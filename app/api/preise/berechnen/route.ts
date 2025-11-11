@@ -33,56 +33,55 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * Hauptformel aus Excel:
- * =WENN(B17=0;0;WENN(C17=0;0;WENN(D17=0;0;(WENN(G17=1;
- *   ($B$25*$B$11)+$B$12;
- *   ((($B$25*$B$11)+$B$12)*(1+$B$13))*(1+$B$14)
- * )))))
+ * Hauptformel aus Excel (vereinfacht):
+ * VK_netto = (EK + Fixkosten_Beitrag + Kosten_statisch) * (1 + Prozent_Aufschlag)
+ * 
+ * Dann werden Plattformgebühren (eBay/Amazon, PayPal) berücksichtigt
  */
 function berechnePreis(ek: number, regler: any, ve: number) {
   const {
-    kosten_variabel,
-    kosten_statisch,
-    mwst,
-    ebay_amazon,
-    paypal,
-    paypal_fix,
-    fixkosten,
-    gewinn_regler_2c,
-    prozent_aufschlag
+    kosten_variabel = 0,
+    kosten_statisch = 0,
+    mwst = 0.19,
+    ebay_amazon = 0,
+    paypal = 0,
+    paypal_fix = 0,
+    fixkosten_beitrag = 0,
+    gewinn_regler_1a = 0,
+    gewinn_regler_2c = 0,
+    gewinn_regler_3e = 0,
+    prozent_aufschlag = 0,
+    aa_threshold = 0
   } = regler
 
-  // Basis-Check - nur prüfen ob kosten_variabel existiert (kosten_statisch kann 0 sein)
-  if (kosten_variabel === undefined || kosten_variabel === null) {
-    return { 
-      ve, 
-      vk_netto: 0, 
-      vk_brutto: 0, 
-      vk_shop_netto: 0, 
-      vk_shop_brutto: 0,
-      gewinn_prozent_vk: 0,
-      gewinn_prozent_ek: 0
-    }
+  // Schritt 1: Basis = EK + Kosten_statisch + Fixkosten_Beitrag
+  const basis = ek + kosten_statisch + fixkosten_beitrag
+
+  // Schritt 2: VK netto berechnen
+  // Basierend auf Excel: VK = (Basis) * (1 + Prozent_Aufschlag)
+  let vk_netto = basis * (1 + prozent_aufschlag)
+
+  // Plattformgebühren einrechnen (wenn gesetzt)
+  if (ebay_amazon > 0) {
+    vk_netto = vk_netto / (1 - ebay_amazon)
   }
 
-  // Basis-Berechnung (vereinfacht, G17=1 Modus)
-  // In der Excel: ($B$25 * $B$11) + $B$12
-  // $B$25 = EK, $B$11 = kosten_variabel, $B$12 = kosten_statisch
-  const basispreis = (ek * kosten_variabel) + kosten_statisch
+  if (paypal > 0) {
+    vk_netto = (vk_netto + paypal_fix) / (1 - paypal)
+  }
 
-  // Standard-Modus: Basis * (1 + MwSt) * (1 + eBay/Amazon)
-  const vk_netto = ((basispreis * (1 + (mwst || 0))) * (1 + (ebay_amazon || 0))) * (gewinn_regler_2c || 1) * (prozent_aufschlag || 1)
-  
-  // VK brutto = VK netto * (1 + MwSt)
-  const vk_brutto = vk_netto * (1 + (mwst || 0))
+  // VK brutto = VK netto * (1 + MwSt.)
+  const vk_brutto = vk_netto * (1 + mwst)
   
   // Shop-Preis (8% Rabatt)
-  const vk_shop_netto = vk_netto * 0.92
-  const vk_shop_brutto = vk_brutto * 0.92
+  const shop_rabatt = aa_threshold || 0.08
+  const vk_shop_netto = vk_netto * (1 - shop_rabatt)
+  const vk_shop_brutto = vk_brutto * (1 - shop_rabatt)
 
   // Gewinn-Prozente berechnen
-  const gewinn_prozent_vk = vk_netto > 0 ? ((vk_netto - ek) / vk_netto) * 100 : 0
-  const gewinn_prozent_ek = ek > 0 ? ((vk_netto - ek) / ek) * 100 : 0
+  const gewinn = vk_netto - ek
+  const gewinn_prozent_vk = vk_netto > 0 ? (gewinn / vk_netto) * 100 : 0
+  const gewinn_prozent_ek = ek > 0 ? (gewinn / ek) * 100 : 0
 
   return {
     ve,
