@@ -53,10 +53,10 @@ export async function GET(request: NextRequest) {
       .limit(5)
       .toArray()
 
-    // Prüfe ob Import läuft (last_updated in den letzten 30 Sekunden)
-    const thirtySecondsAgo = new Date(Date.now() - 30000)
+    // Prüfe ob Import läuft (last_updated in den letzten 60 Sekunden)
+    const sixtySecondsAgo = new Date(Date.now() - 60000)
     const recentlyUpdated = await articlesCollection.countDocuments({
-      last_updated: { $gte: thirtySecondsAgo }
+      last_updated: { $gte: sixtySecondsAgo }
     })
     const isRunning = recentlyUpdated > 0 && totalImported < 166854
 
