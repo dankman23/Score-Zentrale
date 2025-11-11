@@ -533,6 +533,7 @@ export default function PreiseModule() {
                       const ek = parseFloat(vergleichEk)
                       const comparisons = []
                       
+                      // Alte Formeln
                       for (const formel of formeln) {
                         if (selectedFormeln.includes(formel.sheet)) {
                           const res = await fetch('/api/preise/berechnen', {
@@ -541,20 +542,66 @@ export default function PreiseModule() {
                             body: JSON.stringify({
                               ek,
                               regler: formel.regler,
-                              ve_staffeln: [1]
+                              ve_staffeln: [1, 5, 10, 20, 50, 100]
                             })
                           })
                           const data = await res.json()
                           if (data.ok && data.ergebnisse.length > 0) {
                             comparisons.push({
-                              name: formel.name,
+                              name: formel.name + ' (Alt)',
                               sheet: formel.sheet,
+                              type: 'alt',
                               plattform: data.ergebnisse[0].vk_netto,
-                              shop: data.ergebnisse[0].vk_shop_netto
+                              shop: data.ergebnisse[0].vk_shop_netto,
+                              staffeln: data.ergebnisse
                             })
                           }
                         }
                       }
+                      
+                      // g2 wenn aktiviert
+                      if (vergleichG2Enabled) {
+                        const selectedFormel = formeln.find(f => f.sheet === vergleichG2Warengruppe)
+                        if (selectedFormel) {
+                          const res = await fetch('/api/preise/g2/berechnen', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              ek,
+                              warengruppe_regler: selectedFormel.regler,
+                              g2_params: {
+                                gstart_ek: 12,
+                                gneu_ek: 100,
+                                gneu_vk: 189,
+                                fixcost1: 0.35,
+                                fixcost2: 1.4,
+                                varpct1: 0.25,
+                                varpct2: 0.02,
+                                aufschlag: 1.08,
+                                shp_fac: 0.92,
+                                aa_threshold: 18
+                              },
+                              staffel_mengen: [1, 5, 10, 20, 50, 100]
+                            })
+                          })
+                          const data = await res.json()
+                          if (data.ok && data.ergebnisse.length > 0) {
+                            comparisons.push({
+                              name: selectedFormel.name + ' (g2)',
+                              sheet: 'g2_' + vergleichG2Warengruppe,
+                              type: 'g2',
+                              plattform: data.plattform_unit,
+                              shop: data.shop_unit,
+                              staffeln: data.ergebnisse.map(e => ({
+                                ve: e.staffel,
+                                vk_netto: e.plattform_unit,
+                                vk_shop_netto: e.shop_unit
+                              }))
+                            })
+                          }
+                        }
+                      }
+                      
                       setVergleichData(comparisons)
                     }}>
                       <i className="bi bi-calculator mr-2"/>Vergleich berechnen
