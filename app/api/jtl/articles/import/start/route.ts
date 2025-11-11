@@ -29,9 +29,19 @@ export async function POST(request: NextRequest) {
     // Dies bewahrt zusätzliche Felder, die hier an Produkte angehängt wurden.
     // MongoDB upsert: true sorgt für Update bei existierenden und Insert bei neuen Artikeln.
 
-    // Artikel mit allen Joins abrufen
+    // Letzten importierten Artikel aus MongoDB abrufen (für cursor-based pagination)
+    let lastKArtikel = 0
+    if (offset === 0) {
+      const lastArticle = await articlesCollection.findOne({}, { sort: { kArtikel: -1 }, projection: { kArtikel: 1 } })
+      if (lastArticle) {
+        lastKArtikel = lastArticle.kArtikel
+        console.log(`[Articles Import] Resuming from kArtikel > ${lastKArtikel}`)
+      }
+    }
+    
+    // Artikel mit allen Joins abrufen (cursor-based mit kArtikel > lastKArtikel)
     const result = await pool.request().query(`
-      SELECT 
+      SELECT TOP ${batchSize}
         a.kArtikel,
         a.cArtNr,
         a.cBarcode,
@@ -69,10 +79,9 @@ export async function POST(request: NextRequest) {
       WHERE a.cAktiv = 'Y'
         AND a.kStueckliste = 0
         AND (a.nIstVater = 1 OR a.kVaterArtikel = 0)
+        AND a.kArtikel > ${lastKArtikel}
       
       ORDER BY a.kArtikel
-      OFFSET ${offset} ROWS
-      FETCH NEXT ${batchSize} ROWS ONLY
     `)
 
     const articles = result.recordset
