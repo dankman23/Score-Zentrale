@@ -329,7 +329,7 @@ export default function PreiseModule() {
                   </div>
                   <div className="row">
                     <div className="col mb-2">
-                      <label className="font-weight-bold small">Gewinn Regler 1 a</label>
+                      <label className="font-weight-bold" style={{fontSize: '0.75rem'}}>Gewinn Regler 1 a</label>
                       <input 
                         type="number" 
                         step="0.01"
@@ -339,7 +339,7 @@ export default function PreiseModule() {
                       />
                     </div>
                     <div className="col mb-2">
-                      <label className="font-weight-bold small">Gewinn Regler 2 c</label>
+                      <label className="font-weight-bold" style={{fontSize: '0.75rem'}}>Gewinn Regler 2 c</label>
                       <input 
                         type="number" 
                         step="0.01"
@@ -349,7 +349,7 @@ export default function PreiseModule() {
                       />
                     </div>
                     <div className="col mb-2">
-                      <label className="font-weight-bold small">Gewinn Regler 3 e</label>
+                      <label className="font-weight-bold" style={{fontSize: '0.75rem'}}>Gewinn Regler 3 e</label>
                       <input 
                         type="number" 
                         step="0.01"
@@ -359,12 +359,12 @@ export default function PreiseModule() {
                       />
                     </div>
                     <div className="col mb-2">
-                      <label className="font-weight-bold small">Prozent Aufschlag</label>
+                      <label className="font-weight-bold" style={{fontSize: '0.75rem'}}>Prozent Aufschlag</label>
                       <div className="input-group input-group-sm">
                         <input 
                           type="number" 
                           step="0.01"
-                          className="form-control" 
+                          className="form-control form-control-sm" 
                           value={(currentFormel.regler.prozent_aufschlag * 100).toFixed(2)}
                           onChange={(e) => updateRegler('prozent_aufschlag', parseFloat(e.target.value) / 100)}
                         />
@@ -374,7 +374,7 @@ export default function PreiseModule() {
                       </div>
                     </div>
                     <div className="col mb-2">
-                      <label className="font-weight-bold small">A.A. Threshold</label>
+                      <label className="font-weight-bold" style={{fontSize: '0.75rem'}}>A.A. Threshold</label>
                       <input 
                         type="number" 
                         step="1"
