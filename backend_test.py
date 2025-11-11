@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Kaltakquise V3 System Backend Testing
-Tests the 3 new V3 APIs according to German specifications
+Kaltakquise Complete Module Backend Testing
+Tests all Kaltakquise endpoints according to German specifications and priorities
 """
 
 import requests
