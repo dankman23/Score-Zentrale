@@ -11,10 +11,18 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 async function continueImport() {
   console.log('🔄 JTL-Artikel Import wird fortgesetzt...\n')
   
-  let offset = 0
+  // Aktuellen Status abrufen
+  const statusResponse = await fetch(`${BASE_URL}/api/jtl/articles/import/status`)
+  const statusData = await statusResponse.json()
+  const currentCount = statusData.imported || 0
+  
+  console.log(`📊 Aktuell importiert: ${currentCount} Artikel`)
+  console.log(`🎯 Ziel: ~166.855 Artikel\n`)
+  
+  let offset = currentCount // Start ab aktuellem Stand
   let totalImported = 0
   let batchCount = 0
-  const batchSize = 2000
+  const batchSize = 5000 // Größere Batches für schnelleren Import
   
   while (true) {
     batchCount++
