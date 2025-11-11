@@ -75,51 +75,65 @@ export default function PreiseG2Module() {
           </div>
           <div className="card-body py-2">
             <div className="row">
-              <div className="col-md-2 mb-2">
-                <label className="small font-weight-bold">Regler a</label>
-                <input type="number" step="0.01" className="form-control form-control-sm" value={regler.a} onChange={e => updateRegler('a', e.target.value)} />
+              <div className="col-md-2 mb-1">
+                <label style={{fontSize: '0.7rem'}}>c</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" value={params.c} onChange={e => updateParam('c', e.target.value)} />
               </div>
-              <div className="col-md-2 mb-2">
-                <label className="small font-weight-bold">Regler c</label>
-                <input type="number" step="0.01" className="form-control form-control-sm" value={regler.c} onChange={e => updateRegler('c', e.target.value)} />
+              <div className="col-md-2 mb-1">
+                <label style={{fontSize: '0.7rem'}}>a</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" value={params.a} onChange={e => updateParam('a', e.target.value)} />
               </div>
-              <div className="col-md-2 mb-2">
-                <label className="small font-weight-bold">Regler pa</label>
-                <input type="number" step="0.01" className="form-control form-control-sm" value={regler.pa} onChange={e => updateRegler('pa', e.target.value)} />
+              <div className="col-md-2 mb-1">
+                <label style={{fontSize: '0.7rem'}}>pa</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" value={params.pa} onChange={e => updateParam('pa', e.target.value)} />
               </div>
-              <div className="col-md-2 mb-2">
-                <label className="small font-weight-bold">Fixkosten</label>
-                <input type="number" step="0.1" className="form-control form-control-sm" value={regler.fixcost} onChange={e => updateRegler('fixcost', e.target.value)} />
+              <div className="col-md-2 mb-1">
+                <label style={{fontSize: '0.7rem'}}>fixcost1</label>
+                <input type="number" step="0.1" className="form-control form-control-sm" value={params.fixcost1} onChange={e => updateParam('fixcost1', e.target.value)} />
               </div>
-              <div className="col-md-2 mb-2">
-                <label className="small font-weight-bold">Aufschlag</label>
-                <input type="number" step="0.01" className="form-control form-control-sm" value={regler.aufschlag} onChange={e => updateRegler('aufschlag', e.target.value)} />
+              <div className="col-md-2 mb-1">
+                <label style={{fontSize: '0.7rem'}}>fixcost2</label>
+                <input type="number" step="0.1" className="form-control form-control-sm" value={params.fixcost2} onChange={e => updateParam('fixcost2', e.target.value)} />
               </div>
-              <div className="col-md-2 mb-2">
-                <label className="small font-weight-bold">PriceDiscounter</label>
-                <input type="number" step="0.01" className="form-control form-control-sm" value={regler.price_discounter} onChange={e => updateRegler('price_discounter', e.target.value)} />
+              <div className="col-md-2 mb-1">
+                <label style={{fontSize: '0.7rem'}}>aufschlag</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" value={params.aufschlag} onChange={e => updateParam('aufschlag', e.target.value)} />
               </div>
             </div>
             <div className="row">
-              <div className="col-md-2 mb-2">
-                <label className="small font-weight-bold">ShopModifier</label>
-                <input type="number" step="0.01" className="form-control form-control-sm" value={regler.shop_modifier} onChange={e => updateRegler('shop_modifier', e.target.value)} />
+              <div className="col-md-2 mb-1">
+                <label style={{fontSize: '0.7rem'}}>varpct1</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" value={params.varpct1} onChange={e => updateParam('varpct1', e.target.value)} />
               </div>
-              <div className="col-md-2 mb-2">
-                <label className="small font-weight-bold">gstart_ek</label>
-                <input type="number" step="1" className="form-control form-control-sm" value={regler.gstart_ek} onChange={e => updateRegler('gstart_ek', e.target.value)} />
+              <div className="col-md-2 mb-1">
+                <label style={{fontSize: '0.7rem'}}>varpct2</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" value={params.varpct2} onChange={e => updateParam('varpct2', e.target.value)} />
               </div>
-              <div className="col-md-2 mb-2">
-                <label className="small font-weight-bold">gneu_ek</label>
-                <input type="number" step="1" className="form-control form-control-sm" value={regler.gneu_ek} onChange={e => updateRegler('gneu_ek', e.target.value)} />
+              <div className="col-md-2 mb-1">
+                <label style={{fontSize: '0.7rem'}}>shp_fac</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" value={params.shp_fac} onChange={e => updateParam('shp_fac', e.target.value)} />
               </div>
-              <div className="col-md-2 mb-2">
-                <label className="small font-weight-bold">gneu_vk</label>
-                <input type="number" step="1" className="form-control form-control-sm" value={regler.gneu_vk} onChange={e => updateRegler('gneu_vk', e.target.value)} />
+              <div className="col-md-2 mb-1">
+                <label style={{fontSize: '0.7rem'}}>gstart_ek</label>
+                <input type="number" step="1" className="form-control form-control-sm" value={params.gstart_ek} onChange={e => updateParam('gstart_ek', e.target.value)} />
               </div>
-              <div className="col-md-2 mb-2">
-                <label className="small font-weight-bold">A.A. Threshold</label>
-                <input type="number" step="1" className="form-control form-control-sm" value={regler.aa_threshold} onChange={e => updateRegler('aa_threshold', e.target.value)} />
+              <div className="col-md-2 mb-1">
+                <label style={{fontSize: '0.7rem'}}>gneu_ek</label>
+                <input type="number" step="1" className="form-control form-control-sm" value={params.gneu_ek} onChange={e => updateParam('gneu_ek', e.target.value)} />
+              </div>
+              <div className="col-md-2 mb-1">
+                <label style={{fontSize: '0.7rem'}}>gneu_vk</label>
+                <input type="number" step="1" className="form-control form-control-sm" value={params.gneu_vk} onChange={e => updateParam('gneu_vk', e.target.value)} />
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-3 mb-1">
+                <label style={{fontSize: '0.7rem'}}>k (Steuerfaktor)</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" value={params.k} onChange={e => updateParam('k', e.target.value)} />
+              </div>
+              <div className="col-md-3 mb-1">
+                <label style={{fontSize: '0.7rem'}}>A.A. Threshold</label>
+                <input type="number" step="1" className="form-control form-control-sm" value={params.aa_threshold} onChange={e => updateParam('aa_threshold', e.target.value)} />
               </div>
             </div>
           </div>
