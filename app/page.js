@@ -5082,6 +5082,7 @@ export default function App() {
                           <table className="table table-hover table-sm">
                             <thead className="thead-light">
                               <tr>
+                                <th></th>
                                 <th>Art.-Nr.</th>
                                 <th>Name</th>
                                 <th>Hersteller</th>
@@ -5096,7 +5097,7 @@ export default function App() {
                             <tbody>
                               {artikelList.length === 0 ? (
                                 <tr>
-                                  <td colSpan="9" className="text-center text-muted py-4">
+                                  <td colSpan="10" className="text-center text-muted py-4">
                                     <i className="bi bi-inbox mr-2" style={{fontSize: '2rem'}}/>
                                     <div>Keine Artikel gefunden</div>
                                     <small>Versuchen Sie andere Filter</small>
