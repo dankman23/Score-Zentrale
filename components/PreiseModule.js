@@ -207,12 +207,12 @@ export default function PreiseModule() {
         {tab === 'alte_pb' && (
           <>
             {/* Sheet-Tabs */}
-            <div className="mb-4">
-              <ul className="nav nav-pills nav-fill">
+            <div className="mb-2">
+              <ul className="nav nav-pills nav-fill" style={{fontSize: '0.85rem'}}>
                 {sheets.map(s => (
                   <li className="nav-item" key={s.id}>
                     <a 
-                      className={`nav-link ${sheet === s.id ? 'active' : ''}`}
+                      className={`nav-link py-1 px-2 ${sheet === s.id ? 'active' : ''}`}
                       href="#"
                       onClick={(e) => { e.preventDefault(); setSheet(s.id); }}
                     >
@@ -224,8 +224,8 @@ export default function PreiseModule() {
             </div>
 
             {/* Warengruppen */}
-            <div className="alert alert-info mb-4">
-              <strong>Warengruppen:</strong> {currentFormel.warengruppen.map(w => w.name).join(', ')}
+            <div className="alert alert-info mb-2 py-2">
+              <small><strong>Warengruppen:</strong> {currentFormel.warengruppen.map(w => w.name).join(', ')}</small>
             </div>
 
             {/* Regler */}
