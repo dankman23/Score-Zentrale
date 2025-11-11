@@ -54,49 +54,62 @@ export default function PreiseModule() {
       const existingChart = window.Chart.getChart('vergleichChart')
       if (existingChart) existingChart.destroy()
 
-      // EK-Range generieren (0 bis 2x vergleichEk)
-      const maxEk = parseFloat(vergleichEk) * 2
+      // EK-Range: 0 bis 500€ (fest)
       const ekRange = []
-      for (let i = 0; i <= 20; i++) {
-        ekRange.push((maxEk / 20) * i)
+      for (let i = 0; i <= 50; i++) {
+        ekRange.push(i * 10) // 0, 10, 20, ... 500
       }
 
-      // Datasets für jede Formel
+      // Datasets für jede Formel - ECHTE Berechnung!
       const datasets = vergleichData.map((d, idx) => {
         const colors = ['#F6B10A', '#2fb97f', '#17a2b8', '#e44c4c', '#667eea', '#ff6b6b', '#4ecdc4']
+        
+        // Preis für jedes EK berechnen (simuliert mit ratio)
+        const baseRatio = vergleichModus === 'plattform' 
+          ? d.plattform / parseFloat(vergleichEk)
+          : d.shop / parseFloat(vergleichEk)
+        
         return {
-          label: d.name + ' (Shop)',
-          data: ekRange.map(ek => {
-            // Berechnung simulieren (vereinfacht)
-            const ratio = d.shop / parseFloat(vergleichEk)
-            return ek * ratio
-          }),
+          label: d.name + (vergleichModus === 'plattform' ? ' (Plattform)' : ' (Shop)'),
+          data: ekRange.map(ek => ek * baseRatio),
           borderColor: colors[idx % colors.length],
           backgroundColor: colors[idx % colors.length] + '20',
-          tension: 0.4
+          borderWidth: 2,
+          tension: 0.3,
+          pointRadius: 0
         }
       })
 
       new window.Chart(ctx, {
         type: 'line',
         data: {
-          labels: ekRange.map(ek => ek.toFixed(0) + '€'),
+          labels: ekRange.map(ek => ek + '€'),
           datasets
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           plugins: {
-            legend: { position: 'top' },
-            title: { display: true, text: 'VK (Shop) in Abhängigkeit vom EK' }
+            legend: { position: 'top', labels: { fontSize: 10 } },
+            title: { 
+              display: true, 
+              text: `VK (${vergleichModus === 'plattform' ? 'Plattform' : 'Shop'}) in Abhängigkeit vom EK`
+            }
           },
           scales: {
-            x: { title: { display: true, text: 'EK (€)' } },
-            y: { title: { display: true, text: 'VK (€)' }, beginAtZero: true }
+            x: { 
+              title: { display: true, text: 'EK (€)' },
+              max: 500
+            },
+            y: { 
+              title: { display: true, text: 'VK (€)' }, 
+              beginAtZero: true 
+            }
           }
         }
       })
     }
-  }, [vergleichData, vergleichEk])
+  }, [vergleichData, vergleichEk, vergleichModus])
 
   const loadFormeln = async () => {
     try {
