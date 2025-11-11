@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import PreiseG2Module from './PreiseG2Module'
 
 export default function PreiseModule() {
   const [tab, setTab] = useState('alte_pb')
