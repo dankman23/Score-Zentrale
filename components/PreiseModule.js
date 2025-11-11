@@ -630,10 +630,12 @@ export default function PreiseModule() {
             {vergleichData.length > 0 && (
               <div className="card border-info">
                 <div className="card-header bg-info text-white py-2">
-                  <h6 className="mb-0">Preisverlauf (EK → VK)</h6>
+                  <h6 className="mb-0">Preisverlauf (EK 0-500€ → VK)</h6>
                 </div>
                 <div className="card-body">
-                  <canvas id="vergleichChart" style={{maxHeight: '400px'}}></canvas>
+                  <div style={{height: '400px'}}>
+                    <canvas id="vergleichChart"></canvas>
+                  </div>
                 </div>
               </div>
             )}
