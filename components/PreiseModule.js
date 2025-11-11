@@ -682,36 +682,54 @@ export default function PreiseModule() {
               </div>
             </div>
 
-            {/* Vergleichstabelle */}
+            {/* Vergleichstabellen */}
             {vergleichData.length > 0 && (
-              <div className="card border-success mb-3">
-                <div className="card-header bg-success text-white py-2">
-                  <h6 className="mb-0">Preisvergleich bei EK = {vergleichEk}€</h6>
-                </div>
-                <div className="card-body p-0">
-                  <div className="table-responsive">
-                    <table className="table table-striped table-sm mb-0">
-                      <thead className="thead-light">
-                        <tr>
-                          <th>Warengruppe</th>
-                          <th className="text-right">Plattformpreis (netto)</th>
-                          <th className="text-right">Shop-Preis (netto)</th>
-                          <th className="text-right">Differenz</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {vergleichData.map((d, idx) => (
-                          <tr key={idx}>
-                            <td className="font-weight-bold">{d.name}</td>
-                            <td className="text-right">{d.plattform.toFixed(2)} €</td>
-                            <td className="text-right text-success font-weight-bold">{d.shop.toFixed(2)} €</td>
-                            <td className="text-right text-muted">{(d.plattform - d.shop).toFixed(2)} €</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+              <div>
+                {vergleichData.map((d, idx) => (
+                  <div key={idx} className="card border-primary mb-3">
+                    <div className="card-header bg-primary text-white py-2">
+                      <strong>{d.name} - EK = {vergleichEk}€</strong>
+                    </div>
+                    <div className="card-body p-0">
+                      {/* Plattformpreis */}
+                      <div className="p-3 bg-light border-bottom">
+                        <div className="row">
+                          <div className="col-md-6">
+                            <strong>Plattformpreis (netto):</strong>
+                          </div>
+                          <div className="col-md-6 text-right">
+                            <span className="h5 text-primary mb-0">{d.plattform.toFixed(2)} €</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Shop-Staffelpreise */}
+                      <div className="p-2">
+                        <strong className="small text-success">Shop-Staffelpreise (netto):</strong>
+                        <div className="table-responsive mt-2">
+                          <table className="table table-sm table-bordered text-center mb-0">
+                            <thead className="thead-light">
+                              <tr style={{fontSize: '0.8rem'}}>
+                                {d.staffeln.map(s => (
+                                  <th key={s.ve || s.staffel} className="py-1">{s.ve || s.staffel}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                {d.staffeln.map(s => (
+                                  <td key={s.ve || s.staffel} className="font-weight-bold text-success">
+                                    {(s.vk_shop_netto || s.shop_unit).toFixed(2)} €
+                                  </td>
+                                ))}
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
             )}
 
