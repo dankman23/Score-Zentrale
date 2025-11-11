@@ -4828,6 +4828,69 @@ export default function App() {
                       <i className="bi bi-clock mr-1"/>Geschätzte Dauer: 5-10 Minuten
                     </p>
                   </div>
+
+                  {/* Verwaiste Artikel Check */}
+                  {!artikelImportRunning && artikelImportProgress.imported > 0 && (
+                    <div className="mt-4">
+                      <hr/>
+                      <div className="alert alert-warning">
+                        <h6 className="alert-heading"><i className="bi bi-exclamation-triangle mr-2"/>Datenbank-Wartung</h6>
+                        <p className="mb-2">Nach einem Import können Artikel in der Datenbank sein, die nicht mehr in JTL-Wawi existieren.</p>
+                        <p className="mb-3 small">
+                          <strong>Hinweis:</strong> Der Import aktualisiert nur bestehende Artikel und fügt neue hinzu. 
+                          Gelöschte Artikel bleiben in der Datenbank erhalten, um angereicherte Daten nicht zu verlieren.
+                        </p>
+                        <button 
+                          className="btn btn-warning btn-sm"
+                          onClick={checkOrphanedArticles}
+                          disabled={checkingOrphans}
+                        >
+                          {checkingOrphans ? (
+                            <><span className="spinner-border spinner-border-sm mr-2"/>Prüfe...</>
+                          ) : (
+                            <><i className="bi bi-search mr-2"/>Verwaiste Artikel prüfen</>
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Liste verwaister Artikel */}
+                      {orphanedArticles.length > 0 && (
+                        <div className="card border-danger mt-3">
+                          <div className="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                            <span><i className="bi bi-exclamation-circle mr-2"/>{orphanedArticles.length} Verwaiste Artikel gefunden</span>
+                            <button 
+                              className="btn btn-sm btn-light"
+                              onClick={deleteOrphanedArticles}
+                            >
+                              <i className="bi bi-trash mr-1"/>Alle löschen
+                            </button>
+                          </div>
+                          <div className="card-body p-0">
+                            <div className="table-responsive" style={{maxHeight: '300px'}}>
+                              <table className="table table-sm table-hover mb-0">
+                                <thead className="thead-light">
+                                  <tr>
+                                    <th>Artikel-Nr</th>
+                                    <th>Name</th>
+                                    <th>kArtikel</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {orphanedArticles.map((art, idx) => (
+                                    <tr key={idx}>
+                                      <td><code>{art.cArtNr}</code></td>
+                                      <td>{art.cName || '-'}</td>
+                                      <td><small className="text-muted">{art.kArtikel}</small></td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
