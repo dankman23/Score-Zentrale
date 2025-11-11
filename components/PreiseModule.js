@@ -139,6 +139,12 @@ export default function PreiseModule() {
           >
             Neue ab 2025-11 (g2)
           </button>
+          <button 
+            className={`btn ${tab === 'vergleich' ? 'btn-primary' : 'btn-outline-secondary'}`}
+            onClick={() => setTab('vergleich')}
+          >
+            <i className="bi bi-bar-chart mr-1"/>Vergleich
+          </button>
         </div>
 
         {tab === 'alte_pb' && (
