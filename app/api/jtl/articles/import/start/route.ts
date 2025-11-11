@@ -29,17 +29,7 @@ export async function POST(request: NextRequest) {
     // Dies bewahrt zusätzliche Felder, die hier an Produkte angehängt wurden.
     // MongoDB upsert: true sorgt für Update bei existierenden und Insert bei neuen Artikeln.
 
-    // Letzten importierten Artikel aus MongoDB abrufen (für cursor-based pagination)
-    let lastKArtikel = 0
-    if (offset === 0) {
-      const lastArticle = await articlesCollection.findOne({}, { sort: { kArtikel: -1 }, projection: { kArtikel: 1 } })
-      if (lastArticle) {
-        lastKArtikel = lastArticle.kArtikel
-        console.log(`[Articles Import] Resuming from kArtikel > ${lastKArtikel}`)
-      }
-    }
-    
-    // Artikel mit allen Joins abrufen (cursor-based mit kArtikel > lastKArtikel)
+    // Artikel mit allen Joins abrufen
     const result = await pool.request().query(`
       SELECT TOP ${batchSize}
         a.kArtikel,
