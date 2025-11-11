@@ -617,7 +617,7 @@ export default function PreiseModule() {
                 <h6 className="mb-0">Formeln für Vergleich auswählen</h6>
               </div>
               <div className="card-body py-2">
-                <div className="row">
+                <div className="row mb-3">
                   {formeln.map(f => (
                     <div className="col-md-3 mb-2" key={f.sheet}>
                       <div className="custom-control custom-checkbox">
@@ -640,6 +640,44 @@ export default function PreiseModule() {
                       </div>
                     </div>
                   ))}
+                </div>
+                
+                {/* g2-Option */}
+                <div className="border-top pt-2">
+                  <div className="row">
+                    <div className="col-md-4">
+                      <div className="custom-control custom-checkbox">
+                        <input 
+                          type="checkbox" 
+                          className="custom-control-input" 
+                          id="check_g2"
+                          checked={vergleichG2Enabled}
+                          onChange={e => setVergleichG2Enabled(e.target.checked)}
+                        />
+                        <label className="custom-control-label font-weight-bold text-success" htmlFor="check_g2">
+                          Neue Preisberechnung (g2)
+                        </label>
+                      </div>
+                    </div>
+                    {vergleichG2Enabled && (
+                      <div className="col-md-8">
+                        <label className="small">Warengruppe für g2:</label>
+                        <select 
+                          className="form-control form-control-sm" 
+                          value={vergleichG2Warengruppe}
+                          onChange={e => setVergleichG2Warengruppe(e.target.value)}
+                        >
+                          <option value="lagerware">Lagerware</option>
+                          <option value="klingspor_fremdlager">Klingspor Fremdlager</option>
+                          <option value="abverkauf">Abverkauf</option>
+                          <option value="lagerware_guenstiger_ek">Lagerware günstiger EK</option>
+                          <option value="pferd_fremdlager">Pferd Fremdlager</option>
+                          <option value="plastimex_fremdlager">Plastimex Fremdlager</option>
+                          <option value="alle_konfektion">Alle Konfektion</option>
+                        </select>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
