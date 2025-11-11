@@ -153,6 +153,14 @@ export default function App() {
   
   // Produkte (Artikel-Import)
   const [produkteTab, setProdukteTab] = useState('import') // import | browser
+  
+  // Preise
+  const [preiseTab, setPreiseTab] = useState('alte_pb') // alte_pb | neue_2025
+  const [preiseSheet, setPreiseSheet] = useState('lagerware')
+  const [preiseFormeln, setPreiseFormeln] = useState([])
+  const [preiseEK, setPreiseEK] = useState('')
+  const [preiseErgebnisse, setPreiseErgebnisse] = useState([])
+  const [preiseLoading, setPreiseLoading] = useState(false)
   const [artikelImportRunning, setArtikelImportRunning] = useState(false)
   const [artikelImportProgress, setArtikelImportProgress] = useState({ imported: 0, total: 166854 })
   const [artikelList, setArtikelList] = useState([])
