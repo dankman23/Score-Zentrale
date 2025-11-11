@@ -255,25 +255,110 @@ def test_email_v3_send(prospect_id=None):
     
     return success
 
-def test_followup_auto():
+def test_delete_prospect():
     """
-    Test 3: GET /api/coldleads/followup/auto (Auto Follow-up Check)
-    
-    Erwartung:
-    - 200 OK mit { ok: true }
-    - Response enthält sent, errors, timestamp
-    - API läuft ohne Crash
-    - Falls keine fällig: sent=0, errors=0
+    CRITICAL TEST 1: DELETE /api/coldleads/delete
+    Test with existing prospect (recently fixed import path issue)
     """
     log_test("=" * 60)
-    log_test("TEST 3: GET /api/coldleads/followup/auto (Auto Follow-up Check)")
+    log_test("CRITICAL TEST 1: DELETE /api/coldleads/delete")
     log_test("=" * 60)
     
-    status, response = test_api_endpoint('GET', '/coldleads/followup/auto')
+    # First, try to get existing prospects to find one to delete
+    log_test("Step 1: Getting existing prospects...")
+    status, response = test_api_endpoint('GET', '/coldleads/search?limit=1')
     
-    if status is None:
-        log_test("❌ CRITICAL: API request failed completely")
-        return False
+    prospect_id = None
+    if status == 200 and isinstance(response, dict) and response.get('ok'):
+        prospects = response.get('prospects', [])
+        if prospects:
+            prospect_id = prospects[0].get('id')
+            log_test(f"✅ Found existing prospect to delete: {prospect_id}")
+        else:
+            log_test("⚠️  No existing prospects found, will create test prospect")
+    
+    # If no existing prospect, create one first
+    if not prospect_id:
+        log_test("Step 1b: Creating test prospect for deletion...")
+        create_data = {
+            "industry": "Metallverarbeitung",
+            "region": "Köln", 
+            "limit": 1
+        }
+        status, response = test_api_endpoint('POST', '/coldleads/search', create_data)
+        
+        if status == 200 and isinstance(response, dict) and response.get('ok'):
+            prospects = response.get('prospects', [])
+            if prospects:
+                prospect_id = prospects[0].get('id')
+                log_test(f"✅ Created test prospect: {prospect_id}")
+            else:
+                log_test("❌ Failed to create test prospect")
+                return False
+        else:
+            log_test("❌ Failed to create test prospect via search")
+            return False
+    
+    # Now test the DELETE endpoint
+    log_test("Step 2: Testing DELETE endpoint...")
+    delete_data = {
+        "prospect_id": prospect_id
+    }
+    
+    status, response = test_api_endpoint('DELETE', '/coldleads/delete', delete_data)
+    
+    success = True
+    
+    if status == 200:
+        log_test("✅ DELETE returned 200 OK")
+        if isinstance(response, dict):
+            if response.get('ok') == True:
+                log_test("✅ DELETE successful: ok=true")
+                if 'message' in response:
+                    log_test(f"✅ Success message: {response['message']}")
+            else:
+                log_test(f"❌ DELETE failed: {response.get('error', 'Unknown error')}")
+                success = False
+        else:
+            log_test("❌ Invalid response format")
+            success = False
+    elif status == 404:
+        log_test("⚠️  DELETE returned 404 (prospect not found) - acceptable if already deleted")
+        if isinstance(response, dict) and response.get('error'):
+            log_test(f"✅ Proper 404 error: {response['error']}")
+    else:
+        log_test(f"❌ Unexpected status code: {status}")
+        success = False
+    
+    # Verify deletion by trying to find the prospect again
+    log_test("Step 3: Verifying deletion...")
+    status, response = test_api_endpoint('GET', '/coldleads/search?limit=50')
+    
+    if status == 200 and isinstance(response, dict) and response.get('ok'):
+        prospects = response.get('prospects', [])
+        found_deleted = any(p.get('id') == prospect_id for p in prospects)
+        if not found_deleted:
+            log_test("✅ Prospect successfully deleted (not found in list)")
+        else:
+            log_test("⚠️  Prospect still exists after deletion")
+    
+    if success:
+        log_test("✅ CRITICAL TEST 1 PASSED: DELETE endpoint working correctly")
+    else:
+        log_test("❌ CRITICAL TEST 1 FAILED: DELETE endpoint has issues")
+    
+    return success
+
+def test_search_prospects():
+    """
+    IMPORTANT TEST 4: GET /api/coldleads/search?status=analyzed
+    Get analyzed prospects
+    """
+    log_test("=" * 60)
+    log_test("IMPORTANT TEST 4: GET /api/coldleads/search?status=analyzed")
+    log_test("=" * 60)
+    
+    status, response = test_api_endpoint('GET', '/coldleads/search?status=analyzed&limit=10')
     
     success = True
     
@@ -284,49 +369,285 @@ def test_followup_auto():
         log_test("✅ Status 200 OK")
     
     if isinstance(response, dict):
-        # Check required fields
-        required_fields = ['ok', 'sent', 'errors', 'timestamp']
+        required_fields = ['ok', 'count', 'prospects']
         for field in required_fields:
             if field in response:
                 log_test(f"✅ Response has {field}: {response[field]}")
-                
-                # Validate field types
-                if field == 'ok' and isinstance(response[field], bool):
-                    log_test(f"✅ {field} is boolean")
-                elif field in ['sent', 'errors'] and isinstance(response[field], int):
-                    log_test(f"✅ {field} is integer")
-                elif field == 'timestamp' and isinstance(response[field], str):
-                    log_test(f"✅ {field} is string (ISO format)")
-                    # Try to parse timestamp
-                    try:
-                        datetime.fromisoformat(response[field].replace('Z', '+00:00'))
-                        log_test(f"✅ Timestamp is valid ISO format")
-                    except:
-                        log_test(f"⚠️  Timestamp format might be non-standard")
             else:
                 log_test(f"❌ Response missing {field}")
                 success = False
         
-        # Check if response makes sense
-        if response.get('ok') == True:
-            sent = response.get('sent', 0)
-            errors = response.get('errors', 0)
-            log_test(f"✅ Follow-up results: {sent} sent, {errors} errors")
+        if response.get('ok'):
+            prospects = response.get('prospects', [])
+            count = response.get('count', 0)
             
-            if sent == 0 and errors == 0:
-                log_test("✅ No follow-ups due (expected for fresh system)")
-            elif sent > 0:
-                log_test(f"✅ {sent} follow-ups sent successfully")
-            elif errors > 0:
-                log_test(f"⚠️  {errors} follow-up errors (may be expected)")
-        else:
-            log_test("❌ Response ok=false")
-            success = False
+            log_test(f"✅ Found {count} analyzed prospects")
+            
+            # Check structure of prospects
+            if prospects:
+                sample_prospect = prospects[0]
+                expected_fields = ['id', 'company_name', 'website', 'status', 'analysis_v3']
+                for field in expected_fields:
+                    if field in sample_prospect:
+                        log_test(f"✅ Prospect has {field}")
+                    else:
+                        log_test(f"⚠️  Prospect missing {field}")
+                
+                # Verify status is actually 'analyzed'
+                if sample_prospect.get('status') == 'analyzed':
+                    log_test("✅ Prospect status correctly filtered to 'analyzed'")
+                else:
+                    log_test(f"❌ Prospect status is '{sample_prospect.get('status')}', not 'analyzed'")
+                    success = False
+            else:
+                log_test("⚠️  No analyzed prospects found (may be expected for new system)")
     
     if success:
-        log_test("✅ TEST 3 PASSED: followup/auto working correctly")
+        log_test("✅ IMPORTANT TEST 4 PASSED: search prospects working correctly")
     else:
-        log_test("❌ TEST 3 FAILED: followup/auto has issues")
+        log_test("❌ IMPORTANT TEST 4 FAILED: search prospects has issues")
+    
+    return success
+
+def test_search_new_companies():
+    """
+    IMPORTANT TEST 5: POST /api/coldleads/search
+    Search for new companies
+    """
+    log_test("=" * 60)
+    log_test("IMPORTANT TEST 5: POST /api/coldleads/search")
+    log_test("=" * 60)
+    
+    test_data = {
+        "industry": "Metallbau",
+        "region": "München",
+        "limit": 3
+    }
+    
+    log_test(f"Test payload: {json.dumps(test_data, indent=2, ensure_ascii=False)}")
+    
+    status, response = test_api_endpoint('POST', '/coldleads/search', test_data)
+    
+    success = True
+    
+    if status != 200:
+        log_test(f"❌ Expected status 200, got {status}")
+        success = False
+    else:
+        log_test("✅ Status 200 OK")
+    
+    if isinstance(response, dict):
+        required_fields = ['ok', 'count', 'prospects']
+        for field in required_fields:
+            if field in response:
+                log_test(f"✅ Response has {field}: {response[field]}")
+            else:
+                log_test(f"❌ Response missing {field}")
+                success = False
+        
+        if response.get('ok'):
+            prospects = response.get('prospects', [])
+            count = response.get('count', 0)
+            
+            log_test(f"✅ Found {count} new prospects")
+            
+            # Check structure of prospects
+            if prospects:
+                sample_prospect = prospects[0]
+                expected_fields = ['id', 'company_name', 'website', 'industry', 'region', 'status']
+                for field in expected_fields:
+                    if field in sample_prospect:
+                        log_test(f"✅ Prospect has {field}: {sample_prospect[field]}")
+                    else:
+                        log_test(f"❌ Prospect missing {field}")
+                        success = False
+                
+                # Verify industry and region match
+                if sample_prospect.get('industry') == test_data['industry']:
+                    log_test("✅ Industry correctly set")
+                else:
+                    log_test(f"❌ Industry mismatch: expected {test_data['industry']}, got {sample_prospect.get('industry')}")
+                
+                if sample_prospect.get('region') == test_data['region']:
+                    log_test("✅ Region correctly set")
+                else:
+                    log_test(f"❌ Region mismatch: expected {test_data['region']}, got {sample_prospect.get('region')}")
+            else:
+                log_test("⚠️  No prospects found (may be expected if Google API not configured)")
+    
+    if success:
+        log_test("✅ IMPORTANT TEST 5 PASSED: search new companies working correctly")
+    else:
+        log_test("❌ IMPORTANT TEST 5 FAILED: search new companies has issues")
+    
+    return success
+
+def test_dashboard_stats():
+    """
+    IMPORTANT TEST 6: GET /api/coldleads/stats
+    Dashboard statistics
+    """
+    log_test("=" * 60)
+    log_test("IMPORTANT TEST 6: GET /api/coldleads/stats")
+    log_test("=" * 60)
+    
+    status, response = test_api_endpoint('GET', '/coldleads/stats')
+    
+    success = True
+    
+    if status != 200:
+        log_test(f"❌ Expected status 200, got {status}")
+        success = False
+    else:
+        log_test("✅ Status 200 OK")
+    
+    if isinstance(response, dict):
+        required_fields = ['ok', 'unreadReplies', 'recentReplies', 'awaitingFollowup', 'byStatus', 'total']
+        for field in required_fields:
+            if field in response:
+                log_test(f"✅ Response has {field}: {response[field]}")
+            else:
+                log_test(f"❌ Response missing {field}")
+                success = False
+        
+        if response.get('ok'):
+            # Validate field types
+            if isinstance(response.get('unreadReplies'), int):
+                log_test("✅ unreadReplies is integer")
+            else:
+                log_test("❌ unreadReplies is not integer")
+                success = False
+            
+            if isinstance(response.get('byStatus'), dict):
+                log_test("✅ byStatus is dictionary")
+                by_status = response.get('byStatus', {})
+                log_test(f"✅ Status breakdown: {by_status}")
+            else:
+                log_test("❌ byStatus is not dictionary")
+                success = False
+            
+            if isinstance(response.get('total'), int):
+                log_test(f"✅ total is integer: {response.get('total')}")
+            else:
+                log_test("❌ total is not integer")
+                success = False
+    
+    if success:
+        log_test("✅ IMPORTANT TEST 6 PASSED: dashboard stats working correctly")
+    else:
+        log_test("❌ IMPORTANT TEST 6 FAILED: dashboard stats has issues")
+    
+    return success
+
+def test_autopilot_status():
+    """
+    AUTOPILOT TEST 7: GET /api/coldleads/autopilot/status
+    Get autopilot status
+    """
+    log_test("=" * 60)
+    log_test("AUTOPILOT TEST 7: GET /api/coldleads/autopilot/status")
+    log_test("=" * 60)
+    
+    status, response = test_api_endpoint('GET', '/coldleads/autopilot/status')
+    
+    success = True
+    
+    if status != 200:
+        log_test(f"❌ Expected status 200, got {status}")
+        success = False
+    else:
+        log_test("✅ Status 200 OK")
+    
+    if isinstance(response, dict):
+        required_fields = ['ok', 'state']
+        for field in required_fields:
+            if field in response:
+                log_test(f"✅ Response has {field}")
+            else:
+                log_test(f"❌ Response missing {field}")
+                success = False
+        
+        if response.get('ok') and 'state' in response:
+            state = response['state']
+            state_fields = ['running', 'dailyLimit', 'dailyCount', 'remaining', 'totalProcessed']
+            
+            for field in state_fields:
+                if field in state:
+                    log_test(f"✅ State has {field}: {state[field]}")
+                else:
+                    log_test(f"❌ State missing {field}")
+                    success = False
+            
+            # Validate state values
+            if isinstance(state.get('running'), bool):
+                log_test(f"✅ running is boolean: {state.get('running')}")
+            else:
+                log_test("❌ running is not boolean")
+                success = False
+            
+            if isinstance(state.get('dailyLimit'), int) and state.get('dailyLimit') > 0:
+                log_test(f"✅ dailyLimit is positive integer: {state.get('dailyLimit')}")
+            else:
+                log_test("❌ dailyLimit is not positive integer")
+                success = False
+    
+    if success:
+        log_test("✅ AUTOPILOT TEST 7 PASSED: autopilot status working correctly")
+    else:
+        log_test("❌ AUTOPILOT TEST 7 FAILED: autopilot status has issues")
+    
+    return success
+
+def test_autopilot_tick():
+    """
+    AUTOPILOT TEST 8: POST /api/coldleads/autopilot/tick
+    Simulate autopilot tick
+    """
+    log_test("=" * 60)
+    log_test("AUTOPILOT TEST 8: POST /api/coldleads/autopilot/tick")
+    log_test("=" * 60)
+    
+    status, response = test_api_endpoint('POST', '/coldleads/autopilot/tick')
+    
+    success = True
+    
+    if status != 200:
+        log_test(f"❌ Expected status 200, got {status}")
+        success = False
+    else:
+        log_test("✅ Status 200 OK")
+    
+    if isinstance(response, dict):
+        required_fields = ['ok', 'action']
+        for field in required_fields:
+            if field in response:
+                log_test(f"✅ Response has {field}: {response[field]}")
+            else:
+                log_test(f"❌ Response missing {field}")
+                success = False
+        
+        if response.get('ok'):
+            action = response.get('action')
+            valid_actions = ['skip', 'limit_reached', 'search_no_results', 'analyzed_but_not_ready', 'email_sent', 'email_failed']
+            
+            if action in valid_actions:
+                log_test(f"✅ Valid action: {action}")
+                
+                # Check action-specific fields
+                if action == 'email_sent' and 'prospect' in response:
+                    log_test(f"✅ Email sent to: {response['prospect']}")
+                elif action == 'limit_reached' and 'dailyCount' in response:
+                    log_test(f"✅ Daily limit reached: {response['dailyCount']}")
+                elif action == 'skip':
+                    log_test("✅ Autopilot skipped (not running)")
+            else:
+                log_test(f"❌ Unknown action: {action}")
+                success = False
+    
+    if success:
+        log_test("✅ AUTOPILOT TEST 8 PASSED: autopilot tick working correctly")
+    else:
+        log_test("❌ AUTOPILOT TEST 8 FAILED: autopilot tick has issues")
     
     return success
 
