@@ -131,9 +131,8 @@ export default function PreiseModule() {
           <button 
             className={`btn ${tab === 'neue_2025' ? 'btn-primary' : 'btn-outline-secondary'}`}
             onClick={() => setTab('neue_2025')}
-            disabled
           >
-            Neue ab 2025-11 <small className="ml-2">(Coming Soon)</small>
+            Neue ab 2025-11 (g2)
           </button>
         </div>
 
