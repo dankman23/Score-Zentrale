@@ -1290,6 +1290,30 @@ export default function App() {
     setPreisvergleichLoading(false)
   }
 
+  // Artikel-Präsenz laden
+  const loadArtikelPresence = async (kArtikel) => {
+    if (expandedArtikel === kArtikel) {
+      setExpandedArtikel(null)
+      setArtikelPresence(null)
+      return
+    }
+
+    setExpandedArtikel(kArtikel)
+    setLoadingPresence(true)
+    setArtikelPresence(null)
+
+    try {
+      const res = await fetch(`/api/jtl/articles/presence/${kArtikel}`)
+      const data = await res.json()
+      if (data.ok) {
+        setArtikelPresence(data)
+      }
+    } catch (e) {
+      console.error('Fehler beim Laden der Präsenz:', e)
+    }
+    setLoadingPresence(false)
+  }
+
   const startArtikelImport = async () => {
     if (artikelImportRunning) return
     
