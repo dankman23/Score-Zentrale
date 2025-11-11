@@ -34,10 +34,6 @@ export default function PreiseModule() {
   }, [])
 
   useEffect(() => {
-    loadFormeln()
-  }, [])
-
-  useEffect(() => {
     if (formeln.length > 0) {
       const formel = formeln.find(f => f.sheet === sheet)
       setCurrentFormel(formel)
