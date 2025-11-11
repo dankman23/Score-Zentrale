@@ -1257,6 +1257,36 @@ export default function App() {
     }
   }
 
+  // Preisvergleich starten
+  const startePreisvergleich = async (artikel) => {
+    setPreisvergleichArtikel(artikel)
+    setPreisvergleichLoading(true)
+    setPreisvergleichErgebnisse([])
+
+    try {
+      const res = await fetch('/api/preisvergleich/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ean: artikel.cBarcode,
+          mpn: artikel.cHAN,
+          productName: artikel.cName,
+          unserVK: artikel.fVKNetto,
+          unsereVE: 1 // TODO: VE aus Artikel extrahieren
+        })
+      })
+      const data = await res.json()
+      if (data.ok) {
+        setPreisvergleichErgebnisse(data.wettbewerber || [])
+      } else {
+        alert('Fehler beim Preisvergleich: ' + data.error)
+      }
+    } catch (e) {
+      alert('Fehler: ' + e.message)
+    }
+    setPreisvergleichLoading(false)
+  }
+
   const startArtikelImport = async () => {
     if (artikelImportRunning) return
     
