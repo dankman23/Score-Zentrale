@@ -67,9 +67,10 @@ export default function PreiseModule() {
       const colors = ['#F6B10A', '#2fb97f', '#17a2b8', '#e44c4c', '#667eea', '#ff6b6b', '#4ecdc4']
       
       vergleichData.forEach((d, idx) => {
+        console.log('Vergleich Dataset:', d.name, 'Plattform:', d.plattform, 'Shop:', d.shop)
+        
         // Für jedes EK den Preis interpolieren
         const data = ekRange.map(ek => {
-          // Finde nächste Staffel-Preise für Interpolation
           if (ek === 0) return 0
           
           const baseEk = parseFloat(vergleichEk)
@@ -89,6 +90,8 @@ export default function PreiseModule() {
           pointRadius: 1
         })
       })
+      
+      console.log('Total Datasets:', datasets.length)
 
       new window.Chart(ctx, {
         type: 'line',
