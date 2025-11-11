@@ -300,7 +300,7 @@ export default function PreiseModule() {
                   </div>
                   <div className="row">
                     <div className="col-md-6 mb-2">
-                      <label className="font-weight-bold small">Paypal Fix</label>
+                      <label className="font-weight-bold" style={{fontSize: '0.8rem'}}>Paypal Fix</label>
                       <input 
                         type="number" 
                         step="0.01"
@@ -310,7 +310,7 @@ export default function PreiseModule() {
                       />
                     </div>
                     <div className="col-md-6 mb-2">
-                      <label className="font-weight-bold small">Fixkosten Beitrag</label>
+                      <label className="font-weight-bold" style={{fontSize: '0.8rem'}}>Fixkosten Beitrag</label>
                       <input 
                         type="number" 
                         step="0.01"
