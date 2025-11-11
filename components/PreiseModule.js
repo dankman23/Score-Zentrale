@@ -323,8 +323,8 @@ export default function PreiseModule() {
                 </div>
 
                 {/* Regler */}
-                <div className="mb-3">
-                  <div className="bg-light text-dark font-weight-bold px-3 py-2 mb-2" style={{fontSize: '0.95rem'}}>
+                <div className="mb-2">
+                  <div className="bg-light text-dark font-weight-bold px-2 py-1 mb-1" style={{fontSize: '0.85rem'}}>
                     Regler
                   </div>
                   <div className="row">
