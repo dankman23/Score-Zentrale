@@ -164,6 +164,8 @@ export default function App() {
   const [preiseLoading, setPreiseLoading] = useState(false)
   const [artikelImportRunning, setArtikelImportRunning] = useState(false)
   const [artikelImportProgress, setArtikelImportProgress] = useState({ imported: 0, total: 166854 })
+  const [orphanedArticles, setOrphanedArticles] = useState([])
+  const [checkingOrphans, setCheckingOrphans] = useState(false)
   const [artikelList, setArtikelList] = useState([])
   const [artikelFilter, setArtikelFilter] = useState({ search: '', hersteller: '', warengruppe: '' })
   const [artikelPage, setArtikelPage] = useState(1)
