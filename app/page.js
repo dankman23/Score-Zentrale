@@ -1184,6 +1184,61 @@ export default function App() {
     }
   }
 
+  const checkOrphanedArticles = async () => {
+    if (checkingOrphans) return
+    
+    if (!confirm('Verwaiste Artikel prüfen?\n\nDies vergleicht alle Artikel in der Datenbank mit JTL-Wawi und findet Artikel, die nicht mehr vorhanden sind.\n\nDauer: ca. 1-2 Minuten.\n\nFortfahren?')) {
+      return
+    }
+
+    setCheckingOrphans(true)
+    try {
+      const res = await fetch('/api/jtl/articles/import/orphaned')
+      const data = await res.json()
+      if (data.ok) {
+        setOrphanedArticles(data.orphanedArticles || [])
+        if (data.orphanedCount === 0) {
+          alert('✅ Keine verwaisten Artikel gefunden!\n\nAlle Artikel in der Datenbank sind aktuell.')
+        } else {
+          alert(`⚠️ ${data.orphanedCount} verwaiste Artikel gefunden!\n\nDiese Artikel sind in der Datenbank vorhanden, aber nicht mehr in JTL-Wawi aktiv.\n\nSehen Sie sich die Liste an und entscheiden Sie, ob sie gelöscht werden sollen.`)
+        }
+      } else {
+        alert('Fehler beim Prüfen: ' + data.error)
+      }
+    } catch (e) {
+      alert('Fehler: ' + e.message)
+    }
+    setCheckingOrphans(false)
+  }
+
+  const deleteOrphanedArticles = async () => {
+    if (orphanedArticles.length === 0) return
+    
+    if (!confirm(`⚠️ WARNUNG: Artikel löschen\n\n${orphanedArticles.length} verwaiste Artikel werden PERMANENT gelöscht.\n\nDies kann nicht rückgängig gemacht werden!\n\nFortfahren?`)) {
+      return
+    }
+
+    try {
+      const res = await fetch('/api/jtl/articles/import/orphaned', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          kArtikelIds: orphanedArticles.map(a => a.kArtikel)
+        })
+      })
+      const data = await res.json()
+      if (data.ok) {
+        alert(`✅ ${data.deletedCount} Artikel erfolgreich gelöscht!`)
+        setOrphanedArticles([])
+        await loadArtikelStatus()
+      } else {
+        alert('Fehler beim Löschen: ' + data.error)
+      }
+    } catch (e) {
+      alert('Fehler: ' + e.message)
+    }
+  }
+
   const startArtikelImport = async () => {
     if (artikelImportRunning) return
     
