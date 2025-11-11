@@ -91,17 +91,17 @@ function getDefaultFormeln() {
       ],
       regler: {
         kosten_variabel: 0,
-        kosten_statisch: 25,
+        kosten_statisch: 0,
         mwst: 0.19,
-        ebay_amazon: 0.19,
-        paypal: 0.025,
+        ebay_amazon: 0.25,
+        paypal: 0.02,
         paypal_fix: 0.35,
-        fixkosten_beitrag: 0.35,
-        gewinn_regler_1a: 1.4,
-        gewinn_regler_2c: 0,
-        gewinn_regler_3e: 5,
-        prozent_aufschlag: 0.94,
-        aa_threshold: 0.08
+        fixkosten_beitrag: 1.4,
+        gewinn_regler_1a: 0.94,
+        gewinn_regler_2c: 1.07,
+        gewinn_regler_3e: 1,
+        prozent_aufschlag: 0.08,
+        aa_threshold: 18
       },
       ve_staffeln: [1, 3, 5, 10, 25, 50, 100, 300]
     },
