@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 /**
  * POST /api/preise/g2/berechnen
- * Neue g2-Formel: 3 Intervalle mit Warengruppen-Reglern
+ * g2-Formel: Nutzt alte Formel + 3 Intervalle
  */
 export async function POST(request: NextRequest) {
   try {
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     const staffeln = staffel_mengen || [1, 5, 10, 20, 50, 100, 200, 500]
 
-    // Einzelpreis berechnen
+    // Einzelpreis
     const plattform_unit = g2(ek, warengruppe_regler, g2_params)
     const shop_unit = plattform_unit * (g2_params.shp_fac || 0.92)
 
@@ -52,37 +52,39 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * Alte Formel f_alt - nutzt Warengruppen-Regler
+ * f_alt - EXAKT wie alte Formel (für VE=1)
+ * 
+ * Alte Formel aus /api/preise/berechnen:
+ * zaehler = (c * (ve * ek)^a) + paypal_fix + fixkosten_beitrag + (ve * ek)
+ * nenner = 1 - ebay_amazon - paypal
+ * vk = (zaehler / nenner) * (1 + prozent_aufschlag) / ve
  */
 function f_alt(x: number, wg: any, g2: any): number {
+  const ve = 1
   const c = wg.gewinn_regler_2c || 1.07
   const a = wg.gewinn_regler_1a || 0.81
-  const o = wg.gewinn_regler_3e || 1  // o = 3e
-  const pa = g2.fixcost1 || 0.35
-  const fixkosten = g2.fixcost2 || 1.4
+  const paypal_fix = g2.fixcost1 || 0.35
+  const fixkosten_beitrag = g2.fixcost2 || 1.4
   const eba = g2.varpct1 || 0.25
   const paypal = g2.varpct2 || 0.02
-  const aufschlag = g2.aufschlag || 1.08
+  const prozent_aufschlag = (g2.aufschlag - 1) || 0.08  // 1.08 → 0.08
 
-  const zaehler = c * Math.pow(x, a) + pa + fixkosten + x + o
+  // EXAKT wie alte Formel
+  const zaehler = (c * Math.pow(ve * x, a)) + paypal_fix + fixkosten_beitrag + (ve * x)
   const nenner = 1 - eba - paypal
   
-  return (zaehler / nenner) * aufschlag
+  return (zaehler / nenner) * (1 + prozent_aufschlag) / ve
 }
 
 /**
- * g2-Formel mit 3 Intervallen
- * 
- * I:   x ≤ gstart_ek        → f_alt(x)
- * II:  gstart_ek < x < gneu_ek → f_alt(x) * L(x)
- * III: x ≥ gneu_ek         → rNEU * f_alt(x)
+ * g2 mit 3 Intervallen
  */
 function g2(x: number, wg: any, g2_params: any): number {
   const gstart = g2_params.gstart_ek || 12
   const gneu_ek = g2_params.gneu_ek || 100
   const gneu_vk = g2_params.gneu_vk || 189
 
-  // Intervall I: x ≤ gstart_ek
+  // Intervall I: x ≤ gstart_ek → identisch mit alter Formel
   if (x <= gstart) {
     return f_alt(x, wg, g2_params)
   }
@@ -97,15 +99,9 @@ function g2(x: number, wg: any, g2_params: any): number {
   }
 
   // Intervall II: S-Übergang
-  // L(x, xa, xb, ya, yb) = ya + (yb - ya) * S((x - xa)/(xb - xa))
-  const xa = gstart
-  const xb = gneu_ek
-  const ya = 1.0  // Bei gstart: Faktor = 1
-  const yb = rNEU  // Bei gneu: Faktor = rNEU
-
-  const t = (x - xa) / (xb - xa)
+  const t = (x - gstart) / (gneu_ek - gstart)
   const S = 3 * Math.pow(t, 2) - 2 * Math.pow(t, 3)
-  const L = ya + (yb - ya) * S
+  const L = 1 + (rNEU - 1) * S
 
   return f_alt(x, wg, g2_params) * L
 }
