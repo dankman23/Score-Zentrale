@@ -52,8 +52,8 @@ function berechnePreis(ek: number, regler: any, ve: number) {
     prozent_aufschlag
   } = regler
 
-  // Basis-Check - mit Gewinn-Prozenten initialisiert
-  if (!kosten_variabel || !kosten_statisch) {
+  // Basis-Check - nur prüfen ob kosten_variabel existiert (kosten_statisch kann 0 sein)
+  if (kosten_variabel === undefined || kosten_variabel === null) {
     return { 
       ve, 
       vk_netto: 0, 
