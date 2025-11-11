@@ -4274,7 +4274,6 @@ export default function App() {
                                       </div>
                                     </div>
                                   )}
-                                )}
                                   
                             {/* Kontakt-Historie */}
                               {p.history && p.history.length > 0 && (
