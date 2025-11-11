@@ -5105,8 +5105,18 @@ export default function App() {
                                 </tr>
                               ) : (
                                 artikelList.map(artikel => (
-                                  <tr key={artikel.kArtikel}>
-                                    <td className="font-weight-bold text-primary">{artikel.cArtNr}</td>
+                                  <>
+                                    <tr key={artikel.kArtikel}>
+                                      <td className="text-center">
+                                        <button 
+                                          className="btn btn-sm btn-outline-secondary"
+                                          onClick={() => loadArtikelPresence(artikel.kArtikel)}
+                                          title="Präsenz anzeigen"
+                                        >
+                                          <i className={`bi bi-${expandedArtikel === artikel.kArtikel ? 'chevron-up' : 'chevron-down'}`}/>
+                                        </button>
+                                      </td>
+                                      <td className="font-weight-bold text-primary">{artikel.cArtNr}</td>
                                     <td>
                                       <div className="text-truncate font-weight-bold" style={{maxWidth: '350px'}} title={artikel.cName || artikel.cKurzBeschreibung}>
                                         {artikel.cName || artikel.cKurzBeschreibung || 'Kein Name'}
