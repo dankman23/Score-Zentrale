@@ -4635,6 +4635,11 @@ export default function App() {
         </div>
       )}
 
+      {/* Preise (Preisberechnung) */}
+      {activeTab==='preise' && (
+        <PreiseModule />
+      )}
+
       {/* Produkte (Artikel-Import & Browser) */}
       {activeTab==='produkte' && (
         <div>
