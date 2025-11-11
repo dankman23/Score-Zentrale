@@ -13,21 +13,21 @@ export default function PreiseG2Module() {
   const [plattformpreis, setPlattformpreis] = useState(0)
   const [loading, setLoading] = useState(false)
 
-  // Default Regler
-  const [regler, setRegler] = useState({
-    a: 0.81,
+  // Default Parameter
+  const [params, setParams] = useState({
     c: 1.07,
+    a: 0.81,
     pa: 0.35,
-    fixcost: 1.4,
-    eba_pct: 0.25,
-    paypal_pct: 0.02,
-    vat_pct: 0.19,
+    fixcost1: 0,
+    fixcost2: 1.4,
+    varpct1: 0.25,
+    varpct2: 0.02,
     aufschlag: 1.08,
     gstart_ek: 50,
     gneu_ek: 150,
     gneu_vk: 180,
-    price_discounter: 1.00,
-    shop_modifier: 0.92,
+    k: 1.0,
+    shp_fac: 0.92,
     aa_threshold: 18
   })
 
@@ -40,14 +40,9 @@ export default function PreiseG2Module() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ek_input: parseFloat(ekInput),
-          ek_input_per: ekInputPer,
-          ve_size: veSize,
-          regler,
-          tier_set: tierSet,
-          show_ab1: showAb1,
-          ab1_markup_pct: 0.02,
-          pretty_round: prettyRound
+          ek: parseFloat(ekInput),
+          params,
+          staffel_mengen: [1, 5, 10, 20, 50, 100, 200, 500]
         })
       })
       const data = await res.json()
@@ -63,8 +58,8 @@ export default function PreiseG2Module() {
     setLoading(false)
   }
 
-  const updateRegler = (key, value) => {
-    setRegler({ ...regler, [key]: parseFloat(value) || 0 })
+  const updateParam = (key, value) => {
+    setParams({ ...params, [key]: parseFloat(value) || 0 })
   }
 
   return (
