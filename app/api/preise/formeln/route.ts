@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
  */
 function getDefaultFormeln() {
   return [
+    // Lagerware-Gruppe (kosten_statisch: 0)
     {
       sheet: 'lagerware',
       name: 'Lagerware',
@@ -105,22 +106,17 @@ function getDefaultFormeln() {
       },
       ve_staffeln: [1, 3, 5, 10, 25, 50, 100, 300]
     },
+    // Klingspor Fremdlager (kosten_statisch: 32)
     {
       sheet: 'klingspor_fremdlager',
       name: 'Klingspor Fremdlager',
       warengruppen: [
         { id: 'klingspor_fremdlager', name: 'Klingspor Fremdlager' },
-        { id: 'auktion_klingspor_fremdlager', name: 'Auktion Klingspor Fremdlager' },
         { id: 'starcke_fremdlager', name: 'Starcke Fremdlager' },
-        { id: 'auktion_starcke_fremdlager', name: 'Auktion Starcke Fremdlager' },
         { id: 'vsm_fremdlager', name: 'VSM Fremdlager' },
-        { id: 'auktion_vsm_fremdlager', name: 'Auktion VSM Fremdlager' },
         { id: 'lukas_fremdlager', name: 'Lukas Fremdlager' },
-        { id: 'auktion_lukas_fremdlager', name: 'Auktion Lukas Fremdlager' },
         { id: 'norton_fremdlager', name: 'Norton Fremdlager' },
-        { id: 'auktion_norton_fremdlager', name: 'Auktion Norton Fremdlager' },
         { id: 'sia_fremdlager', name: 'SIA Fremdlager' },
-        { id: 'auktion_sia_fremdlager', name: 'Auktion Sia Fremdlager' },
         { id: 'sia_nicht_erhaeltlich', name: 'SIA nicht erhältlich' },
         { id: 'tyrolit_fremdlager', name: 'Tyrolit Fremdlager' }
       ],
@@ -128,18 +124,19 @@ function getDefaultFormeln() {
         kosten_variabel: 0,
         kosten_statisch: 32,
         mwst: 0.19,
-        ebay_amazon: 0.19,
-        paypal: 0.026,
-        paypal_fix: 0.25,
-        fixkosten_beitrag: 0.25,
-        gewinn_regler_1a: 0.02,
-        gewinn_regler_2c: 0.35,
-        gewinn_regler_3e: 1.4,
-        prozent_aufschlag: 19,
-        aa_threshold: 0.08
+        ebay_amazon: 0.25,
+        paypal: 0.02,
+        paypal_fix: 0.35,
+        fixkosten_beitrag: 1.4,
+        gewinn_regler_1a: 0.81,
+        gewinn_regler_2c: 1.07,
+        gewinn_regler_3e: 1,
+        prozent_aufschlag: 0.08,
+        aa_threshold: 18
       },
       ve_staffeln: [1, 3, 5, 10, 25, 50, 100, 300]
     },
+    // Abverkauf (kosten_statisch: 31)
     {
       sheet: 'abverkauf',
       name: 'Abverkauf',
@@ -152,17 +149,18 @@ function getDefaultFormeln() {
         kosten_statisch: 31,
         mwst: 0.19,
         ebay_amazon: 0.25,
-        paypal: 0.026,
-        paypal_fix: 0.19,
-        fixkosten_beitrag: 0.19,
-        gewinn_regler_1a: 0.25,
-        gewinn_regler_2c: 0.02,
-        gewinn_regler_3e: 0.35,
-        prozent_aufschlag: 1.4,
-        aa_threshold: 0.08
+        paypal: 0.02,
+        paypal_fix: 0.35,
+        fixkosten_beitrag: 1.4,
+        gewinn_regler_1a: 0.94,
+        gewinn_regler_2c: 1.07,
+        gewinn_regler_3e: 0.5,
+        prozent_aufschlag: 0.08,
+        aa_threshold: 18
       },
       ve_staffeln: [1, 3, 5, 10, 25, 50, 100, 300]
     },
+    // Lagerware günstiger EK (kosten_statisch: 33, EK wird verdoppelt)
     {
       sheet: 'lagerware_guenstiger_ek',
       name: 'Lagerware günstiger EK',
@@ -175,23 +173,25 @@ function getDefaultFormeln() {
         kosten_statisch: 33,
         mwst: 0.19,
         ebay_amazon: 0.25,
-        paypal: 0.026,
-        paypal_fix: 0.19,
-        fixkosten_beitrag: 0.19,
-        gewinn_regler_1a: 0.25,
-        gewinn_regler_2c: 0.02,
-        gewinn_regler_3e: 0.35,
-        prozent_aufschlag: 1.4,
-        aa_threshold: 0.08
+        paypal: 0.02,
+        paypal_fix: 0.35,
+        fixkosten_beitrag: 1.4,
+        gewinn_regler_1a: 0.94,
+        gewinn_regler_2c: 1.07,
+        gewinn_regler_3e: 2,  // EK-Multiplikator
+        prozent_aufschlag: 0.08,
+        aa_threshold: 18
       },
       ve_staffeln: [1, 3, 5, 10, 25, 50, 100, 300]
     },
+    // Pferd Fremdlager (kosten_statisch: 34)
     {
       sheet: 'pferd_fremdlager',
       name: 'Pferd Fremdlager',
       warengruppen: [
         { id: 'pferd_fremdlager', name: 'Pferd Fremdlager' },
         { id: 'auktion_pferd_fremdlager', name: 'Auktion Pferd Fremdlager' },
+        { id: 'rhodius_fremdlager', name: 'Rhodius Fremdlager' },
         { id: 'bosch_fremdlager', name: 'Bosch Fremdlager' }
       ],
       regler: {
@@ -199,17 +199,18 @@ function getDefaultFormeln() {
         kosten_statisch: 34,
         mwst: 0.19,
         ebay_amazon: 0.25,
-        paypal: 0.026,
-        paypal_fix: 0.19,
-        fixkosten_beitrag: 0.19,
-        gewinn_regler_1a: 0.25,
-        gewinn_regler_2c: 0.02,
-        gewinn_regler_3e: 0.35,
-        prozent_aufschlag: 1.4,
-        aa_threshold: 0.08
+        paypal: 0.02,
+        paypal_fix: 0.35,
+        fixkosten_beitrag: 1.4,
+        gewinn_regler_1a: 0.65,
+        gewinn_regler_2c: 1.07,
+        gewinn_regler_3e: 1,
+        prozent_aufschlag: 0.08,
+        aa_threshold: 18
       },
       ve_staffeln: [1, 3, 5, 10, 25, 50, 100, 300]
     },
+    // Plastimex Fremdlager (kosten_statisch: 35)
     {
       sheet: 'plastimex_fremdlager',
       name: 'Plastimex Fremdlager',
@@ -222,17 +223,18 @@ function getDefaultFormeln() {
         kosten_statisch: 35,
         mwst: 0.19,
         ebay_amazon: 0.25,
-        paypal: 0.026,
-        paypal_fix: 0.19,
-        fixkosten_beitrag: 0.19,
-        gewinn_regler_1a: 0.25,
-        gewinn_regler_2c: 0.02,
-        gewinn_regler_3e: 0.35,
-        prozent_aufschlag: 1.4,
-        aa_threshold: 0.08
+        paypal: 0.02,
+        paypal_fix: 0.35,
+        fixkosten_beitrag: 1.4,
+        gewinn_regler_1a: 0.65,
+        gewinn_regler_2c: 1.07,
+        gewinn_regler_3e: 1,
+        prozent_aufschlag: 0.08,
+        aa_threshold: 18
       },
       ve_staffeln: [1, 3, 5, 10, 25, 50, 100, 300]
     },
+    // Alle Konfektion (kosten_statisch: 37)
     {
       sheet: 'alle_konfektion',
       name: 'Alle Konfektion',
@@ -244,14 +246,14 @@ function getDefaultFormeln() {
         kosten_statisch: 37,
         mwst: 0.19,
         ebay_amazon: 0.25,
-        paypal: 0.026,
-        paypal_fix: 0.19,
-        fixkosten_beitrag: 0.19,
-        gewinn_regler_1a: 0.25,
-        gewinn_regler_2c: 0.02,
-        gewinn_regler_3e: 0.35,
-        prozent_aufschlag: 1.4,
-        aa_threshold: 0.08
+        paypal: 0.02,
+        paypal_fix: 0.35,
+        fixkosten_beitrag: 1.4,
+        gewinn_regler_1a: 0.9,
+        gewinn_regler_2c: 1.07,
+        gewinn_regler_3e: 1,
+        prozent_aufschlag: 0.08,
+        aa_threshold: 18
       },
       ve_staffeln: [1, 3, 5, 10, 25, 50, 100, 300]
     }
