@@ -17,14 +17,21 @@ async function continueImport() {
   const currentCount = statusData.imported || 0
   
   console.log(`📊 Aktuell importiert: ${currentCount} Artikel`)
-  console.log(`🎯 Ziel: ~166.855 Artikel\n`)
+  console.log(`🎯 Ziel: ~166.854 Artikel\n`)
+  
+  const TARGET_COUNT = 166854 // Maximale Anzahl zu importierender Artikel
+  
+  if (currentCount >= TARGET_COUNT) {
+    console.log(`✅ Import bereits abgeschlossen! ${currentCount} Artikel importiert.`)
+    return
+  }
   
   let offset = currentCount // Start ab aktuellem Stand
   let totalImported = 0
   let batchCount = 0
   const batchSize = 5000 // Größere Batches für schnelleren Import
   
-  while (true) {
+  while (offset < TARGET_COUNT) {
     batchCount++
     console.log(`\n📦 Batch ${batchCount}: Importiere ab Offset ${offset}...`)
     
