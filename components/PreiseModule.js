@@ -137,11 +137,21 @@ export default function PreiseModule() {
           ve_staffeln: currentFormel.ve_staffeln
         })
       })
-      const data = await res.json()
+      
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`)
+      }
+      
+      const text = await res.text()
+      const data = JSON.parse(text)
+      
       if (data.ok) {
         setErgebnisse(data.ergebnisse)
+      } else {
+        alert('Fehler: ' + (data.error || 'Unbekannter Fehler'))
       }
     } catch (e) {
+      console.error('Berechnung Fehler:', e)
       alert('Fehler bei der Berechnung: ' + e.message)
     }
     setLoading(false)
