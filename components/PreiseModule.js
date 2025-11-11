@@ -178,12 +178,12 @@ export default function PreiseModule() {
 
   return (
     <div className="card">
-      <div className="card-header">
-        <h2 className="mb-0"><i className="bi bi-calculator mr-2"/>Preisberechnung</h2>
+      <div className="card-header py-2">
+        <h5 className="mb-0"><i className="bi bi-calculator mr-2"/>Preisberechnung</h5>
       </div>
-      <div className="card-body">
+      <div className="card-body py-2">
         {/* Haupt-Tabs */}
-        <div className="btn-group btn-group-lg mb-4 w-100">
+        <div className="btn-group btn-group-sm mb-3 w-100">
           <button 
             className={`btn ${tab === 'alte_pb' ? 'btn-primary' : 'btn-outline-secondary'}`}
             onClick={() => setTab('alte_pb')}
