@@ -171,46 +171,42 @@ export default function PreiseG2Module() {
         {ergebnisse.length > 0 && (
           <div>
             {/* Plattformpreis */}
-            <div className="card border-primary mb-3">
-              <div className="card-header bg-primary text-white py-2">
-                <h6 className="mb-0">Netto Plattformpreis (ab VE)</h6>
+            <div className="card border-primary mb-2">
+              <div className="card-header bg-primary text-white py-1">
+                <small className="mb-0 font-weight-bold">Netto Plattformpreis (Einzelstück)</small>
               </div>
-              <div className="card-body text-center py-3">
-                <div className="h2 font-weight-bold text-primary mb-0">
+              <div className="card-body text-center py-2">
+                <div className="h4 font-weight-bold text-primary mb-0">
                   {plattformpreis.toFixed(2)} €
                 </div>
-                <small className="text-muted">pro Stück (netto)</small>
+                <small className="text-muted" style={{fontSize: '0.7rem'}}>pro Stück (netto)</small>
               </div>
             </div>
 
             {/* Shop-Staffelpreise */}
             <div className="card border-success">
-              <div className="card-header bg-success text-white py-2">
-                <h6 className="mb-0">Netto Shop Staffelpreise (ShopModifier = {(regler.shop_modifier * 100).toFixed(0)}%)</h6>
+              <div className="card-header bg-success text-white py-1">
+                <small className="mb-0 font-weight-bold">Shop-Staffelpreise (shp_fac = {(params.shp_fac * 100).toFixed(0)}%)</small>
               </div>
-              <div className="card-body py-3">
+              <div className="card-body py-2">
                 <div className="table-responsive">
-                  <table className="table table-sm table-bordered text-center mb-0">
+                  <table className="table table-sm table-bordered text-center mb-0" style={{fontSize: '0.85rem'}}>
                     <thead className="thead-light">
-                      <tr>
-                        <th className="font-weight-bold">Anzahl</th>
-                        <th className="font-weight-bold">Preis pro Stück (netto)</th>
-                        <th className="font-weight-bold">Status</th>
+                      <tr style={{fontSize: '0.75rem'}}>
+                        <th className="py-1">Staffel</th>
+                        <th className="py-1">Paket-EK</th>
+                        <th className="py-1">Shop-Paket</th>
+                        <th className="py-1">Shop/Stück</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {ergebnisse.map((tier, idx) => (
-                        <tr key={idx} className={!tier.selectable ? 'table-secondary' : ''}>
-                          <td className="font-weight-bold">{tier.label}</td>
-                          <td className="text-success font-weight-bold" style={{fontSize: '1.1rem'}}>
-                            {tier.unitPriceShop.toFixed(2)} €
-                          </td>
-                          <td>
-                            {tier.selectable ? (
-                              <span className="badge badge-success">Kaufbar</span>
-                            ) : (
-                              <span className="badge badge-secondary">Nur Anzeige</span>
-                            )}
+                      {ergebnisse.map((erg, idx) => (
+                        <tr key={idx}>
+                          <td className="font-weight-bold py-1">{erg.staffel}</td>
+                          <td className="text-muted py-1">{erg.paket_ek.toFixed(2)} €</td>
+                          <td className="py-1">{erg.shop_paket.toFixed(2)} €</td>
+                          <td className="text-success font-weight-bold py-1">
+                            {erg.shop_unit.toFixed(2)} €
                           </td>
                         </tr>
                       ))}
