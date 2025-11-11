@@ -28,6 +28,11 @@ export default function PreiseModule() {
     { id: 'alle_konfektion', name: 'Alle Konfektion' }
   ]
 
+  // Formeln beim ersten Laden abrufen
+  useEffect(() => {
+    loadFormeln()
+  }, [])
+
   useEffect(() => {
     loadFormeln()
   }, [])
