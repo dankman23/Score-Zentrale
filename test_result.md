@@ -1163,6 +1163,23 @@ agent_communication:
         agent: "main"
         comment: "Auto-Follow-up Cron-Job. Prüft fällige Follow-ups (mail_2_scheduled <= now, mail_3_scheduled <= now) und versendet automatisch. Updates followup_schedule nach Versand."
 
+  - task: "Kaltakquise: DELETE /api/coldleads/delete"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/coldleads/delete/route.ts"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "Beim Löschen eines Eintrages im 'Analysiert'-Tab kam es zu einem Fehler: Module not found: Can't resolve '../../../lib/mongodb'"
+      - working: "NA"
+        agent: "main"
+        comment: "Import-Pfad korrigiert von '../../../lib/mongodb' zu '../../../../lib/mongodb' (5 Ebenen nach oben von /app/app/api/coldleads/delete/route.ts zu /app/lib/mongodb.ts). Syntax-Fehler in page.js behoben (fehlende closing brackets)."
+
 agent_communication:
   - agent: "main"
     message: "Kaltakquise V3 System vollständig implementiert (Analyzer, Emailer, APIs, UI). Bereit für Backend-Tests. Bitte testen: analyze-v3 (mit Test-Website), email-v3/send (Mail 1 versenden), followup/auto (Check-Funktion)."
+  - agent: "main"
+    message: "KRITISCHE BUGS BEHOBEN: (1) Syntax-Fehler in /app/app/page.js bei Zeile 4247-4250 (fehlende closing brackets für conditional expressions). (2) Import-Pfad-Fehler in /app/app/api/coldleads/delete/route.ts korrigiert. Frontend kompiliert jetzt erfolgreich. DELETE-Endpoint sollte jetzt funktionieren. Bitte komplettes Kaltakquise-Modul testen: DELETE prospect, Analyze-v3, Email-v3 Send, Autopilot."
