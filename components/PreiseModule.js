@@ -496,8 +496,8 @@ export default function PreiseModule() {
                 <h6 className="mb-0">EK für Vergleich</h6>
               </div>
               <div className="card-body py-3">
-                <div className="row">
-                  <div className="col-md-6">
+                <div className="row mb-2">
+                  <div className="col-md-4">
                     <input 
                       type="number" 
                       step="0.01"
@@ -507,7 +507,23 @@ export default function PreiseModule() {
                       onChange={e => setVergleichEk(e.target.value)}
                     />
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-md-3">
+                    <div className="btn-group btn-group-sm w-100">
+                      <button 
+                        className={`btn ${vergleichModus === 'plattform' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                        onClick={() => setVergleichModus('plattform')}
+                      >
+                        Plattform
+                      </button>
+                      <button 
+                        className={`btn ${vergleichModus === 'shop' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                        onClick={() => setVergleichModus('shop')}
+                      >
+                        Shop-Staffel
+                      </button>
+                    </div>
+                  </div>
+                  <div className="col-md-5">
                     <button className="btn btn-info btn-block font-weight-bold" onClick={async () => {
                       if (!vergleichEk || formeln.length === 0) return
                       const ek = parseFloat(vergleichEk)
