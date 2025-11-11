@@ -246,12 +246,12 @@ export default function PreiseModule() {
                   </div>
                   <div className="row">
                     <div className="col-md-4 mb-2">
-                      <label className="font-weight-bold small">Mwst.</label>
+                      <label className="font-weight-bold" style={{fontSize: '0.8rem'}}>Mwst.</label>
                       <div className="input-group input-group-sm">
                         <input 
                           type="number" 
                           step="0.01"
-                          className="form-control" 
+                          className="form-control form-control-sm" 
                           value={(currentFormel.regler.mwst * 100).toFixed(2)}
                           onChange={(e) => updateRegler('mwst', parseFloat(e.target.value) / 100)}
                         />
@@ -261,12 +261,12 @@ export default function PreiseModule() {
                       </div>
                     </div>
                     <div className="col-md-4 mb-2">
-                      <label className="font-weight-bold small">Ebay/Amazon</label>
+                      <label className="font-weight-bold" style={{fontSize: '0.8rem'}}>Ebay/Amazon</label>
                       <div className="input-group input-group-sm">
                         <input 
                           type="number" 
                           step="0.01"
-                          className="form-control" 
+                          className="form-control form-control-sm" 
                           value={(currentFormel.regler.ebay_amazon * 100).toFixed(2)}
                           onChange={(e) => updateRegler('ebay_amazon', parseFloat(e.target.value) / 100)}
                         />
@@ -276,12 +276,12 @@ export default function PreiseModule() {
                       </div>
                     </div>
                     <div className="col-md-4 mb-2">
-                      <label className="font-weight-bold small">Paypal</label>
+                      <label className="font-weight-bold" style={{fontSize: '0.8rem'}}>Paypal</label>
                       <div className="input-group input-group-sm">
                         <input 
                           type="number" 
                           step="0.01"
-                          className="form-control" 
+                          className="form-control form-control-sm" 
                           value={(currentFormel.regler.paypal * 100).toFixed(2)}
                           onChange={(e) => updateRegler('paypal', parseFloat(e.target.value) / 100)}
                         />
