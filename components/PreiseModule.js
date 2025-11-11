@@ -171,7 +171,9 @@ export default function PreiseModule() {
     setLoading(false)
   }
 
-  if (!currentFormel) return <div className="text-center py-5"><div className="spinner-border"/></div>
+  if (tab === 'alte_pb' && !currentFormel) {
+    return <div className="text-center py-5"><div className="spinner-border"/></div>
+  }
 
   return (
     <div className="card">
