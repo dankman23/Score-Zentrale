@@ -1176,18 +1176,28 @@ export default function App() {
       const res = await fetch('/api/jtl/articles/import/status')
       const data = await res.json()
       if (data.ok) {
-        setArtikelImportProgress({ imported: data.imported, total: data.target || 166854 })
+        const imported = data.imported || 0
+        const total = data.target || 166854
+        setArtikelImportProgress({ imported, total })
         setArtikelImportRunning(data.running || false)
         
-        // Wenn Import läuft, Status in 3 Sekunden erneut prüfen
-        if (data.running) {
-          setTimeout(loadArtikelStatus, 3000)
-        }
+        console.log('[Import Status]', { imported, total, running: data.running })
       }
     } catch (e) {
       console.error('Error loading artikel status:', e)
     }
   }
+
+  // Status-Polling: Prüfe alle 3 Sekunden ob Import läuft
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (activeTab === 'produkte') {
+        loadArtikelStatus()
+      }
+    }, 3000)
+    
+    return () => clearInterval(interval)
+  }, [activeTab])
 
   const checkOrphanedArticles = async () => {
     if (checkingOrphans) return
