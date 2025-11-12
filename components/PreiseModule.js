@@ -737,7 +737,7 @@ export default function PreiseModule() {
                   </small>
                 </div>
                 <div className="card-body py-2">
-                  <div style={{height: '300px'}}>
+                  <div style={{height: '600px'}}>
                     <canvas id="vergleichChart"></canvas>
                   </div>
                 </div>
