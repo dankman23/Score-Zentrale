@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
     
     for (const zahlung of zahlungen.slice(0, limit)) {
       await collection.updateOne(
-        { kZahlung: zahlung.kZahlung },
+        { kZahlungseingang: zahlung.kZahlungseingang },
         { 
           $set: { 
             ...zahlung, 
