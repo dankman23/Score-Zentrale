@@ -7,6 +7,14 @@ export default function FibuModule() {
   const [dateFrom, setDateFrom] = useState('2025-10-01')
   const [dateTo, setDateTo] = useState('2025-10-31')
   
+  // VK-Rechnungen
+  const [vkRechnungen, setVkRechnungen] = useState([])
+  const [vkLoading, setVkLoading] = useState(false)
+  const [vkZeitraum, setVkZeitraum] = useState({
+    from: '2025-10-01',
+    to: '2025-10-31'
+  })
+
   // Kontenplan
   const [konten, setKonten] = useState([])
   const [kontenLoading, setKontenLoading] = useState(false)
