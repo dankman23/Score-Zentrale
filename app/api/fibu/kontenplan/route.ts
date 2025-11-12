@@ -7,19 +7,48 @@ import { getKontenklasse, getKontenklasseName } from '../../../lib/kontenplan-ut
 
 /**
  * GET /api/fibu/kontenplan
- * Lädt alle Konten
+ * Lädt alle Konten (mit optionalen Query-Parametern für Filterung)
  */
 export async function GET(request: NextRequest) {
   try {
+    const searchParams = request.nextUrl.searchParams
+    const search = searchParams.get('search')
+    const klasse = searchParams.get('klasse')
+    const limit = parseInt(searchParams.get('limit') || '1000', 10)
+    const skip = parseInt(searchParams.get('skip') || '0', 10)
+    
     const db = await getDb()
-    const konten = await db.collection('fibu_konten')
-      .find({})
+    const collection = db.collection('fibu_konten')
+    
+    // Build filter
+    const filter: any = {}
+    if (search) {
+      filter.$or = [
+        { konto: { $regex: search, $options: 'i' } },
+        { bezeichnung: { $regex: search, $options: 'i' } }
+      ]
+    }
+    if (klasse && klasse !== 'alle') {
+      filter.kontenklasse = parseInt(klasse, 10)
+    }
+    
+    // Count total
+    const total = await collection.countDocuments(filter)
+    
+    // Get konten with pagination
+    const konten = await collection
+      .find(filter)
       .sort({ konto: 1 })
+      .skip(skip)
+      .limit(limit)
       .toArray()
     
     return NextResponse.json({
       ok: true,
-      konten
+      konten,
+      total,
+      limit,
+      skip
     })
   } catch (error: any) {
     console.error('[Kontenplan GET] Error:', error)
