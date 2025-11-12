@@ -872,16 +872,33 @@ export default function FibuModule() {
                         </tr>
                       </thead>
                       <tbody>
-                        {zahlungen.map((z, idx) => (
+                        {zahlungen
+                          .filter(z => {
+                            if (!zahlungsFilter.anbieter || zahlungsFilter.anbieter === 'alle') return true
+                            return z.zahlungsanbieter?.toLowerCase().includes(zahlungsFilter.anbieter.toLowerCase())
+                          })
+                          .filter(z => {
+                            if (!zahlungsFilter.zuordnung || zahlungsFilter.zuordnung === 'alle') return true
+                            if (zahlungsFilter.zuordnung === 'zugeordnet') return z.kRechnung && z.kRechnung > 0
+                            if (zahlungsFilter.zuordnung === 'nicht-zugeordnet') return !z.kRechnung || z.kRechnung === 0
+                            return true
+                          })
+                          .map((z, idx) => (
                           <tr key={idx} style={{color: '#e0e0e0'}}>
                             <td>
-                              <small style={{color: '#fff', fontWeight: '500'}}>{z.belegnummer?.substring(0, 50)}</small>
-                              {z.belegnummer && z.belegnummer.length > 50 && (
-                                <small className="text-muted" title={z.belegnummer}>...</small>
+                              <span style={{color: '#f0f0f0', fontSize: '0.85rem'}}>{z.belegnummer?.substring(0, 40)}</span>
+                              {z.belegnummer && z.belegnummer.length > 40 && (
+                                <span className="text-muted" title={z.belegnummer}>...</span>
                               )}
                             </td>
                             <td><span style={{color: '#e0e0e0'}}>{new Date(z.zahlungsdatum).toLocaleDateString('de-DE')}</span></td>
-                            <td><span style={{color: '#f0f0f0'}}>{z.rechnungsNr || '-'}</span></td>
+                            <td>
+                              {z.rechnungsNr && z.rechnungsNr !== 'Unbekannt' ? (
+                                <strong style={{color: '#4ade80'}}>{z.rechnungsNr}</strong>
+                              ) : (
+                                <span style={{color: '#ef4444'}}>Nicht zugeordnet</span>
+                              )}
+                            </td>
                             <td><span style={{color: '#d0d0d0'}}>{z.kundenName || '-'}</span></td>
                             <td className="text-right"><strong style={{color: '#4ade80'}}>{z.betrag?.toFixed(2)} €</strong></td>
                             <td>
@@ -889,8 +906,9 @@ export default function FibuModule() {
                                 z.zahlungsanbieter?.toLowerCase().includes('paypal') ? 'badge-primary' :
                                 z.zahlungsanbieter?.toLowerCase().includes('amazon') ? 'badge-warning' :
                                 z.zahlungsanbieter?.toLowerCase().includes('mollie') ? 'badge-info' :
-                                z.zahlungsanbieter?.toLowerCase().includes('commerzbank') ? 'badge-secondary' :
-                                'badge-success'
+                                z.zahlungsanbieter?.toLowerCase().includes('commerzbank') || z.zahlungsanbieter?.toLowerCase().includes('bank') ? 'badge-secondary' :
+                                z.zahlungsanbieter?.toLowerCase().includes('ebay') ? 'badge-success' :
+                                'badge-dark'
                               }`}>
                                 {z.zahlungsanbieter || z.zahlungsart || 'Manuell'}
                               </span>
