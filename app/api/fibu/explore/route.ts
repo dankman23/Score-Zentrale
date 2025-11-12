@@ -13,14 +13,14 @@ export async function GET() {
     const pool = await getMssqlPool()
     const result: any = {}
 
-    // 1. VK-Rechnungen
+    // 1. VK-Rechnungen (Aus Verkauf Schema)
     const rechnungen = await pool.request().query(`
-      SELECT TOP 5 * FROM tRechnung ORDER BY dErstellt DESC
+      SELECT TOP 5 * FROM Verkauf.tRechnung ORDER BY dErstellt DESC
     `)
     result.rechnungen = {
       count: rechnungen.recordset.length,
       columns: Object.keys(rechnungen.recordset[0] || {}),
-      sample: rechnungen.recordset
+      sample: rechnungen.recordset.slice(0, 2)
     }
 
     // 2. Zahlungen
