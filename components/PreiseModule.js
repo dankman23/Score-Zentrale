@@ -6,6 +6,11 @@ import PreiseG2Module from './PreiseG2Module'
 export default function PreiseModule() {
   const [tab, setTab] = useState('alte_pb')
   const [sheet, setSheet] = useState('lagerware')
+  
+  // Historie-Tab
+  const [historieSku, setHistorieSku] = useState('122112')
+  const [historieData, setHistorieData] = useState(null)
+  const [historieLoading, setHistorieLoading] = useState(false)
   const [formeln, setFormeln] = useState([])
   const [currentFormel, setCurrentFormel] = useState(null)
   const [ek, setEk] = useState('')
