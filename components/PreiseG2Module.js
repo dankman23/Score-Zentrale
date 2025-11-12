@@ -10,6 +10,9 @@ export default function PreiseG2Module({ formeln }) {
   const [configExpanded, setConfigExpanded] = useState(false)
   const [g2ParamsEdited, setG2ParamsEdited] = useState(false)
   
+  // Staffelsystem-Auswahl
+  const [staffelSystem, setStaffelSystem] = useState('standard') // 'standard', 'kategorie', 'kategorie_gerundet'
+  
   // Chart und Upload
   const [chartData, setChartData] = useState(null)
   const [uploadedData, setUploadedData] = useState(null)
