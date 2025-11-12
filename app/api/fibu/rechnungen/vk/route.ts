@@ -76,6 +76,7 @@ export async function GET(request: NextRequest) {
           kRechnung: r.kRechnung,
           cRechnungsNr: r.cRechnungsNr,
           kBestellung: r.kBestellung,
+          cBestellNr: r.cBestellNr || '',
           rechnungsdatum: r.rechnungsdatum,
           brutto: parseFloat(brutto.toFixed(2)),
           netto: parseFloat(netto.toFixed(2)),
