@@ -19,9 +19,8 @@ export async function GET(request: NextRequest) {
     
     const pool = await getMssqlPool()
     
-    // Haupt-Query: VK-Rechnungen inkl. externe Rechnungen
+    // Haupt-Query: VK-Rechnungen
     const query = `
-      -- Normale Rechnungen
       SELECT 
         r.kRechnung,
         r.cRechnungsNr,
@@ -35,38 +34,14 @@ export async function GET(request: NextRequest) {
         ISNULL(k.cUSTID, '') AS kundenUstId,
         ISNULL(k.cLand, 'DE') AS kundenLand,
         ISNULL(za.cName, 'Unbekannt') AS zahlungsart,
-        ISNULL(r.kZahlungsart, 0) AS kZahlungsart,
-        'NORMAL' AS typ
+        ISNULL(r.kZahlungsart, 0) AS kZahlungsart
       FROM dbo.tRechnung r
       LEFT JOIN dbo.tKunde k ON r.kKunde = k.kKunde
       LEFT JOIN dbo.tZahlungsart za ON r.kZahlungsart = za.kZahlungsart
       WHERE r.dErstellt >= @from 
         AND r.dErstellt < @to
         AND r.cStatus != 'Storniert'
-      
-      UNION ALL
-      
-      -- Externe Rechnungen (Amazon, eBay, etc.)
-      SELECT 
-        CAST(er.kExterneRechnung AS INT) AS kRechnung,
-        CAST(er.cRechnungsNr AS NVARCHAR(50)) AS cRechnungsNr,
-        er.dErstellt AS rechnungsdatum,
-        er.fBrutto AS brutto,
-        er.fBrutto / 1.19 AS netto,  -- Vereinfachung
-        er.fBrutto - (er.fBrutto / 1.19) AS fMwSt,
-        'Bezahlt' AS cStatus,
-        ISNULL(er.kAuftrag, 0) AS kKunde,
-        'Extern' AS kundenName,
-        '' AS kundenUstId,
-        'DE' AS kundenLand,
-        'Extern' AS zahlungsart,
-        0 AS kZahlungsart,
-        'EXTERN' AS typ
-      FROM Verkauf.lvExterneRechnung er
-      WHERE er.dErstellt >= @from 
-        AND er.dErstellt < @to
-      
-      ORDER BY rechnungsdatum DESC
+      ORDER BY r.dErstellt DESC
     `
     
     const result = await pool.request()
