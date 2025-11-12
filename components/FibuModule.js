@@ -505,6 +505,7 @@ export default function FibuModule() {
     if (tab === 'vk') loadVkRechnungen()
     if (tab === 'ek') loadEkRechnungen()
     if (tab === 'kreditoren') loadKreditoren()
+    if (tab === 'inbox') loadEmailInbox()
   }, [tab, dateFrom, dateTo])
   
   return (
