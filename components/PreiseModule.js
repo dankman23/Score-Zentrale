@@ -114,7 +114,13 @@ export default function PreiseModule() {
             title: { display: true, text: 'Preisverlauf', font: { size: 13 } }
           },
           scales: {
-            x: { title: { display: true, text: 'EK (€)', font: { size: 11 } }, ticks: { maxTicksLimit: 15, font: { size: 9 } } },
+            x: { 
+              type: 'linear',
+              title: { display: true, text: 'EK (€)', font: { size: 11 } }, 
+              ticks: { font: { size: 9 } },
+              min: 0,
+              max: 300
+            },
             y: { title: { display: true, text: 'VK (€)', font: { size: 11 } }, beginAtZero: true, ticks: { font: { size: 9 } } }
           }
         }
