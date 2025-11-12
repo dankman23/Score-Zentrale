@@ -648,14 +648,30 @@ export default function PreiseModule() {
             </div>
 
             {/* Formeln auswählen */}
-            <div className="card mb-3">
-              <div className="card-header py-2">
-                <h6 className="mb-0">Formeln für Vergleich auswählen</h6>
+            <div className="card mb-2">
+              <div className="card-header py-1 d-flex justify-content-between align-items-center">
+                <small className="mb-0 font-weight-bold">Formeln für Vergleich auswählen</small>
+                <div className="btn-group btn-group-sm">
+                  <button 
+                    className="btn btn-xs btn-outline-primary py-0 px-2"
+                    onClick={() => setSelectedFormeln(formeln.map(f => f.sheet))}
+                    style={{fontSize: '0.75rem'}}
+                  >
+                    Alle
+                  </button>
+                  <button 
+                    className="btn btn-xs btn-outline-secondary py-0 px-2"
+                    onClick={() => setSelectedFormeln([])}
+                    style={{fontSize: '0.75rem'}}
+                  >
+                    Keine
+                  </button>
+                </div>
               </div>
               <div className="card-body py-2">
-                <div className="row mb-3">
+                <div className="row mb-2">
                   {formeln.map(f => (
-                    <div className="col-md-3 mb-2" key={f.sheet}>
+                    <div className="col-md-3 mb-1" key={f.sheet}>
                       <div className="custom-control custom-checkbox">
                         <input 
                           type="checkbox" 
@@ -670,7 +686,7 @@ export default function PreiseModule() {
                             }
                           }}
                         />
-                        <label className="custom-control-label small" htmlFor={`check_${f.sheet}`}>
+                        <label className="custom-control-label" htmlFor={`check_${f.sheet}`} style={{fontSize: '0.85rem'}}>
                           {f.name}
                         </label>
                       </div>
