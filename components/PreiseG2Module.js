@@ -182,20 +182,21 @@ export default function PreiseG2Module({ formeln }) {
         })
       }
       
-      // Hochgeladene Daten
+      // Hochgeladene Daten als Scatter
       if (uploadedData) {
         datasets.push({
           label: 'Hochgeladene Preise',
-          data: uploadedData.map(d => d.vk),
+          data: uploadedData.map(d => ({ x: d.ek, y: d.vk })),
+          type: 'scatter',
           borderColor: '#e44c4c',
-          backgroundColor: '#e44c4c20',
-          borderWidth: 2,
-          tension: 0.3,
-          pointRadius: 3
+          backgroundColor: '#e44c4c',
+          pointRadius: 5,
+          pointStyle: 'circle',
+          showLine: false
         })
       }
 
-      const labels = chartData ? chartData.map(d => d.ek + '€') : uploadedData.map(d => d.ek + '€')
+      const labels = chartData ? chartData.map(d => d.ek + '€') : []
 
       new window.Chart(ctx, {
         type: 'line',
