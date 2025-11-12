@@ -565,23 +565,59 @@ export default function FibuModule() {
                     <table className="table table-sm table-hover mb-0">
                       <thead className="thead-light">
                         <tr>
-                          <th>Rechnungsnr</th>
+                          <th>Belegnr</th>
                           <th>Datum</th>
                           <th>Lieferant</th>
+                          <th>Kreditor</th>
+                          <th>Aufwandskonto</th>
                           <th className="text-right">Netto</th>
                           <th className="text-right">Brutto</th>
-                          <th>Eingangsdatum</th>
+                          <th>Match</th>
                         </tr>
                       </thead>
                       <tbody>
                         {ekRechnungen.map((r, idx) => (
                           <tr key={idx}>
-                            <td><small>{r.rechnungsnr}</small></td>
+                            <td>
+                              <small className="font-weight-bold">{r.rechnungsNummer || r.rechnungsnr}</small>
+                              {r.originalRechnungsNummer && r.originalRechnungsNummer !== r.rechnungsNummer && (
+                                <div className="text-muted" style={{fontSize: '0.7rem'}}>
+                                  ({r.originalRechnungsNummer})
+                                </div>
+                              )}
+                            </td>
                             <td><small>{new Date(r.rechnungsdatum).toLocaleDateString('de-DE')}</small></td>
-                            <td><small>{r.lieferant}</small></td>
-                            <td className="text-right"><small>{r.netto?.toFixed(2)} €</small></td>
-                            <td className="text-right"><strong>{r.brutto?.toFixed(2)} €</strong></td>
-                            <td><small>{new Date(r.eingangsdatum).toLocaleDateString('de-DE')}</small></td>
+                            <td><small>{r.lieferantName || r.lieferant}</small></td>
+                            <td>
+                              {r.kreditorKonto ? (
+                                <span className="badge badge-info">{r.kreditorKonto}</span>
+                              ) : (
+                                <span className="badge badge-warning">?</span>
+                              )}
+                            </td>
+                            <td>
+                              {r.aufwandskonto ? (
+                                <span className="badge badge-secondary">{r.aufwandskonto}</span>
+                              ) : (
+                                <span className="badge badge-warning">?</span>
+                              )}
+                            </td>
+                            <td className="text-right"><small>{(r.nettoBetrag || r.netto)?.toFixed(2)} €</small></td>
+                            <td className="text-right"><strong>{(r.gesamtBetrag || r.brutto)?.toFixed(2)} €</strong></td>
+                            <td>
+                              {r.matching && (
+                                <span 
+                                  className={`badge ${
+                                    r.matching.confidence === 100 ? 'badge-success' : 
+                                    r.matching.confidence >= 80 ? 'badge-info' : 
+                                    'badge-warning'
+                                  }`}
+                                  title={`${r.matching.method}: ${r.matching.matchedName || ''}`}
+                                >
+                                  {r.matching.confidence}%
+                                </span>
+                              )}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
