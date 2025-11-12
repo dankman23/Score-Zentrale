@@ -34,6 +34,18 @@ export default function FibuModule() {
   const [exportTo, setExportTo] = useState('2025-01-31')
   const [exportLoading, setExportLoading] = useState(false)
   
+  // Kreditoren
+  const [kreditoren, setKreditoren] = useState([])
+  const [kreditorenLoading, setKreditorenLoading] = useState(false)
+  const [kreditorenFilter, setKreditorenFilter] = useState('')
+  
+  // EK-Upload mit Zuordnung
+  const [uploadFile, setUploadFile] = useState(null)
+  const [uploadLoading, setUploadLoading] = useState(false)
+  const [uploadResult, setUploadResult] = useState(null)
+  const [selectedKreditor, setSelectedKreditor] = useState('')
+  const [selectedAufwandskonto, setSelectedAufwandskonto] = useState('')
+  
   // Kontenplan laden
   const loadKontenplan = async () => {
     setKontenLoading(true)
