@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
         r.cBezahlt,
         r.cStatus,
         r.tBestellung_kBestellung AS kBestellung,
+        b.cBestellNr,
         b.kZahlungsart,
         za.cName AS zahlungsart,
         ISNULL(rv.fGesamtBruttopreis, 0) AS brutto,
