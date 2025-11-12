@@ -1,86 +1,98 @@
 <analysis>
-The AI engineer's work primarily focused on three major areas: stabilizing the JTL article import, implementing a complex multi-formula Preise (Pricing) module, and adding new article-centric features.
+The trajectory documents an extensive, iterative development process focused primarily on enhancing a complex Preise (Pricing) module and initiating a new FIBU (Accounting) module. The work began by addressing user requests to overhaul the pricing comparison tool, evolving it from a simple table to a dynamic multi-curve chart using Chart.js. The engineer systematically added features based on user feedback, including Excel/CSV data uploads for comparison, intelligent data sampling to handle large datasets, and ensuring correct data mapping on scatter plots.
 
-The JTL import was a significant challenge. The initial OFFSET-based pagination proved unreliable for large datasets, leading to incomplete imports. The engineer correctly diagnosed this and transitioned to a robust cursor-based pagination system using a new  endpoint. Debugging involved handling network errors and high CPU load from MongoDB. The final solution was to make the import a persistent, auto-restarting service using , ensuring its completion even after failures.
+A significant portion of the work involved implementing and repeatedly refining a highly complex, three-tiered quantity scaling (Staffelgrenzen) system for the g2 pricing formula. This required translating intricate business rules into JavaScript, creating dynamic UI elements, and debugging logic, UI, and performance issues in real-time.
 
-The Preise module was the most complex task. It involved translating intricate Excel formulas into backend API logic for both an old and a new g2 formula. This process was iterative, involving multiple rounds of debugging: correcting formula logic, fixing data types, and adjusting parameters to match user-provided examples. The frontend development for this module was plagued with issues, including Next.js caching problems (requiring ), incorrect file import paths, and severe React component syntax errors (mismatched divs, duplicate  hooks) that required a full component rewrite from a simplified base.
+Concurrently, the engineer scaffolded a new FIBU module by creating foundational API routes, a frontend component, and integrating it into the main application's navigation. This involved exploring the JTL MS SQL database, debugging connection and query issues, and creating placeholder documentation.
 
-Finally, based on user requests, the engineer added an Article Presence feature to show where an item is used in bundles/sets and a Price Comparison feature using existing Google Search and Jina.ai tools. The trajectory concluded with fulfilling the user's request to prepare the project for a fork by creating comprehensive documentation files.
+The final phase involved adding a price history feature and then, as per the user's last request, preparing to update the project's documentation files to reflect all the new changes. The entire process was characterized by rapid prototyping, frequent user interaction, and incremental refinement.
 </analysis>
 
 <product_requirements>
-The Score Zentrale is a business intelligence and sales automation dashboard. The development work focused on enhancing existing features and building new modules as per user specifications.
+The primary goal is to enhance the Score Zentrale application with advanced pricing analysis tools and a new accounting module.
 
-1.  **JTL Article Import:** The core requirement was to reliably import over 166,000 articles from a JTL MSSQL database into MongoDB. This system needed to be non-destructive (updating existing articles, not deleting them), show real-time progress with a progress bar, and handle failures robustly. The final implementation runs as a persistent background service.
+1.  **Preise (Pricing) Module Overhaul:**
+    *   **Dynamic Charting:** Replace static comparisons with interactive Chart.js graphs. All pricing formulas (old and new g2) must be visualizable as curves, allowing for the simultaneous comparison of multiple selected formulas.
+    *   **Data Import & Visualization:** Implement a feature on all pricing tabs to upload Excel/CSV files containing EK (purchase price) and VK (sale price) data. This data must be plotted as a scatter graph on the same chart as the calculated price curves. The system must intelligently sample large datasets to maintain performance and clarity.
+    *   **Advanced Quantity Scaling:** For the g2 formula, implement three user-selectable quantity scaling systems: a fixed Standard scale, a dynamic category-based system, and a rounded version of the category system. The logic must be highly configurable, with target basket values up to €5000 and a maximum of 8 scale levels.
+    *   **Price History:** Add a new tab to display the price change history for any given article SKU, including its sale price (VK), purchase price (EK), and a performance metric.
 
-2.  **Pricing Module (Preise):** A comprehensive pricing calculator was built with three tabs:
-    *   **Alte PB:** Implements the old pricing formula for seven different product groups, with parameters loaded from an Excel sheet.
-    *   **Neue ab 2025-11 (g2):** Implements a new, more complex g2 S-curve pricing formula which inherits base parameters from the Alte PB product groups.
-    *   **Vergleich:** A comparison tool that plots the price curves of selected old and new formulas on a line chart.
-    The UI for this module required extensive refactoring for compactness and correctness based on user screenshots.
-
-3.  **Article Intelligence Features:**
-    *   **Article Presence:** For any given article, display its usage across the JTL system (e.g., in which bundles/sets it is included, and on which online platforms like Amazon/eBay it is listed).
-    *   **Price Comparison:** A feature to search for competitor prices online using an article's EAN and MPN, leveraging existing Google Search and Jina.ai integrations.
+2.  **FIBU (Accounting) Module Creation:**
+    *   Build a new module to aggregate accounting data.
+    *   Source customer invoices (VK) from the JTL SQL database.
+    *   Source payment data from various platforms (banks, PayPal, Amazon).
+    *   Allow upload of supplier invoices (EK) via PDF.
+    *   Include a settings area to manage a chart of accounts, pre-populated from a user-provided Excel file.
 </product_requirements>
 
 <key_technical_concepts>
-- **Full-Stack Framework:** Next.js with TypeScript.
-- **Databases:** MongoDB (application data) & MS SQL (JTL source data).
-- **Backend APIs:** Next.js API routes for all business logic.
-- **UI:** React, shadcn/ui, Tailwind CSS, Chart.js for diagrams.
-- **Data Import:** Shift from inefficient OFFSET-based pagination to robust cursor-based pagination () for large-scale data transfer.
-- **Process Management:**  to run the long-running JTL import as a persistent, auto-restarting background service.
-- **Web Scraping/Crawling:** Jina.ai Reader and Google Custom Search API for the price comparison feature.
+- **Frontend:** React ('use client'), Next.js, Tailwind CSS.
+- **Charting:** Chart.js for dynamic line and scatter plots.
+- **File Handling:**  library for parsing uploaded Excel files.
+- **Backend:** Next.js API Routes (TypeScript), Node.js.
+- **Database:** MS SQL for JTL data queries, MongoDB for application data (e.g., saved configs).
+- **Business Logic:** Complex, multi-step formula translations from user requirements into JavaScript, including dynamic, category-based calculations.
 </key_technical_concepts>
 
 <code_architecture>
-The application is a standard Next.js full-stack project. The frontend is built with React components in  and the main UI logic resides in . The backend consists of numerous API routes under . Data persistence is handled by MongoDB, with connection logic in . The JTL-Wawi data is accessed via a connection to an MS SQL server defined in .
+The application is a full-stack Next.js project. Business logic is encapsulated in API routes under . The frontend is composed of React components under  and the main page logic is in .
+
+**Directory Structure:**
 
 
+**Key Files and Changes:**
 
-- ****
-    - **Importance:** The main entry point for the entire frontend application, hosting all tabs and modules.
-    - **Changes:** Heavily modified to integrate the JTL import status polling, progress bar, UI for orphaned articles, the price comparison button and modal, and the article presence feature (expandable rows).
+-   ****
+    -   **Importance:** The main component for the Alte PB (old formulas) and Vergleich (comparison) tabs.
+    -   **Changes:** Heavily refactored. The comparison tab was completely reworked to use Chart.js, allowing multiple curves. Logic for Excel/CSV uploads and rendering scatter plot data was added. A new Historie (History) tab was scaffolded with a button and a placeholder content area, along with the data fetching logic ().
 
-- ****
-    - **Importance:** The primary UI component for the entire pricing feature, containing tabs for the old formula, new 'g2' formula, and the comparison tool.
-    - **Changes:** This file underwent extensive debugging and refactoring. Initial bugs involved infinite spinners due to incorrect state handling. Later, it was refactored to make configuration sections collapsible, and the comparison tab was added with Chart.js integration. Severe syntax errors (mismatched , duplicate  hooks) caused by complex edits required a complete file rewrite from a backup to resolve rendering issues.
+-   ****
+    -   **Importance:** The dedicated component for the new g2 pricing formula.
+    -   **Changes:** This file saw the most significant changes. An extremely complex, multi-tiered quantity scaling (Staffelgrenzen) logic was implemented and iteratively refined. This included adding UI selectors for different scaling systems and displaying multiple result tables. The component's own chart was also enhanced with Excel upload functionality and corrected to use real-time API calls for accuracy instead of linear interpolation. The configuration section was made collapsible.
 
-- ****
-    - **Importance:** A dedicated component for the new, complex 'g2' pricing formula UI.
-    - **Changes:** Created and refactored multiple times. The formula logic and UI parameters were adjusted to match user-provided GeoGebra models and screenshots. It also suffered from syntax errors that broke the entire application, which were resolved by rewriting the file from a simplified, working version.
+-   ** (New File)**
+    -   **Importance:** A utility module to house shared logic for the pricing features.
+    -   **Summary:** Created to contain the Excel/CSV parsing logic () and the intelligent sampling algorithm (). The sampling function was updated multiple times to improve its logic (from simple sampling to Largest-Triangle-Three-Buckets) and to increase the number of points returned (from 30 to 200).
 
-- ****
-    - **Importance:** The backend endpoint that contains the complex S-curve logic for the new 'g2' price calculation.
-    - **Changes:** The logic was completely rewritten multiple times to correctly implement the three-interval formula (, , ) and to correctly inherit parameters from the selected Warengruppe (product group), ultimately matching the user's test case (EK=50 -> VK=109.76).
+-   **New FIBU Scaffolding (Multiple Files)**
+    -   **Importance:** These files form the foundation for the new accounting module.
+    -   **Summary:**
+        -   : A new, placeholder frontend component for the FIBU UI.
+        -   : New API routes (, , ) were created as endpoints for future logic.
+        -    & : Modified to integrate the FIBU tab into the application's primary hash-based navigation system.
 
-- ** &  (new)**
-    - **Importance:** These files represent the final, robust solution to the JTL article import problem.
-    - **Changes:** The script was created to repeatedly call the cursor-based  endpoint with smaller batch sizes to avoid timeouts and high CPU load. The  config file was then created to run this script as a persistent service, ensuring the import process would automatically restart and eventually complete.
-
-- **, ,  (new)**
-    - **Importance:** These documentation files were the final deliverable.
-    - **Changes:** Created to fulfill the user's request to prepare the project for a handover or fork, containing setup instructions, environment variables, and an overview of the application.
+-   ** (New File)**
+    -   **Importance:** The backend API to support the new Price History feature.
+    -   **Summary:** Created to query the JTL SQL database for an article's price change history, sales data, and purchase price information. The SQL query was debugged and refined to correctly join tables (, ) and find the article by SKU.
 </code_architecture>
 
 <pending_tasks>
-The trajectory concluded with the successful implementation of all user requests and the preparation of documentation for a project fork. There are no immediate pending tasks from the conversation. The initial list of pending items from the prompt (like Google Ads integration, Firebase, etc.) was not addressed as it was not requested by the user during this work cycle.
+- **FIBU Module Implementation:** The scaffolding is complete, but the core logic needs to be built. This includes:
+  - Fetching and processing VK invoices from the JTL database.
+  - Implementing PDF parsing for uploaded EK invoices.
+  - Aggregating payment data.
+  - Generating the final export file for 10it software.
+- **Price History Feature:** The backend API and basic UI are in place, but the frontend needs to be fully built out to display the historical data in a meaningful way, including calculating and showing the margin over time metric.
 </pending_tasks>
 
 <current_work>
-The most recent work was to finalize all documentation required for a project handover or fork, as explicitly requested by the user. This involved creating and populating several markdown files with essential information for a new developer to understand, set up, and deploy the application.
+The engineer was in the final stages of implementing a new Historie (Price History) feature within the Preise module. The work involved:
 
-The following files were created:
--   **/app/README.md**: Updated with a comprehensive overview.
--   **/app/.env.example**: An example environment file.
--   **/app/FORK_READY_GUIDE.md**: Specific instructions for forking and setting up the repository.
--   **/app/START_HERE.md**: A high-level guide for new developers.
--   **/app/DEPLOYMENT_GUIDE.md**: Instructions for deploying the application.
+1.  **Backend API Creation:** A new API endpoint was created at . This endpoint successfully connects to the JTL MS SQL database and retrieves the  (internal ID) for a given  (SKU), demonstrating a working database query for the required article data.
 
-This documentation phase occurred immediately after successfully debugging a series of critical syntax errors in the  and  components that were preventing the entire application from rendering. The successful creation of these documentation files marked the conclusion of the development cycle documented in the trajectory.
+2.  **Frontend Scaffolding:** The  component was modified to support the new feature:
+    *   A Historie tab was added to the pricing module's navigation.
+    *   A state variable  and a loading function  were created to fetch data from the new API.
+    *   A new content section for the Historie tab was added, which would display the fetched data. This section currently contains a search input and a button to trigger the  function.
+
+The immediate next step, as requested by the user in the final message, was to pivot from development to documentation and update all relevant fork files with information about the numerous features added and modified throughout the trajectory.
 </current_work>
 
 <optional_next_step>
-The previous work, including the final documentation for a project fork, has been completed. There are no outstanding tasks from the user's recent requests. The next logical step is to await user feedback or new instructions.
+Update the documentation files (, , etc.) to reflect all the recent changes to the Preise and FIBU modules.
 </optional_next_step>
+
+<direct_quotes>
+-   **User's Last Request:** bitte alle wichtigen Infos in dei Forkt txt datein schreiben (please write all important info into the fork text files)
+-   **AI's Last Action:** Perfekt! Ich aktualisiere alle wichtigen Dokumentationsdateien mit den neuesten Features: (Perfect! I'm updating all important documentation files with the latest features:)
+</direct_quotes>

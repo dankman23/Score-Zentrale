@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Base URL from environment
-BASE_URL = "https://bizintel-hub-5.preview.emergentagent.com"
+BASE_URL = "https://pricechart-hub.preview.emergentagent.com"
 
 def print_test_header(test_name):
     """Print a formatted test header"""
