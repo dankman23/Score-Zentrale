@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     const artikel = await pool.request()
       .input('sku', sku)
       .query(`
-        SELECT kArtikel, cArtNr, cName, fVKNetto, fVKBrutto
+        SELECT *
         FROM dbo.tArtikel
         WHERE cArtNr = @sku
       `)
