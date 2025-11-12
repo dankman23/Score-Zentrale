@@ -57,29 +57,13 @@ export default function PreiseModule() {
       const existingChart = window.Chart.getChart('vergleichChart')
       if (existingChart) existingChart.destroy()
 
-      // EK-Range: 0 bis 300€ (fest)
-      const ekRange = []
-      for (let i = 0; i <= 30; i++) {
-        ekRange.push(i * 10) // 0, 10, 20, ... 300
-      }
-
-      // Datasets - ECHTE Kurven berechnen
+      // Datasets - ECHTE Kurvendaten aus vergleichData
       const datasets = []
-      const colors = ['#F6B10A', '#2fb97f', '#17a2b8', '#e44c4c', '#667eea', '#ff6b6b', '#4ecdc4']
+      const colors = ['#F6B10A', '#2fb97f', '#17a2b8', '#e44c4c', '#667eea', '#ff6b6b', '#4ecdc4', '#f39c12', '#9b59b6', '#16a085', '#e74c3c', '#3498db', '#2ecc71', '#f1c40f']
       
       vergleichData.forEach((d, idx) => {
-        console.log('Vergleich Dataset:', d.name, 'Plattform:', d.plattform, 'Shop:', d.shop)
-        
-        // Für jedes EK den Preis interpolieren
-        const data = ekRange.map(ek => {
-          if (ek === 0) return 0
-          
-          const baseEk = parseFloat(vergleichEk)
-          const basePrice = vergleichModus === 'plattform' ? d.plattform : d.shop
-          
-          // Lineare Skalierung (vereinfacht)
-          return (ek / baseEk) * basePrice
-        })
+        // Nutze die echten Kurvendaten
+        const data = d.kurve.map(point => vergleichModus === 'plattform' ? point.plattform : point.shop)
         
         datasets.push({
           label: d.name,
@@ -91,40 +75,42 @@ export default function PreiseModule() {
           pointRadius: 1
         })
       })
-      
-      console.log('Total Datasets:', datasets.length)
+
+      // Labels aus erster Kurve
+      const labels = vergleichData[0].kurve.map(point => point.ek + '€')
 
       new window.Chart(ctx, {
         type: 'line',
         data: {
-          labels: ekRange.map(ek => ek + '€'),
+          labels,
           datasets
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { position: 'top', labels: { font: { size: 10 } } },
+            legend: { position: 'top', labels: { font: { size: 9 }, boxWidth: 15, padding: 8 } },
             title: { 
               display: true, 
-              text: `VK (${vergleichModus === 'plattform' ? 'Plattform' : 'Shop'}) in Abhängigkeit vom EK`
+              text: `VK (${vergleichModus === 'plattform' ? 'Plattform' : 'Shop'}) in Abhängigkeit vom EK`,
+              font: { size: 13 }
             }
           },
           scales: {
             x: { 
-              title: { display: true, text: 'EK (€)' },
-              min: 0,
-              max: 300
+              title: { display: true, text: 'EK (€)', font: { size: 11 } },
+              ticks: { maxTicksLimit: 15, font: { size: 9 } }
             },
             y: { 
-              title: { display: true, text: 'VK (€)' }, 
-              beginAtZero: true 
+              title: { display: true, text: 'VK (€)', font: { size: 11 } }, 
+              beginAtZero: true,
+              ticks: { font: { size: 9 } }
             }
           }
         }
       })
     }
-  }, [vergleichData, vergleichEk, vergleichModus])
+  }, [vergleichData, vergleichModus])
 
   const loadFormeln = async () => {
     try {
