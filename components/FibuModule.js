@@ -494,13 +494,13 @@ export default function FibuModule() {
                       </thead>
                       <tbody>
                         {vkRechnungen.map((r, idx) => (
-                          <tr key={idx}>
-                            <td><small><strong>{r.cRechnungsNr}</strong></small></td>
-                            <td><small>{new Date(r.rechnungsdatum).toLocaleDateString('de-DE')}</small></td>
-                            <td><small>{r.kundenName}</small></td>
-                            <td><small>{r.zahlungsart}</small></td>
-                            <td className="text-right"><small>{r.netto?.toFixed(2)} €</small></td>
-                            <td className="text-right"><strong>{r.brutto?.toFixed(2)} €</strong></td>
+                          <tr key={idx} style={{color: '#e0e0e0'}}>
+                            <td><small><strong style={{color: '#fff'}}>{r.cRechnungsNr}</strong></small></td>
+                            <td><small style={{color: '#e0e0e0'}}>{new Date(r.rechnungsdatum).toLocaleDateString('de-DE')}</small></td>
+                            <td><small style={{color: '#f0f0f0', fontWeight: '500'}}>{r.kundenName}</small></td>
+                            <td><small style={{color: '#d0d0d0'}}>{r.zahlungsart}</small></td>
+                            <td className="text-right"><small style={{color: '#e0e0e0'}}>{r.netto?.toFixed(2)} €</small></td>
+                            <td className="text-right"><strong style={{color: '#fff'}}>{r.brutto?.toFixed(2)} €</strong></td>
                             <td>
                               <span className={`badge ${r.status === 'Bezahlt' ? 'badge-success' : 'badge-warning'}`}>
                                 {r.status}
