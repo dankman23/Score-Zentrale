@@ -27,7 +27,6 @@ export async function GET(request: NextRequest) {
         ISNULL(z.cHinweis, '') AS verwendungszweck,
         ISNULL(z.kZahlungsart, 0) AS kZahlungsart,
         ISNULL(za.cName, 'Unbekannt') AS zahlungsart,
-        ISNULL(za.cModulId, '') AS zahlungsart_modul,
         r.cRechnungsNr AS rechnungsNr
       FROM dbo.tZahlung z
       LEFT JOIN dbo.tZahlungsart za ON z.kZahlungsart = za.kZahlungsart
