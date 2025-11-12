@@ -297,15 +297,33 @@ export default function PreiseG2Module({ formeln }) {
           <small className="font-weight-bold" style={{fontSize: '0.85rem'}}>Staffelsystem</small>
         </div>
         <div className="card-body py-1">
-          <select className="form-control form-control-sm" value={staffelSystem} onChange={e => setStaffelSystem(e.target.value)} style={{fontSize: '0.85rem'}}>
-            <option value="standard">Standard (feste Grenzen: 1, 3, 5, 10, 25, 50, 100, 300)</option>
-            <option value="kategorie">Kategorie-basiert (dynamisch nach EK)</option>
-            <option value="kategorie_gerundet">Kategorie gerundet (schöne Zahlen)</option>
-          </select>
-          <small className="text-muted d-block mt-1" style={{fontSize: '0.75rem'}}>
-            {staffelSystem === 'standard' && 'Feste Staffelgrenzen unabhängig vom EK'}
-            {staffelSystem === 'kategorie' && 'Staffelgrenzen basierend auf EK-Kategorie (Basis ≤30€, Standard ≤150€, High Price >150€)'}
-            {staffelSystem === 'kategorie_gerundet' && 'Wie Kategorie-basiert, aber auf schöne Zahlen gerundet'}
+          <div className="btn-group btn-group-sm w-100 mb-2">
+            <button 
+              className={`btn ${staffelSystem === 'standard' ? 'btn-primary' : 'btn-outline-secondary'}`}
+              onClick={() => setStaffelSystem('standard')}
+              style={{fontSize: '0.75rem'}}
+            >
+              Standard
+            </button>
+            <button 
+              className={`btn ${staffelSystem === 'kategorie' ? 'btn-primary' : 'btn-outline-secondary'}`}
+              onClick={() => setStaffelSystem('kategorie')}
+              style={{fontSize: '0.75rem'}}
+            >
+              Kategorie-basiert
+            </button>
+            <button 
+              className={`btn ${staffelSystem === 'kategorie_gerundet' ? 'btn-primary' : 'btn-outline-secondary'}`}
+              onClick={() => setStaffelSystem('kategorie_gerundet')}
+              style={{fontSize: '0.75rem'}}
+            >
+              Gerundet
+            </button>
+          </div>
+          <small className="text-muted d-block" style={{fontSize: '0.7rem'}}>
+            {staffelSystem === 'standard' && '📌 Feste Grenzen: 1, 3, 5, 10, 25, 50, 100, 300'}
+            {staffelSystem === 'kategorie' && '🔢 Dynamisch nach EK: Basis (≤30€), Standard (≤150€), High Price (>150€)'}
+            {staffelSystem === 'kategorie_gerundet' && '✨ Wie Kategorie, aber auf schöne Zahlen gerundet'}
           </small>
         </div>
       </div>
