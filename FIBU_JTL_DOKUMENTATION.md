@@ -60,7 +60,20 @@
 
 ### Wichtige Felder für FIBU
 
-#### VK-Rechnung (tRechnung)
+#### EK-Rechnungen Upload (NICHT in JTL!)
+
+⚠️ **WICHTIG**: EK-Rechnungen sind NICHT in JTL-Wawi gespeichert!
+
+**Upload-Methoden:**
+1. **PDF-Upload** mit OCR/Parsing
+   - Automatische Extraktion: Lieferant, Rechnungsnr, Datum, Beträge
+   - Manuelle Nachbearbeitung möglich
+   
+2. **E-Mail-Import** (zukünftig)
+   - Dedizierte E-Mail-Adresse
+   - Automatische Verarbeitung von PDF-Anhängen
+
+#### VK-Rechnung (aus JTL tRechnung)
 ```sql
 SELECT 
   kRechnung,           -- ID
@@ -73,8 +86,8 @@ SELECT
   cStatus,             -- Status (bezahlt, offen, etc.)
   kKunde               -- Kunden-ID
 FROM dbo.tRechnung
-WHERE dErstellt >= '2024-10-01' 
-  AND dErstellt < '2024-11-01'
+WHERE dErstellt >= '2025-10-01' 
+  AND dErstellt < '2025-11-01'
 ```
 
 #### Zahlungen (tZahlung)
