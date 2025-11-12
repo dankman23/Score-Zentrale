@@ -40,6 +40,131 @@ export default function FibuModule() {
     setKontenLoading(false)
   }
   
+  // Konto hinzufügen
+  const handleAddKonto = async () => {
+    if (!newKonto.konto || !newKonto.bezeichnung) {
+      alert('Bitte Kontonummer und Bezeichnung eingeben')
+      return
+    }
+    
+    try {
+      const res = await fetch('/api/fibu/kontenplan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newKonto)
+      })
+      const data = await res.json()
+      
+      if (data.ok) {
+        alert('✅ Konto hinzugefügt!')
+        setNewKonto({ konto: '', bezeichnung: '' })
+        setShowAddModal(false)
+        loadKontenplan()
+      } else {
+        alert('Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('Fehler: ' + e.message)
+    }
+  }
+  
+  // Konto bearbeiten
+  const handleEditKonto = async (oldKonto) => {
+    if (!editingKonto || !editingKonto.konto || !editingKonto.bezeichnung) {
+      alert('Bitte Kontonummer und Bezeichnung eingeben')
+      return
+    }
+    
+    try {
+      const res = await fetch('/api/fibu/kontenplan', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          oldKonto,
+          konto: editingKonto.konto,
+          bezeichnung: editingKonto.bezeichnung
+        })
+      })
+      const data = await res.json()
+      
+      if (data.ok) {
+        alert('✅ Konto aktualisiert!')
+        setEditingKonto(null)
+        loadKontenplan()
+      } else {
+        alert('Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('Fehler: ' + e.message)
+    }
+  }
+  
+  // Konto löschen
+  const handleDeleteKonto = async (konto) => {
+    if (!confirm(`Konto "${konto}" wirklich löschen?`)) return
+    
+    try {
+      const res = await fetch(`/api/fibu/kontenplan?konto=${encodeURIComponent(konto)}`, {
+        method: 'DELETE'
+      })
+      const data = await res.json()
+      
+      if (data.ok) {
+        alert('✅ Konto gelöscht!')
+        loadKontenplan()
+      } else {
+        alert('Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('Fehler: ' + e.message)
+    }
+  }
+  
+  // Excel-Import
+  const handleKontenplanImport = async (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+    
+    setImportStatus('Import läuft...')
+    setKontenLoading(true)
+    
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      
+      const res = await fetch('/api/fibu/kontenplan/import', {
+        method: 'POST',
+        body: formData
+      })
+      const data = await res.json()
+      
+      if (data.ok) {
+        setImportStatus(`✅ ${data.message}`)
+        loadKontenplan()
+        setTimeout(() => setImportStatus(''), 5000)
+      } else {
+        setImportStatus(`❌ Fehler: ${data.error}`)
+      }
+    } catch (e) {
+      setImportStatus(`❌ Fehler: ${e.message}`)
+    }
+    
+    setKontenLoading(false)
+    event.target.value = '' // Reset file input
+  }
+  
+  // Gefilterte Konten
+  const filteredKonten = konten.filter(k => {
+    const matchesSearch = !kontenFilter || 
+      k.konto.toLowerCase().includes(kontenFilter.toLowerCase()) ||
+      k.bezeichnung.toLowerCase().includes(kontenFilter.toLowerCase())
+    
+    const matchesKlasse = kontenKlasseFilter === 'alle' || 
+      k.kontenklasse?.toString() === kontenKlasseFilter
+    
+    return matchesSearch && matchesKlasse
+  })
+  
   // VK-Rechnungen laden
   const loadVkRechnungen = async () => {
     setVkLoading(true)
