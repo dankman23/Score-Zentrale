@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getMssqlPool } from '@/lib/db/mssql'
+import { getMssqlPool } from '../../../../lib/db/mssql'
 
 /**
  * GET /api/fibu/rechnungen/vk?from=2025-10-01&to=2025-10-31
