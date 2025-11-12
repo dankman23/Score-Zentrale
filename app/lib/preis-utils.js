@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * Intelligentes Sampling von Datenpunkten für Chart-Anzeige
  * Wählt maximal `targetCount` Punkte aus, die den gesamten Bereich gut abdecken
