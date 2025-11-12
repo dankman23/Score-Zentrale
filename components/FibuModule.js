@@ -1499,6 +1499,16 @@ export default function FibuModule() {
                     <div><strong>Betreff:</strong> {selectedEmail.subject}</div>
                     <div><strong>Datum:</strong> {new Date(selectedEmail.date).toLocaleString('de-DE')}</div>
                     <div><strong>Datei:</strong> {selectedEmail.filename} ({(selectedEmail.fileSize / 1024).toFixed(1)} KB)</div>
+                    {selectedEmail.emailTextBody && (
+                      <details className="mt-2">
+                        <summary className="cursor-pointer text-primary">
+                          <i className="bi bi-envelope-open mr-1"/>E-Mail-Text anzeigen
+                        </summary>
+                        <div className="mt-2 p-2 bg-light border rounded" style={{maxHeight: '200px', overflow: 'auto', whiteSpace: 'pre-wrap'}}>
+                          {selectedEmail.emailTextBody}
+                        </div>
+                      </details>
+                    )}
                   </div>
                   
                   {/* Gemini Parse Button */}
