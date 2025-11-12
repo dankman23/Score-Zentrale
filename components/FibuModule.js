@@ -517,6 +517,7 @@ export default function FibuModule() {
                       placeholder="Konto oder Bezeichnung..."
                       value={kontenFilter}
                       onChange={e => setKontenFilter(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && loadKontenplan()}
                     />
                   </div>
                   <div className="col-md-3">
