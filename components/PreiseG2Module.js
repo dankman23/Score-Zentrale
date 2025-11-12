@@ -411,7 +411,7 @@ export default function PreiseG2Module({ formeln }) {
             <strong style={{fontSize: '0.95rem'}}>Preisverlauf (g2)</strong>
           </div>
           <div className="card-body py-2">
-            <div style={{height: '400px'}}>
+            <div style={{height: '600px'}}>
               <canvas id="g2Chart"></canvas>
             </div>
           </div>
