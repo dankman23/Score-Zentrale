@@ -475,6 +475,108 @@ export default function FibuModule() {
     setEmailFetchLoading(false)
   }
   
+  // E-Mail verarbeiten - Modal öffnen
+  const handleProcessEmail = (email) => {
+    setSelectedEmail(email)
+    setEmailForm({
+      lieferantName: '',
+      kreditorKonto: '',
+      rechnungsnummer: '',
+      rechnungsdatum: new Date().toISOString().slice(0, 10),
+      gesamtBetrag: '',
+      aufwandskonto: '5200'
+    })
+    setGeminiResult(null)
+    setShowEmailModal(true)
+    
+    // Lade Kreditoren falls noch nicht geladen
+    if (kreditoren.length === 0) {
+      loadKreditoren()
+    }
+  }
+  
+  // Gemini PDF-Parsing
+  const handleGeminiParse = async () => {
+    if (!selectedEmail) return
+    
+    setGeminiParsing(true)
+    try {
+      const res = await fetch('/api/fibu/email-inbox', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: selectedEmail.id })
+      })
+      
+      const data = await res.json()
+      
+      if (data.ok && data.extracted) {
+        setGeminiResult(data.extracted)
+        
+        // Vorbefüllen wenn Daten vorhanden
+        if (data.extracted.lieferant) {
+          setEmailForm(prev => ({
+            ...prev,
+            lieferantName: data.extracted.lieferant || prev.lieferantName,
+            rechnungsnummer: data.extracted.rechnungsnummer || prev.rechnungsnummer,
+            rechnungsdatum: data.extracted.datum || prev.rechnungsdatum,
+            gesamtBetrag: data.extracted.gesamtbetrag?.toString() || prev.gesamtBetrag
+          }))
+          
+          // Auto-Matching für Kreditor
+          if (data.extracted.lieferant) {
+            handleKreditorSearch(data.extracted.lieferant)
+          }
+        }
+        
+        alert('✅ PDF erfolgreich analysiert!')
+      } else {
+        alert('❌ Fehler beim Parsen: ' + (data.error || 'Unbekannter Fehler'))
+      }
+    } catch (error) {
+      console.error('Gemini Fehler:', error)
+      alert('❌ Fehler beim PDF-Parsing')
+    }
+    setGeminiParsing(false)
+  }
+  
+  // E-Mail als EK-Rechnung speichern
+  const handleSaveEmailInvoice = async () => {
+    if (!selectedEmail || !emailForm.lieferantName || !emailForm.gesamtBetrag) {
+      alert('Bitte alle Pflichtfelder ausfüllen')
+      return
+    }
+    
+    setEkLoading(true)
+    try {
+      const res = await fetch('/api/fibu/email-inbox', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedEmail.id,
+          ...emailForm,
+          kreditorKonto: emailForm.kreditorKonto || undefined,
+          aufwandskonto: emailForm.aufwandskonto
+        })
+      })
+      
+      const data = await res.json()
+      
+      if (data.ok) {
+        alert('✅ EK-Rechnung erstellt!')
+        setShowEmailModal(false)
+        setSelectedEmail(null)
+        loadEmailInbox()
+        loadEkRechnungen()
+      } else {
+        alert('❌ Fehler: ' + data.error)
+      }
+    } catch (error) {
+      console.error('Fehler:', error)
+      alert('❌ Fehler beim Speichern')
+    }
+    setEkLoading(false)
+  }
+  
   // Export-Handler
   const handleExport = async () => {
     if (!exportFrom || !exportTo) {
