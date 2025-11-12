@@ -159,17 +159,8 @@ export default function FibuModule() {
     event.target.value = '' // Reset file input
   }
   
-  // Gefilterte Konten
-  const filteredKonten = konten.filter(k => {
-    const matchesSearch = !kontenFilter || 
-      k.konto.toLowerCase().includes(kontenFilter.toLowerCase()) ||
-      k.bezeichnung.toLowerCase().includes(kontenFilter.toLowerCase())
-    
-    const matchesKlasse = kontenKlasseFilter === 'alle' || 
-      k.kontenklasse?.toString() === kontenKlasseFilter
-    
-    return matchesSearch && matchesKlasse
-  })
+  // Gefilterte Konten - Jetzt serverseitig gefiltert, deshalb keine zusätzliche Filterung nötig
+  const filteredKonten = konten
   
   // VK-Rechnungen laden
   const loadVkRechnungen = async () => {
