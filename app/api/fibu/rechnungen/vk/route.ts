@@ -67,7 +67,13 @@ export async function GET(request: NextRequest) {
         // Kundendaten direkt aus tKunde
         const kundenName = r.kundenName || `Kunde #${r.kKunde}`
         const kundenUstId = r.kundenUstId && r.kundenUstId.trim().length > 0 ? r.kundenUstId.trim() : null
-        const kundenLand = r.kundenLand || 'DE'
+        
+        // Land aus USt-ID ableiten wenn vorhanden
+        let kundenLand = 'DE'
+        if (kundenUstId && kundenUstId.length >= 2) {
+          kundenLand = kundenUstId.substring(0, 2).toUpperCase()
+        }
+        
         const hatUstId = kundenUstId !== null
         const istInnerg = hatUstId && kundenLand !== 'DE'
         
