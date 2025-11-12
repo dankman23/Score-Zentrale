@@ -264,6 +264,43 @@ export default function FibuModule() {
     reader.readAsDataURL(file)
   }
   
+  // Export-Handler
+  const handleExport = async () => {
+    if (!exportFrom || !exportTo) {
+      alert('Bitte Zeitraum auswählen')
+      return
+    }
+    
+    setExportLoading(true)
+    try {
+      const response = await fetch(
+        `/api/fibu/export/10it?from=${exportFrom}&to=${exportTo}`
+      )
+      
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Export fehlgeschlagen')
+      }
+      
+      // Download als Datei
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `Export_Konten_von_${exportFrom}_bis_${exportTo}.csv`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+      
+      alert('✅ Export erfolgreich erstellt!')
+    } catch (error) {
+      console.error('Export Fehler:', error)
+      alert('❌ Fehler beim Export: ' + error.message)
+    }
+    setExportLoading(false)
+  }
+  
   useEffect(() => {
     if (tab === 'kontenplan') loadKontenplan()
     if (tab === 'vk') loadVkRechnungen()
