@@ -1,6 +1,8 @@
 # FIBU SQL-Queries für JTL-Wawi
 
-## 📅 Oktober 2024 Datenimport
+⚠️ **WICHTIG**: JTL-Datenbank-Dokumentation: https://wawi-db.jtl-software.de/tables/1.10.15.0
+
+## 📅 Ab Oktober 2025 - Datenimport
 
 ### 1. VK-Rechnungen (Ausgangsrechnungen) - Oktober 2024
 
