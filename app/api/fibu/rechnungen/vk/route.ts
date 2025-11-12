@@ -31,8 +31,8 @@ export async function GET(request: NextRequest) {
         r.tBestellung_kBestellung AS kBestellung,
         b.kZahlungsart,
         za.cName AS zahlungsart,
-        ISNULL(rv.fGesamtsumme, 0) AS brutto,
-        ISNULL(rv.fWarenpreisNetto, 0) AS netto
+        ISNULL(rv.fGesamtBruttopreis, 0) AS brutto,
+        ISNULL(rv.fGesamtNettopreis, 0) AS netto
       FROM dbo.tRechnung r
       LEFT JOIN dbo.tBestellung b ON r.tBestellung_kBestellung = b.kBestellung
       LEFT JOIN dbo.tZahlungsart za ON b.kZahlungsart = za.kZahlungsart
