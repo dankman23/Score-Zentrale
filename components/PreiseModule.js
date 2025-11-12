@@ -68,7 +68,7 @@ export default function PreiseModule() {
       if (chartData) {
         datasets.push({
           label: 'Plattformpreis (berechnet)',
-          data: chartData.map(d => d.plattform),
+          data: chartData.map(d => ({ x: d.ek, y: d.plattform })),
           borderColor: '#F6B10A',
           backgroundColor: '#F6B10A20',
           borderWidth: 2,
@@ -78,7 +78,7 @@ export default function PreiseModule() {
         
         datasets.push({
           label: 'Shop-Preis (berechnet)',
-          data: chartData.map(d => d.shop),
+          data: chartData.map(d => ({ x: d.ek, y: d.shop })),
           borderColor: '#2fb97f',
           backgroundColor: '#2fb97f20',
           borderWidth: 2,
