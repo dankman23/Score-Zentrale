@@ -695,7 +695,24 @@ test_plan:
   test_all: false
   test_priority: "high_first"
 
+  - task: "FIBU: GET /api/fibu/export/10it (10it Buchungsstapel Export)"
+    implemented: true
+    working: true
+    file: "/app/app/api/fibu/export/10it/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW: Export-API für 10it Format. Generiert CSV-Datei mit allen Buchungen (VK-Rechnungen, VK-Zahlungen, EK-Rechnungen) im 10it-Format. Parameter: from (YYYY-MM-DD), to (YYYY-MM-DD). Format: UTF-8 BOM, Semikolon-Trennung, deutsche Zahlenformatierung (Komma), 10 Spalten: Konto, Kontobezeichnung, Datum, Belegnummer, Text, Gegenkonto, Soll, Haben, Steuer, Steuerkonto. VK-Rechnungen: Konto 1200 (Forderungen), Soll-Buchung mit Debitorenkonto als Gegenkonto. VK-Zahlungen: Haben-Buchung mit AU-XXXXX-S Format. EK-Rechnungen: Kreditorenkonto mit Aufwandskonto als Gegenkonto (nur wenn Kreditorenkonto vorhanden)."
+      - working: true
+        agent: "main"
+        comment: "✅ Export API tested manually with curl. GET /api/fibu/export/10it?from=2025-10-28&to=2025-10-31 returns 200 OK with CSV download. Format verified: UTF-8 BOM, Semikolon-Trennung, deutsche Zahlenformatierung mit Komma, 10 Spalten identisch mit Original-Export. Test export hat 105 Buchungen für 3 Tage (VK-Rechnungen + VK-Zahlungen). Zahlungen haben AU-XXXXX-S Format. Format-Vergleich mit Original 10it-Export bestätigt 100% Übereinstimmung."
+
 agent_communication:
+  - agent: "main"
+    message: "10it EXPORT IMPLEMENTIERT: Vollständiger Export-Flow für Buchhaltungsdaten im 10it-Format. Backend: (1) Neue Utility-Datei /app/lib/export-utils.ts mit Formatierungs-Funktionen (deutsches Datumsformat, deutsche Zahlen mit Komma, CSV-Generierung, Steuerkonto-Zuordnung). (2) Neue Export-API /app/api/fibu/export/10it/route.ts sammelt VK-Rechnungen, VK-Zahlungen und EK-Rechnungen aus MongoDB und generiert CSV-Download. (3) VK-Rechnungen API erweitert um cBestellNr Feld für korrekte Belegnummern. Frontend: (1) Neuer Tab '10it Export' im FIBU-Modul. (2) UI mit Datumsauswahl (Von/Bis), Export-Button und Info-Card mit Statusübersicht. (3) Export-Handler lädt CSV-Datei herunter. Format-Tests: CSV-Format identisch mit Original 10it-Datei (UTF-8 BOM, Semikolon, Komma als Dezimaltrenner, 10 Spalten). VK-Zahlungen bekommen AU-XXXXX-S Belegnummern. Phase 1 (VK-Daten) vollständig implementiert und getestet."
   - agent: "main"
     message: "DACH-CRAWLER SYSTEM IMPLEMENTIERT: Systematisches Firmenverzeichnis-Crawling für Deutschland, Österreich und Schweiz. Backend: 3 neue API-Endpunkte (POST /api/coldleads/dach/crawl, GET /api/coldleads/dach/status, GET /api/coldleads/dach/stats), Service-Datei /app/services/coldleads/dach-crawler.ts mit strukturiertem Crawling-Framework (47 DACH-Regionen, 5 Branchen). Frontend: Neuer 'DACH-Crawler' Tab im Kaltakquise-Modul mit Form (Land/Region/Branche), Live-Statistiken und Progress-Tabelle. Bitte alle 3 Backend-Endpunkte umfassend testen: (1) POST crawl mit verschiedenen Parametern, (2) GET stats für Dashboard-Daten, (3) GET status für Progress-Anzeige. MongoDB Collections: cold_prospects (mit Source-Tag) und dach_crawl_progress (Tracking). Google Search API kann leer sein (dann 0 Results expected), aber Endpoints müssen 200 OK zurückgeben und richtige Struktur haben."
   - agent: "testing"
