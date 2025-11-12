@@ -96,17 +96,17 @@ export default function PreiseG2Module({ formeln }) {
       return [1, 3, 5, 10, 25, 50, 100, 300]
     }
     
-    // Kategorie-basiert - Schwellen bis max. 5000€ Warenkorb
+    // Kategorie-basiert - Schwellen bis ca. 5000€ Warenkorb
     let schwellen = []
     if (ek <= 30) {
-      // Basis (EK ≤ 30€) - 8 Stufen
-      schwellen = [30, 100, 200, 350, 600, 1000, 1500, 2000]
+      // Basis (EK ≤ 30€) - 8 Stufen bis ~5000€
+      schwellen = [40, 120, 250, 450, 800, 1400, 2200, 3500]
     } else if (ek <= 150) {
-      // Standard (EK 30-150€) - 8 Stufen
-      schwellen = [50, 150, 300, 600, 1000, 1500, 2500, 3500]
+      // Standard (EK 30-150€) - 8 Stufen bis ~5000€
+      schwellen = [60, 180, 400, 800, 1400, 2200, 3500, 5000]
     } else {
-      // High Price (EK >150€) - 6-7 Stufen (weniger bei großen EKs)
-      schwellen = [200, 500, 1000, 1500, 2500, 4000]
+      // High Price (EK >150€) - 6 Stufen bis ~5000€
+      schwellen = [250, 600, 1200, 2000, 3500, 5000]
     }
     
     // Berechne VE-Anzahl für jede Schwelle
