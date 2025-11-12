@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     
     const pool = await getMssqlPool()
     
-    // Hole Zahlungen aus tZahlung mit erweitertenInfos
+    // Hole Zahlungen aus tZahlung (minimale Version)
     const query = `
       SELECT TOP ${limit}
         z.kZahlung,
@@ -26,8 +26,6 @@ export async function GET(request: NextRequest) {
         z.fBetrag AS betrag,
         z.dDatum AS zahlungsdatum,
         ISNULL(z.cHinweis, '') AS hinweis,
-        ISNULL(z.cZahlungsanbieter, 'Unbekannt') AS zahlungsanbieter,
-        ISNULL(z.cISO, 'EUR') AS waehrung,
         ISNULL(z.kZahlungsart, 0) AS kZahlungsart,
         r.cRechnungsNr AS rechnungsNr,
         'Kunde #' + CAST(r.tKunde_kKunde AS VARCHAR) AS kundenName,
