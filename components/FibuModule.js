@@ -395,18 +395,30 @@ export default function FibuModule() {
                           <th className="text-right">Netto</th>
                           <th className="text-right">Brutto</th>
                           <th>Status</th>
+                          <th>Debitor-Konto</th>
+                          <th>Sachkonto</th>
                         </tr>
                       </thead>
                       <tbody>
                         {vkRechnungen.map((r, idx) => (
                           <tr key={idx}>
-                            <td><small>{r.rechnungsnr}</small></td>
+                            <td><small><strong>{r.cRechnungsNr}</strong></small></td>
                             <td><small>{new Date(r.rechnungsdatum).toLocaleDateString('de-DE')}</small></td>
-                            <td><small>{r.kunde_name}</small></td>
+                            <td><small>{r.kundenName}</small></td>
                             <td><small>{r.zahlungsart}</small></td>
                             <td className="text-right"><small>{r.netto?.toFixed(2)} €</small></td>
                             <td className="text-right"><strong>{r.brutto?.toFixed(2)} €</strong></td>
-                            <td><span className="badge badge-info">{r.status}</span></td>
+                            <td>
+                              <span className={`badge ${r.status === 'Bezahlt' ? 'badge-success' : 'badge-warning'}`}>
+                                {r.status}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="badge badge-primary">{r.debitorKonto}</span>
+                            </td>
+                            <td>
+                              <span className="badge badge-secondary">{r.sachkonto}</span>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
