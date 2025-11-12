@@ -291,6 +291,25 @@ export default function PreiseG2Module({ formeln }) {
         </div>
       </div>
 
+      {/* Staffelsystem-Auswahl */}
+      <div className="card mb-2 border-info">
+        <div className="card-header bg-info text-white py-1">
+          <small className="font-weight-bold" style={{fontSize: '0.85rem'}}>Staffelsystem</small>
+        </div>
+        <div className="card-body py-1">
+          <select className="form-control form-control-sm" value={staffelSystem} onChange={e => setStaffelSystem(e.target.value)} style={{fontSize: '0.85rem'}}>
+            <option value="standard">Standard (feste Grenzen: 1, 3, 5, 10, 25, 50, 100, 300)</option>
+            <option value="kategorie">Kategorie-basiert (dynamisch nach EK)</option>
+            <option value="kategorie_gerundet">Kategorie gerundet (schöne Zahlen)</option>
+          </select>
+          <small className="text-muted d-block mt-1" style={{fontSize: '0.75rem'}}>
+            {staffelSystem === 'standard' && 'Feste Staffelgrenzen unabhängig vom EK'}
+            {staffelSystem === 'kategorie' && 'Staffelgrenzen basierend auf EK-Kategorie (Basis ≤30€, Standard ≤150€, High Price >150€)'}
+            {staffelSystem === 'kategorie_gerundet' && 'Wie Kategorie-basiert, aber auf schöne Zahlen gerundet'}
+          </small>
+        </div>
+      </div>
+
       {/* G2-Parameter Konfiguration */}
       <div className="card mb-2">
         <div className="card-header py-1 d-flex justify-content-between align-items-center">
