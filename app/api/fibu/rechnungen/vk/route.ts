@@ -43,31 +43,29 @@ export async function GET(request: NextRequest) {
       .query(query)
     
     const rechnungen = result.recordset.map((r: any) => {
-      // Kundendaten müssen separat geladen werden
-      const hatUstId = false // Wird später ergänzt
+      const kundenLand = 'DE' // Default
+      const hatUstId = false
       const istInnerg = false
-      const mwstSatz = calculateMwStSatz(r.brutto, r.netto)
-      const kundenLand = 'DE' // Default, wird später ergänzt
+      const mwstSatz = 19 // Default
       
       return {
         kRechnung: r.kRechnung,
         cRechnungsNr: r.cRechnungsNr,
         rechnungsdatum: r.rechnungsdatum,
-        brutto: parseFloat(r.brutto || 0),
-        netto: parseFloat(r.netto || 0),
-        mwst: parseFloat(r.fMwSt || 0),
+        brutto: 0, // Wird über separate Query geladen
+        netto: 0,
+        mwst: 0,
         mwstSatz,
         status: r.cBezahlt === 'Y' ? 'Bezahlt' : 'Offen',
         kKunde: r.kKunde,
-        kundenName: 'Kunde #' + r.kKunde, // Wird später ergänzt
+        kundenName: 'Kunde #' + r.kKunde,
         kundenLand,
         kundenUstId: null,
-        zahlungsart: 'TBD', // Wird später ergänzt
-        kZahlungsart: r.kZahlungsart,
+        zahlungsart: 'TBD',
+        kZahlungsart: r.kZahlungsart || 0,
         istGutschrift: isGutschrift(r.cRechnungsNr),
         istInnerg,
-        // Automatische Kontenzuordnung
-        debitorKonto: getDebitorKonto(r.kZahlungsart, kundenLand, hatUstId),
+        debitorKonto: getDebitorKonto(r.kZahlungsart || 0, kundenLand, hatUstId),
         sachkonto: getSachkonto(kundenLand, hatUstId, mwstSatz)
       }
     })
