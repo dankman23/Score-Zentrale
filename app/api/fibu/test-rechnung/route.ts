@@ -8,31 +8,19 @@ export async function GET() {
   try {
     const pool = await getMssqlPool()
     
-    // Get column names from tKunde
-    const kundeQuery = await pool.request().query(`
-      SELECT TOP 1 * FROM dbo.tKunde WHERE kKunde > 0
+    // Get column names from lvExterneRechnung
+    const erQuery = await pool.request().query(`
+      SELECT TOP 1 * FROM Verkauf.lvExterneRechnung
     `)
     
-    const kunde = kundeQuery.recordset[0]
-    const kundeColumns = kunde ? Object.keys(kunde) : []
-    
-    // Get column names from tLand
-    const landQuery = await pool.request().query(`
-      SELECT TOP 1 * FROM dbo.tLand
-    `)
-    
-    const land = landQuery.recordset[0]
-    const landColumns = land ? Object.keys(land) : []
+    const er = erQuery.recordset[0]
+    const erColumns = er ? Object.keys(er) : []
     
     return NextResponse.json({
       ok: true,
-      tKunde: {
-        columnNames: kundeColumns,
-        sample: kunde
-      },
-      tLand: {
-        columnNames: landColumns,
-        sample: land
+      lvExterneRechnung: {
+        columnNames: erColumns,
+        sample: er
       }
     })
   } catch (error: any) {
