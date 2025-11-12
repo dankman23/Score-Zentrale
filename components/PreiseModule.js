@@ -734,65 +734,17 @@ export default function PreiseModule() {
               </div>
             </div>
 
-            {/* Vergleichstabellen */}
-            {vergleichData.length > 0 && (
-              <div>
-                {vergleichData.map((d, idx) => (
-                  <div key={idx} className="card border-primary mb-3">
-                    <div className="card-header bg-primary text-white py-2">
-                      <strong>{d.name} - EK = {vergleichEk}€</strong>
-                    </div>
-                    <div className="card-body p-0">
-                      {/* Plattformpreis */}
-                      <div className="p-3 bg-light border-bottom">
-                        <div className="row">
-                          <div className="col-md-6">
-                            <strong>Plattformpreis (netto):</strong>
-                          </div>
-                          <div className="col-md-6 text-right">
-                            <span className="h5 text-primary mb-0">{d.plattform.toFixed(2)} €</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Shop-Staffelpreise */}
-                      <div className="p-2">
-                        <strong className="small text-success">Shop-Staffelpreise (netto):</strong>
-                        <div className="table-responsive mt-2">
-                          <table className="table table-sm table-bordered text-center mb-0">
-                            <thead className="thead-light">
-                              <tr style={{fontSize: '0.8rem'}}>
-                                {d.staffeln.map(s => (
-                                  <th key={s.ve || s.staffel} className="py-1">{s.ve || s.staffel}</th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                {d.staffeln.map(s => (
-                                  <td key={s.ve || s.staffel} className="font-weight-bold text-success">
-                                    {(s.vk_shop_netto || s.shop_unit).toFixed(2)} €
-                                  </td>
-                                ))}
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
             {/* Liniendiagramm */}
             {vergleichData.length > 0 && (
               <div className="card border-info">
                 <div className="card-header bg-info text-white py-2">
-                  <h6 className="mb-0">Preisverlauf (EK 0-500€ → VK)</h6>
+                  <strong style={{fontSize: '0.95rem'}}>Preisverlauf (EK 0-300€ → VK)</strong>
+                  <small className="ml-3 text-white-50" style={{fontSize: '0.8rem'}}>
+                    {vergleichData.length} Formel{vergleichData.length > 1 ? 'n' : ''} im Vergleich
+                  </small>
                 </div>
-                <div className="card-body">
-                  <div style={{height: '400px'}}>
+                <div className="card-body py-2">
+                  <div style={{height: '300px'}}>
                     <canvas id="vergleichChart"></canvas>
                   </div>
                 </div>
