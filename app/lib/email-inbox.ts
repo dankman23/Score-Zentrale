@@ -86,7 +86,7 @@ export async function fetchUnreadEmails(): Promise<ProcessedEmail[]> {
 
           console.log(`[FIBU Email] ${results.length} neue E-Mail(s) gefunden`)
 
-          const fetch = imap.fetch(results, { bodies: '', markSeen: true })
+          const fetch = imap.fetch(results, { bodies: '', markSeen: false })
           let processed = 0
 
           fetch.on('message', (msg, seqno) => {
