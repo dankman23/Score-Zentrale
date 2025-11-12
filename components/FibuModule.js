@@ -276,6 +276,24 @@ export default function FibuModule() {
     reader.readAsDataURL(file)
   }
   
+  // Kreditoren laden
+  const loadKreditoren = async () => {
+    setKreditorenLoading(true)
+    try {
+      const res = await fetch('/api/fibu/kreditoren')
+      const data = await res.json()
+      if (data.ok) {
+        setKreditoren(data.kreditoren)
+      } else {
+        alert('Fehler beim Laden der Kreditoren: ' + data.error)
+      }
+    } catch (error) {
+      console.error('Fehler:', error)
+      alert('Fehler beim Laden der Kreditoren')
+    }
+    setKreditorenLoading(false)
+  }
+  
   // Export-Handler
   const handleExport = async () => {
     if (!exportFrom || !exportTo) {
@@ -311,6 +329,78 @@ export default function FibuModule() {
       alert('❌ Fehler beim Export: ' + error.message)
     }
     setExportLoading(false)
+  }
+  
+  // EK-Upload Handler (vereinfacht - Gemini kommt später)
+  const handleEkUpload = async () => {
+    if (!uploadFile) {
+      alert('Bitte Datei auswählen')
+      return
+    }
+    
+    setUploadLoading(true)
+    setUploadResult(null)
+    
+    try {
+      // Für Demo: Simuliere Upload-Ergebnis
+      // In Produktion: PDF zu Gemini senden und parsen
+      
+      // Beispiel-Ergebnis
+      const result = {
+        lieferantName: 'Beispiel GmbH',
+        rechnungsnummer: 'RE-2025-001',
+        rechnungsdatum: '2025-11-15',
+        gesamtBetrag: 500,
+        matching: {
+          kreditorKonto: '70197',
+          confidence: 85,
+          method: 'fuzzy'
+        }
+      }
+      
+      setUploadResult(result)
+      setSelectedKreditor(result.matching?.kreditorKonto || '')
+      setSelectedAufwandskonto('5200')
+      
+    } catch (error) {
+      console.error('Upload Fehler:', error)
+      alert('❌ Fehler beim Upload: ' + error.message)
+    }
+    setUploadLoading(false)
+  }
+  
+  // EK-Rechnung speichern
+  const saveEkRechnung = async () => {
+    if (!uploadResult || !selectedKreditor || !selectedAufwandskonto) {
+      alert('Bitte alle Felder ausfüllen')
+      return
+    }
+    
+    try {
+      const res = await fetch('/api/fibu/rechnungen/ek', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...uploadResult,
+          kreditorKonto: selectedKreditor,
+          aufwandskonto: selectedAufwandskonto
+        })
+      })
+      
+      const data = await res.json()
+      
+      if (data.ok) {
+        alert('✅ EK-Rechnung gespeichert!')
+        setUploadResult(null)
+        setUploadFile(null)
+        loadEkRechnungen()
+      } else {
+        alert('❌ Fehler: ' + data.error)
+      }
+    } catch (error) {
+      console.error('Fehler:', error)
+      alert('❌ Fehler beim Speichern')
+    }
   }
   
   useEffect(() => {
