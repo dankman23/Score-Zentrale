@@ -845,6 +845,72 @@ export default function FibuModule() {
           </div>
         )}
         
+        {/* Kreditoren Tab */}
+        {tab === 'kreditoren' && (
+          <div>
+            <div className="card border-info mb-3">
+              <div className="card-header bg-info text-white py-2">
+                <strong><i className="bi bi-building mr-2"/>Kreditoren-Verwaltung</strong>
+              </div>
+              <div className="card-body">
+                <div className="mb-3">
+                  <input 
+                    type="text"
+                    className="form-control"
+                    placeholder="🔍 Lieferant suchen..."
+                    value={kreditorenFilter}
+                    onChange={e => setKreditorenFilter(e.target.value)}
+                  />
+                </div>
+                
+                {kreditorenLoading ? (
+                  <div className="text-center py-4">
+                    <div className="spinner-border text-info"/>
+                    <p className="mt-2">Lade Kreditoren...</p>
+                  </div>
+                ) : (
+                  <div className="table-responsive" style={{maxHeight: '500px', overflow: 'auto'}}>
+                    <table className="table table-sm table-hover">
+                      <thead className="thead-light sticky-top">
+                        <tr>
+                          <th>Konto-Nr</th>
+                          <th>Lieferant</th>
+                          <th>Aufwandskonto</th>
+                          <th>Aliases</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {kreditoren
+                          .filter(k => 
+                            !kreditorenFilter || 
+                            k.name.toLowerCase().includes(kreditorenFilter.toLowerCase()) ||
+                            k.kreditorenNummer.includes(kreditorenFilter)
+                          )
+                          .map(k => (
+                            <tr key={k.id}>
+                              <td><span className="badge badge-info">{k.kreditorenNummer}</span></td>
+                              <td>{k.name}</td>
+                              <td><span className="badge badge-secondary">{k.standardAufwandskonto || '-'}</span></td>
+                              <td className="small text-muted">
+                                {k.aliases && k.aliases.length > 0 ? k.aliases.join(', ') : '-'}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                
+                <div className="alert alert-info small mt-3">
+                  <strong><i className="bi bi-info-circle mr-2"/>Info:</strong>
+                  {kreditoren.length} Kreditoren geladen. 
+                  Das System lernt automatisch neue Zuordnungen, wenn Sie EK-Rechnungen manuell zuordnen.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Export Tab */}
         {tab === 'export' && (
           <div>
