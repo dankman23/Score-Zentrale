@@ -8,12 +8,12 @@ export default function PreiseG2Module({ formeln }) {
   const [plattformpreis, setPlattformpreis] = useState(0)
   const [loading, setLoading] = useState(false)
 
-  const [g2Params] = useState({
+  const g2Params = {
     gstart_ek: 12, gneu_ek: 100, gneu_vk: 189,
     fixcost1: 0.35, fixcost2: 1.4,
     varpct1: 0.25, varpct2: 0.02,
     aufschlag: 1.08, shp_fac: 0.92
-  })
+  }
 
   const berechne = async () => {
     if (!ekInput || !formeln) return
