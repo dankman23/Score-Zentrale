@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
         konto: '1200',  // Forderungen aus Lieferungen und Leistungen
         kontobezeichnung: 'Forderungen aus Lieferungen und Leistungen',
         datum: new Date(rechnung.rechnungsdatum),
-        belegnummer: rechnung.kBestellung || rechnung.cRechnungsNr || String(rechnung.kRechnung),
+        belegnummer: rechnung.cBestellNr || rechnung.cRechnungsNr || String(rechnung.kRechnung),
         text: `${rechnung.cRechnungsNr} - ${rechnung.kundenLand || 'DE'}`,
         gegenkonto: sachkonto,
         soll: brutto,
