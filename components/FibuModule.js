@@ -854,6 +854,37 @@ export default function FibuModule() {
                 <strong><i className="bi bi-cash-coin mr-2"/>Zahlungseingänge (VK)</strong>
               </div>
               <div className="card-body">
+                {/* Filter */}
+                <div className="row mb-3">
+                  <div className="col-md-6">
+                    <label className="small font-weight-bold">Zahlungsanbieter:</label>
+                    <select 
+                      className="form-control form-control-sm"
+                      value={zahlungsFilter.anbieter}
+                      onChange={e => setZahlungsFilter(prev => ({ ...prev, anbieter: e.target.value }))}
+                    >
+                      <option value="alle">Alle Anbieter</option>
+                      <option value="paypal">PayPal</option>
+                      <option value="amazon">Amazon Payment</option>
+                      <option value="ebay">eBay Managed Payments</option>
+                      <option value="mollie">Mollie</option>
+                      <option value="commerzbank">Commerzbank</option>
+                    </select>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="small font-weight-bold">Zuordnung:</label>
+                    <select 
+                      className="form-control form-control-sm"
+                      value={zahlungsFilter.zuordnung}
+                      onChange={e => setZahlungsFilter(prev => ({ ...prev, zuordnung: e.target.value }))}
+                    >
+                      <option value="alle">Alle Zahlungen</option>
+                      <option value="zugeordnet">Nur zugeordnete</option>
+                      <option value="nicht-zugeordnet">Nur nicht zugeordnete</option>
+                    </select>
+                  </div>
+                </div>
+                
                 {zahlungenLoading ? (
                   <div className="text-center py-4">
                     <div className="spinner-border text-success"/>
