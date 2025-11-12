@@ -47,6 +47,18 @@ export default function FibuModule() {
   const [emailInbox, setEmailInbox] = useState([])
   const [emailInboxLoading, setEmailInboxLoading] = useState(false)
   const [emailFetchLoading, setEmailFetchLoading] = useState(false)
+  const [showEmailModal, setShowEmailModal] = useState(false)
+  const [selectedEmail, setSelectedEmail] = useState(null)
+  const [emailForm, setEmailForm] = useState({
+    lieferantName: '',
+    kreditorKonto: '',
+    rechnungsnummer: '',
+    rechnungsdatum: new Date().toISOString().slice(0, 10),
+    gesamtBetrag: '',
+    aufwandskonto: '5200'
+  })
+  const [geminiParsing, setGeminiParsing] = useState(false)
+  const [geminiResult, setGeminiResult] = useState(null)
   
   // Export
   const [exportFrom, setExportFrom] = useState('2025-01-01')
