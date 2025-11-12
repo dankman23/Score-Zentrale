@@ -1,14 +1,14 @@
-# Score Zentrale - Dashboard & Kaltakquise System
+# Score Zentrale - Dashboard & Business Intelligence System
 
-**Version:** 2.0 (Kaltakquise V3)  
-**Letzte Aktualisierung:** 11.11.2025  
+**Version:** 3.0 (Preisberechnung g2 + Artikel-Management)
+**Letzte Aktualisierung:** 12.11.2025
 **Status:** ✅ Produktionsbereit
 
 ---
 
 ## 🎯 Übersicht
 
-Next.js Dashboard für **Score Schleifwerkzeuge** (Köln) - integriert Sales (JTL-Wawi), Marketing (GA4, Google Ads), und ein vollautomatisches **Kaltakquise-System V3**.
+Next.js Dashboard für **Score Schleifwerkzeuge** (Köln) - integriert Sales (JTL-Wawi), Marketing (GA4, Google Ads), Kaltakquise-System V3, und fortgeschrittene Preisberechnung.
 
 ---
 
@@ -38,12 +38,8 @@ Next.js Dashboard für **Score Schleifwerkzeuge** (Köln) - integriert Sales (JT
 - **Multi-Page Crawl:** 7 Seiten (Home, Leistungen, Produkte, Referenzen, Team, Kontakt, Impressum)
 - **LLM-Analyse:** OpenAI GPT-4o
 - **Glossar-Mapping:** 311 Begriffe
-  - 71 Anwendungen (Schleifen, Polieren, Entgraten...)
-  - 90 Werkstoffe (Edelstahl, Aluminium, Holz...)
-  - 62 Maschinentypen (Winkelschleifer, Bandschleifer...)
-  - 88 Produktkategorien (Schleifbänder, Trennscheiben...)
 - **Contact Extraction:** Name, Rolle, Email, Telefon (mit Confidence)
-- **Brand Matching:** 10 Score-Partner (Klingspor, 3M, Norton...)
+- **Brand Matching:** 10 Score-Partner
 - **Confidence Score:** 0-100
 
 #### **Emailer V3:**
@@ -53,55 +49,55 @@ Next.js Dashboard für **Score Schleifwerkzeuge** (Köln) - integriert Sales (JT
   3. Follow-up 2 nach 12 Tagen (≤90 Wörter)
 - **Plain Text** (kein Markdown)
 - **Personalisiert:** Anrede, Website-Bezug, passende Marken
-- **CTA:** Telefon, Email, oder Business-Formular
-- **BCC:** leismann@score-schleifwerkzeuge.de
 
-#### **Auto-Follow-ups:**
-- Automatisches Scheduling
-- Täglich prüfen & versenden
-- Status-Tracking
-
-#### **Autopilot:**
-- Vollautomatisch: Suche → Analyse → Email
-- Tages-Limit konfigurierbar
-- Nutzt V3-APIs
-
-#### **UI-Features:**
-- Bulk-Analyse (alle/ausgewählte)
-- Re-Analyse möglich
-- Email-Preview (alle 3 Mails)
-- Löschen-Funktion
-- Details-Ansicht mit V3-Daten
-
-### 4. Warmakquise (Warm Acquisition)
-- Inaktive Kunden-Scores
-- Kontakthistorie
-- Follow-up-Management
-
-### 5. Glossar-Verwaltung
-- **6 Kategorien:**
-  1. Anwendungen (71)
-  2. Kategorien (88)
-  3. Werkstoffe (90)
-  4. Maschinentypen (62)
-  5. Branchen (8)
-  6. Machine Types
-- Versions-Management
-- Website-Content-Publikation
-- PDF-basierte Branchen-Datenbank
-
-### 6. Produkte-Verwaltung (JTL-Artikel)
-- **Artikel-Import:** 166.855+ Artikel aus JTL-Wawi
+### 4. Produkte-Verwaltung (JTL-Artikel) ⭐ NEU!
+- **Artikel-Import:** 166.855 Artikel aus JTL-Wawi
+- **Cursor-basierte Pagination:** Robust & zuverlässig
 - **Artikel-Browser:**
   - Text-Suche (Artikelnummer, Name, Barcode)
   - Filter: Hersteller (13), Warengruppen (35)
   - Pagination (25/50/100 pro Seite)
-- **Daten:** Artikelnummer, Name, Preise, Marge, Lagerbestand
-- **Performance:** Batch-Import, indizierte Suche
+- **Artikel-Präsenz:** ⭐ NEU!
+  - In wie vielen Stücklisten?
+  - eBay-Angebote
+  - Amazon-Angebote
+  - Shop-Präsenz
+  - Verkaufskanäle (SCX)
+- **Preisvergleich:** ⭐ NEU!
+  - Wettbewerbspreise crawlen (Amazon, Idealo, eBay)
+  - VE-Vergleich (Preis pro Stück)
+  - EAN/MPN-basierte Suche
+- **Verwaiste Artikel:** Erkennung & Batch-Löschung
 
-### 7. Marketing
-- Analytics Dashboard Integration
-- Google Ads Kampagnen-Verwaltung
+### 5. Preisberechnung ⭐⭐ KOMPLETT NEU!
+
+#### **Alte Preisberechnung (7 Warengruppen):**
+- Lagerware, Klingspor FL, Abverkauf, Lagerware günstig, Pferd FL, Plastimex FL, Alle Konfektion
+- **Formel:** `(c*(ve*x)^a + paypal_fix + fixkosten + ve*x) / (1 - eba - paypal) * (1 + aufschlag%)`
+- **Shop-Staffelpreise:** Von rechts nach links mit A.A. Threshold
+- **Editierbare Regler:** Live-Speicherung in MongoDB
+- **Ausklappbare Konfiguration:** Platz sparen
+
+#### **Neue Preisberechnung (g2):**
+- **3 Intervalle:** 
+  - I (x ≤ gstart_ek): Wie alte Formel
+  - II (gstart < x < gneu): S-Übergang (Smoothstep)
+  - III (x ≥ gneu): rNEU * f_alt(x)
+- **Warengruppen-basiert:** Nutzt Regler 1a, 2c, 3e von gewählter Warengruppe
+- **Artikelspezifisch:** gstart_ek, gneu_ek, gneu_vk, fixcosts, varpcts, shp_fac
+- **Test:** EK=10€ (Klingspor) → 27.60€ (identisch mit Alter PB bis gstart)
+
+#### **Vergleichs-Tool:**
+- Mehrere Formeln gleichzeitig vergleichen
+- g2 vs. Alte Formeln
+- **Tabellen:** Plattformpreis + Shop-Staffeln untereinander
+- **Liniendiagramm:** X: 0-300€ EK, Y: VK
+- Toggle: Plattform / Shop-Staffel
+
+### 6. Glossar-Verwaltung
+- 6 Kategorien (311 Begriffe)
+- Versions-Management
+- PDF-basierte Branchen-Datenbank
 
 ---
 
@@ -119,17 +115,15 @@ Next.js Dashboard für **Score Schleifwerkzeuge** (Köln) - integriert Sales (JT
 - TypeScript
 
 ### **Datenbanken**
-- **MongoDB:** Kaltakquise, Artikel, Autopilot
+- **MongoDB:** Kaltakquise, Artikel, Preisformeln, g2-Configs
 - **MS SQL Server:** JTL-Wawi (Read-Only)
 
 ### **Integrationen**
 - **OpenAI GPT-4o:** LLM-Analyse
-- **Jina.ai Reader:** Website-Crawling
-- **Google Custom Search:** Lead-Generierung
+- **Jina.ai Reader:** Website-Crawling & Preisvergleich
+- **Google Custom Search:** Lead-Generierung & Produktsuche
 - **Google Analytics 4:** Web-Analytics
-- **Google Ads API:** Kampagnen-Daten
 - **Nodemailer (SMTP):** Email-Versand
-- **IMAP:** Email-Inbox
 
 ---
 
@@ -140,41 +134,41 @@ Next.js Dashboard für **Score Schleifwerkzeuge** (Köln) - integriert Sales (JT
 ├── app/
 │   ├── page.js                 # Haupt-Dashboard (SPA)
 │   ├── layout.js               # Layout + Navigation
-│   ├── globals.css             # Styles
 │   └── api/                    # Backend APIs
-│       ├── coldleads/
-│       │   ├── analyze-v3/     # V3 Analyse
-│       │   ├── email-v3/       # V3 Email-Versand
-│       │   ├── followup/auto/  # Auto-Follow-ups
-│       │   ├── autopilot/      # Autopilot-System
-│       │   ├── search/         # Lead-Suche
-│       │   ├── dach/           # DACH-Crawler
-│       │   └── delete/         # Prospect löschen
-│       └── jtl/articles/
-│           ├── import/         # Artikel-Import
-│           ├── list/           # Browser
-│           └── filters/        # Filter-Optionen
+│       ├── coldleads/          # Kaltakquise V3
+│       ├── jtl/
+│       │   ├── articles/       # Artikel-Management
+│       │   │   ├── import/     # Import mit Cursor-Pagination
+│       │   │   ├── presence/   # Artikel-Präsenz ⭐ NEU
+│       │   │   ├── list/       # Browser
+│       │   │   └── filters/    # Filter-Optionen
+│       │   ├── sales/          # Verkaufs-KPIs
+│       │   └── orders/         # Bestellungen
+│       ├── preise/             # Preisberechnung ⭐⭐ NEU
+│       │   ├── formeln/        # Alte Formeln (7 Warengruppen)
+│       │   ├── berechnen/      # Alte Berechnung
+│       │   └── g2/             # Neue g2-Berechnung
+│       │       ├── berechnen/  # g2-Logik
+│       │       └── config/     # g2-Konfiguration
+│       └── preisvergleich/     # Wettbewerbspreise ⭐ NEU
+│           └── search/         # Crawling
+│
+├── components/
+│   ├── PreiseModule.js         # Alte PB + Vergleich
+│   └── PreiseG2Module.js       # Neue g2-Berechnung
 │
 ├── services/
-│   └── coldleads/
-│       ├── analyzer-v3.ts      # Analyzer V3
-│       ├── emailer-v3.ts       # Emailer V3
-│       ├── dach-crawler.ts     # DACH-Crawler
-│       └── prospector.ts       # Google Search
+│   └── coldleads/              # Kaltakquise-Logik
 │
 ├── lib/
 │   ├── mongodb.ts              # MongoDB Connection
 │   ├── mssql.ts                # MSSQL Connection
-│   ├── emergent-llm.ts         # OpenAI Integration
-│   ├── email-client.ts         # SMTP Client
-│   ├── glossary.ts             # Glossar (311 Begriffe)
-│   └── score-coldleads-config.ts # V3 Config
+│   └── emergent-llm.ts         # OpenAI Integration
 │
-├── .env                        # Environment Variables
-├── README.md                   # Diese Datei
-├── START_HERE.md               # Einstieg für neue Agenten
-├── FORK_READY_GUIDE.md         # Deployment Guide
-└── JTL_API_KNOWLEDGE.md        # JTL-Wawi Schema-Wissen
+├── scripts/
+│   └── cursor-import-small.js  # Cursor-basierter Import
+│
+└── .env                        # Environment Variables
 ```
 
 ---
@@ -184,7 +178,7 @@ Next.js Dashboard für **Score Schleifwerkzeuge** (Köln) - integriert Sales (JT
 ### 1. Environment Setup
 ```bash
 cp .env.example .env
-# .env bearbeiten (siehe FORK_READY_GUIDE.md)
+# .env bearbeiten (siehe unten)
 ```
 
 ### 2. Dependencies
@@ -198,11 +192,17 @@ yarn install
 mongo score_zentrale
 db.createCollection('prospects')
 db.createCollection('articles')
+db.createCollection('preisformeln')
+db.createCollection('g2_configs')
 ```
 
 ### 4. JTL Artikel Import
 ```bash
+# Einmalig: Alle Artikel importieren
 curl -X POST http://localhost:3000/api/jtl/articles/import/start
+
+# Oder mit Cursor (robuster):
+node scripts/cursor-import-small.js
 ```
 
 ### 5. Start
@@ -219,47 +219,43 @@ http://localhost:3000
 
 ## 📊 MongoDB Collections
 
-### `prospects` (Kaltakquise)
+### `preisformeln` (Alte Preisberechnung)
 ```javascript
 {
-  id: "prospect_...",
-  website: "https://...",
-  company_name: "...",
-  industry: "...",
-  region: "...",
-  status: "new" | "analyzed" | "contacted",
-  score: 0-100,
-  
-  // V3 Analysis
-  analysis_v3: {
-    branch_guess: [...],
-    applications: [{term, evidence}],
-    materials: [{term, evidence}],
-    machines: [{term, evidence}],
-    product_categories: [{term, evidence}],
-    contact_person: {name, role, email, confidence},
-    recommended_brands: [...],
-    notes: "..."
+  sheet: "lagerware",
+  name: "Lagerware",
+  warengruppen: [{id, name}, ...],
+  regler: {
+    kosten_variabel: 0,
+    kosten_statisch: 0,
+    ebay_amazon: 0.25,
+    paypal: 0.02,
+    paypal_fix: 0.35,
+    fixkosten_beitrag: 1.4,
+    gewinn_regler_1a: 0.94,
+    gewinn_regler_2c: 1.07,
+    gewinn_regler_3e: 1,
+    prozent_aufschlag: 0.08,
+    aa_threshold: 18
   },
-  
-  // Email Sequence
-  email_sequence: {
-    mail_1: {subject, body, word_count},
-    mail_2: {subject, body, word_count},
-    mail_3: {subject, body, word_count},
-    crm_tags: [...]
-  },
-  
-  // Follow-up Tracking
-  followup_schedule: {
-    mail_1_sent: false,
-    mail_1_sent_at: null,
-    mail_2_scheduled: null,
-    mail_2_sent: false,
-    mail_3_scheduled: null,
-    mail_3_sent: false,
-    sequence_complete: false
-  }
+  ve_staffeln: [1, 3, 5, 10, 25, 50, 100, 300]
+}
+```
+
+### `g2_configs` (Neue Preisberechnung)
+```javascript
+{
+  warengruppe: "lagerware",
+  gstart_ek: 12,
+  gneu_ek: 100,
+  gneu_vk: 189,
+  fixcost1: 0.35,
+  fixcost2: 1.4,
+  varpct1: 0.25,
+  varpct2: 0.02,
+  aufschlag: 1.08,
+  shp_fac: 0.92,
+  aa_threshold: 18
 }
 ```
 
@@ -269,13 +265,15 @@ http://localhost:3000
   kArtikel: 123456,
   cArtNr: "100026",
   cName: "5x VSM KV707T...",
+  cBarcode: "4077249051915",
+  cHAN: "MPN123",
   cHerstellerName: "VSM",
   cWarengruppenName: "Schleifbänder",
   fVKNetto: 49.99,
   fEKNetto: 29.99,
   margin_percent: 40,
   nLagerbestand: 150,
-  imported_at: "2025-11-10T..."
+  imported_at: "2025-11-12T..."
 }
 ```
 
@@ -283,23 +281,41 @@ http://localhost:3000
 
 ## 🔧 API Endpoints
 
+### **Preisberechnung**
+```
+GET    /api/preise/formeln              # Alte Formeln laden
+POST   /api/preise/formeln              # Formel speichern
+POST   /api/preise/berechnen            # Alte Berechnung
+POST   /api/preise/g2/berechnen         # Neue g2-Berechnung
+GET    /api/preise/g2/config            # g2-Konfiguration
+POST   /api/preise/g2/config            # g2-Konfiguration speichern
+```
+
+### **Artikel-Management**
+```
+GET    /api/jtl/articles/count          # Zählbar
+POST   /api/jtl/articles/import/start   # Import starten (OFFSET)
+POST   /api/jtl/articles/import/continue # Import fortsetzen (CURSOR) ⭐
+GET    /api/jtl/articles/import/status  # Import-Status
+GET    /api/jtl/articles/import/orphaned # Verwaiste Artikel
+DELETE /api/jtl/articles/import/orphaned # Verwaiste löschen
+GET    /api/jtl/articles/list           # Browser mit Filter
+GET    /api/jtl/articles/filters        # Filter-Optionen
+GET    /api/jtl/articles/presence/:kArtikel # Artikel-Präsenz ⭐
+```
+
+### **Preisvergleich**
+```
+POST   /api/preisvergleich/search       # Wettbewerbspreise ⭐
+```
+
 ### **Kaltakquise V3**
 ```
-POST   /api/coldleads/analyze-v3        # Analyse starten
+POST   /api/coldleads/analyze-v3        # Analyse
 POST   /api/coldleads/email-v3/send     # Email versenden
 GET    /api/coldleads/followup/auto     # Auto-Follow-ups
 POST   /api/coldleads/search             # Lead-Suche
-GET    /api/coldleads/search?status=... # Prospects laden
 DELETE /api/coldleads/delete             # Prospect löschen
-```
-
-### **JTL Artikel**
-```
-GET  /api/jtl/articles/count          # Zählbar
-POST /api/jtl/articles/import/start  # Import
-GET  /api/jtl/articles/import/status # Status
-GET  /api/jtl/articles/list          # Browser
-GET  /api/jtl/articles/filters       # Filter
 ```
 
 ---
@@ -311,48 +327,71 @@ GET  /api/jtl/articles/filters       # Filter
 // ✅ RICHTIG
 db.collection('prospects')      // Kaltakquise
 db.collection('articles')       // JTL-Artikel
-
-// ❌ FALSCH (Legacy)
-db.collection('cold_prospects') // Veraltet!
+db.collection('preisformeln')   // Alte Preisberechnung
+db.collection('g2_configs')     // Neue g2-Configs
 ```
 
-### **Import-Pfade in API-Routes**
+### **Import: CURSOR vs. OFFSET**
 ```javascript
-// ❌ FALSCH
-import { foo } from '@/lib/bar'
+// ✅ EMPFOHLEN: Cursor-basiert (findet ALLE Artikel)
+// POST /api/jtl/articles/import/continue
+// Nutzt: WHERE kArtikel > lastKArtikel
 
-// ✅ RICHTIG
-import { foo } from '../../../../lib/bar'
+// ⚠️ OFFSET-basiert (kann Artikel überspringen)
+// POST /api/jtl/articles/import/start
+// Nutzt: OFFSET x ROWS
 ```
 
-### **Analysis Format**
+### **Preisberechnung - Formeln**
+
+**Alte Formel (f_alt):**
 ```javascript
-// V3 Format bevorzugen
-if (prospect.analysis_v3) {
-  // Neue Struktur
-} else if (prospect.analysis) {
-  // Legacy Format
-}
+zaehler = (c * (ve*ek)^a) + paypal_fix + fixkosten + (ve*ek)
+nenner = 1 - ebay_amazon - paypal
+vk = (zaehler / nenner) * (1 + aufschlag%) / ve
+```
+
+**g2-Formel:**
+```javascript
+f_alt(x) = wie oben
+rNEU = gneu_vk / f_alt(gneu_ek)
+
+Intervall I (x ≤ gstart):    f_alt(x)
+Intervall II (gstart < x < gneu): f_alt(x) * [1 + (rNEU-1) * S(t)]
+Intervall III (x ≥ gneu):    rNEU * f_alt(x)
+
+S(t) = 3t² - 2t³  (Smoothstep)
+t = (x - gstart) / (gneu - gstart)
 ```
 
 ---
 
 ## 🎯 Workflows
 
-### **Kaltakquise-Workflow:**
-1. **Lead-Generierung:** Google Search / DACH-Crawler
-2. **Speichern:** MongoDB `prospects` (status: "new")
-3. **Analyse V3:** Multi-Page Crawl + LLM + Glossar
-4. **Email-Generierung:** 3 Mails (Erst + 2 Follow-ups)
-5. **Versand:** Mail 1 + Schedule Follow-ups
-6. **Auto-Follow-ups:** Mail 2 (5d), Mail 3 (12d)
-
 ### **Artikel-Import-Workflow:**
 1. **Count:** Prüfe importierbare Artikel (166.855)
-2. **Import:** Batch-Import (2000/Batch)
-3. **Upsert:** Duplikate überschreiben
+2. **Import:** Cursor-basiert (robust)
+3. **Upsert:** Duplikate überschreiben, zusätzliche Felder behalten
 4. **Index:** Performance-Optimierung
-5. **Browser:** Frontend-Zugriff
+5. **Verwaiste prüfen:** Optional nach Import
+
+### **Preisberechnung-Workflow:**
+1. **Warengruppe wählen:** (Alte PB oder g2)
+2. **EK eingeben:** Pro Stück (netto)
+3. **Berechnen:** 
+   - Alte PB: Direkter Preis
+   - g2: Mit S-Übergang wenn EK > gstart
+4. **Ergebnis:** Plattformpreis + Shop-Staffeln
+5. **Vergleich:** Mehrere Formeln nebeneinander
+
+### **Artikel-Präsenz-Workflow:**
+1. **Artikel-Browser öffnen**
+2. **Chevron-Button klicken** (▼)
+3. **Präsenz ansehen:**
+   - Stücklisten
+   - eBay/Amazon-Angebote
+   - Shop-URLs
+   - Verkaufskanäle
 
 ---
 
@@ -361,11 +400,58 @@ if (prospect.analysis_v3) {
 **Bei Problemen:**
 1. Prüfe `FORK_READY_GUIDE.md`
 2. Prüfe `JTL_API_KNOWLEDGE.md`
-3. Prüfe `test_result.md`
-4. Supervisor-Logs: `sudo supervisorctl tail -f nextjs`
+3. Supervisor-Logs: `sudo supervisorctl tail -f nextjs`
 
 ---
 
-**Version:** 2.0  
-**Zuletzt aktualisiert:** 11.11.2025  
+## 🔐 Environment Variables (.env)
+
+```bash
+# MongoDB
+MONGO_URL=mongodb://localhost:27017/score_zentrale
+
+# JTL-Wawi MSSQL
+MSSQL_HOST=localhost
+MSSQL_USER=sa
+MSSQL_PASSWORD=...
+MSSQL_DATABASE=eazybusiness
+
+# Email (SMTP)
+SMTP_HOST=smtp.strato.de
+SMTP_PORT=465
+SMTP_USER=daniel@score-schleifwerkzeuge.de
+SMTP_PASS=...
+
+# Google APIs
+GOOGLE_SEARCH_ENGINE_ID=...
+GOOGLE_SEARCH_API_KEY=...
+
+# Jina.ai (für Crawling)
+JINA_API_KEY=...  # Optional, funktioniert auch ohne
+
+# Emergent LLM (für OpenAI GPT-4o)
+EMERGENT_API_KEY=...  # Wird automatisch gesetzt
+```
+
+---
+
+## 🚨 Wichtige Änderungen in v3.0
+
+### **Neue Features:**
+- ✅ Preisberechnung (Alte + g2)
+- ✅ Artikel-Präsenz (Stücklisten, Plattformen)
+- ✅ Preisvergleich (Wettbewerber-Crawling)
+- ✅ Cursor-basierter Import
+- ✅ Verwaiste Artikel-Erkennung
+
+### **Verbesserungen:**
+- ✅ Kompakteres Design (50% weniger Platz)
+- ✅ Ausklappbare Konfigurationen
+- ✅ Robuster Import (Auto-Retry, Timeout-Schutz)
+- ✅ Header glänzend weiß (bessere Lesbarkeit)
+
+---
+
+**Version:** 3.0  
+**Zuletzt aktualisiert:** 12.11.2025  
 **Maintainer:** Score Zentrale Team

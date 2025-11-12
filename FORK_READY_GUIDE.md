@@ -1,320 +1,268 @@
-# 🔧 FORK-READY GUIDE - Score Zentrale
+# 🚀 FORK READY GUIDE - Score Zentrale v3.0
 
-**Version:** 2.0  
-**Letzte Aktualisierung:** 11.11.2025  
-**Status:** ✅ Produktionsbereit
+**Datum:** 12.11.2025  
+**Version:** 3.0 (Preisberechnung g2 + Artikel-Management)
 
 ---
 
-## 📋 Pre-Deployment Checkliste
+## ✅ Deployment Checklist
 
 ### 1. Environment Setup
 
-**Datei:** `/app/.env`
-
+**a) Kopiere .env.example zu .env:**
 ```bash
-# MongoDB (WICHTIG: Läuft lokal)
+cp .env.example .env
+```
+
+**b) Pflichtfelder in .env ausfüllen:**
+```bash
+# MongoDB (lokal oder extern)
 MONGO_URL=mongodb://localhost:27017/score_zentrale
 
-# JTL-Wawi MSSQL Connection
-MSSQL_HOST=localhost
-MSSQL_PORT=1433
+# JTL-Wawi Datenbank
+MSSQL_HOST=ihre-jtl-server-ip
 MSSQL_USER=sa
-MSSQL_PASSWORD=<SECRET>
+MSSQL_PASSWORD=IhrPasswort
 MSSQL_DATABASE=eazybusiness
-MSSQL_ENCRYPT=false
-MSSQL_TRUST_SERVER_CERTIFICATE=true
 
-# Email (SMTP für Kaltakquise)
-SMTP_HOST=smtp.strato.de
-SMTP_PORT=465
-SMTP_SECURE=true
-SMTP_USER=daniel@score-schleifwerkzeuge.de
-SMTP_PASS=<SECRET>
-SMTP_FROM="Daniel von Score Schleifwerkzeuge <daniel@score-schleifwerkzeuge.de>"
+# Email (für Kaltakquise)
+SMTP_HOST=smtp.ihreprovider.de
+SMTP_USER=ihre@email.de
+SMTP_PASS=IhrPasswort
 
-# Google Custom Search (für Kaltakquise)
-GOOGLE_SEARCH_ENGINE_ID=<ID>
-GOOGLE_SEARCH_API_KEY=<KEY>
+# Google Custom Search (WICHTIG!)
+GOOGLE_SEARCH_ENGINE_ID=...
+GOOGLE_SEARCH_API_KEY=...
+```
 
-# Google Analytics 4
-GA4_PROPERTY_ID=<ID>
-GA4_CREDENTIALS=<JSON_KEY_BASE64>
-
-# Google Ads
-GOOGLE_ADS_CLIENT_ID=<ID>
-GOOGLE_ADS_CLIENT_SECRET=<SECRET>
-GOOGLE_ADS_REFRESH_TOKEN=<TOKEN>
-GOOGLE_ADS_DEVELOPER_TOKEN=<TOKEN>
-GOOGLE_ADS_CUSTOMER_ID=<ID>
-
-# IMAP (Email-Inbox für Kaltakquise)
-IMAP_HOST=imap.strato.de
-IMAP_PORT=993
-IMAP_USER=daniel@score-schleifwerkzeuge.de
-IMAP_PASS=<SECRET>
-IMAP_TLS=true
-
-# Next.js
-NEXT_PUBLIC_BASE_URL=https://score-zentrale.emergentagent.com
-NEXT_PUBLIC_DEGRADED=0
-NODE_OPTIONS=--max-old-space-size=1024
-
-# Emergent LLM Key (wird automatisch gesetzt)
-EMERGENT_API_KEY=<AUTO>
+**c) Optionale Felder:**
+```bash
+JINA_API_KEY=...     # Für besseres Crawling (optional)
+GA4_PROPERTY_ID=...  # Für Analytics (optional)
 ```
 
 ---
 
-### 2. MongoDB Collections Setup
+### 2. Dependencies installieren
 
-**KRITISCH:** Korrekte Collection-Namen verwenden!
-
-```javascript
-// ✅ KORREKT
-db.collection('prospects')      // Kaltakquise
-db.collection('articles')       // JTL-Artikel
-db.collection('autopilot_state')// Autopilot
-
-// ❌ FALSCH (Legacy)
-db.collection('cold_prospects') // Veraltet!
+```bash
+cd /app
+yarn install
 ```
 
-**Collections erstellen (falls nicht vorhanden):**
+---
+
+### 3. MongoDB Setup
+
 ```bash
-mongo score_zentrale
+# MongoDB starten (falls nicht läuft)
+sudo systemctl start mongod
+
+# Collections erstellen
+mongosh score_zentrale
 db.createCollection('prospects')
 db.createCollection('articles')
+db.createCollection('preisformeln')
+db.createCollection('g2_configs')
 db.createCollection('autopilot_state')
-
-db.prospects.createIndex({ "website": 1 }, { unique: true })
-db.articles.createIndex({ "kArtikel": 1 }, { unique: true })
+exit
 ```
 
 ---
 
-### 3. JTL-Wawi Connection Test
+### 4. Artikel-Import (Einmalig)
 
+**Option A: Via UI (empfohlen)**
+1. App starten: `sudo supervisorctl restart nextjs`
+2. Browser öffnen: `http://localhost:3000#produkte`
+3. Tab "Import" wählen
+4. "Artikel-Import starten" klicken
+5. Warten (~1-2 Stunden für 166.855 Artikel)
+
+**Option B: Via Script (für große Imports)**
 ```bash
+node /app/scripts/cursor-import-small.js
+```
+
+**Als Supervisor-Service (automatischer Neustart):**
+```bash
+sudo supervisorctl start jtl-import
+sudo supervisorctl tail -f jtl-import
+```
+
+---
+
+### 5. Preisformeln Setup
+
+**Default-Formeln werden automatisch erstellt:**
+- Beim ersten Aufruf von `/api/preise/formeln`
+- 7 Warengruppen mit Standard-Reglern
+- Basierend auf Excel: "Alte Preisberechnungsformeln Score je Warengruppe.xlsx"
+
+**Keine manuelle Konfiguration nötig!**
+
+---
+
+### 6. Kaltakquise Setup (optional)
+
+**Glossar importieren:**
+```bash
+curl -X POST http://localhost:3000/api/glossary/generate
+```
+
+**Autopilot konfigurieren:**
+```bash
+curl -X POST http://localhost:3000/api/coldleads/autopilot/config \
+  -H "Content-Type: application/json" \
+  -d '{"maxPerDay": 10, "enabled": true}'
+```
+
+---
+
+## 🧪 Testing
+
+### **1. API Health Check**
+```bash
+curl http://localhost:3000/api/preise/formeln
 curl http://localhost:3000/api/jtl/articles/count
-
-# Expected Output:
-{
-  "ok": true,
-  "counts": {
-    "gesamt": 318549,
-    "importierbar": 166855
-  }
-}
-```
-
----
-
-### 4. Kaltakquise V3 System
-
-#### **Komponenten:**
-
-**Analyzer V3:**
-- Multi-Page Crawl (7 Seiten: Home, Leistungen, Produkte, Referenzen, Team, Kontakt, Impressum)
-- OpenAI GPT-4o LLM-Analyse
-- Glossar-Mapping (311 Begriffe: 71 Anwendungen, 90 Werkstoffe, 62 Maschinen, 88 Kategorien)
-- Contact Extraction mit Confidence
-- Brand Matching (10 Score-Partner)
-
-**Emailer V3:**
-- 3 Mails: Erstansprache + Follow-up 1 (5d) + Follow-up 2 (12d)
-- Plain Text (kein Markdown)
-- Wortlimits: ≤180, ≤110, ≤90
-- Personalisiert (Anrede, Website-Bezug, Marken)
-- BCC an leismann@score-schleifwerkzeuge.de
-
-**Auto-Follow-ups:**
-- Automatisch via Cron-Job
-- Prüft täglich fällige Follow-ups
-- Versendet Mail 2 & 3 automatisch
-
-#### **Blacklist (Verzeichnisse filtern):**
-```javascript
-// In prospector.ts & dach-crawler.ts
-const blacklistedDomains = [
-  'gelbenseiten.de', 'gelbeseiten.de',
-  'wlw.de', 'wer-liefert-was.de',
-  'lehrer-online.de', 'schulewirtschaft.de',
-  'wikipedia.org', 'youtube.com',
-  'facebook.com', 'linkedin.com',
-  'indeed.de', 'stepstone.de'
-]
-```
-
-#### **Testing:**
-```bash
-# 1. Einzelne Analyse
-curl -X POST http://localhost:3000/api/coldleads/analyze-v3 \
-  -H "Content-Type: application/json" \
-  -d '{"website":"https://example.com","company_name":"Test","industry":"Metallverarbeitung"}'
-
-# 2. Email versenden
-curl -X POST http://localhost:3000/api/coldleads/email-v3/send \
-  -H "Content-Type: application/json" \
-  -d '{"prospect_id":"...","mail_number":1}'
-
-# 3. Auto-Follow-ups prüfen
-curl http://localhost:3000/api/coldleads/followup/auto
-```
-
----
-
-### 5. JTL Artikel-Import
-
-**Full-Import starten:**
-```bash
-# Import ALLE 166.855 Artikel
-curl -X POST http://localhost:3000/api/jtl/articles/import/start \
-  -H "Content-Type: application/json" \
-  -d '{"batchSize":2000,"offset":0}'
-
-# Loop bis fertig (siehe /tmp/full_import.sh)
-```
-
-**Status prüfen:**
-```bash
-curl http://localhost:3000/api/jtl/articles/import/status
-
-# Expected:
-{
-  "ok": true,
-  "imported": 166855
-}
-```
-
----
-
-### 6. Autopilot Setup
-
-**Autopilot nutzt V3-APIs:**
-- Suche → `/api/coldleads/search`
-- Analyse → `/api/coldleads/analyze-v3`
-- Email → `/api/coldleads/email-v3/send`
-
-**Starten:**
-```bash
-curl -X POST http://localhost:3000/api/coldleads/autopilot/start \
-  -H "Content-Type: application/json" \
-  -d '{"dailyLimit":50}'
-```
-
-**Optional: Cron-Job für Auto-Follow-ups**
-```bash
-# /etc/cron.d/score-followups
-0 10 * * * curl -s http://localhost:3000/api/coldleads/followup/auto
-```
-
----
-
-## 🚨 Bekannte Issues & Fixes
-
-### Issue 1: Import-Pfade in API-Routes
-**Problem:** `@/` Aliases funktionieren nicht in nested routes
-**Fix:** Relative Pfade verwenden:
-```javascript
-// ❌ FALSCH
-import { foo } from '@/lib/bar'
-
-// ✅ RICHTIG
-import { foo } from '../../../../lib/bar'
-```
-
-### Issue 2: MongoDB Collection Names
-**Problem:** Alte Code nutzt `cold_prospects`
-**Fix:** Überall auf `prospects` ändern
-
-### Issue 3: Analysis Format
-**Problem:** Mix aus `analysis` (alt) und `analysis_v3` (neu)
-**Fix:** Immer beide prüfen:
-```javascript
-if (p.analysis_v3) {
-  // V3 Format
-} else if (p.analysis) {
-  // Legacy Format
-}
-```
-
----
-
-## ✅ Post-Deployment Tests
-
-### 1. Basis-Funktionalität
-```bash
-# Health Check
-curl http://localhost:3000/api/health/schema
-
-# MongoDB Connection
 curl http://localhost:3000/api/coldleads/stats
-
-# JTL Connection
-curl http://localhost:3000/api/jtl/sales/kpi
 ```
 
-### 2. Kaltakquise V3
+### **2. Preisberechnung testen**
 ```bash
-# Analyse testen
-curl -X POST http://localhost:3000/api/coldleads/analyze-v3 \
-  -d '{"website":"https://www.klingspor.de"}'
+# Alte Berechnung (Lagerware, EK=10€)
+curl -X POST http://localhost:3000/api/preise/berechnen \
+  -H "Content-Type: application/json" \
+  -d '{"ek":10,"regler":{"gewinn_regler_1a":0.94,"gewinn_regler_2c":1.07,"gewinn_regler_3e":1,"prozent_aufschlag":0.08,"paypal":0.02,"ebay_amazon":0.25,"paypal_fix":0.35,"fixkosten_beitrag":1.4,"aa_threshold":18},"ve_staffeln":[1,5,10]}'
 
-# Prüfen ob in DB
-curl http://localhost:3000/api/coldleads/search?status=analyzed
+# g2-Berechnung (Klingspor, EK=10€)
+curl -X POST http://localhost:3000/api/preise/g2/berechnen \
+  -H "Content-Type: application/json" \
+  -d '{"ek":10,"warengruppe_regler":{"gewinn_regler_1a":0.81,"gewinn_regler_2c":1.07,"gewinn_regler_3e":1},"g2_params":{"gstart_ek":12,"gneu_ek":100,"gneu_vk":189,"fixcost1":0.35,"fixcost2":1.4,"varpct1":0.25,"varpct2":0.02,"aufschlag":1.08,"shp_fac":0.92}}'
 ```
 
-### 3. Frontend
-- Öffne `http://localhost:3000`
-- Gehe zu Kaltakquise → Bulk-Analyse testen
-- Gehe zu Produkte → Artikel-Browser testen
-- Gehe zu Glossar → Branchen prüfen
+**Erwartete Ergebnisse:**
+- Alte PB (Lagerware, EK=10€): Plattform = 31.17€, Shop-Staffeln: 28.68€, 26.28€, 25.60€...
+- g2 (Klingspor, EK=10€): Plattform = 27.60€ (identisch mit Alter PB da EK < gstart)
+
+### **3. Artikel-Präsenz testen**
+```bash
+# Präsenz für Artikel kArtikel=94626
+curl http://localhost:3000/api/jtl/articles/presence/94626
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Problem: "Formeln werden nicht geladen"
+**Lösung:**
+```bash
+# MongoDB Collection löschen und neu laden lassen
+mongosh score_zentrale --eval "db.preisformeln.deleteMany({})"
+# Browser neu laden
+```
+
+### Problem: "Import hängt/stoppt"
+**Lösung:**
+```bash
+# Supervisor-Service neu starten
+sudo supervisorctl restart jtl-import
+
+# Oder manuell cursor-basiert:
+node /app/scripts/cursor-import-small.js
+```
+
+### Problem: "Preisberechnung zeigt falsche Werte"
+**Lösung:**
+- Prüfe Regler in MongoDB: `db.preisformeln.find()`
+- Vergleiche mit Excel-Vorlage
+- g2: EK < gstart_ek muss identisch mit Alter PB sein!
+
+### Problem: "Preview lädt nicht"
+**Lösung:**
+```bash
+# Cache löschen
+rm -rf /app/.next
+sudo supervisorctl restart nextjs
+```
 
 ---
 
 ## 📊 Performance-Tipps
 
-### MongoDB Indices
-```javascript
-// Prospects
-db.prospects.createIndex({ "status": 1 })
-db.prospects.createIndex({ "score": -1 })
-db.prospects.createIndex({ "created_at": -1 })
-
-// Articles
-db.articles.createIndex({ "cHerstellerName": 1 })
-db.articles.createIndex({ "cWarengruppenName": 1 })
-db.articles.createIndex({ "cName": "text" })
-```
-
-### Next.js Memory
+### **MongoDB Indizes erstellen:**
 ```bash
-# In .env
-NODE_OPTIONS=--max-old-space-size=1024
+mongosh score_zentrale
+db.articles.createIndex({ cArtNr: 1 })
+db.articles.createIndex({ cHerstellerName: 1 })
+db.articles.createIndex({ cWarengruppenName: 1 })
+db.articles.createIndex({ kArtikel: 1 }, { unique: true })
+db.prospects.createIndex({ website: 1 }, { unique: true })
+```
+
+### **Supervisor-Services optimieren:**
+```bash
+# JTL-Import nur bei Bedarf laufen lassen
+sudo supervisorctl stop jtl-import
+
+# Bei großem Datenbestand: MongoDB Memory erhöhen
+# /etc/mongod.conf: storage.wiredTiger.engineConfig.cacheSizeGB
 ```
 
 ---
 
-## 🔐 Security Checklist
+## 🎓 Für Entwickler
 
-- [ ] `.env` nie committen
-- [ ] MongoDB Password ändern
-- [ ] MSSQL Password ändern
-- [ ] SMTP Password ändern
-- [ ] Google API Keys rotieren
-- [ ] Firewall: Nur Port 3000 öffnen
+### **Neue Preisformel hinzufügen:**
+1. In `/app/app/api/preise/formeln/route.ts` → `getDefaultFormeln()`
+2. Neue Warengruppe mit Reglern hinzufügen
+3. MongoDB Collection löschen: `db.preisformeln.deleteMany({})`
+4. Formeln neu laden lassen
+
+### **g2-Parameter ändern:**
+1. UI: Tab "Neue ab 2025-11 (g2)"
+2. Warengruppe wählen
+3. Werte ändern (gstart_ek, gneu_ek, gneu_vk, etc.)
+4. "Speichern" klicken
+5. Wird in `g2_configs` Collection gespeichert
+
+### **Artikel-Präsenz erweitern:**
+- API: `/app/app/api/jtl/articles/presence/[kArtikel]/route.ts`
+- SQL-Queries für weitere Plattformen hinzufügen
+- Frontend: Automatisch aktualisiert
 
 ---
 
-## 📞 Support
+## 📦 Deployment Checklist
 
-Bei Problemen:
-1. Prüfe Supervisor-Logs: `sudo supervisorctl tail -f nextjs`
-2. Prüfe MongoDB: `mongo score_zentrale`
-3. Prüfe JTL-Connection: `curl http://localhost:3000/api/jtl/articles/count`
-4. Prüfe Test-Results: `cat /app/test_result.md`
+- [ ] .env ausgefüllt
+- [ ] Dependencies installiert (`yarn install`)
+- [ ] MongoDB läuft
+- [ ] JTL-Wawi MSSQL erreichbar
+- [ ] Artikel importiert (166.855)
+- [ ] Preisformeln geladen (7 Warengruppen)
+- [ ] Email-Versand getestet
+- [ ] Google Search API getestet
+- [ ] Supervisor läuft (`supervisorctl status`)
 
 ---
 
-**Version 2.0 - Kaltakquise V3 System - Ready for Production! 🚀**
+## 🆘 Support
+
+**Dokumentation:**
+- README.md - Feature-Übersicht
+- START_HERE.md - Schnelleinstieg
+- JTL_API_KNOWLEDGE.md - Datenbank-Schema
+- test_result.md - Test-Protokolle
+
+**Logs:**
+```bash
+sudo supervisorctl tail -f nextjs      # Next.js Logs
+sudo supervisorctl tail -f jtl-import  # Import Logs
+tail -f /tmp/cursor-import.log         # Manual Import
+```
+
+---
+
+**Viel Erfolg mit Score Zentrale v3.0! 🚀**
