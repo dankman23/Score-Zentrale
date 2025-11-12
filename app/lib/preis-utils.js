@@ -1,8 +1,10 @@
 'use client'
 
 /**
- * Intelligentes Sampling von Datenpunkten für Chart-Anzeige
- * Wählt maximal `targetCount` Punkte aus, die den gesamten Bereich gut abdecken
+ * Intelligentes Sampling mit Fokus auf lokale Variationen
+ * Wählt Punkte basierend auf:
+ * 1. Gleichmäßige Verteilung über EK-Bereich
+ * 2. Große VK-Variationen bei ähnlichem EK
  */
 export function intelligentSample(data, targetCount = 30) {
   if (!data || data.length === 0) return []
@@ -12,23 +14,63 @@ export function intelligentSample(data, targetCount = 30) {
   const sorted = [...data].sort((a, b) => a.ek - b.ek)
   
   const result = []
-  const step = (sorted.length - 1) / (targetCount - 1)
+  const ekInterval = 5 // Intervall für lokale Variation
   
-  // Ersten Punkt immer nehmen
+  // Ersten und letzten Punkt immer nehmen
   result.push(sorted[0])
   
-  // Gleichmäßig verteilte Punkte
-  for (let i = 1; i < targetCount - 1; i++) {
-    const index = Math.round(i * step)
-    result.push(sorted[index])
-  }
+  // Gruppiere nach EK-Intervallen und finde Ausreißer
+  const groups = {}
+  sorted.forEach(point => {
+    const groupKey = Math.floor(point.ek / ekInterval)
+    if (!groups[groupKey]) groups[groupKey] = []
+    groups[groupKey].push(point)
+  })
   
-  // Letzten Punkt immer nehmen
+  // Für jede Gruppe: Min, Max und Median VK finden
+  const importantPoints = []
+  Object.values(groups).forEach(group => {
+    if (group.length === 0) return
+    
+    const sortedByVk = [...group].sort((a, b) => a.vk - b.vk)
+    const minVk = sortedByVk[0]
+    const maxVk = sortedByVk[sortedByVk.length - 1]
+    const medianVk = sortedByVk[Math.floor(sortedByVk.length / 2)]
+    
+    // Wenn große Spanne, nehme min und max
+    const vkRange = maxVk.vk - minVk.vk
+    if (vkRange > 5) { // Signifikante Variation
+      importantPoints.push({ point: minVk, priority: 10 })
+      importantPoints.push({ point: maxVk, priority: 10 })
+      importantPoints.push({ point: medianVk, priority: 5 })
+    } else {
+      importantPoints.push({ point: medianVk, priority: 1 })
+    }
+  })
+  
+  // Sortiere nach EK und Priorität
+  importantPoints.sort((a, b) => {
+    if (a.priority !== b.priority) return b.priority - a.priority
+    return a.point.ek - b.point.ek
+  })
+  
+  // Entferne Duplikate
+  const seen = new Set()
+  importantPoints.forEach(({point}) => {
+    const key = `${point.ek}_${point.vk}`
+    if (!seen.has(key) && result.length < targetCount - 1) {
+      seen.add(key)
+      result.push(point)
+    }
+  })
+  
+  // Letzten Punkt hinzufügen
   if (sorted.length > 1) {
     result.push(sorted[sorted.length - 1])
   }
   
-  return result
+  // Nach EK sortieren für Chart
+  return result.sort((a, b) => a.ek - b.ek)
 }
 
 /**
