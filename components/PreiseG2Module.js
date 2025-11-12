@@ -196,7 +196,6 @@ export default function PreiseG2Module({ formeln }) {
           setChartData(chartPoints)
         }
       }
-      }
     } catch (e) {
       alert('Fehler: ' + e.message)
     }
