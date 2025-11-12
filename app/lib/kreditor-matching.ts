@@ -127,17 +127,15 @@ export async function findKreditor(lieferantName: string): Promise<KreditorMatch
         if (part.length >= 4) { // Nur aussagekräftige Wörter
           for (const kPart of kNameParts) {
             if (kPart.includes(part) || part.includes(kPart)) {
-              const partSim = Math.max(
-                (part.length / kPart.length) * 100,
-                (kPart.length / part.length) * 100
-              )
+              // Berechne Ähnlichkeit zwischen den Teilstrings
+              const partSim = similarity(part, kPart)
               
               if (partSim > bestSimilarity && partSim >= 70) {
                 bestSimilarity = partSim
                 bestMatch = {
                   kreditorenNummer: k.kreditorenNummer,
                   name: k.name,
-                  confidence: partSim,
+                  confidence: Math.min(100, Math.round(partSim)),
                   method: 'fuzzy'
                 }
               }
@@ -145,6 +143,11 @@ export async function findKreditor(lieferantName: string): Promise<KreditorMatch
           }
         }
       }
+    }
+    
+    // Confidence auf max 100 begrenzen
+    if (bestMatch) {
+      bestMatch.confidence = Math.min(100, Math.round(bestMatch.confidence))
     }
     
     return bestMatch
