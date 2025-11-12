@@ -100,8 +100,8 @@ SELECT
   cHinweis,            -- Verwendungszweck
   kZahlungsart         -- Zahlungsart-ID
 FROM dbo.tZahlung
-WHERE dZeit >= '2024-10-01'
-  AND dZeit < '2024-11-01'
+WHERE dZeit >= '2025-10-01'
+  AND dZeit < '2025-11-01'
 ```
 
 ## 🎯 Sammeldebitoren-Konfiguration
