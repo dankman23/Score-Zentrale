@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
         z.kZahlung,
         z.kRechnung,
         z.fBetrag AS betrag,
-        z.dZeit AS zahlungsdatum,
+        z.dDatum AS zahlungsdatum,
         ISNULL(z.cHinweis, '') AS verwendungszweck,
         ISNULL(z.kZahlungsart, 0) AS kZahlungsart,
         ISNULL(za.cName, 'Unbekannt') AS zahlungsart,
@@ -32,9 +32,9 @@ export async function GET(request: NextRequest) {
       FROM dbo.tZahlung z
       LEFT JOIN dbo.tZahlungsart za ON z.kZahlungsart = za.kZahlungsart
       LEFT JOIN dbo.tRechnung r ON z.kRechnung = r.kRechnung
-      WHERE z.dZeit >= @from
-        AND z.dZeit < @to
-      ORDER BY z.dZeit DESC
+      WHERE z.dDatum >= @from
+        AND z.dDatum < @to
+      ORDER BY z.dDatum DESC
     `
     
     const result = await pool.request()
