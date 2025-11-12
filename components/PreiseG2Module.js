@@ -69,6 +69,76 @@ export default function PreiseG2Module({ formeln }) {
           </select>
         </div>
       </div>
+
+      {/* G2-Parameter Konfiguration */}
+      <div className="card mb-2">
+        <div className="card-header py-1 d-flex justify-content-between align-items-center" style={{cursor: 'pointer'}} onClick={() => setConfigExpanded(!configExpanded)}>
+          <small className="mb-0 font-weight-bold">
+            <i className={`bi bi-chevron-${configExpanded ? 'up' : 'down'} mr-2`}/>
+            G2-Konfiguration {!configExpanded && '(klicken zum Ausklappen)'}
+          </small>
+          {g2ParamsEdited && (
+            <span className="badge badge-warning py-1 px-2" style={{fontSize: '0.7rem'}}>
+              Geändert
+            </span>
+          )}
+        </div>
+        {configExpanded && (
+          <div className="card-body py-2" style={{fontSize: '0.85rem'}}>
+            <div className="row mb-2">
+              <div className="col-md-4">
+                <label className="font-weight-bold mb-1" style={{fontSize: '0.75rem'}}>gstart_ek (€)</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" 
+                  value={g2Params.gstart_ek} onChange={e => updateG2Param('gstart_ek', e.target.value)} />
+              </div>
+              <div className="col-md-4">
+                <label className="font-weight-bold mb-1" style={{fontSize: '0.75rem'}}>gneu_ek (€)</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" 
+                  value={g2Params.gneu_ek} onChange={e => updateG2Param('gneu_ek', e.target.value)} />
+              </div>
+              <div className="col-md-4">
+                <label className="font-weight-bold mb-1" style={{fontSize: '0.75rem'}}>gneu_vk (€)</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" 
+                  value={g2Params.gneu_vk} onChange={e => updateG2Param('gneu_vk', e.target.value)} />
+              </div>
+            </div>
+            <div className="row mb-2">
+              <div className="col-md-3">
+                <label className="font-weight-bold mb-1" style={{fontSize: '0.75rem'}}>fixcost1 (€)</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" 
+                  value={g2Params.fixcost1} onChange={e => updateG2Param('fixcost1', e.target.value)} />
+              </div>
+              <div className="col-md-3">
+                <label className="font-weight-bold mb-1" style={{fontSize: '0.75rem'}}>fixcost2 (€)</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" 
+                  value={g2Params.fixcost2} onChange={e => updateG2Param('fixcost2', e.target.value)} />
+              </div>
+              <div className="col-md-3">
+                <label className="font-weight-bold mb-1" style={{fontSize: '0.75rem'}}>varpct1</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" 
+                  value={g2Params.varpct1} onChange={e => updateG2Param('varpct1', e.target.value)} />
+              </div>
+              <div className="col-md-3">
+                <label className="font-weight-bold mb-1" style={{fontSize: '0.75rem'}}>varpct2</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" 
+                  value={g2Params.varpct2} onChange={e => updateG2Param('varpct2', e.target.value)} />
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-4">
+                <label className="font-weight-bold mb-1" style={{fontSize: '0.75rem'}}>aufschlag</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" 
+                  value={g2Params.aufschlag} onChange={e => updateG2Param('aufschlag', e.target.value)} />
+              </div>
+              <div className="col-md-4">
+                <label className="font-weight-bold mb-1" style={{fontSize: '0.75rem'}}>shp_fac</label>
+                <input type="number" step="0.01" className="form-control form-control-sm" 
+                  value={g2Params.shp_fac} onChange={e => updateG2Param('shp_fac', e.target.value)} />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
       
       <div className="card mb-2 border-primary">
         <div className="card-header bg-primary text-white py-1">
