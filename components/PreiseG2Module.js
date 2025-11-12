@@ -6,6 +6,11 @@ export default function PreiseG2Module({ formeln }) {
   const [ekInput, setEkInput] = useState('')
   const [ergebnisse, setErgebnisse] = useState([])
   const [plattformpreis, setPlattformpreis] = useState(0)
+  
+  // Alle Staffelsystem-Ergebnisse
+  const [ergebnisseStandard, setErgebnisseStandard] = useState([])
+  const [ergebnisseKategorie, setErgebnisseKategorie] = useState([])
+  const [ergebnisseGerundet, setErgebnisseGerundet] = useState([])
   const [loading, setLoading] = useState(false)
   const [configExpanded, setConfigExpanded] = useState(false)
   const [g2ParamsEdited, setG2ParamsEdited] = useState(false)
