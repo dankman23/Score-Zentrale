@@ -43,6 +43,11 @@ export default function FibuModule() {
   const [ekSearchKreditor, setEkSearchKreditor] = useState('')
   const [ekMatchResult, setEkMatchResult] = useState(null)
   
+  // E-Mail Inbox
+  const [emailInbox, setEmailInbox] = useState([])
+  const [emailInboxLoading, setEmailInboxLoading] = useState(false)
+  const [emailFetchLoading, setEmailFetchLoading] = useState(false)
+  
   // Export
   const [exportFrom, setExportFrom] = useState('2025-01-01')
   const [exportTo, setExportTo] = useState('2025-01-31')
