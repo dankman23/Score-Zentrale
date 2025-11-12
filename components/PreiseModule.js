@@ -271,6 +271,27 @@ export default function PreiseModule() {
       alert('Fehler beim Laden der Datei: ' + e.message)
     }
   }
+  
+  const handleVergleichFileUpload = async (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+    
+    try {
+      const { parsePreisFile, intelligentSample } = await import('../app/lib/preis-utils')
+      const preise = await parsePreisFile(file)
+      
+      // Filtere auf relevanten EK-Bereich (0-300€)
+      const filtered = preise.filter(p => p.ek >= 0 && p.ek <= 300)
+      
+      // Intelligentes Sampling auf 30 Punkte
+      const sampled = intelligentSample(filtered, 30)
+      
+      setVergleichUploadedData(sampled)
+      alert(`✅ ${preise.length} Preise geladen, ${filtered.length} im Bereich 0-300€, ${sampled.length} Punkte angezeigt`)
+    } catch (e) {
+      alert('Fehler beim Laden der Datei: ' + e.message)
+    }
+  }
 
   const updateRegler = (key, value) => {
     if (!currentFormel) return
