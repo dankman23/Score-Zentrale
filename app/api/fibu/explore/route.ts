@@ -15,11 +15,7 @@ export async function GET() {
 
     // 1. VK-Rechnungen
     const rechnungen = await pool.request().query(`
-      SELECT TOP 5 
-        kRechnung, cRechnungsnummer, dErstellt, fGesamtsumme, 
-        cStatus, kKunde
-      FROM tRechnung 
-      ORDER BY dErstellt DESC
+      SELECT TOP 5 * FROM tRechnung ORDER BY dErstellt DESC
     `)
     result.rechnungen = {
       count: rechnungen.recordset.length,
