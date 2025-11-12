@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function PreiseG2Module({ formeln }) {
   const [warengruppe, setWarengruppe] = useState('lagerware')
@@ -16,6 +16,61 @@ export default function PreiseG2Module({ formeln }) {
     varpct1: 0.25, varpct2: 0.02,
     aufschlag: 1.08, shp_fac: 0.92
   })
+  
+  // Lade g2-Konfiguration beim Start
+  useEffect(() => {
+    loadG2Config()
+  }, [warengruppe])
+  
+  const loadG2Config = async () => {
+    try {
+      const res = await fetch('/api/preise/g2/config')
+      const data = await res.json()
+      if (data.ok && data.configs && data.configs.length > 0) {
+        // Finde Config für aktuelle Warengruppe oder verwende erste
+        const config = data.configs.find(c => c.warengruppe === warengruppe) || data.configs[0]
+        setG2Params({
+          gstart_ek: config.gstart_ek,
+          gneu_ek: config.gneu_ek,
+          gneu_vk: config.gneu_vk,
+          fixcost1: config.fixcost1,
+          fixcost2: config.fixcost2,
+          varpct1: config.varpct1,
+          varpct2: config.varpct2,
+          aufschlag: config.aufschlag,
+          shp_fac: config.shp_fac
+        })
+      }
+    } catch (e) {
+      console.error('Fehler beim Laden der g2-Konfiguration:', e)
+    }
+  }
+  
+  const speichernG2Config = async () => {
+    if (!confirm('Möchten Sie die g2-Parameter wirklich speichern?')) return
+    
+    setLoading(true)
+    try {
+      const res = await fetch('/api/preise/g2/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          warengruppe,
+          params: g2Params
+        })
+      })
+      const data = await res.json()
+      if (data.ok) {
+        alert('✅ G2-Parameter gespeichert!')
+        setG2ParamsEdited(false)
+      } else {
+        alert('Fehler: ' + (data.error || 'Unbekannter Fehler'))
+      }
+    } catch (e) {
+      alert('Fehler beim Speichern: ' + e.message)
+    }
+    setLoading(false)
+  }
   
   const updateG2Param = (key, value) => {
     setG2Params(prev => ({ ...prev, [key]: parseFloat(value) || 0 }))
