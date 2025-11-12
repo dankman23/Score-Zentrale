@@ -651,21 +651,212 @@ export default function FibuModule() {
           <div>
             <div className="card mb-3 border-warning">
               <div className="card-header bg-warning text-dark py-2">
-                <strong>EK-Rechnung hochladen</strong>
+                <strong><i className="bi bi-cloud-upload mr-2"/>EK-Rechnungen hochladen</strong>
               </div>
               <div className="card-body py-2">
                 <input 
                   type="file" 
                   accept="application/pdf"
+                  multiple
                   className="form-control"
-                  onChange={handleEkUpload}
+                  onChange={handleEkFileSelect}
                   disabled={ekLoading}
                 />
                 <small className="text-muted d-block mt-1">
-                  PDF-Upload mit automatischem Parsing (Lieferant, Datum, Betrag)
+                  <i className="bi bi-info-circle mr-1"/>
+                  Mehrere PDFs gleichzeitig möglich. Auto-Matching versucht Lieferanten zu erkennen.
                 </small>
               </div>
             </div>
+            
+            {/* Upload Modal */}
+            {showEkModal && (
+              <div className="card mb-3 border-success" style={{maxWidth: '800px', margin: '0 auto'}}>
+                <div className="card-header bg-success text-white py-2 d-flex justify-content-between align-items-center">
+                  <strong><i className="bi bi-pencil-square mr-2"/>EK-Rechnung erfassen</strong>
+                  <button 
+                    className="btn btn-sm btn-light"
+                    onClick={() => {
+                      setShowEkModal(false)
+                      setEkFiles([])
+                    }}
+                  >
+                    <i className="bi bi-x-lg"/>
+                  </button>
+                </div>
+                <div className="card-body">
+                  <div className="alert alert-info small mb-3">
+                    <strong><i className="bi bi-files mr-2"/>{ekFiles.length} Datei(en) ausgewählt:</strong>
+                    {ekFiles.map((f, i) => (
+                      <div key={i} className="ml-3 text-truncate">{f.name}</div>
+                    ))}
+                  </div>
+                  
+                  {/* Lieferant Suche */}
+                  <div className="form-group">
+                    <label className="font-weight-bold">
+                      Lieferant <span className="text-danger">*</span>
+                    </label>
+                    <input 
+                      type="text"
+                      className="form-control"
+                      placeholder="Lieferant suchen..."
+                      value={ekForm.lieferantName}
+                      onChange={e => {
+                        setEkForm(prev => ({ ...prev, lieferantName: e.target.value }))
+                        handleKreditorSearch(e.target.value)
+                      }}
+                      list="kreditorenList"
+                    />
+                    <datalist id="kreditorenList">
+                      {kreditoren.map(k => (
+                        <option key={k.id} value={k.name}/>
+                      ))}
+                    </datalist>
+                    
+                    {/* Match-Ergebnis */}
+                    {ekMatchResult && (
+                      <div className="mt-2">
+                        <span className={`badge ${
+                          ekMatchResult.confidence === 100 ? 'badge-success' : 'badge-info'
+                        }`}>
+                          ✓ {ekMatchResult.method === 'exact' ? 'Exakte Übereinstimmung' : 'Ähnlicher Lieferant'}: {ekMatchResult.name}
+                        </span>
+                        <small className="d-block text-muted mt-1">
+                          Kreditor: {ekMatchResult.kreditorenNummer} | Aufwandskonto: {ekMatchResult.aufwandskonto}
+                        </small>
+                      </div>
+                    )}
+                    
+                    {ekForm.lieferantName && !ekMatchResult && (
+                      <div className="mt-2">
+                        <div className="custom-control custom-checkbox">
+                          <input 
+                            type="checkbox"
+                            className="custom-control-input"
+                            id="neuerKreditorCheck"
+                            checked={ekForm.neuerKreditor}
+                            onChange={e => setEkForm(prev => ({ ...prev, neuerKreditor: e.target.checked }))}
+                          />
+                          <label className="custom-control-label" htmlFor="neuerKreditorCheck">
+                            <i className="bi bi-plus-circle mr-1"/>Neuen Lieferanten anlegen
+                          </label>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label className="font-weight-bold">
+                          Rechnungsnummer <span className="text-danger">*</span>
+                        </label>
+                        <input 
+                          type="text"
+                          className="form-control"
+                          placeholder="z.B. XRE-5561, IDE-2025-001"
+                          value={ekForm.rechnungsnummer}
+                          onChange={e => setEkForm(prev => ({ ...prev, rechnungsnummer: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label className="font-weight-bold">
+                          Rechnungsdatum <span className="text-danger">*</span>
+                        </label>
+                        <input 
+                          type="date"
+                          className="form-control"
+                          value={ekForm.rechnungsdatum}
+                          onChange={e => setEkForm(prev => ({ ...prev, rechnungsdatum: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label className="font-weight-bold">
+                          Bruttobetrag <span className="text-danger">*</span>
+                        </label>
+                        <input 
+                          type="number"
+                          step="0.01"
+                          className="form-control"
+                          placeholder="119.00"
+                          value={ekForm.gesamtBetrag}
+                          onChange={e => setEkForm(prev => ({ ...prev, gesamtBetrag: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label className="font-weight-bold">Aufwandskonto</label>
+                        <select 
+                          className="form-control"
+                          value={ekForm.aufwandskonto}
+                          onChange={e => setEkForm(prev => ({ ...prev, aufwandskonto: e.target.value }))}
+                        >
+                          <option value="5200">5200 - Wareneinkauf</option>
+                          <option value="6300">6300 - Versandkosten</option>
+                          <option value="6530">6530 - Kraftstoff</option>
+                          <option value="6600">6600 - Werbung</option>
+                          <option value="6610">6610 - Bürobedarf</option>
+                          <option value="6640">6640 - Versicherungen</option>
+                          <option value="6805">6805 - Telefon/Internet</option>
+                          <option value="6815">6815 - IT/Software</option>
+                          <option value="6823">6823 - Lizenzgebühren</option>
+                          <option value="6850">6850 - Bankgebühren</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label className="font-weight-bold">Beschreibung</label>
+                    <textarea 
+                      className="form-control"
+                      rows="2"
+                      placeholder="Optional: Zusätzliche Informationen"
+                      value={ekForm.beschreibung}
+                      onChange={e => setEkForm(prev => ({ ...prev, beschreibung: e.target.value }))}
+                    />
+                  </div>
+                  
+                  <div className="d-flex justify-content-end gap-2">
+                    <button 
+                      className="btn btn-secondary mr-2"
+                      onClick={() => {
+                        setShowEkModal(false)
+                        setEkFiles([])
+                      }}
+                    >
+                      Abbrechen
+                    </button>
+                    <button 
+                      className="btn btn-success"
+                      onClick={handleEkSave}
+                      disabled={ekLoading}
+                    >
+                      {ekLoading ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm mr-2"/>
+                          Speichere...
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-check-lg mr-2"/>
+                          Speichern
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
             
             {ekLoading ? (
               <div className="text-center py-5">
