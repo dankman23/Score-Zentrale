@@ -77,6 +77,11 @@ export default function FibuModule() {
   const [selectedKreditor, setSelectedKreditor] = useState('')
   const [selectedAufwandskonto, setSelectedAufwandskonto] = useState('')
   
+  // Zahlungen
+  const [zahlungen, setZahlungen] = useState([])
+  const [zahlungenLoading, setZahlungenLoading] = useState(false)
+  const [showZahlungenTab, setShowZahlungenTab] = useState(false)
+  
   // Kontenplan laden
   const loadKontenplan = async () => {
     setKontenLoading(true)
