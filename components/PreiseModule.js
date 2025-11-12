@@ -48,16 +48,6 @@ export default function PreiseModule() {
   }, [sheet, formeln])
 
   // Vergleichs-Diagramm rendern
-    if (formeln.length > 0) {
-      const formel = formeln.find(f => f.sheet === sheet)
-      setCurrentFormel(formel)
-      setErgebnisse([])
-      setEk('')
-      setReglerEdited(false)
-    }
-  }, [sheet, formeln])
-
-  // Vergleichs-Diagramm rendern
   useEffect(() => {
     if (vergleichData.length > 0 && typeof window !== 'undefined' && window.Chart) {
       const ctx = document.getElementById('vergleichChart')
