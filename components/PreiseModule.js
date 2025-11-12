@@ -720,6 +720,138 @@ export default function PreiseModule() {
           <PreiseG2Module formeln={formeln} />
         )}
 
+        {/* Historie Tab */}
+        {tab === 'historie' && (
+          <div>
+            {/* SKU-Eingabe */}
+            <div className="card mb-2 border-primary">
+              <div className="card-header bg-primary text-white py-1">
+                <small className="font-weight-bold">Artikel-Suche</small>
+              </div>
+              <div className="card-body py-2">
+                <div className="row">
+                  <div className="col-md-8">
+                    <input 
+                      type="text" 
+                      className="form-control form-control-sm"
+                      placeholder="SKU / Artikelnummer"
+                      value={historieSku}
+                      onChange={e => setHistorieSku(e.target.value)}
+                      onKeyPress={e => e.key === 'Enter' && loadHistorie()}
+                    />
+                  </div>
+                  <div className="col-md-4">
+                    <button 
+                      className="btn btn-sm btn-primary w-100"
+                      onClick={loadHistorie}
+                      disabled={historieLoading}
+                    >
+                      {historieLoading ? (
+                        <><span className="spinner-border spinner-border-sm mr-1"/>Laden...</>
+                      ) : (
+                        <><i className="bi bi-search mr-1"/>Suchen</>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Historie-Daten */}
+            {historieData && (
+              <div>
+                {/* Artikel-Info */}
+                <div className="card mb-2 border-info">
+                  <div className="card-header bg-info text-white py-1">
+                    <small className="font-weight-bold">Artikel-Info</small>
+                  </div>
+                  <div className="card-body py-2">
+                    <div className="row">
+                      <div className="col-md-4">
+                        <small className="text-muted">SKU:</small>
+                        <div className="font-weight-bold">{historieData.artikel.cArtNr}</div>
+                      </div>
+                      <div className="col-md-4">
+                        <small className="text-muted">Aktueller VK (netto):</small>
+                        <div className="font-weight-bold text-success">{historieData.artikel.fVKNetto?.toFixed(2)} €</div>
+                      </div>
+                      <div className="col-md-4">
+                        <small className="text-muted">Lagerbestand:</small>
+                        <div className="font-weight-bold">{historieData.artikel.nLagerbestand || 0}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Historie-Tabelle */}
+                <div className="card border-warning">
+                  <div className="card-header bg-warning text-dark py-1">
+                    <strong>Preis-Historie & Erfolgsmetriken</strong>
+                    <span className="badge badge-light ml-2">{historieData.historie?.length || 0} Einträge</span>
+                  </div>
+                  <div className="card-body p-0">
+                    <div className="table-responsive">
+                      <table className="table table-sm table-hover mb-0" style={{fontSize: '0.85rem'}}>
+                        <thead className="thead-light">
+                          <tr>
+                            <th>Von</th>
+                            <th>Bis</th>
+                            <th>Tage</th>
+                            <th className="text-right">VK Netto</th>
+                            <th className="text-right">Ø EK</th>
+                            <th className="text-right">Marge %</th>
+                            <th className="text-right">Verkäufe</th>
+                            <th className="text-right">Umsatz</th>
+                            <th className="text-right">Rohertrag</th>
+                            <th className="text-right bg-success text-white">€/Tag</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {historieData.historie?.length > 0 ? (
+                            historieData.historie.map((h, idx) => (
+                              <tr key={idx}>
+                                <td><small>{new Date(h.von_datum).toLocaleDateString('de-DE')}</small></td>
+                                <td><small>{new Date(h.bis_datum).toLocaleDateString('de-DE')}</small></td>
+                                <td><small>{h.tage_aktiv}</small></td>
+                                <td className="text-right font-weight-bold">{h.vk_netto?.toFixed(2)} €</td>
+                                <td className="text-right">{h.durchschnitt_ek?.toFixed(2)} €</td>
+                                <td className="text-right">
+                                  <span className={`badge ${h.marge_prozent > 30 ? 'badge-success' : h.marge_prozent > 20 ? 'badge-warning' : 'badge-danger'}`}>
+                                    {h.marge_prozent?.toFixed(1)}%
+                                  </span>
+                                </td>
+                                <td className="text-right">{h.anzahl_verkaufe}</td>
+                                <td className="text-right">{h.umsatz?.toFixed(2)} €</td>
+                                <td className="text-right font-weight-bold text-primary">{h.rohertrag?.toFixed(2)} €</td>
+                                <td className="text-right font-weight-bold bg-success text-white">
+                                  {h.rohertrag_pro_tag?.toFixed(2)} €
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan="10" className="text-center text-muted py-3">
+                                Keine Historie-Daten gefunden
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!historieData && !historieLoading && (
+              <div className="alert alert-info">
+                <i className="bi bi-info-circle mr-2"/>
+                Geben Sie eine SKU ein und klicken Sie auf "Suchen"
+              </div>
+            )}
+          </div>
+        )}
+
         {tab === 'vergleich' && (
           <div>
             {/* Einstellungen */}
