@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
         k.cFirma AS kundenFirma,
         ISNULL(b.kZahlungsart, 0) AS kZahlungsart,
         ISNULL(za.cName, 'Unbekannt') AS zahlungsart
-      FROM dbo.tZahlungseingang z
+      FROM tZahlungseingang z
       LEFT JOIN dbo.tRechnung r ON z.kRechnung = r.kRechnung
       LEFT JOIN dbo.tKunde k ON r.tKunde_kKunde = k.kKunde
       LEFT JOIN dbo.tBestellung b ON r.tBestellung_kBestellung = b.kBestellung
