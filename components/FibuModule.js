@@ -668,6 +668,12 @@ export default function FibuModule() {
             <i className="bi bi-receipt mr-1"/>VK-Rechnungen
           </button>
           <button 
+            className={`btn ${tab === 'zahlungen' ? 'btn-primary' : 'btn-outline-secondary'}`}
+            onClick={() => setTab('zahlungen')}
+          >
+            <i className="bi bi-cash-coin mr-1"/>Zahlungen
+          </button>
+          <button 
             className={`btn ${tab === 'ek' ? 'btn-primary' : 'btn-outline-secondary'}`}
             onClick={() => setTab('ek')}
           >
