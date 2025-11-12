@@ -83,6 +83,46 @@ export default function PreiseG2Module({ formeln }) {
     setG2Params(prev => ({ ...prev, [key]: parseFloat(value) || 0 }))
     setG2ParamsEdited(true)
   }
+  
+  // Berechne Staffelgrenzen basierend auf System und EK
+  const berechneStaffelgrenzen = (ek, system) => {
+    if (system === 'standard') {
+      // Standard: Feste Grenzen
+      return [1, 3, 5, 10, 25, 50, 100, 300]
+    }
+    
+    // Kategorie-basiert
+    let schwellen = []
+    if (ek <= 30) {
+      // Basis
+      schwellen = [20, 40, 60, 100, 150, 250, 400, 600]
+    } else if (ek <= 150) {
+      // Standard
+      schwellen = [25, 50, 100, 150, 250, 400, 600, 1000]
+    } else {
+      // High Price
+      schwellen = [50, 100, 200, 400, 700, 1000]
+    }
+    
+    // Berechne VE-Anzahl für jede Schwelle
+    const staffeln = schwellen.map(schwelle => {
+      const ve = Math.ceil(schwelle / ek)
+      return ve
+    })
+    
+    if (system === 'kategorie_gerundet') {
+      // Runde auf "schöne" Zahlen: 10, 12, 15, 20, 25, 30, 40, 50, 60, 75, 100, 120, 150, 200, 250, 300, 400, 500, 600, 750, 1000
+      const schoeneZahlen = [1, 3, 5, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75, 100, 120, 150, 200, 250, 300, 400, 500, 600, 750, 1000, 1200, 1500, 2000]
+      
+      return staffeln.map(ve => {
+        // Finde nächste schöne Zahl >= ve
+        const schoene = schoeneZahlen.find(z => z >= ve)
+        return schoene || ve
+      }).filter((v, i, arr) => arr.indexOf(v) === i) // Duplikate entfernen
+    }
+    
+    return staffeln.filter((v, i, arr) => arr.indexOf(v) === i) // Duplikate entfernen
+  }
 
   const berechne = async () => {
     if (!ekInput || !formeln) return
