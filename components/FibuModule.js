@@ -10,6 +10,12 @@ export default function FibuModule() {
   // Kontenplan
   const [konten, setKonten] = useState([])
   const [kontenLoading, setKontenLoading] = useState(false)
+  const [kontenFilter, setKontenFilter] = useState('')
+  const [kontenKlasseFilter, setKontenKlasseFilter] = useState('alle')
+  const [editingKonto, setEditingKonto] = useState(null)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [newKonto, setNewKonto] = useState({ konto: '', bezeichnung: '' })
+  const [importStatus, setImportStatus] = useState('')
   
   // VK-Rechnungen
   const [vkRechnungen, setVkRechnungen] = useState([])
