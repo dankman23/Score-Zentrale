@@ -51,10 +51,12 @@
 
 ### Import-Reihenfolge
 1. ✅ **Kontenplan** (aus Excel bereits analysiert)
-2. 🔄 **VK-Rechnungen** Oktober (aus `lvRechnungsverwaltung`)
-3. 🔄 **EK-Rechnungen** Oktober (Upload + aus `tEingangsrechnung`)
-4. 🔄 **Zahlungen** Oktober (aus `tZahlung`)
-5. 🔄 **Marketplace-Zahlungen** (Amazon, eBay, PayPal)
+2. 🔄 **VK-Rechnungen** ab Oktober 2025 (aus JTL: `lvRechnungsverwaltung`)
+3. 🔄 **EK-Rechnungen** ab Oktober 2025 (**NICHT in JTL!**)
+   - ⚠️ **Upload per PDF** (mit OCR/Parsing)
+   - ⚠️ **Upload per E-Mail** (zukünftig)
+4. 🔄 **Zahlungen** ab Oktober 2025 (aus JTL: `tZahlung`)
+5. 🔄 **Marketplace-Zahlungen** (Amazon, eBay, PayPal aus JTL)
 
 ### Wichtige Felder für FIBU
 
