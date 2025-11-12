@@ -4776,6 +4776,11 @@ export default function App() {
         <PreiseModule />
       )}
 
+      {/* FIBU Modul */}
+      {activeTab==='fibu' && (
+        <FibuModule />
+      )}
+
       {/* Produkte (Artikel-Import & Browser) */}
       {activeTab==='produkte' && (
         <div>
