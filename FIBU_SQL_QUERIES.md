@@ -4,7 +4,7 @@
 
 ## 📅 Ab Oktober 2025 - Datenimport
 
-### 1. VK-Rechnungen (Ausgangsrechnungen) - Oktober 2024
+### 1. VK-Rechnungen (Ausgangsrechnungen) - Ab Oktober 2025
 
 ```sql
 -- Hauptabfrage für VK-Rechnungen
