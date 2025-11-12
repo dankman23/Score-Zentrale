@@ -42,12 +42,12 @@
 | `tEbayPayment` | dbo | eBay Zahlungen |
 | `tPayPalZahlung` | dbo | PayPal Zahlungen |
 
-## 📅 Datenimport für Oktober 2024
+## 📅 Datenimport für Oktober 2025
 
 ### Zeitraum
-- **Start**: 2024-10-01
-- **Ende**: 2024-10-31
-- **Ziel**: Alle Rechnungs- und Zahlungsdaten für Oktober importieren
+- **Start**: 2025-10-01
+- **Ende**: 2025-10-31
+- **Ziel**: Alle Rechnungs- und Zahlungsdaten ab Oktober 2025 importieren
 
 ### Import-Reihenfolge
 1. ✅ **Kontenplan** (aus Excel bereits analysiert)
