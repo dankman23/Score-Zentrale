@@ -49,8 +49,7 @@ export async function GET(request: NextRequest) {
       zahlungsdatum: z.zahlungsdatum,
       verwendungszweck: z.verwendungszweck,
       zahlungsart: z.zahlungsart,
-      kZahlungsart: z.kZahlungsart,
-      zahlungsart_modul: z.zahlungsart_modul
+      kZahlungsart: z.kZahlungsart
     }))
     
     // Speichere in MongoDB
