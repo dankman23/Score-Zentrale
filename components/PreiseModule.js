@@ -311,8 +311,8 @@ export default function PreiseModule() {
       // Filtere auf relevanten EK-Bereich (0-300€)
       const filtered = preise.filter(p => p.ek >= 0 && p.ek <= 300)
       
-      // Intelligentes Sampling auf 30 Punkte
-      const sampled = intelligentSample(filtered, 30)
+      // Intelligentes Sampling auf 100 Punkte
+      const sampled = intelligentSample(filtered, 100)
       
       setVergleichUploadedData(sampled)
       alert(`✅ ${preise.length} Preise geladen, ${filtered.length} im Bereich 0-300€, ${sampled.length} Punkte angezeigt`)
