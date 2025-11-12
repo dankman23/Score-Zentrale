@@ -323,7 +323,8 @@ def test_fibu_zahlungen_endpoint():
     print("FIBU ZAHLUNGEN ENDPOINT TESTING COMPLETED")
     print("=" * 80)
 
-def test_analyze_v3():
+if __name__ == "__main__":
+    test_fibu_zahlungen_endpoint()
     """
     Test 1: POST /api/coldleads/analyze-v3 (Haupt-Analyse)
     
