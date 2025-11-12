@@ -124,7 +124,7 @@ export default function PreiseModule() {
 
   // Vergleichs-Diagramm rendern
   useEffect(() => {
-    if (vergleichData.length > 0 && typeof window !== 'undefined' && window.Chart) {
+    if ((vergleichData.length > 0 || vergleichUploadedData) && typeof window !== 'undefined' && window.Chart) {
       const ctx = document.getElementById('vergleichChart')
       if (!ctx) return
 
@@ -149,9 +149,25 @@ export default function PreiseModule() {
           pointRadius: 1
         })
       })
+      
+      // Hochgeladene Daten hinzufügen
+      if (vergleichUploadedData) {
+        datasets.push({
+          label: 'Hochgeladene Preise',
+          data: vergleichUploadedData.map(d => d.vk),
+          borderColor: '#dc3545',
+          backgroundColor: '#dc354520',
+          borderWidth: 3,
+          tension: 0.3,
+          pointRadius: 3,
+          pointStyle: 'circle'
+        })
+      }
 
-      // Labels aus erster Kurve
-      const labels = vergleichData[0].kurve.map(point => point.ek + '€')
+      // Labels aus erster Kurve oder hochgeladenen Daten
+      const labels = vergleichData.length > 0 
+        ? vergleichData[0].kurve.map(point => point.ek + '€')
+        : vergleichUploadedData.map(d => d.ek + '€')
 
       new window.Chart(ctx, {
         type: 'line',
@@ -184,7 +200,7 @@ export default function PreiseModule() {
         }
       })
     }
-  }, [vergleichData, vergleichModus])
+  }, [vergleichData, vergleichModus, vergleichUploadedData])
 
   const loadFormeln = async () => {
     try {
