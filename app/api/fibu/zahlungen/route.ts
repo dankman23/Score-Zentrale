@@ -46,19 +46,19 @@ export async function GET(request: NextRequest) {
       .query(query)
     
     const zahlungen = result.recordset.map((z: any) => ({
-      kZahlungseingang: z.kZahlungseingang,
+      kZahlung: z.kZahlung,
       kRechnung: z.kRechnung,
       rechnungsNr: z.rechnungsNr,
       betrag: parseFloat(z.betrag || 0),
       zahlungsdatum: z.zahlungsdatum,
       hinweis: z.hinweis,
-      abgeholt: z.abgeholt,
-      zahlungsanbieter: z.zahlungsanbieter,
+      zahlungsanbieter: z.zahlungsanbieter || 'Manuell',
       zahlungsart: z.zahlungsart,
       kZahlungsart: z.kZahlungsart,
-      kKunde: z.kKunde,
-      kundenName: z.kundenFirma || `Kunde #${z.kKunde}`,
-      waehrung: z.waehrung
+      kundenName: z.kundenName,
+      waehrung: z.waehrung,
+      // Echte Belegnummer aus Hinweis extrahieren oder generieren
+      belegnummer: z.hinweis || `ZE-${z.kZahlung}`
     }))
     
     // Speichere in MongoDB
