@@ -465,7 +465,7 @@ export default function PreiseG2Module({ formeln }) {
           <ul className="mb-0 mt-1" style={{fontSize: '0.75rem'}}>
             <li><strong>Standard:</strong> Feste VE-Mengen: 1, 3, 5, 10, 25, 50, 100, 300</li>
             <li><strong>Kategorie-basiert:</strong> Berechnung: VE = aufrunden(Schwellenwert / EK). 
-              Schwellen nach EK-Kategorie: Basis (≤30€): 20-600€, Standard (30-150€): 25-1000€, High (>150€): 50-1000€</li>
+              Schwellen nach EK-Kategorie: Basis (≤30€): 20-600€, Standard (30-150€): 25-1000€, High (&gt;150€): 50-1000€</li>
             <li><strong>Gerundet:</strong> Wie Kategorie, aber VE auf schöne Zahlen gerundet (3, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100...)</li>
             <li><strong>Gesamtkosten:</strong> VE-Menge × Einzelpreis (Shop-Preis pro Stück)</li>
           </ul>
