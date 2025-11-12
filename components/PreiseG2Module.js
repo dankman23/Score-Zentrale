@@ -9,6 +9,10 @@ export default function PreiseG2Module({ formeln }) {
   const [loading, setLoading] = useState(false)
   const [configExpanded, setConfigExpanded] = useState(false)
   const [g2ParamsEdited, setG2ParamsEdited] = useState(false)
+  
+  // Chart und Upload
+  const [chartData, setChartData] = useState(null)
+  const [uploadedData, setUploadedData] = useState(null)
 
   const [g2Params, setG2Params] = useState({
     gstart_ek: 12, gneu_ek: 100, gneu_vk: 189,
