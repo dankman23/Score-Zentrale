@@ -8,9 +8,9 @@ export async function GET() {
   try {
     const pool = await getMssqlPool()
     
-    // Get column names from lvExterneRechnung
+    // Get column names from tExterneRechnung
     const erQuery = await pool.request().query(`
-      SELECT TOP 1 * FROM Verkauf.lvExterneRechnung
+      SELECT TOP 1 * FROM dbo.tExterneRechnung
     `)
     
     const er = erQuery.recordset[0]
