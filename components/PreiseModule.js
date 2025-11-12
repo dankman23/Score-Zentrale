@@ -14,6 +14,10 @@ export default function PreiseModule() {
   const [reglerEdited, setReglerEdited] = useState(false)
   const [configExpanded, setConfigExpanded] = useState(false)
   
+  // Chart für Alte PB
+  const [chartData, setChartData] = useState(null)
+  const [uploadedData, setUploadedData] = useState(null)
+  
   // Vergleich-Tab
   const [vergleichEk, setVergleichEk] = useState('10')
   const [selectedFormeln, setSelectedFormeln] = useState(['lagerware', 'klingspor_fremdlager'])
