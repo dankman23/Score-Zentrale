@@ -544,16 +544,28 @@ export default function FibuModule() {
                 
                 <div className="d-flex gap-2">
                   <button 
+                    className="btn btn-sm btn-primary"
+                    onClick={loadKontenplan}
+                    disabled={kontenLoading}
+                  >
+                    <i className="bi bi-search mr-1"/>Suchen
+                  </button>
+                  <button 
                     className="btn btn-sm btn-success"
                     onClick={() => setShowAddModal(true)}
                   >
                     <i className="bi bi-plus-circle mr-1"/>Neues Konto
                   </button>
                   <button 
-                    className="btn btn-sm btn-primary"
-                    onClick={loadKontenplan}
+                    className="btn btn-sm btn-secondary"
+                    onClick={() => {
+                      setKontenFilter('')
+                      setKontenKlasseFilter('alle')
+                      setTimeout(loadKontenplan, 100)
+                    }}
+                    disabled={kontenLoading}
                   >
-                    <i className="bi bi-arrow-clockwise mr-1"/>Aktualisieren
+                    <i className="bi bi-x-circle mr-1"/>Filter zurücksetzen
                   </button>
                 </div>
               </div>
