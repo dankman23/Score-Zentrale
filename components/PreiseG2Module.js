@@ -96,17 +96,17 @@ export default function PreiseG2Module({ formeln }) {
       return [1, 3, 5, 10, 25, 50, 100, 300]
     }
     
-    // Kategorie-basiert
+    // Kategorie-basiert - Schwellen erhöht für max. Warenkorb ~3000€
     let schwellen = []
     if (ek <= 30) {
-      // Basis
-      schwellen = [20, 40, 60, 100, 150, 250, 400, 600]
+      // Basis (EK ≤ 30€)
+      schwellen = [30, 60, 100, 150, 250, 400, 600, 900, 1200, 1500]
     } else if (ek <= 150) {
-      // Standard
-      schwellen = [25, 50, 100, 150, 250, 400, 600, 1000]
+      // Standard (EK 30-150€)
+      schwellen = [50, 100, 200, 350, 500, 750, 1000, 1500, 2000, 2500]
     } else {
-      // High Price
-      schwellen = [50, 100, 200, 400, 700, 1000]
+      // High Price (EK >150€)
+      schwellen = [100, 200, 400, 600, 1000, 1500, 2000, 2500, 3000]
     }
     
     // Berechne VE-Anzahl für jede Schwelle
