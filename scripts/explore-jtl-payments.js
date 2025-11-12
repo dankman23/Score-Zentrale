@@ -1,19 +1,18 @@
 // Script to explore JTL payment tables
 const sql = require('mssql');
-require('dotenv').config({ path: '/app/.env' });
 
 const config = {
-  user: process.env.JTL_SQL_USER,
-  password: process.env.JTL_SQL_PASSWORD,
-  server: process.env.JTL_SQL_HOST,
-  port: parseInt(process.env.JTL_SQL_PORT || '1433', 10),
-  database: process.env.JTL_SQL_DATABASE,
+  user: 'sellermath',
+  password: 'xbPWTh87rLtvQx11',
+  server: '162.55.235.45',
+  port: 49172,
+  database: 'eazybusiness',
   connectionTimeout: 15000,
   requestTimeout: 30000,
   pool: { max: 5, min: 0, idleTimeoutMillis: 30000 },
   options: { 
-    encrypt: process.env.JTL_SQL_ENCRYPT === 'true',
-    trustServerCertificate: process.env.JTL_SQL_TRUST_CERT === 'true',
+    encrypt: false,
+    trustServerCertificate: true,
     enableArithAbort: true
   }
 };
