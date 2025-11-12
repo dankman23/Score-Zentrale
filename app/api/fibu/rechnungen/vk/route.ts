@@ -25,20 +25,15 @@ export async function GET(request: NextRequest) {
         r.kRechnung,
         r.cRechnungsNr,
         r.dErstellt AS rechnungsdatum,
+        r.tKunde_kKunde AS kKunde,
         ISNULL(re.fGesamtsumme, 0) AS brutto,
         ISNULL(re.fWarenpreisNetto, 0) AS netto,
         ISNULL(re.fMwStSumme, 0) AS fMwSt,
         ISNULL(r.cStatus, '') AS cStatus,
-        r.tKunde_kKunde AS kKunde,
-        ISNULL(k.cFirma, '') AS kundenName,
-        ISNULL(k.cUSTID, '') AS kundenUstId,
-        ISNULL(k.cLand, 'DE') AS kundenLand,
-        ISNULL(za.cName, 'Unbekannt') AS zahlungsart,
+        ISNULL(r.cBezahlt, 'N') AS cBezahlt,
         ISNULL(b.kZahlungsart, 0) AS kZahlungsart
       FROM dbo.tRechnung r
-      LEFT JOIN dbo.tKunde k ON r.tKunde_kKunde = k.kKunde
       LEFT JOIN dbo.tBestellung b ON r.tBestellung_kBestellung = b.kBestellung
-      LEFT JOIN dbo.tZahlungsart za ON b.kZahlungsart = za.kZahlungsart
       LEFT JOIN Verkauf.lvRechnungsverwaltung re ON r.kRechnung = re.kRechnung
       WHERE r.dErstellt >= @from 
         AND r.dErstellt < @to
