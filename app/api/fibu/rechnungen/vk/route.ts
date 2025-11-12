@@ -66,10 +66,27 @@ export async function GET(request: NextRequest) {
         const mwst = brutto - netto
         const mwstSatz = netto > 0 ? (mwst / netto) * 100 : 19
         
-        // Kontenzuordnung
-        const kundenLand = 'DE' // Wird später aus separater Query geladen
-        const hatUstId = false // Wird später aus separater Query geladen
-        const istInnerg = false
+        // Kundenname zusammensetzen
+        let kundenName = r.kundenName || ''
+        if (!kundenName && (r.kundenVorname || r.kundenNachname)) {
+          kundenName = `${r.kundenVorname || ''} ${r.kundenNachname || ''}`.trim()
+        }
+        if (!kundenName) {
+          kundenName = `Kunde #${r.kKunde}`
+        }
+        
+        // Kontenzuordnung mit echten Kundendaten
+        const kundenLand = r.kundenLand || 'DE'
+        const kundenUstId = r.kundenUstId && r.kundenUstId.length > 0 ? r.kundenUstId : null
+        const hatUstId = kundenUstId !== null
+        const istInnerg = hatUstId && kundenLand !== 'DE' && kundenLand !== ''
+        
+        // Debitor-Konto: Für innergemeinschaftliche mit USt-ID: Einzeldebitor
+        let debitorKonto = getDebitorKonto(r.kZahlungsart || 0, kundenLand, hatUstId)
+        if (istInnerg) {
+          // Einzeldebitor-Konto: 70000 + kKunde
+          debitorKonto = `${70000 + (r.kKunde % 10000)}`
+        }
         
         rechnungen.push({
           kRechnung: r.kRechnung,
@@ -81,14 +98,14 @@ export async function GET(request: NextRequest) {
           mwstSatz: parseFloat(mwstSatz.toFixed(2)),
           status: r.cBezahlt === 'Y' ? 'Bezahlt' : 'Offen',
           kKunde: r.kKunde,
-          kundenName: `Kunde #${r.kKunde}`, // Wird später ergänzt
+          kundenName,
           kundenLand,
-          kundenUstId: null,
+          kundenUstId,
           zahlungsart: r.zahlungsart || 'Unbekannt',
           kZahlungsart: r.kZahlungsart || 0,
           istGutschrift: isGutschrift(r.cRechnungsNr),
           istInnerg,
-          debitorKonto: getDebitorKonto(r.kZahlungsart || 0, kundenLand, hatUstId),
+          debitorKonto,
           sachkonto: getSachkonto(kundenLand, hatUstId, mwstSatz)
         })
       } catch (err) {
