@@ -325,6 +325,25 @@ export default function PreiseModule() {
       alert('Fehler beim Laden der Datei: ' + e.message)
     }
   }
+  
+  // Lade Preis-Historie
+  const loadHistorie = async () => {
+    if (!historieSku) return
+    
+    setHistorieLoading(true)
+    try {
+      const res = await fetch(`/api/preise/historie?sku=${historieSku}`)
+      const data = await res.json()
+      if (data.ok) {
+        setHistorieData(data)
+      } else {
+        alert('Fehler: ' + (data.error || 'Unbekannter Fehler'))
+      }
+    } catch (e) {
+      alert('Fehler beim Laden der Historie: ' + e.message)
+    }
+    setHistorieLoading(false)
+  }
 
   const updateRegler = (key, value) => {
     if (!currentFormel) return
