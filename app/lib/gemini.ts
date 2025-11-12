@@ -44,6 +44,15 @@ export async function extractInvoiceData(
   try {
     const model = getGeminiModel()
     
+    // Zusätzlicher Kontext aus E-Mail
+    let contextText = ''
+    if (emailContext) {
+      contextText = '\n\nZUSÄTZLICHER KONTEXT AUS E-MAIL:\n'
+      if (emailContext.from) contextText += `Absender: ${emailContext.from}\n`
+      if (emailContext.subject) contextText += `Betreff: ${emailContext.subject}\n`
+      if (emailContext.body) contextText += `E-Mail-Text: ${emailContext.body.substring(0, 500)}\n`
+    }
+    
     // Spezifischer Prompt für deutsche Lieferantenrechnungen
     const prompt = extractionPrompt || 
       `Extrahiere die folgenden Informationen aus dieser deutschen Lieferantenrechnung (EK-Rechnung):
@@ -57,6 +66,11 @@ export async function extractInvoiceData(
       - MwSt-Satz (z.B. 19, 7)
       - Zahlungsbedingungen (z.B. "14 Tage netto")
       - Artikelpositionen (mit Beschreibung, Menge, Einzelpreis, Gesamtpreis)
+      
+      ${contextText}
+      
+      WICHTIG: Nutze auch die Informationen aus dem E-Mail-Kontext oben, falls das PDF nicht alle Daten enthält.
+      Der Lieferantenname kann z.B. aus dem E-Mail-Absender stammen.
       
       Formatiere die Antwort als JSON-Objekt mit folgenden Feldern:
       {
