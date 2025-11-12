@@ -30,6 +30,8 @@ interface ProcessedEmail {
   from: string
   subject: string
   date: Date
+  textBody: string
+  htmlBody: string
   attachments: EmailAttachment[]
 }
 
