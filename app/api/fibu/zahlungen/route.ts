@@ -46,17 +46,16 @@ export async function GET(request: NextRequest) {
     const zahlungen = result.recordset.map((z: any) => ({
       kZahlung: z.kZahlung,
       kRechnung: z.kRechnung,
-      rechnungsNr: z.rechnungsNr,
+      rechnungsNr: z.rechnungsNr || 'Unbekannt',
       betrag: parseFloat(z.betrag || 0),
       zahlungsdatum: z.zahlungsdatum,
-      hinweis: z.hinweis,
-      zahlungsanbieter: z.zahlungsanbieter || 'Manuell',
+      hinweis: z.hinweis || '',
       zahlungsart: z.zahlungsart,
       kZahlungsart: z.kZahlungsart,
       kundenName: z.kundenName,
-      waehrung: z.waehrung,
-      // Echte Belegnummer aus Hinweis extrahieren oder generieren
-      belegnummer: z.hinweis || `ZE-${z.kZahlung}`
+      // Echte Belegnummer: Hinweis enthält oft PayPal-ID, Überweisungsreferenz etc.
+      belegnummer: z.hinweis || `Zahlung-${z.kZahlung}`,
+      zahlungsanbieter: z.zahlungsart // PayPal, Commerzbank, etc. aus Zahlungsart
     }))
     
     // Speichere in MongoDB
