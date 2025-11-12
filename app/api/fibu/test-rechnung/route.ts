@@ -8,19 +8,31 @@ export async function GET() {
   try {
     const pool = await getMssqlPool()
     
-    // Get column names from lvRechnungsverwaltung
-    const rvColumns = await pool.request().query(`
-      SELECT TOP 1 * FROM Verkauf.lvRechnungsverwaltung
+    // Get column names from tKunde
+    const kundeQuery = await pool.request().query(`
+      SELECT TOP 1 * FROM dbo.tKunde WHERE kKunde > 0
     `)
     
-    const firstRV = rvColumns.recordset[0]
-    const rvColumnNames = firstRV ? Object.keys(firstRV) : []
+    const kunde = kundeQuery.recordset[0]
+    const kundeColumns = kunde ? Object.keys(kunde) : []
+    
+    // Get column names from tLand
+    const landQuery = await pool.request().query(`
+      SELECT TOP 1 * FROM dbo.tLand
+    `)
+    
+    const land = landQuery.recordset[0]
+    const landColumns = land ? Object.keys(land) : []
     
     return NextResponse.json({
       ok: true,
-      lvRechnungsverwaltung: {
-        columnNames: rvColumnNames,
-        sample: firstRV
+      tKunde: {
+        columnNames: kundeColumns,
+        sample: kunde
+      },
+      tLand: {
+        columnNames: landColumns,
+        sample: land
       }
     })
   } catch (error: any) {
