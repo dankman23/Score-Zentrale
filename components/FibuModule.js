@@ -230,72 +230,176 @@ export default function FibuModule() {
     setEkLoading(false)
   }
   
-  // EK-Rechnung Upload (vereinfacht - für Demo ohne Gemini)
-  const handleEkUpload = async (event) => {
-    const file = event.target.files[0]
-    if (!file) return
+  // EK-Rechnung Upload - Multi-File
+  const handleEkFileSelect = async (event) => {
+    const files = Array.from(event.target.files)
     
-    if (file.type !== 'application/pdf') {
-      alert('Bitte nur PDF-Dateien hochladen')
+    // Filter nur PDFs
+    const pdfFiles = files.filter(f => f.type === 'application/pdf')
+    
+    if (pdfFiles.length === 0) {
+      alert('Bitte nur PDF-Dateien auswählen')
       return
     }
     
-    setUploadFile(file)
+    if (pdfFiles.length !== files.length) {
+      alert(`${files.length - pdfFiles.length} Nicht-PDF-Dateien wurden ignoriert`)
+    }
     
-    // Zeige Eingabedialog
-    const lieferant = prompt('Lieferantenname:', 'Amazon Payment')
-    if (!lieferant) {
-      setUploadFile(null)
+    setEkFiles(pdfFiles)
+    setShowEkModal(true)
+    
+    // Lade Kreditoren für Dropdown
+    if (kreditoren.length === 0) {
+      await loadKreditoren()
+    }
+    
+    // Auto-Vorschlag aus Dateinamen
+    if (pdfFiles[0]) {
+      const filename = pdfFiles[0].name
+      // Versuche Lieferant aus Dateinamen zu erkennen
+      const lowerName = filename.toLowerCase()
+      
+      if (lowerName.includes('amazon')) {
+        setEkForm(prev => ({ ...prev, lieferantName: 'Amazon Payment' }))
+        handleKreditorSearch('Amazon Payment')
+      } else if (lowerName.includes('idealo')) {
+        setEkForm(prev => ({ ...prev, lieferantName: 'Idealo' }))
+        handleKreditorSearch('Idealo')
+      } else if (lowerName.includes('dhl')) {
+        setEkForm(prev => ({ ...prev, lieferantName: 'DHL' }))
+        handleKreditorSearch('DHL')
+      }
+    }
+  }
+  
+  // Kreditor-Suche und Auto-Matching
+  const handleKreditorSearch = async (searchTerm) => {
+    setEkSearchKreditor(searchTerm)
+    
+    if (!searchTerm || searchTerm.length < 2) {
+      setEkMatchResult(null)
       return
     }
     
-    const rechnungsnr = prompt('Rechnungsnummer:', 'XRE-5562')
-    if (!rechnungsnr) {
-      setUploadFile(null)
+    // Lokales Matching in geladenen Kreditoren
+    const normalized = searchTerm.toLowerCase().trim()
+    
+    // Exakte Übereinstimmung
+    const exactMatch = kreditoren.find(k => 
+      k.name.toLowerCase() === normalized
+    )
+    
+    if (exactMatch) {
+      setEkMatchResult({
+        kreditorenNummer: exactMatch.kreditorenNummer,
+        name: exactMatch.name,
+        aufwandskonto: exactMatch.standardAufwandskonto,
+        confidence: 100,
+        method: 'exact'
+      })
+      setEkForm(prev => ({
+        ...prev,
+        kreditorKonto: exactMatch.kreditorenNummer,
+        aufwandskonto: exactMatch.standardAufwandskonto || '5200'
+      }))
       return
     }
     
-    const rechnungsdatum = prompt('Rechnungsdatum (YYYY-MM-DD):', dateFrom)
-    if (!rechnungsdatum) {
-      setUploadFile(null)
+    // Fuzzy Match
+    const fuzzyMatches = kreditoren.filter(k =>
+      k.name.toLowerCase().includes(normalized) ||
+      normalized.includes(k.name.toLowerCase())
+    )
+    
+    if (fuzzyMatches.length > 0) {
+      const bestMatch = fuzzyMatches[0]
+      setEkMatchResult({
+        kreditorenNummer: bestMatch.kreditorenNummer,
+        name: bestMatch.name,
+        aufwandskonto: bestMatch.standardAufwandskonto,
+        confidence: 85,
+        method: 'fuzzy'
+      })
+      setEkForm(prev => ({
+        ...prev,
+        kreditorKonto: bestMatch.kreditorenNummer,
+        aufwandskonto: bestMatch.standardAufwandskonto || '5200'
+      }))
+    } else {
+      setEkMatchResult(null)
+    }
+  }
+  
+  // EK-Rechnungen speichern
+  const handleEkSave = async () => {
+    if (!ekForm.lieferantName || !ekForm.rechnungsnummer || !ekForm.gesamtBetrag) {
+      alert('Bitte alle Pflichtfelder ausfüllen')
       return
     }
     
-    const brutto = parseFloat(prompt('Bruttobetrag:', '119.00') || '0')
+    setEkLoading(true)
     
-    setUploadLoading(true)
     try {
-      // Sende zu Backend für Auto-Matching
+      // Wenn neuer Kreditor, erst anlegen
+      if (ekForm.neuerKreditor && ekForm.lieferantName && !ekForm.kreditorKonto) {
+        const kreditorRes = await fetch('/api/fibu/kreditoren', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            kreditorenNummer: '7' + String(Math.floor(Math.random() * 10000)).padStart(4, '0'),
+            name: ekForm.lieferantName,
+            standardAufwandskonto: ekForm.aufwandskonto
+          })
+        })
+        
+        const kreditorData = await kreditorRes.json()
+        if (kreditorData.ok) {
+          ekForm.kreditorKonto = kreditorData.kreditorenNummer
+          await loadKreditoren()
+        }
+      }
+      
+      // Speichere Rechnung
       const res = await fetch('/api/fibu/rechnungen/ek', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          lieferantName: lieferant,
-          rechnungsnummer: rechnungsnr,
-          rechnungsdatum,
-          eingangsdatum: new Date().toISOString().slice(0, 10),
-          gesamtBetrag: brutto,
-          nettoBetrag: brutto / 1.19,
-          beschreibung: 'Upload via UI'
+          lieferantName: ekForm.lieferantName,
+          rechnungsnummer: ekForm.rechnungsnummer,
+          rechnungsdatum: ekForm.rechnungsdatum,
+          gesamtBetrag: parseFloat(ekForm.gesamtBetrag),
+          kreditorKonto: ekForm.kreditorKonto,
+          aufwandskonto: ekForm.aufwandskonto,
+          beschreibung: ekForm.beschreibung
         })
       })
       
       const data = await res.json()
+      
       if (data.ok) {
-        const matchInfo = data.matching 
-          ? `\n\n✅ Auto-Match: ${data.matching.method} (${data.matching.confidence}% Confidence)\nKreditor: ${data.matching.kreditorKonto}\nAufwandskonto: ${data.matching.aufwandskonto}`
-          : '\n\n⚠️ Kein Kreditor gefunden - bitte manuell zuordnen'
-        
-        alert('✅ EK-Rechnung gespeichert!' + matchInfo)
+        alert(`✅ ${ekFiles.length} EK-Rechnung(en) gespeichert!`)
+        setShowEkModal(false)
+        setEkFiles([])
+        setEkForm({
+          lieferantName: '',
+          kreditorKonto: '',
+          rechnungsnummer: '',
+          rechnungsdatum: new Date().toISOString().slice(0, 10),
+          gesamtBetrag: '',
+          aufwandskonto: '5200',
+          beschreibung: '',
+          neuerKreditor: false
+        })
         loadEkRechnungen()
-        setUploadFile(null)
       } else {
-        alert('Fehler: ' + data.error)
+        alert('❌ Fehler: ' + data.error)
       }
     } catch (e) {
-      alert('Fehler beim Upload: ' + e.message)
+      alert('❌ Fehler: ' + e.message)
     }
-    setUploadLoading(false)
+    
+    setEkLoading(false)
   }
   
   // Kreditoren laden
