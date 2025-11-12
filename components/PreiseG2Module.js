@@ -102,12 +102,116 @@ export default function PreiseG2Module({ formeln }) {
       if (data.ok) {
         setErgebnisse(data.ergebnisse || [])
         setPlattformpreis(data.plattform_unit || 0)
+        
+        // Generiere Chart-Daten
+        if (data.plattform_unit && data.shop_unit) {
+          const ekVal = parseFloat(ekInput)
+          const chartPoints = []
+          
+          // 16 Punkte von 0 bis 300€
+          for (let i = 0; i <= 300; i += 20) {
+            const ratio = i / ekVal
+            chartPoints.push({
+              ek: i,
+              plattform: data.plattform_unit * ratio,
+              shop: data.shop_unit * ratio
+            })
+          }
+          
+          setChartData(chartPoints)
+        }
       }
     } catch (e) {
       alert('Fehler: ' + e.message)
     }
     setLoading(false)
   }
+  
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+    
+    try {
+      const { parsePreisFile, intelligentSample } = await import('../app/lib/preis-utils')
+      const preise = await parsePreisFile(file)
+      
+      // Intelligentes Sampling auf 30 Punkte
+      const sampled = intelligentSample(preise, 30)
+      
+      setUploadedData(sampled)
+      alert(`✅ ${preise.length} Preise geladen, ${sampled.length} Punkte angezeigt`)
+    } catch (e) {
+      alert('Fehler beim Laden der Datei: ' + e.message)
+    }
+  }
+  
+  // Chart rendern
+  useEffect(() => {
+    if ((chartData || uploadedData) && typeof window !== 'undefined' && window.Chart) {
+      const ctx = document.getElementById('g2Chart')
+      if (!ctx) return
+
+      const existingChart = window.Chart.getChart('g2Chart')
+      if (existingChart) existingChart.destroy()
+
+      const datasets = []
+      
+      // Berechnete Daten
+      if (chartData) {
+        datasets.push({
+          label: 'Plattformpreis (g2)',
+          data: chartData.map(d => d.plattform),
+          borderColor: '#F6B10A',
+          backgroundColor: '#F6B10A20',
+          borderWidth: 2,
+          tension: 0.3,
+          pointRadius: 2
+        })
+        
+        datasets.push({
+          label: 'Shop-Preis (g2)',
+          data: chartData.map(d => d.shop),
+          borderColor: '#2fb97f',
+          backgroundColor: '#2fb97f20',
+          borderWidth: 2,
+          tension: 0.3,
+          pointRadius: 2
+        })
+      }
+      
+      // Hochgeladene Daten
+      if (uploadedData) {
+        datasets.push({
+          label: 'Hochgeladene Preise',
+          data: uploadedData.map(d => d.vk),
+          borderColor: '#e44c4c',
+          backgroundColor: '#e44c4c20',
+          borderWidth: 2,
+          tension: 0.3,
+          pointRadius: 3
+        })
+      }
+
+      const labels = chartData ? chartData.map(d => d.ek + '€') : uploadedData.map(d => d.ek + '€')
+
+      new window.Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top', labels: { font: { size: 9 }, boxWidth: 15, padding: 8 } },
+            title: { display: true, text: 'Preisverlauf (g2)', font: { size: 13 } }
+          },
+          scales: {
+            x: { title: { display: true, text: 'EK (€)', font: { size: 11 } }, ticks: { maxTicksLimit: 15, font: { size: 9 } } },
+            y: { title: { display: true, text: 'VK (€)', font: { size: 11 } }, beginAtZero: true, ticks: { font: { size: 9 } } }
+          }
+        }
+      })
+    }
+  }, [chartData, uploadedData])
 
   return (
     <div>
