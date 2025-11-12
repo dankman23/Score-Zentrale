@@ -474,9 +474,9 @@ export default function PreiseG2Module({ formeln }) {
 
       {/* Glossar */}
       {ergebnisseStandard.length > 0 && (
-        <div className="alert alert-info py-2 mb-2">
-          <strong style={{fontSize: '0.85rem'}}>📖 Staffelsystem-Glossar:</strong>
-          <ul className="mb-0 mt-1" style={{fontSize: '0.75rem'}}>
+        <div className="alert alert-info py-2 mb-2" style={{backgroundColor: '#d1ecf1', color: '#0c5460'}}>
+          <strong style={{fontSize: '0.85rem', color: '#0c5460'}}>📖 Staffelsystem-Glossar:</strong>
+          <ul className="mb-0 mt-1" style={{fontSize: '0.75rem', color: '#0c5460'}}>
             <li><strong>Standard:</strong> Feste VE-Mengen: 1, 3, 5, 10, 25, 50, 100, 300</li>
             <li><strong>Kategorie-basiert:</strong> Berechnung: VE = aufrunden(Schwellenwert / EK). 
               Schwellen nach EK-Kategorie: Basis (≤30€): 20-600€, Standard (30-150€): 25-1000€, High (&gt;150€): 50-1000€</li>
