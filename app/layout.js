@@ -70,6 +70,7 @@ export default function RootLayout({ children }) {
                   <li className="nav-item"><a className="nav-link" href="#warmakquise"><i className="bi bi-people"/>Warmakquise</a></li>
                   <li className="nav-item"><a className="nav-link" href="#produkte"><i className="bi bi-box-seam"/>Produkte</a></li>
                   <li className="nav-item"><a className="nav-link" href="#preise"><i className="bi bi-calculator"/>Preise</a></li>
+                  <li className="nav-item"><a className="nav-link" href="#fibu"><i className="bi bi-receipt-cutoff"/>FIBU</a></li>
                   <li className="nav-item"><a className="nav-link" href="#outbound"><i className="bi bi-send"/>Outbound</a></li>
                 </ul>
               </div>
