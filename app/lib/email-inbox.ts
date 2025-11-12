@@ -66,8 +66,12 @@ export async function fetchUnreadEmails(): Promise<ProcessedEmail[]> {
           return
         }
 
-        // Suche ungelesene E-Mails
-        imap.search(['UNSEEN'], (err, results) => {
+        // Suche E-Mails der letzten 30 Tage (gelesen + ungelesen)
+        const since = new Date()
+        since.setDate(since.getDate() - 30)
+        const sinceStr = since.toISOString().split('T')[0].replace(/-/g, '')
+        
+        imap.search(['SINCE', sinceStr], (err, results) => {
           if (err) {
             reject(err)
             return
