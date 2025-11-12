@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getMSSQLConnection } from '../../../lib/db/mssql'
+import { getMssqlPool } from '../../../lib/db/mssql'
 import { getDb } from '../../../lib/db/mongodb'
 
 /**
