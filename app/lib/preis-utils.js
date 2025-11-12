@@ -6,7 +6,7 @@
  * 1. Gleichmäßige Verteilung über EK-Bereich
  * 2. Große VK-Variationen bei ähnlichem EK
  */
-export function intelligentSample(data, targetCount = 100) {
+export function intelligentSample(data, targetCount = 200) {
   if (!data || data.length === 0) return []
   if (data.length <= targetCount) return data
 
