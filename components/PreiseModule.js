@@ -203,10 +203,10 @@ export default function PreiseModule() {
 
   return (
     <div className="card">
-      <div className="card-header py-2">
-        <h5 className="mb-0"><i className="bi bi-calculator mr-2"/>Preisberechnung</h5>
+      <div className="card-header py-1">
+        <h6 className="mb-0"><i className="bi bi-calculator mr-2"/>Preisberechnung</h6>
       </div>
-      <div className="card-body py-2">
+      <div className="card-body py-2" style={{fontSize: '0.9rem'}}>
         {/* Haupt-Tabs */}
         <div className="btn-group btn-group-sm mb-3 w-100">
           <button 
