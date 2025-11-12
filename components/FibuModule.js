@@ -25,10 +25,6 @@ export default function FibuModule() {
   const [newKonto, setNewKonto] = useState({ konto: '', bezeichnung: '' })
   const [importStatus, setImportStatus] = useState('')
   
-  // VK-Rechnungen
-  const [vkRechnungen, setVkRechnungen] = useState([])
-  const [vkLoading, setVkLoading] = useState(false)
-  
   // EK-Rechnungen
   const [ekRechnungen, setEkRechnungen] = useState([])
   const [ekLoading, setEkLoading] = useState(false)
