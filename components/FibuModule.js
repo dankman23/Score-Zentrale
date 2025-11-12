@@ -1476,6 +1476,205 @@ export default function FibuModule() {
                 )}
               </div>
             </div>
+            
+            {/* Verarbeiten Modal */}
+            {showEmailModal && selectedEmail && (
+              <div className="card border-success mt-3" style={{maxWidth: '900px', margin: '1rem auto'}}>
+                <div className="card-header bg-success text-white py-2 d-flex justify-content-between align-items-center">
+                  <strong><i className="bi bi-envelope-open mr-2"/>E-Mail verarbeiten</strong>
+                  <button 
+                    className="btn btn-sm btn-light"
+                    onClick={() => {
+                      setShowEmailModal(false)
+                      setSelectedEmail(null)
+                    }}
+                  >
+                    <i className="bi bi-x-lg"/>
+                  </button>
+                </div>
+                <div className="card-body">
+                  {/* E-Mail Info */}
+                  <div className="alert alert-info small mb-3">
+                    <div><strong>Von:</strong> {selectedEmail.from}</div>
+                    <div><strong>Betreff:</strong> {selectedEmail.subject}</div>
+                    <div><strong>Datum:</strong> {new Date(selectedEmail.date).toLocaleString('de-DE')}</div>
+                    <div><strong>Datei:</strong> {selectedEmail.filename} ({(selectedEmail.fileSize / 1024).toFixed(1)} KB)</div>
+                  </div>
+                  
+                  {/* Gemini Parse Button */}
+                  <div className="mb-3">
+                    <button 
+                      className="btn btn-primary"
+                      onClick={handleGeminiParse}
+                      disabled={geminiParsing}
+                    >
+                      {geminiParsing ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm mr-2"/>
+                          PDF wird analysiert...
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-magic mr-2"/>
+                          🤖 Mit Gemini automatisch auslesen
+                        </>
+                      )}
+                    </button>
+                    <small className="d-block text-muted mt-1">
+                      Gemini 2.0 Flash liest automatisch: Lieferant, Rechnungsnr, Datum, Betrag
+                    </small>
+                  </div>
+                  
+                  {/* Gemini Ergebnis */}
+                  {geminiResult && (
+                    <div className="alert alert-success small mb-3">
+                      <strong><i className="bi bi-check-circle mr-2"/>Gemini hat folgendes erkannt:</strong>
+                      <div className="mt-2">
+                        {geminiResult.lieferant && <div>✓ Lieferant: <strong>{geminiResult.lieferant}</strong></div>}
+                        {geminiResult.rechnungsnummer && <div>✓ Rechnungsnr: <strong>{geminiResult.rechnungsnummer}</strong></div>}
+                        {geminiResult.datum && <div>✓ Datum: <strong>{geminiResult.datum}</strong></div>}
+                        {geminiResult.gesamtbetrag && <div>✓ Betrag: <strong>{geminiResult.gesamtbetrag.toFixed(2)} €</strong></div>}
+                        {geminiResult.error && <div className="text-warning">⚠️ {geminiResult.error}</div>}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Formular */}
+                  <div className="form-group">
+                    <label className="font-weight-bold">
+                      Lieferant <span className="text-danger">*</span>
+                    </label>
+                    <input 
+                      type="text"
+                      className="form-control"
+                      placeholder="Lieferant suchen..."
+                      value={emailForm.lieferantName}
+                      onChange={e => {
+                        setEmailForm(prev => ({ ...prev, lieferantName: e.target.value }))
+                        handleKreditorSearch(e.target.value)
+                      }}
+                      list="kreditorenListEmail"
+                    />
+                    <datalist id="kreditorenListEmail">
+                      {kreditoren.map(k => (
+                        <option key={k.id} value={k.name}/>
+                      ))}
+                    </datalist>
+                    
+                    {ekMatchResult && (
+                      <div className="mt-2">
+                        <span className={`badge ${
+                          ekMatchResult.confidence === 100 ? 'badge-success' : 'badge-info'
+                        }`}>
+                          ✓ {ekMatchResult.method === 'exact' ? 'Exakte Übereinstimmung' : 'Ähnlicher Lieferant'}: {ekMatchResult.name}
+                        </span>
+                        <small className="d-block text-muted mt-1">
+                          Kreditor: {ekMatchResult.kreditorenNummer} | Aufwandskonto: {ekMatchResult.aufwandskonto}
+                        </small>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label className="font-weight-bold">
+                          Rechnungsnummer <span className="text-danger">*</span>
+                        </label>
+                        <input 
+                          type="text"
+                          className="form-control"
+                          placeholder="z.B. RE-2025-001"
+                          value={emailForm.rechnungsnummer}
+                          onChange={e => setEmailForm(prev => ({ ...prev, rechnungsnummer: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label className="font-weight-bold">
+                          Rechnungsdatum <span className="text-danger">*</span>
+                        </label>
+                        <input 
+                          type="date"
+                          className="form-control"
+                          value={emailForm.rechnungsdatum}
+                          onChange={e => setEmailForm(prev => ({ ...prev, rechnungsdatum: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label className="font-weight-bold">
+                          Bruttobetrag <span className="text-danger">*</span>
+                        </label>
+                        <input 
+                          type="number"
+                          step="0.01"
+                          className="form-control"
+                          placeholder="119.00"
+                          value={emailForm.gesamtBetrag}
+                          onChange={e => setEmailForm(prev => ({ ...prev, gesamtBetrag: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label className="font-weight-bold">Aufwandskonto</label>
+                        <select 
+                          className="form-control"
+                          value={emailForm.aufwandskonto}
+                          onChange={e => setEmailForm(prev => ({ ...prev, aufwandskonto: e.target.value }))}
+                        >
+                          <option value="5200">5200 - Wareneinkauf</option>
+                          <option value="6300">6300 - Versandkosten</option>
+                          <option value="6530">6530 - Kraftstoff</option>
+                          <option value="6600">6600 - Werbung</option>
+                          <option value="6610">6610 - Bürobedarf</option>
+                          <option value="6640">6640 - Versicherungen</option>
+                          <option value="6805">6805 - Telefon/Internet</option>
+                          <option value="6815">6815 - IT/Software</option>
+                          <option value="6823">6823 - Lizenzgebühren</option>
+                          <option value="6850">6850 - Bankgebühren</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="d-flex justify-content-end gap-2">
+                    <button 
+                      className="btn btn-secondary mr-2"
+                      onClick={() => {
+                        setShowEmailModal(false)
+                        setSelectedEmail(null)
+                      }}
+                    >
+                      Abbrechen
+                    </button>
+                    <button 
+                      className="btn btn-success"
+                      onClick={handleSaveEmailInvoice}
+                      disabled={ekLoading}
+                    >
+                      {ekLoading ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm mr-2"/>
+                          Speichere...
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-check-lg mr-2"/>
+                          Als EK-Rechnung speichern
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
         
