@@ -184,6 +184,8 @@ export async function processEmailInbox(): Promise<{
             emailSubject: email.subject,
             emailDate: email.date,
             emailMessageId: email.messageId,
+            emailTextBody: email.textBody,
+            emailHtmlBody: email.htmlBody,
             filename: attachment.filename,
             pdfBase64: attachment.content.toString('base64'),
             fileSize: attachment.size,
