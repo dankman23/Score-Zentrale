@@ -21,26 +21,28 @@ export async function GET(request: NextRequest) {
     
     // Haupt-Query: VK-Rechnungen
     const query = `
-      SELECT 
+      SELECT TOP ${limit}
         r.kRechnung,
         r.cRechnungsNr,
         r.dErstellt AS rechnungsdatum,
-        r.fGesamtsumme AS brutto,
-        r.fWarensumme AS netto,
-        r.fMwSt,
-        r.cStatus,
-        r.kKunde,
-        k.cFirma AS kundenName,
+        ISNULL(re.fGesamtsumme, 0) AS brutto,
+        ISNULL(re.fWarenpreisNetto, 0) AS netto,
+        ISNULL(re.fMwStSumme, 0) AS fMwSt,
+        ISNULL(r.cStatus, '') AS cStatus,
+        r.tKunde_kKunde AS kKunde,
+        ISNULL(k.cFirma, '') AS kundenName,
         ISNULL(k.cUSTID, '') AS kundenUstId,
         ISNULL(k.cLand, 'DE') AS kundenLand,
         ISNULL(za.cName, 'Unbekannt') AS zahlungsart,
-        ISNULL(r.kZahlungsart, 0) AS kZahlungsart
+        ISNULL(b.kZahlungsart, 0) AS kZahlungsart
       FROM dbo.tRechnung r
-      LEFT JOIN dbo.tKunde k ON r.kKunde = k.kKunde
-      LEFT JOIN dbo.tZahlungsart za ON r.kZahlungsart = za.kZahlungsart
+      LEFT JOIN dbo.tKunde k ON r.tKunde_kKunde = k.kKunde
+      LEFT JOIN dbo.tBestellung b ON r.tBestellung_kBestellung = b.kBestellung
+      LEFT JOIN dbo.tZahlungsart za ON b.kZahlungsart = za.kZahlungsart
+      LEFT JOIN Verkauf.lvRechnungsverwaltung re ON r.kRechnung = re.kRechnung
       WHERE r.dErstellt >= @from 
         AND r.dErstellt < @to
-        AND r.cStatus != 'Storniert'
+        AND ISNULL(r.cStatus, '') != 'Storniert'
       ORDER BY r.dErstellt DESC
     `
     
