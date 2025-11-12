@@ -26,6 +26,7 @@ export default function PreiseModule() {
   const [vergleichG2Enabled, setVergleichG2Enabled] = useState(false)
   const [vergleichG2Warengruppe, setVergleichG2Warengruppe] = useState('lagerware')
   const [vergleichLoading, setVergleichLoading] = useState(false)
+  const [vergleichUploadedData, setVergleichUploadedData] = useState(null)
 
   const sheets = [
     { id: 'lagerware', name: 'Lagerware' },
