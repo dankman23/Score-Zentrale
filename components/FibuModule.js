@@ -536,6 +536,17 @@ export default function FibuModule() {
             <i className="bi bi-file-earmark-arrow-down mr-1"/>EK-Rechnungen
           </button>
           <button 
+            className={`btn ${tab === 'inbox' ? 'btn-primary' : 'btn-outline-secondary'}`}
+            onClick={() => setTab('inbox')}
+          >
+            <i className="bi bi-envelope mr-1"/>📧 Inbox
+            {emailInbox.filter(e => e.status === 'pending').length > 0 && (
+              <span className="badge badge-danger ml-1">
+                {emailInbox.filter(e => e.status === 'pending').length}
+              </span>
+            )}
+          </button>
+          <button 
             className={`btn ${tab === 'kontenplan' ? 'btn-primary' : 'btn-outline-secondary'}`}
             onClick={() => setTab('kontenplan')}
           >
