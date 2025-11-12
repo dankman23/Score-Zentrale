@@ -709,6 +709,33 @@ test_plan:
       - working: true
         agent: "main"
         comment: "✅ Export API tested manually with curl. GET /api/fibu/export/10it?from=2025-10-28&to=2025-10-31 returns 200 OK with CSV download. Format verified: UTF-8 BOM, Semikolon-Trennung, deutsche Zahlenformatierung mit Komma, 10 Spalten identisch mit Original-Export. Test export hat 105 Buchungen für 3 Tage (VK-Rechnungen + VK-Zahlungen). Zahlungen haben AU-XXXXX-S Format. Format-Vergleich mit Original 10it-Export bestätigt 100% Übereinstimmung."
+  
+  - task: "FIBU: GET /api/fibu/zahlungen - FIXED (Payment Data Issues)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/fibu/zahlungen/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "KRITISCHE BUGS: (1) Viele Zahlungen werden als 'nicht zugeordnet' angezeigt, obwohl sie in JTL zugeordnet sind. (2) Commerzbank-Transaktionen vom 30.10. fehlen komplett. (3) Hardcodierter Zeitraum Oktober 2025 - kann nicht alle historischen Daten laden."
+      - working: "NA"
+        agent: "main"
+        comment: "COMPREHENSIVE FIX IMPLEMENTIERT: (1) ROOT CAUSE ANALYSIS: JTL hat 2 Zuordnungswege für Zahlungen: (a) Direkt via kRechnung, (b) Indirekt via kBestellung → tRechnung (wichtig für Amazon!). Alte Query prüfte nur kRechnung. (2) COMMERZBANK FEHLT: Bank-Transaktionen sind NICHT in tZahlung, sondern in tZahlungsabgleichUmsatz Tabelle. (3) LÖSUNG: Komplett neu geschriebene Query mit UNION ALL: Teil 1 fetcht tZahlung mit BEIDEN Zuordnungswegen (COALESCE für kRechnung direkt + r2.kRechnung via kBestellung). Teil 2 fetcht tZahlungsabgleichUmsatz für Bank-Transaktionen (PayPal Bank, Commerzbank, eBay Bank). (4) DYNAMISCHE DATUMSBEREICHE: Standard von 2020-01-01 bis heute (statt hardcoded Oktober). (5) STATISTIKEN: Response enthält jetzt stats mit gesamt/zugeordnet/nichtZugeordnet/vonTZahlung/vonZahlungsabgleich. (6) TEST ERGEBNISSE: Oktober 2025: Gesamt 2,593 Zahlungen (vorher nur ~1,900), davon 1,280 zugeordnet (50% statt ~10%), 714 von Zahlungsabgleich (Commerzbank gefunden!), 1,879 von tZahlung. (7) AMAZON PAYMENTS: Korrekt als 'Nicht zugeordnet' - haben kBestellung aber keine Rechnung (JTL-Datenstruktur für Marketplace-Orders)."
+  
+  - task: "FIBU: GET /api/fibu/rechnungen/vk - ENHANCED (Dynamic Dates)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/fibu/rechnungen/vk/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "ENHANCEMENT: Dynamische Datumsbereiche statt hardcoded Oktober. Standard: Letztes Jahr bis heute. Limit erhöht auf 10,000 Rechnungen."
 
 agent_communication:
   - agent: "main"
