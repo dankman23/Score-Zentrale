@@ -845,6 +845,63 @@ export default function FibuModule() {
           </div>
         )}
         
+        {/* Zahlungen Tab */}
+        {tab === 'zahlungen' && (
+          <div>
+            <div className="card border-success">
+              <div className="card-header bg-success text-white py-2">
+                <strong><i className="bi bi-cash-coin mr-2"/>Zahlungseingänge (VK)</strong>
+              </div>
+              <div className="card-body">
+                {zahlungenLoading ? (
+                  <div className="text-center py-4">
+                    <div className="spinner-border text-success"/>
+                    <p className="mt-2">Lade Zahlungen...</p>
+                  </div>
+                ) : (
+                  <div className="table-responsive" style={{maxHeight: '600px', overflow: 'auto'}}>
+                    <table className="table table-sm table-hover">
+                      <thead className="thead-light sticky-top">
+                        <tr>
+                          <th>Belegnr</th>
+                          <th>Datum</th>
+                          <th>Rechnung</th>
+                          <th>Kunde</th>
+                          <th className="text-right">Betrag</th>
+                          <th>Debitor</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {zahlungen.map((z, idx) => (
+                          <tr key={idx} style={{color: '#e0e0e0'}}>
+                            <td><strong style={{color: '#fff'}}>AU-{z.kZahlung}-S</strong></td>
+                            <td><span style={{color: '#e0e0e0'}}>{new Date(z.zahlungsdatum).toLocaleDateString('de-DE')}</span></td>
+                            <td><span style={{color: '#f0f0f0'}}>{z.rechnungsNr || 'Unbekannt'}</span></td>
+                            <td><span style={{color: '#d0d0d0'}}>{z.kundenName || '-'}</span></td>
+                            <td className="text-right"><strong style={{color: '#4ade80'}}>{z.betrag?.toFixed(2)} €</strong></td>
+                            <td><span className="badge badge-success">{z.debitorKonto || '-'}</span></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {zahlungen.length === 0 && (
+                      <div className="text-center py-4 text-muted">
+                        Keine Zahlungen im gewählten Zeitraum gefunden.
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                <div className="alert alert-info small mt-3 mb-0">
+                  <strong><i className="bi bi-info-circle mr-2"/>Info:</strong>
+                  {zahlungen.length} Zahlungseingang/Zahlungseingänge gefunden. 
+                  Zahlungen werden automatisch den Rechnungen zugeordnet (via kRechnung).
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* EK-Rechnungen Tab */}
         {tab === 'ek' && (
           <div>
