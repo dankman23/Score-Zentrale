@@ -341,6 +341,12 @@ export default function FibuModule() {
             <i className="bi bi-list-ol mr-1"/>Kontenplan
           </button>
           <button 
+            className={`btn ${tab === 'export' ? 'btn-primary' : 'btn-outline-secondary'}`}
+            onClick={() => setTab('export')}
+          >
+            <i className="bi bi-file-earmark-arrow-down mr-1"/>10it Export
+          </button>
+          <button 
             className={`btn ${tab === 'einstellungen' ? 'btn-primary' : 'btn-outline-secondary'}`}
             onClick={() => setTab('einstellungen')}
           >
