@@ -143,7 +143,10 @@ export default function PreiseModule() {
       
       vergleichData.forEach((d, idx) => {
         // Nutze die echten Kurvendaten
-        const data = d.kurve.map(point => vergleichModus === 'plattform' ? point.plattform : point.shop)
+        const data = d.kurve.map(point => ({ 
+          x: point.ek, 
+          y: vergleichModus === 'plattform' ? point.plattform : point.shop 
+        }))
         
         datasets.push({
           label: d.name,
