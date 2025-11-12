@@ -111,8 +111,8 @@ export default function PreiseG2Module({ formeln }) {
     })
     
     if (system === 'kategorie_gerundet') {
-      // Runde auf "schöne" Zahlen: 10, 12, 15, 20, 25, 30, 40, 50, 60, 75, 100, 120, 150, 200, 250, 300, 400, 500, 600, 750, 1000
-      const schoeneZahlen = [1, 3, 5, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75, 100, 120, 150, 200, 250, 300, 400, 500, 600, 750, 1000, 1200, 1500, 2000]
+      // Runde auf "schöne" Zahlen - erweiterte Liste für bessere kleine Werte
+      const schoeneZahlen = [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75, 100, 120, 150, 200, 250, 300, 400, 500, 600, 750, 1000, 1200, 1500, 2000, 2500, 3000]
       
       return staffeln.map(ve => {
         // Finde nächste schöne Zahl >= ve
