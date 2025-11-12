@@ -913,8 +913,29 @@ export default function PreiseModule() {
               </div>
             </div>
 
+            {/* Excel/CSV Upload */}
+            <div className="card mb-2 border-secondary">
+              <div className="card-header bg-secondary text-white py-1">
+                <small className="mb-0 font-weight-bold">
+                  <i className="bi bi-upload mr-1"/>Excel/CSV Upload (EK/VK)
+                </small>
+              </div>
+              <div className="card-body py-2">
+                <input 
+                  type="file" 
+                  accept=".xlsx,.xls,.csv" 
+                  className="form-control form-control-sm"
+                  onChange={handleVergleichFileUpload}
+                  style={{fontSize: '0.85rem'}}
+                />
+                <small className="text-muted d-block mt-1" style={{fontSize: '0.75rem'}}>
+                  Erste Spalte: EK, Zweite Spalte: VK
+                </small>
+              </div>
+            </div>
+
             {/* Liniendiagramm */}
-            {vergleichData.length > 0 && (
+            {(vergleichData.length > 0 || vergleichUploadedData) && (
               <div className="card border-info">
                 <div className="card-header bg-info text-white py-2">
                   <strong style={{fontSize: '0.95rem'}}>Preisverlauf (EK 0-300€ → VK)</strong>
