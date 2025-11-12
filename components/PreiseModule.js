@@ -648,7 +648,7 @@ export default function PreiseModule() {
                   <strong style={{fontSize: '0.95rem'}}>Preisverlauf</strong>
                 </div>
                 <div className="card-body py-2">
-                  <div style={{height: '400px'}}>
+                  <div style={{height: '600px'}}>
                     <canvas id="altePbChart"></canvas>
                   </div>
                 </div>
