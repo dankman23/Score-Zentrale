@@ -59,27 +59,12 @@ export async function GET(request: NextRequest) {
         const mwst = brutto - netto
         const mwstSatz = netto > 0 ? (mwst / netto) * 100 : 19
         
-        // Kundenname zusammensetzen
-        let kundenName = r.kundenName || ''
-        if (!kundenName && (r.kundenVorname || r.kundenNachname)) {
-          kundenName = `${r.kundenVorname || ''} ${r.kundenNachname || ''}`.trim()
-        }
-        if (!kundenName) {
-          kundenName = `Kunde #${r.kKunde}`
-        }
-        
-        // Kontenzuordnung mit echten Kundendaten
-        const kundenLand = r.kundenLand || 'DE'
-        const kundenUstId = r.kundenUstId && r.kundenUstId.length > 0 ? r.kundenUstId : null
-        const hatUstId = kundenUstId !== null
-        const istInnerg = hatUstId && kundenLand !== 'DE' && kundenLand !== ''
-        
-        // Debitor-Konto: Für innergemeinschaftliche mit USt-ID: Einzeldebitor
-        let debitorKonto = getDebitorKonto(r.kZahlungsart || 0, kundenLand, hatUstId)
-        if (istInnerg) {
-          // Einzeldebitor-Konto: 70000 + kKunde
-          debitorKonto = `${70000 + (r.kKunde % 10000)}`
-        }
+        // Kundendaten vorerst als Platzhalter (werden später per separater Query geladen)
+        const kundenName = `Kunde #${r.kKunde}`
+        const kundenLand = 'DE'
+        const kundenUstId = null
+        const hatUstId = false
+        const istInnerg = false
         
         rechnungen.push({
           kRechnung: r.kRechnung,
@@ -98,7 +83,7 @@ export async function GET(request: NextRequest) {
           kZahlungsart: r.kZahlungsart || 0,
           istGutschrift: isGutschrift(r.cRechnungsNr),
           istInnerg,
-          debitorKonto,
+          debitorKonto: getDebitorKonto(r.kZahlungsart || 0, kundenLand, hatUstId),
           sachkonto: getSachkonto(kundenLand, hatUstId, mwstSatz)
         })
       } catch (err) {
