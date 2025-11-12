@@ -1245,6 +1245,125 @@ export default function FibuModule() {
           </div>
         )}
         
+        {/* Inbox Tab */}
+        {tab === 'inbox' && (
+          <div>
+            <div className="card border-info mb-3">
+              <div className="card-header bg-info text-white py-2 d-flex justify-content-between align-items-center">
+                <strong><i className="bi bi-envelope mr-2"/>📧 E-Mail Inbox</strong>
+                <button 
+                  className="btn btn-sm btn-light"
+                  onClick={fetchNewEmails}
+                  disabled={emailFetchLoading}
+                >
+                  {emailFetchLoading ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm mr-1"/>
+                      Abrufen...
+                    </>
+                  ) : (
+                    <>
+                      <i className="bi bi-arrow-clockwise mr-1"/>
+                      Neue E-Mails abrufen
+                    </>
+                  )}
+                </button>
+              </div>
+              <div className="card-body">
+                {emailInboxLoading ? (
+                  <div className="text-center py-4">
+                    <div className="spinner-border text-info"/>
+                    <p className="mt-2">Lade E-Mails...</p>
+                  </div>
+                ) : (
+                  <div>
+                    {emailInbox.length === 0 ? (
+                      <div className="text-center py-4 text-muted">
+                        <i className="bi bi-inbox display-4 d-block mb-3"/>
+                        Keine E-Mails in der Inbox
+                      </div>
+                    ) : (
+                      <div className="table-responsive" style={{maxHeight: '500px', overflow: 'auto'}}>
+                        <table className="table table-sm table-hover">
+                          <thead className="thead-light sticky-top">
+                            <tr>
+                              <th>Status</th>
+                              <th>Datum</th>
+                              <th>Von</th>
+                              <th>Betreff</th>
+                              <th>Anhänge</th>
+                              <th>Aktionen</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {emailInbox.map((email, idx) => (
+                              <tr key={idx} className={email.status === 'pending' ? 'table-warning' : ''}>
+                                <td>
+                                  <span className={`badge ${
+                                    email.status === 'pending' ? 'badge-warning' : 
+                                    email.status === 'processed' ? 'badge-success' : 
+                                    'badge-secondary'
+                                  }`}>
+                                    {email.status === 'pending' ? 'Neu' : 
+                                     email.status === 'processed' ? 'Verarbeitet' : 
+                                     'Archiviert'}
+                                  </span>
+                                </td>
+                                <td className="small">
+                                  {new Date(email.receivedDate).toLocaleDateString('de-DE')}
+                                </td>
+                                <td className="small">{email.from}</td>
+                                <td className="small">{email.subject}</td>
+                                <td>
+                                  {email.attachments && email.attachments.length > 0 ? (
+                                    <span className="badge badge-info">
+                                      <i className="bi bi-paperclip mr-1"/>
+                                      {email.attachments.length}
+                                    </span>
+                                  ) : (
+                                    <span className="text-muted">-</span>
+                                  )}
+                                </td>
+                                <td>
+                                  <button 
+                                    className="btn btn-sm btn-outline-primary mr-1"
+                                    title="E-Mail anzeigen"
+                                  >
+                                    <i className="bi bi-eye"/>
+                                  </button>
+                                  {email.status === 'pending' && (
+                                    <button 
+                                      className="btn btn-sm btn-outline-success"
+                                      title="Als verarbeitet markieren"
+                                    >
+                                      <i className="bi bi-check"/>
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                    
+                    <div className="alert alert-info small mt-3">
+                      <strong><i className="bi bi-info-circle mr-2"/>Info:</strong>
+                      {emailInbox.length} E-Mails in der Inbox. 
+                      Neue E-Mails werden automatisch alle 15 Minuten abgerufen.
+                      {emailInbox.filter(e => e.status === 'pending').length > 0 && (
+                        <span className="text-warning ml-2">
+                          <strong>{emailInbox.filter(e => e.status === 'pending').length} unbearbeitete E-Mails</strong>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Kreditoren Tab */}
         {tab === 'kreditoren' && (
           <div>
