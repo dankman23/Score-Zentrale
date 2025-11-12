@@ -380,6 +380,12 @@ export default function FibuModule() {
             <i className="bi bi-list-ol mr-1"/>Kontenplan
           </button>
           <button 
+            className={`btn ${tab === 'kreditoren' ? 'btn-primary' : 'btn-outline-secondary'}`}
+            onClick={() => setTab('kreditoren')}
+          >
+            <i className="bi bi-building mr-1"/>Kreditoren
+          </button>
+          <button 
             className={`btn ${tab === 'export' ? 'btn-primary' : 'btn-outline-secondary'}`}
             onClick={() => setTab('export')}
           >
