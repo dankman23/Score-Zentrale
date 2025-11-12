@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const to = searchParams.get('to') || '2025-10-31'
     const limit = parseInt(searchParams.get('limit') || '500', 10)
     
-    const pool = await getMSSQLConnection()
+    const pool = await getMssqlPool()
     
     const query = `
       SELECT
