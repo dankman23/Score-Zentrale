@@ -8,32 +8,19 @@ export async function GET() {
   try {
     const pool = await getMssqlPool()
     
-    // Get column names from tRechnung
-    const columns = await pool.request().query(`
-      SELECT TOP 1 * FROM dbo.tRechnung 
-      WHERE dErstellt >= '2025-10-01'
+    // Get column names from lvRechnungsverwaltung
+    const rvColumns = await pool.request().query(`
+      SELECT TOP 1 * FROM Verkauf.lvRechnungsverwaltung
     `)
     
-    const firstRow = columns.recordset[0]
-    const columnNames = firstRow ? Object.keys(firstRow) : []
-    
-    // Get column names from tZahlung
-    const zahlungColumns = await pool.request().query(`
-      SELECT TOP 1 * FROM dbo.tZahlung
-    `)
-    
-    const firstZahlung = zahlungColumns.recordset[0]
-    const zahlungColumnNames = firstZahlung ? Object.keys(firstZahlung) : []
+    const firstRV = rvColumns.recordset[0]
+    const rvColumnNames = firstRV ? Object.keys(firstRV) : []
     
     return NextResponse.json({
       ok: true,
-      tRechnung: {
-        columnNames,
-        sample: firstRow
-      },
-      tZahlung: {
-        columnNames,
-        sample: firstZahlung
+      lvRechnungsverwaltung: {
+        columnNames: rvColumnNames,
+        sample: firstRV
       }
     })
   } catch (error: any) {
