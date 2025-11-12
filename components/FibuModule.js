@@ -81,6 +81,7 @@ export default function FibuModule() {
   const [zahlungen, setZahlungen] = useState([])
   const [zahlungenLoading, setZahlungenLoading] = useState(false)
   const [showZahlungenTab, setShowZahlungenTab] = useState(false)
+  const [zahlungsFilter, setZahlungsFilter] = useState({ anbieter: 'alle', zuordnung: 'alle' })
   
   // Kontenplan laden
   const loadKontenplan = async () => {
