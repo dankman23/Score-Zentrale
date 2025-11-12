@@ -1,7 +1,11 @@
-# FIBU-Modul - JTL-Wawi Datenbank Dokumentation
+# JTL-Wawi Datenbank Dokumentation
 
 ## 🔗 Offizielle JTL-Wawi Datenbank-Dokumentation
 **URL**: https://wawi-db.jtl-software.de/tables/1.10.15.0
+
+⚠️ **WICHTIG**: Diese Dokumentation gilt für ALLE JTL-Datenbank-Abfragen, nicht nur FIBU!
+- Bei Bedarf Version prüfen und URL anpassen
+- Aktuelle Version: 1.10.15.0
 
 ## 📊 Wichtige Tabellen für FIBU
 
