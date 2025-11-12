@@ -30,10 +30,16 @@ export interface ExtractedInvoiceData {
 
 /**
  * Extrahiert Rechnungsdaten aus PDF-Inhalt mit Gemini 2.0 Flash
+ * Optional: Mit E-Mail-Text für zusätzlichen Kontext
  */
 export async function extractInvoiceData(
   pdfContent: Buffer,
-  extractionPrompt?: string
+  extractionPrompt?: string,
+  emailContext?: {
+    from?: string
+    subject?: string
+    body?: string
+  }
 ): Promise<ExtractedInvoiceData> {
   try {
     const model = getGeminiModel()
