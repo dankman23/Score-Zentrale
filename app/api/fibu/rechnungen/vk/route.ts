@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
     
     for (const rechnung of rechnungen.slice(0, limit)) {
       await collection.updateOne(
-        { kRechnung: rechnung.kRechnung, typ: rechnung.typ },
+        { kRechnung: rechnung.kRechnung },
         { 
           $set: { 
             ...rechnung, 
