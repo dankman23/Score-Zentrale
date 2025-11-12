@@ -641,6 +641,7 @@ export default function FibuModule() {
     if (tab === 'kontenplan') loadKontenplan()
     if (tab === 'vk') loadVkRechnungen()
     if (tab === 'ek') loadEkRechnungen()
+    if (tab === 'zahlungen') loadZahlungen()
     if (tab === 'kreditoren') loadKreditoren()
     if (tab === 'inbox') loadEmailInbox()
   }, [tab, dateFrom, dateTo])
