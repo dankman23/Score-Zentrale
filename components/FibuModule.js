@@ -1439,19 +1439,20 @@ export default function FibuModule() {
                                   )}
                                 </td>
                                 <td>
-                                  <button 
-                                    className="btn btn-sm btn-outline-primary mr-1"
-                                    title="E-Mail anzeigen"
-                                  >
-                                    <i className="bi bi-eye"/>
-                                  </button>
                                   {email.status === 'pending' && (
                                     <button 
-                                      className="btn btn-sm btn-outline-success"
-                                      title="Als verarbeitet markieren"
+                                      className="btn btn-sm btn-success mr-1"
+                                      onClick={() => handleProcessEmail(email)}
+                                      title="Verarbeiten"
                                     >
-                                      <i className="bi bi-check"/>
+                                      <i className="bi bi-pencil-square mr-1"/>
+                                      Verarbeiten
                                     </button>
+                                  )}
+                                  {email.status === 'processed' && (
+                                    <span className="badge badge-success">
+                                      <i className="bi bi-check-lg"/> Erledigt
+                                    </span>
                                   )}
                                 </td>
                               </tr>
