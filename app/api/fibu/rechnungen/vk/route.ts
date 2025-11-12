@@ -68,9 +68,9 @@ export async function GET(request: NextRequest) {
         const brutto = netto + mwst
         
         // Kontenzuordnung
-        const kundenLand = r.kundenLand || 'DE'
-        const hatUstId = r.kundenUstId && r.kundenUstId.length > 0
-        const istInnerg = hatUstId && kundenLand !== 'DE'
+        const kundenLand = 'DE' // Wird später aus separater Query geladen
+        const hatUstId = false // Wird später aus separater Query geladen
+        const istInnerg = false
         
         rechnungen.push({
           kRechnung: r.kRechnung,
@@ -82,9 +82,9 @@ export async function GET(request: NextRequest) {
           mwstSatz: parseFloat(mwstSatz.toFixed(2)),
           status: r.cBezahlt === 'Y' ? 'Bezahlt' : 'Offen',
           kKunde: r.kKunde,
-          kundenName: r.kundenName || 'Unbekannt',
+          kundenName: `Kunde #${r.kKunde}`, // Wird später ergänzt
           kundenLand,
-          kundenUstId: r.kundenUstId || null,
+          kundenUstId: null,
           zahlungsart: r.zahlungsart || 'Unbekannt',
           kZahlungsart: r.kZahlungsart || 0,
           istGutschrift: isGutschrift(r.cRechnungsNr),
