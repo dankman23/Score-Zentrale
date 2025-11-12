@@ -28,6 +28,20 @@ export default function FibuModule() {
   // EK-Rechnungen
   const [ekRechnungen, setEkRechnungen] = useState([])
   const [ekLoading, setEkLoading] = useState(false)
+  const [showEkModal, setShowEkModal] = useState(false)
+  const [ekFiles, setEkFiles] = useState([])
+  const [ekForm, setEkForm] = useState({
+    lieferantName: '',
+    kreditorKonto: '',
+    rechnungsnummer: '',
+    rechnungsdatum: new Date().toISOString().slice(0, 10),
+    gesamtBetrag: '',
+    aufwandskonto: '5200',
+    beschreibung: '',
+    neuerKreditor: false
+  })
+  const [ekSearchKreditor, setEkSearchKreditor] = useState('')
+  const [ekMatchResult, setEkMatchResult] = useState(null)
   
   // Export
   const [exportFrom, setExportFrom] = useState('2025-01-01')
