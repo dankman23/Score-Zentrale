@@ -70,21 +70,25 @@ export async function GET(request: NextRequest) {
       WHERE kArtikel = ${kArtikel}
     `)
     
-    // 4. Verkaufsdaten für Erfolgsmetrik (letzte 12 Monate)
-    const verkaufsdaten = await pool.request().query(`
-      SELECT 
-        op.fVKNetto as vk_netto,
-        op.fEKNetto as ek_netto,
-        op.nAnzahl as menge,
-        o.dErstellt as datum,
-        DATEDIFF(day, o.dErstellt, GETDATE()) as tage_alt
-      FROM dbo.tBestellposition op
-      INNER JOIN dbo.tBestellung o ON op.tBestellung_kBestellung = o.kBestellung
-      WHERE op.kArtikel = ${kArtikel}
-        AND o.dErstellt >= DATEADD(month, -12, GETDATE())
-        AND o.cStatus NOT IN ('storniert', 'abgelehnt')
-      ORDER BY o.dErstellt DESC
-    `)
+    // 4. Verkaufsdaten für Erfolgsmetrik (aus Auftragsposition - letzte 12 Monate)
+    let verkaufsdaten = { recordset: [] }
+    try {
+      verkaufsdaten = await pool.request().query(`
+        SELECT 
+          pos.fPreis as vk_netto,
+          pos.fEKNetto as ek_netto,
+          pos.fAnzahl as menge,
+          auf.dErstellt as datum
+        FROM dbo.tAuftragPosition pos
+        INNER JOIN dbo.tAuftrag auf ON pos.tAuftrag_kAuftrag = auf.kAuftrag
+        WHERE pos.kArtikel = ${kArtikel}
+          AND auf.dErstellt >= DATEADD(month, -12, GETDATE())
+          AND auf.cStatus NOT IN ('storniert', 'abgelehnt')
+        ORDER BY auf.dErstellt DESC
+      `)
+    } catch (e: any) {
+      console.log('Verkaufsdaten nicht verfügbar:', e.message)
+    }
     
     // 5. Berechne Erfolgsmetriken für jeden Preis-Zeitraum
     const historieWithMetrics = preisHistorie.map((preis, idx) => {
