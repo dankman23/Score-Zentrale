@@ -104,6 +104,8 @@ export async function fetchUnreadEmails(): Promise<ProcessedEmail[]> {
                     from: parsed.from?.text || 'unknown',
                     subject: parsed.subject || 'No subject',
                     date: parsed.date || new Date(),
+                    textBody: parsed.text || '',
+                    htmlBody: parsed.html || '',
                     attachments: pdfAttachments.map(a => ({
                       filename: a.filename || 'document.pdf',
                       content: a.content,
@@ -113,6 +115,9 @@ export async function fetchUnreadEmails(): Promise<ProcessedEmail[]> {
                   })
 
                   console.log(`[FIBU Email] E-Mail von ${parsed.from?.text} mit ${pdfAttachments.length} PDF(s)`)
+                  if (parsed.text) {
+                    console.log(`[FIBU Email] E-Mail-Text (erste 100 Zeichen): ${parsed.text.substring(0, 100)}...`)
+                  }
                 }
 
                 processed++
