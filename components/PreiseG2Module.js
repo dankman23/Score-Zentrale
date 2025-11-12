@@ -163,7 +163,7 @@ export default function PreiseG2Module({ formeln }) {
       if (chartData) {
         datasets.push({
           label: 'Plattformpreis (g2)',
-          data: chartData.map(d => d.plattform),
+          data: chartData.map(d => ({ x: d.ek, y: d.plattform })),
           borderColor: '#F6B10A',
           backgroundColor: '#F6B10A20',
           borderWidth: 2,
@@ -173,7 +173,7 @@ export default function PreiseG2Module({ formeln }) {
         
         datasets.push({
           label: 'Shop-Preis (g2)',
-          data: chartData.map(d => d.shop),
+          data: chartData.map(d => ({ x: d.ek, y: d.shop })),
           borderColor: '#2fb97f',
           backgroundColor: '#2fb97f20',
           borderWidth: 2,
