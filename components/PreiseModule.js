@@ -52,6 +52,75 @@ export default function PreiseModule() {
     }
   }, [sheet, formeln])
 
+  // Chart für Alte PB rendern
+  useEffect(() => {
+    if ((chartData || uploadedData) && typeof window !== 'undefined' && window.Chart) {
+      const ctx = document.getElementById('altePbChart')
+      if (!ctx) return
+
+      const existingChart = window.Chart.getChart('altePbChart')
+      if (existingChart) existingChart.destroy()
+
+      const datasets = []
+      
+      // Berechnete Daten
+      if (chartData) {
+        datasets.push({
+          label: 'Plattformpreis (berechnet)',
+          data: chartData.map(d => d.plattform),
+          borderColor: '#F6B10A',
+          backgroundColor: '#F6B10A20',
+          borderWidth: 2,
+          tension: 0.3,
+          pointRadius: 2
+        })
+        
+        datasets.push({
+          label: 'Shop-Preis (berechnet)',
+          data: chartData.map(d => d.shop),
+          borderColor: '#2fb97f',
+          backgroundColor: '#2fb97f20',
+          borderWidth: 2,
+          tension: 0.3,
+          pointRadius: 2
+        })
+      }
+      
+      // Hochgeladene Daten
+      if (uploadedData) {
+        datasets.push({
+          label: 'Hochgeladene Preise',
+          data: uploadedData.map(d => d.vk),
+          borderColor: '#e44c4c',
+          backgroundColor: '#e44c4c20',
+          borderWidth: 2,
+          tension: 0.3,
+          pointRadius: 3,
+          pointStyle: 'circle'
+        })
+      }
+
+      const labels = chartData ? chartData.map(d => d.ek + '€') : uploadedData.map(d => d.ek + '€')
+
+      new window.Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top', labels: { font: { size: 9 }, boxWidth: 15, padding: 8 } },
+            title: { display: true, text: 'Preisverlauf', font: { size: 13 } }
+          },
+          scales: {
+            x: { title: { display: true, text: 'EK (€)', font: { size: 11 } }, ticks: { maxTicksLimit: 15, font: { size: 9 } } },
+            y: { title: { display: true, text: 'VK (€)', font: { size: 11 } }, beginAtZero: true, ticks: { font: { size: 9 } } }
+          }
+        }
+      })
+    }
+  }, [chartData, uploadedData])
+
   // Vergleichs-Diagramm rendern
   useEffect(() => {
     if (vergleichData.length > 0 && typeof window !== 'undefined' && window.Chart) {
