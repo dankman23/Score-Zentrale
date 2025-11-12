@@ -71,7 +71,12 @@ export async function GET(request: NextRequest) {
         u.fBetrag AS betrag,
         u.dBuchungsdatum AS zahlungsdatum,
         ISNULL(u.cVerwendungszweck, '') AS hinweis,
-        ISNULL(m.cName, 'Bank-Überweisung') AS zahlungsart,
+        CASE 
+          WHEN u.kZahlungsabgleichModul = 1 THEN 'PayPal (Bank)'
+          WHEN u.kZahlungsabgleichModul = 5 THEN 'Commerzbank'
+          WHEN u.kZahlungsabgleichModul = 7 THEN 'eBay (Bank)'
+          ELSE 'Bank-Überweisung'
+        END AS zahlungsart,
         0 AS kZahlungsart,
         CASE 
           WHEN r.kRechnung IS NOT NULL THEN 'Via Referenz'
@@ -80,7 +85,6 @@ export async function GET(request: NextRequest) {
         NULL AS cBestellNr,
         ISNULL(u.cName, '') AS kundenName
       FROM dbo.tZahlungsabgleichUmsatz u
-      LEFT JOIN dbo.tZahlungsabgleichModul m ON u.kZahlungsabgleichModul = m.kZahlungsabgleichModul
       -- Versuche Zuordnung über cReferenz (z.B. "AU_12345")
       LEFT JOIN dbo.tBestellung b ON u.cReferenz = b.cBestellNr
       LEFT JOIN dbo.tRechnung r ON b.kBestellung = r.tBestellung_kBestellung
