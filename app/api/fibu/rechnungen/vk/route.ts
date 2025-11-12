@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
         r.cBezahlt,
         r.cStatus,
         r.tBestellung_kBestellung AS kBestellung,
-        r.cEmpfaenger AS kundenName,
+        'Kunde #' + CAST(r.tKunde_kKunde AS VARCHAR) AS kundenName,
         b.cBestellNr,
         b.kZahlungsart,
         za.cName AS zahlungsart,
