@@ -182,6 +182,17 @@ export async function processEmailInbox(): Promise<{
     for (const email of emails) {
       try {
         for (const attachment of email.attachments) {
+          // Prüfe auf Duplikat (gleiche Message-ID + gleicher Dateiname)
+          const existing = await collection.findOne({
+            emailMessageId: email.messageId,
+            filename: attachment.filename
+          })
+          
+          if (existing) {
+            console.log(`[FIBU Email] SKIP Duplikat: ${attachment.filename} von ${email.from} (bereits vorhanden)`)
+            continue
+          }
+          
           // Speichere PDF-Anhang
           const doc = {
             emailFrom: email.from,
