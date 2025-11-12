@@ -53,22 +53,11 @@ export async function GET(request: NextRequest) {
     
     for (const r of result.recordset) {
       try {
-        // Lade Rechnungsbeträge aus lvRechnungsposition View
-        const betraegeQuery = await pool.request()
-          .input('kRechnung', r.kRechnung)
-          .query(`
-            SELECT 
-              SUM(fVKNetto) AS netto,
-              AVG(fMwStSatz) AS mwstSatz
-            FROM Verkauf.lvRechnungsposition
-            WHERE kRechnung = @kRechnung
-          `)
-        
-        const betraege = betraegeQuery.recordset[0] || { netto: 0, mwstSatz: 19 }
-        const netto = parseFloat(betraege.netto || 0)
-        const mwstSatz = parseFloat(betraege.mwstSatz || 19)
-        const mwst = netto * (mwstSatz / 100)
-        const brutto = netto + mwst
+        // Beträge sind bereits im Query geladen
+        const brutto = parseFloat(r.brutto || 0)
+        const netto = parseFloat(r.netto || 0)
+        const mwst = brutto - netto
+        const mwstSatz = netto > 0 ? (mwst / netto) * 100 : 19
         
         // Kontenzuordnung
         const kundenLand = 'DE' // Wird später aus separater Query geladen
