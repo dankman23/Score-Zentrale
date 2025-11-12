@@ -130,15 +130,20 @@ export default function PreiseG2Module({ formeln }) {
     if (!sel) return
 
     setLoading(true)
+    
+    // Berechne dynamische Staffelgrenzen
+    const ek = parseFloat(ekInput)
+    const staffelMengen = berechneStaffelgrenzen(ek, staffelSystem)
+    
     try {
       const res = await fetch('/api/preise/g2/berechnen', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ek: parseFloat(ekInput),
+          ek,
           warengruppe_regler: sel.regler,
           g2_params: g2Params,
-          staffel_mengen: [1, 5, 10, 20, 50, 100, 200, 500]
+          staffel_mengen: staffelMengen
         })
       })
       const data = await res.json()
