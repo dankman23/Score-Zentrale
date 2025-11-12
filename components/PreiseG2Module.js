@@ -205,23 +205,36 @@ export default function PreiseG2Module({ formeln }) {
         setErgebnisse(selected.ergebnisse)
         setPlattformpreis(selected.plattform)
         
-        // Generiere Chart-Daten
-        if (selected.plattform && selected.shop) {
-          const ekVal = parseFloat(ekInput)
-          const chartPoints = []
-          
-          // 16 Punkte von 0 bis 300€
-          for (let i = 0; i <= 300; i += 20) {
-            const ratio = i / ekVal
-            chartPoints.push({
-              ek: i,
-              plattform: selected.plattform * ratio,
-              shop: selected.shop * ratio
+        // Generiere ECHTE Chart-Daten mit API-Calls
+        const chartPoints = []
+        
+        // 16 Punkte von 0 bis 300€ - ECHTE Berechnungen
+        for (let i = 0; i <= 300; i += 20) {
+          if (i === 0) {
+            chartPoints.push({ ek: 0, plattform: 0, shop: 0 })
+          } else {
+            const res = await fetch('/api/preise/g2/berechnen', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                ek: i,
+                warengruppe_regler: selectedFormel.regler,
+                g2_params: g2Params,
+                staffel_mengen: [1]
+              })
             })
+            const data = await res.json()
+            if (data.ok) {
+              chartPoints.push({
+                ek: i,
+                plattform: data.plattform_unit || 0,
+                shop: data.shop_unit || 0
+              })
+            }
           }
-          
-          setChartData(chartPoints)
         }
+        
+        setChartData(chartPoints)
       }
     } catch (e) {
       alert('Fehler: ' + e.message)
