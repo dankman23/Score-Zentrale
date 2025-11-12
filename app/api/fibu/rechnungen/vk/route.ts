@@ -62,12 +62,14 @@ export async function GET(request: NextRequest) {
         const mwst = brutto - netto
         const mwstSatz = netto > 0 ? (mwst / netto) * 100 : 19
         
-        // Kundendaten vorerst als Platzhalter (werden später per separater Query geladen)
-        const kundenName = `Kunde #${r.kKunde}`
+        // Kundendaten aus lvRechnungsverwaltung
+        const kundenName = r.kundenName || `Kunde #${r.kKunde}`
+        const kundenUstId = r.kundenUstId && r.kundenUstId.length > 0 ? r.kundenUstId : null
+        const hatUstId = kundenUstId !== null
+        
+        // Land muss noch ermittelt werden - vorerst Default 'DE'
         const kundenLand = 'DE'
-        const kundenUstId = null
-        const hatUstId = false
-        const istInnerg = false
+        const istInnerg = hatUstId && kundenLand !== 'DE'
         
         rechnungen.push({
           kRechnung: r.kRechnung,
