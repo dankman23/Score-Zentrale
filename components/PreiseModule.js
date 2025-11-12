@@ -47,12 +47,7 @@ export default function PreiseModule() {
     }
   }, [sheet, formeln])
 
-  // Formeln beim ersten Laden abrufen
-  useEffect(() => {
-    loadFormeln()
-  }, [])
-
-  useEffect(() => {
+  // Vergleichs-Diagramm rendern
     if (formeln.length > 0) {
       const formel = formeln.find(f => f.sheet === sheet)
       setCurrentFormel(formel)
