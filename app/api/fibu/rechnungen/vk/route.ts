@@ -50,22 +50,11 @@ export async function GET(request: NextRequest) {
     
     for (const r of result.recordset) {
       try {
-        // Lade Rechnungsbeträge
-        const betraegeQuery = await pool.request()
-          .input('kRechnung', r.kRechnung)
-          .query(`
-            SELECT 
-              SUM(fVKNetto * fAnzahl) AS netto,
-              AVG(fMwStSatz) AS mwstSatz
-            FROM dbo.tRechnungPosition
-            WHERE kRechnung = @kRechnung
-          `)
-        
-        const betraege = betraegeQuery.recordset[0] || { netto: 0, mwstSatz: 0 }
-        const netto = parseFloat(betraege.netto || 0)
-        const mwstSatz = parseFloat(betraege.mwstSatz || 19)
-        const mwst = netto * (mwstSatz / 100)
-        const brutto = netto + mwst
+        // Beträge werden vorerst auf 0 gesetzt, bis wir die richtige Tabelle finden
+        const netto = 0
+        const mwstSatz = 19 // Default
+        const mwst = 0
+        const brutto = 0
         
         // Kontenzuordnung
         const kundenLand = 'DE' // Wird später aus separater Query geladen
