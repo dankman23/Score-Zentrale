@@ -152,6 +152,25 @@ export default function PreiseModule() {
       
       if (data.ok) {
         setErgebnisse(data.ergebnisse)
+        
+        // Generiere Chart-Daten
+        if (data.ergebnisse.length > 0) {
+          const firstResult = data.ergebnisse[0]
+          const ekVal = parseFloat(ek)
+          const chartPoints = []
+          
+          // 16 Punkte von 0 bis 300€
+          for (let i = 0; i <= 300; i += 20) {
+            const ratio = i / ekVal
+            chartPoints.push({
+              ek: i,
+              plattform: firstResult.vk_netto * ratio,
+              shop: firstResult.vk_shop_netto * ratio
+            })
+          }
+          
+          setChartData(chartPoints)
+        }
       } else {
         alert('Fehler: ' + (data.error || 'Unbekannter Fehler'))
       }
@@ -160,6 +179,24 @@ export default function PreiseModule() {
       alert('Fehler bei der Berechnung: ' + e.message)
     }
     setLoading(false)
+  }
+  
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+    
+    try {
+      const { parsePreisFile, intelligentSample } = await import('@/lib/preis-utils')
+      const preise = await parsePreisFile(file)
+      
+      // Intelligentes Sampling auf 30 Punkte
+      const sampled = intelligentSample(preise, 30)
+      
+      setUploadedData(sampled)
+      alert(`✅ ${preise.length} Preise geladen, ${sampled.length} Punkte angezeigt`)
+    } catch (e) {
+      alert('Fehler beim Laden der Datei: ' + e.message)
+    }
   }
 
   const updateRegler = (key, value) => {
