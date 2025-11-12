@@ -179,7 +179,7 @@ export default function PreiseG2Module({ formeln }) {
         setPlattformpreis(selected.plattform)
         
         // Generiere Chart-Daten
-        if (data.plattform_unit && data.shop_unit) {
+        if (selected.plattform && selected.shop) {
           const ekVal = parseFloat(ekInput)
           const chartPoints = []
           
@@ -188,13 +188,14 @@ export default function PreiseG2Module({ formeln }) {
             const ratio = i / ekVal
             chartPoints.push({
               ek: i,
-              plattform: data.plattform_unit * ratio,
-              shop: data.shop_unit * ratio
+              plattform: selected.plattform * ratio,
+              shop: selected.shop * ratio
             })
           }
           
           setChartData(chartPoints)
         }
+      }
       }
     } catch (e) {
       alert('Fehler: ' + e.message)
