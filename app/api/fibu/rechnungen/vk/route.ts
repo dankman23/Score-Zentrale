@@ -48,18 +48,18 @@ export async function GET(request: NextRequest) {
       
       -- Externe Rechnungen (Amazon, eBay, etc.)
       SELECT 
-        er.kExterneRechnung AS kRechnung,
-        er.cRechnungsNr,
+        CAST(er.kExterneRechnung AS INT) AS kRechnung,
+        CAST(er.cRechnungsNr AS NVARCHAR(50)) AS cRechnungsNr,
         er.dErstellt AS rechnungsdatum,
         er.fBrutto AS brutto,
         er.fBrutto / 1.19 AS netto,  -- Vereinfachung
         er.fBrutto - (er.fBrutto / 1.19) AS fMwSt,
         'Bezahlt' AS cStatus,
-        ISNULL(er.kKunde, 0) AS kKunde,
-        ISNULL(er.cPlattform, 'Extern') AS kundenName,
+        ISNULL(er.kAuftrag, 0) AS kKunde,
+        'Extern' AS kundenName,
         '' AS kundenUstId,
         'DE' AS kundenLand,
-        ISNULL(er.cPlattform, 'Extern') AS zahlungsart,
+        'Extern' AS zahlungsart,
         0 AS kZahlungsart,
         'EXTERN' AS typ
       FROM Verkauf.lvExterneRechnung er
