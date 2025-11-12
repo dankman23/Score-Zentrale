@@ -442,6 +442,24 @@ export default function FibuModule() {
     setKreditorenLoading(false)
   }
   
+  // Zahlungen laden
+  const loadZahlungen = async () => {
+    setZahlungenLoading(true)
+    try {
+      const res = await fetch(`/api/fibu/zahlungen?from=${dateFrom}&to=${dateTo}&limit=500`)
+      const data = await res.json()
+      if (data.ok) {
+        setZahlungen(data.zahlungen)
+      } else {
+        alert('Fehler beim Laden der Zahlungen: ' + data.error)
+      }
+    } catch (error) {
+      console.error('Fehler:', error)
+      alert('Fehler beim Laden der Zahlungen')
+    }
+    setZahlungenLoading(false)
+  }
+  
   // E-Mail Inbox laden
   const loadEmailInbox = async () => {
     setEmailInboxLoading(true)
