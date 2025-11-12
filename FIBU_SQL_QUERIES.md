@@ -26,8 +26,8 @@ SELECT
 FROM dbo.tRechnung r
 LEFT JOIN dbo.tKunde k ON r.kKunde = k.kKunde
 LEFT JOIN dbo.tZahlungsart za ON r.kZahlungsart = za.kZahlungsart
-WHERE r.dErstellt >= '2024-10-01' 
-  AND r.dErstellt < '2024-11-01'
+WHERE r.dErstellt >= '2025-10-01' 
+  AND r.dErstellt < '2025-11-01'
 ORDER BY r.dErstellt
 ```
 
@@ -47,8 +47,8 @@ SELECT
   rp.fMwStSatz AS MwSt_Satz
 FROM dbo.tRechnungPosition rp
 INNER JOIN dbo.tRechnung r ON rp.kRechnung = r.kRechnung
-WHERE r.dErstellt >= '2024-10-01' 
-  AND r.dErstellt < '2024-11-01'
+WHERE r.dErstellt >= '2025-10-01' 
+  AND r.dErstellt < '2025-11-01'
 ```
 
 ### 3. Externe Rechnungen (Amazon, eBay) - Oktober 2024
@@ -63,8 +63,8 @@ SELECT
   er.cPlattform,  -- 'Amazon', 'eBay', etc.
   er.kAuftrag
 FROM Verkauf.lvExterneRechnung er
-WHERE er.dErstellt >= '2024-10-01'
-  AND er.dErstellt < '2024-11-01'
+WHERE er.dErstellt >= '2025-10-01'
+  AND er.dErstellt < '2025-11-01'
 ```
 
 ### 4. Zahlungen - Oktober 2024
@@ -84,8 +84,8 @@ SELECT
 FROM dbo.tZahlung z
 LEFT JOIN dbo.tZahlungsart za ON z.kZahlungsart = za.kZahlungsart
 LEFT JOIN dbo.tRechnung r ON z.kRechnung = r.kRechnung
-WHERE z.dZeit >= '2024-10-01'
-  AND z.dZeit < '2024-11-01'
+WHERE z.dZeit >= '2025-10-01'
+  AND z.dZeit < '2025-11-01'
 ORDER BY z.dZeit
 ```
 
@@ -107,8 +107,8 @@ SELECT
   l.cUSTID AS Lieferanten_UStID
 FROM dbo.tEingangsrechnung er
 LEFT JOIN dbo.tLieferant l ON er.kLieferant = l.kLieferant
-WHERE er.dRechnungsdatum >= '2024-10-01'
-  AND er.dRechnungsdatum < '2024-11-01'
+WHERE er.dRechnungsdatum >= '2025-10-01'
+  AND er.dRechnungsdatum < '2025-11-01'
 ORDER BY er.dRechnungsdatum
 ```
 
@@ -126,8 +126,8 @@ SELECT
   erp.fMwSt AS MwSt_Betrag
 FROM dbo.tEingangsrechnungPos erp
 INNER JOIN dbo.tEingangsrechnung er ON erp.kEingangsrechnung = er.kEingangsrechnung
-WHERE er.dRechnungsdatum >= '2024-10-01'
-  AND er.dRechnungsdatum < '2024-11-01'
+WHERE er.dRechnungsdatum >= '2025-10-01'
+  AND er.dRechnungsdatum < '2025-11-01'
 ```
 
 ## 🔍 Hilfstabellen
@@ -173,8 +173,8 @@ SELECT
   SUM(r.fMwSt) AS Gesamt_MwSt
 FROM dbo.tRechnung r
 LEFT JOIN dbo.tZahlungsart za ON r.kZahlungsart = za.kZahlungsart
-WHERE r.dErstellt >= '2024-10-01'
-  AND r.dErstellt < '2024-11-01'
+WHERE r.dErstellt >= '2025-10-01'
+  AND r.dErstellt < '2025-11-01'
 GROUP BY za.cName
 ORDER BY Gesamt_Brutto DESC
 ```
@@ -192,8 +192,8 @@ SELECT
 FROM dbo.tRechnung r
 LEFT JOIN dbo.tKunde k ON r.kKunde = k.kKunde
 LEFT JOIN dbo.tZahlung z ON r.kRechnung = z.kRechnung
-WHERE r.dErstellt >= '2024-10-01'
-  AND r.dErstellt < '2024-11-01'
+WHERE r.dErstellt >= '2025-10-01'
+  AND r.dErstellt < '2025-11-01'
 GROUP BY r.kRechnung, r.cRechnungsNr, r.dErstellt, r.fGesamtsumme, k.cFirma
 HAVING r.fGesamtsumme - ISNULL(SUM(z.fBetrag), 0) > 0
 ```
@@ -205,7 +205,7 @@ HAVING r.fGesamtsumme - ISNULL(SUM(z.fBetrag), 0) > 0
 ```sql
 -- Wenn tAmazonPayment existiert
 SELECT * FROM dbo.tAmazonPayment
-WHERE dZeit >= '2024-10-01' AND dZeit < '2024-11-01'
+WHERE dZeit >= '2025-10-01' AND dZeit < '2025-11-01'
 ```
 
 ### eBay Zahlungen
@@ -213,7 +213,7 @@ WHERE dZeit >= '2024-10-01' AND dZeit < '2024-11-01'
 ```sql
 -- Wenn tEbayPayment existiert
 SELECT * FROM dbo.tEbayPayment  
-WHERE dZeit >= '2024-10-01' AND dZeit < '2024-11-01'
+WHERE dZeit >= '2025-10-01' AND dZeit < '2025-11-01'
 ```
 
 ### PayPal Zahlungen
@@ -221,7 +221,7 @@ WHERE dZeit >= '2024-10-01' AND dZeit < '2024-11-01'
 ```sql
 -- Wenn tPayPalZahlung existiert
 SELECT * FROM dbo.tPayPalZahlung
-WHERE dZeit >= '2024-10-01' AND dZeit < '2024-11-01'
+WHERE dZeit >= '2025-10-01' AND dZeit < '2025-11-01'
 ```
 
 ## 🔧 Technische Hinweise
@@ -229,7 +229,7 @@ WHERE dZeit >= '2024-10-01' AND dZeit < '2024-11-01'
 ### Datumsformate
 - JTL speichert Daten als `datetime`
 - Filter immer mit `>=` und `<` für Monats-Range
-- Beispiel: `WHERE dErstellt >= '2024-10-01' AND dErstellt < '2024-11-01'`
+- Beispiel: `WHERE dErstellt >= '2025-10-01' AND dErstellt < '2025-11-01'`
 
 ### Schemas
 - `dbo` - Hauptschema (Standard-Tabellen)
