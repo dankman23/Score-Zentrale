@@ -417,6 +417,13 @@ export default function PreiseModule() {
           >
             <i className="bi bi-bar-chart mr-1"/>Vergleich
           </button>
+          <button 
+            className={`btn btn-sm ${tab === 'historie' ? 'btn-primary' : 'btn-outline-secondary'}`}
+            onClick={() => setTab('historie')}
+            style={{fontSize: '0.85rem'}}
+          >
+            <i className="bi bi-clock-history mr-1"/>Historie
+          </button>
         </div>
 
         {tab === 'alte_pb' && (
