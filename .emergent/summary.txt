@@ -1,102 +1,98 @@
 <analysis>
-The trajectory details a significant and complex development effort focused on building out the FIBU (Accounting) module of the Score Zentrale application. The work began with a user request to implement a full-featured Kontenplan (Chart of Accounts) management system. This involved creating backend APIs for CRUD operations and Excel import, storing the data in MongoDB, and building a comprehensive frontend UI in the  component. A key challenge emerged when loading the full dataset (4,482 accounts), which caused frontend performance issues. This was adeptly solved by implementing server-side pagination and filtering, a crucial architectural decision.
+The trajectory documents the development of a comprehensive accounting (FIBU) module for the Score Zentrale application. The work commenced with building a Kontenplan (Chart of Accounts) management system, including CRUD APIs and an Excel import feature, with data stored in MongoDB. A key architectural decision was implementing server-side pagination to resolve frontend performance issues when loading large datasets.
 
-The next major phase involved fetching transactional data (invoices and payments) from an external JTL MS SQL database. This proved to be a difficult, iterative process involving extensive debugging of SQL queries. The engineer systematically overcame numerous Invalid column name and Invalid object name errors by creating test endpoints to explore the database schema, simplifying queries, and strategically using JTL's built-in views (like ) instead of direct table joins.
+The next phase involved integrating with an external JTL MS SQL database to fetch sales invoices (VK) and payments. This was a challenging, iterative process marked by extensive SQL debugging to correctly identify table and column names within the JTL schema.
 
-Finally, the engineer integrated AI-powered document processing by adding a feature to upload supplier invoices (EK-Rechnungen) as PDFs. Following a user request for Gemini 2.0 Flash, an integration playbook was used to set up the Gemini API for data extraction. The trajectory concludes with the user requesting the final piece of the puzzle: creating an export file in the format required by 10it software.
+Subsequently, the module was enhanced with AI capabilities by integrating Google Gemini to parse uploaded supplier invoice (EK) PDFs. Following this, the core objective of creating a data export compatible with 10it accounting software was successfully completed.
+
+Further development, driven by user feedback, included importing a list of creditors (Kreditoren) from a CSV for automatic matching against supplier invoices, and building a fully automated email inbox poller using IMAP to ingest invoices sent as attachments.
+
+The trajectory concludes with the engineer addressing critical data discrepancy issues reported by the user, specifically concerning incorrect payment-to-invoice association and missing transaction data from certain providers.
 </analysis>
 
 <product_requirements>
-The primary objective is to build a comprehensive FIBU (Accounting) module within the Score Zentrale application to automate bookkeeping tasks.
+The primary objective is to build a comprehensive FIBU (Accounting) module to automate and streamline bookkeeping tasks for the Score Zentrale application.
 
-**Core Features:**
-1.  **Chart of Accounts (Kontenplan) Management:**
-    *   Implement a system to import a chart of accounts from a user-provided Excel file.
-    *   The system must be stored in MongoDB and managed via a dedicated UI, allowing full CRUD (Create, Read, Update, Delete) operations.
-    *   The UI must support searching and filtering.
-
-2.  **Data Aggregation from JTL Database:**
-    *   Fetch sales invoices (VK-Rechnungen), including customer details, amounts, and tax information, from the JTL MS SQL database.
-    *   Fetch all payment records (Zahlungen) from the JTL database.
-    *   Associate fetched invoices and payments with the correct revenue accounts (Sachkonten) and debtor accounts (Debitoren) based on complex, user-defined business rules (e.g., special handling for EU customers with VAT IDs).
-
-3.  **Supplier Invoice Processing:**
-    *   Implement a feature allowing users to upload supplier invoices (EK-Rechnungen) in PDF format.
-    *   Utilize an AI model (specifically Google Gemini) to parse these PDFs and extract key information like invoice number, date, and amounts.
-
-4.  **Data Export:**
-    *   Generate a final export file (CSV/Excel) containing all aggregated booking data, formatted specifically for compatibility with the 10it accounting software.
+**Core Features Implemented:**
+1.  **Chart of Accounts (Kontenplan):** A complete CRUD system for managing accounts, including import from Excel, stored in MongoDB.
+2.  **JTL Data Integration:** Fetching sales invoices (VK-Rechnungen) and all payment records (Zahlungen) from an external JTL MS SQL database.
+3.  **AI-Powered Supplier Invoice Processing (EK-Rechnungen):** A feature to upload supplier invoices as PDFs, which are automatically parsed by Google Gemini to extract key data.
+4.  **Creditor Management:** Import of creditors via CSV and an intelligent matching system to automatically associate uploaded supplier invoices with the correct creditor.
+5.  **Automated Email Ingestion:** An IMAP email inbox poller that automatically fetches emails, extracts PDF invoice attachments, and adds them to the processing queue. This includes parsing the email body text for additional context.
+6.  **10it Data Export:** Generation of a CSV export file containing aggregated booking data formatted for the 10it accounting software.
+7.  **Unified UI:** A multi-tab interface within the FIBU module to manage all the above features, including manual overrides for invoice-creditor matching.
 </product_requirements>
 
 <key_technical_concepts>
-- **Frontend:** React ('use client'), Next.js, Tailwind CSS.
+- **Frontend:** React ('use client'), Next.js, Tailwind CSS, shadcn/ui.
 - **Backend:** Next.js API Routes (TypeScript), Node.js.
 - **Databases:**
-    - **MongoDB:** For storing application data like the Chart of Accounts (Kontenplan).
-    - **MS SQL:** For querying the external JTL business database.
-- **AI Integration:** Google Gemini API () for parsing PDF documents.
-- **File Handling:**  for Excel parsing,  and  for PDF uploads.
-- **Architecture:** Server-side filtering and pagination to handle large datasets efficiently.
+    - **MongoDB:** For application data (Kontenplan, EK-Rechnungen, Kreditoren, Email-Inbox).
+    - **MS SQL:** For querying the external JTL ERP database.
+- **AI Integration:** Google Gemini () for PDF and text parsing.
+- **Integrations:**  &  for email polling,  for Excel,  for PDF reading.
+- **Key Patterns:** Server-side pagination, cron job for automation, robust error handling for external services (SQL, IMAP).
 </key_technical_concepts>
 
 <code_architecture>
-The application is a Next.js full-stack project. The core work was done within the FIBU module, which involves new API routes to interact with both MongoDB and an external MS SQL database, and significant updates to the corresponding frontend component.
+The application is a full-stack Next.js project. The majority of the work is encapsulated within the FIBU module, which consists of frontend components and a set of dedicated backend API routes.
 
 **Directory Structure:**
 
 
-**Key Files Modified/Created:**
+**Key Files:**
 
 -   ****
-    -   **Importance:** The central API for managing the Chart of Accounts.
-    -   **Changes:** Created to provide full CRUD functionality for accounts stored in MongoDB. It handles GET requests with server-side pagination and filtering (a key performance optimization), POST for importing from Excel, PUT for updates, and DELETE for removals.
+    -   **Importance:** The central, monolithic frontend component for the entire accounting module.
+    -   **Summary:** This large client component manages the state and UI for all FIBU features. It contains a tabbed interface for Kontenplan, VK-Rechnungen (Sales Invoices), EK-Rechnungen (Supplier Invoices), Zahlungen (Payments), Kreditoren (Creditors), Export, and Email Inbox. It handles data fetching, user interactions like uploads and filtering, and displays data in tables. It was heavily modified to add a multi-file upload modal with manual creditor selection and to display information from the email inbox.
 
 -   ****
-    -   **Importance:** The API responsible for fetching sales invoices from the JTL MS SQL database.
-    -   **Changes:** This file underwent extensive, iterative debugging. The final version uses the  view from the JTL database to reliably fetch invoice totals, customer data (name, VAT ID), and other details. It integrates  to apply business logic for assigning debtor and revenue accounts.
+    -   **Importance:** API to fetch sales invoices from the JTL MS SQL database.
+    -   **Summary:** After significant debugging of SQL queries (errors like Invalid column name), the final implementation primarily uses the  view to reliably fetch invoice data. It was later modified to use a fallback for the customer name () to resolve an issue where it always showed the user's own company.
 
 -   ****
-    -   **Importance:** The endpoint for handling supplier invoice PDF uploads.
-    -   **Changes:** A new route created to accept file uploads. It uses  to extract text from the PDF and then calls the Google Gemini API (via ) to parse the text into structured JSON data, which is then saved to MongoDB.
+    -   **Importance:** API to fetch payment transactions from JTL.
+    -   **Summary:** This file also underwent extensive debugging to find the correct table () and columns. The query was simplified to fetch core payment details like provider, amount, and date, which are displayed in the Zahlungen tab. The current implementation is being re-evaluated due to missing data.
 
 -   ****
-    -   **Importance:** API for fetching payment records from the JTL database.
-    -   **Changes:** A new route created to query the  table in the MS SQL database, retrieving all payment transactions within a specified date range.
+    -   **Importance:** Handles the upload and processing of supplier invoices (PDFs).
+    -   **Summary:** It uses  for file handling,  to extract text, calls the Gemini service () for data extraction, and then uses the  logic to find the best matching creditor. It was updated to handle special Amazon invoice number formats.
 
 -   ****
-    -   **Importance:** The main frontend component for the entire accounting module.
-    -   **Changes:** This component was heavily modified. A complete UI for managing the Kontenplan was built from scratch. This includes a table, search/filter inputs, an Add New modal, and an Excel import trigger. The logic was refactored to use server-side filtering. Placeholder sections for displaying VK invoices, EK invoices, and payments were wired up with state and data-loading functions.
+    -   **Importance:** Manages the email inbox polling and processing.
+    -   **Summary:** A new endpoint that connects to an IMAP server using credentials from . It can be triggered to fetch new emails, save them to MongoDB, and extract PDF attachments. It was made more robust to prevent data loss by processing both seen and unseen emails and using a  to prevent duplicates.
 
--   ** (New File)**
-    -   **Importance:** Encapsulates the complex business logic for account assignment.
-    -   **Summary:** Created to house the  and  functions, which determine the correct accounts for an invoice based on customer data (country, VAT ID) and product category. This keeps the API route cleaner.
+-   ****
+    -   **Importance:** Encapsulates the IMAP connection and email parsing logic.
+    -   **Summary:** Contains the core functions for connecting to the IMAP server, searching for emails, parsing them with , and handling attachments. It was updated to include the email's text body in the data sent for AI processing.
 
--   ** (New File)**
-    -   **Importance:** A dedicated client for interacting with the Google Gemini API.
-    -   **Summary:** Created to configure the Gemini client with the API key and provide a simple, reusable function for sending prompts (the extracted PDF text) to the model for parsing.
+-   ****
+    -   **Importance:** Houses the logic for matching suppliers to invoices.
+    -   **Summary:** Provides a  function that uses both exact and fuzzy string matching () to find the correct creditor from the database based on text extracted from an invoice.
+
+-   ****
+    -   **Importance:** A one-time script to populate the creditors collection.
+    -   **Summary:** Created to parse the user-provided  and import all creditors into the MongoDB database.
 </code_architecture>
 
 <pending_tasks>
-- **10it Export:** The primary pending task is to create the data export functionality. This involves analyzing the required 10it file format and building an API endpoint to generate a CSV/Excel file with the aggregated invoice and payment data.
-- **Payment-Invoice Linking:** Connect the fetched payment data to the corresponding invoices.
-- **Frontend Display:** Fully implement the UI tables to display the fetched payments, and ensure the VK and EK invoice tables are populated and functional.
-- **End-to-End PDF Test:** Conduct a full test of the supplier invoice upload from the frontend UI to confirm the file upload, Gemini parsing, and data display works seamlessly.
+- **Automatic Payment Matching for EK:** Automatically associate outgoing payments (Zahlungsabgänge) with the corresponding supplier invoices (EK-Rechnungen).
+- **UI Filters:** Implement the frontend logic for the newly added payment filters (provider, assigned status).
+- **10it Export Enhancement:** Integrate the fetched sales payment data into the final 10it export file, ensuring correct mapping between payments and invoices.
 </pending_tasks>
 
 <current_work>
-The engineer was actively working on the final major feature for the FIBU module: **creating an export file compatible with the 10it accounting software**.
+The engineer is currently addressing several critical data integrity and completeness issues reported by the user, which are preventing the system from being fully production-ready.
 
-The user has just requested this and provided two example files ( and ) that show the exact format required for the export. The engineer's immediate task is to analyze these files to understand the column structure, data types, and specific values needed for a valid 10it booking batch (Buchungsstapel).
+1.  **Incorrect Payment Association:** The user has pointed out that many payments appearing as unassigned in the Zahlungen tab are, in fact, correctly assigned to invoices within the JTL system. The current SQL query in  is failing to retrieve this association.
 
-The previous steps successfully laid the groundwork by implementing the APIs to fetch and process all the necessary source data:
-1.  **Chart of Accounts** (from MongoDB)
-2.  **Sales Invoices** with assigned accounts (from JTL MS SQL)
-3.  **Payments** (from JTL MS SQL)
-4.  **Supplier Invoices** parsed by AI (from MongoDB)
+2.  **Missing Transaction Data:** Commerzbank payment transactions, which are present in JTL for the selected date range (e.g., October 30th), are not being fetched and displayed in the application. This points to a flaw in the payment query's ability to capture all payment types.
 
-The current work is the critical junction of bringing all this data together. The plan is to map the collected data to the columns defined in the user-provided 10it example files and create a new API endpoint that will generate the final export on demand. The last action was a failed attempt to read the example CSV file, indicating that analysis of the file format is the very next step.
+3.  **Incomplete Data History:** The user has requested to load all historical transaction data up to the current day, rather than the limited date range currently hardcoded for testing. This requires parameterizing the API endpoints to accept a dynamic date range from the frontend.
+
+The immediate task is to debug the SQL queries, primarily in , to ensure all payment types and their invoice associations are correctly and completely fetched from the JTL database.
 </current_work>
 
 <optional_next_step>
-Analyze the provided  file to define the required export format. Then, create a new API endpoint to generate a downloadable file in this format.
+Address the data discrepancy issues by investigating why JTL-assigned payments are not correctly reflected and why Commerzbank transactions are missing. This involves debugging the SQL query in .
 </optional_next_step>

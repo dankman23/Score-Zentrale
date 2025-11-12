@@ -8,7 +8,7 @@ import requests
 import json
 import time
 
-BASE_URL = "https://bookkeeper-49.preview.emergentagent.com/api"
+BASE_URL = "https://fibu-connect.preview.emergentagent.com/api"
 
 def print_section(title):
     print(f"\n{'='*80}")

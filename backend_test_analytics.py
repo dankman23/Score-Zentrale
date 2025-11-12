@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Base URL from environment
-BASE_URL = "https://bookkeeper-49.preview.emergentagent.com"
+BASE_URL = "https://fibu-connect.preview.emergentagent.com"
 
 def print_test_header(test_name):
     """Print a formatted test header"""

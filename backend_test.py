@@ -11,7 +11,7 @@ import os
 from datetime import datetime
 
 # Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://bookkeeper-49.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://fibu-connect.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def log_test(message):
