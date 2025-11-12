@@ -863,12 +863,12 @@ export default function FibuModule() {
                     <table className="table table-sm table-hover">
                       <thead className="thead-light sticky-top">
                         <tr>
-                          <th>Belegnr</th>
+                          <th>Referenz/Hinweis</th>
                           <th>Datum</th>
                           <th>Rechnung</th>
                           <th>Kunde</th>
                           <th className="text-right">Betrag</th>
-                          <th>Debitor</th>
+                          <th>Zahlungsanbieter</th>
                         </tr>
                       </thead>
                       <tbody>
