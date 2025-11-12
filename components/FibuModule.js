@@ -216,7 +216,7 @@ export default function FibuModule() {
     setEkLoading(false)
   }
   
-  // EK-Rechnung Upload
+  // EK-Rechnung Upload (vereinfacht - für Demo ohne Gemini)
   const handleEkUpload = async (event) => {
     const file = event.target.files[0]
     if (!file) return
@@ -226,54 +226,62 @@ export default function FibuModule() {
       return
     }
     
-    // PDF zu Base64
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      const base64 = e.target.result.split(',')[1]
-      
-      // Zeige Eingabedialog
-      const lieferant = prompt('Lieferantenname:')
-      if (!lieferant) return
-      
-      const rechnungsnr = prompt('Rechnungsnummer:')
-      if (!rechnungsnr) return
-      
-      const rechnungsdatum = prompt('Rechnungsdatum (YYYY-MM-DD):', dateFrom)
-      if (!rechnungsdatum) return
-      
-      const brutto = parseFloat(prompt('Bruttobetrag:') || '0')
-      
-      setEkLoading(true)
-      try {
-        const res = await fetch('/api/fibu/rechnungen/ek', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            lieferant,
-            rechnungsnr,
-            rechnungsdatum,
-            eingangsdatum: new Date().toISOString().slice(0, 10),
-            brutto,
-            netto: brutto / 1.19,
-            mwst: brutto - (brutto / 1.19),
-            mwst_satz: 0.19,
-            pdf_base64: base64
-          })
-        })
-        
-        const data = await res.json()
-        if (data.ok) {
-          alert('✅ EK-Rechnung hochgeladen!')
-          loadEkRechnungen()
-        } else {
-          alert('Fehler: ' + data.error)
-        }
-      } catch (e) {
-        alert('Fehler beim Upload: ' + e.message)
-      }
-      setEkLoading(false)
+    setUploadFile(file)
+    
+    // Zeige Eingabedialog
+    const lieferant = prompt('Lieferantenname:', 'Amazon Payment')
+    if (!lieferant) {
+      setUploadFile(null)
+      return
     }
-    reader.readAsDataURL(file)
+    
+    const rechnungsnr = prompt('Rechnungsnummer:', 'XRE-5562')
+    if (!rechnungsnr) {
+      setUploadFile(null)
+      return
+    }
+    
+    const rechnungsdatum = prompt('Rechnungsdatum (YYYY-MM-DD):', dateFrom)
+    if (!rechnungsdatum) {
+      setUploadFile(null)
+      return
+    }
+    
+    const brutto = parseFloat(prompt('Bruttobetrag:', '119.00') || '0')
+    
+    setUploadLoading(true)
+    try {
+      // Sende zu Backend für Auto-Matching
+      const res = await fetch('/api/fibu/rechnungen/ek', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lieferantName: lieferant,
+          rechnungsnummer: rechnungsnr,
+          rechnungsdatum,
+          eingangsdatum: new Date().toISOString().slice(0, 10),
+          gesamtBetrag: brutto,
+          nettoBetrag: brutto / 1.19,
+          beschreibung: 'Upload via UI'
+        })
+      })
+      
+      const data = await res.json()
+      if (data.ok) {
+        const matchInfo = data.matching 
+          ? `\n\n✅ Auto-Match: ${data.matching.method} (${data.matching.confidence}% Confidence)\nKreditor: ${data.matching.kreditorKonto}\nAufwandskonto: ${data.matching.aufwandskonto}`
+          : '\n\n⚠️ Kein Kreditor gefunden - bitte manuell zuordnen'
+        
+        alert('✅ EK-Rechnung gespeichert!' + matchInfo)
+        loadEkRechnungen()
+        setUploadFile(null)
+      } else {
+        alert('Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('Fehler beim Upload: ' + e.message)
+    }
+    setUploadLoading(false)
   }
   
   // Kreditoren laden
