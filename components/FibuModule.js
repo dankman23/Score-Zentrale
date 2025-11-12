@@ -29,6 +29,11 @@ export default function FibuModule() {
   const [ekRechnungen, setEkRechnungen] = useState([])
   const [ekLoading, setEkLoading] = useState(false)
   
+  // Export
+  const [exportFrom, setExportFrom] = useState('2025-01-01')
+  const [exportTo, setExportTo] = useState('2025-01-31')
+  const [exportLoading, setExportLoading] = useState(false)
+  
   // Kontenplan laden
   const loadKontenplan = async () => {
     setKontenLoading(true)
