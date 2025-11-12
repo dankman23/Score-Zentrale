@@ -12,30 +12,83 @@ import { getDb } from '../../../lib/db/mongodb'
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
-    const from = searchParams.get('from') || '2025-10-01'
-    const to = searchParams.get('to') || '2025-10-31'
-    const limit = parseInt(searchParams.get('limit') || '500', 10)
+    // Dynamische Datumsbereiche - Standard: gesamter Zeitraum
+    const from = searchParams.get('from') || '2020-01-01'
+    const to = searchParams.get('to') || new Date().toISOString().split('T')[0]
+    const limit = parseInt(searchParams.get('limit') || '10000', 10)
     
     const pool = await getMssqlPool()
     
-    // Hole Zahlungen aus tZahlung (minimale Version)
+    /**
+     * VERBESSERTE ZAHLUNGSABFRAGE MIT ZWEI QUELLEN:
+     * 
+     * 1. tZahlung: Standard-Zahlungen (PayPal, eBay, Amazon, etc.)
+     *    - Rechnungszuordnung über kRechnung ODER kBestellung
+     *    - Amazon-Zahlungen haben kRechnung=0, aber kBestellung ist gesetzt
+     * 
+     * 2. tZahlungsabgleichUmsatz: Bank-Transaktionen (Commerzbank, Überweisungen)
+     *    - Zuordnung über cReferenz (z.B. "AU_12345_SW6")
+     *    - Diese fehlen komplett in tZahlung
+     */
     const query = `
+      -- Teil 1: Standard-Zahlungen aus tZahlung (mit beiden Zuordnungswegen)
       SELECT TOP ${limit}
-        z.kZahlung,
-        z.kRechnung,
+        'tZahlung' AS quelle,
+        z.kZahlung AS zahlungsId,
+        COALESCE(z.kRechnung, r2.kRechnung, 0) AS kRechnung,
+        COALESCE(r.cRechnungsNr, r2.cRechnungsNr, 'Unbekannt') AS rechnungsNr,
         z.fBetrag AS betrag,
         z.dDatum AS zahlungsdatum,
         ISNULL(z.cHinweis, '') AS hinweis,
-        ISNULL(z.kZahlungsart, 0) AS kZahlungsart,
-        r.cRechnungsNr AS rechnungsNr,
-        'Kunde #' + CAST(r.tKunde_kKunde AS VARCHAR) AS kundenName,
-        ISNULL(za.cName, 'Unbekannt') AS zahlungsart
+        ISNULL(za.cName, 'Unbekannt') AS zahlungsart,
+        z.kZahlungsart,
+        CASE 
+          WHEN z.kRechnung IS NOT NULL AND z.kRechnung > 0 THEN 'Direkt (kRechnung)'
+          WHEN z.kBestellung IS NOT NULL AND r2.kRechnung IS NOT NULL THEN 'Indirekt (kBestellung)'
+          ELSE 'Nicht zugeordnet'
+        END AS zuordnungstyp,
+        b.cBestellNr,
+        COALESCE('Kunde #' + CAST(r.tKunde_kKunde AS VARCHAR), 'Kunde #' + CAST(r2.tKunde_kKunde AS VARCHAR), '') AS kundenName
       FROM dbo.tZahlung z
+      -- Direkte Zuordnung über kRechnung
       LEFT JOIN dbo.tRechnung r ON z.kRechnung = r.kRechnung
+      -- Indirekte Zuordnung über kBestellung (wichtig für Amazon!)
+      LEFT JOIN dbo.tBestellung b ON z.kBestellung = b.kBestellung
+      LEFT JOIN dbo.tRechnung r2 ON b.kBestellung = r2.tBestellung_kBestellung
+      -- Zahlungsart
       LEFT JOIN dbo.tZahlungsart za ON z.kZahlungsart = za.kZahlungsart
       WHERE z.dDatum >= @from
-        AND z.dDatum < @to
-      ORDER BY z.dDatum DESC
+        AND z.dDatum < DATEADD(day, 1, @to)
+      
+      UNION ALL
+      
+      -- Teil 2: Bank-Transaktionen aus tZahlungsabgleichUmsatz (Commerzbank etc.)
+      SELECT TOP ${Math.floor(limit / 2)}
+        'tZahlungsabgleichUmsatz' AS quelle,
+        u.kZahlungsabgleichUmsatz AS zahlungsId,
+        COALESCE(r.kRechnung, 0) AS kRechnung,
+        COALESCE(r.cRechnungsNr, 'Unbekannt') AS rechnungsNr,
+        u.fBetrag AS betrag,
+        u.dBuchungsdatum AS zahlungsdatum,
+        ISNULL(u.cVerwendungszweck, '') AS hinweis,
+        ISNULL(m.cName, 'Bank-Überweisung') AS zahlungsart,
+        0 AS kZahlungsart,
+        CASE 
+          WHEN r.kRechnung IS NOT NULL THEN 'Via Referenz'
+          ELSE 'Nicht zugeordnet'
+        END AS zuordnungstyp,
+        NULL AS cBestellNr,
+        ISNULL(u.cName, '') AS kundenName
+      FROM dbo.tZahlungsabgleichUmsatz u
+      LEFT JOIN dbo.tZahlungsabgleichModul m ON u.kZahlungsabgleichModul = m.kZahlungsabgleichModul
+      -- Versuche Zuordnung über cReferenz (z.B. "AU_12345")
+      LEFT JOIN dbo.tBestellung b ON u.cReferenz = b.cBestellNr
+      LEFT JOIN dbo.tRechnung r ON b.kBestellung = r.tBestellung_kBestellung
+      WHERE u.dBuchungsdatum >= @from
+        AND u.dBuchungsdatum < DATEADD(day, 1, @to)
+        AND u.nSichtbar = 1
+      
+      ORDER BY zahlungsdatum DESC
     `
     
     const result = await pool.request()
@@ -44,7 +97,8 @@ export async function GET(request: NextRequest) {
       .query(query)
     
     const zahlungen = result.recordset.map((z: any) => ({
-      kZahlung: z.kZahlung,
+      quelle: z.quelle,
+      zahlungsId: z.zahlungsId,
       kRechnung: z.kRechnung,
       rechnungsNr: z.rechnungsNr || 'Unbekannt',
       betrag: parseFloat(z.betrag || 0),
@@ -52,10 +106,13 @@ export async function GET(request: NextRequest) {
       hinweis: z.hinweis || '',
       zahlungsart: z.zahlungsart,
       kZahlungsart: z.kZahlungsart,
-      kundenName: z.kundenName,
-      // Echte Belegnummer: Hinweis enthält oft PayPal-ID, Überweisungsreferenz etc.
-      belegnummer: z.hinweis || `Zahlung-${z.kZahlung}`,
-      zahlungsanbieter: z.zahlungsart // PayPal, Commerzbank, etc. aus Zahlungsart
+      kundenName: z.kundenName || '',
+      zuordnungstyp: z.zuordnungstyp,
+      cBestellNr: z.cBestellNr || '',
+      // Belegnummer: Verwende Hinweis oder generiere aus ID
+      belegnummer: z.hinweis ? z.hinweis.substring(0, 50) : `${z.quelle}-${z.zahlungsId}`,
+      zahlungsanbieter: z.zahlungsart,
+      istZugeordnet: z.kRechnung > 0
     }))
     
     // Speichere in MongoDB
