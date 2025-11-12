@@ -491,8 +491,8 @@ export default function PreiseG2Module({ formeln }) {
           <strong style={{fontSize: '0.85rem', color: '#0c5460'}}>📖 Staffelsystem-Glossar:</strong>
           <ul className="mb-0 mt-1" style={{fontSize: '0.75rem', color: '#0c5460'}}>
             <li><strong>Standard:</strong> Feste VE-Mengen: 1, 3, 5, 10, 25, 50, 100, 300</li>
-            <li><strong>Kategorie-basiert:</strong> Berechnung: VE = aufrunden(Schwellenwert / EK). 
-              Schwellen nach EK-Kategorie: Basis (≤30€): 30-1500€, Standard (30-150€): 50-2500€, High (&gt;150€): 100-3000€</li>
+            <li><strong>Kategorie-basiert:</strong> VE=1 immer dabei. VE = aufrunden(Schwellenwert / EK). 
+              Schwellen: Basis (≤30€): 30-2000€, Standard (30-150€): 50-3500€, High (&gt;150€): 200-4000€. Max. 8 Staffeln.</li>
             <li><strong>Gerundet:</strong> Wie Kategorie, aber VE auf schöne Zahlen gerundet (3, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100...)</li>
             <li><strong>Gesamtkosten:</strong> VE-Menge × Einzelpreis (Shop-Preis pro Stück)</li>
           </ul>
