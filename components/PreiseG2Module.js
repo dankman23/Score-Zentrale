@@ -458,45 +458,138 @@ export default function PreiseG2Module({ formeln }) {
         </div>
       </div>
 
-      {ergebnisse.length > 0 && (
-        <div>
-          <div className="card border-primary mb-2">
-            <div className="card-header bg-primary text-white py-1">
-              <small className="font-weight-bold" style={{fontSize: '0.85rem'}}>Netto Plattformpreis (g2)</small>
-            </div>
-            <div className="card-body text-center py-2">
-              <div className="h4 font-weight-bold text-primary mb-0">
-                {plattformpreis.toFixed(2)} €
-              </div>
-              <small className="text-muted" style={{fontSize: '0.7rem'}}>pro Stück (netto)</small>
+      {/* Glossar */}
+      {ergebnisseStandard.length > 0 && (
+        <div className="alert alert-info py-2 mb-2">
+          <strong style={{fontSize: '0.85rem'}}>📖 Staffelsystem-Glossar:</strong>
+          <ul className="mb-0 mt-1" style={{fontSize: '0.75rem'}}>
+            <li><strong>Standard:</strong> Feste VE-Mengen: 1, 3, 5, 10, 25, 50, 100, 300</li>
+            <li><strong>Kategorie-basiert:</strong> Berechnung: VE = aufrunden(Schwellenwert / EK). 
+              Schwellen nach EK-Kategorie: Basis (≤30€): 20-600€, Standard (30-150€): 25-1000€, High (>150€): 50-1000€</li>
+            <li><strong>Gerundet:</strong> Wie Kategorie, aber VE auf schöne Zahlen gerundet (3, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100...)</li>
+            <li><strong>Gesamtkosten:</strong> VE-Menge × Einzelpreis (Shop-Preis pro Stück)</li>
+          </ul>
+        </div>
+      )}
+
+      {/* Standard-Staffel (immer anzeigen) */}
+      {ergebnisseStandard.length > 0 && (
+        <div className="card border-warning mb-2">
+          <div className="card-header bg-warning text-dark py-1">
+            <small className="font-weight-bold">📌 Standard-Staffel (fest)</small>
+          </div>
+          <div className="card-body py-2 px-1">
+            <div className="table-responsive">
+              <table className="table table-sm table-bordered text-center mb-0" style={{fontSize: '0.8rem'}}>
+                <thead className="thead-light">
+                  <tr style={{fontSize: '0.7rem'}}>
+                    <th className="py-1">VE-Menge</th>
+                    {ergebnisseStandard.map(e => (
+                      <th key={e.staffel} className="py-1">{e.staffel}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="font-weight-bold">Stückpreis</td>
+                    {ergebnisseStandard.map(e => (
+                      <td key={e.staffel} className="text-success font-weight-bold">
+                        {e.shop_unit.toFixed(2)} €
+                      </td>
+                    ))}
+                  </tr>
+                  <tr className="table-active">
+                    <td className="font-weight-bold">Gesamtkosten</td>
+                    {ergebnisseStandard.map(e => (
+                      <td key={e.staffel} className="text-primary font-weight-bold">
+                        {(e.shop_unit * e.staffel).toFixed(2)} €
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
+        </div>
+      )}
 
-          <div className="card border-success">
-            <div className="card-header bg-success text-white py-1">
-              <small className="font-weight-bold" style={{fontSize: '0.85rem'}}>Netto Shop Staffelpreise (shp_fac = {(g2Params.shp_fac*100).toFixed(0)}%)</small>
+      {/* Kategorie-Staffel (wenn ausgewählt) */}
+      {(staffelSystem === 'kategorie' || staffelSystem === 'kategorie_gerundet') && ergebnisseKategorie.length > 0 && (
+        <div className="card border-info mb-2">
+          <div className="card-header bg-info text-white py-1">
+            <small className="font-weight-bold">🔢 Kategorie-basierte Staffel (dynamisch)</small>
+          </div>
+          <div className="card-body py-2 px-1">
+            <div className="table-responsive">
+              <table className="table table-sm table-bordered text-center mb-0" style={{fontSize: '0.8rem'}}>
+                <thead className="thead-light">
+                  <tr style={{fontSize: '0.7rem'}}>
+                    <th className="py-1">VE-Menge</th>
+                    {ergebnisseKategorie.map(e => (
+                      <th key={e.staffel} className="py-1">{e.staffel}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="font-weight-bold">Stückpreis</td>
+                    {ergebnisseKategorie.map(e => (
+                      <td key={e.staffel} className="text-success font-weight-bold">
+                        {e.shop_unit.toFixed(2)} €
+                      </td>
+                    ))}
+                  </tr>
+                  <tr className="table-active">
+                    <td className="font-weight-bold">Gesamtkosten</td>
+                    {ergebnisseKategorie.map(e => (
+                      <td key={e.staffel} className="text-primary font-weight-bold">
+                        {(e.shop_unit * e.staffel).toFixed(2)} €
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div className="card-body py-2">
-              <div className="table-responsive">
-                <table className="table table-sm table-bordered text-center mb-0" style={{fontSize: '0.85rem'}}>
-                  <thead className="thead-light">
-                    <tr className="font-weight-bold" style={{fontSize: '0.75rem'}}>
-                      {ergebnisse.map(e => (
-                        <th key={e.staffel} className="py-1 px-1">{e.staffel}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      {ergebnisse.map(e => (
-                        <td key={e.staffel} className="font-weight-bold text-success py-1 px-1">
-                          {e.shop_unit.toFixed(2)} €
-                        </td>
-                      ))}
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+          </div>
+        </div>
+      )}
+
+      {/* Gerundete Staffel (nur wenn ausgewählt) */}
+      {staffelSystem === 'kategorie_gerundet' && ergebnisseGerundet.length > 0 && (
+        <div className="card border-success mb-2">
+          <div className="card-header bg-success text-white py-1">
+            <small className="font-weight-bold">✨ Gerundete Staffel (schöne Zahlen)</small>
+          </div>
+          <div className="card-body py-2 px-1">
+            <div className="table-responsive">
+              <table className="table table-sm table-bordered text-center mb-0" style={{fontSize: '0.8rem'}}>
+                <thead className="thead-light">
+                  <tr style={{fontSize: '0.7rem'}}>
+                    <th className="py-1">VE-Menge</th>
+                    {ergebnisseGerundet.map(e => (
+                      <th key={e.staffel} className="py-1">{e.staffel}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="font-weight-bold">Stückpreis</td>
+                    {ergebnisseGerundet.map(e => (
+                      <td key={e.staffel} className="text-success font-weight-bold">
+                        {e.shop_unit.toFixed(2)} €
+                      </td>
+                    ))}
+                  </tr>
+                  <tr className="table-active">
+                    <td className="font-weight-bold">Gesamtkosten</td>
+                    {ergebnisseGerundet.map(e => (
+                      <td key={e.staffel} className="text-primary font-weight-bold">
+                        {(e.shop_unit * e.staffel).toFixed(2)} €
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
