@@ -55,9 +55,9 @@ export async function GET(request: NextRequest) {
           .input('kRechnung', r.kRechnung)
           .query(`
             SELECT 
-              SUM(fPreis * nAnzahl) AS netto,
-              AVG(fMwSt) AS mwstSatz
-            FROM Verkauf.tRechnungspos
+              SUM(fVKNetto * fAnzahl) AS netto,
+              AVG(fMwStSatz) AS mwstSatz
+            FROM dbo.tRechnungPosition
             WHERE kRechnung = @kRechnung
           `)
         
