@@ -492,6 +492,125 @@ export default function FibuModule() {
         {/* Kontenplan Tab */}
         {tab === 'kontenplan' && (
           <div>
+            {/* Import & Filter Controls */}
+            <div className="card mb-3 border-info">
+              <div className="card-header bg-info text-white py-2">
+                <strong>Kontenplan-Verwaltung</strong>
+              </div>
+              <div className="card-body py-2">
+                <div className="row mb-3">
+                  <div className="col-md-6">
+                    <label className="small font-weight-bold">Excel-Import:</label>
+                    <input 
+                      type="file" 
+                      accept=".xlsx,.xls"
+                      className="form-control form-control-sm"
+                      onChange={handleKontenplanImport}
+                      disabled={kontenLoading}
+                    />
+                    {importStatus && (
+                      <div className="mt-2 small">{importStatus}</div>
+                    )}
+                  </div>
+                  <div className="col-md-3">
+                    <label className="small font-weight-bold">Suche:</label>
+                    <input 
+                      type="text"
+                      className="form-control form-control-sm"
+                      placeholder="Konto oder Bezeichnung..."
+                      value={kontenFilter}
+                      onChange={e => setKontenFilter(e.target.value)}
+                    />
+                  </div>
+                  <div className="col-md-3">
+                    <label className="small font-weight-bold">Kontenklasse:</label>
+                    <select 
+                      className="form-control form-control-sm"
+                      value={kontenKlasseFilter}
+                      onChange={e => setKontenKlasseFilter(e.target.value)}
+                    >
+                      <option value="alle">Alle Klassen</option>
+                      <option value="0">0 - Anlagevermögen</option>
+                      <option value="1">1 - Umlaufvermögen</option>
+                      <option value="2">2 - Eigenkapital/Verbindlichk.</option>
+                      <option value="3">3 - Bestandskonten</option>
+                      <option value="4">4 - Betriebliche Aufwendungen</option>
+                      <option value="5">5 - Betriebliche Erträge</option>
+                      <option value="6">6 - Weitere Aufwendungen</option>
+                      <option value="7">7 - Weitere Erträge</option>
+                      <option value="8">8 - Ergebnisrechnungen</option>
+                      <option value="9">9 - Abschlusskonten</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="d-flex gap-2">
+                  <button 
+                    className="btn btn-sm btn-success"
+                    onClick={() => setShowAddModal(true)}
+                  >
+                    <i className="bi bi-plus-circle mr-1"/>Neues Konto
+                  </button>
+                  <button 
+                    className="btn btn-sm btn-primary"
+                    onClick={loadKontenplan}
+                  >
+                    <i className="bi bi-arrow-clockwise mr-1"/>Aktualisieren
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Add Modal */}
+            {showAddModal && (
+              <div className="card mb-3 border-success">
+                <div className="card-header bg-success text-white py-2">
+                  <strong>Neues Konto hinzufügen</strong>
+                  <button 
+                    className="close text-white"
+                    onClick={() => {
+                      setShowAddModal(false)
+                      setNewKonto({ konto: '', bezeichnung: '' })
+                    }}
+                  >
+                    &times;
+                  </button>
+                </div>
+                <div className="card-body">
+                  <div className="row">
+                    <div className="col-md-3">
+                      <label className="small">Kontonummer:</label>
+                      <input 
+                        type="text"
+                        className="form-control form-control-sm"
+                        placeholder="z.B. 1000"
+                        value={newKonto.konto}
+                        onChange={e => setNewKonto({...newKonto, konto: e.target.value})}
+                      />
+                    </div>
+                    <div className="col-md-7">
+                      <label className="small">Bezeichnung:</label>
+                      <input 
+                        type="text"
+                        className="form-control form-control-sm"
+                        placeholder="z.B. Kasse"
+                        value={newKonto.bezeichnung}
+                        onChange={e => setNewKonto({...newKonto, bezeichnung: e.target.value})}
+                      />
+                    </div>
+                    <div className="col-md-2 d-flex align-items-end">
+                      <button 
+                        className="btn btn-sm btn-success w-100"
+                        onClick={handleAddKonto}
+                      >
+                        <i className="bi bi-check-circle"/>Speichern
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             {kontenLoading ? (
               <div className="text-center py-5">
                 <div className="spinner-border text-primary"/>
@@ -499,34 +618,103 @@ export default function FibuModule() {
               </div>
             ) : (
               <div className="card">
-                <div className="card-header bg-info text-white py-2">
+                <div className="card-header bg-primary text-white py-2">
                   <strong>Kontenplan</strong>
-                  <span className="badge badge-light ml-2">{konten.length}</span>
+                  <span className="badge badge-light ml-2">{filteredKonten.length} / {konten.length}</span>
                 </div>
                 <div className="card-body p-0">
                   <div className="table-responsive" style={{maxHeight: '500px', overflowY: 'auto'}}>
                     <table className="table table-sm table-hover mb-0">
                       <thead className="thead-light" style={{position: 'sticky', top: 0, zIndex: 1}}>
                         <tr>
-                          <th>Konto</th>
-                          <th>Bezeichnung</th>
-                          <th>Typ</th>
+                          <th style={{width: '15%'}}>Konto</th>
+                          <th style={{width: '45%'}}>Bezeichnung</th>
+                          <th style={{width: '10%'}}>Klasse</th>
+                          <th style={{width: '20%'}}>Kategorie</th>
+                          <th style={{width: '10%'}}>Aktionen</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {konten.map((k, idx) => (
+                        {filteredKonten.map((k, idx) => (
                           <tr key={idx}>
-                            <td><strong>{k.konto}</strong></td>
-                            <td><small>{k.bezeichnung}</small></td>
-                            <td><span className="badge badge-secondary">{k.typ}</span></td>
+                            {editingKonto && editingKonto.konto === k.konto ? (
+                              <>
+                                <td>
+                                  <input 
+                                    type="text"
+                                    className="form-control form-control-sm"
+                                    value={editingKonto.konto}
+                                    onChange={e => setEditingKonto({...editingKonto, konto: e.target.value})}
+                                  />
+                                </td>
+                                <td>
+                                  <input 
+                                    type="text"
+                                    className="form-control form-control-sm"
+                                    value={editingKonto.bezeichnung}
+                                    onChange={e => setEditingKonto({...editingKonto, bezeichnung: e.target.value})}
+                                  />
+                                </td>
+                                <td><small className="text-muted">{k.kontenklasse ?? '-'}</small></td>
+                                <td><small className="text-muted">{k.kontenklasseName || k.typ}</small></td>
+                                <td>
+                                  <button 
+                                    className="btn btn-sm btn-success mr-1"
+                                    onClick={() => handleEditKonto(k.konto)}
+                                    title="Speichern"
+                                  >
+                                    <i className="bi bi-check"/>
+                                  </button>
+                                  <button 
+                                    className="btn btn-sm btn-secondary"
+                                    onClick={() => setEditingKonto(null)}
+                                    title="Abbrechen"
+                                  >
+                                    <i className="bi bi-x"/>
+                                  </button>
+                                </td>
+                              </>
+                            ) : (
+                              <>
+                                <td><strong>{k.konto}</strong></td>
+                                <td><small>{k.bezeichnung}</small></td>
+                                <td>
+                                  {k.kontenklasse !== null && k.kontenklasse !== undefined ? (
+                                    <span className="badge badge-info">{k.kontenklasse}</span>
+                                  ) : (
+                                    <small className="text-muted">-</small>
+                                  )}
+                                </td>
+                                <td><small className="text-muted">{k.kontenklasseName || k.typ || 'Sonstiges'}</small></td>
+                                <td>
+                                  <button 
+                                    className="btn btn-sm btn-outline-primary mr-1"
+                                    onClick={() => setEditingKonto({konto: k.konto, bezeichnung: k.bezeichnung})}
+                                    title="Bearbeiten"
+                                  >
+                                    <i className="bi bi-pencil"/>
+                                  </button>
+                                  <button 
+                                    className="btn btn-sm btn-outline-danger"
+                                    onClick={() => handleDeleteKonto(k.konto)}
+                                    title="Löschen"
+                                  >
+                                    <i className="bi bi-trash"/>
+                                  </button>
+                                </td>
+                              </>
+                            )}
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
-                  {konten.length === 0 && (
+                  {filteredKonten.length === 0 && (
                     <div className="text-center py-4 text-muted">
-                      Noch keine Konten im Kontenplan
+                      {konten.length === 0 ? 
+                        'Noch keine Konten im Kontenplan. Bitte Excel importieren oder manuell anlegen.' :
+                        'Keine Konten gefunden für die aktuelle Filterung.'
+                      }
                     </div>
                   )}
                 </div>
