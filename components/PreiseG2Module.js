@@ -101,19 +101,19 @@ export default function PreiseG2Module({ formeln }) {
               <div className="h4 font-weight-bold text-primary mb-0">
                 {plattformpreis.toFixed(2)} €
               </div>
-              <small className="text-muted" style={{fontSize: '0.75rem'}}>pro Stück (netto)</small>
+              <small className="text-muted" style={{fontSize: '0.7rem'}}>pro Stück (netto)</small>
             </div>
           </div>
 
           <div className="card border-success">
             <div className="card-header bg-success text-white py-1">
-              <small className="font-weight-bold">Netto Shop Staffelpreise (shp_fac = {(g2Params.shp_fac*100).toFixed(0)}%)</small>
+              <small className="font-weight-bold" style={{fontSize: '0.85rem'}}>Netto Shop Staffelpreise (shp_fac = {(g2Params.shp_fac*100).toFixed(0)}%)</small>
             </div>
             <div className="card-body py-2">
               <div className="table-responsive">
-                <table className="table table-sm table-bordered text-center mb-0" style={{fontSize: '0.9rem'}}>
+                <table className="table table-sm table-bordered text-center mb-0" style={{fontSize: '0.85rem'}}>
                   <thead className="thead-light">
-                    <tr className="font-weight-bold" style={{fontSize: '0.8rem'}}>
+                    <tr className="font-weight-bold" style={{fontSize: '0.75rem'}}>
                       {ergebnisse.map(e => (
                         <th key={e.staffel} className="py-1 px-1">{e.staffel}</th>
                       ))}
