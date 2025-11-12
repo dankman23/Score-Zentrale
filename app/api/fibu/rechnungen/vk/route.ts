@@ -15,11 +15,11 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const from = searchParams.get('from') || '2025-10-01'
     const to = searchParams.get('to') || '2025-10-31'
-    const limit = parseInt(searchParams.get('limit') || '500', 10)
+    const limit = parseInt(searchParams.get('limit') || '100', 10)
     
     const pool = await getMssqlPool()
     
-    // Haupt-Query: VK-Rechnungen  
+    // Haupt-Query: VK-Rechnungen mit erweiterten Daten
     const query = `
       SELECT TOP ${limit}
         r.kRechnung,
@@ -28,9 +28,16 @@ export async function GET(request: NextRequest) {
         r.tKunde_kKunde AS kKunde,
         r.cBezahlt,
         r.cStatus,
-        b.kZahlungsart
+        r.tBestellung_kBestellung AS kBestellung,
+        b.kZahlungsart,
+        k.cFirma AS kundenName,
+        k.cUSTID AS kundenUstId,
+        k.cLand AS kundenLand,
+        za.cName AS zahlungsart
       FROM dbo.tRechnung r
       LEFT JOIN dbo.tBestellung b ON r.tBestellung_kBestellung = b.kBestellung
+      LEFT JOIN dbo.tKunde k ON r.tKunde_kKunde = k.kKunde
+      LEFT JOIN dbo.tZahlungsart za ON b.kZahlungsart = za.kZahlungsart
       WHERE r.dErstellt >= @from 
         AND r.dErstellt < @to
         AND ISNULL(r.cStatus, '') != 'Storniert'
@@ -42,39 +49,63 @@ export async function GET(request: NextRequest) {
       .input('to', to)
       .query(query)
     
-    const rechnungen = result.recordset.map((r: any) => {
-      const kundenLand = 'DE' // Default
-      const hatUstId = false
-      const istInnerg = false
-      const mwstSatz = 19 // Default
-      
-      return {
-        kRechnung: r.kRechnung,
-        cRechnungsNr: r.cRechnungsNr,
-        rechnungsdatum: r.rechnungsdatum,
-        brutto: 0, // Wird über separate Query geladen
-        netto: 0,
-        mwst: 0,
-        mwstSatz,
-        status: r.cBezahlt === 'Y' ? 'Bezahlt' : 'Offen',
-        kKunde: r.kKunde,
-        kundenName: 'Kunde #' + r.kKunde,
-        kundenLand,
-        kundenUstId: null,
-        zahlungsart: 'TBD',
-        kZahlungsart: r.kZahlungsart || 0,
-        istGutschrift: isGutschrift(r.cRechnungsNr),
-        istInnerg,
-        debitorKonto: getDebitorKonto(r.kZahlungsart || 0, kundenLand, hatUstId),
-        sachkonto: getSachkonto(kundenLand, hatUstId, mwstSatz)
-      }
-    })
+    // Für jede Rechnung, lade Beträge aus Rechnungspositionen
+    const rechnungen = []
     
-    // Speichere in MongoDB für spätere Verarbeitung
+    for (const r of result.recordset) {
+      try {
+        // Lade Rechnungsbeträge
+        const betraegeQuery = await pool.request()
+          .input('kRechnung', r.kRechnung)
+          .query(`
+            SELECT 
+              SUM(fPreis * nAnzahl) AS netto,
+              AVG(fMwSt) AS mwstSatz
+            FROM Verkauf.tRechnungspos
+            WHERE kRechnung = @kRechnung
+          `)
+        
+        const betraege = betraegeQuery.recordset[0] || { netto: 0, mwstSatz: 0 }
+        const netto = parseFloat(betraege.netto || 0)
+        const mwstSatz = parseFloat(betraege.mwstSatz || 19)
+        const mwst = netto * (mwstSatz / 100)
+        const brutto = netto + mwst
+        
+        // Kontenzuordnung
+        const kundenLand = r.kundenLand || 'DE'
+        const hatUstId = r.kundenUstId && r.kundenUstId.length > 0
+        const istInnerg = hatUstId && kundenLand !== 'DE'
+        
+        rechnungen.push({
+          kRechnung: r.kRechnung,
+          cRechnungsNr: r.cRechnungsNr,
+          rechnungsdatum: r.rechnungsdatum,
+          brutto: parseFloat(brutto.toFixed(2)),
+          netto: parseFloat(netto.toFixed(2)),
+          mwst: parseFloat(mwst.toFixed(2)),
+          mwstSatz: parseFloat(mwstSatz.toFixed(2)),
+          status: r.cBezahlt === 'Y' ? 'Bezahlt' : 'Offen',
+          kKunde: r.kKunde,
+          kundenName: r.kundenName || 'Unbekannt',
+          kundenLand,
+          kundenUstId: r.kundenUstId || null,
+          zahlungsart: r.zahlungsart || 'Unbekannt',
+          kZahlungsart: r.kZahlungsart || 0,
+          istGutschrift: isGutschrift(r.cRechnungsNr),
+          istInnerg,
+          debitorKonto: getDebitorKonto(r.kZahlungsart || 0, kundenLand, hatUstId),
+          sachkonto: getSachkonto(kundenLand, hatUstId, mwstSatz)
+        })
+      } catch (err) {
+        console.error(`Fehler bei Rechnung ${r.kRechnung}:`, err)
+      }
+    }
+    
+    // Speichere in MongoDB
     const db = await getDb()
     const collection = db.collection('fibu_vk_rechnungen')
     
-    for (const rechnung of rechnungen.slice(0, limit)) {
+    for (const rechnung of rechnungen) {
       await collection.updateOne(
         { kRechnung: rechnung.kRechnung },
         { 
@@ -90,7 +121,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       ok: true,
-      rechnungen: rechnungen.slice(0, limit),
+      rechnungen,
       total: rechnungen.length,
       zeitraum: { from, to }
     })
