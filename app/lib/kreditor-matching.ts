@@ -188,25 +188,27 @@ export async function learnKreditorMapping(
  * Extrahiert Belegnummer aus verschiedenen Formaten
  * - Standard: RE2025-12345, GS2025-123
  * - Amazon: XRE-5561, XRK-203 (mit Bindestrich)
+ * - Andere: IDE-2025-001, INV-12345
  */
 export function extractBelegnummer(text: string): string | null {
   // Amazon-Format: XRE-XXXX oder XRK-XXX
   const amazonMatch = text.match(/X[RK][EK]-\d+/i)
   if (amazonMatch) {
-    return amazonMatch[0]
+    return amazonMatch[0].toUpperCase()
+  }
+  
+  // Standard-Format mit Bindestrich: XXX-YYYY-ZZZ oder XX-YYYY
+  const dashMatch = text.match(/[A-Z]{2,4}-\d{2,}-\d+|[A-Z]{2,4}-\d{4,}/i)
+  if (dashMatch) {
+    return dashMatch[0].toUpperCase()
   }
   
   // Standard-Format: RE2025-XXXXX, GS2025-XXX
   const standardMatch = text.match(/[A-Z]{2}\d{4}-\d+/i)
   if (standardMatch) {
-    return standardMatch[0]
+    return standardMatch[0].toUpperCase()
   }
   
-  // Fallback: Erste Zahl-Kombination
-  const fallbackMatch = text.match(/\d{4,}/i)
-  if (fallbackMatch) {
-    return fallbackMatch[0]
-  }
-  
-  return null
+  // Fallback: Ganze Eingabe verwenden
+  return text.trim()
 }
