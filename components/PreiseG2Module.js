@@ -129,31 +129,31 @@ export default function PreiseG2Module({ formeln }) {
     }
     
     if (system === 'kategorie_gerundet') {
-      // Runde auf "schöne" Zahlen - mit aggressiverem Runden
-      const schoeneZahlen = [3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 75, 100, 120, 150, 200, 250, 300, 400, 500, 600, 750, 1000, 1200, 1500, 2000, 2500, 3000]
+      // Runde auf "schöne" Zahlen - aber behalte VE=1
+      const schoeneZahlen = [1, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 75, 100, 120, 150, 200, 250, 300, 400, 500, 600, 750, 1000, 1200, 1500, 2000, 2500, 3000]
       
       const gerundet = staffeln.map(ve => {
-        // Finde nächste schöne Zahl >= ve
-        const schoene = schoeneZahlen.find(z => z >= ve)
-        return schoene || ve
+        // VE=1 immer beibehalten
+        if (ve === 1) return 1
+        
+        // Für kleine Werte (< 10): Nächste schöne Zahl
+        // Für größere Werte: Aggressive Rundung
+        if (ve < 10) {
+          const schoene = schoeneZahlen.find(z => z >= ve)
+          return schoene || ve
+        } else {
+          // Bei größeren Werten: Springe zu nächster schöner Zahl (kann größer sein)
+          const idx = schoeneZahlen.findIndex(z => z >= ve)
+          return schoeneZahlen[idx + 1] || schoeneZahlen[idx] || ve
+        }
       })
       
-      // Entferne Duplikate und stelle sicher, dass es anders ist als kategorie
-      const unique = gerundet.filter((v, i, arr) => arr.indexOf(v) === i)
-      
-      // Wenn zu ähnlich, erhöhe einige Werte
-      if (JSON.stringify(unique) === JSON.stringify(staffeln.filter((v, i, arr) => arr.indexOf(v) === i))) {
-        return unique.map((v, i) => {
-          // Runde auf nächst höhere schöne Zahl
-          const nextHigher = schoeneZahlen.find(z => z > v)
-          return nextHigher || v
-        })
-      }
-      
+      // Entferne Duplikate und begrenze auf 8
+      const unique = [...new Set(gerundet)].sort((a, b) => a - b).slice(0, 8)
       return unique
     }
     
-    return staffeln.filter((v, i, arr) => arr.indexOf(v) === i) // Duplikate entfernen
+    return staffeln
   }
 
   const berechne = async () => {
