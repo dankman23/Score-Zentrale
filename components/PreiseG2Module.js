@@ -116,14 +116,28 @@ export default function PreiseG2Module({ formeln }) {
     })
     
     if (system === 'kategorie_gerundet') {
-      // Runde auf "schöne" Zahlen - erweiterte Liste für bessere kleine Werte
-      const schoeneZahlen = [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75, 100, 120, 150, 200, 250, 300, 400, 500, 600, 750, 1000, 1200, 1500, 2000, 2500, 3000]
+      // Runde auf "schöne" Zahlen - mit aggressiverem Runden
+      const schoeneZahlen = [3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 75, 100, 120, 150, 200, 250, 300, 400, 500, 600, 750, 1000, 1200, 1500, 2000, 2500, 3000]
       
-      return staffeln.map(ve => {
+      const gerundet = staffeln.map(ve => {
         // Finde nächste schöne Zahl >= ve
         const schoene = schoeneZahlen.find(z => z >= ve)
         return schoene || ve
-      }).filter((v, i, arr) => arr.indexOf(v) === i) // Duplikate entfernen
+      })
+      
+      // Entferne Duplikate und stelle sicher, dass es anders ist als kategorie
+      const unique = gerundet.filter((v, i, arr) => arr.indexOf(v) === i)
+      
+      // Wenn zu ähnlich, erhöhe einige Werte
+      if (JSON.stringify(unique) === JSON.stringify(staffeln.filter((v, i, arr) => arr.indexOf(v) === i))) {
+        return unique.map((v, i) => {
+          // Runde auf nächst höhere schöne Zahl
+          const nextHigher = schoeneZahlen.find(z => z > v)
+          return nextHigher || v
+        })
+      }
+      
+      return unique
     }
     
     return staffeln.filter((v, i, arr) => arr.indexOf(v) === i) // Duplikate entfernen
