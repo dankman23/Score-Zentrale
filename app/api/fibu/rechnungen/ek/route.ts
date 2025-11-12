@@ -49,38 +49,88 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const {
       lieferant,
+      lieferantName, // Alias für lieferant
       rechnungsnr,
+      rechnungsnummer, // Alias für rechnungsnr
       rechnungsdatum,
       eingangsdatum,
       brutto,
+      gesamtBetrag, // Alias für brutto
       netto,
+      nettoBetrag, // Alias für netto
       mwst,
       mwst_satz,
+      steuersatz, // Alias für mwst_satz
       positionen,
       pdf_base64,
-      parsed_data
+      parsed_data,
+      kreditorKonto, // Manuell zugeordnet
+      aufwandskonto, // Manuell zugeordnet
+      beschreibung
     } = body
     
-    if (!lieferant || !rechnungsnr || !rechnungsdatum) {
+    const finalLieferant = lieferant || lieferantName
+    const finalRechnungsnr = rechnungsnr || rechnungsnummer
+    const finalBrutto = parseFloat(brutto || gesamtBetrag || '0')
+    const finalNetto = parseFloat(netto || nettoBetrag || (finalBrutto / 1.19).toString())
+    const finalMwstSatz = parseFloat(steuersatz || mwst_satz || '0.19')
+    
+    if (!finalLieferant || !finalRechnungsnr || !rechnungsdatum) {
       return NextResponse.json(
-        { ok: false, error: 'Pflichtfelder fehlen' },
+        { ok: false, error: 'Pflichtfelder fehlen: Lieferant, Rechnungsnummer, Rechnungsdatum' },
         { status: 400 }
       )
     }
     
+    // Auto-Matching: Suche Kreditor
+    let matchedKreditor = null
+    let autoKreditorKonto = kreditorKonto
+    let autoAufwandskonto = aufwandskonto
+    
+    if (!autoKreditorKonto) {
+      matchedKreditor = await findKreditor(finalLieferant)
+      
+      if (matchedKreditor) {
+        autoKreditorKonto = matchedKreditor.kreditorenNummer
+        
+        // Hole Standard-Aufwandskonto
+        const db = await getDb()
+        const kreditor = await db.collection('kreditoren').findOne({ 
+          kreditorenNummer: matchedKreditor.kreditorenNummer 
+        })
+        
+        if (kreditor && kreditor.standardAufwandskonto) {
+          autoAufwandskonto = kreditor.standardAufwandskonto
+        }
+      }
+    }
+    
+    // Extrahiere Belegnummer (für Amazon XRE-Format)
+    const extractedBeleg = extractBelegnummer(finalRechnungsnr)
+    const finalBelegnummer = extractedBeleg || finalRechnungsnr
+    
     const db = await getDb()
     const rechnung = {
-      lieferant,
-      rechnungsnr,
+      lieferantName: finalLieferant,
+      rechnungsNummer: finalBelegnummer,
+      originalRechnungsNummer: finalRechnungsnr,
       rechnungsdatum: new Date(rechnungsdatum),
       eingangsdatum: eingangsdatum ? new Date(eingangsdatum) : new Date(),
-      brutto: parseFloat(brutto) || 0,
-      netto: parseFloat(netto) || 0,
-      mwst: parseFloat(mwst) || 0,
-      mwst_satz: parseFloat(mwst_satz) || 0.19,
+      gesamtBetrag: finalBrutto,
+      nettoBetrag: finalNetto,
+      steuerBetrag: parseFloat(mwst) || (finalBrutto - finalNetto),
+      steuersatz: finalMwstSatz,
+      kreditorKonto: autoKreditorKonto || null,
+      aufwandskonto: autoAufwandskonto || '5200', // Default: Wareneinkauf
+      beschreibung: beschreibung || '',
       positionen: positionen || [],
       pdf_base64: pdf_base64 || null,
       parsed_data: parsed_data || null,
+      matching: matchedKreditor ? {
+        method: matchedKreditor.method,
+        confidence: matchedKreditor.confidence,
+        matchedName: matchedKreditor.name
+      } : null,
       created_at: new Date(),
       updated_at: new Date()
     }
@@ -90,10 +140,78 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       id: result.insertedId,
-      message: 'EK-Rechnung gespeichert'
+      message: 'EK-Rechnung gespeichert',
+      matching: matchedKreditor ? {
+        kreditorKonto: autoKreditorKonto,
+        aufwandskonto: autoAufwandskonto,
+        confidence: matchedKreditor.confidence,
+        method: matchedKreditor.method
+      } : null
     })
   } catch (error: any) {
     console.error('[EK-Rechnungen POST] Error:', error)
+    return NextResponse.json(
+      { ok: false, error: error.message },
+      { status: 500 }
+    )
+  }
+}
+
+/**
+ * PUT /api/fibu/rechnungen/ek
+ * Aktualisiert EK-Rechnung (z.B. manuelle Kreditor-Zuordnung)
+ */
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { id, kreditorKonto, aufwandskonto } = body
+    
+    if (!id) {
+      return NextResponse.json(
+        { ok: false, error: 'ID erforderlich' },
+        { status: 400 }
+      )
+    }
+    
+    const db = await getDb()
+    const collection = db.collection('fibu_ek_rechnungen')
+    
+    // Hole alte Rechnung
+    const rechnung = await collection.findOne({ _id: id })
+    
+    if (!rechnung) {
+      return NextResponse.json(
+        { ok: false, error: 'Rechnung nicht gefunden' },
+        { status: 404 }
+      )
+    }
+    
+    // Update
+    const updates: any = { updated_at: new Date() }
+    
+    if (kreditorKonto) {
+      updates.kreditorKonto = kreditorKonto
+      
+      // Lernfunktion: Speichere Mapping
+      await learnKreditorMapping(rechnung.lieferantName, kreditorKonto)
+    }
+    
+    if (aufwandskonto) {
+      updates.aufwandskonto = aufwandskonto
+    }
+    
+    await collection.updateOne(
+      { _id: id },
+      { $set: updates }
+    )
+    
+    return NextResponse.json({
+      ok: true,
+      message: 'EK-Rechnung aktualisiert',
+      learned: kreditorKonto ? true : false
+    })
+  } catch (error: any) {
+    console.error('[EK-Rechnungen PUT] Error:', error)
     return NextResponse.json(
       { ok: false, error: error.message },
       { status: 500 }
