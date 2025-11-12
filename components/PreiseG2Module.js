@@ -7,12 +7,19 @@ export default function PreiseG2Module({ formeln }) {
   const [ergebnisse, setErgebnisse] = useState([])
   const [plattformpreis, setPlattformpreis] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [configExpanded, setConfigExpanded] = useState(false)
+  const [g2ParamsEdited, setG2ParamsEdited] = useState(false)
 
-  const g2Params = {
+  const [g2Params, setG2Params] = useState({
     gstart_ek: 12, gneu_ek: 100, gneu_vk: 189,
     fixcost1: 0.35, fixcost2: 1.4,
     varpct1: 0.25, varpct2: 0.02,
     aufschlag: 1.08, shp_fac: 0.92
+  })
+  
+  const updateG2Param = (key, value) => {
+    setG2Params(prev => ({ ...prev, [key]: parseFloat(value) || 0 }))
+    setG2ParamsEdited(true)
   }
 
   const berechne = async () => {
