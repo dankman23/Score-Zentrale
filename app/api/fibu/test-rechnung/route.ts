@@ -20,7 +20,6 @@ export async function GET() {
     // Get column names from tZahlung
     const zahlungColumns = await pool.request().query(`
       SELECT TOP 1 * FROM dbo.tZahlung
-      WHERE dZeit >= '2025-10-01'
     `)
     
     const firstZahlung = zahlungColumns.recordset[0]
