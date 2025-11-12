@@ -13,9 +13,10 @@ import { getDebitorKonto, getSachkonto, calculateMwStSatz, isGutschrift } from '
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
-    const from = searchParams.get('from') || '2025-10-01'
-    const to = searchParams.get('to') || '2025-10-31'
-    const limit = parseInt(searchParams.get('limit') || '100', 10)
+    // Dynamische Datumsbereiche - Standard: letztes Jahr bis heute
+    const from = searchParams.get('from') || new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().split('T')[0]
+    const to = searchParams.get('to') || new Date().toISOString().split('T')[0]
+    const limit = parseInt(searchParams.get('limit') || '10000', 10)
     
     const pool = await getMssqlPool()
     
