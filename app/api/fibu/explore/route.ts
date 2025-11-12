@@ -17,7 +17,7 @@ export async function GET() {
     const rechnungen = await pool.request().query(`
       SELECT TOP 5 
         kRechnung, cRechnungsnummer, dErstellt, fGesamtsumme, 
-        cStatus, kKunde, kWaehrung
+        cStatus, kKunde
       FROM tRechnung 
       ORDER BY dErstellt DESC
     `)
