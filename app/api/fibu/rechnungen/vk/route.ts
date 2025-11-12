@@ -69,7 +69,6 @@ export async function GET(request: NextRequest) {
         kundenUstId: r.kundenUstId || null,
         zahlungsart: r.zahlungsart,
         kZahlungsart: r.kZahlungsart,
-        typ: r.typ,
         istGutschrift: isGutschrift(r.cRechnungsNr),
         istInnerg,
         // Automatische Kontenzuordnung
