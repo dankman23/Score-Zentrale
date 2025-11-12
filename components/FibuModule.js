@@ -800,6 +800,84 @@ export default function FibuModule() {
           </div>
         )}
         
+        {/* Export Tab */}
+        {tab === 'export' && (
+          <div>
+            <div className="card border-success mb-3">
+              <div className="card-header bg-success text-white py-2">
+                <strong><i className="bi bi-download mr-2"/>10it Export - Buchungsstapel generieren</strong>
+              </div>
+              <div className="card-body">
+                <p className="small text-muted mb-3">
+                  Exportiert alle Buchungen (VK-Rechnungen, Zahlungen, EK-Rechnungen) im 10it-Format (EXTF CSV).
+                </p>
+                
+                <div className="row mb-3">
+                  <div className="col-md-4">
+                    <label className="small font-weight-bold">Von (Startdatum):</label>
+                    <input 
+                      type="date" 
+                      className="form-control"
+                      value={exportFrom}
+                      onChange={e => setExportFrom(e.target.value)}
+                    />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="small font-weight-bold">Bis (Enddatum):</label>
+                    <input 
+                      type="date" 
+                      className="form-control"
+                      value={exportTo}
+                      onChange={e => setExportTo(e.target.value)}
+                    />
+                  </div>
+                  <div className="col-md-4 d-flex align-items-end">
+                    <button 
+                      className="btn btn-success w-100"
+                      onClick={handleExport}
+                      disabled={exportLoading}
+                    >
+                      {exportLoading ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm mr-2"/>
+                          Exportiere...
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-file-earmark-arrow-down mr-2"/>
+                          CSV Exportieren
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="alert alert-info small">
+                  <strong><i className="bi bi-info-circle mr-2"/>Enthaltene Daten:</strong>
+                  <ul className="mb-0 mt-2">
+                    <li>✅ VK-Rechnungen (Ausgangsrechnungen aus JTL)</li>
+                    <li>✅ VK-Zahlungen (Zahlungseingänge aus JTL)</li>
+                    <li>⚠️ EK-Rechnungen (nur wenn Kreditorenkonto zugeordnet)</li>
+                    <li>❌ EK-Zahlungen (noch nicht implementiert)</li>
+                  </ul>
+                </div>
+                
+                <div className="card bg-light">
+                  <div className="card-body small">
+                    <h6>Export-Format:</h6>
+                    <ul className="mb-0">
+                      <li>CSV-Datei mit Semikolon-Trennung</li>
+                      <li>UTF-8 Encoding mit BOM</li>
+                      <li>Deutsche Zahlenformatierung (Komma als Dezimaltrenner)</li>
+                      <li>10 Spalten: Konto, Kontobezeichnung, Datum, Belegnummer, Text, Gegenkonto, Soll, Haben, Steuer, Steuerkonto</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Einstellungen Tab */}
         {tab === 'einstellungen' && (
           <div className="card border-secondary">
@@ -814,7 +892,7 @@ export default function FibuModule() {
               </p>
               
               <div className="alert alert-info">
-                <strong>In Entwicklung:</strong> Zahlungsarten-Konfiguration, Export zu 10it
+                <strong>In Entwicklung:</strong> Zahlungsarten-Konfiguration
               </div>
             </div>
           </div>
