@@ -528,9 +528,9 @@ export default function PreiseModule() {
                         setVergleichLoading(true)
                         const comparisons = []
                         
-                        // EK-Range: 0 bis 300€ in 10€ Schritten
+                        // EK-Range: 0 bis 300€ in 20€ Schritten (Performance-Optimierung)
                         const ekRange = []
-                        for (let i = 0; i <= 300; i += 10) {
+                        for (let i = 0; i <= 300; i += 20) {
                           ekRange.push(i)
                         }
                         
