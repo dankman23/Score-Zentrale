@@ -150,24 +150,24 @@ export default function PreiseModule() {
         })
       })
       
-      // Hochgeladene Daten hinzufügen
+      // Hochgeladene Daten als Scatter hinzufügen
       if (vergleichUploadedData) {
         datasets.push({
           label: 'Hochgeladene Preise',
-          data: vergleichUploadedData.map(d => d.vk),
+          data: vergleichUploadedData.map(d => ({ x: d.ek, y: d.vk })),
+          type: 'scatter',
           borderColor: '#dc3545',
-          backgroundColor: '#dc354520',
-          borderWidth: 3,
-          tension: 0.3,
-          pointRadius: 3,
-          pointStyle: 'circle'
+          backgroundColor: '#dc3545',
+          pointRadius: 5,
+          pointStyle: 'circle',
+          showLine: false
         })
       }
 
-      // Labels aus erster Kurve oder hochgeladenen Daten
+      // Labels aus erster Kurve
       const labels = vergleichData.length > 0 
         ? vergleichData[0].kurve.map(point => point.ek + '€')
-        : vergleichUploadedData.map(d => d.ek + '€')
+        : []
 
       new window.Chart(ctx, {
         type: 'line',
