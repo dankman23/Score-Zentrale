@@ -1466,6 +1466,36 @@ export default function App() {
 
   return (
     <div>
+      {/* Haupt-Navigation */}
+      <div className="mb-3">
+        <div className="btn-group btn-group-sm">
+          <button className={`btn ${activeTab==='dashboard'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setActiveTab('dashboard')}>
+            <i className="bi bi-speedometer2 mr-1"/>Dashboard
+          </button>
+          <button className={`btn ${activeTab==='sales'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setActiveTab('sales')}>
+            <i className="bi bi-graph-up mr-1"/>Sales
+          </button>
+          <button className={`btn ${activeTab==='marketing'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setActiveTab('marketing')}>
+            <i className="bi bi-megaphone mr-1"/>Marketing
+          </button>
+          <button className={`btn ${activeTab==='preise'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setActiveTab('preise')}>
+            <i className="bi bi-calculator mr-1"/>Preise
+          </button>
+          <button className={`btn ${activeTab==='fibu'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setActiveTab('fibu')}>
+            <i className="bi bi-calculator-fill mr-1"/>FIBU
+          </button>
+          <button className={`btn ${activeTab==='produkte'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setActiveTab('produkte')}>
+            <i className="bi bi-box-seam mr-1"/>Produkte
+          </button>
+          <button className={`btn ${activeTab==='outbound'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setActiveTab('outbound')}>
+            <i className="bi bi-send mr-1"/>Outbound
+          </button>
+          <button className={`btn ${activeTab==='kaltakquise'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setActiveTab('kaltakquise')}>
+            <i className="bi bi-telephone mr-1"/>Kaltakquise
+          </button>
+        </div>
+      </div>
+      
       {/* Date Range - nur bei Dashboard, Sales, Marketing */}
       {(activeTab === 'dashboard' || activeTab === 'sales' || activeTab === 'marketing') && (
         <>
