@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
         from: e.emailFrom,
         subject: e.emailSubject,
         date: e.emailDate,
+        emailTextBody: e.emailTextBody,
         filename: e.filename,
         fileSize: e.fileSize,
         status: e.status,
