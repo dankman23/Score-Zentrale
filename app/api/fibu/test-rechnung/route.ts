@@ -10,7 +10,7 @@ export async function GET() {
     
     // Get column names from tExterneRechnung
     const erQuery = await pool.request().query(`
-      SELECT TOP 1 * FROM dbo.tExterneRechnung
+      SELECT TOP 1 * FROM Verkauf.tExterneRechnung
     `)
     
     const er = erQuery.recordset[0]
