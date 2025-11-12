@@ -29,7 +29,13 @@ export default function FibuModule() {
   const loadKontenplan = async () => {
     setKontenLoading(true)
     try {
-      const res = await fetch('/api/fibu/kontenplan')
+      // Build query params
+      const params = new URLSearchParams()
+      if (kontenFilter) params.append('search', kontenFilter)
+      if (kontenKlasseFilter !== 'alle') params.append('klasse', kontenKlasseFilter)
+      params.append('limit', '500')  // Limit to 500 for performance
+      
+      const res = await fetch(`/api/fibu/kontenplan?${params.toString()}`)
       const data = await res.json()
       if (data.ok) {
         setKonten(data.konten)
