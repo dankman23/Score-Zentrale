@@ -45,12 +45,13 @@ export default function PreiseG2Module({ formeln }) {
 
   return (
     <div>
+      {/* Kompaktere Warengruppen-Auswahl */}
       <div className="card mb-2 border-warning">
         <div className="card-header bg-warning text-dark py-1">
-          <small className="font-weight-bold">Warengruppe (Regler 1a, 2c, 3e)</small>
+          <small className="font-weight-bold" style={{fontSize: '0.85rem'}}>Warengruppe (Regler 1a, 2c, 3e)</small>
         </div>
-        <div className="card-body py-2">
-          <select className="form-control form-control-sm" value={warengruppe} onChange={e => setWarengruppe(e.target.value)}>
+        <div className="card-body py-1">
+          <select className="form-control form-control-sm" value={warengruppe} onChange={e => setWarengruppe(e.target.value)} style={{fontSize: '0.85rem'}}>
             <option value="lagerware">Lagerware</option>
             <option value="klingspor_fremdlager">Klingspor Fremdlager</option>
             <option value="abverkauf">Abverkauf</option>
@@ -64,10 +65,10 @@ export default function PreiseG2Module({ formeln }) {
       
       <div className="card mb-2 border-primary">
         <div className="card-header bg-primary text-white py-1">
-          <small className="font-weight-bold">EK-Eingabe (pro Stück)</small>
+          <small className="font-weight-bold" style={{fontSize: '0.85rem'}}>EK-Eingabe (pro Stück)</small>
         </div>
         <div className="card-body py-2">
-          <div className="row">
+          <div className="row align-items-end">
             <div className="col-md-8">
               <input 
                 type="number" 
@@ -77,10 +78,11 @@ export default function PreiseG2Module({ formeln }) {
                 value={ekInput}
                 onChange={e => setEkInput(e.target.value)}
                 onKeyPress={e => e.key === 'Enter' && berechne()}
+                style={{fontSize: '0.9rem'}}
               />
             </div>
             <div className="col-md-4">
-              <button className="btn btn-warning btn-sm btn-block font-weight-bold" onClick={berechne} disabled={loading || !ekInput}>
+              <button className="btn btn-warning btn-sm btn-block font-weight-bold" onClick={berechne} disabled={loading || !ekInput} style={{fontSize: '0.85rem'}}>
                 {loading ? <span className="spinner-border spinner-border-sm mr-1"/> : <i className="bi bi-calculator mr-1"/>}
                 Berechnen
               </button>
@@ -93,10 +95,10 @@ export default function PreiseG2Module({ formeln }) {
         <div>
           <div className="card border-primary mb-2">
             <div className="card-header bg-primary text-white py-1">
-              <small className="font-weight-bold">Netto Plattformpreis (g2)</small>
+              <small className="font-weight-bold" style={{fontSize: '0.85rem'}}>Netto Plattformpreis (g2)</small>
             </div>
             <div className="card-body text-center py-2">
-              <div className="h3 font-weight-bold text-primary mb-0">
+              <div className="h4 font-weight-bold text-primary mb-0">
                 {plattformpreis.toFixed(2)} €
               </div>
               <small className="text-muted" style={{fontSize: '0.75rem'}}>pro Stück (netto)</small>
