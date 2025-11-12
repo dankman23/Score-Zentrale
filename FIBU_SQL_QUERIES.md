@@ -89,27 +89,38 @@ WHERE z.dZeit >= '2025-10-01'
 ORDER BY z.dZeit
 ```
 
-### 5. EK-Rechnungen (Eingangsrechnungen) - Oktober 2024
+### 5. EK-Rechnungen (Eingangsrechnungen) - ⚠️ NICHT IN JTL!
 
-```sql
--- Lieferantenrechnungen
-SELECT
-  er.kEingangsrechnung,
-  er.cRechnungsNr,
-  er.dEingangsdatum,
-  er.dRechnungsdatum,
-  er.fBrutto,
-  er.fNetto,
-  er.fMwSt,
-  er.kLieferant,
-  l.cFirma AS Lieferantenname,
-  l.cLand AS Lieferantenland,
-  l.cUSTID AS Lieferanten_UStID
-FROM dbo.tEingangsrechnung er
-LEFT JOIN dbo.tLieferant l ON er.kLieferant = l.kLieferant
-WHERE er.dRechnungsdatum >= '2025-10-01'
-  AND er.dRechnungsdatum < '2025-11-01'
-ORDER BY er.dRechnungsdatum
+**WICHTIG**: EK-Rechnungen sind NICHT in JTL gespeichert!
+
+**Upload-Methoden:**
+1. **PDF-Upload** mit OCR/Parsing
+   - Automatische Extraktion von Lieferant, Rechnungsnr, Datum, Beträgen
+   - Manuelle Nachbearbeitung möglich
+
+2. **E-Mail-Import** (zukünftig)
+   - Dedizierte E-Mail-Adresse für EK-Rechnungen
+   - Automatische PDF-Verarbeitung
+
+**Datenstruktur nach Upload (in MongoDB gespeichert)**:
+```javascript
+{
+  _id: "uuid",
+  lieferant: "Lieferantenname",
+  rechnungsnr: "RE-2025-12345",
+  rechnungsdatum: "2025-10-15",
+  eingangsdatum: "2025-10-16",
+  brutto: 119.00,
+  netto: 100.00,
+  mwst: 19.00,
+  mwst_satz: 0.19,
+  positionen: [
+    { bezeichnung: "...", menge: 1, preis: 100.00 }
+  ],
+  pdf_path: "/uploads/ek/...",
+  parsed_data: { ... },
+  created_at: "2025-10-16T10:00:00Z"
+}
 ```
 
 ### 6. EK-Rechnungspositionen - Oktober 2024
