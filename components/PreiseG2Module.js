@@ -136,25 +136,47 @@ export default function PreiseG2Module({ formeln }) {
 
     setLoading(true)
     
-    // Berechne dynamische Staffelgrenzen
     const ek = parseFloat(ekInput)
-    const staffelMengen = berechneStaffelgrenzen(ek, staffelSystem)
     
     try {
-      const res = await fetch('/api/preise/g2/berechnen', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ek,
-          warengruppe_regler: sel.regler,
-          g2_params: g2Params,
-          staffel_mengen: staffelMengen
+      // Berechne immer alle drei Systeme
+      const systeme = ['standard', 'kategorie', 'kategorie_gerundet']
+      const results = []
+      
+      for (const system of systeme) {
+        const staffelMengen = berechneStaffelgrenzen(ek, system)
+        
+        const res = await fetch('/api/preise/g2/berechnen', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ek,
+            warengruppe_regler: sel.regler,
+            g2_params: g2Params,
+            staffel_mengen: staffelMengen
+          })
         })
-      })
-      const data = await res.json()
-      if (data.ok) {
-        setErgebnisse(data.ergebnisse || [])
-        setPlattformpreis(data.plattform_unit || 0)
+        const data = await res.json()
+        if (data.ok) {
+          results.push({
+            system,
+            ergebnisse: data.ergebnisse || [],
+            plattform: data.plattform_unit || 0,
+            shop: data.shop_unit || 0
+          })
+        }
+      }
+      
+      // Speichere Ergebnisse getrennt
+      setErgebnisseStandard(results.find(r => r.system === 'standard')?.ergebnisse || [])
+      setErgebnisseKategorie(results.find(r => r.system === 'kategorie')?.ergebnisse || [])
+      setErgebnisseGerundet(results.find(r => r.system === 'kategorie_gerundet')?.ergebnisse || [])
+      
+      // Für Chart: Verwende ausgewähltes System
+      const selected = results.find(r => r.system === staffelSystem)
+      if (selected) {
+        setErgebnisse(selected.ergebnisse)
+        setPlattformpreis(selected.plattform)
         
         // Generiere Chart-Daten
         if (data.plattform_unit && data.shop_unit) {
