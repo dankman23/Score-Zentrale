@@ -1,98 +1,102 @@
 <analysis>
-The trajectory documents an extensive, iterative development process focused primarily on enhancing a complex Preise (Pricing) module and initiating a new FIBU (Accounting) module. The work began by addressing user requests to overhaul the pricing comparison tool, evolving it from a simple table to a dynamic multi-curve chart using Chart.js. The engineer systematically added features based on user feedback, including Excel/CSV data uploads for comparison, intelligent data sampling to handle large datasets, and ensuring correct data mapping on scatter plots.
+The trajectory details a significant and complex development effort focused on building out the FIBU (Accounting) module of the Score Zentrale application. The work began with a user request to implement a full-featured Kontenplan (Chart of Accounts) management system. This involved creating backend APIs for CRUD operations and Excel import, storing the data in MongoDB, and building a comprehensive frontend UI in the  component. A key challenge emerged when loading the full dataset (4,482 accounts), which caused frontend performance issues. This was adeptly solved by implementing server-side pagination and filtering, a crucial architectural decision.
 
-A significant portion of the work involved implementing and repeatedly refining a highly complex, three-tiered quantity scaling (Staffelgrenzen) system for the g2 pricing formula. This required translating intricate business rules into JavaScript, creating dynamic UI elements, and debugging logic, UI, and performance issues in real-time.
+The next major phase involved fetching transactional data (invoices and payments) from an external JTL MS SQL database. This proved to be a difficult, iterative process involving extensive debugging of SQL queries. The engineer systematically overcame numerous Invalid column name and Invalid object name errors by creating test endpoints to explore the database schema, simplifying queries, and strategically using JTL's built-in views (like ) instead of direct table joins.
 
-Concurrently, the engineer scaffolded a new FIBU module by creating foundational API routes, a frontend component, and integrating it into the main application's navigation. This involved exploring the JTL MS SQL database, debugging connection and query issues, and creating placeholder documentation.
-
-The final phase involved adding a price history feature and then, as per the user's last request, preparing to update the project's documentation files to reflect all the new changes. The entire process was characterized by rapid prototyping, frequent user interaction, and incremental refinement.
+Finally, the engineer integrated AI-powered document processing by adding a feature to upload supplier invoices (EK-Rechnungen) as PDFs. Following a user request for Gemini 2.0 Flash, an integration playbook was used to set up the Gemini API for data extraction. The trajectory concludes with the user requesting the final piece of the puzzle: creating an export file in the format required by 10it software.
 </analysis>
 
 <product_requirements>
-The primary goal is to enhance the Score Zentrale application with advanced pricing analysis tools and a new accounting module.
+The primary objective is to build a comprehensive FIBU (Accounting) module within the Score Zentrale application to automate bookkeeping tasks.
 
-1.  **Preise (Pricing) Module Overhaul:**
-    *   **Dynamic Charting:** Replace static comparisons with interactive Chart.js graphs. All pricing formulas (old and new g2) must be visualizable as curves, allowing for the simultaneous comparison of multiple selected formulas.
-    *   **Data Import & Visualization:** Implement a feature on all pricing tabs to upload Excel/CSV files containing EK (purchase price) and VK (sale price) data. This data must be plotted as a scatter graph on the same chart as the calculated price curves. The system must intelligently sample large datasets to maintain performance and clarity.
-    *   **Advanced Quantity Scaling:** For the g2 formula, implement three user-selectable quantity scaling systems: a fixed Standard scale, a dynamic category-based system, and a rounded version of the category system. The logic must be highly configurable, with target basket values up to €5000 and a maximum of 8 scale levels.
-    *   **Price History:** Add a new tab to display the price change history for any given article SKU, including its sale price (VK), purchase price (EK), and a performance metric.
+**Core Features:**
+1.  **Chart of Accounts (Kontenplan) Management:**
+    *   Implement a system to import a chart of accounts from a user-provided Excel file.
+    *   The system must be stored in MongoDB and managed via a dedicated UI, allowing full CRUD (Create, Read, Update, Delete) operations.
+    *   The UI must support searching and filtering.
 
-2.  **FIBU (Accounting) Module Creation:**
-    *   Build a new module to aggregate accounting data.
-    *   Source customer invoices (VK) from the JTL SQL database.
-    *   Source payment data from various platforms (banks, PayPal, Amazon).
-    *   Allow upload of supplier invoices (EK) via PDF.
-    *   Include a settings area to manage a chart of accounts, pre-populated from a user-provided Excel file.
+2.  **Data Aggregation from JTL Database:**
+    *   Fetch sales invoices (VK-Rechnungen), including customer details, amounts, and tax information, from the JTL MS SQL database.
+    *   Fetch all payment records (Zahlungen) from the JTL database.
+    *   Associate fetched invoices and payments with the correct revenue accounts (Sachkonten) and debtor accounts (Debitoren) based on complex, user-defined business rules (e.g., special handling for EU customers with VAT IDs).
+
+3.  **Supplier Invoice Processing:**
+    *   Implement a feature allowing users to upload supplier invoices (EK-Rechnungen) in PDF format.
+    *   Utilize an AI model (specifically Google Gemini) to parse these PDFs and extract key information like invoice number, date, and amounts.
+
+4.  **Data Export:**
+    *   Generate a final export file (CSV/Excel) containing all aggregated booking data, formatted specifically for compatibility with the 10it accounting software.
 </product_requirements>
 
 <key_technical_concepts>
 - **Frontend:** React ('use client'), Next.js, Tailwind CSS.
-- **Charting:** Chart.js for dynamic line and scatter plots.
-- **File Handling:**  library for parsing uploaded Excel files.
 - **Backend:** Next.js API Routes (TypeScript), Node.js.
-- **Database:** MS SQL for JTL data queries, MongoDB for application data (e.g., saved configs).
-- **Business Logic:** Complex, multi-step formula translations from user requirements into JavaScript, including dynamic, category-based calculations.
+- **Databases:**
+    - **MongoDB:** For storing application data like the Chart of Accounts (Kontenplan).
+    - **MS SQL:** For querying the external JTL business database.
+- **AI Integration:** Google Gemini API () for parsing PDF documents.
+- **File Handling:**  for Excel parsing,  and  for PDF uploads.
+- **Architecture:** Server-side filtering and pagination to handle large datasets efficiently.
 </key_technical_concepts>
 
 <code_architecture>
-The application is a full-stack Next.js project. Business logic is encapsulated in API routes under . The frontend is composed of React components under  and the main page logic is in .
+The application is a Next.js full-stack project. The core work was done within the FIBU module, which involves new API routes to interact with both MongoDB and an external MS SQL database, and significant updates to the corresponding frontend component.
 
 **Directory Structure:**
 
 
-**Key Files and Changes:**
+**Key Files Modified/Created:**
 
 -   ****
-    -   **Importance:** The main component for the Alte PB (old formulas) and Vergleich (comparison) tabs.
-    -   **Changes:** Heavily refactored. The comparison tab was completely reworked to use Chart.js, allowing multiple curves. Logic for Excel/CSV uploads and rendering scatter plot data was added. A new Historie (History) tab was scaffolded with a button and a placeholder content area, along with the data fetching logic ().
+    -   **Importance:** The central API for managing the Chart of Accounts.
+    -   **Changes:** Created to provide full CRUD functionality for accounts stored in MongoDB. It handles GET requests with server-side pagination and filtering (a key performance optimization), POST for importing from Excel, PUT for updates, and DELETE for removals.
 
 -   ****
-    -   **Importance:** The dedicated component for the new g2 pricing formula.
-    -   **Changes:** This file saw the most significant changes. An extremely complex, multi-tiered quantity scaling (Staffelgrenzen) logic was implemented and iteratively refined. This included adding UI selectors for different scaling systems and displaying multiple result tables. The component's own chart was also enhanced with Excel upload functionality and corrected to use real-time API calls for accuracy instead of linear interpolation. The configuration section was made collapsible.
+    -   **Importance:** The API responsible for fetching sales invoices from the JTL MS SQL database.
+    -   **Changes:** This file underwent extensive, iterative debugging. The final version uses the  view from the JTL database to reliably fetch invoice totals, customer data (name, VAT ID), and other details. It integrates  to apply business logic for assigning debtor and revenue accounts.
+
+-   ****
+    -   **Importance:** The endpoint for handling supplier invoice PDF uploads.
+    -   **Changes:** A new route created to accept file uploads. It uses  to extract text from the PDF and then calls the Google Gemini API (via ) to parse the text into structured JSON data, which is then saved to MongoDB.
+
+-   ****
+    -   **Importance:** API for fetching payment records from the JTL database.
+    -   **Changes:** A new route created to query the  table in the MS SQL database, retrieving all payment transactions within a specified date range.
+
+-   ****
+    -   **Importance:** The main frontend component for the entire accounting module.
+    -   **Changes:** This component was heavily modified. A complete UI for managing the Kontenplan was built from scratch. This includes a table, search/filter inputs, an Add New modal, and an Excel import trigger. The logic was refactored to use server-side filtering. Placeholder sections for displaying VK invoices, EK invoices, and payments were wired up with state and data-loading functions.
 
 -   ** (New File)**
-    -   **Importance:** A utility module to house shared logic for the pricing features.
-    -   **Summary:** Created to contain the Excel/CSV parsing logic () and the intelligent sampling algorithm (). The sampling function was updated multiple times to improve its logic (from simple sampling to Largest-Triangle-Three-Buckets) and to increase the number of points returned (from 30 to 200).
-
--   **New FIBU Scaffolding (Multiple Files)**
-    -   **Importance:** These files form the foundation for the new accounting module.
-    -   **Summary:**
-        -   : A new, placeholder frontend component for the FIBU UI.
-        -   : New API routes (, , ) were created as endpoints for future logic.
-        -    & : Modified to integrate the FIBU tab into the application's primary hash-based navigation system.
+    -   **Importance:** Encapsulates the complex business logic for account assignment.
+    -   **Summary:** Created to house the  and  functions, which determine the correct accounts for an invoice based on customer data (country, VAT ID) and product category. This keeps the API route cleaner.
 
 -   ** (New File)**
-    -   **Importance:** The backend API to support the new Price History feature.
-    -   **Summary:** Created to query the JTL SQL database for an article's price change history, sales data, and purchase price information. The SQL query was debugged and refined to correctly join tables (, ) and find the article by SKU.
+    -   **Importance:** A dedicated client for interacting with the Google Gemini API.
+    -   **Summary:** Created to configure the Gemini client with the API key and provide a simple, reusable function for sending prompts (the extracted PDF text) to the model for parsing.
 </code_architecture>
 
 <pending_tasks>
-- **FIBU Module Implementation:** The scaffolding is complete, but the core logic needs to be built. This includes:
-  - Fetching and processing VK invoices from the JTL database.
-  - Implementing PDF parsing for uploaded EK invoices.
-  - Aggregating payment data.
-  - Generating the final export file for 10it software.
-- **Price History Feature:** The backend API and basic UI are in place, but the frontend needs to be fully built out to display the historical data in a meaningful way, including calculating and showing the margin over time metric.
+- **10it Export:** The primary pending task is to create the data export functionality. This involves analyzing the required 10it file format and building an API endpoint to generate a CSV/Excel file with the aggregated invoice and payment data.
+- **Payment-Invoice Linking:** Connect the fetched payment data to the corresponding invoices.
+- **Frontend Display:** Fully implement the UI tables to display the fetched payments, and ensure the VK and EK invoice tables are populated and functional.
+- **End-to-End PDF Test:** Conduct a full test of the supplier invoice upload from the frontend UI to confirm the file upload, Gemini parsing, and data display works seamlessly.
 </pending_tasks>
 
 <current_work>
-The engineer was in the final stages of implementing a new Historie (Price History) feature within the Preise module. The work involved:
+The engineer was actively working on the final major feature for the FIBU module: **creating an export file compatible with the 10it accounting software**.
 
-1.  **Backend API Creation:** A new API endpoint was created at . This endpoint successfully connects to the JTL MS SQL database and retrieves the  (internal ID) for a given  (SKU), demonstrating a working database query for the required article data.
+The user has just requested this and provided two example files ( and ) that show the exact format required for the export. The engineer's immediate task is to analyze these files to understand the column structure, data types, and specific values needed for a valid 10it booking batch (Buchungsstapel).
 
-2.  **Frontend Scaffolding:** The  component was modified to support the new feature:
-    *   A Historie tab was added to the pricing module's navigation.
-    *   A state variable  and a loading function  were created to fetch data from the new API.
-    *   A new content section for the Historie tab was added, which would display the fetched data. This section currently contains a search input and a button to trigger the  function.
+The previous steps successfully laid the groundwork by implementing the APIs to fetch and process all the necessary source data:
+1.  **Chart of Accounts** (from MongoDB)
+2.  **Sales Invoices** with assigned accounts (from JTL MS SQL)
+3.  **Payments** (from JTL MS SQL)
+4.  **Supplier Invoices** parsed by AI (from MongoDB)
 
-The immediate next step, as requested by the user in the final message, was to pivot from development to documentation and update all relevant fork files with information about the numerous features added and modified throughout the trajectory.
+The current work is the critical junction of bringing all this data together. The plan is to map the collected data to the columns defined in the user-provided 10it example files and create a new API endpoint that will generate the final export on demand. The last action was a failed attempt to read the example CSV file, indicating that analysis of the file format is the very next step.
 </current_work>
 
 <optional_next_step>
-Update the documentation files (, , etc.) to reflect all the recent changes to the Preise and FIBU modules.
+Analyze the provided  file to define the required export format. Then, create a new API endpoint to generate a downloadable file in this format.
 </optional_next_step>
-
-<direct_quotes>
--   **User's Last Request:** bitte alle wichtigen Infos in dei Forkt txt datein schreiben (please write all important info into the fork text files)
--   **AI's Last Action:** Perfekt! Ich aktualisiere alle wichtigen Dokumentationsdateien mit den neuesten Features: (Perfect! I'm updating all important documentation files with the latest features:)
-</direct_quotes>
