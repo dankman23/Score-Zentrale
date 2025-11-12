@@ -208,22 +208,25 @@ export default function PreiseModule() {
       </div>
       <div className="card-body py-2" style={{fontSize: '0.9rem'}}>
         {/* Haupt-Tabs */}
-        <div className="btn-group btn-group-sm mb-3 w-100">
+        <div className="btn-group btn-group-sm mb-2 w-100">
           <button 
-            className={`btn ${tab === 'alte_pb' ? 'btn-primary' : 'btn-outline-secondary'}`}
+            className={`btn btn-sm ${tab === 'alte_pb' ? 'btn-primary' : 'btn-outline-secondary'}`}
             onClick={() => setTab('alte_pb')}
+            style={{fontSize: '0.85rem'}}
           >
             Alte PB
           </button>
           <button 
-            className={`btn ${tab === 'neue_2025' ? 'btn-primary' : 'btn-outline-secondary'}`}
+            className={`btn btn-sm ${tab === 'neue_2025' ? 'btn-primary' : 'btn-outline-secondary'}`}
             onClick={() => setTab('neue_2025')}
+            style={{fontSize: '0.85rem'}}
           >
             Neue ab 2025-11 (g2)
           </button>
           <button 
-            className={`btn ${tab === 'vergleich' ? 'btn-primary' : 'btn-outline-secondary'}`}
+            className={`btn btn-sm ${tab === 'vergleich' ? 'btn-primary' : 'btn-outline-secondary'}`}
             onClick={() => setTab('vergleich')}
+            style={{fontSize: '0.85rem'}}
           >
             <i className="bi bi-bar-chart mr-1"/>Vergleich
           </button>
