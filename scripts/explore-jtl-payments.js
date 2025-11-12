@@ -59,9 +59,9 @@ async function explore() {
     // 3. Check all Zahlungsarten to find Commerzbank
     console.log('=== All Zahlungsarten (Payment Methods) ===');
     const zahlungsarten = await pool.request().query(`
-      SELECT kZahlungsart, cName, cModulId, nSort
+      SELECT kZahlungsart, cName
       FROM dbo.tZahlungsart
-      ORDER BY nSort
+      ORDER BY kZahlungsart
     `);
     console.log('Total payment methods:', zahlungsarten.recordset.length);
     console.log(JSON.stringify(zahlungsarten.recordset, null, 2));
