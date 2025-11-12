@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
         za.cName AS zahlungsart,
         ISNULL(rv.fGesamtBruttopreis, 0) AS brutto,
         ISNULL(rv.fGesamtNettopreis, 0) AS netto,
-        ISNULL(k.cFirma, ISNULL(k.cVorname + ' ' + k.cNachname, 'Unbekannt')) AS kundenName,
+        ISNULL(rv.cFirmenname, 'Kunde #' + CAST(r.tKunde_kKunde AS VARCHAR)) AS kundenName,
         ISNULL(rv.cUmsatzsteuerID, '') AS kundenUstId,
         ISNULL(rv.cWaehrung, 'EUR') AS waehrung
       FROM dbo.tRechnung r
