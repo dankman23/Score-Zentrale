@@ -494,37 +494,28 @@ export default function PreiseModule() {
 
         {tab === 'vergleich' && (
           <div>
-            {/* EK-Eingabe für Vergleich */}
-            <div className="card mb-3 border-info">
-              <div className="card-header bg-info text-white py-2">
-                <h6 className="mb-0">EK für Vergleich</h6>
+            {/* Einstellungen */}
+            <div className="card mb-2 border-info">
+              <div className="card-header bg-info text-white py-1">
+                <small className="mb-0 font-weight-bold">Einstellungen</small>
               </div>
-              <div className="card-body py-3">
-                <div className="row mb-2">
+              <div className="card-body py-2">
+                <div className="row align-items-end mb-1">
                   <div className="col-md-3">
-                    <label className="small font-weight-bold">EK-Wert (€)</label>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      className="form-control" 
-                      placeholder="EK in €"
-                      value={vergleichEk}
-                      onChange={e => setVergleichEk(e.target.value)}
-                    />
-                  </div>
-                  <div className="col-md-3">
-                    <div className="btn-group btn-group-sm w-100 mt-4">
+                    <div className="btn-group btn-group-sm w-100">
                       <button 
                         className={`btn ${vergleichModus === 'plattform' ? 'btn-primary' : 'btn-outline-secondary'}`}
                         onClick={() => setVergleichModus('plattform')}
+                        style={{fontSize: '0.8rem'}}
                       >
                         Plattform
                       </button>
                       <button 
                         className={`btn ${vergleichModus === 'shop' ? 'btn-primary' : 'btn-outline-secondary'}`}
                         onClick={() => setVergleichModus('shop')}
+                        style={{fontSize: '0.8rem'}}
                       >
-                        Shop-Staffel
+                        Shop
                       </button>
                     </div>
                   </div>
