@@ -1,185 +1,309 @@
-# Score Zentrale - Deployment Guide (Option A: Direct SQL)
+# 🚀 DEPLOYMENT GUIDE - Score Zentrale v3.0
 
-## Übersicht
-Die Score Zentrale benötigt eine **direkte TCP-Verbindung** zum externen JTL-Wawi MS-SQL-Server.
-
----
-
-## 1️⃣ Server-Vorbereitung (JTL-SQL-Server)
-
-### 1.1 Read-Only SQL Login anlegen
-
-```sql
--- Als sysadmin auf dem JTL-SQL-Server ausführen:
-CREATE LOGIN [score_analytics_ro] WITH PASSWORD = '<STRONG_PASSWORD>';
-USE [eazybusiness];
-CREATE USER [score_analytics_ro] FOR LOGIN [score_analytics_ro];
-EXEC sp_addrolemember 'db_datareader', 'score_analytics_ro';
-```
-
-**Hinweis:** Nur **db_datareader** Rechte - kein Schreibzugriff!
-
-### 1.2 TLS/SSL prüfen
-
-- **Empfohlen:** SQL Server mit gültigem SSL-Zertifikat betreiben
-- **Fallback:** Self-Signed Zertifikat + `JTL_SQL_TRUST_CERT=true` in .env
-
-### 1.3 Firewall konfigurieren
-
-**Windows Firewall Regel:**
-- **Port:** TCP 1433 (eingehend)
-- **Quell-IPs:** Nur Emergent Egress IPs
-- **Instanz:** Fester Port (kein dynamischer Port/Browser)
-
-**Test:**
-```bash
-telnet <JTL_SQL_HOST> 1433
-# oder
-Test-NetConnection -ComputerName <JTL_SQL_HOST> -Port 1433
-```
+**Für Production Deployment**  
+**Version:** 3.0  
+**Datum:** 12.11.2025
 
 ---
 
-## 2️⃣ Environment Variables (Emergent)
+## 📋 Pre-Deployment Checklist
 
-In Emergent Dashboard diese Variablen konfigurieren:
+### ✅ Anforderungen
 
-```bash
-# MongoDB (Emergent Managed)
-MONGO_URL=<emergent-mongodb-connection-string>
+**Server:**
+- [ ] Ubuntu 20.04+ oder Debian 11+
+- [ ] Min. 4GB RAM (empfohlen: 8GB für große Artikel-Imports)
+- [ ] Min. 2 CPU Cores
+- [ ] 20GB Disk Space
 
-# App URLs
-NEXT_PUBLIC_BASE_URL=https://jtl-acquisition-hub.preview.emergentagent.com
-CORS_ORIGINS=https://jtl-acquisition-hub.preview.emergentagent.com
+**Software:**
+- [ ] Node.js 20+
+- [ ] MongoDB 7.0+
+- [ ] MS SQL Server Zugang (JTL-Wawi, Read-Only ausreichend)
+- [ ] Supervisor (für Process Management)
 
-# MS SQL (JTL-Wawi) - WICHTIG: Echte Werte einsetzen!
-JTL_SQL_HOST=<sql.server.public.ip>
-JTL_SQL_PORT=1433
-JTL_SQL_USER=score_analytics_ro
-JTL_SQL_PASSWORD=<STRONG_PASSWORD>
-JTL_SQL_DB=eazybusiness
-JTL_SQL_ENCRYPT=true
-JTL_SQL_TRUST_CERT=true
-
-# App Verhalten
-NEXT_PUBLIC_DEGRADED=0
-JTL_SQL_OPTIONAL=0
-
-# Warmakquise Config
-INACTIVE_MONTHS=6
-MIN_ORDERS=2
-MIN_REVENUE=100
-WARM_W1=0.4
-WARM_W2=0.3
-WARM_W3=0.2
-WARM_W4=0.1
-```
+**Netzwerk:**
+- [ ] JTL-Wawi SQL Server erreichbar (Port 1433)
+- [ ] MongoDB erreichbar (Port 27017)
+- [ ] Outbound SMTP (Port 465/587)
+- [ ] Internet-Zugang (Google APIs, Jina.ai)
 
 ---
 
-## 3️⃣ Deployment
+## 🔧 Installation
 
-1. **Push to GitHub** (oder gewähltes Repo)
-2. **Deploy via Emergent Dashboard**
-3. Warten bis Status "Running"
-
----
-
-## 4️⃣ Health Checks (Post-Deployment)
-
-### Automatisches Healthcheck-Script:
+### 1. Repository klonen
 ```bash
-node healthcheck.js
+git clone <your-repo-url> /app
+cd /app
 ```
 
-### Manuelle Tests:
-
-**1. SQL Connectivity:**
+### 2. Dependencies installieren
 ```bash
-curl https://jtl-acquisition-hub.preview.emergentagent.com/api/jtl/ping
-# Erwartung: {"ok":true,"server":"...","hasNPosTyp":false}
+yarn install
 ```
 
-**2. Orders KPI (Stichtag):**
+### 3. Environment Variables
 ```bash
-curl "https://jtl-acquisition-hub.preview.emergentagent.com/api/jtl/orders/kpi/shipping-split?from=2025-11-03&to=2025-11-03"
-# Erwartung: {"ok":true,"orders":>0,...}
+cp .env.example .env
+nano .env  # Pflichtfelder ausfüllen
 ```
 
-**3. Diagnostics:**
+**Pflicht-Felder:**
 ```bash
-curl "https://jtl-acquisition-hub.preview.emergentagent.com/api/jtl/orders/diag/day?date=2025-11-03"
-# Erwartung: {"ok":true,"totals":{"orders":71,"gross":"7077.67"},...}
+MONGO_URL=mongodb://localhost:27017/score_zentrale
+MSSQL_HOST=ihre-jtl-server-ip
+MSSQL_USER=sa
+MSSQL_PASSWORD=...
+MSSQL_DATABASE=eazybusiness
+SMTP_HOST=smtp.ihreprovider.de
+SMTP_USER=ihre@email.de
+SMTP_PASS=...
+GOOGLE_SEARCH_ENGINE_ID=...
+GOOGLE_SEARCH_API_KEY=...
 ```
 
-**4. Expenses:**
+### 4. MongoDB Setup
 ```bash
-curl "https://jtl-acquisition-hub.preview.emergentagent.com/api/jtl/purchase/expenses?from=2024-01-01&to=2024-12-31"
-# Erwartung: {"ok":true,"invoices":>0,"net":"...","gross":"..."}
+# Starten
+sudo systemctl start mongod
+sudo systemctl enable mongod
+
+# Collections erstellen
+mongosh score_zentrale << EOFMONGO
+db.createCollection('prospects')
+db.createCollection('articles')
+db.createCollection('preisformeln')
+db.createCollection('g2_configs')
+db.createCollection('autopilot_state')
+
+# Indizes für Performance
+db.articles.createIndex({ kArtikel: 1 }, { unique: true })
+db.articles.createIndex({ cArtNr: 1 })
+db.articles.createIndex({ cHerstellerName: 1 })
+db.articles.createIndex({ cWarengruppenName: 1 })
+db.prospects.createIndex({ website: 1 }, { unique: true })
+EOFMONGO
 ```
 
-**5. Margin:**
+### 5. Supervisor Configuration
 ```bash
-curl "https://jtl-acquisition-hub.preview.emergentagent.com/api/jtl/orders/kpi/margin?from=2025-11-01&to=2025-11-05"
-# Erwartung: {"ok":true,"margin_net":"...","cost_source":{...}}
-```
+# Next.js Service
+cat > /etc/supervisor/conf.d/nextjs.conf << EOFSUP
+[program:nextjs]
+command=/usr/bin/node /bin/yarn dev
+directory=/app
+autostart=true
+autorestart=true
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/nextjs.out.log
+user=root
+environment=NODE_ENV="production"
+EOFSUP
 
-**6. Warmakquise Import:**
-```bash
-curl -X POST https://jtl-acquisition-hub.preview.emergentagent.com/api/leads/import \
-  -H "Content-Type: application/json" \
-  -d '{"limit":200}'
-# Erwartung: {"ok":true,"imported":>0}
+# JTL-Import Service (optional, bei Bedarf)
+cat > /etc/supervisor/conf.d/jtl-import.conf << EOFSUP2
+[program:jtl-import]
+command=/usr/bin/node /app/scripts/cursor-import-small.js
+directory=/app
+autostart=false
+autorestart=true
+startretries=999
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/jtl-import.log
+user=root
+EOFSUP2
+
+# Reload Supervisor
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start nextjs
 ```
 
 ---
 
-## 5️⃣ Akzeptanzkriterien
+## 📦 Artikel-Import (Erstmalig)
 
-✅ **Alle Healthchecks grün**
-✅ **Dashboard lädt ohne "Demo"-Badge**
-✅ **Keine 502/404 bei JTL-Endpoints**
-✅ **Warmakquise zeigt importierte Leads**
-✅ **KPI-Tiles zeigen echte Daten**
+### Option A: Via Supervisor (empfohlen)
+```bash
+sudo supervisorctl start jtl-import
+sudo supervisorctl tail -f jtl-import
+```
 
----
+### Option B: Manuell
+```bash
+node /app/scripts/cursor-import-small.js
+```
 
-## 🔒 Sicherheit
+**Dauer:** ~1-2 Stunden für 166.855 Artikel  
+**Batch-Größe:** 1000 Artikel  
+**Methode:** Cursor-basiert (WHERE kArtikel > lastKArtikel)
 
-- ✅ SQL-Login ist **read-only** (db_datareader)
-- ✅ Firewall **nur Emergent IPs**
-- ✅ Credentials **nur in .env** (nie in Code)
-- ✅ Logs **keine Passwörter** (nur Error-Codes)
-- ✅ TLS-Verschlüsselung aktiv
+**Fortschritt überwachen:**
+```bash
+# Via API
+curl http://localhost:3000/api/jtl/articles/import/status
 
----
-
-## ⚠️ Troubleshooting
-
-### "Connection timeout" / "ETIMEDOUT"
-- Firewall prüfen (Port 1433 offen?)
-- Telnet-Test von Emergent-Server
-- ISP NAT-Probleme? → Option B (Tunnel) erwägen
-
-### TLS-Fehler
-- Temporär: `JTL_SQL_TRUST_CERT=true`
-- Langfristig: Gültiges CA-Zertifikat auf SQL-Server
-
-### "Login failed"
-- Credentials prüfen (.env)
-- SQL-Login existiert? (`SELECT name FROM sys.server_principals WHERE name='score_analytics_ro'`)
-
-### Keine Daten / 404
-- Tabellen existieren? (Beschaffungs-Module in JTL aktiviert?)
-- Zeitraum prüfen (Daten vorhanden?)
+# Via MongoDB
+mongosh score_zentrale --eval "db.articles.countDocuments()"
+```
 
 ---
 
-## 📞 Support
+## 🔒 Security Best Practices
 
-Bei Problemen:
-1. Logs prüfen: `kubectl logs <pod-name>`
-2. Healthcheck-Output teilen
-3. SQL-Verbindung testen (Telnet)
+### 1. Credentials absichern
+```bash
+chmod 600 /app/.env
+chown root:root /app/.env
+```
 
-**Kontakt:** [Ihr Support-Kontakt]
+### 2. MongoDB Authentication aktivieren
+```bash
+# /etc/mongod.conf
+security:
+  authorization: enabled
+
+# User erstellen
+mongosh admin
+db.createUser({
+  user: "score_admin",
+  pwd: "SecurePassword123!",
+  roles: [{role: "readWrite", db: "score_zentrale"}]
+})
+```
+
+### 3. Firewall konfigurieren
+```bash
+# Nur localhost für MongoDB
+sudo ufw allow from 127.0.0.1 to any port 27017
+
+# Next.js Port (nur intern oder via Reverse Proxy)
+sudo ufw allow 3000
+```
+
+### 4. HTTPS mit Nginx (Production)
+```nginx
+server {
+    listen 443 ssl http2;
+    server_name score-zentrale.ihredomain.de;
+
+    ssl_certificate /etc/letsencrypt/live/ihredomain.de/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/ihredomain.de/privkey.pem;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+---
+
+## 📊 Monitoring
+
+### Supervisor Status
+```bash
+sudo supervisorctl status
+```
+
+### Logs ansehen
+```bash
+sudo supervisorctl tail -f nextjs
+sudo supervisorctl tail -f jtl-import
+```
+
+### Performance Monitoring
+```bash
+# MongoDB Stats
+mongosh score_zentrale --eval "db.stats()"
+
+# Disk Usage
+df -h
+
+# Memory
+free -h
+
+# CPU
+top
+```
+
+---
+
+## 🔄 Updates & Wartung
+
+### Code Updates
+```bash
+cd /app
+git pull
+yarn install  # Falls neue Dependencies
+sudo supervisorctl restart nextjs
+```
+
+### Datenbank-Wartung
+```bash
+# Verwaiste Artikel prüfen (nach JTL-Updates)
+curl http://localhost:3000/api/jtl/articles/import/orphaned
+
+# Alte Logs löschen
+mongosh score_zentrale
+db.prospects.deleteMany({ created_at: { $lt: new Date('2024-01-01') } })
+```
+
+### Backup
+```bash
+# MongoDB Backup
+mongodump --db score_zentrale --out /backup/score_$(date +%Y%m%d)
+
+# .env Backup
+cp /app/.env /backup/.env.$(date +%Y%m%d)
+```
+
+---
+
+## 🆘 Emergency Procedures
+
+### App läuft nicht
+```bash
+sudo supervisorctl status nextjs
+sudo supervisorctl restart nextjs
+tail -100 /var/log/supervisor/nextjs.out.log
+```
+
+### MongoDB Verbindungsprobleme
+```bash
+sudo systemctl status mongod
+sudo systemctl restart mongod
+mongosh --eval "db.adminCommand('ping')"
+```
+
+### Import hängt
+```bash
+# Import stoppen
+sudo supervisorctl stop jtl-import
+
+# Status prüfen
+curl http://localhost:3000/api/jtl/articles/import/status
+
+# Neu starten
+sudo supervisorctl start jtl-import
+```
+
+---
+
+## 📞 Support Kontakte
+
+**Technischer Support:**
+- Logs prüfen: `/var/log/supervisor/`
+- MongoDB: `mongosh score_zentrale`
+- API testen: `curl http://localhost:3000/api/...`
+
+**Dokumentation:**
+- README.md - Feature-Übersicht
+- FORK_READY_GUIDE.md - Setup & Testing
+- JTL_API_KNOWLEDGE.md - Datenbank-Schema
+
+---
+
+**Deployment erfolgreich? Viel Erfolg mit Score Zentrale v3.0! 🎉**
