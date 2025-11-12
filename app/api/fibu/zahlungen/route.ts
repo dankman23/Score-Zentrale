@@ -115,16 +115,20 @@ export async function GET(request: NextRequest) {
       istZugeordnet: z.kRechnung > 0
     }))
     
-    // Speichere in MongoDB
+    // Speichere in MongoDB mit eindeutiger ID pro Quelle
     const db = await getDb()
     const collection = db.collection('fibu_zahlungen')
     
-    for (const zahlung of zahlungen.slice(0, limit)) {
+    for (const zahlung of zahlungen) {
+      // Eindeutige ID basierend auf Quelle und zahlungsId
+      const uniqueId = `${zahlung.quelle}_${zahlung.zahlungsId}`
+      
       await collection.updateOne(
-        { kZahlung: zahlung.kZahlung },
+        { uniqueId },
         { 
           $set: { 
-            ...zahlung, 
+            ...zahlung,
+            uniqueId,
             updated_at: new Date() 
           },
           $setOnInsert: { created_at: new Date() }
@@ -133,10 +137,19 @@ export async function GET(request: NextRequest) {
       )
     }
     
+    // Statistiken
+    const stats = {
+      gesamt: zahlungen.length,
+      zugeordnet: zahlungen.filter(z => z.istZugeordnet).length,
+      nichtZugeordnet: zahlungen.filter(z => !z.istZugeordnet).length,
+      vonTZahlung: zahlungen.filter(z => z.quelle === 'tZahlung').length,
+      vonZahlungsabgleich: zahlungen.filter(z => z.quelle === 'tZahlungsabgleichUmsatz').length
+    }
+    
     return NextResponse.json({
       ok: true,
-      zahlungen: zahlungen.slice(0, limit),
-      total: zahlungen.length,
+      zahlungen,
+      stats,
       zeitraum: { from, to }
     })
   } catch (error: any) {
