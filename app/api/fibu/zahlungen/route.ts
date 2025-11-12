@@ -18,22 +18,30 @@ export async function GET(request: NextRequest) {
     
     const pool = await getMssqlPool()
     
+    // Hole Zahlungen aus tZahlungseingang (die echte Zahlungstabelle)
     const query = `
-      SELECT
-        z.kZahlung,
+      SELECT TOP ${limit}
+        z.kZahlungseingang,
         z.kRechnung,
         z.fBetrag AS betrag,
-        z.dDatum AS zahlungsdatum,
-        ISNULL(z.cHinweis, '') AS verwendungszweck,
-        ISNULL(z.kZahlungsart, 0) AS kZahlungsart,
-        ISNULL(za.cName, 'Unbekannt') AS zahlungsart,
-        r.cRechnungsNr AS rechnungsNr
-      FROM dbo.tZahlung z
-      LEFT JOIN dbo.tZahlungsart za ON z.kZahlungsart = za.kZahlungsart
+        z.dZeit AS zahlungsdatum,
+        ISNULL(z.cHinweis, '') AS hinweis,
+        ISNULL(z.cAbgeholt, '') AS abgeholt,
+        ISNULL(z.cZahlungsanbieter, 'Unbekannt') AS zahlungsanbieter,
+        ISNULL(z.cISO, 'EUR') AS waehrung,
+        r.cRechnungsNr AS rechnungsNr,
+        r.tKunde_kKunde AS kKunde,
+        k.cFirma AS kundenFirma,
+        ISNULL(b.kZahlungsart, 0) AS kZahlungsart,
+        ISNULL(za.cName, 'Unbekannt') AS zahlungsart
+      FROM dbo.tZahlungseingang z
       LEFT JOIN dbo.tRechnung r ON z.kRechnung = r.kRechnung
-      WHERE z.dDatum >= @from
-        AND z.dDatum < @to
-      ORDER BY z.dDatum DESC
+      LEFT JOIN dbo.tKunde k ON r.tKunde_kKunde = k.kKunde
+      LEFT JOIN dbo.tBestellung b ON r.tBestellung_kBestellung = b.kBestellung
+      LEFT JOIN dbo.tZahlungsart za ON b.kZahlungsart = za.kZahlungsart
+      WHERE z.dZeit >= @from
+        AND z.dZeit < @to
+      ORDER BY z.dZeit DESC
     `
     
     const result = await pool.request()
