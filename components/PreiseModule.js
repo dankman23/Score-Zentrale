@@ -258,11 +258,14 @@ export default function PreiseModule() {
       const { parsePreisFile, intelligentSample } = await import('../app/lib/preis-utils')
       const preise = await parsePreisFile(file)
       
+      // Filtere auf relevanten EK-Bereich (0-300€)
+      const filtered = preise.filter(p => p.ek >= 0 && p.ek <= 300)
+      
       // Intelligentes Sampling auf 30 Punkte
-      const sampled = intelligentSample(preise, 30)
+      const sampled = intelligentSample(filtered, 30)
       
       setUploadedData(sampled)
-      alert(`✅ ${preise.length} Preise geladen, ${sampled.length} Punkte angezeigt`)
+      alert(`✅ ${preise.length} Preise geladen, ${filtered.length} im Bereich 0-300€, ${sampled.length} Punkte angezeigt`)
     } catch (e) {
       alert('Fehler beim Laden der Datei: ' + e.message)
     }
