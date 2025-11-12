@@ -167,6 +167,24 @@ export default function FibuModule() {
     event.target.value = '' // Reset file input
   }
   
+  // VK-Rechnungen laden
+  const loadVkRechnungen = async () => {
+    setVkLoading(true)
+    try {
+      const res = await fetch(`/api/fibu/rechnungen/vk?from=${vkZeitraum.from}&to=${vkZeitraum.to}&limit=100`)
+      const data = await res.json()
+      if (data.ok) {
+        setVkRechnungen(data.rechnungen)
+      } else {
+        alert('Fehler: ' + data.error)
+      }
+    } catch (e) {
+      console.error('Fehler beim Laden der VK-Rechnungen:', e)
+      alert('Fehler: ' + e.message)
+    }
+    setVkLoading(false)
+  }
+  
   // Gefilterte Konten - Jetzt serverseitig gefiltert, deshalb keine zusätzliche Filterung nötig
   const filteredKonten = konten
   
