@@ -1312,8 +1312,8 @@ export default function FibuModule() {
                               </>
                             ) : (
                               <>
-                                <td><strong>{k.konto}</strong></td>
-                                <td><small>{k.bezeichnung}</small></td>
+                                <td><strong style={{color: '#fff'}}>{k.konto}</strong></td>
+                                <td><span style={{color: '#f0f0f0'}}>{k.bezeichnung}</span></td>
                                 <td>
                                   {k.kontenklasse !== null && k.kontenklasse !== undefined ? (
                                     <span className="badge badge-info">{k.kontenklasse}</span>
@@ -1321,7 +1321,7 @@ export default function FibuModule() {
                                     <small className="text-muted">-</small>
                                   )}
                                 </td>
-                                <td><small className="text-muted">{k.kontenklasseName || k.typ || 'Sonstiges'}</small></td>
+                                <td><span style={{color: '#d0d0d0'}}>{k.kontenklasseName || k.typ || 'Sonstiges'}</span></td>
                                 <td>
                                   <button 
                                     className="btn btn-sm btn-outline-primary mr-1"
