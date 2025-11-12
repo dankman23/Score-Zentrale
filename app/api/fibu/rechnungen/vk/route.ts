@@ -35,7 +35,6 @@ export async function GET(request: NextRequest) {
         ISNULL(rv.fGesamtBruttopreis, 0) AS brutto,
         ISNULL(rv.fGesamtNettopreis, 0) AS netto,
         ISNULL(k.cFirma, ISNULL(k.cVorname + ' ' + k.cNachname, 'Unbekannt')) AS kundenName,
-        ISNULL(k.cUSTID, '') AS kundenUstId,
         ISNULL(rv.cWaehrung, 'EUR') AS waehrung
       FROM dbo.tRechnung r
       LEFT JOIN dbo.tBestellung b ON r.tBestellung_kBestellung = b.kBestellung
