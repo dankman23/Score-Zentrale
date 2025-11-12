@@ -425,6 +425,44 @@ export default function FibuModule() {
     setKreditorenLoading(false)
   }
   
+  // E-Mail Inbox laden
+  const loadEmailInbox = async () => {
+    setEmailInboxLoading(true)
+    try {
+      const res = await fetch('/api/fibu/email-inbox')
+      const data = await res.json()
+      if (data.ok) {
+        setEmailInbox(data.emails)
+      } else {
+        alert('Fehler beim Laden der Inbox: ' + data.error)
+      }
+    } catch (error) {
+      console.error('Fehler:', error)
+      alert('Fehler beim Laden der Inbox')
+    }
+    setEmailInboxLoading(false)
+  }
+  
+  // Neue E-Mails manuell abrufen
+  const fetchNewEmails = async () => {
+    setEmailFetchLoading(true)
+    try {
+      const res = await fetch('/api/fibu/email-inbox', { method: 'POST' })
+      const data = await res.json()
+      
+      if (data.ok) {
+        alert(`✅ ${data.message}`)
+        loadEmailInbox()
+      } else {
+        alert('❌ Fehler: ' + data.error)
+      }
+    } catch (error) {
+      console.error('Fehler:', error)
+      alert('❌ Fehler beim Abrufen')
+    }
+    setEmailFetchLoading(false)
+  }
+  
   // Export-Handler
   const handleExport = async () => {
     if (!exportFrom || !exportTo) {
