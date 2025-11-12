@@ -234,26 +234,25 @@ export default function PreiseModule() {
 
         {tab === 'alte_pb' && (
           <>
-            {/* Sheet-Tabs */}
+            {/* Sheet-Tabs - kompakter */}
             <div className="mb-2">
-              <ul className="nav nav-pills nav-fill" style={{fontSize: '0.85rem'}}>
+              <div className="btn-group btn-group-sm d-flex flex-wrap">
                 {sheets.map(s => (
-                  <li className="nav-item" key={s.id}>
-                    <a 
-                      className={`nav-link py-1 px-2 ${sheet === s.id ? 'active' : ''}`}
-                      href="#"
-                      onClick={(e) => { e.preventDefault(); setSheet(s.id); }}
-                    >
-                      {s.name}
-                    </a>
-                  </li>
+                  <button
+                    key={s.id}
+                    className={`btn btn-sm ${sheet === s.id ? 'btn-warning' : 'btn-outline-secondary'}`}
+                    onClick={() => setSheet(s.id)}
+                    style={{fontSize: '0.75rem', padding: '0.25rem 0.5rem', flex: '1 1 auto', minWidth: '120px'}}
+                  >
+                    {s.name}
+                  </button>
                 ))}
-              </ul>
+              </div>
             </div>
 
-            {/* Warengruppen */}
-            <div className="alert alert-info mb-2 py-2">
-              <small><strong>Warengruppen:</strong> {currentFormel.warengruppen.map(w => w.name).join(', ')}</small>
+            {/* Warengruppen - kompakter */}
+            <div className="alert alert-info mb-2 py-1">
+              <small style={{fontSize: '0.8rem'}}><strong>Warengruppen:</strong> {currentFormel.warengruppen.map(w => w.name).join(', ')}</small>
             </div>
 
             {/* Regler */}
