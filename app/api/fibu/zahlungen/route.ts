@@ -18,28 +18,26 @@ export async function GET(request: NextRequest) {
     
     const pool = await getMssqlPool()
     
-    // Hole Zahlungen - verwende tIncomingPayment (JTL Standard-Tabelle)
+    // Hole Zahlungen aus tZahlung mit erweitertenInfos
     const query = `
       SELECT TOP ${limit}
-        ip.kIncomingPayment AS kZahlungseingang,
-        ip.kOrder,
-        ip.fAmount AS betrag,
-        ip.dCreated AS zahlungsdatum,
-        ISNULL(ip.cPurpose, '') AS hinweis,
-        ISNULL(ip.cISO, 'EUR') AS waehrung,
-        ISNULL(ip.cPaymentProvider, 'Unbekannt') AS zahlungsanbieter,
+        z.kZahlung,
+        z.kRechnung,
+        z.fBetrag AS betrag,
+        z.dDatum AS zahlungsdatum,
+        ISNULL(z.cHinweis, '') AS hinweis,
+        ISNULL(z.cZahlungsanbieter, 'Unbekannt') AS zahlungsanbieter,
+        ISNULL(z.cISO, 'EUR') AS waehrung,
+        ISNULL(z.kZahlungsart, 0) AS kZahlungsart,
         r.cRechnungsNr AS rechnungsNr,
-        r.kRechnung,
         'Kunde #' + CAST(r.tKunde_kKunde AS VARCHAR) AS kundenName,
-        ISNULL(b.kZahlungsart, 0) AS kZahlungsart,
         ISNULL(za.cName, 'Unbekannt') AS zahlungsart
-      FROM dbo.tIncomingPayment ip
-      LEFT JOIN dbo.tBestellung b ON ip.kOrder = b.kBestellung
-      LEFT JOIN dbo.tRechnung r ON b.kBestellung = r.tBestellung_kBestellung
-      LEFT JOIN dbo.tZahlungsart za ON b.kZahlungsart = za.kZahlungsart
-      WHERE ip.dCreated >= @from
-        AND ip.dCreated < @to
-      ORDER BY ip.dCreated DESC
+      FROM dbo.tZahlung z
+      LEFT JOIN dbo.tRechnung r ON z.kRechnung = r.kRechnung
+      LEFT JOIN dbo.tZahlungsart za ON z.kZahlungsart = za.kZahlungsart
+      WHERE z.dDatum >= @from
+        AND z.dDatum < @to
+      ORDER BY z.dDatum DESC
     `
     
     const result = await pool.request()
