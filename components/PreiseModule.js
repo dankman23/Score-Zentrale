@@ -775,6 +775,28 @@ export default function PreiseModule() {
                         if (vergleichG2Enabled) {
                           const selectedFormel = formeln.find(f => f.sheet === vergleichG2Warengruppe)
                           if (selectedFormel) {
+                            // Lade aktuelle g2-Config
+                            const configRes = await fetch('/api/preise/g2/config')
+                            const configData = await configRes.json()
+                            let g2Config = {
+                              gstart_ek: 12,
+                              gneu_ek: 100,
+                              gneu_vk: 189,
+                              fixcost1: 0.35,
+                              fixcost2: 1.4,
+                              varpct1: 0.25,
+                              varpct2: 0.02,
+                              aufschlag: 1.08,
+                              shp_fac: 0.92,
+                              aa_threshold: 18
+                            }
+                            
+                            // Verwende gespeicherte Config falls vorhanden
+                            if (configData.ok && configData.configs && configData.configs.length > 0) {
+                              const savedConfig = configData.configs.find(c => c.warengruppe === vergleichG2Warengruppe) || configData.configs[0]
+                              g2Config = { ...g2Config, ...savedConfig }
+                            }
+                            
                             const kurve = []
                             
                             for (const ek of ekRange) {
@@ -787,18 +809,7 @@ export default function PreiseModule() {
                                   body: JSON.stringify({
                                     ek,
                                     warengruppe_regler: selectedFormel.regler,
-                                    g2_params: {
-                                      gstart_ek: 12,
-                                      gneu_ek: 100,
-                                      gneu_vk: 189,
-                                      fixcost1: 0.35,
-                                      fixcost2: 1.4,
-                                      varpct1: 0.25,
-                                      varpct2: 0.02,
-                                      aufschlag: 1.08,
-                                      shp_fac: 0.92,
-                                      aa_threshold: 18
-                                    },
+                                    g2_params: g2Config,
                                     staffel_mengen: [1]
                                   })
                                 })
