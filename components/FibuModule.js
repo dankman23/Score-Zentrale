@@ -874,12 +874,27 @@ export default function FibuModule() {
                       <tbody>
                         {zahlungen.map((z, idx) => (
                           <tr key={idx} style={{color: '#e0e0e0'}}>
-                            <td><strong style={{color: '#fff'}}>AU-{z.kZahlung}-S</strong></td>
+                            <td>
+                              <small style={{color: '#fff', fontWeight: '500'}}>{z.belegnummer?.substring(0, 50)}</small>
+                              {z.belegnummer && z.belegnummer.length > 50 && (
+                                <small className="text-muted" title={z.belegnummer}>...</small>
+                              )}
+                            </td>
                             <td><span style={{color: '#e0e0e0'}}>{new Date(z.zahlungsdatum).toLocaleDateString('de-DE')}</span></td>
-                            <td><span style={{color: '#f0f0f0'}}>{z.rechnungsNr || 'Unbekannt'}</span></td>
+                            <td><span style={{color: '#f0f0f0'}}>{z.rechnungsNr || '-'}</span></td>
                             <td><span style={{color: '#d0d0d0'}}>{z.kundenName || '-'}</span></td>
                             <td className="text-right"><strong style={{color: '#4ade80'}}>{z.betrag?.toFixed(2)} €</strong></td>
-                            <td><span className="badge badge-success">{z.debitorKonto || '-'}</span></td>
+                            <td>
+                              <span className={`badge ${
+                                z.zahlungsanbieter?.toLowerCase().includes('paypal') ? 'badge-primary' :
+                                z.zahlungsanbieter?.toLowerCase().includes('amazon') ? 'badge-warning' :
+                                z.zahlungsanbieter?.toLowerCase().includes('mollie') ? 'badge-info' :
+                                z.zahlungsanbieter?.toLowerCase().includes('commerzbank') ? 'badge-secondary' :
+                                'badge-success'
+                              }`}>
+                                {z.zahlungsanbieter || z.zahlungsart || 'Manuell'}
+                              </span>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
