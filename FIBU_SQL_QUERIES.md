@@ -123,23 +123,10 @@ ORDER BY z.dZeit
 }
 ```
 
-### 6. EK-Rechnungspositionen - Oktober 2024
+### 6. EK-Rechnungspositionen - ⚠️ NICHT IN JTL!
 
-```sql
--- Positionen zu Eingangsrechnungen
-SELECT
-  erp.kEingangsrechnungPos,
-  erp.kEingangsrechnung,
-  erp.kArtikel,
-  erp.cName AS Artikelname,
-  erp.fAnzahl AS Menge,
-  erp.fPreis AS Preis_Netto,
-  erp.fMwSt AS MwSt_Betrag
-FROM dbo.tEingangsrechnungPos erp
-INNER JOIN dbo.tEingangsrechnung er ON erp.kEingangsrechnung = er.kEingangsrechnung
-WHERE er.dRechnungsdatum >= '2025-10-01'
-  AND er.dRechnungsdatum < '2025-11-01'
-```
+**Siehe oben**: EK-Rechnungen werden per PDF-Upload oder E-Mail hochgeladen und geparst.
+Positionen werden aus dem PDF extrahiert und in MongoDB gespeichert.
 
 ## 🔍 Hilfstabellen
 
