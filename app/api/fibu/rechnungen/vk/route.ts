@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     
     const pool = await getMssqlPool()
     
-    // Haupt-Query: VK-Rechnungen mit Beträgen und Kundendaten aus lvRechnungsverwaltung
+    // Haupt-Query: VK-Rechnungen mit Beträgen und Kundendaten
     const query = `
       SELECT TOP ${limit}
         r.kRechnung,
@@ -34,13 +34,15 @@ export async function GET(request: NextRequest) {
         za.cName AS zahlungsart,
         ISNULL(rv.fGesamtBruttopreis, 0) AS brutto,
         ISNULL(rv.fGesamtNettopreis, 0) AS netto,
-        ISNULL(rv.cFirmenname, '') AS kundenName,
-        ISNULL(rv.cUmsatzsteuerID, '') AS kundenUstId,
+        ISNULL(k.cFirma, ISNULL(k.cVorname + ' ' + k.cNachname, 'Unbekannt')) AS kundenName,
+        ISNULL(k.cUSTID, '') AS kundenUstId,
+        ISNULL(k.cLand, 'DE') AS kundenLand,
         ISNULL(rv.cWaehrung, 'EUR') AS waehrung
       FROM dbo.tRechnung r
       LEFT JOIN dbo.tBestellung b ON r.tBestellung_kBestellung = b.kBestellung
       LEFT JOIN dbo.tZahlungsart za ON b.kZahlungsart = za.kZahlungsart
       LEFT JOIN Verkauf.lvRechnungsverwaltung rv ON r.kRechnung = rv.kRechnung
+      LEFT JOIN dbo.tKunde k ON r.tKunde_kKunde = k.kKunde
       WHERE r.dErstellt >= @from 
         AND r.dErstellt < @to
         AND ISNULL(r.cStatus, '') != 'Storniert'
