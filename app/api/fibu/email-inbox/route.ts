@@ -212,14 +212,26 @@ export async function PATCH(request: NextRequest) {
       )
     }
     
-    // Parse mit Gemini
+    // Parse mit Gemini (inkl. E-Mail-Kontext)
     const { extractInvoiceData } = await import('../../../lib/gemini')
     const pdfBuffer = Buffer.from(email.pdfBase64, 'base64')
-    const extracted = await extractInvoiceData(pdfBuffer)
+    
+    const emailContext = {
+      from: email.emailFrom,
+      subject: email.emailSubject,
+      body: email.emailTextBody || email.emailHtmlBody
+    }
+    
+    const extracted = await extractInvoiceData(pdfBuffer, undefined, emailContext)
     
     return NextResponse.json({
       ok: true,
-      extracted
+      extracted,
+      emailContext: {
+        from: email.emailFrom,
+        subject: email.emailSubject,
+        bodyPreview: (email.emailTextBody || '').substring(0, 200)
+      }
     })
   } catch (error: any) {
     console.error('[Email Inbox PATCH] Error:', error)
