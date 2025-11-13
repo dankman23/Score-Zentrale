@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
           ELSE k.cVorname + ' ' + k.cNachname
         END AS kundenName,
         ISNULL(k.cLand, 'DE') AS kundenLand,
-        k.cUSTID AS kundenUstId,
+        '' AS kundenUstId,
         r.kZahlungsart,
         ISNULL(za.cName, 'Unbekannt') AS zahlungsart,
         CASE WHEN r.cStatus = 'Bezahlt' THEN 1 ELSE 0 END AS istBezahlt,
