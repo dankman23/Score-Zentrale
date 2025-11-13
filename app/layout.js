@@ -40,7 +40,16 @@ export default function RootLayout({ children }) {
               <li className="nav-item"><a className="nav-link" href="#sales"><i className="bi bi-bar-chart mr-1"/>Sales</a></li>
               <li className="nav-item"><a className="nav-link" href="#marketing"><i className="bi bi-bullseye mr-1"/>Marketing</a></li>
               <li className="nav-item"><a className="nav-link" href="#glossar"><i className="bi bi-book mr-1"/>Glossar</a></li>
-              <li className="nav-item"><a className="nav-link" href="#outbound"><i className="bi bi-send mr-1"/>Outbound</a></li>
+              <li className="nav-item dropdown">
+                <a className="nav-link dropdown-toggle" href="#outbound" id="outboundDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i className="bi bi-send mr-1"/>Outbound
+                </a>
+                <div className="dropdown-menu" aria-labelledby="outboundDropdown">
+                  <a className="dropdown-item" href="#outbound"><i className="bi bi-list-ul mr-2"/>Prospect Management</a>
+                  <a className="dropdown-item" href="#kaltakquise"><i className="bi bi-search mr-2"/>Kaltakquise</a>
+                  <a className="dropdown-item" href="#warmakquise"><i className="bi bi-people mr-2"/>Warmakquise</a>
+                </div>
+              </li>
               <li className="nav-item"><a className="nav-link" href="#produkte"><i className="bi bi-box-seam mr-1"/>Produkte</a></li>
               <li className="nav-item"><a className="nav-link" href="#preise"><i className="bi bi-calculator mr-1"/>Preise</a></li>
               <li className="nav-item"><a className="nav-link" href="#fibu"><i className="bi bi-receipt-cutoff mr-1"/>FIBU</a></li>
