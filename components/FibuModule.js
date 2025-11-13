@@ -756,6 +756,7 @@ export default function FibuModule() {
                     onClick={() => {
                       if (tab === 'vk') loadVkRechnungen()
                       if (tab === 'ek') loadEkRechnungen()
+                      if (tab === 'ek-manager') loadEkRechnungen()
                     }}
                   >
                     <i className="bi bi-arrow-clockwise"/>
