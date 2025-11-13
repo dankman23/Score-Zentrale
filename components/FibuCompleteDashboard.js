@@ -8,6 +8,7 @@ import KontenplanView from './KontenplanView'
 import VKRechnungenView from './VKRechnungenView'
 import ZahlungenView from './ZahlungenView'
 import ZahlungsEinstellungen from './ZahlungsEinstellungen'
+import FibuMonatsUebersicht from './FibuMonatsUebersicht'
 
 export default function FibuCompleteDashboard() {
   const [data, setData] = useState(null)
