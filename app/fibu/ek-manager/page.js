@@ -1,6 +1,6 @@
 'use client'
 
-import FibuDashboard from '@/components/FibuDashboard'
+import FibuDashboard from '../../../components/FibuDashboard'
 
 export default function EKManagerPage() {
   return (
