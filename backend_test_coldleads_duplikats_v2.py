@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 # Backend URL
-BASE_URL = "https://account-hub-34.preview.emergentagent.com/api"
+BASE_URL = "https://invoice-parser-24.preview.emergentagent.com/api"
 
 def print_section(title):
     """Print a section header"""

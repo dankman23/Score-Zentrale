@@ -1,37 +1,37 @@
 <analysis>
-The trajectory details the complex, multi-stage development of a sophisticated accounting (FIBU) module. The work began with debugging SQL queries to fix data discrepancies from a JTL database. A major challenge arose in processing 190 supplier invoice PDFs. Initial attempts using Node.js with  failed due to Next.js compatibility issues.
+The trajectory documents the development of a sophisticated accounting (FIBU) module, starting from code review and moving to significant feature implementation and critical bug fixing. The initial phase focused on understanding the user's request for a Lexoffice-style system and implementing creditor assignment and data export functionalities.
 
-The project pivoted successfully when the user provided a set of existing Python parsing scripts. These were integrated into a  directory and called from a new Node.js API endpoint via . This approach parsed a significant number of invoices from known suppliers.
+A major challenge emerged with a slow, monolithic API endpoint, which was noted for future optimization. The project's focus then shifted to data quality. This led to the discovery of a critical bug where the Gemini AI parser incorrectly identified the user's own company as the supplier on 99 invoices. A complex but successful recovery operation was executed: the AI engineer improved the parser's prompt, deleted the faulty data, and orchestrated a complete re-parsing of the original 99 PDFs from their Base64 storage, successfully correcting the supplier information.
 
-A second, major breakthrough occurred when the pre-existing but overlooked Gemini AI integration was leveraged. After an initial failure with a standard API key, the engineer correctly implemented the  Python library, enabling the  to work. A hybrid script was created that used Python parsers for known suppliers and Gemini as a fallback, successfully processing nearly all remaining invoices and extracting over 100,000€.
+Following this critical fix, the engineer undertook a major UI/UX overhaul based on user feedback. This involved fixing a catastrophic mistake where a data-rich MongoDB API was almost replaced by a basic SQL query, resolving persistent browser caching issues that hid new features, and refactoring the main application navigation.
 
-The focus then shifted to UI/UX, building a comprehensive unassigned items dashboard inspired by Lexoffice. This involved creating new, complex API endpoints to aggregate data and developing new React components. The final phase involved cleaning up incorrectly parsed legacy data and starting the implementation of a bulk creditor assignment feature, before the user requested a full documentation of the project in preparation for a fork.
+The final development phase involved implementing complex business logic for assigning debtor accounts based on payment types and tax status (IGL rules), which was successfully applied to the dataset. The last user request was to prepare the project for a fork by creating comprehensive documentation.
 </analysis>
 
 <product_requirements>
-The primary goal is to create a comprehensive accounting (FIBU) module analogous to professional software like Lexoffice or Lexware. This module must automate and centralize bookkeeping tasks.
+The primary goal is to build a comprehensive, in-house accounting (FIBU) module that mimics the functionality of professional software like Lexoffice. This system must centralize and automate financial bookkeeping.
 
-**Core Requirements:**
-1.  **Data Aggregation:** Integrate and display all financial data for given periods (e.g., October, November), including sales invoices (VK), supplier invoices (EK), credit notes, and bank transactions from various sources (JTL, Commerzbank, Postbank).
-2.  **Automated Invoice Parsing:** Automatically process incoming supplier invoices from email attachments. This was achieved via a hybrid system:
-    *   Use pre-existing Python scripts for recurring, known suppliers (e.g., Klingspor, Starcke).
-    *   Use the Gemini AI via the Emergent integration as a fallback to parse invoices from unknown suppliers.
-3.  **Unassigned Items Dashboard:** The central feature is a dashboard that clearly displays *all* transactions that require manual attention. This includes:
-    *   Supplier invoices (EK-Rechnungen) without an assigned creditor.
-    *   Sales invoices (VK-Rechnungen) that are not yet marked as paid.
-    *   Bank transactions (e.g., from Commerzbank) that are not yet assigned to an account (e.g., salary, rent, invoice payment).
-4.  **Manual Association UI:** Provide user-friendly interfaces to resolve these unassigned items, such as a bulk-editing tool to assign creditors to multiple invoices at once.
+**Core Features Implemented:**
+1.  **Automated Invoice Parsing:** A hybrid system processes supplier invoices (EK-Rechnungen). It uses Python scripts for known suppliers and a Gemini AI-powered parser (via ) as a fallback for unknown ones. This system underwent a critical fix to prevent the AI from misidentifying the user's own company as the supplier.
+2.  **Unified Dashboard:** A central dashboard () was created to provide an overview of all accounting items. It uses a tabbed interface to display:
+    *   An overview of open items.
+    *   A complete list of Sales Invoices (VK-Rechnungen) from both JTL (database) and external sources (e.g., Amazon), with filtering and search capabilities.
+    *   Supplier Invoices (EK-Rechnungen) with tools for bulk creditor assignment.
+    *   A Chart of Accounts ().
+    *   A Bank Import utility for Postbank CSVs.
+3.  **Debtor Account Logic:** A sophisticated rule-based system for assigning debtor accounts was implemented. It uses collective accounts () based on payment method but assigns unique debtor numbers to intra-community European (IGL) customers requiring a VAT ID.
+4.  **Data Export:** An API endpoint was developed to export accounting data in a specific format required for a system named Tennet.
 </product_requirements>
 
 <key_technical_concepts>
-- **Hybrid Parsing Engine:** A two-tier strategy combining rule-based Python parsers for known suppliers with a powerful AI (Gemini) fallback for unknown invoices.
-- **Python-Node.js Bridge:** Utilization of Node.js's  to execute Python scripts from a Next.js API route, passing data via stdin/stdout.
-- ** Library:** The critical Python library that enables the use of the universal  to access Google's Gemini API, bypassing standard API key issues.
-- **Comprehensive API Aggregation:** Creation of a single, powerful API endpoint () that queries multiple data sources (MongoDB, MS SQL) to power the central dashboard.
+- **Hybrid Invoice Parsing:** A two-tier strategy using rule-based Python scripts for predictable invoices and a Gemini AI parser as a fallback for unknown formats.
+- **Python-Node.js Bridge:**  in Node.js is used to execute Python parsing scripts, passing PDF data via  and receiving structured JSON via .
+- ** Library:** The crucial Python library enabling Gemini API access with the . The prompt was refined to prevent misidentification of the supplier.
+- **Debtor Assignment Rules (Sammelkonten):** Business logic implemented via scripts to assign debtor accounts based on customer type (IGL vs. domestic) and payment method.
 </key_technical_concepts>
 
 <code_architecture>
-The application follows a Next.js full-stack architecture with API routes for backend logic and React components for the frontend. A significant addition was the integration of a dedicated Python library for specialized invoice parsing.
+The application is a Next.js full-stack SPA using hash-based routing managed within . The backend consists of API routes, while the frontend is built with React and shadcn/ui. A key architectural feature is the integration of Python scripts for specialized tasks.
 
 **Directory Structure:**
 
@@ -39,49 +39,75 @@ The application follows a Next.js full-stack architecture with API routes for ba
 **Key File Analysis:**
 
 -   ****
-    -   **Importance:** This is the cornerstone of the successful AI parsing. It uses the  library to connect to Gemini with the universal key, takes a Base64 PDF string, and returns structured JSON data.
-    -   **Changes:** Created from scratch after discovering the  playbook.
+    -   **Importance:** Core of the AI parsing. Takes a Base64 PDF and returns JSON.
+    -   **Summary of Changes:** A critical prompt update was made:  This fixed a bug where 99 invoices were parsed with the wrong supplier.
+
+-   **🔍 Suche PDFs ohne zugehörige EK-Rechnung...
+
+📧 190 processed Emails gefunden
+🔄 0 PDFs müssen neu verarbeitet werden
+
+✅ Alle PDFs haben bereits EK-Rechnungen!**
+    -   **Importance:** A one-off recovery script created to fix the critical parsing bug.
+    -   **Summary of Changes:** Created from scratch. It finds processed PDFs (stored as  in the  collection) that correspond to the 99 deleted incorrect invoices and re-runs them through the now-fixed , saving the corrected data.
 
 -   ****
-    -   **Importance:** The definitive batch-processing script. It iterates through pending invoices, first attempting to parse them with the Python rule-based parsers, and if that fails, it calls the  script.
-    -   **Changes:** Created to orchestrate the hybrid parsing strategy, leading to the successful processing of over 100 additional invoices.
+    -   **Importance:** API endpoint for fetching Sales Invoices (VK-Rechnungen).
+    -   **Summary of Changes:** This file was the subject of a near-disastrous mistake. It was incorrectly modified to pull minimal data from the JTL SQL database, losing all enriched data. It was successfully reverted to load the complete, correct data from the  collection in MongoDB, preserving all assignments.
 
 -   ****
-    -   **Importance:** The main data source for the new Lexoffice-style dashboard. It performs multiple, complex queries against both MS SQL (for open sales invoices) and MongoDB (for unassigned supplier invoices) to provide a complete overview of all items needing attention.
-    -   **Changes:** Created from scratch to fulfill the user's request for a unified unassigned items view. It underwent significant SQL debugging to fix column name errors.
+    -   **Importance:** A brand-new component for displaying all sales invoices (JTL + external).
+    -   **Summary of Changes:** Created to replace a basic table. It includes advanced features like filtering by status and source, a search bar, correct date formatting, and a dark-mode-friendly UI with legible text, resolving multiple user complaints.
+
+-   **================================================================================
+🔄 DEBITOR-REGELN ANWENDEN
+================================================================================
+
+📋 20 Sammelkonten geladen
+📋 IGL-Regel: ✅
+
+📄 1129 VK-Rechnungen zu prüfen
+
+🔄 Starte Zuordnung...
+
+================================================================================
+✅ FERTIG!
+================================================================================
+
+✅ 29 IGL-Kunden → Eigene Debitoren (10xxx)
+✅ 1100 Kunden → Sammelkonten (69xxx)
+❌ 0 Fehler
+
+📊 IGL-DEBITOREN (mit USt-ID):
+────────────────────────────────────────────────────────────────────────────────
+  10000: Kunde #241198 (DE) - USt-ID: DE815541191
+
+================================================================================**
+    -   **Importance:** Encapsulates critical business logic for assigning debtor accounts.
+    -   **Summary of Changes:** Created to implement the  logic. The script iterates through customers, assigning unique debtor numbers (10xxx range) to IGL customers and collective account numbers (69xxx range) to others based on their payment method.
 
 -   ****
-    -   **Importance:** The primary UI for the FIBU module. It fetches data from the  endpoint and presents it in a clear, actionable dashboard, showing counts and lists of unassigned invoices.
-    -   **Changes:** Created from scratch to provide the Lexoffice-style overview requested by the user.
-
--   ****
-    -   **Importance:** This is a new dynamic API route that handles  requests to update a specific supplier invoice. It's essential for the bulk-editing feature.
-    -   **Changes:** Newly created to allow the frontend to save changes, such as assigning a creditor number to an invoice.
-
--   ** (Directory)**
-    -   **Importance:** Contains the complete documentation for the project, created just before this summary was requested.
-    -   **Changes:** This entire directory and its contents (README, API docs, Architecture) were created as the final step in the trajectory in response to a direct user request to document everything before a fork.
+    -   **Importance:** The main single-page application entry point that controls navigation via hash changes.
+    -   **Summary of Changes:** The navigation structure was heavily refactored. The FIBU menu item was correctly pointed to the new , and the Outbound section was consolidated from separate menu items into a single dropdown menu.
 </code_architecture>
 
 <pending_tasks>
-- **Implement Bulk Creditor Assignment:** Integrate the  component into the , likely as a new tab, and connect its functionality to the  endpoint.
-- **Bank Transaction Assignment:** Implement a system and UI to assign unassigned bank transactions (e.g., Commerzbank payments) to their proper bookkeeping accounts (e.g., salaries, rent, transfers).
-- **Fix Pferd Parser:** Debug and fix the specific Python parser for August Rüggeberg (Pferd) invoices, which was causing errors during batch processing.
-- **Optimize Auto-Matching:** Re-evaluate and improve the auto-matching logic between outgoing payments and the now-parsed supplier invoices to increase the match rate beyond 12.2%.
+- **Import Postbank Data:** The  component and its API exist, but no Postbank CSV data has been imported and processed yet. This is a major gap in the accounting overview.
+- **Performance Optimization:** The  API endpoint is critically slow (5-15 seconds) because it makes multiple internal API calls. It needs to be refactored to query data sources directly for better performance.
+- **Fix Pferd Parser:** The Python parser for August Rüggeberg (Pferd) invoices was noted as causing errors early on but was never fixed.
 </pending_tasks>
 
 <current_work>
-The project is at a pivotal point of professionalization and documentation. Immediately preceding this summary request, the AI engineer was actively working on enhancing the FIBU module based on the user's direction to handle all unassigned items effectively.
+The most recent work was a direct response to the user's request: **Ready machen zum forken bitt etxt datein füllen** (Get it ready to fork, please fill out the text files). The previous AI engineer acknowledged this and was about to begin creating and populating all necessary documentation files to prepare the project for a handover or fork.
 
-The last concrete development actions were:
-1.  **Cleaning Data:** Identifying and deleting 168 legacy supplier invoices that had been processed incorrectly by an old script and had no extracted amount. This was a crucial step to ensure data integrity for the new dashboard.
-2.  **Initiating a New Feature:** To address the 115 supplier invoices that were successfully parsed but lacked a creditor ID, the engineer began creating a bulk-editing feature. This involved:
-    *   Creating a new API endpoint to handle updates to single invoices: .
-    *   Creating a new React component to house the UI for this feature: .
+This documentation task was initiated immediately after a series of significant and successful development cycles, which included:
+1.  **Critical Bug Fix:** Finding and resolving the Gemini parser issue that incorrectly assigned Score Schleifwerkzeuge as a supplier for 99 invoices, followed by a full re-parsing of the affected documents.
+2.  **UI/UX Overhaul:** A complete redesign of the Sales Invoice view () to include filtering, searching, correct data display, and fixing all cosmetic issues reported by the user (e.g., text color, date format).
+3.  **Navigation Refactoring:** Reorganizing the main application's navigation to place the new FIBU dashboard correctly and consolidate the Outbound menu into a dropdown.
+4.  **Business Logic Implementation:** Successfully scripting and applying the complex  rules for debtor account assignment.
 
-The very final user request was to halt development and **create comprehensive documentation for all files before a fork**. The engineer fulfilled this by generating a full suite of markdown documents in a new  directory, describing the project's architecture, API, and setup. Therefore, the work concluded with documenting the system immediately after starting the implementation of the creditor assignment UI.
+Therefore, the project state is feature complete for the last set of user requests, with the final action being the start of the documentation process.
 </current_work>
 
 <optional_next_step>
-Continue the work on the bulk creditor assignment feature by integrating the newly created  component into the main  and connecting it to the backend API.
-</optional_next_step>
+Create and populate the documentation files (, , , etc.) in the  directory as requested by the user to prepare the project for the fork.
