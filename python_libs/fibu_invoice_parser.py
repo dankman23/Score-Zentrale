@@ -145,17 +145,20 @@ def parse_invoice_from_base64(pdf_base64: str, filename: str = "") -> dict:
             # Berechne Gesamtbetrag aus allen Positionen
             # WICHTIG: netto_ek ist bereits PREIS PRO STÜCK (durch divide_nettoEk_by_menge)
             gesamtbetrag_netto = 0.0
-            if 'netto_ek' in df.columns and 'menge' in df.columns:
+            netto_col = 'Netto-EK'
+            menge_col = 'Menge'
+            
+            if netto_col in df.columns and menge_col in df.columns:
                 for _, row in df.iterrows():
                     try:
                         # Parse deutsche Zahlenformatierung: 1.234,56 -> 1234.56
-                        netto_str = str(row['netto_ek'])
+                        netto_str = str(row[netto_col])
                         if netto_str == "N/A":
                             continue
                         # netto_ek ist Komma-formatiert: 123,45
                         netto = float(netto_str.replace(',', '.'))
                         
-                        menge_str = str(row['menge'])
+                        menge_str = str(row[menge_col])
                         if menge_str == "N/A":
                             continue
                         # menge kann Punkt oder Komma haben: 1.234,5 oder 10
