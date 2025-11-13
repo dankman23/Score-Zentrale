@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     
     // Analyse-Modus: Gib Lern-Statistiken zurück
     if (analyze === 'true') {
-      const { analyzeProcessedInvoices } = await import('../../../lib/ek-rechnung-parser')
+      const { analyzeProcessedInvoices } = await import('../../../../lib/ek-rechnung-parser')
       const db = await getDb()
       const collection = db.collection('fibu_ek_rechnungen')
       
