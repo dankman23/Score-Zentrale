@@ -61,7 +61,8 @@ export async function POST(request: NextRequest) {
         
         // 1. PDF Text extrahieren
         const pdfBuffer = Buffer.from(pdf.pdfBase64, 'base64')
-        const pdfData = await pdfParse(pdfBuffer)
+        const parser = await getPdfParse()
+        const pdfData = await parser(pdfBuffer)
         const pdfText = pdfData.text
         
         // 2. Extrahiere Kreditor-Hint aus Dateinamen
