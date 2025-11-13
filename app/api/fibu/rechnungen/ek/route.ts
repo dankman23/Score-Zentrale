@@ -7,11 +7,34 @@ import { findKreditor, learnKreditorMapping, extractBelegnummer } from '../../..
 
 /**
  * GET /api/fibu/rechnungen/ek?from=2025-10-01&to=2025-10-31
- * Lädt hochgeladene EK-Rechnungen
+ * GET /api/fibu/rechnungen/ek?analyze=true - Analysiere verarbeitete EK-Rechnungen
+ * Lädt hochgeladene EK-Rechnungen oder analysiert sie für Lern-Statistiken
  */
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
+    const analyze = searchParams.get('analyze')
+    
+    // Analyse-Modus: Gib Lern-Statistiken zurück
+    if (analyze === 'true') {
+      const { analyzeProcessedInvoices } = await import('../../../lib/ek-rechnung-parser')
+      const db = await getDb()
+      const collection = db.collection('fibu_ek_rechnungen')
+      
+      const invoices = await collection.find({}).sort({ created_at: -1 }).limit(100).toArray()
+      
+      const analysis = await analyzeProcessedInvoices(invoices)
+      
+      return NextResponse.json({
+        ok: true,
+        totalInvoices: invoices.length,
+        statistics: analysis.statistics,
+        suggestions: analysis.suggestions,
+        message: `Analysiert: ${invoices.length} Rechnungen, ${analysis.suggestions.length} Template-Vorschläge`
+      })
+    }
+    
+    // Standard-Modus: Lade Rechnungen nach Datum
     const from = searchParams.get('from') || '2025-10-01'
     const to = searchParams.get('to') || '2025-10-31'
     
