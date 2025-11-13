@@ -33,7 +33,6 @@ export async function GET(request: NextRequest) {
         k.cFirma,
         k.cVorname,
         k.cNachname,
-        k.cLand,
         r.cRechnungsNr
       FROM dbo.tgutschrift g
       LEFT JOIN dbo.tKunde k ON g.kKunde = k.kKunde
