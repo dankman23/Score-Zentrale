@@ -1,19 +1,22 @@
 export const runtime = 'nodejs'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getMssqlPool } from '../../../../lib/db/mssql'
+import { getDb } from '../../../../lib/db/mongodb'
 
 /**
  * GET /api/fibu/rechnungen/vk
- * Lädt VK-Rechnungen aus JTL MSSQL
+ * Lädt VK-Rechnungen aus MongoDB (fibu_vk_rechnungen)
  * 
  * Query-Parameter:
  * - from: Startdatum (YYYY-MM-DD)
  * - to: Enddatum (YYYY-MM-DD)
  * 
- * WICHTIG: Lädt ALLE Rechnungen ohne Limit!
- * Rechnungen werden NIEMALS automatisch gelöscht.
- * Status-Updates (Offen -> Bezahlt/Storniert) sind erlaubt.
+ * WICHTIG: 
+ * - Lädt aus MongoDB, NICHT aus MSSQL!
+ * - Rechnungen werden NIEMALS automatisch gelöscht
+ * - Rechnungen werden NIEMALS überschrieben
+ * - Nur neue Rechnungen werden hinzugefügt
+ * - Status-Updates (Offen -> Bezahlt) erlaubt
  */
 export async function GET(request: NextRequest) {
   try {
@@ -21,45 +24,45 @@ export async function GET(request: NextRequest) {
     const from = searchParams.get('from') || '2025-01-01'
     const to = searchParams.get('to') || '2025-12-31'
     
-    console.log('[VK-Rechnungen] Lade ALLE Rechnungen von', from, 'bis', to)
+    const startDate = new Date(from)
+    const endDate = new Date(to + 'T23:59:59.999Z')
     
-    const pool = await getMssqlPool()
+    console.log('[VK-Rechnungen] Lade aus MongoDB:', from, 'bis', to)
     
-    const result = await pool.request()
-      .input('from', from)
-      .input('to', to)
-      .query(`
-        SELECT
-          r.kRechnung,
-          r.cRechnungsNr,
-          r.dErstellt,
-          r.tKunde_kKunde,
-          CASE
-            WHEN EXISTS (SELECT 1 FROM tZahlung z WHERE z.kRechnung = r.kRechnung) THEN 'Bezahlt'
-            ELSE 'Offen'
-          END as status
-        FROM tRechnung r
-        WHERE r.dErstellt >= @from
-          AND r.dErstellt < DATEADD(day, 1, CAST(@to as date))
-        ORDER BY r.dErstellt DESC
-      `)
+    const db = await getDb()
     
-    console.log('[VK-Rechnungen] Geladen:', result.recordset.length, 'Rechnungen')
+    // Lade VK-Rechnungen aus MongoDB
+    const rechnungen = await db.collection('fibu_vk_rechnungen')
+      .find({
+        rechnungsdatum: {
+          $gte: startDate,
+          $lte: endDate
+        }
+      })
+      .sort({ rechnungsdatum: -1 })
+      .toArray()
     
-    const rechnungen = result.recordset.map(r => ({
-      id: r.kRechnung.toString(),
-      rechnungsNr: r.cRechnungsNr,
-      datum: r.dErstellt,
-      kunde: `Kunde #${r.tKunde_kKunde || 'Unbekannt'}`,
-      betrag: 0, // TODO: Betrag aus tRechnungPositionen berechnen
-      status: r.status
+    console.log('[VK-Rechnungen] Geladen:', rechnungen.length, 'aus MongoDB')
+    
+    const mapped = rechnungen.map(r => ({
+      id: r._id.toString(),
+      rechnungsNr: r.rechnungsNr || r.rechnungsNummer || 'N/A',
+      datum: r.rechnungsdatum,
+      kunde: r.kundenName || r.kunde || 'Unbekannt',
+      betrag: r.gesamtBetrag || r.betrag || 0,
+      debitor: r.debitorKonto,
+      sachkonto: r.sachkonto,
+      zahlungsart: r.zahlungsart,
+      status: r.status || 'Offen',
+      quelle: r.quelle || 'JTL'
     }))
     
     return NextResponse.json({
       ok: true,
-      rechnungen,
-      total: rechnungen.length,
-      zeitraum: { from, to }
+      rechnungen: mapped,
+      total: mapped.length,
+      zeitraum: { from, to },
+      quelle: 'MongoDB (fibu_vk_rechnungen)'
     })
     
   } catch (error: any) {
