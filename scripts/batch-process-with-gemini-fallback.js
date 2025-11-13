@@ -18,8 +18,9 @@ envContent.split('\n').forEach(line => {
 
 const MONGO_URL = env.MONGO_URL || 'mongodb://localhost:27017/score_zentrale';
 const GOOGLE_API_KEY = env.GOOGLE_API_KEY || '';
+const EMERGENT_LLM_KEY = env.GOOGLE_API_KEY || env.EMERGENT_LLM_KEY || '';
 
-if (!GOOGLE_API_KEY) {
+if (!EMERGENT_LLM_KEY) {
   console.log('⚠️  WARNUNG: GOOGLE_API_KEY nicht gesetzt. Gemini-Fallback deaktiviert.');
 }
 
