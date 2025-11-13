@@ -76,10 +76,10 @@ export async function GET(request: NextRequest) {
       // Sachkonto (Erlöskonto, z.B. 4400)
       const sachkonto = rechnung.sachkonto || '4400'
       
-      // Buchung: Debitor an Erlöskonto
-      // SOLL: Debitorenkonto (Forderung steigt)
-      // HABEN: Erlöskonto (Umsatz)
-      bookings.push({
+      // Buchung: Forderung an Erlöskonto (gemäß Tennet-Vorlage)
+      // SOLL: 1200 Forderungen (Forderung steigt)
+      // HABEN: 4400 Erlöse (Umsatz)
+      const booking = {
         konto: '1200',  // Forderungen aus Lieferungen und Leistungen
         kontobezeichnung: 'Forderungen aus Lieferungen und Leistungen',
         datum: new Date(rechnung.rechnungsdatum),
@@ -90,7 +90,13 @@ export async function GET(request: NextRequest) {
         haben: 0,
         steuer: steuersatz,
         steuerkonto: getSteuerkonto(steuersatz, false)
-      })
+      }
+      
+      bookings.push(booking)
+      
+      if (vkRechnungen.length <= 5) {
+        console.log(`[10it Export] VK-Rechnung hinzugefügt: ${rechnung.cRechnungsNr}, Brutto: ${brutto}`)
+      }
     }
     
     // ========================================
