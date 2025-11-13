@@ -137,13 +137,16 @@ export async function GET(request: NextRequest) {
     // ========================================
     // 3. EXTERNE RECHNUNGEN (Amazon VCS-Lite etc.)
     // ========================================
-    const externeRechnungenCol = db.collection('fibu_externe_rechnungen')
-    const externeRechnungen = await externeRechnungenCol.find({
-      belegdatum: {
-        $gte: startDate,
-        $lt: endDate
-      }
-    }).toArray()
+    let externeRechnungen: any[] = []
+    if (type === 'alle' || type === 'vk') {
+      const externeRechnungenCol = db.collection('fibu_externe_rechnungen')
+      externeRechnungen = await externeRechnungenCol.find({
+        belegdatum: {
+          $gte: startDate,
+          $lt: endDate
+        }
+      }).toArray()
+    }
     
     for (const rechnung of externeRechnungen) {
       const brutto = rechnung.brutto || 0
