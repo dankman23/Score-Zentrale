@@ -101,7 +101,7 @@ async function main() {
       
       try {
         // Parse mit Gemini
-        const result = await parseInvoiceWithGemini(attachment.content)
+        const result = await parseInvoiceWithGemini(email.pdfBase64)
         
         if (result.success && result.data) {
           const data = result.data
