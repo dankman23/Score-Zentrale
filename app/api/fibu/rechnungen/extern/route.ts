@@ -61,10 +61,10 @@ export async function GET(request: NextRequest) {
       kZahlungsart: r.kZahlungsart,
       zahlungsart: r.zahlungsartName || 'Amazon Payment',
       waehrung: r.cWaehrungISO || 'EUR',
-      brutto: parseFloat(r.fBrutto || 0),
-      netto: parseFloat(r.fNetto || 0),
-      steuer: parseFloat(r.fSteuer || 0),
-      mwstSatz: r.fNetto > 0 ? parseFloat((r.fSteuer / r.fNetto * 100).toFixed(2)) : 0
+      brutto: parseFloat(r.fVkBrutto || 0),
+      netto: parseFloat(r.fVkNetto || 0),
+      steuer: parseFloat((r.fVkBrutto || 0) - (r.fVkNetto || 0)),
+      mwstSatz: r.fVkNetto > 0 ? parseFloat(((r.fVkBrutto - r.fVkNetto) / r.fVkNetto * 100).toFixed(2)) : 0
     }))
     
     // MongoDB speichern
