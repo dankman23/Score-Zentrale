@@ -439,47 +439,7 @@ export default function FibuCompleteDashboard() {
 
         {/* Zahlungen Tab */}
         {activeTab === 'zahlungen' && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">💳 Zahlungsausgänge ohne Zuordnung (Top 30)</h3>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Anbieter</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Betrag</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hinweis</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Typ</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aktion</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {details.zahlungenNegativ.map((zahlung, idx) => (
-                      <tr key={idx} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm text-gray-600">
-                          {new Date(zahlung.datum).toLocaleDateString('de-DE')}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{zahlung.anbieter}</td>
-                        <td className="px-4 py-3 text-sm font-medium text-red-600">{zahlung.betrag?.toFixed(2)}€</td>
-                        <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate" title={zahlung.hinweis}>
-                          {zahlung.hinweis}
-                        </td>
-                        <td className="px-4 py-3 text-sm">
-                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">
-                            {zahlung.typ}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm">
-                          <button className="text-blue-600 hover:text-blue-800">Konto zuordnen</button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+          <ZahlungenView />
         )}
       </div>
 
