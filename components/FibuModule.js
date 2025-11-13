@@ -1,8 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import FibuCompleteDashboard from './FibuCompleteDashboard'
 
 export default function FibuModule() {
+  // Das neue, vollständige FIBU Dashboard
+  return <FibuCompleteDashboard />
+}
+
+// ALTE VERSION (vor Refactoring)
+function FibuModuleOld() {
+  const { useState, useEffect } = require('react')
   const [tab, setTab] = useState('uebersicht')
   const [dateFrom, setDateFrom] = useState('2025-10-01')
   const [dateTo, setDateTo] = useState('2025-10-31')
