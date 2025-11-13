@@ -16,6 +16,10 @@ const CONFIG = {
   datumTolerance: 14,          // ±14 Tage Abweichung erlaubt
   minConfidence: 70,           // Mindest-Confidence für Auto-Match (0-100)
   manualConfidence: 50,        // Ab diesem Score manuelle Prüfung vorschlagen
+  
+  // Zeitraum (von Kommandozeile oder Standard: aktueller Monat)
+  zeitraumVon: process.argv[2] || null,
+  zeitraumBis: process.argv[3] || null
 }
 
 async function main() {
