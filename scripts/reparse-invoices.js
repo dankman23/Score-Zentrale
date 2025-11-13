@@ -43,8 +43,8 @@ async function parseInvoiceWithGemini(pdfBase64) {
       }
     })
     
-    // Sende PDF als Base64 via stdin
-    python.stdin.write(JSON.stringify({ pdfBase64 }))
+    // Sende PDF als Base64 via stdin (Format das Python erwartet)
+    python.stdin.write(JSON.stringify({ pdf_base64: pdfBase64 }))
     python.stdin.end()
   })
 }
