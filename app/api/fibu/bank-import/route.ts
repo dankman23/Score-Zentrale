@@ -3,8 +3,6 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '../../../lib/db/mongodb'
-import multer from 'multer'
-import { Readable } from 'stream'
 
 /**
  * Postbank/Bank CSV Import
@@ -16,12 +14,6 @@ import { Readable } from 'stream'
  * - Buchungstag, Wertstellung, Buchungstext, Auftraggeber, Verwendungszweck, Betrag, Währung
  * - oder alternative Bank-Formate
  */
-
-const storage = multer.memoryStorage()
-const upload = multer({ 
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 } // 10 MB
-})
 
 export async function POST(request: NextRequest) {
   try {
