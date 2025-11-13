@@ -1,0 +1,4 @@
+Buchungstag;Wertstellung;Buchungstext;Auftraggeber;Verwendungszweck;Betrag;Währung
+30.10.2025;30.10.2025;Überweisung;Max Mustermann;Zahlung RE2025-97899;41,07;EUR
+30.10.2025;30.10.2025;Überweisung;Firma Test GmbH;Rechnung XRE-5056 Amazon;87,00;EUR
+29.10.2025;29.10.2025;Lastschrift;Lieferant AG;Einkauf Ware AU_12345_SW6;-150,00;EUR
