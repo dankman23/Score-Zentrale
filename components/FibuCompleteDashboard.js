@@ -468,6 +468,11 @@ export default function FibuCompleteDashboard() {
           <BankImport onSuccess={loadData} />
         )}
 
+        {/* Kontenplan Tab */}
+        {activeTab === 'kontenplan' && (
+          <KontenplanView />
+        )}
+
         {/* Zahlungen Tab */}
         {activeTab === 'zahlungen' && (
           <div className="space-y-6">
