@@ -143,14 +143,27 @@ def parse_invoice_from_base64(pdf_base64: str, filename: str = "") -> dict:
                 datum = datetime.now().strftime('%Y-%m-%d')
             
             # Berechne Gesamtbetrag aus allen Positionen
+            # WICHTIG: netto_ek ist bereits PREIS PRO STÜCK (durch divide_nettoEk_by_menge)
             gesamtbetrag_netto = 0.0
             if 'netto_ek' in df.columns and 'menge' in df.columns:
                 for _, row in df.iterrows():
                     try:
-                        netto = float(str(row['netto_ek']).replace(',', '.'))
-                        menge = float(str(row['menge']).replace(',', '.'))
+                        # Parse deutsche Zahlenformatierung: 1.234,56 -> 1234.56
+                        netto_str = str(row['netto_ek'])
+                        if netto_str == "N/A":
+                            continue
+                        # netto_ek ist Komma-formatiert: 123,45
+                        netto = float(netto_str.replace(',', '.'))
+                        
+                        menge_str = str(row['menge'])
+                        if menge_str == "N/A":
+                            continue
+                        # menge kann Punkt oder Komma haben: 1.234,5 oder 10
+                        menge = float(menge_str.replace('.', '').replace(',', '.'))
+                        
                         gesamtbetrag_netto += netto * menge
-                    except:
+                    except Exception as e:
+                        print(f"Fehler bei Betragsberechnung: {e}", file=sys.stderr)
                         pass
             
             # MwSt (meistens 19%)
