@@ -58,42 +58,43 @@ async function callPythonParser(pdfBase64, filename) {
 }
 
 async function callGeminiParser(pdfBase64, emailContext) {
-  // Dynamischer Import von Gemini-Modul
-  const { extractInvoiceData } = await import('../app/lib/gemini.ts');
-  
-  const pdfBuffer = Buffer.from(pdfBase64, 'base64');
-  
-  try {
-    const result = await extractInvoiceData(pdfBuffer, undefined, emailContext);
+  return new Promise((resolve, reject) => {
+    const python = spawn('python3', ['/app/python_libs/gemini_invoice_parser.py']);
     
-    if (result.error) {
-      return {
-        success: false,
-        error: result.error
-      };
-    }
+    let stdout = '';
+    let stderr = '';
     
-    // Mappe Gemini-Output zu unserem Format
-    return {
-      success: true,
-      lieferant: result.lieferant || 'Unbekannt',
-      rechnungsnummer: result.rechnungsnummer || 'Unbekannt',
-      datum: result.datum || new Date().toISOString().split('T')[0],
-      gesamtbetrag: result.gesamtbetrag || 0,
-      nettobetrag: result.nettobetrag || 0,
-      steuerbetrag: result.mehrwertsteuer || 0,
-      steuersatz: result.mwstSatz || 19,
-      kreditor: null, // Wird später manuell zugeordnet
-      parsing_method: 'gemini-ai',
-      confidence: result.gesamtbetrag > 0 ? 80 : 50,
-      positions_count: result.positionen?.length || 0
+    python.stdout.on('data', (data) => {
+      stdout += data.toString();
+    });
+    
+    python.stderr.on('data', (data) => {
+      stderr += data.toString();
+    });
+    
+    python.on('close', (code) => {
+      if (code !== 0) {
+        reject(new Error(`Gemini-Python exited with code ${code}: ${stderr}`));
+        return;
+      }
+      
+      try {
+        const result = JSON.parse(stdout);
+        resolve(result);
+      } catch (error) {
+        reject(new Error(`JSON parse error: ${error.message}`));
+      }
+    });
+    
+    // Sende Input via stdin
+    const input = {
+      pdf_base64: pdfBase64,
+      filename: '',
+      email_context: emailContext
     };
-  } catch (error) {
-    return {
-      success: false,
-      error: error.message
-    };
-  }
+    python.stdin.write(JSON.stringify(input));
+    python.stdin.end();
+  });
 }
 
 async function main() {
