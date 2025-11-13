@@ -52,7 +52,6 @@ Zahlungen sind ebenfalls in **ZWEI Quellen** gespeichert:
   - Test: `GET /api/fibu/gutschriften?from=2025-10-01&to=2025-10-31`
 
 ### ❌ Fehlt noch
-- **Externe Rechnungen** aus `Rechnung.tExternerBeleg` (XRE-XXXXX)
 - **Zuordnung** zwischen externen Rechnungen und Zahlungen
 - **Integration** der externen Rechnungen in 10it Export
 
