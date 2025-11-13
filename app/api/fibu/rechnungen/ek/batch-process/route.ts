@@ -5,7 +5,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '../../../../../lib/db/mongodb'
 import { parseEKRechnung } from '../../../../../lib/ek-rechnung-parser'
 import { parseInvoiceWithGemini } from '../../../../../lib/gemini'
-import pdfParse from 'pdf-parse'
+
+// Dynamic import for pdf-parse to avoid Next.js build issues
+let pdfParse: any = null
+async function getPdfParse() {
+  if (!pdfParse) {
+    pdfParse = (await import('pdf-parse')).default
+  }
+  return pdfParse
+}
 
 /**
  * POST /api/fibu/rechnungen/ek/batch-process
