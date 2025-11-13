@@ -69,7 +69,11 @@ async def parse_invoice_with_emergent_gemini(pdf_path: str, email_context: dict 
         
         {context_text}
         
-        WICHTIG: 
+        KRITISCH WICHTIG: 
+        - Dies ist eine EINGANGSRECHNUNG (Lieferantenrechnung)
+        - Der LIEFERANT ist derjenige, der die Rechnung AUSSTELLT (oben auf der Rechnung)
+        - "Score Schleifwerkzeuge" ist NICHT der Lieferant! Das ist der EMPFÄNGER/KUNDE
+        - Ignoriere die Empfängeradresse - suche nur nach dem Absender/Rechnungssteller
         - Nutze auch die Informationen aus dem E-Mail-Kontext.
         - Der Lieferantenname kann aus dem E-Mail-Absender stammen.
         - Bei deutschen Beträgen: 1.234,56 € = 1234.56
