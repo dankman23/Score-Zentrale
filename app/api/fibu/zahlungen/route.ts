@@ -120,6 +120,7 @@ export async function GET(request: NextRequest) {
     }))
     
     // Speichere in MongoDB mit eindeutiger ID pro Quelle
+    // WICHTIG: Überschreibe NICHT bestehende Zuordnungen!
     const db = await getDb()
     const collection = db.collection('fibu_zahlungen')
     
@@ -127,18 +128,36 @@ export async function GET(request: NextRequest) {
       // Eindeutige ID basierend auf Quelle und zahlungsId
       const uniqueId = `${zahlung.quelle}_${zahlung.zahlungsId}`
       
-      await collection.updateOne(
-        { uniqueId },
-        { 
-          $set: { 
-            ...zahlung,
-            uniqueId,
-            updated_at: new Date() 
-          },
-          $setOnInsert: { created_at: new Date() }
-        },
-        { upsert: true }
-      )
+      // Prüfe ob bereits vorhanden
+      const existing = await collection.findOne({ uniqueId })
+      
+      if (existing) {
+        // Wenn bereits vorhanden, nur bestimmte Felder aktualisieren
+        // NICHT überschreiben: Zuordnungen, manuelle Änderungen
+        await collection.updateOne(
+          { uniqueId },
+          { 
+            $set: { 
+              // Nur Basis-Daten aktualisieren
+              betrag: zahlung.betrag,
+              zahlungsdatum: zahlung.zahlungsdatum,
+              hinweis: zahlung.hinweis,
+              zahlungsart: zahlung.zahlungsart,
+              zahlungsanbieter: zahlung.zahlungsanbieter,
+              updated_at: new Date()
+            }
+            // Lasse kRechnung, istZugeordnet, und andere Zuordnungen unverändert
+          }
+        )
+      } else {
+        // Neu anlegen
+        await collection.insertOne({
+          ...zahlung,
+          uniqueId,
+          created_at: new Date(),
+          updated_at: new Date()
+        })
+      }
     }
     
     // Statistiken
