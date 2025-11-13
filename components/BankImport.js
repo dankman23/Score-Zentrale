@@ -182,7 +182,7 @@ function TransactionsList() {
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
 
-  useState(() => {
+  useEffect(() => {
     loadTransactions()
   }, [])
 
