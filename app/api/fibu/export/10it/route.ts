@@ -92,7 +92,6 @@ export async function GET(request: NextRequest) {
       }
       
       bookings.push(booking)
-      console.log(`[10it Export] Buchung hinzugefügt: ${rechnung.cRechnungsNr}, Buchungen gesamt: ${bookings.length}`)
     }
     
     // ========================================
