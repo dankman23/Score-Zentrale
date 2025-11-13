@@ -98,22 +98,33 @@ export async function POST(request: NextRequest) {
         console.log(`[Batch] Template-Parsing: ${parsedData.parsingMethod} (${parsedData.confidence}%)`)
         
         // 4. Fallback: Gemini wenn Confidence niedrig
-        if (parsedData.confidence < 70) {
-          const kreditorNameHint = kreditor?.name || ''
-          const geminiResult = await parseInvoiceWithGemini(pdfText, kreditorNameHint)
-          
-          parsedData = {
-            lieferantName: geminiResult.lieferantName || kreditor?.name || 'Unbekannt',
-            rechnungsNummer: geminiResult.rechnungsNummer || '',
-            rechnungsDatum: geminiResult.rechnungsDatum || '',
-            betrag: geminiResult.betrag || 0,
-            nettoBetrag: geminiResult.nettoBetrag,
-            steuersatz: geminiResult.steuersatz,
-            confidence: 85,
-            parsingMethod: 'gemini-ai',
-            rawText: pdfText
+        if (parsedData.confidence < 70 && process.env.GOOGLE_API_KEY) {
+          try {
+            const pdfBuffer = Buffer.from(pdf.pdfBase64, 'base64')
+            const geminiResult = await extractInvoiceData(pdfBuffer, undefined, {
+              from: pdf.emailFrom,
+              subject: pdf.subject,
+              body: ''
+            })
+            
+            if (geminiResult && !geminiResult.error) {
+              parsedData = {
+                lieferantName: geminiResult.lieferant || kreditor?.name || 'Unbekannt',
+                rechnungsNummer: geminiResult.rechnungsnummer || '',
+                rechnungsDatum: geminiResult.datum || '',
+                betrag: geminiResult.gesamtbetrag || 0,
+                nettoBetrag: geminiResult.nettobetrag,
+                steuersatz: geminiResult.mwstSatz,
+                confidence: 85,
+                parsingMethod: 'gemini-ai',
+                rawText: pdfText
+              }
+              console.log(`[Batch] Gemini-Parsing: ${parsedData.lieferantName}, ${parsedData.betrag}€`)
+            }
+          } catch (geminiError) {
+            console.log(`[Batch] Gemini-Fehler: ${geminiError}`)
+            // Continue with template parsing result
           }
-          console.log(`[Batch] Gemini-Parsing: ${parsedData.lieferantName}, ${parsedData.betrag}€`)
         }
         
         // 5. Überschreibe mit Kreditor wenn vorhanden
