@@ -57,9 +57,10 @@ export async function GET(request: NextRequest) {
       vkRechnungen = await vkRechnungenCol.find({
         rechnungsdatum: {
           $gte: startDate,
-          $lt: endDate
+          $lte: endDate
         }
       }).toArray()
+      console.log(`[10it Export] VK-Rechnungen gefunden: ${vkRechnungen.length}`)
     }
     
     for (const rechnung of vkRechnungen) {
