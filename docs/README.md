@@ -1,153 +1,226 @@
-# FIBU-Modul Dokumentation
+# Score Zentrale - Internes ERP & FIBU System
 
-## 📚 Willkommen
+## 📋 Projektübersicht
 
-Dies ist die vollständige Dokumentation des FIBU-Moduls (Finanzbuchhaltung) für Score Schleifwerkzeuge.
+**Score Zentrale** ist ein maßgeschneidertes ERP-System mit integriertem FIBU-Modul (Finanzbuchhaltung) für Score Schleifwerkzeuge. Das System wurde entwickelt, um Buchhaltungsprozesse zu automatisieren und eine vollständige Übersicht über alle finanziellen Transaktionen zu bieten – ähnlich wie Lexoffice, aber speziell angepasst an die Unternehmensanforderungen.
 
-**Was kann das System?**
-- ✅ Automatische Verarbeitung von Lieferantenrechnungen (PDF)
-- ✅ Intelligentes PDF-Parsing (Python + Gemini AI)
-- ✅ Automatische Zahlung-zu-Rechnung-Zuordnung
-- ✅ JTL-ERP-Integration
-- ✅ Export für Buchhaltungssoftware (10it)
+## 🎯 Hauptziele
 
-**Stand:** 365 Rechnungen verarbeitet, 108.005,79€ extrahiert ✨
+- **Automatisierte Rechnungsverarbeitung**: KI-gestützte Extraktion von Lieferantenrechnungen aus PDFs
+- **Zentrale Buchhaltungs-Übersicht**: Alle Eingangs- und Ausgangsrechnungen, Zahlungen und Gutschriften an einem Ort
+- **Kreditor- & Debitor-Verwaltung**: Automatische Zuordnung nach Geschäftsregeln
+- **Export-Funktionalität**: Nahtloser Export für externe Buchhaltungssysteme (10it-Format)
+- **Bank-Integration**: Automatischer Import von Postbank-Kontoauszügen
 
----
+## 🏗️ Technologie-Stack
 
-## 🚀 Quick Links
+- **Frontend**: Next.js 14 (App Router), React, TailwindCSS, shadcn/ui
+- **Backend**: Next.js API Routes (TypeScript)
+- **Datenbanken**: 
+  - MongoDB (Geschäftsdaten, FIBU)
+  - MSSQL (JTL-Warenwirtschaft, read-only)
+- **AI/ML**: Gemini 2.0 Flash (via emergentintegrations)
+- **Python**: Invoice Parsing Scripts
 
-| Ich möchte... | Dokument |
-|---------------|----------|
-| **Schnell loslegen** | [Quick Start Guide](./QUICKSTART.md) |
-| **Alles verstehen** | [Vollständige README](./FIBU_README.md) |
-| **API nutzen** | [API-Dokumentation](./API_DOCUMENTATION.md) |
-| **Architektur verstehen** | [Architektur-Doku](./ARCHITECTURE.md) |
-| **Übersicht aller Docs** | [Dokumentations-Index](./INDEX.md) |
-
----
-
-## 📖 Dokumentations-Struktur
+## 📁 Projekt-Struktur
 
 ```
-/docs
-├── README.md                  ← Du bist hier
-├── INDEX.md                   ← Vollständiger Index
-├── QUICKSTART.md              ← In 5 Minuten loslegen
-├── FIBU_README.md             ← Haupt-Dokumentation
-├── API_DOCUMENTATION.md       ← API-Referenz
-└── ARCHITECTURE.md            ← Technische Architektur
+/app
+├── app/                          # Next.js App Directory
+│   ├── api/fibu/                # FIBU API Routes
+│   ├── fibu/                    # FIBU Frontend Pages
+│   └── page.js                  # Main SPA Entry Point
+├── components/                   # React Components
+│   ├── FibuCompleteDashboard.js # Haupt-Dashboard
+│   ├── KreditorZuordnung.js     # Kreditor-Zuordnung
+│   ├── VKRechnungenView.js      # VK-Rechnungen Ansicht
+│   ├── KontenplanView.js        # Kontenplan
+│   └── BankImport.js            # Bank CSV Import
+├── python_libs/                  # Python Parsing Scripts
+│   └── emergent_gemini_parser.py # Gemini AI Parser
+├── scripts/                      # Utility Scripts
+│   ├── auto-match-kreditoren.js # Automatische Kreditor-Zuordnung
+│   ├── apply-debitor-regeln.js  # Debitor-Zuordnung
+│   └── reparse-invoices.js      # Re-Parsing nach Parser-Fixes
+└── docs/                         # Dokumentation
 ```
 
----
+## 🚀 Quick Start
 
-## 🎯 Für wen ist was?
+Für detaillierte Setup-Anweisungen siehe [SETUP.md](./SETUP.md)
 
-### 👤 Endanwender (Buchhaltung)
-1. [Quick Start](./QUICKSTART.md) - System nutzen lernen
-2. [FIBU README - Verwendung](./FIBU_README.md#verwendung) - Workflows
-
-### 👨‍💻 Entwickler
-1. [FIBU README - Architektur](./FIBU_README.md#architektur) - Überblick
-2. [Architektur](./ARCHITECTURE.md) - Details
-3. [API-Doku](./API_DOCUMENTATION.md) - Endpoints
-
-### 🔧 DevOps
-1. [FIBU README - Installation](./FIBU_README.md#installation--setup)
-2. [Architektur - Deployment](./ARCHITECTURE.md#deployment)
-3. [Quick Start - Troubleshooting](./QUICKSTART.md#-troubleshooting)
-
----
-
-## 💡 Häufige Aufgaben
-
-### PDF verarbeiten
 ```bash
-node scripts/batch-process-with-gemini-fallback.js 200
-```
-→ [Details](./QUICKSTART.md#4-erste-pdf-verarbeiten)
+# Dependencies installieren
+cd /app/app
+yarn install
 
-### Auto-Matching
+# Python-Dependencies
+pip install -r /app/requirements.txt
+
+# Services starten
+sudo supervisorctl restart all
+
+# App öffnen
+# → http://localhost:3000
+```
+
+## 📚 Dokumentation
+
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Technische Architektur und Datenflüsse
+- **[FIBU_README.md](./FIBU_README.md)** - Detaillierte FIBU-Modul Dokumentation
+- **[API_DOCUMENTATION.md](./API_DOCUMENTATION.md)** - Alle API-Endpunkte mit Beispielen
+- **[SETUP.md](./SETUP.md)** - Installation und Konfiguration
+- **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** - Häufige Probleme und Lösungen
+- **[PENDING_TASKS.md](./PENDING_TASKS.md)** - Offene Aufgaben und TODOs
+
+## 🔑 Hauptfunktionalitäten
+
+### 1. FIBU-Dashboard (`/fibu`)
+- **Übersicht**: KPIs für EK/VK-Rechnungen, Zahlungen, offene Posten
+- **EK-Rechnungen**: Lieferantenrechnungen mit Kreditor-Zuordnung
+- **VK-Rechnungen**: Verkaufsrechnungen aus JTL + externe Quellen (Amazon)
+- **Zahlungen**: Alle Zahlungsbewegungen nach Anbieter
+- **Bank-Import**: CSV-Upload für Postbank-Kontoauszüge
+- **Kontenplan**: Vollständiger SKR03-ähnlicher Kontenrahmen
+- **Export**: Datenexport für externe Buchhaltungssoftware
+
+### 2. Automatisierte Rechnungsverarbeitung
+
+#### Hybrid-Parsing-System:
+1. **Regelbasierte Parser** (Python): Für bekannte Lieferanten (schnell, präzise)
+2. **Gemini AI Fallback**: Für unbekannte/neue Lieferanten (flexibel, robust)
+
+#### Workflow:
+```
+PDF Rechnung → Email-Postfach → Parser-Erkennung → Datenextraktion → 
+Kreditor-Zuordnung → MongoDB-Speicherung → Dashboard-Anzeige
+```
+
+### 3. Debitor-Logik (Sammelkonten)
+
+**IGL-Kunden** (EU + USt-ID):
+- Erhalten eigenen Debitor (10000-19999)
+- USt-ID wird hinterlegt
+- Wichtig für innergemeinschaftliche Lieferungen
+
+**Standard-Kunden**:
+- Werden in Sammelkonten gruppiert (69000-69999)
+- Zuordnung nach Zahlungsart (PayPal, Amazon, Rechnung, etc.)
+- Vereinfacht die Buchhaltung
+
+### 4. Datenexport
+
+- **Format**: CSV (10it-kompatibel)
+- **Inhalte**: VK-Rechnungen, EK-Rechnungen, Zahlungen, Gutschriften
+- **Filterung**: Nach Zeitraum und Typ
+
+## 🔧 Konfiguration
+
+### Umgebungsvariablen (`.env`)
+
 ```bash
-curl -X POST http://localhost:3000/api/fibu/auto-match-ek-zahlungen
-```
-→ [Details](./QUICKSTART.md#5-auto-matching-ausführen)
+# MongoDB
+MONGO_URL=mongodb://localhost:27017
 
-### Export erstellen
+# MSSQL (JTL)
+DB_HOST=localhost
+DB_USER=sa
+DB_PASSWORD=***
+DB_NAME=eazybusiness
+
+# AI Parsing
+EMERGENT_LLM_KEY=***
+
+# App URL
+NEXT_PUBLIC_BASE_URL=https://ihre-domain.com
+```
+
+## 📊 Datenbank-Schema
+
+### MongoDB Collections:
+
+- `fibu_ek_rechnungen` - Eingangsrechnungen (Lieferanten)
+- `fibu_vk_rechnungen` - Verkaufsrechnungen (JTL + manuell)
+- `fibu_externe_rechnungen` - Externe Rechnungen (Amazon XRE)
+- `fibu_zahlungen` - Zahlungsbewegungen
+- `fibu_gutschriften` - Gutschriften
+- `kreditoren` - Kreditorenstammdaten (70000-79999)
+- `fibu_igl_debitoren` - IGL-Debitoren mit USt-ID
+- `fibu_debitor_regeln` - Debitor-Zuordnungsregeln
+- `kontenplan` - Vollständiger Kontenrahmen
+
+### MSSQL (JTL) - Read-Only:
+
+- `tRechnung` - Verkaufsrechnungen
+- `tZahlungseingang` - Zahlungseingänge
+- `tKunde` - Kundenstammdaten
+
+## 🐛 Bekannte Probleme & Fixes
+
+### ✅ GELÖST: Gemini Parser identifiziert Score als Lieferant
+
+**Problem**: Der AI-Parser hat "Score Schleifwerkzeuge" (eigene Firma) als Lieferant erkannt bei 99 Rechnungen.
+
+**Fix**: 
+- Prompt wurde erweitert mit expliziter Anweisung
+- 99 Rechnungen wurden erfolgreich neu geparst
+- Script: `/app/scripts/reparse-invoices.js`
+
+### ⏳ OFFEN: Performance-Optimierung
+
+**Problem**: `/api/fibu/uebersicht/complete` ist langsam (5-15 Sek.)
+
+**Grund**: Endpoint macht mehrere interne API-Calls statt direkter DB-Queries
+
+**Lösung**: Refactoring auf direkte MongoDB/MSSQL Queries
+
+### ⏳ OFFEN: Pferd-Parser
+
+**Problem**: Parser für "August Rüggeberg" (Pferd) wirft Fehler
+
+**Status**: Noch nicht gefixt
+
+## 🤝 Entwickler-Hinweise
+
+### Scripts ausführen:
+
 ```bash
-curl "http://localhost:3000/api/fibu/export/10it?from=2025-10-01&to=2025-11-13" > export.csv
+# Debitor-Regeln anwenden
+node /app/scripts/apply-debitor-regeln.js
+
+# Rechnungen neu parsen
+node /app/scripts/reparse-invoices.js
+
+# Kreditoren auto-matchen
+node /app/scripts/auto-match-kreditoren.js
 ```
-→ [Details](./QUICKSTART.md#7-export-für-buchhaltung)
+
+### API Testen:
+
+```bash
+# FIBU Übersicht
+curl http://localhost:3000/api/fibu/uebersicht/complete?from=2025-10-01&to=2025-11-30
+
+# EK-Rechnungen
+curl http://localhost:3000/api/fibu/rechnungen/ek?limit=100
+
+# Kreditoren
+curl http://localhost:3000/api/fibu/kreditoren
+```
+
+## 📝 Lizenz
+
+Internes Projekt - Score Schleifwerkzeuge GmbH
+
+## 📞 Support
+
+Bei Fragen oder Problemen:
+1. Siehe [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
+2. Prüfe Logs: `/var/log/supervisor/nextjs.out.log`
+3. Kontaktiere den Entwickler
 
 ---
 
-## 📊 System-Übersicht
-
-**Hybrid-Parsing-System:**
-1. **Python-Parser** (bekannte Lieferanten) → Kostenlos, schnell
-2. **Gemini AI** (unbekannte Lieferanten) → Flexibel, ~0,03€/PDF
-
-**Erfolgsrate:** 93% gesamt
-- Python: 96% bei bekannten Mustern
-- Gemini: 90% bei unbekannten
-
-**Kosten:** ~4€ für 145 unbekannte Rechnungen
-
-→ [Mehr Details](./ARCHITECTURE.md#warum-hybrid-ansatz-python--gemini)
-
----
-
-## 🆘 Hilfe benötigt?
-
-1. **Quick Start nicht funktioniert?**
-   → [Troubleshooting](./QUICKSTART.md#-troubleshooting)
-
-2. **API-Frage?**
-   → [API-Doku](./API_DOCUMENTATION.md)
-
-3. **Technisches Problem?**
-   → [Architektur - Monitoring](./ARCHITECTURE.md#monitoring--logging)
-
-4. **Etwas fehlt?**
-   → [INDEX.md](./INDEX.md) - Vollständige Übersicht
-
----
-
-## 📈 Aktuelle Statistiken
-
-| Metrik | Wert |
-|--------|------|
-| 📄 Total Rechnungen | 365 |
-| 💰 Extrahierter Betrag | 108.005,79€ |
-| 🐍 Python-geparst | 50 |
-| 🤖 Gemini-geparst | 145 |
-| 🎯 Auto-Match-Rate | 12.2% |
-| ✅ Pending PDFs | 0 |
-
-→ [Performance-Details](./FIBU_README.md#performance--statistiken)
-
----
-
-## 🚀 Nächste Schritte
-
-**Nach dem Lesen:**
-1. [Quick Start durcharbeiten](./QUICKSTART.md)
-2. [Erste PDFs verarbeiten](./QUICKSTART.md#4-erste-pdf-verarbeiten)
-3. [Auto-Matching testen](./QUICKSTART.md#5-auto-matching-ausführen)
-4. [System erweitern](./FIBU_README.md#roadmap)
-
----
-
-## 📝 Letzte Updates
-
-**13. November 2025**
-- ✅ Vollständige Dokumentation erstellt
-- ✅ 365 Rechnungen verarbeitet
-- ✅ 108.005,79€ extrahiert
-- ✅ System produktionsbereit
-
----
-
-**Happy Automating! 🎉**
-
-[↑ Zurück zum Anfang](#fibu-modul-dokumentation)
+**Letzte Aktualisierung**: Januar 2025
+**Version**: 1.0.0
+**Status**: Produktiv

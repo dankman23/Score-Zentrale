@@ -1,547 +1,485 @@
-# FIBU-Modul - Technische Architektur
+# Technische Architektur
 
-## System-Überblick
-
-Das FIBU-Modul ist ein Hybrid-System, das Template-basierte Python-Parser mit KI-basiertem PDF-Parsing kombiniert, um eine hohe Automatisierungsrate bei der Verarbeitung von Lieferantenrechnungen zu erreichen.
-
-## Technologie-Entscheidungen
-
-### Warum Hybrid-Ansatz (Python + Gemini)?
-
-**Problem:**
-- PDF-Parsing in Node.js ist unzuverlässig (pdfjs-dist, pdf-parse haben Kompatibilitätsprobleme mit Next.js)
-- Reine AI-Lösungen sind teuer (~0,03€ pro Rechnung)
-- Vorhandene Python-Parser existierten bereits und funktionierten gut
-
-**Lösung:**
-1. **Stufe 1 - Python-Parser** (kostenlos, schnell):
-   - Template-basiert für bekannte Lieferanten
-   - 96% Erfolgsrate bei bekannten Mustern
-   - 0,5-1 Sek pro PDF
-   
-2. **Stufe 2 - Gemini AI** (flexibel, universell):
-   - Für unbekannte Lieferanten
-   - 90% Erfolgsrate
-   - 3-5 Sek pro PDF, ~0,03€
-
-**Ergebnis:**
-- 93% Gesamt-Erfolgsrate
-- Nur ~4€ Kosten für 145 unbekannte Lieferanten
-- Best of both worlds
-
-### Warum MongoDB statt PostgreSQL?
-
-- **Flexibles Schema**: EK-Rechnungen haben verschiedene Strukturen je nach Lieferant
-- **Schnelle Entwicklung**: Keine Migrations bei Schema-Änderungen
-- **JSON-native**: Gemini-Responses können direkt gespeichert werden
-- **Bereits im Stack**: Score Zentrale nutzt bereits MongoDB
-
-### Warum Next.js API Routes statt separatem Backend?
-
-- **Einfachheit**: Ein Deployment, ein Server
-- **TypeScript**: Type-Safety über Frontend und Backend
-- **Performance**: Server-Side Rendering + API in einem
-- **Developer Experience**: Hot Reload für API-Entwicklung
-
-## Komponenten-Architektur
-
-### 1. Email-Inbox-System
+## 📐 System-Übersicht
 
 ```
-┌────────────────────────────────────────────────────┐
-│              Email Inbox Workflow                   │
-├────────────────────────────────────────────────────┤
-│                                                      │
-│  IMAP Server (invoices@score.de)                   │
-│         │                                            │
-│         │ (Cron Job / Manual Trigger)               │
-│         ▼                                            │
-│  ┌──────────────────┐                               │
-│  │ IMAP Client      │  imap + mailparser            │
-│  │ /lib/email-inbox │                               │
-│  └────────┬─────────┘                               │
-│           │                                          │
-│           │ Parse Email + Extract PDF               │
-│           ▼                                          │
-│  ┌──────────────────┐                               │
-│  │ Duplicate Check  │  Check by filename hash      │
-│  └────────┬─────────┘                               │
-│           │                                          │
-│           ▼                                          │
-│  ┌──────────────────┐                               │
-│  │ Save to MongoDB  │  fibu_email_inbox            │
-│  │ status: 'pending'│                               │
-│  └──────────────────┘                               │
-│                                                      │
-└────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                         Browser (Client)                         │
+│                    Next.js Frontend (React)                      │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+                         │ HTTP/API Calls
+                         │
+┌────────────────────────┴────────────────────────────────────────┐
+│                    Next.js Backend (API Routes)                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │  FIBU API Layer                                           │  │
+│  │  - /api/fibu/rechnungen/ek     (EK-Rechnungen)          │  │
+│  │  - /api/fibu/rechnungen/vk     (VK-Rechnungen)          │  │
+│  │  - /api/fibu/kreditoren        (Kreditoren)             │  │
+│  │  - /api/fibu/uebersicht        (Dashboard)              │  │
+│  │  - /api/fibu/export/10it       (Export)                 │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                              │                                   │
+│          ┌───────────────────┴──────────────────┐               │
+│          │                                      │               │
+│    ┌─────▼──────┐                      ┌───────▼─────────┐     │
+│    │  MongoDB   │                      │  Python Parser  │     │
+│    │  Database  │                      │  (child_process)│     │
+│    └─────┬──────┘                      └───────┬─────────┘     │
+│          │                                      │               │
+└──────────┼──────────────────────────────────────┼───────────────┘
+           │                                      │
+           │                                      │
+     ┌─────▼──────┐                      ┌───────▼─────────┐
+     │  MongoDB   │                      │  Gemini API     │
+     │  (Local)   │                      │  (emergent)     │
+     └────────────┘                      └─────────────────┘
 ```
 
-**Wichtige Dateien:**
-- `/app/lib/email-inbox.ts` - IMAP Client
-- `/app/api/fibu/email-inbox/test-fetch/route.ts` - Test-Endpoint
-- `/app/api/fibu/email-inbox/cron/route.ts` - Cron-Job-Endpoint
+## 🗂️ Code-Architektur
 
-**Datenfluss:**
-1. Cron Job ruft IMAP-Server ab
-2. Neue Emails werden erkannt (SINCE-Filter)
-3. PDFs werden extrahiert und Base64-encodiert
-4. Duplicate-Check via Filename-Hash
-5. Speicherung in MongoDB mit `status: 'pending'`
+### 1. Frontend (React/Next.js)
 
-### 2. PDF-Parsing-System
+**Haupt-Entry-Point**: `/app/app/page.js`
+- Single Page Application (SPA)
+- Hash-basierte Navigation (#/fibu, #/outbound, etc.)
+- Client-seitige Komponenten mit `'use client'`
 
-```
-┌────────────────────────────────────────────────────┐
-│            PDF Parsing Workflow                     │
-├────────────────────────────────────────────────────┤
-│                                                      │
-│  MongoDB: fibu_email_inbox                          │
-│  (PDFs mit status='pending')                        │
-│         │                                            │
-│         │ Batch Script gestartet                    │
-│         ▼                                            │
-│  ┌──────────────────┐                               │
-│  │ Python Parser    │  Subprocess spawn()           │
-│  │ Attempt          │                               │
-│  └────────┬─────────┘                               │
-│           │                                          │
-│           ├─ SUCCESS (bekannter Lieferant)          │
-│           │  └─▶ Strukturierte Daten                │
-│           │                                          │
-│           └─ FAILURE (unbekannter Lieferant)        │
-│              │                                       │
-│              ▼                                       │
-│  ┌──────────────────┐                               │
-│  │ Gemini AI        │  Emergent Universal Key       │
-│  │ Fallback         │                               │
-│  └────────┬─────────┘                               │
-│           │                                          │
-│           ├─ SUCCESS                                 │
-│           │  └─▶ Strukturierte Daten                │
-│           │                                          │
-│           └─ FAILURE                                 │
-│              └─▶ Status: Error                      │
-│                                                      │
-│         ▼                                            │
-│  ┌──────────────────┐                               │
-│  │ Save to MongoDB  │  fibu_ek_rechnungen          │
-│  │ + Update Email   │  status: 'processed'         │
-│  └──────────────────┘                               │
-│                                                      │
-└────────────────────────────────────────────────────┘
-```
-
-**Wichtige Dateien:**
-- `/app/python_libs/fibu_invoice_parser.py` - Python-Wrapper
-- `/app/python_libs/emergent_gemini_parser.py` - Gemini-Integration
-- `/app/scripts/batch-process-with-gemini-fallback.js` - Hybrid-Batch-Script
-
-**Parser-Pipeline:**
-
-1. **Filename-Analysis** (schnell, kostenlos):
-   ```javascript
-   if (filename.match(/^(70\d{3})/)) {
-     kreditorNr = filename.substring(0, 5)
-   }
-   ```
-
-2. **Python Template-Parsing** (0,5-1s, kostenlos):
-   ```python
-   # Identifiziere Firma
-   if "klingspor" in text.lower():
-       parser = InvoiceKlingsporParser()
-       return parser.parse(pdf_path)
-   ```
-
-3. **Gemini AI-Parsing** (3-5s, ~0,03€):
-   ```python
-   chat = LlmChat(api_key=EMERGENT_LLM_KEY)
-       .with_model("gemini", "gemini-2.0-flash")
-   
-   response = await chat.send_message(
-       prompt + pdf_file
-   )
-   ```
-
-### 3. Auto-Matching-Engine
-
-```
-┌────────────────────────────────────────────────────┐
-│          Auto-Matching Algorithm                    │
-├────────────────────────────────────────────────────┤
-│                                                      │
-│  Input:                                             │
-│  - Negative Zahlungen (Zahlungsausgänge)           │
-│  - EK-Rechnungen (mit Betrag)                      │
-│                                                      │
-│  ┌──────────────────┐                               │
-│  │ For each Zahlung │                               │
-│  └────────┬─────────┘                               │
-│           │                                          │
-│           ▼                                          │
-│  ┌──────────────────────────────────┐               │
-│  │ Find Matching Rechnungen         │               │
-│  │ (within date range ±30 days)     │               │
-│  └────────┬─────────────────────────┘               │
-│           │                                          │
-│           ▼                                          │
-│  ┌──────────────────────────────────┐               │
-│  │ Calculate Match Score            │               │
-│  │                                   │               │
-│  │ Score = 0                         │               │
-│  │ + BetragMatch (0-60 Punkte)      │               │
-│  │ + DatumNähe (0-20 Punkte)        │               │
-│  │ + RgNrInHinweis (0-20 Punkte)    │               │
-│  └────────┬─────────────────────────┘               │
-│           │                                          │
-│           ▼                                          │
-│  ┌──────────────────────────────────┐               │
-│  │ Score >= 70?                     │               │
-│  │  YES → Create Match               │               │
-│  │  NO  → Next Rechnung              │               │
-│  └──────────────────────────────────┘               │
-│                                                      │
-│  Output:                                            │
-│  - Matched Pairs (Zahlung ↔ Rechnung)             │
-│  - Match Rate (%)                                   │
-│                                                      │
-└────────────────────────────────────────────────────┘
-```
-
-**Matching-Score-Details:**
+**FIBU-Komponenten**: `/app/components/`
 
 ```javascript
-// 1. Betrags-Match (max 60 Punkte)
-const betragDiff = Math.abs(zahlung.betrag + rechnung.gesamtBetrag)
-if (betragDiff < 0.01) score += 60        // Exakt
-else if (betragDiff < 1) score += 50      // < 1€ Differenz
-else if (betragDiff < 5) score += 40      // < 5€ Differenz
-else if (betragDiff < 10) score += 20     // < 10€ Differenz
-
-// 2. Datum-Nähe (max 20 Punkte)
-const daysDiff = Math.abs(daysBetween(zahlung.datum, rechnung.datum))
-if (daysDiff <= 3) score += 20
-else if (daysDiff <= 7) score += 15
-else if (daysDiff <= 14) score += 10
-else if (daysDiff <= 30) score += 5
-
-// 3. Rechnungsnummer im Hinweis (20 Punkte)
-if (zahlung.hinweis.includes(rechnung.rechnungsNummer)) {
-  score += 20
-}
-
-// Threshold
-return score >= 70 ? 'match' : 'no-match'
+FibuCompleteDashboard.js          // Haupt-Dashboard (Tabs, KPIs)
+├── KreditorZuordnung.js          // Bulk-Zuordnung von EK zu Kreditoren
+├── VKRechnungenView.js           // VK-Rechnungen mit Filterung
+├── KontenplanView.js             // Kontenplan-Anzeige
+├── BankImport.js                 // CSV-Upload
+└── ExportDialog.js               // Export-Konfiguration
 ```
 
-**Optimierungsmöglichkeiten:**
-- Lieferanten-Name-Matching (Fuzzy)
-- IBAN-Matching
-- Machine Learning für Score-Threshold
-- Multi-Rechnung-Matching (Teilzahlungen)
-
-### 4. JTL-Integration
+#### Komponenten-Hierarchie:
 
 ```
-┌────────────────────────────────────────────────────┐
-│           JTL MS SQL Integration                    │
-├────────────────────────────────────────────────────┤
-│                                                      │
-│  JTL ERP Database (MS SQL)                         │
-│         │                                            │
-│         │ node-mssql Driver                         │
-│         ▼                                            │
-│  ┌──────────────────┐                               │
-│  │ Connection Pool  │  /lib/db/mssql.ts            │
-│  └────────┬─────────┘                               │
-│           │                                          │
-│           ├─▶ VK-Rechnungen (tRechnung)            │
-│           │   SELECT * FROM dbo.tRechnung           │
-│           │   WHERE dErstellt BETWEEN @from @to     │
-│           │                                          │
-│           ├─▶ Externe Rechnungen (tExternerBeleg)  │
-│           │   SELECT * FROM Rechnung.tExternerBeleg │
-│           │   WHERE cExterneBelegnr LIKE 'XRE%'     │
-│           │                                          │
-│           ├─▶ Zahlungen (tZahlung + tZahlungsab.)  │
-│           │   SELECT * FROM dbo.tZahlung            │
-│           │   UNION ALL                              │
-│           │   SELECT * FROM tZahlungsabgleichUmsatz │
-│           │                                          │
-│           └─▶ Gutschriften (tRechnung + FLAG)      │
-│               SELECT * WHERE cType = 'Gutschrift'   │
-│                                                      │
-└────────────────────────────────────────────────────┘
+page.js (Router)
+  └── FibuCompleteDashboard
+        ├── Header (Zeitraum-Auswahl, Export)
+        ├── Tabs (Overview, EK, VK, etc.)
+        └── Tab-Content
+              ├── Overview: KPI-Cards + Issues
+              ├── EK: Tabellarische Anzeige
+              ├── Zuordnung: KreditorZuordnung Component
+              ├── VK: VKRechnungenView Component
+              ├── Zahlungen: Tabelle
+              ├── Bank-Import: BankImport Component
+              └── Kontenplan: KontenplanView Component
 ```
 
-**Wichtige Query-Optimierungen:**
+### 2. Backend (Next.js API Routes)
 
-1. **Zahlungen UNION**:
-   - Problem: Commerzbank-Transaktionen fehlten
-   - Lösung: `tZahlung UNION ALL tZahlungsabgleichUmsatz`
-
-2. **Externe Rechnungen**:
-   - Problem: Amazon XRE-Rechnungen fehlten
-   - Lösung: Neue Tabelle `Rechnung.tExternerBeleg` gefunden
-
-3. **Indizes**:
-   - `dErstellt` für Datum-Filter
-   - `cRechnungNr` für schnelle Suche
-   - `kKunde` für Kunden-Filter
-
-### 5. Export-System
+**Route-Struktur**: `/app/app/api/fibu/`
 
 ```
-┌────────────────────────────────────────────────────┐
-│              10it Export Pipeline                   │
-├────────────────────────────────────────────────────┤
-│                                                      │
-│  Query MongoDB + JTL                                │
-│         │                                            │
-│         ├─▶ VK-Rechnungen (JTL)                    │
-│         ├─▶ EK-Rechnungen (MongoDB)                │
-│         ├─▶ Gutschriften (JTL)                     │
-│         └─▶ Zahlungen (JTL)                        │
-│                                                      │
-│         ▼                                            │
-│  ┌──────────────────────────────────┐               │
-│  │ Data Transformation               │               │
-│  │                                   │               │
-│  │ - Format Dates (DD.MM.YYYY)      │               │
-│  │ - Format Amounts (1234,56)       │               │
-│  │ - Map Konten                      │               │
-│  │ - Add SKR03 Codes                │               │
-│  └────────┬─────────────────────────┘               │
-│           │                                          │
-│           ▼                                          │
-│  ┌──────────────────────────────────┐               │
-│  │ CSV Generation                    │               │
-│  │                                   │               │
-│  │ Headers:                          │               │
-│  │ - Belegdatum                      │               │
-│  │ - Belegnummer                     │               │
-│  │ - Lieferant                       │               │
-│  │ - Kreditor                        │               │
-│  │ - Aufwandskonto                   │               │
-│  │ - Nettobetrag                     │               │
-│  │ - MwSt                            │               │
-│  │ - Bruttobetrag                    │               │
-│  └────────┬─────────────────────────┘               │
-│           │                                          │
-│           ▼                                          │
-│  10it-kompatible CSV-Datei                          │
-│                                                      │
-└────────────────────────────────────────────────────┘
+api/fibu/
+├── uebersicht/
+│   └── complete/route.ts        # Dashboard-Daten (SLOW!)
+├── rechnungen/
+│   ├── ek/
+│   │   ├── route.ts             # GET/POST EK-Rechnungen
+│   │   ├── [id]/route.ts        # GET/PUT/DELETE einzelne Rechnung
+│   │   ├── upload/route.ts      # PDF-Upload
+│   │   └── batch-process/route.ts # Batch-Verarbeitung
+│   ├── vk/
+│   │   └── route.ts             # GET VK-Rechnungen (JTL + MongoDB)
+│   └── extern/route.ts          # GET externe Rechnungen (Amazon)
+├── kreditoren/
+│   └── route.ts                 # GET/POST Kreditoren
+├── zahlungen/route.ts           # GET Zahlungen
+├── gutschriften/route.ts        # GET Gutschriften
+├── kontenplan/route.ts          # GET Kontenplan
+├── bank-import/route.ts         # POST CSV, GET Transaktionen
+└── export/
+    └── 10it/route.ts            # GET CSV-Export
 ```
 
-## Datenbank-Design
-
-### MongoDB Collections
-
-#### 1. `fibu_email_inbox`
-
-**Zweck**: Speichert eingehende Emails mit PDF-Anhängen
-
-**Indizes:**
-```javascript
-db.fibu_email_inbox.createIndex({ status: 1 })
-db.fibu_email_inbox.createIndex({ receivedDate: -1 })
-db.fibu_email_inbox.createIndex({ filename: 1 })
-```
-
-**Typische Größe**: ~100KB pro Dokument (Base64 PDF)
-
-#### 2. `fibu_ek_rechnungen`
-
-**Zweck**: Geparste EK-Rechnungen
-
-**Indizes:**
-```javascript
-db.fibu_ek_rechnungen.createIndex({ rechnungsdatum: -1 })
-db.fibu_ek_rechnungen.createIndex({ kreditorKonto: 1 })
-db.fibu_ek_rechnungen.createIndex({ gesamtBetrag: 1 })
-db.fibu_ek_rechnungen.createIndex({ 'parsing.method': 1 })
-```
-
-**Typische Größe**: ~2-5KB pro Dokument
-
-#### 3. `kreditoren`
-
-**Zweck**: Lieferanten-Stammdaten
-
-**Indizes:**
-```javascript
-db.kreditoren.createIndex({ kreditorenNummer: 1 }, { unique: true })
-db.kreditoren.createIndex({ name: 1 })
-```
-
-**Typische Größe**: ~1KB pro Dokument
-
-### Daten-Retention
-
-- **Emails**: Unbegrenzt (Archiv-Zweck)
-- **EK-Rechnungen**: Unbegrenzt (Buchhaltungspflicht)
-- **Logs**: 90 Tage
-
-## Performance-Optimierungen
-
-### 1. Batch-Processing
-
-**Problem**: 190 PDFs einzeln verarbeiten = langsam
-
-**Lösung**: Batch-Script mit Parallel-Processing
-
-```javascript
-// Pseudo-Code
-const pdfs = await fetchPending(limit)
-const results = await Promise.all(
-  pdfs.map(pdf => parsePDF(pdf))
-)
-```
-
-**Ergebnis**: 200 PDFs in ~10 Minuten
-
-### 2. MongoDB Connection Pooling
+#### API-Design-Pattern:
 
 ```typescript
-// /lib/db/mongodb.ts
-let cachedClient = null
-let cachedDb = null
+// Standard API Route Structure
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
-export async function getDb() {
-  if (cachedDb) return cachedDb
-  
-  cachedClient = await MongoClient.connect(MONGO_URL, {
-    maxPoolSize: 10,
-    minPoolSize: 2
-  })
-  
-  cachedDb = cachedClient.db()
-  return cachedDb
-}
-```
-
-### 3. Gemini Request Optimization
-
-**Original**: 1 Request pro PDF = langsam
-
-**Optimiert**: Async/Await mit Queue
-
-```javascript
-const queue = []
-for (const pdf of pdfs) {
-  queue.push(callGemini(pdf))
-  
-  // Max 5 parallel
-  if (queue.length >= 5) {
-    await Promise.race(queue)
+export async function GET(request: NextRequest) {
+  try {
+    const db = await getDb()
+    const searchParams = request.nextUrl.searchParams
+    
+    // Query Parameters
+    const from = searchParams.get('from')
+    const to = searchParams.get('to')
+    const limit = parseInt(searchParams.get('limit') || '100')
+    
+    // Database Query
+    const results = await db.collection('fibu_ek_rechnungen')
+      .find({ /* query */ })
+      .limit(limit)
+      .toArray()
+    
+    return NextResponse.json({ ok: true, results })
+  } catch (error) {
+    return NextResponse.json(
+      { ok: false, error: error.message },
+      { status: 500 }
+    )
   }
 }
 ```
 
-## Sicherheit
+### 3. Datenbank-Layer
 
-### 1. Credentials
-
-- **MongoDB**: `MONGO_URL` in `.env`, localhost-only
-- **MS SQL**: Connection-String in `.env`, read-only user
-- **IMAP**: Credentials in `.env`, dedicated inbox
-- **Gemini**: Emergent Universal Key in `.env`
-
-### 2. Input-Validierung
-
-- PDF Base64: Längen-Check
-- Dates: ISO-Format-Validierung
-- Amounts: Number-Type-Check
-- SQL: Parameterized Queries
-
-### 3. Error-Handling
+**MongoDB-Connection**: `/app/app/lib/db/mongodb.ts`
 
 ```typescript
-try {
-  // Operation
-} catch (error) {
-  console.error('Error:', error)
-  return NextResponse.json(
-    { ok: false, error: error.message },
-    { status: 500 }
-  )
+import { MongoClient, Db } from 'mongodb'
+
+let cachedClient: MongoClient | null = null
+let cachedDb: Db | null = null
+
+export async function getDb(): Promise<Db> {
+  if (cachedDb) return cachedDb
+  
+  const client = await MongoClient.connect(process.env.MONGO_URL)
+  const db = client.db('score_zentrale')
+  
+  cachedClient = client
+  cachedDb = db
+  return db
 }
 ```
 
-## Monitoring & Logging
+**MSSQL-Connection**: `/app/app/lib/db/mssql.ts`
 
-### Logs
+```typescript
+import sql from 'mssql'
 
-- **Next.js**: `/var/log/supervisor/nextjs.out.log`
-- **Errors**: `/var/log/supervisor/nextjs.err.log`
-- **MongoDB**: `mongosh` CLI für Queries
+let pool: sql.ConnectionPool | null = null
 
-### Metriken
+export async function getJTLConnection(): Promise<sql.ConnectionPool> {
+  if (pool) return pool
+  
+  pool = await sql.connect({
+    server: process.env.DB_HOST!,
+    database: process.env.DB_NAME!,
+    user: process.env.DB_USER!,
+    password: process.env.DB_PASSWORD!,
+    options: {
+      encrypt: false,
+      trustServerCertificate: true
+    }
+  })
+  
+  return pool
+}
+```
 
-```bash
-# Parsing-Erfolgsrate
-db.fibu_ek_rechnungen.aggregate([
-  { $group: {
-    _id: "$parsing.method",
-    count: { $sum: 1 }
-  }}
+### 4. Python-Integration
+
+**Parser-Architektur**:
+
+```
+Node.js API Route
+    |
+    | spawn child_process
+    |
+    v
+Python Script (emergent_gemini_parser.py)
+    |
+    | stdin: { pdf_base64, filename, email_context }
+    |
+    v
+Gemini API (via emergentintegrations)
+    |
+    | stdout: { success, lieferant, rechnungsnummer, ... }
+    |
+    v
+Node.js (JSON.parse)
+    |
+    v
+MongoDB (fibu_ek_rechnungen)
+```
+
+**Code-Beispiel**: API → Python
+
+```typescript
+import { spawn } from 'child_process'
+
+const python = spawn('python3', ['/app/python_libs/emergent_gemini_parser.py'])
+
+// Send PDF as JSON via stdin
+python.stdin.write(JSON.stringify({
+  pdf_base64: pdfBase64,
+  filename: 'rechnung.pdf',
+  email_context: { from: 'lieferant@example.com' }
+}))
+python.stdin.end()
+
+// Receive result via stdout
+let output = ''
+python.stdout.on('data', (data) => output += data.toString())
+python.stdout.on('end', () => {
+  const result = JSON.parse(output)
+  // result = { success: true, lieferant: '...', ... }
+})
+```
+
+## 🔄 Datenflüsse
+
+### Workflow 1: EK-Rechnung Processing
+
+```
+1. PDF kommt via Email → fibu_email_inbox (MongoDB)
+2. Batch-Processor erkennt neues PDF
+3. Parser-Detection:
+   a) Filename-Match? → Nutze spezifischen Parser
+   b) Kein Match → Nutze Gemini AI Parser
+4. Parsing:
+   - Python Script liest PDF
+   - Extrahiert: Lieferant, RgNr, Datum, Betrag
+5. Kreditor-Matching:
+   - Suche in kreditoren Collection
+   - Auto-Match wenn eindeutig
+6. Speicherung in fibu_ek_rechnungen
+7. Dashboard zeigt neue Rechnung an
+```
+
+### Workflow 2: VK-Rechnung Anzeige
+
+```
+1. User öffnet VK-Rechnungen Tab
+2. Frontend → GET /api/fibu/rechnungen/vk?from=...&to=...
+3. Backend:
+   a) Query MongoDB: fibu_vk_rechnungen
+   b) Query MSSQL: JTL tRechnung (falls nicht in Mongo)
+   c) Merge beide Datenquellen
+4. Debitor-Zuordnung (falls noch nicht vorhanden):
+   - Prüfe: IGL-Kunde? (EU + USt-ID + MwSt=0%)
+     - JA → Eigener Debitor (10xxx)
+     - NEIN → Sammelkonto nach Zahlungsart (69xxx)
+5. Response mit vollständigen Daten
+6. Frontend rendert Tabelle mit Filterung
+```
+
+### Workflow 3: Datenexport (10it)
+
+```
+1. User klickt Export-Button
+2. Dialog: Zeitraum + Typ auswählen
+3. GET /api/fibu/export/10it?from=...&to=...&type=alle
+4. Backend sammelt:
+   - VK-Rechnungen → Buchungssätze
+   - VK-Zahlungen → Buchungssätze
+   - EK-Rechnungen → Buchungssätze
+   - Gutschriften → Buchungssätze
+5. Generiere CSV:
+   ```csv
+   Konto;Kontobezeichnung;Datum;Belegnummer;Text;Gegenkonto;Soll;Haben;Steuer
+   1200;Forderungen;01.10.2025;RE-12345;...;4400;119.00;0.00;19
+   ```
+6. Download CSV-Datei
+```
+
+## 🗄️ Datenbank-Schema (detailliert)
+
+### MongoDB Collections
+
+#### `fibu_ek_rechnungen`
+```javascript
+{
+  _id: ObjectId,
+  rechnungsNummer: String,
+  rechnungsdatum: Date,
+  lieferantName: String,
+  gesamtBetrag: Number,
+  nettoBetrag: Number,
+  steuerbetrag: Number,
+  steuersatz: Number,
+  kreditorKonto: String,        // z.B. "70001"
+  aufwandskonto: String,         // z.B. "5200"
+  zahlungId: String,             // Verknüpfung zu fibu_zahlungen
+  pdfBase64: String,             // Original PDF
+  emailId: String,               // Verknüpfung zu fibu_email_inbox
+  parsing_method: String,        // "emergent-gemini" / "python-parser"
+  created_at: Date
+}
+```
+
+#### `fibu_vk_rechnungen`
+```javascript
+{
+  _id: ObjectId,
+  kRechnung: Number,             // JTL ID (optional)
+  cRechnungsNr: String,          // "RE-12345"
+  rechnungsdatum: Date,
+  kundenName: String,
+  kundenLand: String,            // "DE", "FR", etc.
+  kundenUstId: String,           // nur bei IGL
+  brutto: Number,
+  netto: Number,
+  mwst: Number,
+  mwstSatz: Number,              // 19, 7, 0
+  zahlungsart: String,           // "PayPal", "Rechnung", etc.
+  status: String,                // "Bezahlt", "Offen"
+  debitorKonto: String,          // "10001" (IGL) oder "69015" (Sammelkonto)
+  sachkonto: String,             // "4400" (Erlöse)
+  quelle: String,                // "JTL" / "manuell"
+  created_at: Date
+}
+```
+
+#### `kreditoren`
+```javascript
+{
+  _id: ObjectId,
+  kreditorenNummer: String,      // "70001" - "79999"
+  name: String,
+  adresse: Object,
+  standardAufwandskonto: String, // "5200"
+  created_at: Date
+}
+```
+
+#### `fibu_igl_debitoren`
+```javascript
+{
+  _id: ObjectId,
+  debitorNr: String,             // "10001" - "19999"
+  kundenName: String,
+  kundenUstId: String,
+  kundenLand: String,            // EU-Land
+  created_at: Date
+}
+```
+
+#### `fibu_debitor_regeln`
+```javascript
+{
+  _id: ObjectId,
+  typ: String,                   // "sammelkonto" / "igl_ausnahme"
+  zahlungsart: String,           // "PayPal", "Amazon", etc.
+  debitorNr: String,             // "69015", "69002", etc.
+  bezeichnung: String
+}
+```
+
+### MSSQL (JTL) Schema
+
+#### `tRechnung`
+```sql
+kRechnung           INT PRIMARY KEY
+cRechnungsNr        NVARCHAR(50)
+dErstellt           DATETIME
+fGesamtsumme        DECIMAL(18,2)
+cStatus             NVARCHAR(20)
+kKunde              INT
+```
+
+#### `tZahlungseingang`
+```sql
+kZahlungseingang    INT PRIMARY KEY
+dZahlungsdatum      DATETIME
+fBetrag             DECIMAL(18,2)
+cZahlungsanbieter   NVARCHAR(50)
+kRechnung           INT
+```
+
+## ⚡ Performance-Überlegungen
+
+### Aktuelles Problem: `/api/fibu/uebersicht/complete`
+
+**Ist-Zustand** (Langsam - 5-15 Sek.):
+```typescript
+// Macht 5 separate API-Calls:
+const vkResponse = await fetch('/api/fibu/rechnungen/vk?...')
+const externResponse = await fetch('/api/fibu/rechnungen/extern?...')
+const zahlungenResponse = await fetch('/api/fibu/zahlungen?...')
+const gutschriftenResponse = await fetch('/api/fibu/gutschriften?...')
+```
+
+**Soll-Zustand** (Schnell - <2 Sek.):
+```typescript
+// Direkte DB-Queries:
+const [ek, vk, zahlungen, extern, gutschriften] = await Promise.all([
+  db.collection('fibu_ek_rechnungen').find({...}).toArray(),
+  db.collection('fibu_vk_rechnungen').find({...}).toArray(),
+  db.collection('fibu_zahlungen').find({...}).toArray(),
+  db.collection('fibu_externe_rechnungen').find({...}).toArray(),
+  db.collection('fibu_gutschriften').find({...}).toArray()
 ])
-
-# Auto-Match-Rate
-curl -X POST /api/fibu/auto-match-ek-zahlungen
 ```
 
-## Deployment
+### Caching-Strategie
 
-### Production-Checklist
+```typescript
+// In-Memory Cache für statische Daten
+const kontenplanCache = new Map()
 
-- [ ] `.env` mit Production-Credentials
-- [ ] MongoDB Backup-Strategy
-- [ ] Supervisor für Process-Management
-- [ ] Nginx für Reverse-Proxy
-- [ ] SSL-Zertifikat
-- [ ] Firewall-Regeln (MongoDB Port)
-- [ ] Cron-Job für Email-Polling
-- [ ] Monitoring-Alerts
+export async function getKontenplan() {
+  if (kontenplanCache.has('kontenplan')) {
+    return kontenplanCache.get('kontenplan')
+  }
+  
+  const db = await getDb()
+  const kontenplan = await db.collection('kontenplan').find({}).toArray()
+  kontenplanCache.set('kontenplan', kontenplan)
+  return kontenplan
+}
+```
 
-### Backup-Strategy
+## 🔐 Sicherheit
+
+### Umgebungsvariablen
+- Alle Secrets in `.env`
+- NIEMALS in Git committen
+- Server-seitige Validierung bei allen API-Calls
+
+### Datenbank-Zugriff
+- MongoDB: Nur via Server-Side API Routes
+- MSSQL (JTL): Read-Only Zugriff
+- Keine direkten DB-Credentials im Frontend
+
+## 🧪 Testing-Überlegungen
 
 ```bash
-# Daily MongoDB Backup
-mongodump --uri="$MONGO_URL" --out=/backup/$(date +%Y%m%d)
+# API Tests mit curl
+curl -X GET "http://localhost:3000/api/fibu/rechnungen/ek?limit=10"
 
-# Retention: 30 Tage
-find /backup -mtime +30 -delete
+# Python Parser Test
+echo '{"pdf_base64":"..."}' | python3 /app/python_libs/emergent_gemini_parser.py
+
+# Script Tests
+node /app/scripts/apply-debitor-regeln.js
 ```
 
-## Skalierung
+## 📦 Deployment-Struktur
 
-### Horizontal
+```
+Kubernetes Pod
+├── Next.js App (Port 3000)
+├── MongoDB (Port 27017)
+├── Python Runtime
+└── Supervisor (Process Management)
+```
 
-- Multiple Next.js Instances hinter Load Balancer
-- MongoDB Replica Set für Read-Skalierung
-- Redis für Caching (future)
+### Supervisor Config:
+```ini
+[program:nextjs]
+command=yarn dev
+directory=/app/app
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/nextjs.out.log
+stderr_logfile=/var/log/supervisor/nextjs.err.log
+```
 
-### Vertical
+---
 
-- Mehr RAM für MongoDB
-- Mehr CPU für PDF-Processing
-- SSD für schnellere File-I/O
-
-## Zukünftige Erweiterungen
-
-### Q1 2026
-- [ ] Webhook für Real-Time Processing
-- [ ] OCR für gescannte PDFs
-- [ ] More Python-Parser (Norton, Rhodius vollständig)
-
-### Q2 2026
-- [ ] Machine Learning für besseres Matching
-- [ ] Automatische Duplikat-Erkennung
-- [ ] Multi-Tenant-Support
-
-### Q3 2026
-- [ ] Mobile App
-- [ ] Real-Time Dashboard
-- [ ] AI-Powered Anomalie-Detection
+**Letzte Aktualisierung**: Januar 2025
