@@ -40,12 +40,10 @@ export default function RootLayout({ children }) {
               <li className="nav-item"><a className="nav-link" href="#sales"><i className="bi bi-bar-chart mr-1"/>Sales</a></li>
               <li className="nav-item"><a className="nav-link" href="#marketing"><i className="bi bi-bullseye mr-1"/>Marketing</a></li>
               <li className="nav-item"><a className="nav-link" href="#glossar"><i className="bi bi-book mr-1"/>Glossar</a></li>
-              <li className="nav-item"><a className="nav-link" href="#kaltakquise"><i className="bi bi-search mr-1"/>Kaltakquise</a></li>
-              <li className="nav-item"><a className="nav-link" href="#warmakquise"><i className="bi bi-people mr-1"/>Warmakquise</a></li>
+              <li className="nav-item"><a className="nav-link" href="#outbound"><i className="bi bi-send mr-1"/>Outbound</a></li>
               <li className="nav-item"><a className="nav-link" href="#produkte"><i className="bi bi-box-seam mr-1"/>Produkte</a></li>
               <li className="nav-item"><a className="nav-link" href="#preise"><i className="bi bi-calculator mr-1"/>Preise</a></li>
               <li className="nav-item"><a className="nav-link" href="#fibu"><i className="bi bi-receipt-cutoff mr-1"/>FIBU</a></li>
-              <li className="nav-item"><a className="nav-link" href="#outbound"><i className="bi bi-send mr-1"/>Outbound</a></li>
             </ul>
           </div>
         </nav>
