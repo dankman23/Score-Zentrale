@@ -326,8 +326,12 @@ export default function ZahlungenView() {
                   }`}>
                     {zahlung.betrag >= 0 ? '+' : ''}{zahlung.betrag.toFixed(2)}€
                   </td>
-                  <td className="px-4 py-3 text-sm text-blue-600 font-medium">
-                    {zahlung.rechnungsNr}
+                  <td className="px-4 py-3 text-sm">
+                    {zahlung.kRechnung > 0 ? (
+                      <span className="text-blue-600 font-medium">{zahlung.rechnungsNr}</span>
+                    ) : (
+                      <span className="text-gray-400">{zahlung.rechnungsNr}</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600">
                     {zahlung.kundenName || '-'}
@@ -335,11 +339,16 @@ export default function ZahlungenView() {
                   <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate" title={zahlung.hinweis}>
                     {zahlung.hinweis || '-'}
                   </td>
-                  <td className="px-4 py-3 text-sm">
+                  <td className="px-4 py-3 text-sm text-center">
                     {zahlung.istZugeordnet ? (
-                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-                        ✓ Zugeordnet
-                      </span>
+                      <div>
+                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                          ✓ Zugeordnet
+                        </span>
+                        {zahlung.kRechnung > 0 && (
+                          <div className="text-xs text-gray-500 mt-1">kRg: {zahlung.kRechnung}</div>
+                        )}
+                      </div>
                     ) : (
                       <span className="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">
                         ○ Offen
@@ -350,9 +359,11 @@ export default function ZahlungenView() {
                     <span className={`px-2 py-1 text-xs rounded ${
                       zahlung.quelle === 'tZahlung' 
                         ? 'bg-blue-100 text-blue-700' 
+                        : zahlung.quelle === 'postbank'
+                        ? 'bg-green-100 text-green-700'
                         : 'bg-purple-100 text-purple-700'
                     }`}>
-                      {zahlung.quelle === 'tZahlung' ? 'Standard' : 'Bank'}
+                      {zahlung.quelle === 'tZahlung' ? 'JTL' : zahlung.quelle === 'postbank' ? 'Postbank' : 'Bank'}
                     </span>
                   </td>
                 </tr>
