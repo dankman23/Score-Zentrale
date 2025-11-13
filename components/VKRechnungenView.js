@@ -141,11 +141,94 @@ export default function VKRechnungenView() {
         </div>
       </div>
 
+      {/* Filter */}
+      <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-gray-400 text-xs mb-2">Status</label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full bg-gray-900 text-white border border-gray-600 rounded px-3 py-2 text-sm"
+            >
+              <option value="alle">Alle Status</option>
+              <option value="bezahlt">Bezahlt</option>
+              <option value="offen">Offen</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-gray-400 text-xs mb-2">Quelle</label>
+            <select
+              value={quelleFilter}
+              onChange={(e) => setQuelleFilter(e.target.value)}
+              className="w-full bg-gray-900 text-white border border-gray-600 rounded px-3 py-2 text-sm"
+            >
+              <option value="alle">Alle Quellen</option>
+              <option value="jtl">JTL (VK)</option>
+              <option value="extern">Externe (Amazon, etc.)</option>
+            </select>
+          </div>
+          
+          <div className="md:col-span-2">
+            <label className="block text-gray-400 text-xs mb-2">Suche</label>
+            <input
+              type="text"
+              placeholder="Rechnungsnr, Kunde, Zahlungsart..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-gray-900 text-white border border-gray-600 rounded px-3 py-2 text-sm"
+            />
+          </div>
+        </div>
+        
+        {(statusFilter !== 'alle' || quelleFilter !== 'alle' || searchTerm) && (
+          <div className="mt-3 flex items-center gap-2">
+            <span className="text-gray-400 text-sm">Aktive Filter:</span>
+            {statusFilter !== 'alle' && (
+              <button
+                onClick={() => setStatusFilter('alle')}
+                className="bg-blue-900 text-blue-300 px-2 py-1 rounded text-xs flex items-center gap-1"
+              >
+                Status: {statusFilter} <span className="ml-1">×</span>
+              </button>
+            )}
+            {quelleFilter !== 'alle' && (
+              <button
+                onClick={() => setQuelleFilter('alle')}
+                className="bg-blue-900 text-blue-300 px-2 py-1 rounded text-xs flex items-center gap-1"
+              >
+                Quelle: {quelleFilter} <span className="ml-1">×</span>
+              </button>
+            )}
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="bg-blue-900 text-blue-300 px-2 py-1 rounded text-xs flex items-center gap-1"
+              >
+                Suche: "{searchTerm}" <span className="ml-1">×</span>
+              </button>
+            )}
+            <button
+              onClick={() => {
+                setStatusFilter('alle')
+                setQuelleFilter('alle')
+                setSearchTerm('')
+              }}
+              className="text-gray-400 text-xs underline ml-2"
+            >
+              Alle zurücksetzen
+            </button>
+          </div>
+        )}
+      </div>
+
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-          <div className="text-gray-400 text-sm">Gesamt</div>
-          <div className="text-2xl font-bold text-white mt-1">{rechnungen.length}</div>
+          <div className="text-gray-400 text-sm">Angezeigt</div>
+          <div className="text-2xl font-bold text-white mt-1">{filteredRechnungen.length}</div>
+          <div className="text-xs text-gray-500">von {rechnungen.length} gesamt</div>
         </div>
         
         <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
