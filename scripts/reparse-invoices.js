@@ -95,9 +95,9 @@ async function main() {
     
     for (let i = 0; i < toReparse.length; i++) {
       const email = toReparse[i]
-      const attachment = email.attachments[0]
+      const filename = email.filename || 'unknown.pdf'
       
-      process.stdout.write(`[${i+1}/${toReparse.length}] ${attachment.filename}... `)
+      process.stdout.write(`[${i+1}/${toReparse.length}] ${filename}... `)
       
       try {
         // Parse mit Gemini
