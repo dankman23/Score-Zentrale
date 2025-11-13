@@ -189,6 +189,11 @@ export default function FibuCompleteDashboard() {
         
         {/* Overview Tab */}
         {activeTab === 'overview' && (
+          <FibuMonatsUebersicht selectedPeriod={selectedPeriod} />
+        )}
+
+        {/* Overview Tab (Alt - wird nicht mehr verwendet) */}
+        {activeTab === 'overview_old' && (
           <div className="space-y-6">
             
             {/* Critical Issues Alert */}
