@@ -119,9 +119,37 @@ export async function GET(request: NextRequest) {
       istZugeordnet: z.kRechnung > 0
     }))
     
+    // Lade auch Postbank-Transaktionen
+    const postbankCollection = db.collection('fibu_bank_transaktionen')
+    const postbankTransaktionen = await postbankCollection.find({
+      datum: { $gte: new Date(from), $lte: new Date(to + 'T23:59:59.999Z') }
+    }).toArray()
+    
+    // Konvertiere Postbank-Transaktionen zu Zahlungs-Format
+    const postbankZahlungen = postbankTransaktionen.map((t: any) => ({
+      quelle: 'postbank',
+      zahlungsId: t._id.toString(),
+      kRechnung: 0,
+      rechnungsNr: t.matchedRechnungNr || 'Unbekannt',
+      betrag: t.betrag,
+      zahlungsdatum: t.datum,
+      hinweis: t.verwendungszweck,
+      zahlungsart: t.kategorie === 'gehalt' ? 'Gehalt' : t.buchungstext,
+      kZahlungsart: 0,
+      kundenName: t.auftraggeber,
+      zuordnungstyp: t.kategorie || 'Nicht zugeordnet',
+      cBestellNr: t.matchedBestellNr || '',
+      belegnummer: t.verwendungszweck?.substring(0, 50) || '',
+      zahlungsanbieter: t.kategorie === 'gehalt' ? 'Gehalt' : 'Postbank',
+      istZugeordnet: false,
+      kategorie: t.kategorie
+    }))
+    
+    // Kombiniere alle Zahlungen
+    zahlungen = [...zahlungen, ...postbankZahlungen]
+    
     // Speichere in MongoDB mit eindeutiger ID pro Quelle
     // WICHTIG: Überschreibe NICHT bestehende Zuordnungen!
-    const db = await getDb()
     const collection = db.collection('fibu_zahlungen')
     
     for (const zahlung of zahlungen) {
