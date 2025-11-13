@@ -51,13 +51,16 @@ export async function GET(request: NextRequest) {
     // ========================================
     // 1. VK-RECHNUNGEN (Verkaufsrechnungen)
     // ========================================
-    const vkRechnungenCol = db.collection('fibu_vk_rechnungen')
-    const vkRechnungen = await vkRechnungenCol.find({
-      rechnungsdatum: {
-        $gte: startDate,
-        $lt: endDate
-      }
-    }).toArray()
+    let vkRechnungen: any[] = []
+    if (type === 'alle' || type === 'vk') {
+      const vkRechnungenCol = db.collection('fibu_vk_rechnungen')
+      vkRechnungen = await vkRechnungenCol.find({
+        rechnungsdatum: {
+          $gte: startDate,
+          $lt: endDate
+        }
+      }).toArray()
+    }
     
     for (const rechnung of vkRechnungen) {
       const brutto = rechnung.brutto || 0
