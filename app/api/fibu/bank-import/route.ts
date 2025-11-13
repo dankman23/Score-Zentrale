@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     const content = buffer.toString('utf-8')
     
     // CSV parsen
-    const lines = content.split('\n').filter(line => line.trim())
+    let lines = content.split('\n').filter(line => line.trim())
     
     if (lines.length === 0) {
       return NextResponse.json(
@@ -42,28 +42,54 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Erkenne CSV-Format
-    const header = lines[0]
+    // Erkenne CSV-Format und finde Header-Zeile
     let format = 'unknown'
     let delimiter = ';'
+    let headerIndex = 0
+    let header = ''
     
-    // Postbank Format erkennen
-    if (header.includes('Buchungstag') && header.includes('Verwendungszweck')) {
-      format = 'postbank'
-      delimiter = ';'
-    } 
-    // Commerzbank Format
-    else if (header.includes('Buchungstag') && header.includes('Umsatzart')) {
-      format = 'commerzbank'
-      delimiter = ';'
+    // Suche nach der Header-Zeile (Postbank hat mehrere Kopfzeilen)
+    for (let i = 0; i < Math.min(lines.length, 20); i++) {
+      const line = lines[i]
+      
+      // Postbank Format (neue Version mit "Buchungstag;Wert;Umsatzart...")
+      if (line.includes('Buchungstag') && line.includes('Begünstigter') && line.includes('Verwendungszweck')) {
+        format = 'postbank'
+        delimiter = ';'
+        headerIndex = i
+        header = line
+        break
+      }
+      // Alte Postbank Format
+      else if (line.includes('Buchungstag') && line.includes('Verwendungszweck')) {
+        format = 'postbank'
+        delimiter = ';'
+        headerIndex = i
+        header = line
+        break
+      }
+      // Commerzbank Format
+      else if (line.includes('Buchungstag') && line.includes('Umsatzart')) {
+        format = 'commerzbank'
+        delimiter = ';'
+        headerIndex = i
+        header = line
+        break
+      }
     }
-    // Generisches CSV
-    else if (header.includes(',')) {
-      delimiter = ','
-      format = 'generic'
+    
+    if (!header) {
+      header = lines[0]
+      if (header.includes(',')) {
+        delimiter = ','
+        format = 'generic'
+      }
     }
     
     const headerFields = header.split(delimiter).map(f => f.trim().replace(/"/g, ''))
+    
+    // Starte Parsing nach Header-Zeile
+    lines = lines.slice(headerIndex + 1)
     
     // Transaktionen parsen
     const transaktionen = []
