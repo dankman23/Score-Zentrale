@@ -60,10 +60,7 @@ export async function GET(request: NextRequest) {
           $lte: endDate
         }
       }).toArray()
-      console.log(`[10it Export] VK-Rechnungen gefunden: ${vkRechnungen.length}`)
     }
-    
-    console.log(`[10it Export] Starte VK-Rechnungen-Loop mit ${vkRechnungen.length} Rechnungen`)
     
     for (const rechnung of vkRechnungen) {
       const brutto = rechnung.brutto || 0
