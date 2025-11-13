@@ -173,7 +173,8 @@ def parse_invoice_from_base64(pdf_base64: str, filename: str = "") -> dict:
             mwst_satz = 19
             if 'MwST' in df.columns:
                 try:
-                    mwst_satz = int(df.iloc[0]['MwST'])
+                    mwst_satz_str = str(df.iloc[0]['MwST']).strip()
+                    mwst_satz = int(mwst_satz_str)
                 except:
                     pass
             
