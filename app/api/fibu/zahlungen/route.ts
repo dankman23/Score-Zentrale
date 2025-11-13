@@ -120,6 +120,7 @@ export async function GET(request: NextRequest) {
     }))
     
     // Lade auch Postbank-Transaktionen
+    const db = await getDb()
     const postbankCollection = db.collection('fibu_bank_transaktionen')
     const postbankTransaktionen = await postbankCollection.find({
       datum: { $gte: new Date(from), $lte: new Date(to + 'T23:59:59.999Z') }
