@@ -1,7 +1,7 @@
 export const runtime = 'nodejs'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getSqlConnection } from '../../../../lib/db/mssql'
+import { getMssqlPool } from '../../../../lib/db/mssql'
 
 /**
  * GET /api/fibu/rechnungen/vk
