@@ -10,14 +10,18 @@ import { getSqlConnection } from '../../../lib/db/mssql'
  * Query-Parameter:
  * - from: Startdatum (YYYY-MM-DD)
  * - to: Enddatum (YYYY-MM-DD)
- * - limit: Max. Anzahl (default: 1000)
+ * 
+ * WICHTIG: Lädt ALLE Rechnungen ohne Limit!
+ * Rechnungen werden NIEMALS automatisch gelöscht.
+ * Status-Updates (Offen -> Bezahlt/Storniert) sind erlaubt.
  */
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const from = searchParams.get('from') || '2025-01-01'
     const to = searchParams.get('to') || '2025-12-31'
-    const limit = parseInt(searchParams.get('limit') || '1000')
+    
+    console.log('[VK-Rechnungen] Lade ALLE Rechnungen von', from, 'bis', to)
     
     const pool = await getSqlConnection()
     
@@ -25,7 +29,7 @@ export async function GET(request: NextRequest) {
       .input('from', from)
       .input('to', to)
       .query(`
-        SELECT TOP ${limit}
+        SELECT
           r.kRechnung,
           r.cRechnungsNr,
           r.dErstellt,
