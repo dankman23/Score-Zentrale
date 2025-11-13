@@ -725,7 +725,7 @@ export default function FibuModule() {
         </div>
         
         {/* Datumsfilter (für VK/EK) */}
-        {(tab === 'vk' || tab === 'ek') && (
+        {(tab === 'vk' || tab === 'ek' || tab === 'ek-manager') && (
           <div className="card mb-3 border-info">
             <div className="card-header bg-info text-white py-1">
               <small className="font-weight-bold">Zeitraum</small>
