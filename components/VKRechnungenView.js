@@ -271,7 +271,7 @@ export default function VKRechnungenView() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700">
-              {rechnungen.map((rechnung, idx) => (
+              {filteredRechnungen.map((rechnung, idx) => (
                 <tr key={idx} className="hover:bg-gray-750">
                   <td className="px-4 py-3 text-sm font-medium text-blue-400">
                     {rechnung.rechnungsNr}
