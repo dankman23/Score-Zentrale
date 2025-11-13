@@ -35,7 +35,6 @@ export async function GET(request: NextRequest) {
           r.dErstellt,
           r.fGesamtsumme,
           r.fWarensumme,
-          r.fVersandkosten,
           r.tKunde_kKunde,
           CASE
             WHEN EXISTS (SELECT 1 FROM tZahlung z WHERE z.kRechnung = r.kRechnung) THEN 'Bezahlt'
@@ -56,7 +55,6 @@ export async function GET(request: NextRequest) {
       kunde: `Kunde #${r.tKunde_kKunde || 'Unbekannt'}`,
       betrag: r.fGesamtsumme,
       warenwert: r.fWarensumme,
-      versandkosten: r.fVersandkosten,
       status: r.status
     }))
     
