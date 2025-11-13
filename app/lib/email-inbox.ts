@@ -88,9 +88,13 @@ export async function fetchUnreadEmails(): Promise<ProcessedEmail[]> {
 
           fetch.on('message', (msg, seqno) => {
             msg.on('body', (stream) => {
-              simpleParser(stream, async (err, parsed) => {
+              simpleParser(stream, (err, parsed) => {
                 if (err) {
                   console.error('[FIBU Email] Parse error:', err)
+                  processed++
+                  if (processed === results.length) {
+                    imap.end()
+                  }
                   return
                 }
 
@@ -117,13 +121,17 @@ export async function fetchUnreadEmails(): Promise<ProcessedEmail[]> {
 
                   console.log(`[FIBU Email] E-Mail von ${parsed.from?.text} mit ${pdfAttachments.length} PDF(s)`)
                   if (parsed.text) {
-                    console.log(`[FIBU Email] E-Mail-Text (erste 100 Zeichen): ${parsed.text.substring(0, 100)}...`)
+                    console.log(`[FIBU Email] E-Mail-Text (erste 100 Zeichen): ${parsed.text.substring(0, 100)}`)
                   }
                 }
 
                 processed++
                 if (processed === results.length) {
-                  imap.end()
+                  // Warte kurz damit alle async Operationen fertig sind
+                  setTimeout(() => {
+                    console.log(`[FIBU Email] Alle ${results.length} Emails verarbeitet, ${emails.length} mit PDFs`)
+                    imap.end()
+                  }, 1000)
                 }
               })
             })
