@@ -127,7 +127,83 @@ export async function GET(request: NextRequest) {
     }
     
     // ========================================
-    // 3. EK-RECHNUNGEN (Lieferantenrechnungen)
+    // 3. EXTERNE RECHNUNGEN (Amazon VCS-Lite etc.)
+    // ========================================
+    const externeRechnungenCol = db.collection('fibu_externe_rechnungen')
+    const externeRechnungen = await externeRechnungenCol.find({
+      belegdatum: {
+        $gte: startDate,
+        $lt: endDate
+      }
+    }).toArray()
+    
+    for (const rechnung of externeRechnungen) {
+      const brutto = rechnung.brutto || 0
+      const netto = rechnung.netto || 0
+      const steuer = rechnung.steuer || 0
+      const mwstSatz = rechnung.mwstSatz || 19
+      const steuersatz = getSteuersatz(mwstSatz)
+      
+      // Externe Rechnungen = Amazon → Debitorenkonto 69002 (Amazon)
+      const debitorKonto = '69002'
+      const sachkonto = '4400'  // Erlöse Waren
+      
+      // Buchung: Forderung an Erlös
+      bookings.push({
+        konto: '1200',
+        kontobezeichnung: 'Forderungen aus Lieferungen und Leistungen',
+        datum: new Date(rechnung.belegdatum),
+        belegnummer: rechnung.belegnummer || `EXT-${rechnung.kExternerBeleg}`,
+        text: `${rechnung.belegnummer} (${rechnung.herkunft}) - ${rechnung.kundenLand || 'DE'}`,
+        gegenkonto: sachkonto,
+        soll: brutto,
+        haben: 0,
+        steuer: steuersatz,
+        steuerkonto: getSteuerkonto(steuersatz, false)
+      })
+    }
+    
+    // ========================================
+    // 4. GUTSCHRIFTEN (negative Rechnungen)
+    // ========================================
+    const gutschriftenCol = db.collection('fibu_gutschriften')
+    const gutschriften = await gutschriftenCol.find({
+      belegdatum: {
+        $gte: startDate,
+        $lt: endDate
+      }
+    }).toArray()
+    
+    for (const gutschrift of gutschriften) {
+      // Beträge sind bereits negativ
+      const brutto = gutschrift.brutto || 0  // z.B. -100
+      const netto = gutschrift.netto || 0
+      const mwst = gutschrift.mwst || 0
+      const mwstSatz = gutschrift.mwstSatz || 19
+      const steuersatz = getSteuersatz(mwstSatz)
+      
+      const debitorKonto = '69015'  // Standard-Debitor
+      const sachkonto = '4400'
+      
+      // Gutschrift = STORNO der Rechnung
+      // HABEN: Forderung sinkt (negative Buchung)
+      // SOLL: Erlös sinkt
+      bookings.push({
+        konto: '1200',
+        kontobezeichnung: 'Forderungen aus Lieferungen und Leistungen',
+        datum: new Date(gutschrift.belegdatum),
+        belegnummer: gutschrift.belegnummer || `GU-${gutschrift.kGutschrift}`,
+        text: `Gutschrift ${gutschrift.originalRechnungNr || ''} - DE`,
+        gegenkonto: sachkonto,
+        soll: 0,
+        haben: Math.abs(brutto),  // Positiver Wert im HABEN
+        steuer: steuersatz,
+        steuerkonto: getSteuerkonto(steuersatz, false)
+      })
+    }
+    
+    // ========================================
+    // 5. EK-RECHNUNGEN (Lieferantenrechnungen)
     // ========================================
     const ekRechnungenCol = db.collection('fibu_ek_rechnungen')
     const ekRechnungen = await ekRechnungenCol.find({
