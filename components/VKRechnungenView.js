@@ -266,6 +266,7 @@ export default function VKRechnungenView() {
                 <th className="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase">Netto</th>
                 <th className="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase">Brutto</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Quelle</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Debitor-Konto</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Sachkonto</th>
               </tr>
@@ -294,6 +295,15 @@ export default function VKRechnungenView() {
                         : 'bg-orange-900 text-orange-300'
                     }`}>
                       {rechnung.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      rechnung.quelle === 'JTL' 
+                        ? 'bg-blue-900 text-blue-300' 
+                        : 'bg-purple-900 text-purple-300'
+                    }`}>
+                      {rechnung.quelle || 'JTL'}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-300">{rechnung.debitor || 'N/A'}</td>
