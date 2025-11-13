@@ -170,14 +170,14 @@ export async function GET(request: NextRequest) {
         })),
       
       vkOffen: vkRechnungen
-        .filter(r => r.cStatus !== 'Bezahlt')
+        .filter((r: any) => r.status !== 'Bezahlt')
         .slice(0, 20)
-        .map(r => ({
-          rechnungsNr: r.cRechnungNr,
-          kunde: r.cFirma,
-          betrag: r.fGesamtsumme,
-          datum: r.dErstellt,
-          status: r.cStatus
+        .map((r: any) => ({
+          rechnungsNr: r.cRechnungsNr,
+          kunde: r.kundenName,
+          betrag: r.brutto,
+          datum: r.rechnungsdatum,
+          status: r.status
         })),
       
       zahlungenNegativ: zahlungen
