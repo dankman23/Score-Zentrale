@@ -122,18 +122,24 @@ export async function GET(request: NextRequest) {
       const zahlungsId = zahlung.zahlungsId || zahlung.kZahlung || 'UNBEKANNT'
       const belegnummer = `ZE-${zahlungsId}`
       
-      // Bestimme Bankkonto basierend auf Zahlungsanbieter
-      let bankKonto = '1200'  // Standard: Hauptbankkonto
+      // Bestimme Bankkonto basierend auf Zahlungsanbieter (gemäß Tennet-Vorlage)
+      let bankKonto = '1800'  // Standard: Bank
       const anbieter = (zahlung.zahlungsanbieter || '').toLowerCase()
       
       if (anbieter.includes('paypal')) {
-        bankKonto = '1202'  // PayPal-Konto
+        bankKonto = '1820'  // PayPal-Konto
       } else if (anbieter.includes('amazon')) {
-        bankKonto = '1201'  // Amazon-Konto
+        bankKonto = '1825'  // Amazon-Konto
       } else if (anbieter.includes('ebay')) {
-        bankKonto = '1203'  // eBay-Konto
+        bankKonto = '1840'  // eBay-Konto
       } else if (anbieter.includes('mollie')) {
-        bankKonto = '1204'  // Mollie-Konto
+        bankKonto = '1830'  // Mollie-Konto
+      } else if (anbieter.includes('commerzbank') || anbieter.includes('überweisung')) {
+        bankKonto = '1802'  // Commerzbank Girokonto
+      } else if (anbieter.includes('kreditkarte')) {
+        bankKonto = '1850'  // Kreditkartenkonto
+      } else if (anbieter.includes('bar')) {
+        bankKonto = '1600'  // Kasse
       }
       
       // Bei positiven Beträgen: Bank SOLL, Debitor HABEN (Zahlung eingegangen)
