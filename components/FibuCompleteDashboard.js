@@ -438,6 +438,11 @@ export default function FibuCompleteDashboard() {
           <VKRechnungenView />
         )}
 
+        {/* Zahlungen Tab */}
+        {activeTab === 'zahlungen' && (
+          <ZahlungenView />
+        )}
+
         {/* Bank-Import Tab */}
         {activeTab === 'bank-import' && (
           <BankImport onSuccess={loadData} />
