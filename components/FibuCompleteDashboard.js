@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import KreditorZuordnung from './KreditorZuordnung'
 import ExportDialog from './ExportDialog'
+import BankImport from './BankImport'
 
 export default function FibuCompleteDashboard() {
   const [data, setData] = useState(null)
