@@ -46,15 +46,19 @@ export async function GET(request: NextRequest) {
     
     const mapped = rechnungen.map(r => ({
       id: r._id.toString(),
-      rechnungsNr: r.rechnungsNr || r.rechnungsNummer || 'N/A',
+      rechnungsNr: r.cRechnungsNr || r.rechnungsNr || 'N/A',
       datum: r.rechnungsdatum,
-      kunde: r.kundenName || r.kunde || 'Unbekannt',
-      betrag: r.gesamtBetrag || r.betrag || 0,
+      kunde: r.kundenName || 'Unbekannt',
+      betrag: r.brutto || 0,
+      netto: r.netto || 0,
+      mwst: r.mwst || 0,
       debitor: r.debitorKonto,
       sachkonto: r.sachkonto,
       zahlungsart: r.zahlungsart,
       status: r.status || 'Offen',
-      quelle: r.quelle || 'JTL'
+      land: r.kundenLand,
+      ustId: r.kundenUstId,
+      quelle: 'JTL'
     }))
     
     return NextResponse.json({
