@@ -218,3 +218,32 @@ export async function PUT(request: NextRequest) {
     )
   }
 }
+
+/**
+ * GET: Analysiere verarbeitete EK-Rechnungen und gib Lern-Statistiken zurück
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const { analyzeProcessedInvoices } = await import('../../../lib/ek-rechnung-parser')
+    const db = await getDb()
+    const collection = db.collection('fibu_ek_rechnungen')
+    
+    const invoices = await collection.find({}).sort({ created_at: -1 }).limit(100).toArray()
+    
+    const analysis = await analyzeProcessedInvoices(invoices)
+    
+    return NextResponse.json({
+      ok: true,
+      totalInvoices: invoices.length,
+      statistics: analysis.statistics,
+      suggestions: analysis.suggestions,
+      message: `Analysiert: ${invoices.length} Rechnungen, ${analysis.suggestions.length} Template-Vorschläge`
+    })
+  } catch (error: any) {
+    console.error('[EK-Rechnung Analysis] Error:', error)
+    return NextResponse.json(
+      { ok: false, error: error.message },
+      { status: 500 }
+    )
+  }
+}
