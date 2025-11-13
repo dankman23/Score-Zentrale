@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     const to = searchParams.get('to') || '2025-01-31'
     
     const startDate = new Date(from)
-    const endDate = new Date(to)
+    const endDate = new Date(to + 'T23:59:59.999Z')
     
     // Hole Kontenplan aus MongoDB für Bezeichnungen
     const db = await getDb()
