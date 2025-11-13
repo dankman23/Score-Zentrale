@@ -5,6 +5,7 @@ import KreditorZuordnung from './KreditorZuordnung'
 import ExportDialog from './ExportDialog'
 import BankImport from './BankImport'
 import KontenplanView from './KontenplanView'
+import VKRechnungenView from './VKRechnungenView'
 
 export default function FibuCompleteDashboard() {
   const [data, setData] = useState(null)
