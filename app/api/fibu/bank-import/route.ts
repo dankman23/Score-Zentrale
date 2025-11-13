@@ -248,6 +248,54 @@ function extractBestellnummer(text: string): string | null {
   return null
 }
 
+// Helper: Kategorisiere Transaktion automatisch
+function categorizeTransaction(verwendungszweck: string, auftraggeber: string, umsatzart: string, betrag: number): string {
+  const text = `${verwendungszweck} ${auftraggeber} ${umsatzart}`.toLowerCase()
+  
+  // Gehälter (negative Beträge)
+  if (betrag < 0) {
+    // Mitarbeiter-Namen erkennen
+    if (text.includes('waller') || text.includes('angelika') || text.includes('dorothee')) {
+      return 'gehalt'
+    }
+    
+    // Steuer & Abgaben
+    if (text.includes('steuerverwaltung') || text.includes('lohnsteuer') || text.includes('umsatzsteuer')) {
+      return 'steuern'
+    }
+    
+    // Versand & Logistik
+    if (text.includes('deutsche post') || text.includes('dhl') || text.includes('paket')) {
+      return 'versand'
+    }
+    
+    // Payment Provider Gebühren
+    if (text.includes('paypal') && text.includes('gebühr')) {
+      return 'gebühren_payment'
+    }
+    
+    // Sonstige Dienstleistungen
+    if (text.includes('trustami') || text.includes('rechnung')) {
+      return 'dienstleistung'
+    }
+  }
+  
+  // Einnahmen (positive Beträge)
+  if (betrag > 0) {
+    if (text.includes('ebay')) {
+      return 'einnahme_ebay'
+    }
+    if (text.includes('paypal') && !text.includes('gebühr')) {
+      return 'einnahme_paypal'
+    }
+    if (text.includes('amazon')) {
+      return 'einnahme_amazon'
+    }
+  }
+  
+  return betrag < 0 ? 'ausgabe_sonstige' : 'einnahme_sonstige'
+}
+
 // GET: Liste importierte Bank-Transaktionen
 export async function GET(request: NextRequest) {
   try {
