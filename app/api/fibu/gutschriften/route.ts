@@ -30,10 +30,8 @@ export async function GET(request: NextRequest) {
         g.cWaehrung,
         g.cStatus,
         g.nStorno,
-        k.cFirma,
         r.cRechnungsNr
       FROM dbo.tgutschrift g
-      LEFT JOIN dbo.tKunde k ON g.kKunde = k.kKunde
       LEFT JOIN dbo.tRechnung r ON g.kRechnung = r.kRechnung
       WHERE g.dErstellt >= @from
         AND g.dErstellt < DATEADD(day, 1, @to)
