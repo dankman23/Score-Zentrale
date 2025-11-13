@@ -37,7 +37,6 @@ export async function GET(request: NextRequest) {
           r.fWarensumme,
           r.fVersandkosten,
           k.cFirma,
-          k.cLand,
           CASE
             WHEN EXISTS (SELECT 1 FROM tZahlung z WHERE z.kRechnung = r.kRechnung) THEN 'Bezahlt'
             ELSE 'Offen'
