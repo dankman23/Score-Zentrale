@@ -42,6 +42,15 @@ Zahlungen sind ebenfalls in **ZWEI Quellen** gespeichert:
 - **EK-Rechnungen** (Lieferantenrechnungen via PDF-Upload + AI)
 - **10it Export** (teilweise)
 
+### ✅ NEU IMPLEMENTIERT:
+- **`/app/app/api/fibu/rechnungen/extern/route.ts`** - Externe Rechnungen (XRE-XXXXX)
+  - Status: ✅ Funktioniert - Oktober 2025: 1.140 externe Rechnungen
+  - Test: `GET /api/fibu/rechnungen/extern?from=2025-10-01&to=2025-10-31`
+  
+- **`/app/app/api/fibu/gutschriften/route.ts`** - Gutschriften (GU2025-XXXXX)
+  - Status: ✅ Funktioniert - Oktober 2025: 26 Gutschriften
+  - Test: `GET /api/fibu/gutschriften?from=2025-10-01&to=2025-10-31`
+
 ### ❌ Fehlt noch
 - **Externe Rechnungen** aus `Rechnung.tExternerBeleg` (XRE-XXXXX)
 - **Zuordnung** zwischen externen Rechnungen und Zahlungen
