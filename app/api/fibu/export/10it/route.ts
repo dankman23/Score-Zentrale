@@ -177,13 +177,16 @@ export async function GET(request: NextRequest) {
     // ========================================
     // 4. GUTSCHRIFTEN (negative Rechnungen)
     // ========================================
-    const gutschriftenCol = db.collection('fibu_gutschriften')
-    const gutschriften = await gutschriftenCol.find({
-      belegdatum: {
-        $gte: startDate,
-        $lt: endDate
-      }
-    }).toArray()
+    let gutschriften: any[] = []
+    if (type === 'alle' || type === 'vk') {
+      const gutschriftenCol = db.collection('fibu_gutschriften')
+      gutschriften = await gutschriftenCol.find({
+        belegdatum: {
+          $gte: startDate,
+          $lt: endDate
+        }
+      }).toArray()
+    }
     
     for (const gutschrift of gutschriften) {
       // Beträge sind bereits negativ
