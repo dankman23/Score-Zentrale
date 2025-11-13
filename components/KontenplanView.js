@@ -75,7 +75,7 @@ export default function KontenplanView() {
           {[
             { id: 'sachkonten', label: '📊 Sachkonten', count: kontenplan.sachkonten.length },
             { id: 'kreditoren', label: '🏭 Kreditoren', count: kontenplan.kreditoren_aktiv.length },
-            { id: 'debitoren', label: '👥 Debitoren', count: kontenplan.debitoren.length },
+            { id: 'debitoren', label: '👥 Debitoren', count: 23 }, // 20 Sammelkonten + IGL + Marketplace
             { id: 'kasse_bank', label: '🏦 Kasse/Bank', count: kontenplan.kasse_bank.length },
             { id: 'steuer', label: '📄 Steuerkonten', count: kontenplan.steuer.length },
           ].map(tab => (
