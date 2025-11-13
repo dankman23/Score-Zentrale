@@ -108,30 +108,65 @@ export async function GET(request: NextRequest) {
     
     for (const zahlung of zahlungen) {
       const betrag = zahlung.betrag || 0
-      const rechnungsNr = zahlung.rechnungsNr || 'unbekannt'
+      
+      // Überspringe 0-Beträge und Postbank-Zahlungen (werden separat behandelt)
+      if (betrag === 0 || zahlung.quelle === 'postbank') continue
+      
+      const rechnungsNr = zahlung.rechnungsNr || 'Unbekannt'
       
       // Finde zugehörige Rechnung für Debitorenkonto
       const rechnung = vkRechnungen.find((r: any) => r.kRechnung === zahlung.kRechnung)
       const debitorKonto = rechnung?.debitorKonto || '69015'
       
-      // Belegnummer im Format AU-XXXXX-S generieren
-      const belegnummer = `AU-${zahlung.kZahlung}-S`
+      // Belegnummer: Nutze zahlungsId oder kRechnung
+      const zahlungsId = zahlung.zahlungsId || zahlung.kZahlung || 'UNBEKANNT'
+      const belegnummer = `ZE-${zahlungsId}`
       
-      // Buchung: Bank an Debitor
-      // SOLL: (leer, wird in HABEN gebucht)
-      // HABEN: Forderung sinkt
-      bookings.push({
-        konto: '1200',  // Forderungen
-        kontobezeichnung: 'Forderungen aus Lieferungen und Leistungen',
-        datum: new Date(zahlung.zahlungsdatum),
-        belegnummer: belegnummer,
-        text: `Zahlungseing.: ${rechnungsNr} - DE`,
-        gegenkonto: debitorKonto,
-        soll: 0,
-        haben: betrag,
-        steuer: 0,
-        steuerkonto: ''
-      })
+      // Bestimme Bankkonto basierend auf Zahlungsanbieter
+      let bankKonto = '1200'  // Standard: Hauptbankkonto
+      const anbieter = (zahlung.zahlungsanbieter || '').toLowerCase()
+      
+      if (anbieter.includes('paypal')) {
+        bankKonto = '1202'  // PayPal-Konto
+      } else if (anbieter.includes('amazon')) {
+        bankKonto = '1201'  // Amazon-Konto
+      } else if (anbieter.includes('ebay')) {
+        bankKonto = '1203'  // eBay-Konto
+      } else if (anbieter.includes('mollie')) {
+        bankKonto = '1204'  // Mollie-Konto
+      }
+      
+      // Bei positiven Beträgen: Bank SOLL, Debitor HABEN (Zahlung eingegangen)
+      // Bei negativen Beträgen: Bank HABEN, Debitor SOLL (Rückzahlung)
+      if (betrag > 0) {
+        // Zahlungseingang
+        bookings.push({
+          konto: bankKonto,
+          kontobezeichnung: getBezeichnung(bankKonto),
+          datum: new Date(zahlung.zahlungsdatum),
+          belegnummer: belegnummer,
+          text: `Zahlungseing. ${rechnungsNr} via ${zahlung.zahlungsanbieter || 'Bank'}`,
+          gegenkonto: debitorKonto,
+          soll: betrag,
+          haben: 0,
+          steuer: 0,
+          steuerkonto: ''
+        })
+      } else {
+        // Rückzahlung/Gutschrift
+        bookings.push({
+          konto: bankKonto,
+          kontobezeichnung: getBezeichnung(bankKonto),
+          datum: new Date(zahlung.zahlungsdatum),
+          belegnummer: belegnummer,
+          text: `Rückzahlung ${rechnungsNr}`,
+          gegenkonto: debitorKonto,
+          soll: 0,
+          haben: Math.abs(betrag),
+          steuer: 0,
+          steuerkonto: ''
+        })
+      }
     }
     
     // ========================================
