@@ -35,8 +35,27 @@ async function parseInvoiceWithGemini(pdfBase64) {
         reject(new Error(`Python exited with code ${code}: ${stderr}`))
       } else {
         try {
+          // Python gibt direkt das Result zurück
           const result = JSON.parse(stdout)
-          resolve(result)
+          
+          // Mapping: Python-Output zu unserem Format
+          if (result.success) {
+            resolve({
+              success: true,
+              data: {
+                lieferant: result.lieferant,
+                rechnungsnummer: result.rechnungsnummer,
+                datum: result.datum,
+                gesamtbetrag: result.gesamtbetrag,
+                nettobetrag: result.nettobetrag,
+                mehrwertsteuer: result.steuerbetrag,
+                mwstSatz: result.steuersatz
+              },
+              confidence: result.confidence
+            })
+          } else {
+            resolve(result)
+          }
         } catch (e) {
           reject(new Error(`Failed to parse JSON: ${stdout}`))
         }
