@@ -54,9 +54,35 @@ const STANDARD_KONTENPLAN = {
   ],
   
   debitoren: [
-    { bereich: '10000-19999', bezeichnung: 'Debitoren (Kunden)', beschreibung: 'Forderungen aus Lieferungen und Leistungen' },
-    { konto: '10000', bezeichnung: 'Standard-Debitor', beispiel: 'Amazon Kunde' },
-    { konto: '99012594', bezeichnung: 'Sammelkonto Marketplace Kunden', beispiel: 'Marketplace Sammelkonto' },
+    // IGL-Debitoren (Innergemeinschaftliche Lieferung mit USt-ID)
+    { bereich: '10000-19999', bezeichnung: 'IGL-Debitoren (EU mit USt-ID)', beschreibung: 'EU-Kunden mit USt-ID - brauchen eigenen Debitor für USt-ID-Hinterlegung' },
+    { konto: '10000', bezeichnung: 'IGL-Debitor Beispiel', beispiel: 'EU-Kunde mit USt-ID' },
+    
+    // Sammelkonten nach Zahlungsart (69xxx)
+    { bereich: '69000-69999', bezeichnung: 'Sammelkonten nach Zahlungsart', beschreibung: 'Alle Standard-Kunden werden nach Zahlungsart zusammengefasst' },
+    { konto: '69001', bezeichnung: 'Sammelkonto Amazon Payment', zahlungsart: 'Amazon Payment' },
+    { konto: '69002', bezeichnung: 'Sammelkonto Bar', zahlungsart: 'Bar' },
+    { konto: '69003', bezeichnung: 'Sammelkonto eBay Managed Payments', zahlungsart: 'eBay Managed Payments' },
+    { konto: '69004', bezeichnung: 'Sammelkonto eBay Rechnungskauf', zahlungsart: 'eBay Rechnungskauf' },
+    { konto: '69005', bezeichnung: 'Sammelkonto EPS', zahlungsart: 'EPS' },
+    { konto: '69006', bezeichnung: 'Sammelkonto GiroPay', zahlungsart: 'GiroPay' },
+    { konto: '69007', bezeichnung: 'Sammelkonto Kaufland.de', zahlungsart: 'Kaufland.de' },
+    { konto: '69008', bezeichnung: 'Sammelkonto Kreditkarte', zahlungsart: 'Kreditkarte' },
+    { konto: '69010', bezeichnung: 'Sammelkonto Nachnahme', zahlungsart: 'Nachnahme' },
+    { konto: '69011', bezeichnung: 'Sammelkonto Otto.de', zahlungsart: 'Otto.de' },
+    { konto: '69012', bezeichnung: 'Sammelkonto Paypal', zahlungsart: 'Paypal' },
+    { konto: '69013', bezeichnung: 'Sammelkonto PayPal Express', zahlungsart: 'PayPal Express' },
+    { konto: '69014', bezeichnung: 'Sammelkonto Ratepay', zahlungsart: 'Ratepay' },
+    { konto: '69015', bezeichnung: 'Sammelkonto Rechnung', zahlungsart: 'Rechnung' },
+    { konto: '69016', bezeichnung: 'Sammelkonto Rechnungskauf', zahlungsart: 'Rechnungskauf' },
+    { konto: '69017', bezeichnung: 'Sammelkonto Scheck', zahlungsart: 'Scheck' },
+    { konto: '69018', bezeichnung: 'Sammelkonto Überweisung / Vorkasse', zahlungsart: 'Überweisung / Vorkasse' },
+    { konto: '69019', bezeichnung: 'Sammelkonto Überweisung mit 2% Skonto', zahlungsart: 'Überweisung / Vorkasse mit 2% Skc' },
+    { konto: '69020', bezeichnung: 'Sammelkonto Mollie', zahlungsart: 'Mollie' },
+    { konto: '69022', bezeichnung: 'Sammelkonto Apple Pay', zahlungsart: 'Apple Pay' },
+    
+    // Marketplace Sammelkonto
+    { konto: '99012594', bezeichnung: 'Sammelkonto Marketplace Kunden', beispiel: 'Amazon, eBay, Otto Sammelkonto' },
   ],
   
   kreditoren: [
