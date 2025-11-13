@@ -14,7 +14,7 @@ import sys
 from datetime import datetime, timedelta
 
 # Base URL from environment
-BASE_URL = "https://fibu-connect.preview.emergentagent.com/api"
+BASE_URL = "https://fibu-central.preview.emergentagent.com/api"
 
 # Color codes for output
 GREEN = '\033[92m'
