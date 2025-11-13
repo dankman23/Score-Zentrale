@@ -85,15 +85,23 @@ export async function POST(request: NextRequest) {
       let transaktion: any = {}
       
       if (format === 'postbank') {
+        const verwendungszweck = row['Verwendungszweck'] || ''
+        const auftraggeber = row['Begünstigter / Auftraggeber'] || row['Auftraggeber'] || row['Empfänger'] || ''
+        const umsatzart = row['Umsatzart'] || row['Buchungstext'] || ''
+        const betrag = parseGermanAmount(row['Betrag'] || row['Soll'] || row['Haben'])
+        
         transaktion = {
-          datum: parseGermanDate(row['Buchungstag'] || row['Wertstellung']),
-          verwendungszweck: row['Verwendungszweck'] || '',
-          auftraggeber: row['Auftraggeber'] || row['Empfänger'] || '',
-          betrag: parseGermanAmount(row['Betrag']),
+          datum: parseGermanDate(row['Buchungstag'] || row['Wert'] || row['Wertstellung']),
+          verwendungszweck,
+          auftraggeber,
+          betrag,
           waehrung: row['Währung'] || 'EUR',
-          buchungstext: row['Buchungstext'] || '',
-          quelle: 'Postbank',
-          format: format
+          buchungstext: umsatzart,
+          iban: row['IBAN / Kontonummer'] || row['IBAN'] || '',
+          bic: row['BIC'] || '',
+          quelle: 'postbank',
+          format: format,
+          kategorie: categorizeTransaction(verwendungszweck, auftraggeber, umsatzart, betrag)
         }
       } else if (format === 'commerzbank') {
         transaktion = {
