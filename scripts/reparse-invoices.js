@@ -118,7 +118,7 @@ async function main() {
             kreditorKonto: null,
             aufwandskonto: '5200',
             sourceEmailId: email._id.toString(),
-            pdfFileName: attachment.filename,
+            pdfFileName: filename,
             parsing: {
               method: 'emergent-gemini',
               confidence: result.confidence || 80,
