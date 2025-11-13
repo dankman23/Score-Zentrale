@@ -264,6 +264,10 @@ function kategorisiereZahlung(zahlung) {
   
   // PayPal Gebühren
   if (anbieter.includes('paypal')) {
+    // Kleine Beträge (<5€) bei PayPal sind fast immer Gebühren
+    if (zahlung.betrag > -5 && zahlung.betrag < 0) {
+      return 'gebuehren'
+    }
     if (text.includes('gebühr') || text.includes('fee') || text.includes('provision')) {
       return 'gebuehren'
     }
