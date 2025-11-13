@@ -66,18 +66,9 @@ export async function fetchUnreadEmails(): Promise<ProcessedEmail[]> {
           return
         }
 
-        // Suche E-Mails der letzten 30 Tage (gelesen + ungelesen)
-        const since = new Date()
-        since.setDate(since.getDate() - 30)
-        
-        // IMAP SINCE format: DD-MMM-YYYY (e.g. "01-Nov-2025")
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-        const day = String(since.getDate()).padStart(2, '0')
-        const month = months[since.getMonth()]
-        const year = since.getFullYear()
-        const sinceStr = `${day}-${month}-${year}`
-        
-        imap.search(['SINCE', sinceStr], (err, results) => {
+        // Suche ALLE E-Mails (wird später nach Datum gefiltert)
+        // SINCE funktioniert nicht korrekt mit diesem IMAP-Server
+        imap.search(['ALL'], (err, results) => {
           if (err) {
             reject(err)
             return
