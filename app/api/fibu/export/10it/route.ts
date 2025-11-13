@@ -63,6 +63,8 @@ export async function GET(request: NextRequest) {
       console.log(`[10it Export] VK-Rechnungen gefunden: ${vkRechnungen.length}`)
     }
     
+    console.log(`[10it Export] Starte VK-Rechnungen-Loop mit ${vkRechnungen.length} Rechnungen`)
+    
     for (const rechnung of vkRechnungen) {
       const brutto = rechnung.brutto || 0
       const netto = rechnung.netto || 0
@@ -93,10 +95,7 @@ export async function GET(request: NextRequest) {
       }
       
       bookings.push(booking)
-      
-      if (vkRechnungen.length <= 5) {
-        console.log(`[10it Export] VK-Rechnung hinzugefügt: ${rechnung.cRechnungsNr}, Brutto: ${brutto}`)
-      }
+      console.log(`[10it Export] Buchung hinzugefügt: ${rechnung.cRechnungsNr}, Buchungen gesamt: ${bookings.length}`)
     }
     
     // ========================================
