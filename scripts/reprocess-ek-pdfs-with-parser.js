@@ -5,7 +5,19 @@
 
 const { MongoClient, ObjectId } = require('mongodb');
 const fs = require('fs');
-const pdfParse = require('pdf-parse');
+
+// PDF-Parse Import (default export)
+let pdfParse;
+try {
+  pdfParse = require('pdf-parse');
+  // Falls es ein default export ist
+  if (pdfParse.default) {
+    pdfParse = pdfParse.default;
+  }
+} catch (error) {
+  console.error('❌ pdf-parse konnte nicht geladen werden:', error.message);
+  process.exit(1);
+}
 
 // Lade ENV
 const envContent = fs.readFileSync('/app/.env', 'utf-8');
