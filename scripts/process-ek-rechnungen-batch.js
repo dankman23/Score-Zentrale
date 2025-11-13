@@ -5,7 +5,8 @@
  */
 
 const { MongoClient } = require('mongodb');
-const pdfParse = require('pdf-parse').default || require('pdf-parse');
+const { PDFParse } = require('pdf-parse');
+const pdfParse = PDFParse;
 const fs = require('fs');
 
 // Lade ENV manuell
