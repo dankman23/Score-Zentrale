@@ -53,7 +53,6 @@ export async function GET(request: NextRequest) {
       rechnungsNr: r.cRechnungsNr,
       datum: r.dErstellt,
       kunde: r.cFirma || 'Unbekannt',
-      land: r.cLand,
       betrag: r.fGesamtsumme,
       warenwert: r.fWarensumme,
       versandkosten: r.fVersandkosten,
