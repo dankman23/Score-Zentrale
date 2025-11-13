@@ -1,40 +1,37 @@
 <analysis>
-The trajectory details the iterative development and debugging of a comprehensive accounting (FIBU) module. The process began by addressing user-reported data discrepancies in payment records from a JTL MS SQL database. This involved extensive SQL debugging, leading to the discovery that payment data was split between two tables ( and ).
+The trajectory details the complex, multi-stage development of a sophisticated accounting (FIBU) module. The work began with debugging SQL queries to fix data discrepancies from a JTL database. A major challenge arose in processing 190 supplier invoice PDFs. Initial attempts using Node.js with  failed due to Next.js compatibility issues.
 
-Following this, a new user request revealed that external Amazon invoices (XRE-...) were missing. Investigation uncovered another dedicated JTL table, , which was then integrated via a new API endpoint. The engineer also added support for credit notes () and a CSV import for Postbank transactions.
+The project pivoted successfully when the user provided a set of existing Python parsing scripts. These were integrated into a  directory and called from a new Node.js API endpoint via . This approach parsed a significant number of invoices from known suppliers.
 
-A significant portion of the work focused on building an automated email inbox poller to ingest supplier invoices (EK-Rechnungen). This phase was marked by complex debugging of IMAP connectivity, asynchronous Node.js code, and a critical database configuration error where a missing DB name in the  caused data to be written to the wrong database.
+A second, major breakthrough occurred when the pre-existing but overlooked Gemini AI integration was leveraged. After an initial failure with a standard API key, the engineer correctly implemented the  Python library, enabling the  to work. A hybrid script was created that used Python parsers for known suppliers and Gemini as a fallback, successfully processing nearly all remaining invoices and extracting over 100,000€.
 
-The final phase involved creating a system to process the 190 ingested PDFs, building a UI for manual assignment, and developing logic to auto-match outgoing JTL payments to these supplier invoices. The immediate task before this summary was creating a script to batch-process the pending PDFs, a necessary prerequisite for effective auto-matching.
+The focus then shifted to UI/UX, building a comprehensive unassigned items dashboard inspired by Lexoffice. This involved creating new, complex API endpoints to aggregate data and developing new React components. The final phase involved cleaning up incorrectly parsed legacy data and starting the implementation of a bulk creditor assignment feature, before the user requested a full documentation of the project in preparation for a fork.
 </analysis>
 
 <product_requirements>
-The primary objective is to build a FIBU (Accounting) module for the Score Zentrale application to automate bookkeeping.
+The primary goal is to create a comprehensive accounting (FIBU) module analogous to professional software like Lexoffice or Lexware. This module must automate and centralize bookkeeping tasks.
 
-**Core Features:**
-1.  **JTL Data Integration:** Fetch sales invoices (both standard and external Amazon/XRE invoices), credit notes, and payment transactions from an external JTL MS SQL database.
-2.  **Automated Email Ingestion:** An IMAP email inbox poller automatically fetches emails, extracts PDF invoice attachments, and saves them for processing, with robust duplicate detection.
-3.  **AI-Powered Supplier Invoice Processing (EK-Rechnungen):** A system to parse supplier invoices from emails. It uses a combination of filename hints (for creditor numbers), keyword matching (for recurring suppliers like Klingspor), and eventually AI for data extraction.
-4.  **Bank Statement Import:** A feature to upload and parse Postbank CSV statements.
-5.  **Payment Matching:**
-    *   Correctly reflect payment-to-invoice associations from JTL.
-    *   Automatically match outgoing payments (Zahlungsabgänge) to the parsed supplier invoices (EK-Rechnungen).
-6.  **Data Export:** Generate a CSV export compatible with 10it accounting software, including all invoice and credit types.
-7.  **Management UI:** A dedicated interface () for viewing the status of all supplier invoices and manually assigning those that could not be matched automatically.
+**Core Requirements:**
+1.  **Data Aggregation:** Integrate and display all financial data for given periods (e.g., October, November), including sales invoices (VK), supplier invoices (EK), credit notes, and bank transactions from various sources (JTL, Commerzbank, Postbank).
+2.  **Automated Invoice Parsing:** Automatically process incoming supplier invoices from email attachments. This was achieved via a hybrid system:
+    *   Use pre-existing Python scripts for recurring, known suppliers (e.g., Klingspor, Starcke).
+    *   Use the Gemini AI via the Emergent integration as a fallback to parse invoices from unknown suppliers.
+3.  **Unassigned Items Dashboard:** The central feature is a dashboard that clearly displays *all* transactions that require manual attention. This includes:
+    *   Supplier invoices (EK-Rechnungen) without an assigned creditor.
+    *   Sales invoices (VK-Rechnungen) that are not yet marked as paid.
+    *   Bank transactions (e.g., from Commerzbank) that are not yet assigned to an account (e.g., salary, rent, invoice payment).
+4.  **Manual Association UI:** Provide user-friendly interfaces to resolve these unassigned items, such as a bulk-editing tool to assign creditors to multiple invoices at once.
 </product_requirements>
 
 <key_technical_concepts>
-- **Backend:** Next.js API Routes (Node.js, TypeScript).
-- **Frontend:** React ('use client'), Next.js Pages.
-- **Databases:**
-    - **MongoDB:** Primary application database for storing processed invoices (EK), emails, creditors, etc.
-    - **MS SQL:** For querying the external JTL ERP database.
-- **Integrations & Parsing:** / (email),  (Postbank import),  (PDF text extraction).
-- **Core Patterns:** Asynchronous processing, database exploration scripts, creation of dedicated API endpoints for different data types, batch processing scripts for large jobs.
+- **Hybrid Parsing Engine:** A two-tier strategy combining rule-based Python parsers for known suppliers with a powerful AI (Gemini) fallback for unknown invoices.
+- **Python-Node.js Bridge:** Utilization of Node.js's  to execute Python scripts from a Next.js API route, passing data via stdin/stdout.
+- ** Library:** The critical Python library that enables the use of the universal  to access Google's Gemini API, bypassing standard API key issues.
+- **Comprehensive API Aggregation:** Creation of a single, powerful API endpoint () that queries multiple data sources (MongoDB, MS SQL) to power the central dashboard.
 </key_technical_concepts>
 
 <code_architecture>
-The application is a Next.js full-stack project. The architecture heavily relies on dedicated API routes for different accounting data entities, which are then consumed by frontend components. A critical architectural element was the shift to creating separate, standalone Node.js scripts for heavy batch processing to avoid Next.js runtime limitations.
+The application follows a Next.js full-stack architecture with API routes for backend logic and React components for the frontend. A significant addition was the integration of a dedicated Python library for specialized invoice parsing.
 
 **Directory Structure:**
 
@@ -42,47 +39,49 @@ The application is a Next.js full-stack project. The architecture heavily relies
 **Key File Analysis:**
 
 -   ****
-    -   **Importance:** Fetches all payment data from JTL.
-    -   **Changes:** This file was heavily modified. The SQL query was updated to  data from both  and  to fix missing Commerzbank transactions and improve payment assignment accuracy. It now accepts dynamic date ranges.
+    -   **Importance:** This is the cornerstone of the successful AI parsing. It uses the  library to connect to Gemini with the universal key, takes a Base64 PDF string, and returns structured JSON data.
+    -   **Changes:** Created from scratch after discovering the  playbook.
 
 -   ****
-    -   **Importance:** A new endpoint created to fetch external Amazon invoices (XRE-...).
-    -   **Changes:** Created from scratch to query the  table in the JTL database, solving a major missing data issue reported by the user.
+    -   **Importance:** The definitive batch-processing script. It iterates through pending invoices, first attempting to parse them with the Python rule-based parsers, and if that fails, it calls the  script.
+    -   **Changes:** Created to orchestrate the hybrid parsing strategy, leading to the successful processing of over 100 additional invoices.
 
 -   ****
-    -   **Importance:** Contains the core logic for connecting to the IMAP server and fetching emails.
-    -   **Changes:** This file underwent significant debugging. The IMAP search criteria were changed from  to  to be more robust. The core logic was wrapped in  to correctly handle the asynchronous nature of , fixing a critical bug where emails were processed but never saved.
-
--   ** and **
-    -   **Importance:** Manages the MongoDB connection.
-    -   **Changes:** A critical fix was made here. The  in  was updated from  to . This resolved a major issue where all FIBU data was being written to the default  database instead of the intended  database. Data was subsequently migrated.
+    -   **Importance:** The main data source for the new Lexoffice-style dashboard. It performs multiple, complex queries against both MS SQL (for open sales invoices) and MongoDB (for unassigned supplier invoices) to provide a complete overview of all items needing attention.
+    -   **Changes:** Created from scratch to fulfill the user's request for a unified unassigned items view. It underwent significant SQL debugging to fix column name errors.
 
 -   ****
-    -   **Importance:** A new endpoint to automatically associate negative payments from JTL with parsed supplier invoices.
-    -   **Changes:** Created to implement a key user requirement. It fetches negative payments and unprocessed EK invoices, then attempts to match them based on amount and date proximity. Its effectiveness is currently limited because the EK invoices are not yet fully processed.
+    -   **Importance:** The primary UI for the FIBU module. It fetches data from the  endpoint and presents it in a clear, actionable dashboard, showing counts and lists of unassigned invoices.
+    -   **Changes:** Created from scratch to provide the Lexoffice-style overview requested by the user.
 
 -   ****
-    -   **Importance:** The most recently created file, designed to solve the final blocker.
-    -   **Changes:** A new standalone Node.js script that fetches all unprocessed PDFs from the  collection and calls the existing  endpoint for each one to parse and save it as a structured EK-Rechnung document. This offloads the heavy processing from a single API request.
+    -   **Importance:** This is a new dynamic API route that handles  requests to update a specific supplier invoice. It's essential for the bulk-editing feature.
+    -   **Changes:** Newly created to allow the frontend to save changes, such as assigning a creditor number to an invoice.
+
+-   ** (Directory)**
+    -   **Importance:** Contains the complete documentation for the project, created just before this summary was requested.
+    -   **Changes:** This entire directory and its contents (README, API docs, Architecture) were created as the final step in the trajectory in response to a direct user request to document everything before a fork.
 </code_architecture>
 
 <pending_tasks>
-- **Run Batch Processing:** Execute the  script to parse all 190 supplier invoices currently in the database.
-- **Finalize EK Payment Matching:** After the batch processing is complete, re-run and refine the logic in  to achieve a higher match rate.
-- **Enhance 10it Export:** Fully integrate the newly added payment and invoice data (especially matched EK payments) into the final 10it export file.
-- **Frontend Polish:** Ensure the  UI correctly displays all 190 invoices and allows for seamless manual assignment.
+- **Implement Bulk Creditor Assignment:** Integrate the  component into the , likely as a new tab, and connect its functionality to the  endpoint.
+- **Bank Transaction Assignment:** Implement a system and UI to assign unassigned bank transactions (e.g., Commerzbank payments) to their proper bookkeeping accounts (e.g., salaries, rent, transfers).
+- **Fix Pferd Parser:** Debug and fix the specific Python parser for August Rüggeberg (Pferd) invoices, which was causing errors during batch processing.
+- **Optimize Auto-Matching:** Re-evaluate and improve the auto-matching logic between outgoing payments and the now-parsed supplier invoices to increase the match rate beyond 12.2%.
 </pending_tasks>
 
 <current_work>
-The most recent work focused on addressing a three-part user request: fixing a crash in the new , automatically matching outgoing payments to supplier invoices, and importing all historical data from October.
+The project is at a pivotal point of professionalization and documentation. Immediately preceding this summary request, the AI engineer was actively working on enhancing the FIBU module based on the user's direction to handle all unassigned items effectively.
 
-1.  **Crash Fix & Data Loading:** The crash was traced to an incorrect import path and fixed. The engineer verified that all requested historical data (VK invoices, external invoices, and payments) was already being loaded correctly into the system. Over 3,700 payments were loaded for the period.
+The last concrete development actions were:
+1.  **Cleaning Data:** Identifying and deleting 168 legacy supplier invoices that had been processed incorrectly by an old script and had no extracted amount. This was a crucial step to ensure data integrity for the new dashboard.
+2.  **Initiating a New Feature:** To address the 115 supplier invoices that were successfully parsed but lacked a creditor ID, the engineer began creating a bulk-editing feature. This involved:
+    *   Creating a new API endpoint to handle updates to single invoices: .
+    *   Creating a new React component to house the UI for this feature: .
 
-2.  **EK Payment Auto-Matching:** An API endpoint () was created to tackle this. It successfully identifies negative payments from JTL and attempts to link them to supplier invoices in MongoDB. However, the initial test yielded a low match rate (3%) because almost none of the **190 supplier invoice PDFs** had been processed into structured data that the matching logic could use.
-
-3.  **The Blocker & The Solution:** Realizing that processing the 190 PDFs was the critical next step, the engineer's final action was to create a standalone Node.js script: . This script is designed to iterate through all unprocessed PDFs and call the existing, functional API endpoint to parse and save each one. This approach was chosen to handle the large batch operation reliably outside of a single, time-sensitive API request. The system is now poised to run this script.
+The very final user request was to halt development and **create comprehensive documentation for all files before a fork**. The engineer fulfilled this by generating a full suite of markdown documents in a new  directory, describing the project's architecture, API, and setup. Therefore, the work concluded with documenting the system immediately after starting the implementation of the creditor assignment UI.
 </current_work>
 
 <optional_next_step>
-I will now execute the script  to process the 190 pending PDF invoices. This is the crucial next step to enable effective automatic payment matching.
+Continue the work on the bulk creditor assignment feature by integrating the newly created  component into the main  and connecting it to the backend API.
 </optional_next_step>
