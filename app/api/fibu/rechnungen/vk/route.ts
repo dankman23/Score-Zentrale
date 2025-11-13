@@ -36,23 +36,24 @@ export async function GET(request: NextRequest) {
           r.fGesamtsumme,
           r.fWarensumme,
           r.fVersandkosten,
-          k.cFirma,
+          r.tKunde_kKunde,
           CASE
             WHEN EXISTS (SELECT 1 FROM tZahlung z WHERE z.kRechnung = r.kRechnung) THEN 'Bezahlt'
             ELSE 'Offen'
           END as status
         FROM tRechnung r
-        LEFT JOIN tKunde k ON r.kKunde = k.kKunde
         WHERE r.dErstellt >= @from
           AND r.dErstellt < DATEADD(day, 1, CAST(@to as date))
         ORDER BY r.dErstellt DESC
       `)
     
+    console.log('[VK-Rechnungen] Geladen:', result.recordset.length, 'Rechnungen')
+    
     const rechnungen = result.recordset.map(r => ({
       id: r.kRechnung.toString(),
       rechnungsNr: r.cRechnungsNr,
       datum: r.dErstellt,
-      kunde: r.cFirma || 'Unbekannt',
+      kunde: `Kunde #${r.tKunde_kKunde || 'Unbekannt'}`,
       betrag: r.fGesamtsumme,
       warenwert: r.fWarensumme,
       versandkosten: r.fVersandkosten,
