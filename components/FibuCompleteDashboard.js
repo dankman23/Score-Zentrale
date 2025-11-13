@@ -9,6 +9,7 @@ import VKRechnungenView from './VKRechnungenView'
 import ZahlungenView from './ZahlungenView'
 import ZahlungsEinstellungen from './ZahlungsEinstellungen'
 import FibuMonatsUebersicht from './FibuMonatsUebersicht'
+import FuzzyMatchingView from './FuzzyMatchingView'
 
 export default function FibuCompleteDashboard() {
   const [data, setData] = useState(null)
