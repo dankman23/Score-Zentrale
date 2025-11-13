@@ -31,9 +31,8 @@ export async function GET(request: NextRequest) {
         eb.cKaeuferUstId,
         eb.kZahlungsart,
         eb.cWaehrungISO,
-        eck.fBrutto,
-        eck.fNetto,
-        eck.fSteuer,
+        eck.fVkBrutto,
+        eck.fVkNetto,
         za.cName AS zahlungsartName
       FROM Rechnung.tExternerBeleg eb
       LEFT JOIN Rechnung.tExternerBelegEckdaten eck ON eb.kExternerBeleg = eck.kExternerBeleg
