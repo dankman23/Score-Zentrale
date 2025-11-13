@@ -58,11 +58,11 @@ async function main() {
     
     console.log('🔍 Suche PDFs ohne zugehörige EK-Rechnung...\n')
     
-    // Hole alle processed emails mit Attachments
+    // Hole alle processed emails mit PDF
     const emails = await db.collection('fibu_email_inbox')
       .find({ 
         status: 'processed',
-        'attachments.0': { $exists: true }
+        pdfBase64: { $exists: true }
       })
       .toArray()
     
