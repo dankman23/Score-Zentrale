@@ -75,50 +75,14 @@ export async function GET(request: NextRequest) {
     }
     
     // ========================================
-    // 4. ZAHLUNGEN (JTL - alle Konten)
+    // 4. ZAHLUNGEN (JTL - alle Konten) - verwende API
     // ========================================
-    const zahlungenQuery = `
-      SELECT 
-        kZahlung,
-        cHinweis,
-        fBetrag,
-        dErstellt,
-        cZahlungsanbieter,
-        cISO
-      FROM (
-        SELECT 
-          kZahlung,
-          cHinweis,
-          fBetrag,
-          dErstellt,
-          cZahlungsanbieter,
-          cISO
-        FROM dbo.tZahlung
-        WHERE dErstellt >= @from
-          AND dErstellt <= @to
-        
-        UNION ALL
-        
-        SELECT 
-          kZahlungsabgleichUmsatz as kZahlung,
-          cHinweis,
-          fBetrag,
-          dErstellt,
-          'Commerzbank' as cZahlungsanbieter,
-          'EUR' as cISO
-        FROM dbo.tZahlungsabgleichUmsatz
-        WHERE dErstellt >= @from
-          AND dErstellt <= @to
-      ) AS AlleZahlungen
-      ORDER BY dErstellt DESC
-    `
-    
-    const zahlungenResult = await mssqlPool.request()
-      .input('from', from)
-      .input('to', to + ' 23:59:59')
-      .query(zahlungenQuery)
-    
-    const zahlungen = zahlungenResult.recordset
+    const zahlungenResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/fibu/zahlungen?from=${from}&to=${to}&limit=5000`,
+      { cache: 'no-store' }
+    )
+    const zahlungenData = await zahlungenResponse.json()
+    const zahlungen = zahlungenData.zahlungen || []
     
     // Kategorisiere Zahlungen
     const zahlungStats = {
