@@ -29,15 +29,28 @@ async function main() {
   console.log('🔍 Starte Fuzzy Matching für Zahlungen...\n')
   
   try {
-    // 1. Lade alle nicht zugeordneten Zahlungen
-    const zahlungen = await db.collection('fibu_zahlungen').find({
+    // Zeitraum festlegen
+    let query = {
       $or: [
         { istZugeordnet: false },
         { istZugeordnet: { $exists: false } },
         { kRechnung: 0 },
         { kRechnung: { $exists: false } }
       ]
-    }).toArray()
+    }
+    
+    if (CONFIG.zeitraumVon && CONFIG.zeitraumBis) {
+      query.zahlungsdatum = {
+        $gte: new Date(CONFIG.zeitraumVon + 'T00:00:00.000Z'),
+        $lte: new Date(CONFIG.zeitraumBis + 'T23:59:59.999Z')
+      }
+      console.log(`📅 Zeitraum: ${CONFIG.zeitraumVon} bis ${CONFIG.zeitraumBis}\n`)
+    } else {
+      console.log('📅 Zeitraum: Alle Zahlungen (kein Filter)\n')
+    }
+    
+    // 1. Lade alle nicht zugeordneten Zahlungen
+    const zahlungen = await db.collection('fibu_zahlungen').find(query).toArray()
     
     console.log(`📊 Gefunden: ${zahlungen.length} nicht zugeordnete Zahlungen\n`)
     
