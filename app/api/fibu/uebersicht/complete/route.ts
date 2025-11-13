@@ -181,14 +181,14 @@ export async function GET(request: NextRequest) {
         })),
       
       zahlungenNegativ: zahlungen
-        .filter(z => z.fBetrag < 0)
+        .filter((z: any) => z.betrag < 0)
         .slice(0, 30)
-        .map(z => ({
-          kZahlung: z.kZahlung,
-          betrag: z.fBetrag,
-          datum: z.dErstellt,
-          anbieter: z.cZahlungsanbieter,
-          hinweis: z.cHinweis,
+        .map((z: any) => ({
+          id: z.id,
+          betrag: z.betrag,
+          datum: z.datum,
+          anbieter: z.zahlungsanbieter,
+          hinweis: z.hinweis,
           typ: 'Ausgabe - muss Konto zugeordnet werden'
         }))
     }
