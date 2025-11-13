@@ -219,13 +219,16 @@ export async function GET(request: NextRequest) {
     // ========================================
     // 5. EK-RECHNUNGEN (Lieferantenrechnungen)
     // ========================================
-    const ekRechnungenCol = db.collection('fibu_ek_rechnungen')
-    const ekRechnungen = await ekRechnungenCol.find({
-      rechnungsdatum: {
-        $gte: startDate,
-        $lt: endDate
-      }
-    }).toArray()
+    let ekRechnungen: any[] = []
+    if (type === 'alle' || type === 'ek') {
+      const ekRechnungenCol = db.collection('fibu_ek_rechnungen')
+      ekRechnungen = await ekRechnungenCol.find({
+        rechnungsdatum: {
+          $gte: startDate,
+          $lt: endDate
+        }
+      }).toArray()
+    }
     
     for (const rechnung of ekRechnungen) {
       // Nur wenn Kreditorenkonto vorhanden
