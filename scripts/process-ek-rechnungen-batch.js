@@ -6,10 +6,18 @@
 
 const { MongoClient } = require('mongodb');
 const pdfParse = require('pdf-parse');
-require('dotenv').config({ path: '/app/.env' });
+const fs = require('fs');
 
-const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/score_zentrale';
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+// Lade ENV manuell
+const envContent = fs.readFileSync('/app/.env', 'utf-8');
+const env = {};
+envContent.split('\n').forEach(line => {
+  const match = line.match(/^([^=]+)=(.*)$/);
+  if (match) env[match[1]] = match[2];
+});
+
+const MONGO_URL = env.MONGO_URL || 'mongodb://localhost:27017/score_zentrale';
+const GEMINI_API_KEY = env.GEMINI_API_KEY;
 
 // Kreditor-Matching Funktion
 function findKreditorByFilename(filename, kreditoren) {
