@@ -60,30 +60,18 @@ export async function GET(request: NextRequest) {
     }
     
     // ========================================
-    // 3. EXTERNE RECHNUNGEN (Amazon XRE, etc.)
+    // 3. EXTERNE RECHNUNGEN (Amazon XRE, etc.) - verwende API
     // ========================================
-    const externQuery = `
-      SELECT 
-        cExterneBelegnr,
-        dErstellt,
-        fBetrag,
-        cPlattform
-      FROM Rechnung.tExternerBeleg
-      WHERE dErstellt >= @from
-        AND dErstellt <= @to
-      ORDER BY dErstellt DESC
-    `
-    
-    const externResult = await mssqlPool.request()
-      .input('from', from)
-      .input('to', to + ' 23:59:59')
-      .query(externQuery)
-    
-    const externeRechnungen = externResult.recordset
+    const externResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/fibu/rechnungen/extern?from=${from}&to=${to}`,
+      { cache: 'no-store' }
+    )
+    const externData = await externResponse.json()
+    const externeRechnungen = externData.rechnungen || []
     
     const externStats = {
       total: externeRechnungen.length,
-      gesamtBetrag: externeRechnungen.reduce((sum, r) => sum + (r.fBetrag || 0), 0)
+      gesamtBetrag: externeRechnungen.reduce((sum: number, r: any) => sum + (r.betrag || 0), 0)
     }
     
     // ========================================
