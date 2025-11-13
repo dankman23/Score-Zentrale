@@ -40,37 +40,23 @@ export async function GET(request: NextRequest) {
     }
     
     // ========================================
-    // 2. VK-RECHNUNGEN (Verkauf aus JTL)
+    // 2. VK-RECHNUNGEN (Verkauf aus JTL) - verwende existierende API
     // ========================================
-    const vkQuery = `
-      SELECT 
-        kRechnung,
-        cRechnungNr,
-        dErstellt,
-        fGesamtsumme,
-        cFirma,
-        cStatus
-      FROM dbo.tRechnung
-      WHERE dErstellt >= @from
-        AND dErstellt <= @to
-      ORDER BY dErstellt DESC
-    `
-    
-    const vkResult = await mssqlPool.request()
-      .input('from', from)
-      .input('to', to + ' 23:59:59')
-      .query(vkQuery)
-    
-    const vkRechnungen = vkResult.recordset
+    const vkResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/fibu/rechnungen/vk?from=${from}&to=${to}&limit=5000`,
+      { cache: 'no-store' }
+    )
+    const vkData = await vkResponse.json()
+    const vkRechnungen = vkData.rechnungen || []
     
     const vkStats = {
       total: vkRechnungen.length,
-      offen: vkRechnungen.filter(r => r.cStatus !== 'Bezahlt').length,
-      bezahlt: vkRechnungen.filter(r => r.cStatus === 'Bezahlt').length,
-      gesamtBetrag: vkRechnungen.reduce((sum, r) => sum + (r.fGesamtsumme || 0), 0),
+      offen: vkRechnungen.filter((r: any) => r.status !== 'Bezahlt').length,
+      bezahlt: vkRechnungen.filter((r: any) => r.status === 'Bezahlt').length,
+      gesamtBetrag: vkRechnungen.reduce((sum: number, r: any) => sum + (r.brutto || 0), 0),
       offenerBetrag: vkRechnungen
-        .filter(r => r.cStatus !== 'Bezahlt')
-        .reduce((sum, r) => sum + (r.fGesamtsumme || 0), 0)
+        .filter((r: any) => r.status !== 'Bezahlt')
+        .reduce((sum: number, r: any) => sum + (r.brutto || 0), 0)
     }
     
     // ========================================
