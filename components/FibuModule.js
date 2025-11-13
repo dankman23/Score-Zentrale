@@ -1270,6 +1270,129 @@ export default function FibuModule() {
           </div>
         )}
         
+        {/* EK-Manager Tab */}
+        {tab === 'ek-manager' && (
+          <div>
+            <div className="card border-info">
+              <div className="card-header bg-info text-white py-2">
+                <strong><i className="bi bi-list-check mr-2"/>EK-Manager - Rechnungsübersicht</strong>
+                <span className="badge badge-light ml-2">{ekRechnungen.length}</span>
+              </div>
+              <div className="card-body">
+                {ekLoading ? (
+                  <div className="text-center py-5">
+                    <div className="spinner-border text-primary"/>
+                    <p className="mt-2">Lade EK-Rechnungen...</p>
+                  </div>
+                ) : (
+                  <div>
+                    {ekRechnungen.length === 0 ? (
+                      <div className="text-center py-4 text-muted">
+                        <i className="bi bi-inbox display-4 d-block mb-3"/>
+                        Noch keine EK-Rechnungen vorhanden
+                        <p className="mt-2">
+                          <button 
+                            className="btn btn-primary"
+                            onClick={() => setTab('ek')}
+                          >
+                            <i className="bi bi-plus-circle mr-1"/>Erste Rechnung hochladen
+                          </button>
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="table-responsive" style={{maxHeight: '600px', overflow: 'auto'}}>
+                        <table className="table table-sm table-hover">
+                          <thead className="thead-light sticky-top">
+                            <tr>
+                              <th>Belegnr</th>
+                              <th>Datum</th>
+                              <th>Lieferant</th>
+                              <th>Kreditor</th>
+                              <th>Aufwandskonto</th>
+                              <th className="text-right">Netto</th>
+                              <th className="text-right">Brutto</th>
+                              <th>Status</th>
+                              <th>Aktionen</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {ekRechnungen.map((r, idx) => (
+                              <tr key={idx}>
+                                <td>
+                                  <small className="font-weight-bold">{r.rechnungsNummer || r.rechnungsnr}</small>
+                                  {r.originalRechnungsNummer && r.originalRechnungsNummer !== r.rechnungsNummer && (
+                                    <div className="text-muted" style={{fontSize: '0.7rem'}}>
+                                      ({r.originalRechnungsNummer})
+                                    </div>
+                                  )}
+                                </td>
+                                <td><small>{new Date(r.rechnungsdatum).toLocaleDateString('de-DE')}</small></td>
+                                <td><small>{r.lieferantName || r.lieferant}</small></td>
+                                <td>
+                                  {r.kreditorKonto ? (
+                                    <span className="badge badge-info">{r.kreditorKonto}</span>
+                                  ) : (
+                                    <span className="badge badge-warning">Nicht zugeordnet</span>
+                                  )}
+                                </td>
+                                <td>
+                                  {r.aufwandskonto ? (
+                                    <span className="badge badge-secondary">{r.aufwandskonto}</span>
+                                  ) : (
+                                    <span className="badge badge-warning">?</span>
+                                  )}
+                                </td>
+                                <td className="text-right"><small>{(r.nettoBetrag || r.netto)?.toFixed(2)} €</small></td>
+                                <td className="text-right"><strong>{(r.gesamtBetrag || r.brutto)?.toFixed(2)} €</strong></td>
+                                <td>
+                                  {r.matching ? (
+                                    <span 
+                                      className={`badge ${
+                                        r.matching.confidence === 100 ? 'badge-success' : 
+                                        r.matching.confidence >= 80 ? 'badge-info' : 
+                                        'badge-warning'
+                                      }`}
+                                      title={`${r.matching.method}: ${r.matching.matchedName || ''}`}
+                                    >
+                                      {r.matching.confidence}% Match
+                                    </span>
+                                  ) : (
+                                    <span className="badge badge-secondary">Manuell</span>
+                                  )}
+                                </td>
+                                <td>
+                                  <button 
+                                    className="btn btn-sm btn-outline-primary mr-1"
+                                    title="Bearbeiten"
+                                  >
+                                    <i className="bi bi-pencil"/>
+                                  </button>
+                                  <button 
+                                    className="btn btn-sm btn-outline-danger"
+                                    title="Löschen"
+                                  >
+                                    <i className="bi bi-trash"/>
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                    
+                    <div className="alert alert-info small mt-3 mb-0">
+                      <strong><i className="bi bi-info-circle mr-2"/>Info:</strong>
+                      Hier können Sie alle hochgeladenen EK-Rechnungen verwalten, bearbeiten und den Status überprüfen.
+                      Rechnungen mit hoher Match-Confidence wurden automatisch zugeordnet.
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Kontenplan Tab */}
         {tab === 'kontenplan' && (
           <div>
