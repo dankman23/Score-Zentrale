@@ -61,7 +61,11 @@ async function callPythonParser(pdfBase64, filename) {
 async function callGeminiParser(pdfBase64, emailContext) {
   return new Promise((resolve, reject) => {
     const python = spawn('python3', ['/app/python_libs/emergent_gemini_parser.py'], {
-      env: { ...process.env }  // Wichtig: ENV weitergeben
+      env: { 
+        ...process.env,
+        EMERGENT_LLM_KEY: EMERGENT_LLM_KEY,
+        GOOGLE_API_KEY: GOOGLE_API_KEY
+      }
     });
     
     let stdout = '';
