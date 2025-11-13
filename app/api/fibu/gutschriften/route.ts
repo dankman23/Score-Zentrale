@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       kRechnung: g.kRechnung,
       originalRechnungNr: g.cRechnungsNr || '',
       kKunde: g.kKunde,
-      kundenName: g.cFirma || 'Unbekannt',
+      kundenName: `Kunde #${g.kKunde}`,
       kundenLand: 'DE',
       brutto: -1 * parseFloat(g.fPreis || 0), // Negativ für Gutschrift
       mwst: -1 * parseFloat(g.fMwSt || 0),
