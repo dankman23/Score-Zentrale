@@ -730,15 +730,54 @@ test_plan:
   
   - task: "FIBU: GET /api/fibu/rechnungen/vk - ENHANCED (Dynamic Dates)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/fibu/rechnungen/vk/route.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "ENHANCEMENT: Dynamische Datumsbereiche statt hardcoded Oktober. Standard: Letztes Jahr bis heute. Limit erhöht auf 10,000 Rechnungen."
+      - working: true
+        agent: "main"
+        comment: "✅ Getestet und funktioniert mit dynamischen Datumsbereichen"
+  
+  - task: "FIBU: GET /api/fibu/rechnungen/extern - NEW (Externe Amazon-Rechnungen)"
+    implemented: true
+    working: true
+    file: "/app/app/api/fibu/rechnungen/extern/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ NEUE API: Externe Rechnungen aus Rechnung.tExternerBeleg laden (XRE-XXXXX Amazon VCS-Lite). Oktober 2025: 1.140 externe Rechnungen erfolgreich geladen. Diese waren bisher komplett fehlend! Query fetcht kExternerBeleg, cBelegnr, dBelegdatumUtc, nBelegtyp, cHerkunft (VCS-Lite/VCS/IDU), kKunde, cRAName (Kunde), kZahlungsart, fVkBrutto, fVkNetto aus Rechnung.tExternerBeleg + Rechnung.tExternerBelegEckdaten. MongoDB Collection: fibu_externe_rechnungen. Test erfolgreich: GET /api/fibu/rechnungen/extern?from=2025-10-01&to=2025-10-31 → 100 Rechnungen mit korrekten Daten (Brutto, Netto, MwSt berechnet)."
+  
+  - task: "FIBU: GET /api/fibu/gutschriften - NEW (Gutschriften/Rechnungskorrekturen)"
+    implemented: true
+    working: true
+    file: "/app/app/api/fibu/gutschriften/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ NEUE API: Gutschriften aus dbo.tgutschrift laden (GU2025-XXXXX). Oktober 2025: 26 Gutschriften geladen. Query fetcht kGutschrift, cGutschriftNr, dErstellt, kRechnung (Verknüpfung zur Originalrechnung!), kKunde, fPreis (Brutto), fMwSt, cWaehrung, cStatus, nStorno. Beträge werden negativ gespeichert (Gutschrift = negative Rechnung). MongoDB Collection: fibu_gutschriften. Test erfolgreich: GET /api/fibu/gutschriften?from=2025-10-01&to=2025-10-31 → 26 Gutschriften mit originalRechnungNr Verknüpfung."
+  
+  - task: "FIBU: GET /api/fibu/uebersicht/nicht-zugeordnet - NEW (Übersicht Nicht-Zugeordnet)"
+    implemented: true
+    working: true
+    file: "/app/app/api/fibu/uebersicht/nicht-zugeordnet/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ NEUE API: Übersichts-Dashboard für nicht zugeordnete Zahlungen und offene Rechnungen. Fetcht aus MongoDB Collections: fibu_zahlungen (istZugeordnet: false), fibu_rechnungen_vk (status != 'Bezahlt'), fibu_externe_rechnungen (alle). Liefert Statistiken mit Anzahl und Gesamtbeträgen. Oktober 2025 Test: 100 nicht zugeordnete Zahlungen (-483.24 EUR), 100 externe Rechnungen (6.133,85 EUR). Zeigt Top 20 pro Kategorie. Test erfolgreich: GET /api/fibu/uebersicht/nicht-zugeordnet?from=2025-10-01&to=2025-10-31"
 
 agent_communication:
   - agent: "main"
