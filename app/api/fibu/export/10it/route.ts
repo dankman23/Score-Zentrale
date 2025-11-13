@@ -266,8 +266,9 @@ export async function GET(request: NextRequest) {
     // Generiere CSV
     const csv = generate10itCSV(bookings)
     
-    // Dateiname
-    const filename = `Export_Konten_von_${from}_bis_${to}.csv`
+    // Dateiname mit Export-Typ
+    const typeLabel = type === 'vk' ? 'VK' : type === 'ek' ? 'EK' : 'Alle'
+    const filename = `Export_${typeLabel}_von_${from}_bis_${to}.csv`
     
     return new Response(csv, {
       headers: {
