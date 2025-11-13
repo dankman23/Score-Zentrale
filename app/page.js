@@ -1734,31 +1734,9 @@ export default function App() {
         <div>
           <div className="d-flex align-items-center justify-content-between mb-4">
             <div>
-              <h2 className="mb-1"><i className="bi bi-send mr-2"/>Outbound</h2>
-              <p className="text-muted small mb-0">Kaltakquise & Warmakquise</p>
+              <h2 className="mb-1"><i className="bi bi-list-ul mr-2"/>Prospect Management</h2>
+              <p className="text-muted small mb-0">Lead-Verwaltung und Qualifizierung</p>
             </div>
-          </div>
-          
-          {/* Sub-Navigation */}
-          <div className="btn-group mb-4 w-100" role="group">
-            <button 
-              className={`btn ${activeTab==='outbound' && (!window.location.hash.includes('kalt') && !window.location.hash.includes('warm')) ? 'btn-primary' : 'btn-outline-primary'}`}
-              onClick={()=>window.location.hash='outbound'}
-            >
-              Prospect Management
-            </button>
-            <button 
-              className={`btn ${window.location.hash.includes('kaltakquise') ? 'btn-primary' : 'btn-outline-primary'}`}
-              onClick={()=>window.location.hash='kaltakquise'}
-            >
-              <i className="bi bi-search mr-1"/>Kaltakquise
-            </button>
-            <button 
-              className={`btn ${window.location.hash.includes('warmakquise') ? 'btn-primary' : 'btn-outline-primary'}`}
-              onClick={()=>window.location.hash='warmakquise'}
-            >
-              <i className="bi bi-people mr-1"/>Warmakquise
-            </button>
           </div>
           
           <div className="row">
