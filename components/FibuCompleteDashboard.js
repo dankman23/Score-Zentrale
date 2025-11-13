@@ -464,6 +464,11 @@ export default function FibuCompleteDashboard() {
           </div>
         )}
 
+        {/* Fuzzy Matching Tab */}
+        {activeTab === 'fuzzy-matching' && (
+          <FuzzyMatchingView />
+        )}
+
         {/* Zahlungen Tab */}
         {activeTab === 'zahlungen' && (
           <ZahlungenView />
