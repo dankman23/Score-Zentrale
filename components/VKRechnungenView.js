@@ -304,6 +304,22 @@ export default function VKRechnungenView() {
           </table>
         </div>
         
+        {filteredRechnungen.length === 0 && rechnungen.length > 0 && (
+          <div className="text-center py-12 text-gray-400">
+            <p>Keine Rechnungen gefunden, die den Filterkriterien entsprechen.</p>
+            <button
+              onClick={() => {
+                setStatusFilter('alle')
+                setQuelleFilter('alle')
+                setSearchTerm('')
+              }}
+              className="mt-4 text-blue-400 underline"
+            >
+              Filter zurücksetzen
+            </button>
+          </div>
+        )}
+        
         {rechnungen.length === 0 && (
           <div className="text-center py-12 text-gray-400">
             <p>Keine Rechnungen im gewählten Zeitraum gefunden.</p>
