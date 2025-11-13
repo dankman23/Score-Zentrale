@@ -35,6 +35,12 @@ export default function EKRechnungenManager() {
       const kredRes = await fetch('/api/fibu/kreditoren?limit=500')
       const kredData = await kredRes.json()
       
+      console.log('Loaded data:', { 
+        pdfs: pdfData.emails?.length || 0, 
+        ek: ekData.rechnungen?.length || 0,
+        kreditoren: kredData.kreditoren?.length || 0 
+      })
+      
       setPdfs(pdfData.emails || [])
       setEkRechnungen(ekData.rechnungen || [])
       setKreditoren(kredData.kreditoren || [])
