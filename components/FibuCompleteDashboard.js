@@ -454,6 +454,11 @@ export default function FibuCompleteDashboard() {
         )}
       </div>
 
+      {/* Zahlungseinstellungen Tab */}
+      {activeTab === 'zahlungseinstellungen' && (
+        <ZahlungsEinstellungen />
+      )}
+
       {/* Export Dialog */}
       {showExportDialog && (
         <ExportDialog 
