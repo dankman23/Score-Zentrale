@@ -87,52 +87,38 @@ export async function GET(request: NextRequest) {
     // Kategorisiere Zahlungen
     const zahlungStats = {
       total: zahlungen.length,
-      positiv: zahlungen.filter(z => z.fBetrag > 0).length,
-      negativ: zahlungen.filter(z => z.fBetrag < 0).length,
-      positiverBetrag: zahlungen.filter(z => z.fBetrag > 0).reduce((sum, z) => sum + z.fBetrag, 0),
-      negativerBetrag: zahlungen.filter(z => z.fBetrag < 0).reduce((sum, z) => sum + z.fBetrag, 0)
+      positiv: zahlungen.filter((z: any) => z.betrag > 0).length,
+      negativ: zahlungen.filter((z: any) => z.betrag < 0).length,
+      positiverBetrag: zahlungen.filter((z: any) => z.betrag > 0).reduce((sum: number, z: any) => sum + z.betrag, 0),
+      negativerBetrag: zahlungen.filter((z: any) => z.betrag < 0).reduce((sum: number, z: any) => sum + z.betrag, 0)
     }
     
     // Nach Zahlungsanbieter gruppieren
     const byAnbieter: any = {}
-    zahlungen.forEach(z => {
-      const anbieter = z.cZahlungsanbieter || 'Unbekannt'
+    zahlungen.forEach((z: any) => {
+      const anbieter = z.zahlungsanbieter || 'Unbekannt'
       if (!byAnbieter[anbieter]) {
         byAnbieter[anbieter] = { count: 0, betrag: 0 }
       }
       byAnbieter[anbieter].count++
-      byAnbieter[anbieter].betrag += z.fBetrag
+      byAnbieter[anbieter].betrag += z.betrag
     })
     
     zahlungStats.byAnbieter = byAnbieter
     
     // ========================================
-    // 5. GUTSCHRIFTEN
+    // 5. GUTSCHRIFTEN - verwende API
     // ========================================
-    const gutschriftenQuery = `
-      SELECT 
-        kRechnung,
-        cRechnungNr,
-        dErstellt,
-        fGesamtsumme,
-        cFirma
-      FROM dbo.tRechnung
-      WHERE dErstellt >= @from
-        AND dErstellt <= @to
-        AND cType = 'Gutschrift'
-      ORDER BY dErstellt DESC
-    `
-    
-    const gutschriftenResult = await mssqlPool.request()
-      .input('from', from)
-      .input('to', to + ' 23:59:59')
-      .query(gutschriftenQuery)
-    
-    const gutschriften = gutschriftenResult.recordset
+    const gutschriftenResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/fibu/gutschriften?from=${from}&to=${to}`,
+      { cache: 'no-store' }
+    )
+    const gutschriftenData = await gutschriftenResponse.json()
+    const gutschriften = gutschriftenData.gutschriften || []
     
     const gutschriftStats = {
       total: gutschriften.length,
-      gesamtBetrag: gutschriften.reduce((sum, g) => sum + (g.fGesamtsumme || 0), 0)
+      gesamtBetrag: gutschriften.reduce((sum: number, g: any) => sum + (g.betrag || 0), 0)
     }
     
     // ========================================
