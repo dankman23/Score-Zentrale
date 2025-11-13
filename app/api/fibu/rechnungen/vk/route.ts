@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     
     console.log('[VK-Rechnungen] Lade ALLE Rechnungen von', from, 'bis', to)
     
-    const pool = await getSqlConnection()
+    const pool = await getMssqlPool()
     
     const result = await pool.request()
       .input('from', from)
