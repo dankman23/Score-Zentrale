@@ -6,7 +6,12 @@
 
 const { MongoClient } = require('mongodb');
 const { PDFParse } = require('pdf-parse');
-const pdfParse = PDFParse;
+
+// Wrapper-Funktion für PDFParse
+async function pdfParse(buffer) {
+  const parser = new PDFParse();
+  return parser.parse(buffer);
+}
 const fs = require('fs');
 
 // Lade ENV manuell
