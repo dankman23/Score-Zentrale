@@ -51,6 +51,14 @@ Zahlungen sind ebenfalls in **ZWEI Quellen** gespeichert:
   - Status: ✅ Funktioniert - Oktober 2025: 26 Gutschriften
   - Test: `GET /api/fibu/gutschriften?from=2025-10-01&to=2025-10-31`
 
+### ✅ POSTBANK-INTEGRATION (IMPLEMENTIERT):
+- **`POST /api/fibu/bank-import`** - CSV-Upload für Banktransaktionen
+- **`GET /api/fibu/bank-import`** - Liste importierte Transaktionen
+- **Unterstützte Formate:** Postbank, Commerzbank, generisches CSV
+- **Auto-Matching:** Erkennt Rechnungs-/Bestellnummern im Verwendungszweck
+- **MongoDB Collection:** `fibu_bank_transaktionen`
+- **Test erfolgreich:** 3 Postbank-Transaktionen importiert mit Matching
+
 ### ❌ Fehlt noch
 - **Zuordnung** zwischen externen Rechnungen und Zahlungen
 - **Integration** der externen Rechnungen in 10it Export
