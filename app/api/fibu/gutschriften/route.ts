@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
       kRechnung: g.kRechnung,
       originalRechnungNr: g.cRechnungsNr || '',
       kKunde: g.kKunde,
-      kundenName: g.cFirma || `${g.cVorname || ''} ${g.cNachname || ''}`.trim() || 'Unbekannt',
+      kundenName: g.cFirma || 'Unbekannt',
       kundenLand: 'DE',
       brutto: -1 * parseFloat(g.fPreis || 0), // Negativ für Gutschrift
       mwst: -1 * parseFloat(g.fMwSt || 0),
