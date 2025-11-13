@@ -34,7 +34,6 @@ export async function GET(request: NextRequest) {
           r.cRechnungsNr,
           r.dErstellt,
           r.fGesamtsumme,
-          r.fWarensumme,
           r.tKunde_kKunde,
           CASE
             WHEN EXISTS (SELECT 1 FROM tZahlung z WHERE z.kRechnung = r.kRechnung) THEN 'Bezahlt'
@@ -54,7 +53,6 @@ export async function GET(request: NextRequest) {
       datum: r.dErstellt,
       kunde: `Kunde #${r.tKunde_kKunde || 'Unbekannt'}`,
       betrag: r.fGesamtsumme,
-      warenwert: r.fWarensumme,
       status: r.status
     }))
     
