@@ -234,21 +234,21 @@ export default function VKRechnungenView() {
         <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
           <div className="text-gray-400 text-sm">Bezahlt</div>
           <div className="text-2xl font-bold text-green-500 mt-1">
-            {rechnungen.filter(r => r.status === 'Bezahlt').length}
+            {filteredRechnungen.filter(r => r.status === 'Bezahlt').length}
           </div>
         </div>
         
         <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
           <div className="text-gray-400 text-sm">Offen</div>
           <div className="text-2xl font-bold text-orange-500 mt-1">
-            {rechnungen.filter(r => r.status !== 'Bezahlt').length}
+            {filteredRechnungen.filter(r => r.status !== 'Bezahlt').length}
           </div>
         </div>
         
         <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-          <div className="text-gray-400 text-sm">Gesamtsumme</div>
+          <div className="text-gray-400 text-sm">Summe (gefiltert)</div>
           <div className="text-2xl font-bold text-white mt-1">
-            {rechnungen.reduce((sum, r) => sum + (r.betrag || 0), 0).toFixed(2)}€
+            {filteredRechnungen.reduce((sum, r) => sum + (r.betrag || 0), 0).toFixed(2)}€
           </div>
         </div>
       </div>
