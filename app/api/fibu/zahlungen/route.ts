@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
       .input('to', to)
       .query(query)
     
-    const zahlungen = result.recordset.map((z: any) => ({
+    let zahlungen = result.recordset.map((z: any) => ({
       quelle: z.quelle,
       zahlungsId: z.zahlungsId,
       kRechnung: z.kRechnung,
