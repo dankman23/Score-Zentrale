@@ -42,16 +42,49 @@ export default function VKRechnungenView() {
     setLoading(false)
   }
 
+  const [statusFilter, setStatusFilter] = useState('alle')
+  const [quelleFilter, setQuelleFilter] = useState('alle')
+  const [searchTerm, setSearchTerm] = useState('')
+
   function formatDate(dateStr) {
     if (!dateStr) return 'N/A'
     try {
       const d = new Date(dateStr)
       if (isNaN(d.getTime())) return 'N/A'
-      return d.toLocaleDateString('de-DE')
+      const day = d.getDate().toString().padStart(2, '0')
+      const month = (d.getMonth() + 1).toString().padStart(2, '0')
+      const year = d.getFullYear()
+      return `${day}.${month}.${year}`
     } catch {
       return 'N/A'
     }
   }
+
+  const filteredRechnungen = rechnungen.filter(r => {
+    // Status Filter
+    if (statusFilter !== 'alle') {
+      if (statusFilter === 'bezahlt' && r.status !== 'Bezahlt') return false
+      if (statusFilter === 'offen' && r.status === 'Bezahlt') return false
+    }
+    
+    // Quelle Filter
+    if (quelleFilter !== 'alle') {
+      if (quelleFilter === 'jtl' && r.quelle !== 'JTL') return false
+      if (quelleFilter === 'extern' && r.quelle === 'JTL') return false
+    }
+    
+    // Such-Filter
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase()
+      return (
+        r.rechnungsNr?.toLowerCase().includes(search) ||
+        r.kunde?.toLowerCase().includes(search) ||
+        r.zahlungsart?.toLowerCase().includes(search)
+      )
+    }
+    
+    return true
+  })
 
   if (loading) {
     return (
