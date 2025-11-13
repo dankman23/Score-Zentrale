@@ -174,35 +174,86 @@ export default function KontenplanView() {
         {activeTab === 'debitoren' && (
           <div className="p-6">
             <div className="space-y-4">
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-bold text-gray-900 mb-2">Bereich 10000-19999: Debitoren (Kunden)</h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  Forderungen aus Lieferungen und Leistungen
+              
+              {/* IGL-Debitoren */}
+              <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                <h3 className="font-bold text-green-900 mb-2">📊 Bereich 10000-19999: IGL-Debitoren (EU mit USt-ID)</h3>
+                <p className="text-sm text-green-800 mb-3">
+                  <strong>IGL = Innergemeinschaftliche Lieferung</strong><br/>
+                  EU-Kunden mit USt-ID brauchen eigenen Debitor für USt-ID-Hinterlegung (steuerlich vorgeschrieben!)
                 </p>
-                <table className="min-w-full">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-2 text-sm font-medium text-gray-500">Konto</th>
-                      <th className="text-left py-2 text-sm font-medium text-gray-500">Bezeichnung</th>
-                      <th className="text-left py-2 text-sm font-medium text-gray-500">Beispiel</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {kontenplan.debitoren.map((deb, idx) => (
-                      <tr key={idx} className="border-b border-gray-100">
-                        <td className="py-2 text-sm font-medium text-blue-600">{deb.konto || deb.bereich}</td>
-                        <td className="py-2 text-sm text-gray-900">{deb.bezeichnung}</td>
-                        <td className="py-2 text-sm text-gray-600">{deb.beispiel || deb.beschreibung}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className="bg-white rounded p-3">
+                  <table className="min-w-full text-sm">
+                    <tbody>
+                      {kontenplan.debitoren.filter(d => d.bereich === '10000-19999' || (d.konto && d.konto >= '10000' && d.konto < '20000')).map((deb, idx) => (
+                        <tr key={idx} className="border-b border-gray-100">
+                          <td className="py-2 font-medium text-green-700">{deb.konto || deb.bereich}</td>
+                          <td className="py-2 text-gray-900">{deb.bezeichnung}</td>
+                          <td className="py-2 text-gray-600">{deb.beispiel || deb.beschreibung}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
               
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
-                  💡 <strong>Automatisch:</strong> VK-Rechnungen aus JTL werden automatisch Debitoren-Konten zugeordnet.
-                  Marketplace-Kunden (Amazon, eBay, Otto) laufen über Sammelkonten (z.B. 99012594).
+              {/* Sammelkonten */}
+              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                <h3 className="font-bold text-blue-900 mb-2">📊 Bereich 69000-69999: Sammelkonten nach Zahlungsart</h3>
+                <p className="text-sm text-blue-800 mb-3">
+                  <strong>STANDARD:</strong> Alle Normal-Kunden werden nach Zahlungsart in Sammelkonten gruppiert (vereinfacht die Buchhaltung)
+                </p>
+                <div className="bg-white rounded p-3 max-h-96 overflow-y-auto">
+                  <table className="min-w-full text-sm">
+                    <thead className="sticky top-0 bg-white">
+                      <tr className="border-b-2 border-blue-200">
+                        <th className="text-left py-2 font-medium text-gray-700">Konto</th>
+                        <th className="text-left py-2 font-medium text-gray-700">Bezeichnung</th>
+                        <th className="text-left py-2 font-medium text-gray-700">Zahlungsart</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {kontenplan.debitoren.filter(d => d.konto && d.konto >= '69000' && d.konto < '70000').map((deb, idx) => (
+                        <tr key={idx} className="border-b border-gray-100 hover:bg-blue-50">
+                          <td className="py-2 font-medium text-blue-700">{deb.konto}</td>
+                          <td className="py-2 text-gray-900">{deb.bezeichnung}</td>
+                          <td className="py-2">
+                            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                              {deb.zahlungsart}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              
+              {/* Marketplace Sammelkonto */}
+              <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                <h3 className="font-bold text-purple-900 mb-2">📊 Marketplace Sammelkonto</h3>
+                <div className="bg-white rounded p-3">
+                  <table className="min-w-full text-sm">
+                    <tbody>
+                      {kontenplan.debitoren.filter(d => d.konto === '99012594').map((deb, idx) => (
+                        <tr key={idx}>
+                          <td className="py-2 font-medium text-purple-700">{deb.konto}</td>
+                          <td className="py-2 text-gray-900">{deb.bezeichnung}</td>
+                          <td className="py-2 text-gray-600">{deb.beispiel}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              
+              {/* Hinweis */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-sm text-yellow-900">
+                  <strong>ℹ️ Automatische Zuordnung:</strong><br/>
+                  • <strong>IGL-Kunden</strong> (EU + USt-ID + MwSt=0%) → Eigener Debitor (10xxx)<br/>
+                  • <strong>Alle anderen</strong> → Sammelkonto nach Zahlungsart (69xxx)<br/>
+                  • <strong>Script:</strong> <code className="bg-yellow-100 px-1 rounded">node scripts/apply-debitor-regeln.js</code>
                 </p>
               </div>
             </div>
