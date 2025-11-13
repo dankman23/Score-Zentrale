@@ -450,7 +450,11 @@ export default function FibuCompleteDashboard() {
 
         {/* Kontenplan Tab */}
         {activeTab === 'kontenplan' && (
-          <KontenplanView />
+          <div className="space-y-6">
+            <KontenplanView />
+            <div className="border-t-2 border-gray-200 my-8"></div>
+            <ZahlungsEinstellungen />
+          </div>
         )}
 
         {/* Zahlungen Tab */}
