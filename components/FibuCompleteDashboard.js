@@ -1,12 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import KreditorZuordnung from './KreditorZuordnung'
+import ExportDialog from './ExportDialog'
 
 export default function FibuCompleteDashboard() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState('2025-10-01_2025-11-30')
   const [activeTab, setActiveTab] = useState('overview')
+  const [showExportDialog, setShowExportDialog] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -80,6 +83,12 @@ export default function FibuCompleteDashboard() {
                 <option value="2025-10-01_2025-11-30">Okt + Nov 2025</option>
               </select>
               <button
+                onClick={() => setShowExportDialog(true)}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium flex items-center gap-2"
+              >
+                📥 Export
+              </button>
+              <button
                 onClick={loadData}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium"
               >
@@ -109,6 +118,21 @@ export default function FibuCompleteDashboard() {
               }`}
             >
               📥 EK-Rechnungen
+            </button>
+            <button
+              onClick={() => setActiveTab('zuordnung')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition relative ${
+                activeTab === 'zuordnung'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              🔗 Kreditor-Zuordnung
+              {issues.ekOhneKreditor > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {issues.ekOhneKreditor}
+                </span>
+              )}
             </button>
             <button
               onClick={() => setActiveTab('vk')}
@@ -159,9 +183,10 @@ export default function FibuCompleteDashboard() {
                         </div>
                       )}
                       {issues.ekOhneKreditor > 0 && (
-                        <div className="bg-white rounded-lg p-3 border border-red-200">
+                        <div className="bg-white rounded-lg p-3 border border-red-200 cursor-pointer hover:bg-red-50" onClick={() => setActiveTab('zuordnung')}>
                           <div className="text-2xl font-bold text-red-600">{issues.ekOhneKreditor}</div>
                           <div className="text-xs text-red-700">EK ohne Kreditor</div>
+                          <div className="text-xs text-blue-600 mt-1">→ Jetzt zuordnen</div>
                         </div>
                       )}
                       {issues.zahlungenNegativOhneZuordnung > 0 && (
@@ -331,7 +356,15 @@ export default function FibuCompleteDashboard() {
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">📥 EK-Rechnungen ohne Kreditor ({details.ekOhneKreditor.length})</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-gray-900">📥 EK-Rechnungen ohne Kreditor ({details.ekOhneKreditor.length})</h3>
+                <button
+                  onClick={() => setActiveTab('zuordnung')}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium"
+                >
+                  → Zur Zuordnung
+                </button>
+              </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -340,7 +373,6 @@ export default function FibuCompleteDashboard() {
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">RgNr</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Betrag</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aktion</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -352,9 +384,6 @@ export default function FibuCompleteDashboard() {
                         <td className="px-4 py-3 text-sm text-gray-600">
                           {new Date(rechnung.datum).toLocaleDateString('de-DE')}
                         </td>
-                        <td className="px-4 py-3 text-sm">
-                          <button className="text-blue-600 hover:text-blue-800">Kreditor zuordnen</button>
-                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -362,6 +391,11 @@ export default function FibuCompleteDashboard() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Zuordnung Tab */}
+        {activeTab === 'zuordnung' && (
+          <KreditorZuordnung onUpdate={loadData} />
         )}
 
         {/* VK Tab */}
@@ -452,6 +486,14 @@ export default function FibuCompleteDashboard() {
           </div>
         )}
       </div>
+
+      {/* Export Dialog */}
+      {showExportDialog && (
+        <ExportDialog 
+          onClose={() => setShowExportDialog(false)}
+          period={selectedPeriod}
+        />
+      )}
     </div>
   )
 }
