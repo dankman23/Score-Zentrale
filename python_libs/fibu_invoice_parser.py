@@ -124,12 +124,12 @@ def parse_invoice_from_base64(pdf_base64: str, filename: str = "") -> dict:
                 }
             
             # 4. Extrahiere Rechnungsdaten
-            # DataFrame hat Spalten: siehe INVOICE_COLUMNS
+            # DataFrame hat Spalten mit deutschen Namen
             first_row = df.iloc[0]
             
-            lieferant = first_row['lieferant'] if 'lieferant' in df.columns else firma_key
-            rechnungsnummer = identifier or first_row.get('fremdbelegnummer_eingangsrechnung', 'Unbekannt')
-            datum_str = first_row.get('belegdatum', '')
+            lieferant = first_row.get('Lieferant', firma_key)
+            rechnungsnummer = identifier or first_row.get('Fremdbelegnummer (Eingangsrechnung)', 'Unbekannt')
+            datum_str = first_row.get('Belegdatum', '')
             
             # Parse Datum
             try:
