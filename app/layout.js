@@ -73,7 +73,16 @@ export default function RootLayout({ children }) {
                   <li className="nav-item"><a className="nav-link" href="#sales"><i className="bi bi-bar-chart"/>Sales</a></li>
                   <li className="nav-item"><a className="nav-link" href="#marketing"><i className="bi bi-bullseye"/>Marketing</a></li>
                   <li className="nav-item"><a className="nav-link" href="#glossar"><i className="bi bi-book"/>Glossar</a></li>
-                  <li className="nav-item"><a className="nav-link" href="#outbound"><i className="bi bi-send"/>Outbound</a></li>
+                  <li className="nav-item dropdown">
+                    <a className="nav-link dropdown-toggle" href="#outbound" role="button" data-toggle="dropdown">
+                      <i className="bi bi-send"/>Outbound
+                    </a>
+                    <div className="dropdown-menu">
+                      <a className="dropdown-item" href="#outbound">Prospect Management</a>
+                      <a className="dropdown-item" href="#kaltakquise">Kaltakquise</a>
+                      <a className="dropdown-item" href="#warmakquise">Warmakquise</a>
+                    </div>
+                  </li>
                   <li className="nav-item"><a className="nav-link" href="#produkte"><i className="bi bi-box-seam"/>Produkte</a></li>
                   <li className="nav-item"><a className="nav-link" href="#preise"><i className="bi bi-calculator"/>Preise</a></li>
                   <li className="nav-item"><a className="nav-link" href="#fibu"><i className="bi bi-receipt-cutoff"/>FIBU</a></li>
