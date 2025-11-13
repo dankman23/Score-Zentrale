@@ -6,6 +6,7 @@ import ExportDialog from './ExportDialog'
 import BankImport from './BankImport'
 import KontenplanView from './KontenplanView'
 import VKRechnungenView from './VKRechnungenView'
+import ZahlungenView from './ZahlungenView'
 
 export default function FibuCompleteDashboard() {
   const [data, setData] = useState(null)
