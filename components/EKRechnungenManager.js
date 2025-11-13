@@ -14,7 +14,9 @@ export default function EKRechnungenManager() {
   const [kreditoren, setKreditoren] = useState([])
   const [loading, setLoading] = useState(false)
   const [stats, setStats] = useState(null)
+  const [detailedStats, setDetailedStats] = useState(null)
   const [filter, setFilter] = useState('all') // all, pending, processed, matched, unmatched
+  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     loadData()
