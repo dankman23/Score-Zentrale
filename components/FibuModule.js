@@ -678,7 +678,13 @@ export default function FibuModule() {
             className={`btn ${tab === 'ek' ? 'btn-primary' : 'btn-outline-secondary'}`}
             onClick={() => setTab('ek')}
           >
-            <i className="bi bi-file-earmark-arrow-down mr-1"/>EK-Rechnungen
+            <i className="bi bi-file-earmark-arrow-down mr-1"/>EK-Upload
+          </button>
+          <button 
+            className={`btn ${tab === 'ek-manager' ? 'btn-primary' : 'btn-outline-secondary'}`}
+            onClick={() => setTab('ek-manager')}
+          >
+            <i className="bi bi-list-check mr-1"/>EK-Manager
           </button>
           <button 
             className={`btn ${tab === 'inbox' ? 'btn-primary' : 'btn-outline-secondary'}`}
