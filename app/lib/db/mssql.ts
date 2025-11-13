@@ -58,3 +58,6 @@ export async function getMssqlPool(): Promise<MssqlPool> {
   
   throw new Error('MSSQL connection failed after retries')
 }
+
+// Alias für JTL-spezifische Verwendung
+export const getJTLConnection = getMssqlPool
