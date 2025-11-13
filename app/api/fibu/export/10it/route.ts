@@ -95,13 +95,16 @@ export async function GET(request: NextRequest) {
     // ========================================
     // 2. VK-ZAHLUNGEN (Zahlungseingänge)
     // ========================================
-    const zahlungenCol = db.collection('fibu_zahlungen')
-    const zahlungen = await zahlungenCol.find({
-      zahlungsdatum: {
-        $gte: startDate,
-        $lt: endDate
-      }
-    }).toArray()
+    let zahlungen: any[] = []
+    if (type === 'alle' || type === 'vk') {
+      const zahlungenCol = db.collection('fibu_zahlungen')
+      zahlungen = await zahlungenCol.find({
+        zahlungsdatum: {
+          $gte: startDate,
+          $lt: endDate
+        }
+      }).toArray()
+    }
     
     for (const zahlung of zahlungen) {
       const betrag = zahlung.betrag || 0
