@@ -1,201 +1,124 @@
 export const runtime = 'nodejs'
-export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '../../../lib/db/mongodb'
-import { getKontenklasse, getKontenklasseName } from '../../../lib/kontenplan-utils'
+
+/**
+ * Vollständiger Kontenplan für die Buchhaltung
+ * Basierend auf deutschem Standard (ähnlich SKR03/SKR04)
+ */
+const STANDARD_KONTENPLAN = {
+  sachkonten: [
+    // ERLÖSKONTEN (4xxx)
+    { konto: '4100', bezeichnung: 'Erlöse ohne USt (steuerfrei)', typ: 'Erlöse', kategorie: 'Inland' },
+    { konto: '4120', bezeichnung: 'Erlöse Drittland steuerfrei', typ: 'Erlöse', kategorie: 'Export' },
+    { konto: '4125', bezeichnung: 'Erlöse EU steuerfrei (IGL mit UstID)', typ: 'Erlöse', kategorie: 'EU' },
+    { konto: '4300', bezeichnung: 'Erlöse 7% USt', typ: 'Erlöse', kategorie: 'Inland' },
+    { konto: '4310', bezeichnung: 'Erlöse 7% USt EU', typ: 'Erlöse', kategorie: 'EU' },
+    { konto: '4315', bezeichnung: 'Erlöse 19% USt EU', typ: 'Erlöse', kategorie: 'EU' },
+    { konto: '4320', bezeichnung: 'Erlöse 19% USt EU (Reverse Charge)', typ: 'Erlöse', kategorie: 'EU' },
+    { konto: '4340', bezeichnung: 'Erlöse sonstige USt Inland', typ: 'Erlöse', kategorie: 'Inland' },
+    { konto: '4400', bezeichnung: 'Erlöse 19% USt', typ: 'Erlöse', kategorie: 'Inland' },
+    
+    // WARENEINKAUF (5xxx)
+    { konto: '5000', bezeichnung: 'Wareneinkauf 19% VSt', typ: 'Aufwand', kategorie: 'Wareneinkauf' },
+    { konto: '5200', bezeichnung: 'Wareneinkauf Schleifwerkzeuge 19% VSt', typ: 'Aufwand', kategorie: 'Wareneinkauf' },
+    { konto: '5400', bezeichnung: 'Wareneinkauf 7% VSt', typ: 'Aufwand', kategorie: 'Wareneinkauf' },
+    
+    // BETRIEBSKOSTEN (6xxx)
+    { konto: '6000', bezeichnung: 'Löhne und Gehälter', typ: 'Aufwand', kategorie: 'Personal' },
+    { konto: '6020', bezeichnung: 'Sozialabgaben', typ: 'Aufwand', kategorie: 'Personal' },
+    { konto: '6100', bezeichnung: 'Mieten und Pachten', typ: 'Aufwand', kategorie: 'Raumkosten' },
+    { konto: '6200', bezeichnung: 'Versicherungen', typ: 'Aufwand', kategorie: 'Versicherung' },
+    { konto: '6300', bezeichnung: 'Versand-/Frachtkosten 19% VSt', typ: 'Aufwand', kategorie: 'Versand' },
+    { konto: '6310', bezeichnung: 'Versand-/Frachtkosten 7% VSt', typ: 'Aufwand', kategorie: 'Versand' },
+    { konto: '6320', bezeichnung: 'Verpackungsmaterial', typ: 'Aufwand', kategorie: 'Versand' },
+    { konto: '6400', bezeichnung: 'Werbekosten', typ: 'Aufwand', kategorie: 'Marketing' },
+    { konto: '6500', bezeichnung: 'Kfz-Kosten', typ: 'Aufwand', kategorie: 'Fahrzeug' },
+    { konto: '6510', bezeichnung: 'Bürobedarf', typ: 'Aufwand', kategorie: 'Büro' },
+    { konto: '6520', bezeichnung: 'Telefon/Internet', typ: 'Aufwand', kategorie: 'Büro' },
+    { konto: '6530', bezeichnung: 'Porto', typ: 'Aufwand', kategorie: 'Büro' },
+    { konto: '6540', bezeichnung: 'Raumausstattung', typ: 'Aufwand', kategorie: 'Büro' },
+    { konto: '6600', bezeichnung: 'Marketing/Online-Werbung', typ: 'Aufwand', kategorie: 'Marketing' },
+    { konto: '6610', bezeichnung: 'Reisekosten', typ: 'Aufwand', kategorie: 'Reise' },
+    { konto: '6620', bezeichnung: 'Fortbildung', typ: 'Aufwand', kategorie: 'Personal' },
+    { konto: '6640', bezeichnung: 'Software/Lizenzen', typ: 'Aufwand', kategorie: 'IT' },
+    { konto: '6650', bezeichnung: 'Lagerkosten', typ: 'Aufwand', kategorie: 'Lager' },
+    { konto: '6700', bezeichnung: 'Zinsen und ähnliche Aufwendungen', typ: 'Aufwand', kategorie: 'Finanzen' },
+    { konto: '6800', bezeichnung: 'Sonstige betriebliche Aufwendungen', typ: 'Aufwand', kategorie: 'Sonstiges' },
+    { konto: '6805', bezeichnung: 'Versicherungen', typ: 'Aufwand', kategorie: 'Versicherung' },
+    { konto: '6815', bezeichnung: 'Rechts- und Beratungskosten', typ: 'Aufwand', kategorie: 'Beratung' },
+    { konto: '6820', bezeichnung: 'Buchführung/Jahresabschluss', typ: 'Aufwand', kategorie: 'Beratung' },
+    { konto: '6823', bezeichnung: 'Buchführungskosten', typ: 'Aufwand', kategorie: 'Beratung' },
+    { konto: '6850', bezeichnung: 'Sonstige betriebliche Kosten', typ: 'Aufwand', kategorie: 'Sonstiges' },
+  ],
+  
+  debitoren: [
+    { bereich: '10000-19999', bezeichnung: 'Debitoren (Kunden)', beschreibung: 'Forderungen aus Lieferungen und Leistungen' },
+    { konto: '10000', bezeichnung: 'Standard-Debitor', beispiel: 'Amazon Kunde' },
+    { konto: '99012594', bezeichnung: 'Sammelkonto Marketplace Kunden', beispiel: 'Marketplace Sammelkonto' },
+  ],
+  
+  kreditoren: [
+    { bereich: '70000-79999', bezeichnung: 'Kreditoren (Lieferanten)', beschreibung: 'Verbindlichkeiten aus Lieferungen und Leistungen' },
+    { konto: '70000', bezeichnung: 'Standard-Kreditor', beispiel: 'Diverse Lieferanten' },
+  ],
+  
+  kasse_bank: [
+    { konto: '1000', bezeichnung: 'Kasse', typ: 'Kasse' },
+    { konto: '1200', bezeichnung: 'Bank', typ: 'Bank' },
+    { konto: '1201', bezeichnung: 'Commerzbank', typ: 'Bank' },
+    { konto: '1202', bezeichnung: 'Postbank', typ: 'Bank' },
+    { konto: '1800', bezeichnung: 'PayPal', typ: 'Zahlungsdienstleister' },
+    { konto: '1810', bezeichnung: 'Mollie', typ: 'Zahlungsdienstleister' },
+    { konto: '1820', bezeichnung: 'Amazon Pay', typ: 'Zahlungsdienstleister' },
+  ],
+  
+  steuer: [
+    { konto: '1570', bezeichnung: 'Abziehbare Vorsteuer 7%', typ: 'VSt' },
+    { konto: '1576', bezeichnung: 'Abziehbare Vorsteuer 19%', typ: 'VSt' },
+    { konto: '1780', bezeichnung: 'Umsatzsteuer 7%', typ: 'USt' },
+    { konto: '1776', bezeichnung: 'Umsatzsteuer 19%', typ: 'USt' },
+  ]
+}
 
 /**
  * GET /api/fibu/kontenplan
- * Lädt alle Konten (mit optionalen Query-Parametern für Filterung)
+ * Liefert den vollständigen Kontenplan
  */
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams
-    const search = searchParams.get('search')
-    const klasse = searchParams.get('klasse')
-    const limit = parseInt(searchParams.get('limit') || '1000', 10)
-    const skip = parseInt(searchParams.get('skip') || '0', 10)
-    
     const db = await getDb()
-    const collection = db.collection('fibu_konten')
     
-    // Build filter
-    const filter: any = {}
-    if (search) {
-      filter.$or = [
-        { konto: { $regex: search, $options: 'i' } },
-        { bezeichnung: { $regex: search, $options: 'i' } }
-      ]
-    }
-    if (klasse && klasse !== 'alle') {
-      filter.kontenklasse = parseInt(klasse, 10)
-    }
-    
-    // Count total
-    const total = await collection.countDocuments(filter)
-    
-    // Get konten with pagination
-    const konten = await collection
-      .find(filter)
-      .sort({ konto: 1 })
-      .skip(skip)
-      .limit(limit)
+    // Lade zusätzlich die echten Kreditoren aus der DB
+    const kreditoren = await db.collection('kreditoren')
+      .find({})
+      .sort({ kreditorenNummer: 1 })
       .toArray()
     
+    const kreditorenListe = kreditoren.map(k => ({
+      konto: k.kreditorenNummer,
+      bezeichnung: k.name,
+      standardKonto: k.standardAufwandskonto,
+      typ: 'Kreditor'
+    }))
+    
     return NextResponse.json({
       ok: true,
-      konten,
-      total,
-      limit,
-      skip
-    })
-  } catch (error: any) {
-    console.error('[Kontenplan GET] Error:', error)
-    return NextResponse.json(
-      { ok: false, error: error.message },
-      { status: 500 }
-    )
-  }
-}
-
-/**
- * POST /api/fibu/kontenplan
- * Erstellt oder aktualisiert ein Konto
- */
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
-    const { konto, bezeichnung, typ } = body
-    
-    if (!konto || !bezeichnung) {
-      return NextResponse.json(
-        { ok: false, error: 'Konto und Bezeichnung erforderlich' },
-        { status: 400 }
-      )
-    }
-    
-    // Automatische Kontenklassen-Erkennung
-    const kontenklasse = getKontenklasse(konto)
-    const kontenklasseName = getKontenklasseName(kontenklasse)
-    
-    const db = await getDb()
-    await db.collection('fibu_konten').updateOne(
-      { konto },
-      {
-        $set: {
-          konto,
-          bezeichnung,
-          kontenklasse,
-          kontenklasseName,
-          typ: typ || kontenklasseName,
-          updated_at: new Date()
-        },
-        $setOnInsert: {
-          created_at: new Date(),
-          aktiv: true
-        }
+      kontenplan: {
+        ...STANDARD_KONTENPLAN,
+        kreditoren_aktiv: kreditorenListe
       },
-      { upsert: true }
-    )
-    
-    return NextResponse.json({
-      ok: true,
-      message: 'Konto gespeichert'
-    })
-  } catch (error: any) {
-    console.error('[Kontenplan POST] Error:', error)
-    return NextResponse.json(
-      { ok: false, error: error.message },
-      { status: 500 }
-    )
-  }
-}
-
-/**
- * PUT /api/fibu/kontenplan
- * Aktualisiert ein bestehendes Konto
- */
-export async function PUT(request: NextRequest) {
-  try {
-    const body = await request.json()
-    const { oldKonto, konto, bezeichnung, typ } = body
-    
-    if (!oldKonto || !konto || !bezeichnung) {
-      return NextResponse.json(
-        { ok: false, error: 'Alte Kontonummer, neue Kontonummer und Bezeichnung erforderlich' },
-        { status: 400 }
-      )
-    }
-    
-    // Automatische Kontenklassen-Erkennung
-    const kontenklasse = getKontenklasse(konto)
-    const kontenklasseName = getKontenklasseName(kontenklasse)
-    
-    const db = await getDb()
-    
-    // Prüfen ob neues Konto bereits existiert (falls Kontonummer geändert wurde)
-    if (oldKonto !== konto) {
-      const existing = await db.collection('fibu_konten').findOne({ konto })
-      if (existing) {
-        return NextResponse.json(
-          { ok: false, error: 'Ein Konto mit dieser Nummer existiert bereits' },
-          { status: 400 }
-        )
+      info: {
+        sachkonten: STANDARD_KONTENPLAN.sachkonten.length,
+        kreditoren: kreditorenListe.length,
+        debitoren: STANDARD_KONTENPLAN.debitoren.length,
+        kasse_bank: STANDARD_KONTENPLAN.kasse_bank.length
       }
-    }
-    
-    // Altes Konto löschen, neues anlegen
-    await db.collection('fibu_konten').deleteOne({ konto: oldKonto })
-    await db.collection('fibu_konten').insertOne({
-      konto,
-      bezeichnung,
-      kontenklasse,
-      kontenklasseName,
-      typ: typ || kontenklasseName,
-      updated_at: new Date(),
-      created_at: new Date(),
-      aktiv: true
     })
     
-    return NextResponse.json({
-      ok: true,
-      message: 'Konto aktualisiert'
-    })
   } catch (error: any) {
-    console.error('[Kontenplan PUT] Error:', error)
-    return NextResponse.json(
-      { ok: false, error: error.message },
-      { status: 500 }
-    )
-  }
-}
-
-/**
- * DELETE /api/fibu/kontenplan
- * Löscht ein Konto
- */
-export async function DELETE(request: NextRequest) {
-  try {
-    const searchParams = request.nextUrl.searchParams
-    const konto = searchParams.get('konto')
-    
-    if (!konto) {
-      return NextResponse.json(
-        { ok: false, error: 'Kontonummer erforderlich' },
-        { status: 400 }
-      )
-    }
-    
-    const db = await getDb()
-    await db.collection('fibu_konten').deleteOne({ konto })
-    
-    return NextResponse.json({
-      ok: true,
-      message: 'Konto gelöscht'
-    })
-  } catch (error: any) {
-    console.error('[Kontenplan DELETE] Error:', error)
+    console.error('[Kontenplan API] Fehler:', error)
     return NextResponse.json(
       { ok: false, error: error.message },
       { status: 500 }
