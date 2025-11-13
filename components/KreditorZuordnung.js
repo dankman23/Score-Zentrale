@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from 'react'
 
-export default function KreditorZuordnung() {
+export default function KreditorZuordnung({ onUpdate }) {
   const [rechnungen, setRechnungen] = useState([])
   const [kreditoren, setKreditoren] = useState([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedItems, setSelectedItems] = useState(new Set())
+  const [showNewKreditorDialog, setShowNewKreditorDialog] = useState(false)
+  const [bulkKreditor, setBulkKreditor] = useState('')
 
   useEffect(() => {
     loadData()
@@ -53,20 +55,31 @@ export default function KreditorZuordnung() {
     return false
   }
 
-  async function bulkSave(kreditorNr) {
-    if (selectedItems.size === 0) return
+  async function bulkSave() {
+    if (selectedItems.size === 0 || !bulkKreditor) return
     
     setSaving(true)
     let success = 0
+    let failed = 0
     
     for (const id of selectedItems) {
-      const saved = await saveKreditor(id, kreditorNr)
+      const saved = await saveKreditor(id, bulkKreditor)
       if (saved) success++
+      else failed++
     }
     
     setSelectedItems(new Set())
+    setBulkKreditor('')
     setSaving(false)
-    alert(`${success} Rechnungen zugeordnet!`)
+    
+    if (failed > 0) {
+      alert(`${success} Rechnungen zugeordnet, ${failed} fehlgeschlagen!`)
+    } else {
+      alert(`✅ ${success} Rechnungen erfolgreich zugeordnet!`)
+    }
+    
+    // Trigger reload in parent
+    if (onUpdate) onUpdate()
   }
 
   function toggleSelection(id) {
@@ -79,6 +92,14 @@ export default function KreditorZuordnung() {
       }
       return newSet
     })
+  }
+
+  function selectAll() {
+    if (selectedItems.size === filteredRechnungen.length) {
+      setSelectedItems(new Set())
+    } else {
+      setSelectedItems(new Set(filteredRechnungen.map(r => r._id)))
+    }
   }
 
   const filteredRechnungen = rechnungen.filter(r => 
@@ -108,23 +129,64 @@ export default function KreditorZuordnung() {
           </p>
         </div>
         
-        {selectedItems.size > 0 && (
-          <div className="flex items-center gap-4">
-            <select
-              className="border border-gray-300 rounded-lg px-4 py-2"
-              onChange={(e) => e.target.value && bulkSave(e.target.value)}
-              disabled={saving}
-            >
-              <option value="">Kreditor für ausgewählte...</option>
-              {kreditoren.map(k => (
-                <option key={k.kreditorenNummer} value={k.kreditorenNummer}>
-                  {k.kreditorenNummer} - {k.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        <button
+          onClick={() => setShowNewKreditorDialog(true)}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium flex items-center gap-2"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Neuer Kreditor
+        </button>
       </div>
+
+      {/* Bulk Actions */}
+      {selectedItems.size > 0 && (
+        <div className="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-lg">
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-blue-900">
+                {selectedItems.size} Rechnungen ausgewählt
+              </p>
+              <p className="text-xs text-blue-700 mt-1">
+                Wähle einen Kreditor und klicke auf "Zuordnen"
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <select
+                value={bulkKreditor}
+                onChange={(e) => setBulkKreditor(e.target.value)}
+                disabled={saving}
+                className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Kreditor wählen...</option>
+                {kreditoren.map(k => (
+                  <option key={k.kreditorenNummer} value={k.kreditorenNummer}>
+                    {k.kreditorenNummer} - {k.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={bulkSave}
+                disabled={saving || !bulkKreditor}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {saving ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Speichere...
+                  </>
+                ) : (
+                  '✓ Zuordnen'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Search */}
       <div>
@@ -147,13 +209,7 @@ export default function KreditorZuordnung() {
                   <input
                     type="checkbox"
                     checked={selectedItems.size === filteredRechnungen.length && filteredRechnungen.length > 0}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedItems(new Set(filteredRechnungen.map(r => r._id)))
-                      } else {
-                        setSelectedItems(new Set())
-                      }
-                    }}
+                    onChange={selectAll}
                     className="rounded"
                   />
                 </th>
@@ -185,7 +241,7 @@ export default function KreditorZuordnung() {
                   </td>
                   <td className="px-4 py-3">
                     <select
-                      className="text-sm border border-gray-300 rounded px-2 py-1"
+                      className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onChange={(e) => e.target.value && saveKreditor(rechnung._id, e.target.value)}
                     >
                       <option value="">Auswählen...</option>
@@ -224,6 +280,146 @@ export default function KreditorZuordnung() {
           <p className="text-gray-600">Es gibt keine Rechnungen ohne Kreditor mehr.</p>
         </div>
       )}
+
+      {/* Neuer Kreditor Dialog */}
+      {showNewKreditorDialog && (
+        <NewKreditorDialog
+          onClose={() => setShowNewKreditorDialog(false)}
+          onSuccess={() => {
+            setShowNewKreditorDialog(false)
+            loadData()
+          }}
+        />
+      )}
+    </div>
+  )
+}
+
+function NewKreditorDialog({ onClose, onSuccess }) {
+  const [formData, setFormData] = useState({
+    kreditorenNummer: '',
+    name: '',
+    standardAufwandskonto: '5200'
+  })
+  const [saving, setSaving] = useState(false)
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setSaving(true)
+    
+    try {
+      const res = await fetch('/api/fibu/kreditoren', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+      
+      if (res.ok) {
+        alert('✅ Kreditor erfolgreich angelegt!')
+        onSuccess()
+      } else {
+        const error = await res.json()
+        alert('❌ Fehler: ' + error.error)
+      }
+    } catch (error) {
+      alert('❌ Fehler: ' + error.message)
+    }
+    
+    setSaving(false)
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+        {/* Header */}
+        <div className="border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-bold text-gray-900">Neuen Kreditor anlegen</h3>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Kreditorennummer *
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.kreditorenNummer}
+              onChange={(e) => setFormData({...formData, kreditorenNummer: e.target.value})}
+              placeholder="z.B. 70099"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Name *
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
+              placeholder="z.B. Neue Firma GmbH"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Standard-Aufwandskonto
+            </label>
+            <select
+              value={formData.standardAufwandskonto}
+              onChange={(e) => setFormData({...formData, standardAufwandskonto: e.target.value})}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="5200">5200 - Wareneinkauf</option>
+              <option value="6300">6300 - Versandkosten</option>
+              <option value="6510">6510 - Bürobedarf</option>
+              <option value="6520">6520 - Telefon/Internet</option>
+              <option value="6530">6530 - Porto</option>
+              <option value="6600">6600 - Werbung</option>
+              <option value="6610">6610 - Reisekosten</option>
+              <option value="6640">6640 - Fachliteratur</option>
+              <option value="6805">6805 - Versicherungen</option>
+              <option value="6815">6815 - Rechts-/Beratungskosten</option>
+              <option value="6823">6823 - Buchführungskosten</option>
+              <option value="6850">6850 - Sonstige Kosten</option>
+            </select>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-end gap-3 pt-4 border-t">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              disabled={saving}
+            >
+              Abbrechen
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {saving ? 'Speichere...' : 'Kreditor anlegen'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }
