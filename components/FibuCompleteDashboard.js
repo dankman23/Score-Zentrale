@@ -452,6 +452,11 @@ export default function FibuCompleteDashboard() {
           </div>
         )}
 
+        {/* Bank-Import Tab */}
+        {activeTab === 'bank-import' && (
+          <BankImport onSuccess={loadData} />
+        )}
+
         {/* Zahlungen Tab */}
         {activeTab === 'zahlungen' && (
           <div className="space-y-6">
