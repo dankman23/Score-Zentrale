@@ -18,12 +18,14 @@ import {
  * Query-Parameter:
  * - from: Startdatum (YYYY-MM-DD)
  * - to: Enddatum (YYYY-MM-DD)
+ * - type: Export-Typ ('alle', 'vk', 'ek') - optional
  */
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const from = searchParams.get('from') || '2025-01-01'
     const to = searchParams.get('to') || '2025-01-31'
+    const type = searchParams.get('type') || 'alle'  // 'alle', 'vk', 'ek'
     
     const startDate = new Date(from)
     const endDate = new Date(to + 'T23:59:59.999Z')
