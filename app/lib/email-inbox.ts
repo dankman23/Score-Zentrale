@@ -172,19 +172,24 @@ export async function processEmailInbox(): Promise<{
   errors: number
 }> {
   try {
+    console.log('[processEmailInbox] Starte Verarbeitung...')
     const emails = await fetchUnreadEmails()
+    console.log(`[processEmailInbox] ${emails.length} Emails empfangen`)
     
     if (emails.length === 0) {
+      console.log('[processEmailInbox] Keine Emails zum Verarbeiten')
       return { processed: 0, pdfs: 0, errors: 0 }
     }
 
     const db = await getDb()
     const collection = db.collection('fibu_email_inbox')
+    console.log('[processEmailInbox] MongoDB Collection bereit')
 
     let pdfCount = 0
     let errorCount = 0
 
     for (const email of emails) {
+      console.log(`[processEmailInbox] Verarbeite Email von ${email.from} mit ${email.attachments.length} Anhängen`)
       try {
         for (const attachment of email.attachments) {
           // Prüfe auf Duplikat (gleiche Message-ID + gleicher Dateiname)
