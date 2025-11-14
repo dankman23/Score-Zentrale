@@ -82,8 +82,7 @@ async function testRelations() {
       SELECT TOP 1
         b.kBestellung,
         b.cBestellNr,
-        b.cZahlungsanbieter,
-        b.cBestellNrExtern
+        b.cZahlungsanbieter
       FROM dbo.tBestellung b
       WHERE b.kBestellung = ${kExternerBeleg}
     `)
