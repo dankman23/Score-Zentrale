@@ -114,7 +114,23 @@ export async function POST(request: NextRequest) {
         const verwendungszweck = row['Verwendungszweck'] || ''
         const auftraggeber = row['Begünstigter / Auftraggeber'] || row['Auftraggeber'] || row['Empfänger'] || ''
         const umsatzart = row['Umsatzart'] || row['Buchungstext'] || ''
-        const betrag = parseGermanAmount(row['Betrag'] || row['Soll'] || row['Haben'])
+        
+        // WICHTIG: Postbank hat Soll (negativ) und Haben (positiv) Spalten
+        const solltBetrag = parseGermanAmount(row['Soll'] || '')
+        const habenBetrag = parseGermanAmount(row['Haben'] || '')
+        
+        // Berechne finalen Betrag: Haben ist positiv, Soll ist negativ
+        let betrag = 0
+        if (habenBetrag !== 0) {
+          betrag = habenBetrag
+        } else if (sollBetrag !== 0) {
+          betrag = -Math.abs(sollBetrag)
+        }
+        
+        // Überspringe Nullbeträge
+        if (betrag === 0) {
+          continue
+        }
         
         transaktion = {
           datum: parseGermanDate(row['Buchungstag'] || row['Wert'] || row['Wertstellung']),
