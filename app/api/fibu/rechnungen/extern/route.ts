@@ -46,8 +46,10 @@ export async function GET(request: NextRequest) {
       LEFT JOIN Rechnung.tExternerBelegEckdaten eck ON eb.kExternerBeleg = eck.kExternerBeleg
       LEFT JOIN dbo.tZahlungsart za ON eb.kZahlungsart = za.kZahlungsart
       -- WICHTIG: Zuordnung zu Amazon Payment über kBestellung
+      -- In tZahlung ist kBestellung der Foreign Key zu kExternerBeleg
       LEFT JOIN dbo.tZahlung z ON z.kBestellung = eb.kExternerBeleg
-      LEFT JOIN dbo.tBestellung b ON eb.kExternerBeleg = b.kBestellung
+      -- Hole auch die Bestellung um die Bestellnummer zu bekommen
+      LEFT JOIN dbo.tBestellung b ON z.kBestellung = b.kBestellung
       WHERE eb.dBelegdatumUtc >= @from
         AND eb.dBelegdatumUtc < DATEADD(day, 1, @to)
         AND eb.nBelegtyp = 0
