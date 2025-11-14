@@ -11,6 +11,15 @@ export default function KreditorZuordnung({ onUpdate }) {
   const [selectedItems, setSelectedItems] = useState(new Set())
   const [showNewKreditorDialog, setShowNewKreditorDialog] = useState(false)
   const [bulkKreditor, setBulkKreditor] = useState('')
+  
+  // Edit-Modal State
+  const [editRechnung, setEditRechnung] = useState(null)
+  const [editForm, setEditForm] = useState({
+    lieferantName: '',
+    rechnungsNummer: '',
+    gesamtBetrag: 0,
+    rechnungsdatum: ''
+  })
 
   useEffect(() => {
     loadData()
