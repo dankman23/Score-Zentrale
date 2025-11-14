@@ -2,11 +2,26 @@
 
 import { useState, useEffect } from 'react'
 
-export default function VKRechnungenView() {
+export default function VKRechnungenView({ zeitraum: zeitraumProp, initialFilter }) {
   const [rechnungen, setRechnungen] = useState([])
   const [loading, setLoading] = useState(true)
-  const [zeitraum, setZeitraum] = useState('2025-10-01_2025-10-31')
+  const [zeitraum, setZeitraum] = useState(zeitraumProp || '2025-10-01_2025-10-31')
   const [alleAnzeigen, setAlleAnzeigen] = useState(false)
+  const [statusFilter, setStatusFilter] = useState(initialFilter || 'alle')
+
+  // Update zeitraum when prop changes
+  useEffect(() => {
+    if (zeitraumProp) {
+      setZeitraum(zeitraumProp)
+    }
+  }, [zeitraumProp])
+
+  // Update filter when initialFilter prop changes
+  useEffect(() => {
+    if (initialFilter) {
+      setStatusFilter(initialFilter)
+    }
+  }, [initialFilter])
 
   useEffect(() => {
     loadRechnungen()
