@@ -193,7 +193,27 @@ export async function GET(request: NextRequest) {
           konten: []
         }
       }
+      acc[klasse].konten.push(konto)
+      return acc
+    }, {})
+    
+    return NextResponse.json({
+      ok: true,
+      konten: konten,
+      grouped: Object.values(grouped),
+      total: konten.length
+    })
+    
+  } catch (error: any) {
+    console.error('[Kontenplan API] Fehler:', error)
+    return NextResponse.json(
+      { ok: false, error: error.message },
+      { status: 500 }
+    )
+  }
+}
 
+// END OF GET
 
 /**
  * POST /api/fibu/kontenplan
