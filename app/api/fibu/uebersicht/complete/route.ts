@@ -105,12 +105,17 @@ export async function GET(request: NextRequest) {
     const zahlungen = zahlungenData.zahlungen || []
     
     // Kategorisiere Zahlungen
+    const zahlungenZugeordnet = zahlungen.filter((z: any) => z.istZugeordnet).length
+    const zahlungenNichtZugeordnet = zahlungen.filter((z: any) => !z.istZugeordnet).length
+    
     const zahlungStats = {
       total: zahlungen.length,
       positiv: zahlungen.filter((z: any) => z.betrag > 0).length,
       negativ: zahlungen.filter((z: any) => z.betrag < 0).length,
       positiverBetrag: zahlungen.filter((z: any) => z.betrag > 0).reduce((sum: number, z: any) => sum + z.betrag, 0),
-      negativerBetrag: zahlungen.filter((z: any) => z.betrag < 0).reduce((sum: number, z: any) => sum + z.betrag, 0)
+      negativerBetrag: zahlungen.filter((z: any) => z.betrag < 0).reduce((sum: number, z: any) => sum + z.betrag, 0),
+      zugeordnet: zahlungenZugeordnet,
+      nichtZugeordnet: zahlungenNichtZugeordnet
     }
     
     // Nach Zahlungsanbieter gruppieren
