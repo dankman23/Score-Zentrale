@@ -66,8 +66,10 @@ export default function KreditorZuordnung({ onUpdate }) {
           r.lieferantName === lieferant
         )
         
+        let confirmed = false
+        
         if (gleicheLieferanten.length > 0) {
-          const confirmed = confirm(
+          confirmed = confirm(
             `Es gibt noch ${gleicheLieferanten.length} weitere Rechnung(en) von "${lieferant}".\n\n` +
             `Sollen diese auch automatisch dem Kreditor ${kreditorNr} zugeordnet werden?`
           )
@@ -99,10 +101,11 @@ export default function KreditorZuordnung({ onUpdate }) {
         }
         
         // Update local state - entferne alle zugeordneten
-        setRechnungen(prev => prev.filter(r => 
-          r._id !== rechnungId && 
-          !(gleicheLieferanten.some(gl => gl._id === r._id) && confirmed)
-        ))
+        const idsToRemove = confirmed 
+          ? [rechnungId, ...gleicheLieferanten.map(r => r._id)]
+          : [rechnungId]
+        
+        setRechnungen(prev => prev.filter(r => !idsToRemove.includes(r._id)))
         
         return true
       }
