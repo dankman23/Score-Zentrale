@@ -193,6 +193,193 @@ export async function GET(request: NextRequest) {
           konten: []
         }
       }
+
+
+/**
+ * POST /api/fibu/kontenplan
+ * Neues Konto anlegen oder bestehende aktualisieren
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { kontonummer, bezeichnung, beschreibung, steuersatz, vorsteuer, istAktiv = true } = body
+    
+    if (!kontonummer || !bezeichnung) {
+      return NextResponse.json(
+        { ok: false, error: 'Kontonummer und Bezeichnung sind erforderlich' },
+        { status: 400 }
+      )
+    }
+    
+    // Validiere 4-stellige Kontonummer
+    if (!/^\d{4}$/.test(kontonummer)) {
+      return NextResponse.json(
+        { ok: false, error: 'Kontonummer muss 4-stellig sein' },
+        { status: 400 }
+      )
+    }
+    
+    const db = await getDb()
+    const collection = db.collection('fibu_kontenplan')
+    
+    // Analysiere Kontonummer
+    const analysis = analyzeKontonummer(kontonummer)
+    
+    // Prüfe ob Konto bereits existiert
+    const existing = await collection.findOne({ kontonummer })
+    
+    const konto: any = {
+      kontonummer,
+      bezeichnung,
+      beschreibung,
+      ...analysis,
+      steuerrelevant: steuersatz !== undefined || vorsteuer === true,
+      steuersatz,
+      vorsteuer,
+      istAktiv,
+      istSystemkonto: false,
+      updated_at: new Date()
+    }
+    
+    if (existing) {
+      // Update
+      konto.created_at = existing.created_at
+      await collection.updateOne(
+        { kontonummer },
+        { $set: konto }
+      )
+      
+      return NextResponse.json({
+        ok: true,
+        konto,
+        updated: true
+      })
+    } else {
+      // Insert
+      konto.created_at = new Date()
+      await collection.insertOne(konto)
+      
+      return NextResponse.json({
+        ok: true,
+        konto,
+        created: true
+      })
+    }
+    
+  } catch (error: any) {
+    console.error('Kontenplan POST Fehler:', error)
+    return NextResponse.json(
+      { ok: false, error: error.message },
+      { status: 500 }
+    )
+  }
+}
+
+/**
+ * PUT /api/fibu/kontenplan
+ * Konto aktualisieren
+ */
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { kontonummer, ...updates } = body
+    
+    if (!kontonummer) {
+      return NextResponse.json(
+        { ok: false, error: 'Kontonummer ist erforderlich' },
+        { status: 400 }
+      )
+    }
+    
+    const db = await getDb()
+    const collection = db.collection('fibu_kontenplan')
+    
+    // Wenn Kontonummer geändert wird, neu analysieren
+    if (updates.kontonummer && updates.kontonummer !== kontonummer) {
+      const analysis = analyzeKontonummer(updates.kontonummer)
+      Object.assign(updates, analysis)
+    }
+    
+    updates.updated_at = new Date()
+    
+    const result = await collection.updateOne(
+      { kontonummer },
+      { $set: updates }
+    )
+    
+    if (result.matchedCount === 0) {
+      return NextResponse.json(
+        { ok: false, error: 'Konto nicht gefunden' },
+        { status: 404 }
+      )
+    }
+    
+    return NextResponse.json({
+      ok: true,
+      updated: true
+    })
+    
+  } catch (error: any) {
+    console.error('Kontenplan PUT Fehler:', error)
+    return NextResponse.json(
+      { ok: false, error: error.message },
+      { status: 500 }
+    )
+  }
+}
+
+/**
+ * DELETE /api/fibu/kontenplan
+ * Konto löschen (nur wenn nicht Systemkonto)
+ */
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const kontonummer = searchParams.get('kontonummer')
+    
+    if (!kontonummer) {
+      return NextResponse.json(
+        { ok: false, error: 'Kontonummer ist erforderlich' },
+        { status: 400 }
+      )
+    }
+    
+    const db = await getDb()
+    const collection = db.collection('fibu_kontenplan')
+    
+    // Prüfe ob Systemkonto
+    const konto = await collection.findOne({ kontonummer })
+    
+    if (!konto) {
+      return NextResponse.json(
+        { ok: false, error: 'Konto nicht gefunden' },
+        { status: 404 }
+      )
+    }
+    
+    if (konto.istSystemkonto) {
+      return NextResponse.json(
+        { ok: false, error: 'Systemkonten können nicht gelöscht werden' },
+        { status: 400 }
+      )
+    }
+    
+    await collection.deleteOne({ kontonummer })
+    
+    return NextResponse.json({
+      ok: true,
+      deleted: true
+    })
+    
+  } catch (error: any) {
+    console.error('Kontenplan DELETE Fehler:', error)
+    return NextResponse.json(
+      { ok: false, error: error.message },
+      { status: 500 }
+    )
+  }
+}
+
       acc[klasse].konten.push(konto)
       return acc
     }, {})
