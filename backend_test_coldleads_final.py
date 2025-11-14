@@ -8,7 +8,7 @@ import requests
 import json
 import time
 
-BASE_URL = "https://tennet-export.preview.emergentagent.com/api"
+BASE_URL = "https://paydash-11.preview.emergentagent.com/api"
 
 def print_section(title):
     print(f"\n{'='*80}")
