@@ -1,0 +1,229 @@
+FIBU Modul - Installation & Setup
+==================================
+
+Voraussetzungen
+---------------
+✓ Node.js 20+ installiert
+✓ Yarn Package Manager
+✓ MongoDB Server
+✓ MSSQL Server (JTL-Wawi Zugriff)
+✓ Git
+
+
+Schritt 1: Repository klonen
+-----------------------------
+git clone <repository-url>
+cd score-zentrale
+
+
+Schritt 2: Dependencies installieren
+-------------------------------------
+yarn install
+
+Hinweis: Nutzt YARN, NICHT npm!
+
+
+Schritt 3: Environment Variables
+---------------------------------
+Datei erstellen: /app/.env
+
+Inhalt:
+-------
+# MongoDB
+MONGO_URL=mongodb://localhost:27017/score_zentrale
+
+# JTL MSSQL Database
+JTL_SQL_HOST=162.55.235.45
+JTL_SQL_PORT=1433
+JTL_SQL_DATABASE=eazybusiness
+JTL_SQL_USER=<username>
+JTL_SQL_PASSWORD=<password>
+JTL_SQL_ENCRYPT=true
+JTL_SQL_TRUST_CERT=true
+
+# Gemini AI (für PDF-Parsing)
+GEMINI_API_KEY=<your-api-key>
+
+# Next.js
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+
+
+Schritt 4: MongoDB Setup
+------------------------
+1. MongoDB starten:
+   sudo systemctl start mongod
+
+2. Datenbank erstellen:
+   mongosh
+   use score_zentrale
+   exit
+
+3. Collections werden automatisch erstellt beim ersten Insert
+
+
+Schritt 5: Kreditoren importieren
+----------------------------------
+1. CSV-Datei vorbereiten (Format: siehe Beispiel unten)
+
+2. Import ausführen:
+   cd /app
+   node scripts/import-kreditoren-csv.js /pfad/zu/kreditoren.csv
+
+3. Ausgabe prüfen:
+   ✅ MongoDB verbunden
+   📄 117 Kreditoren aus CSV gelesen
+   🗑️ 0 alte Kreditoren gelöscht
+   ✅ 117 Kreditoren importiert
+
+CSV-Format:
+-----------
+70000;Lieferant;4
+70001;Haufe Service Center GmbH;4
+70002;Idealo Internet GmbH;4
+...
+
+Spalten:
+- Spalte 1: Kreditor-Nummer (70000-79999)
+- Spalte 2: Lieferanten-Name
+- Spalte 3: Kategorie (1-4)
+
+
+Schritt 6: Development Server starten
+--------------------------------------
+yarn dev
+
+Server läuft auf: http://localhost:3000
+
+FIBU-Modul öffnen: http://localhost:3000/fibu
+
+
+Schritt 7: Amazon Payment Fix ausführen
+----------------------------------------
+(Einmalig nach Ersteinrichtung)
+
+curl -X POST http://localhost:3000/api/fibu/fix-amazon-zuordnung
+
+Ergebnis:
+{
+  "ok": true,
+  "message": "221 falsche Zuordnungen entfernt",
+  "korrigiert": 221
+}
+
+
+Schritt 8: Production Build
+----------------------------
+1. Build erstellen:
+   yarn build
+
+2. Production starten:
+   yarn start
+
+3. Supervisor Setup (optional):
+   sudo supervisorctl restart nextjs
+
+
+Verifikation
+------------
+Nach dem Setup sollten folgende Dinge funktionieren:
+
+✓ FIBU Dashboard lädt ohne Fehler
+✓ 117 Kreditoren in "Kontenplan + Einstellungen" sichtbar
+✓ EK-Rechnungen Tab zeigt Rechnungen
+✓ VK-Rechnungen Tab zeigt Rechnungen mit Kunde + RgNr
+✓ Zahlungen Tab lädt in ~3 Sekunden (Cache)
+✓ Kreditor-Zuordnung zeigt offene Rechnungen
+✓ PDF-Beleg kann geöffnet werden
+✓ Auto-Zuordnung funktioniert (mehrere Rechnungen auf einmal)
+
+
+Troubleshooting
+---------------
+
+Problem: MongoDB Verbindung fehlgeschlagen
+Lösung: 
+  - MongoDB läuft? sudo systemctl status mongod
+  - MONGO_URL in .env korrekt?
+  - Firewall blockiert Port 27017?
+
+Problem: JTL MSSQL Verbindung fehlgeschlagen
+Lösung:
+  - VPN zu JTL-Server aktiv?
+  - Credentials in .env korrekt?
+  - Port 1433 erreichbar? telnet 162.55.235.45 1433
+
+Problem: PDF-Parsing funktioniert nicht
+Lösung:
+  - GEMINI_API_KEY in .env gesetzt?
+  - API-Key gültig?
+  - Check Logs: tail -f /var/log/supervisor/nextjs.out.log
+
+Problem: Zahlungen-API sehr langsam
+Lösung:
+  - Cache aktiviert? Sollte nach 1x Laden schnell sein
+  - "Aktualisieren" Button klicken für Fresh-Load
+  - Check: force=true Parameter in URL
+
+Problem: Kreditoren falsch importiert
+Lösung:
+  - CSV-Datei Encoding prüfen (sollte latin1 oder utf-8 sein)
+  - Import erneut ausführen (löscht alte Daten)
+  - node scripts/import-kreditoren-csv.js <csv-file>
+
+Problem: Amazon Payment zu RE-Rechnungen zugeordnet
+Lösung:
+  - Fix-API ausführen: curl -X POST /api/fibu/fix-amazon-zuordnung
+  - Fuzzy-Matching neu laufen lassen
+
+Problem: Build Fehler "db is not defined"
+Lösung:
+  - Import-Pfad prüfen: import { getDb } from '../../../lib/db/mongodb'
+  - TypeScript Compiler neu starten: yarn build
+
+Problem: Frontend zeigt alte Daten
+Lösung:
+  - Browser-Cache leeren (Strg+Shift+R)
+  - "Aktualisieren" Button im Dashboard klicken
+  - Server neu starten: yarn dev
+
+
+Logs
+----
+Frontend/Backend Logs:
+tail -f /var/log/supervisor/nextjs.out.log
+
+MongoDB Logs:
+tail -f /var/log/mongodb/mongod.log
+
+Nginx Logs:
+tail -f /var/log/nginx/error.log
+
+
+Backup
+------
+MongoDB Datenbank sichern:
+mongodump --db=score_zentrale --out=/backup/$(date +%Y%m%d)
+
+Wiederherstellen:
+mongorestore --db=score_zentrale /backup/20251115/score_zentrale
+
+
+Update
+------
+Neue Version installieren:
+1. git pull origin main
+2. yarn install
+3. yarn build
+4. sudo supervisorctl restart nextjs
+
+
+Support
+-------
+Bei Problemen:
+1. Logs prüfen (siehe oben)
+2. Dokumentation lesen: /app/docs/
+3. README.md durchlesen
+4. Known Issues prüfen: docs/CHANGELOG.txt
+
+---
+Ende Setup-Anleitung

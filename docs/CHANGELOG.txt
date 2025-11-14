@@ -1,0 +1,183 @@
+FIBU Modul - Änderungsprotokoll
+================================
+
+Version 1.0.0 - November 2025
+-----------------------------
+
+[NEUE FEATURES]
+
+✅ EK-Rechnungen System
+  - Vollständige Verwaltung von Lieferantenrechnungen
+  - E-Mail-Import mit PDF-Parsing (Gemini AI)
+  - Duplikate-Erkennung
+  - Beleg-Anzeige (PDF aus MongoDB)
+  - Filter: Kreditor, Zahlung, Suche
+  - Sortierung: Datum, Lieferant, Betrag, Kreditor
+  - Aktionen: Beleg, Zurück in Zuordnung, Löschen
+  - 0€-Rechnungen automatisch in Zuordnung
+
+✅ VK-Rechnungen System
+  - JTL-Integration für RE-Rechnungen
+  - Externe XRE-* Rechnungen (Amazon/eBay)
+  - MongoDB-Lookup für Rechnungsnummer + Kunde
+  - Status: Bezahlt/Offen
+  - Filter nach Quelle und Status
+
+✅ Zahlungen System
+  - Multi-Source: PayPal, Amazon Payment, eBay, Commerzbank, Postbank
+  - 1000 Zahlungen mit 5-Minuten-Cache
+  - Bestellnummer für Amazon/eBay angezeigt
+  - Filter: Anbieter, Zuordnung, Richtung
+  - Horizontales Scrolling für alle Spalten
+
+✅ Kreditor-Zuordnung
+  - Intelligente Vorschläge (Name-Matching)
+  - Batch-Zuordnung
+  - Auto-Zuordnung: Alle Rechnungen vom gleichen Lieferanten
+  - Mapping speichern für zukünftige Rechnungen
+  - Edit-Funktion mit Modal
+  - Beleg-Anzeige integriert
+
+✅ Kreditoren-Verwaltung
+  - CRUD-Funktionen (Anlegen, Bearbeiten, Löschen)
+  - 117 Kreditoren aus CSV importiert
+  - Suche nach Nummer oder Name
+  - Kategorien 1-4
+
+✅ Monats-Übersicht
+  - KPI-Dashboard mit kompakten 2-Spalten-Kacheln
+  - Fortschrittsbalken
+  - Zufallszitat (Philosophen feat. Reality-TV-Stars)
+  - Direkte Links von KPIs zu Detail-Views
+  - Export-Button wenn Monat abschließbar
+
+✅ Tennet/10it Export
+  - SKR04-konform
+  - Doppelte Buchführung (SOLL/HABEN)
+  - Alle Belege: VK, EK, Zahlungen
+  - CSV-Format für Tennet/Addison
+
+✅ Bank-Import
+  - Postbank CSV parsen
+  - Gehälter automatisch kategorisieren
+
+✅ Fuzzy-Matching
+  - Automatische Zuordnung Zahlungen → Rechnungen
+  - Betrag + Datum + Rechnungsnummer Matching
+  - Amazon Payment Regel: NUR zu XRE-* Rechnungen
+  - Confidence-Score System
+
+✅ Custom Date Range Picker
+  - Voreinstellungen + Custom-Modus
+  - Von/Bis Datum frei wählbar
+
+[BUG FIXES]
+
+🔧 Amazon Payment Zuordnung
+  - Problem: 221 falsche Zuordnungen zu RE-Rechnungen
+  - Ursache: Fuzzy-Matching ohne Amazon-Regel
+  - Fix: Regel implementiert (nur XRE-* Rechnungen)
+  - Fix-API erstellt: /api/fibu/fix-amazon-zuordnung
+  - Status: Alle falschen Zuordnungen entfernt
+
+🔧 Kreditoren Import
+  - Problem: 70032 = "Werkstatt Holger Stölting" statt "Bosch Power Tools"
+  - Ursache: Alte Kreditoren nicht gelöscht, falsche Datenbank
+  - Fix: Import-Script korrigiert (richtige DB, löscht ALLE alten)
+  - Status: 117 Kreditoren exakt aus CSV
+
+🔧 Externe VK-Rechnungen
+  - Problem: Rechnungsnummer + Kunde fehlten
+  - Ursache: MongoDB-Lookup fehlte
+  - Fix: API erweitert mit MongoDB-Daten
+  - Status: XRE-5636, Johannes Ruckwied, etc. angezeigt
+
+🔧 EK-Rechnungen Duplikate
+  - Problem: Robert Bosch 3x, CUMI AWUKO 3x
+  - Ursache: Kein Duplikate-Check
+  - Fix: Duplikate-Erkennung in API implementiert
+  - Status: 5 Duplikate entfernt
+
+🔧 Filter Weiß-auf-Weiß
+  - Problem: Dropdown-Text nicht lesbar
+  - Ursache: Fehlende CSS-Klassen
+  - Fix: bg-white text-gray-900 hinzugefügt
+  - Status: Alle Dropdowns lesbar
+
+🔧 EK-Rechnungen fehlten
+  - Problem: Tab zeigte "Keine Rechnungen"
+  - Ursache: details.ekRechnungen nicht in API-Response
+  - Fix: ekRechnungen zu details hinzugefügt
+  - Status: Alle 107 EK-Rechnungen sichtbar
+
+🔧 Zahlungen-API Performance
+  - Problem: 40 Sekunden Ladezeit
+  - Ursache: Keine Server-Side Cache
+  - Fix: 5-Minuten Cache implementiert
+  - Status: 3 Sekunden Ladezeit (13x schneller)
+
+🔧 VK-Rechnungen Statistik
+  - Problem: 0€ Gesamtumsatz, 0 zugeordnete Zahlungen
+  - Ursache: Felder nicht in API-Response
+  - Fix: gesamtUmsatz + zugeordnet/nichtZugeordnet hinzugefügt
+  - Status: 109.743€ Gesamtumsatz, 3783 zugeordnet
+
+🔧 Edit-Button nicht sichtbar
+  - Problem: Außerhalb des sichtbaren Bereichs
+  - Ursache: Eigene Spalte ganz rechts
+  - Fix: In "Aktionen"-Spalte verschoben (📄 PDF | ✏️)
+  - Status: Alle Buttons sichtbar
+
+🔧 Auto-Zuordnung JavaScript Fehler
+  - Problem: "confirmed is not defined"
+  - Ursache: Variable im falschen Scope
+  - Fix: let confirmed = false außerhalb
+  - Status: Funktioniert (7 Rechnungen Robert Bosch zugeordnet)
+
+[OPTIMIERUNGEN]
+
+⚡ Performance
+  - Server-Side Cache für FIBU Übersicht (5 Min)
+  - Server-Side Cache für Zahlungen (5 Min)
+  - MongoDB-Lookup optimiert
+
+⚡ UI/UX
+  - Kompaktere Kacheln (2-Spalten statt full-width)
+  - Dropdown-Größe reduziert (w-40)
+  - Sticky Header für Tabellen
+  - Horizontal Scrolling aktiviert
+
+⚡ Code-Qualität
+  - TypeScript für alle API-Routes
+  - Duplikate-Check in allen Listen
+  - Error-Handling verbessert
+  - Console-Logs für Debugging
+
+[BEKANNTE PROBLEME]
+
+⚠️ PDF-Parsing nicht 100% akkurat
+⚠️ Fuzzy-Matching kann falsch-positive generieren
+⚠️ Cache-Invalidierung nur manuell per Button
+
+[STATISTIK]
+
+📊 Aktueller Stand:
+  - 117 Kreditoren
+  - 108 geprüfte EK-Rechnungen
+  - 22 EK-Rechnungen in Zuordnung
+  - 2769 VK-Rechnungen
+  - 4477 Zahlungen (3783 zugeordnet)
+  - 221 falsche Amazon-Zuordnungen korrigiert
+  - 5 Duplikate entfernt
+
+[MIGRATION NOTES]
+
+Beim Forken beachten:
+1. MONGO_URL in .env anpassen
+2. JTL_SQL_* Credentials anpassen
+3. GEMINI_API_KEY für PDF-Parsing
+4. Kreditoren neu importieren: node scripts/import-kreditoren-csv.js
+5. Fix-API einmalig ausführen: curl -X POST /api/fibu/fix-amazon-zuordnung
+
+---
+Ende Changelog
