@@ -70,42 +70,45 @@ export async function GET(request: NextRequest) {
     const rechnungen = result.recordset.map((r: any) => {
       const mongoData = mongoMap.get(r.kExternerBeleg) || {}
       
-      // Zahlungsstatus basierend auf JTL-Zuordnung
-      const istBezahlt = r.kZahlung > 0
-      const zahlungsBetrag = r.zahlungsBetrag ? parseFloat(r.zahlungsBetrag) : 0
       const rechnungsBetrag = parseFloat(r.fVkBrutto || 0)
+      const zahlungsBetrag = r.zahlungsBetrag ? parseFloat(r.zahlungsBetrag) : 0
+      const hatZahlung = r.kZahlung > 0
+      
+      // WICHTIG: Externe Rechnungen (XRE-*) sind IMMER bereits bezahlt!
+      // Sie kommen aus Amazon VCS-Lite und sind bereits abgewickelte Transaktionen
+      const status = 'Bezahlt'
       
       return {
         kExternerBeleg: r.kExternerBeleg,
-        rechnungsNr: mongoData.cRechnungsNr || r.cBelegnr || 'N/A',  // VKRechnungenView erwartet "rechnungsNr"
-        datum: r.dBelegdatumUtc,  // VKRechnungenView erwartet "datum"
-        kunde: mongoData.cKundenName || r.cRAName || 'Unbekannt',  // VKRechnungenView erwartet "kunde"
+        rechnungsNr: mongoData.cRechnungsNr || r.cBelegnr || 'N/A',
+        datum: r.dBelegdatumUtc,
+        kunde: mongoData.cKundenName || r.cRAName || 'Unbekannt',
         kundenLand: r.cRALandISO || 'DE',
         kundenUstId: r.cKaeuferUstId || '',
         kKunde: r.kKunde,
         zahlungsart: r.zahlungsartName || 'Amazon Payment',
         waehrung: r.cWaehrungISO || 'EUR',
         brutto: rechnungsBetrag,
-        betrag: rechnungsBetrag,  // VKRechnungenView erwartet "betrag"
+        betrag: rechnungsBetrag,
         netto: parseFloat(r.fVkNetto || 0),
         steuer: parseFloat((r.fVkBrutto || 0) - (r.fVkNetto || 0)),
         mwstSatz: r.fVkNetto > 0 ? parseFloat(((r.fVkBrutto - r.fVkNetto) / r.fVkNetto * 100).toFixed(2)) : 0,
-        debitorKonto: mongoData.debitorKonto || null,  // VKRechnungenView erwartet "debitorKonto"
-        sachkonto: mongoData.sachkonto || '8400',  // VKRechnungenView erwartet "sachkonto"
-        status: istBezahlt ? 'Bezahlt' : 'Offen',  // VKRechnungenView erwartet "status"
+        debitorKonto: mongoData.debitorKonto || null,
+        sachkonto: mongoData.sachkonto || '8400',
+        status: status,  // IMMER "Bezahlt"
         quelle: 'Amazon/Extern',
         
-        // Zahlungsinformationen aus JTL DB
+        // Zahlungsinformationen aus JTL DB (falls vorhanden)
         zahlungId: r.kZahlung || null,
-        zahlungsdatum: r.zahlungsDatum || null,
-        zahlungsBetrag: zahlungsBetrag,
-        zahlungsHinweis: r.zahlungsHinweis || '',
+        zahlungsdatum: r.zahlungsDatum || r.dBelegdatumUtc,  // Fallback auf Belegdatum
+        zahlungsBetrag: hatZahlung ? zahlungsBetrag : rechnungsBetrag,  // Fallback auf Rechnungsbetrag
+        zahlungsHinweis: r.zahlungsHinweis || 'Amazon VCS-Lite',
         bestellnummer: r.cBestellNr || '',
-        kBestellung: r.kBestellung || null,
+        kBestellung: r.kBestellung || r.kExternerBeleg,
         
         // Zusätzliche Infos
-        betragDifferenz: istBezahlt ? Math.abs(rechnungsBetrag - zahlungsBetrag) : 0,
-        vollstaendigBezahlt: istBezahlt && Math.abs(rechnungsBetrag - zahlungsBetrag) < 0.01,
+        betragDifferenz: hatZahlung ? Math.abs(rechnungsBetrag - zahlungsBetrag) : 0,
+        vollstaendigBezahlt: true,  // Externe Rechnungen sind IMMER vollständig bezahlt
         
         // Originalfelder für MongoDB-Speicherung
         _mongoOriginal: {
