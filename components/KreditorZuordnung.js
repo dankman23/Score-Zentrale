@@ -317,10 +317,10 @@ export default function KreditorZuordnung({ onUpdate }) {
                   </td>
                   <td className="px-4 py-3">
                     <select
-                      className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                      className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 w-40"
                       onChange={(e) => e.target.value && saveKreditor(rechnung._id, e.target.value)}
                     >
-                      <option value="" className="text-gray-900">Auswählen...</option>
+                      <option value="" className="text-gray-900">Wählen...</option>
                       {kreditoren
                         .filter(k => 
                           k.name.toLowerCase().includes(rechnung.lieferantName.toLowerCase().substring(0, 10)) ||
