@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Base URL from environment
-BASE_URL = "https://invoice-parser-24.preview.emergentagent.com"
+BASE_URL = "https://tennet-export.preview.emergentagent.com"
 
 def print_test_header(test_name):
     """Print a formatted test header"""

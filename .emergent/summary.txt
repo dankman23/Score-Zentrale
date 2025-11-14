@@ -1,113 +1,90 @@
 <analysis>
-The trajectory documents the development of a sophisticated accounting (FIBU) module, starting from code review and moving to significant feature implementation and critical bug fixing. The initial phase focused on understanding the user's request for a Lexoffice-style system and implementing creditor assignment and data export functionalities.
+The trajectory documents an intensive, multi-sprint development cycle on a financial accounting (FIBU) module. The work began with a user-driven pivot away from premature documentation towards building a comprehensive Payments () view. This involved creating new UI components, integrating data from both JTL (SQL) and MongoDB, and implementing filters.
 
-A major challenge emerged with a slow, monolithic API endpoint, which was noted for future optimization. The project's focus then shifted to data quality. This led to the discovery of a critical bug where the Gemini AI parser incorrectly identified the user's own company as the supplier on 99 invoices. A complex but successful recovery operation was executed: the AI engineer improved the parser's prompt, deleted the faulty data, and orchestrated a complete re-parsing of the original 99 PDFs from their Base64 storage, successfully correcting the supplier information.
+A significant portion of the work involved iterative debugging and feature refinement based on user feedback. Key challenges included fixing persistent browser caching issues that hid new features, diagnosing and fixing a critically slow API endpoint by implementing a caching layer, and correcting a white-on-white CSS bug in a filter component.
 
-Following this critical fix, the engineer undertook a major UI/UX overhaul based on user feedback. This involved fixing a catastrophic mistake where a data-rich MongoDB API was almost replaced by a basic SQL query, resolving persistent browser caching issues that hid new features, and refactoring the main application navigation.
+The core of the development focused on complex business logic. A major effort was the implementation and exhaustive testing of a data export for Tennet accounting software, which required correcting account mappings (to SKR04 standard), fixing logic to include all sales invoices, and ensuring the final CSV format was perfect. Another major feature was building a multi-stage automated payment assignment system, starting with fuzzy matching and evolving to include rule-based logic for fees and a smart matching system for Commerzbank transactions against known creditors.
 
-The final development phase involved implementing complex business logic for assigning debtor accounts based on payment types and tax status (IGL rules), which was successfully applied to the dataset. The last user request was to prepare the project for a fork by creating comprehensive documentation.
+The final user request, after a large batch of UI/UX improvements, was to prepare the project for a fork by creating comprehensive documentation, which is the immediate next step.
 </analysis>
 
 <product_requirements>
-The primary goal is to build a comprehensive, in-house accounting (FIBU) module that mimics the functionality of professional software like Lexoffice. This system must centralize and automate financial bookkeeping.
+The primary objective is to develop a sophisticated, in-house accounting (FIBU) module that serves as a central hub for all financial operations, aiming for functionality comparable to professional software like Lexoffice. The system must integrate seamlessly with the existing JTL database while providing enhanced, automated bookkeeping capabilities.
 
-**Core Features Implemented:**
-1.  **Automated Invoice Parsing:** A hybrid system processes supplier invoices (EK-Rechnungen). It uses Python scripts for known suppliers and a Gemini AI-powered parser (via ) as a fallback for unknown ones. This system underwent a critical fix to prevent the AI from misidentifying the user's own company as the supplier.
-2.  **Unified Dashboard:** A central dashboard () was created to provide an overview of all accounting items. It uses a tabbed interface to display:
-    *   An overview of open items.
-    *   A complete list of Sales Invoices (VK-Rechnungen) from both JTL (database) and external sources (e.g., Amazon), with filtering and search capabilities.
-    *   Supplier Invoices (EK-Rechnungen) with tools for bulk creditor assignment.
-    *   A Chart of Accounts ().
-    *   A Bank Import utility for Postbank CSVs.
-3.  **Debtor Account Logic:** A sophisticated rule-based system for assigning debtor accounts was implemented. It uses collective accounts () based on payment method but assigns unique debtor numbers to intra-community European (IGL) customers requiring a VAT ID.
-4.  **Data Export:** An API endpoint was developed to export accounting data in a specific format required for a system named Tennet.
+**Key Features & Requirements:**
+1.  **Unified Payments Dashboard:** A centralized view () to display all incoming and outgoing payments from multiple sources (PayPal, Amazon, eBay, Commerzbank, Postbank). This view must include robust filtering by source, assignment status, and date.
+2.  **Automated Transaction Processing:**
+    *   **Postbank CSV Import:** Ability to upload and parse Postbank CSV files, automatically categorizing transactions like salaries.
+    *   **Intelligent Assignment:** A multi-layered system to automatically assign payments. This includes fuzzy string matching for invoice payments, rule-based assignment for fees (e.g., PayPal fees), and a learning system for recurring bank transfers (e.g., Commerzbank).
+3.  **SKR04-Compliant Bookkeeping:** All financial data, particularly the Chart of Accounts () and data exports, must adhere to the German SKR04 accounting standard.
+4.  **Tennet (10it/Addison) Export:** A critical feature to generate a compliant CSV export of all monthly transactions (sales invoices, purchase invoices, payments) for direct import into the Tennet accounting software.
+5.  **KPI-Driven Overview:** A main dashboard that provides actionable KPIs for the monthly closing process, showing open items like unassigned invoices or payments, with direct links to the relevant management views.
 </product_requirements>
 
 <key_technical_concepts>
-- **Hybrid Invoice Parsing:** A two-tier strategy using rule-based Python scripts for predictable invoices and a Gemini AI parser as a fallback for unknown formats.
-- **Python-Node.js Bridge:**  in Node.js is used to execute Python parsing scripts, passing PDF data via  and receiving structured JSON via .
-- ** Library:** The crucial Python library enabling Gemini API access with the . The prompt was refined to prevent misidentification of the supplier.
-- **Debtor Assignment Rules (Sammelkonten):** Business logic implemented via scripts to assign debtor accounts based on customer type (IGL vs. domestic) and payment method.
+- **Hybrid Data Sources:** Aggregates financial data from an existing JTL MSSQL database and a dedicated MongoDB for enriched accounting information.
+- **Multi-Source Payment Aggregation:** Fetches and unifies payment data from JTL, imported Postbank CSVs (stored in MongoDB), and other sources into a single, filterable view.
+- **Automated Payment Matching:** Employs fuzzy string matching () and rule-based logic to automatically associate payments with invoices or categorize them as non-invoice expenses (e.g., fees, salaries).
+- **SKR04 Accounting Standard:** All account mappings, especially for the Tennet/10it export, are configured to be compliant with the SKR04 chart of accounts.
+- **API Performance Caching:** A server-side caching mechanism was implemented for the main payments API to drastically reduce load times from ~40 seconds to near-instantaneous.
 </key_technical_concepts>
 
 <code_architecture>
-The application is a Next.js full-stack SPA using hash-based routing managed within . The backend consists of API routes, while the frontend is built with React and shadcn/ui. A key architectural feature is the integration of Python scripts for specialized tasks.
+The application is a Next.js full-stack SPA. The frontend is built with React and shadcn/ui, managing views within a primary . The backend consists of API routes under  that connect to both a MongoDB database and a JTL MSSQL database. Node.js scripts are used for batch operations.
 
 **Directory Structure:**
 
 
-**Key File Analysis:**
+**Key Files:**
 
 -   ****
-    -   **Importance:** Core of the AI parsing. Takes a Base64 PDF and returns JSON.
-    -   **Summary of Changes:** A critical prompt update was made:  This fixed a bug where 99 invoices were parsed with the wrong supplier.
-
--   **🔍 Suche PDFs ohne zugehörige EK-Rechnung...
-
-📧 190 processed Emails gefunden
-🔄 0 PDFs müssen neu verarbeitet werden
-
-✅ Alle PDFs haben bereits EK-Rechnungen!**
-    -   **Importance:** A one-off recovery script created to fix the critical parsing bug.
-    -   **Summary of Changes:** Created from scratch. It finds processed PDFs (stored as  in the  collection) that correspond to the 99 deleted incorrect invoices and re-runs them through the now-fixed , saving the corrected data.
+    -   **Importance:** This is the core of the Tennet export feature. It gathers all sales invoices, purchase invoices, and payments for a given period and formats them into a single, compliant CSV file.
+    -   **Changes:** This file underwent extensive debugging. It was modified to fetch JTL sales invoices (which were previously missing), corrected to use SKR04 account numbers (e.g., 1825 for Amazon), and structured to create proper double-entry bookkeeping records (e.g., Invoice: 1200 SOLL / 4400 HABEN).
 
 -   ****
-    -   **Importance:** API endpoint for fetching Sales Invoices (VK-Rechnungen).
-    -   **Summary of Changes:** This file was the subject of a near-disastrous mistake. It was incorrectly modified to pull minimal data from the JTL SQL database, losing all enriched data. It was successfully reverted to load the complete, correct data from the  collection in MongoDB, preserving all assignments.
+    -   **Importance:** Powers the entire Payments view by aggregating data from multiple sources.
+    -   **Changes:** Heavily refactored to fix a critical performance bottleneck. It now uses a server-side cache () to store the large dataset, with a mechanism to force-reload the data. It was also updated to merge data from  (Postbank) with JTL payments.
 
 -   ****
-    -   **Importance:** A brand-new component for displaying all sales invoices (JTL + external).
-    -   **Summary of Changes:** Created to replace a basic table. It includes advanced features like filtering by status and source, a search bar, correct date formatting, and a dark-mode-friendly UI with legible text, resolving multiple user complaints.
-
--   **================================================================================
-🔄 DEBITOR-REGELN ANWENDEN
-================================================================================
-
-📋 20 Sammelkonten geladen
-📋 IGL-Regel: ✅
-
-📄 1129 VK-Rechnungen zu prüfen
-
-🔄 Starte Zuordnung...
-
-================================================================================
-✅ FERTIG!
-================================================================================
-
-✅ 29 IGL-Kunden → Eigene Debitoren (10xxx)
-✅ 1100 Kunden → Sammelkonten (69xxx)
-❌ 0 Fehler
-
-📊 IGL-DEBITOREN (mit USt-ID):
-────────────────────────────────────────────────────────────────────────────────
-  10000: Kunde #241198 (DE) - USt-ID: DE815541191
-
-================================================================================**
-    -   **Importance:** Encapsulates critical business logic for assigning debtor accounts.
-    -   **Summary of Changes:** Created to implement the  logic. The script iterates through customers, assigning unique debtor numbers (10xxx range) to IGL customers and collective account numbers (69xxx range) to others based on their payment method.
+    -   **Importance:** The new, primary UI component for displaying all payments.
+    -   **Changes:** Created from scratch to provide a detailed table with filters for payment provider and assignment status. CSS was fixed to solve a white-on-white text issue in the filter buttons and to add horizontal scrolling for visibility of all columns.
 
 -   ****
-    -   **Importance:** The main single-page application entry point that controls navigation via hash changes.
-    -   **Summary of Changes:** The navigation structure was heavily refactored. The FIBU menu item was correctly pointed to the new , and the Outbound section was consolidated from separate menu items into a single dropdown menu.
+    -   **Importance:** The KPI dashboard for the FIBU overview tab, providing a quick glance at the status of the monthly closing.
+    -   **Changes:** Created to display key metrics like unassigned invoices and payments. The layout was made more compact, and links were added from the KPI tiles to the corresponding detailed views. A randomly selected grotesque quote was added to the header.
+
+-   ** & **
+    -   **Importance:** These scripts contain the core logic for the automated payment assignment features, which are crucial for reducing manual work.
+    -   **Changes:** Created to implement the matching logic.  was later updated to operate on specific time ranges instead of the entire database.
+
+-   ****
+    -   **Importance:** Handles the upload and processing of bank statements.
+    -   **Changes:** Updated to correctly parse Postbank-specific CSV files, including improving the header detection logic and adding rules to automatically categorize certain transactions like salaries.
 </code_architecture>
 
 <pending_tasks>
-- **Import Postbank Data:** The  component and its API exist, but no Postbank CSV data has been imported and processed yet. This is a major gap in the accounting overview.
-- **Performance Optimization:** The  API endpoint is critically slow (5-15 seconds) because it makes multiple internal API calls. It needs to be refactored to query data sources directly for better performance.
-- **Fix Pferd Parser:** The Python parser for August Rüggeberg (Pferd) invoices was noted as causing errors early on but was never fixed.
+- **Implement UI for Rule Creation:** Build the UI for the smart-match system so that when a Commerzbank payment is manually assigned, a rule for future transactions can be created automatically.
+- **Implement Custom Date Range Filter:** Add a date picker to the FIBU overview for selecting custom time periods, as requested.
+- **Correct IGL Debitor Numbering:** Adjust the logic for assigning Intra-Community (IGL) customer debtor numbers to start from the  range as requested by the user.
+- **Finalize JTL Payment Assignment:** Ensure Amazon/eBay payments from JTL are correctly associated with their invoices, fetching any missing assignment data from the JTL database.
 </pending_tasks>
 
 <current_work>
-The most recent work was a direct response to the user's request: **Ready machen zum forken bitt etxt datein füllen** (Get it ready to fork, please fill out the text files). The previous AI engineer acknowledged this and was about to begin creating and populating all necessary documentation files to prepare the project for a handover or fork.
+The most recent development cycle concluded with a large batch of high-priority fixes and features based on detailed user feedback. This included:
 
-This documentation task was initiated immediately after a series of significant and successful development cycles, which included:
-1.  **Critical Bug Fix:** Finding and resolving the Gemini parser issue that incorrectly assigned Score Schleifwerkzeuge as a supplier for 99 invoices, followed by a full re-parsing of the affected documents.
-2.  **UI/UX Overhaul:** A complete redesign of the Sales Invoice view () to include filtering, searching, correct data display, and fixing all cosmetic issues reported by the user (e.g., text color, date format).
-3.  **Navigation Refactoring:** Reorganizing the main application's navigation to place the new FIBU dashboard correctly and consolidate the Outbound menu into a dropdown.
-4.  **Business Logic Implementation:** Successfully scripting and applying the complex  rules for debtor account assignment.
+1.  **Performance Optimization:** A critical performance issue with the Payments API, causing 40-second load times, was resolved by implementing a server-side caching strategy in . A manual Reload Payments button was added to the UI.
+2.  **UI/UX Overhaul:** Several UI bugs were fixed: the FIBU overview dashboard () was made more compact, links were added from KPI tiles to detailed views, a white-on-white text issue in the  filters was corrected, and horizontal scrolling was enabled to prevent columns from being cut off. A humorous, randomly selected quote was also added to the dashboard header.
+3.  **SKR04 Account Import:** A critical accounting standard correction was made. The user clarified they use SKR04, not SKR03. 74 new SKR04-compliant accounts were parsed from a user-provided Excel file and imported into the  collection in MongoDB.
 
-Therefore, the project state is feature complete for the last set of user requests, with the final action being the start of the documentation process.
+Immediately following the confirmation of these fixes, the user made a final request: **bitte dateein für dass forken jetzt aktualisieren** (please update the files for forking now). The engineer acknowledged this and was about to begin creating and updating all necessary documentation files to prepare the project for handover.
 </current_work>
 
 <optional_next_step>
-Create and populate the documentation files (, , , etc.) in the  directory as requested by the user to prepare the project for the fork.
+Create and populate all necessary documentation files in the  directory, such as , , and , to fully document the current state of the application and prepare it for the requested fork.
+</optional_next_step>
+
+<direct_quotes>
+**User's Final Request:** bitte dateein für dass forken jetzt aktualisieren
+
+**AI Engineer's Last Action:** Perfekt! Ich erstelle jetzt alle wichtigen Dokumentations-Dateien für das Forken mit allen aktuellen Features
+</direct_quotes>

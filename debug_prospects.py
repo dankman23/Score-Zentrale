@@ -7,7 +7,7 @@ import requests
 import json
 import os
 
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://invoice-parser-24.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://tennet-export.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def debug_prospects():
