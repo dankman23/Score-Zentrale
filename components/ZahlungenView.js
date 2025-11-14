@@ -363,9 +363,9 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600">
                     <div className="max-w-xs">
-                      {zahlung.bestellNr && (
+                      {zahlung.cBestellNr && (
                         <div className="font-medium text-blue-600 mb-1">
-                          📦 {zahlung.bestellNr}
+                          📦 {zahlung.cBestellNr}
                         </div>
                       )}
                       <div className="text-xs truncate" title={zahlung.hinweis}>
