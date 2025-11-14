@@ -20,11 +20,25 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const from = searchParams.get('from') || '2025-10-01'
     const to = searchParams.get('to') || '2025-11-30'
+    const forceReload = searchParams.get('force') === 'true'
+    
+    const cacheKey = `${from}_${to}`
+    const now = Date.now()
+    
+    // Check cache
+    if (!forceReload && cachedData && cachedData.cacheKey === cacheKey && (now - cacheTimestamp) < CACHE_TTL) {
+      console.log(`[FIBU Übersicht] ✅ Cache HIT: ${from} - ${to} (Alter: ${Math.round((now - cacheTimestamp) / 1000)}s)`)
+      return NextResponse.json({
+        ...cachedData.data,
+        cached: true,
+        cacheAge: Math.round((now - cacheTimestamp) / 1000)
+      })
+    }
+    
+    console.log(`[FIBU Übersicht] 🔄 Cache MISS: ${from} - ${to} - Lade neu...`)
     
     const mongoDb = await getDb()
     const mssqlPool = await getJTLConnection()
-    
-    console.log(`[FIBU Übersicht] Zeitraum: ${from} - ${to}`)
     
     // ========================================
     // 1. EK-RECHNUNGEN (Lieferanten)
