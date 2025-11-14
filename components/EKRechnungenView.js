@@ -168,11 +168,11 @@ export default function EKRechnungenView({ zeitraum: zeitraumProp, initialFilter
             <select
               value={kreditorFilter}
               onChange={(e) => setKreditorFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white text-gray-900"
             >
-              <option value="alle">Alle</option>
-              <option value="mit_kreditor">Mit Kreditor</option>
-              <option value="ohne_kreditor">Ohne Kreditor</option>
+              <option value="alle" className="text-gray-900">Alle</option>
+              <option value="mit_kreditor" className="text-gray-900">Mit Kreditor</option>
+              <option value="ohne_kreditor" className="text-gray-900">Ohne Kreditor</option>
             </select>
           </div>
 
@@ -182,11 +182,11 @@ export default function EKRechnungenView({ zeitraum: zeitraumProp, initialFilter
             <select
               value={zahlungsFilter}
               onChange={(e) => setZahlungsFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white text-gray-900"
             >
-              <option value="alle">Alle</option>
-              <option value="bezahlt">Bezahlt</option>
-              <option value="offen">Offen</option>
+              <option value="alle" className="text-gray-900">Alle</option>
+              <option value="bezahlt" className="text-gray-900">Bezahlt</option>
+              <option value="offen" className="text-gray-900">Offen</option>
             </select>
           </div>
 
