@@ -141,52 +141,6 @@ export default function FibuMonatsUebersicht({ selectedPeriod, summaryData }) {
         </div>
       )}
 
-      {/* Kritische Probleme */}
-      {!istMonatAbschließbar && (
-        <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg">
-          <h3 className="text-xl font-bold text-red-900 mb-4 flex items-center gap-2">
-            ⚠️ Offene Aufgaben (Kritisch)
-          </h3>
-          <div className="space-y-3">
-            {stats.ekRechnungenOhneKreditor > 0 && (
-              <div className="flex items-center justify-between bg-white p-3 rounded">
-                <div>
-                  <span className="font-medium text-red-900">EK-Rechnungen ohne Kreditor</span>
-                  <p className="text-sm text-gray-600">Lieferantenrechnungen müssen zugeordnet werden</p>
-                </div>
-                <span className="bg-red-600 text-white px-4 py-2 rounded-full font-bold">
-                  {stats.ekRechnungenOhneKreditor}
-                </span>
-              </div>
-            )}
-            
-            {stats.vkRechnungenOhneBezahlung > 0 && (
-              <div className="flex items-center justify-between bg-white p-3 rounded">
-                <div>
-                  <span className="font-medium text-yellow-900">VK-Rechnungen ohne Zahlung</span>
-                  <p className="text-sm text-gray-600">Offene Forderungen (noch nicht bezahlt)</p>
-                </div>
-                <span className="bg-yellow-600 text-white px-4 py-2 rounded-full font-bold">
-                  {stats.vkRechnungenOhneBezahlung}
-                </span>
-              </div>
-            )}
-            
-            {stats.zahlungenNichtZugeordnet > 0 && (
-              <div className="flex items-center justify-between bg-white p-3 rounded">
-                <div>
-                  <span className="font-medium text-orange-900">Zahlungen ohne Zuordnung</span>
-                  <p className="text-sm text-gray-600">Zahlungseingänge müssen Rechnungen zugeordnet werden</p>
-                </div>
-                <span className="bg-orange-600 text-white px-4 py-2 rounded-full font-bold">
-                  {stats.zahlungenNichtZugeordnet}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* Kritische Probleme - Kompakt mit direkten Links */}
       {!istMonatAbschließbar && (
         <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
