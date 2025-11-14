@@ -107,8 +107,7 @@ async function testRelations() {
         z.dDatum AS zahlungsDatum,
         z.kBestellung AS z_kBestellung,
         b.kBestellung AS b_kBestellung,
-        b.cBestellNr,
-        b.cBestellNrExtern
+        b.cBestellNr
       FROM Rechnung.tExternerBeleg eb
       LEFT JOIN dbo.tZahlung z ON z.kBestellung = eb.kExternerBeleg
       LEFT JOIN dbo.tBestellung b ON z.kBestellung = b.kBestellung
