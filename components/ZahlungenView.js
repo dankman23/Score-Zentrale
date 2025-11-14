@@ -204,7 +204,7 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
             <select
               value={richtungFilter}
               onChange={(e) => setRichtungFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+              className="w-full bg-white text-gray-900 border border-gray-300 rounded px-3 py-2 text-sm"
             >
               <option value="alle">Alle</option>
               <option value="eingang">💰 Eingänge (positiv)</option>
