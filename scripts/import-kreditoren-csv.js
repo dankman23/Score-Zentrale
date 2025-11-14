@@ -7,8 +7,8 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const { MongoClient } = require('mongodb');
 
-const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017';
-const DB_NAME = 'fibu';
+const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/score_zentrale';
+const DB_NAME = new URL(MONGO_URL).pathname.substring(1) || 'score_zentrale';
 
 async function importKreditoren(csvPath) {
   const client = new MongoClient(MONGO_URL);
