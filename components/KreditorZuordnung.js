@@ -216,7 +216,9 @@ export default function KreditorZuordnung({ onUpdate }) {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">RgNr</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Betrag</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Beleg</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kreditor zuordnen</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aktion</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -233,17 +235,34 @@ export default function KreditorZuordnung({ onUpdate }) {
                   <td className="px-4 py-3 text-sm text-gray-900 font-medium">{rechnung.lieferantName}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{rechnung.rechnungsNummer}</td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                    {rechnung.gesamtBetrag?.toFixed(2)}€
+                    {rechnung.gesamtBetrag ? (
+                      <span>{rechnung.gesamtBetrag.toFixed(2)}€</span>
+                    ) : (
+                      <span className="text-red-600 font-bold">0,00€ ⚠️</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600">
                     {new Date(rechnung.rechnungsdatum).toLocaleDateString('de-DE')}
                   </td>
+                  <td className="px-4 py-3 text-sm">
+                    {rechnung.sourceEmailId ? (
+                      <button
+                        onClick={() => window.open(`/api/fibu/beleg/${rechnung.sourceEmailId}`, '_blank')}
+                        className="text-blue-600 hover:text-blue-800 font-medium"
+                        title="PDF-Beleg öffnen"
+                      >
+                        📄 PDF
+                      </button>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     <select
-                      className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
                       onChange={(e) => e.target.value && saveKreditor(rechnung._id, e.target.value)}
                     >
-                      <option value="">Auswählen...</option>
+                      <option value="" className="text-gray-900">Auswählen...</option>
                       {kreditoren
                         .filter(k => 
                           k.name.toLowerCase().includes(rechnung.lieferantName.toLowerCase().substring(0, 10)) ||
@@ -251,19 +270,31 @@ export default function KreditorZuordnung({ onUpdate }) {
                         )
                         .slice(0, 10)
                         .map(k => (
-                          <option key={k.kreditorenNummer} value={k.kreditorenNummer}>
+                          <option key={k.kreditorenNummer} value={k.kreditorenNummer} className="text-gray-900">
                             {k.kreditorenNummer} - {k.name}
                           </option>
                         ))
                       }
                       <optgroup label="Alle Kreditoren">
                         {kreditoren.map(k => (
-                          <option key={k.kreditorenNummer} value={k.kreditorenNummer}>
+                          <option key={k.kreditorenNummer} value={k.kreditorenNummer} className="text-gray-900">
                             {k.kreditorenNummer} - {k.name}
                           </option>
                         ))}
                       </optgroup>
                     </select>
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    <button
+                      onClick={() => {
+                        // TODO: Edit-Dialog öffnen
+                        alert(`Edit-Funktion für ${rechnung.lieferantName}\nWird jetzt implementiert...`)
+                      }}
+                      className="text-gray-600 hover:text-gray-800 font-medium"
+                      title="Rechnung bearbeiten"
+                    >
+                      ✏️
+                    </button>
                   </td>
                 </tr>
               ))}
