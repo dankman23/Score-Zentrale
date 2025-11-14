@@ -83,13 +83,33 @@ export async function GET(request: NextRequest) {
       console.log(`[EK-Rechnungen] 🧹 ${duplikateAnzahl} Duplikate entfernt`)
     }
     
+    // NEUE LOGIK: Nur GEPRÜFTE und VOLLSTÄNDIGE Rechnungen im EK-Tab
+    // Rechnungen müssen haben: Kreditor UND Betrag > 0
+    const gepruefte = ohneDuplikate.filter(r => {
+      const hatKreditor = r.kreditorKonto && r.kreditorKonto.trim() !== ''
+      const hatBetrag = r.gesamtBetrag && r.gesamtBetrag > 0
+      
+      if (!hatKreditor || !hatBetrag) {
+        console.log(`[EK-Rechnungen] ℹ️ In Zuordnung: ${r.lieferantName} - ${r.rechnungsNummer} (Kreditor: ${hatKreditor}, Betrag: ${r.gesamtBetrag || 0}€)`)
+        return false
+      }
+      
+      return true
+    })
+    
+    const inZuordnung = ohneDuplikate.length - gepruefte.length
+    
+    console.log(`[EK-Rechnungen] ✅ Geprüfte Rechnungen: ${gepruefte.length}`)
+    console.log(`[EK-Rechnungen] 📋 In Zuordnung: ${inZuordnung}`)
+    
     return NextResponse.json({
       ok: true,
-      rechnungen: ohneDuplikate,
+      rechnungen: gepruefte,
       stats: {
-        gesamt: ohneDuplikate.length,
+        gesamt: gepruefte.length,
         gefiltert: alleRechnungen.length - gereinigte.length,
         duplikateEntfernt: duplikateAnzahl,
+        inZuordnung: inZuordnung,
         zeitraum: { from, to }
       }
     })
