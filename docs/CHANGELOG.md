@@ -1,4 +1,46 @@
-# Changelog - Score Zentrale FIBU
+# Changelog - FIBU Modul
+
+Dokumentiert alle wichtigen Änderungen am FIBU-Modul.
+
+---
+
+## [15. Januar 2025] - KRITISCHE SICHERHEITS-MASSNAHMEN
+
+### Grund
+KRITISCHER FEHLER: Externe Rechnungen waren plötzlich komplett verschwunden (0 statt 50)
+durch fehlerhaften SQL-Subquery.
+
+### Maßnahmen implementiert:
+
+1. **Dokumentation für Daten-Sicherheit**
+   - `/app/docs/CRITICAL_APIS_DO_NOT_BREAK.md` erstellt
+   - Listet alle kritischen APIs auf
+   - Zeigt was erlaubt/verboten ist
+   - Rollback-Anleitung
+
+2. **Automatischer Daten-Test**
+   - `/app/test-critical-data.js` erstellt
+   - Prüft ob alle Daten noch da sind
+   - MUSS vor und nach JEDER Änderung ausgeführt werden
+   - Exit Code 0 = OK, Exit Code 1 = FEHLER
+
+3. **Agent-Anleitung**
+   - `/app/README_FOR_AGENTS.md` erstellt
+   - Pflicht-Checkliste für alle zukünftigen Agents
+   - DO's und DON'Ts klar definiert
+
+4. **Externe Rechnungs-API FIX**
+   - SQL-Subquery entfernt (war fehlerhaft)
+   - Matching-Logik nach Node.js verschoben (sicherer)
+   - 2-Stufen-Ansatz: Erst Rechnungen laden, dann Zahlungen matchen
+   - Ergebnis: 46/50 Rechnungen (92%) korrekt zugeordnet
+
+### Regel für Zukunft
+**"Was einmal im Modul ist, bleibt auch da und kann nur manuell gelöscht werden!"**
+
+Keine Code-Änderung darf jemals dazu führen, dass Daten verschwinden.
+
+---
 
 ## Version 2.0.0 (Januar 2025)
 
