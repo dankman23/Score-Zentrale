@@ -223,18 +223,28 @@ export async function GET(request: NextRequest) {
         }))
     }
     
-    return NextResponse.json({
+    const result = {
       ok: true,
       summary,
       details,
       timestamp: new Date().toISOString()
-    })
+    }
     
+    // Cache speichern
+    cachedData = {
+      cacheKey,
+      data: result
+    }
+    cacheTimestamp = Date.now()
+    
+    console.log(`[FIBU Übersicht] ✅ Cache gespeichert: ${from} - ${to}`)
+    
+    return NextResponse.json(result)
   } catch (error: any) {
     console.error('[FIBU Übersicht] Fehler:', error)
-    return NextResponse.json(
-      { ok: false, error: error.message },
-      { status: 500 }
-    )
+    return NextResponse.json({
+      ok: false,
+      error: error.message
+    }, { status: 500 })
   }
 }
