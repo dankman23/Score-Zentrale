@@ -4,9 +4,14 @@ import { useState, useEffect } from 'react'
 
 export default function FuzzyMatchingView() {
   const [vorschlaege, setVorschlaege] = useState([])
+  const [commerzbankVorschlaege, setCommerzbankVorschlaege] = useState([])
+  const [kreditoren, setKreditoren] = useState([])
+  const [kontenplan, setKontenplan] = useState([])
   const [stats, setStats] = useState(null)
+  const [commerzbankStats, setCommerzbankStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const [running, setRunning] = useState(false)
+  const [activeView, setActiveView] = useState('fuzzy') // 'fuzzy' or 'commerzbank'
 
   useEffect(() => {
     loadVorschlaege()
