@@ -33,43 +33,10 @@ export async function GET(request: NextRequest) {
         eb.cWaehrungISO,
         eck.fVkBrutto,
         eck.fVkNetto,
-        za.cName AS zahlungsartName,
-        -- KORREKTES MATCHING: Über Betrag + Datum (±1 Tag, ±0.50 EUR)
-        -- Amazon Payments haben andere kBestellung IDs als kExternerBeleg!
-        z.kZahlung,
-        z.fBetrag AS zahlungsBetrag,
-        z.dDatum AS zahlungsDatum,
-        z.cHinweis AS zahlungsHinweis,
-        z.kBestellung
+        za.cName AS zahlungsartName
       FROM Rechnung.tExternerBeleg eb
       LEFT JOIN Rechnung.tExternerBelegEckdaten eck ON eb.kExternerBeleg = eck.kExternerBeleg
       LEFT JOIN dbo.tZahlungsart za ON eb.kZahlungsart = za.kZahlungsart
-      -- MATCHING über Betrag + Datum: Nehme die beste Übereinstimmung (kleinste Differenz)
-      LEFT JOIN (
-        SELECT 
-          z_inner.kZahlung,
-          z_inner.fBetrag,
-          z_inner.dDatum,
-          z_inner.cHinweis,
-          z_inner.kBestellung,
-          eck_inner.kExternerBeleg,
-          -- Ranking: Beste Übereinstimmung = kleinste Betrag-Differenz
-          ROW_NUMBER() OVER (
-            PARTITION BY eck_inner.kExternerBeleg 
-            ORDER BY ABS(z_inner.fBetrag - eck_inner.fVkBrutto) ASC, 
-                     ABS(DATEDIFF(day, z_inner.dDatum, eb_inner.dBelegdatumUtc)) ASC
-          ) as rn
-        FROM Rechnung.tExternerBeleg eb_inner
-        LEFT JOIN Rechnung.tExternerBelegEckdaten eck_inner ON eb_inner.kExternerBeleg = eck_inner.kExternerBeleg
-        LEFT JOIN dbo.tZahlung z_inner ON 
-          ABS(z_inner.fBetrag - eck_inner.fVkBrutto) <= 0.50
-          AND ABS(DATEDIFF(day, z_inner.dDatum, eb_inner.dBelegdatumUtc)) <= 1
-          AND z_inner.dDatum >= @from
-          AND z_inner.dDatum < DATEADD(day, 2, @to)
-        LEFT JOIN dbo.tZahlungsart za2_inner ON z_inner.kZahlungsart = za2_inner.kZahlungsart
-        WHERE eb_inner.nBelegtyp = 0
-          AND za2_inner.cName LIKE '%Amazon%'
-      ) z ON z.kExternerBeleg = eb.kExternerBeleg AND z.rn = 1
       WHERE eb.dBelegdatumUtc >= @from
         AND eb.dBelegdatumUtc < DATEADD(day, 1, @to)
         AND eb.nBelegtyp = 0
