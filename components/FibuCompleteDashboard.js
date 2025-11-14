@@ -82,13 +82,18 @@ export default function FibuCompleteDashboard() {
     loadData()
   }, [selectedPeriod])
 
-  async function loadData() {
+  async function loadData(forceReload = false) {
     setLoading(true)
     try {
       const [from, to] = selectedPeriod.split('_')
-      const res = await fetch(`/api/fibu/uebersicht/complete?from=${from}&to=${to}`)
+      const forceParam = forceReload ? '&force=true' : ''
+      const res = await fetch(`/api/fibu/uebersicht/complete?from=${from}&to=${to}${forceParam}`)
       const json = await res.json()
       setData(json)
+      
+      if (json.cached) {
+        console.log(`✅ Daten aus Cache geladen (${json.cacheAge}s alt)`)
+      }
     } catch (error) {
       console.error('Fehler beim Laden:', error)
     }
