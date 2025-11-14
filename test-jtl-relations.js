@@ -122,7 +122,6 @@ async function testRelations() {
       console.log(`   z.kBestellung: ${r.z_kBestellung || 'N/A'}`)
       console.log(`   b.kBestellung: ${r.b_kBestellung || 'N/A'}`)
       console.log(`   Bestellnummer: ${r.cBestellNr || 'N/A'}`)
-      console.log(`   Bestellnr Extern: ${r.cBestellNrExtern || 'N/A'}`)
       console.log('')
     })
     
