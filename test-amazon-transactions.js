@@ -35,8 +35,7 @@ async function testAmazonTransactions() {
         -- Transaktionen
         et.kExternerBelegTransaktion,
         et.fBetrag AS transaktionsBetrag,
-        et.dBuchungsdatum AS transaktionsDatum,
-        et.cTransaktionsTyp
+        et.dBuchungsdatum AS transaktionsDatum
       FROM Rechnung.tExternerBeleg eb
       LEFT JOIN Rechnung.tExternerBelegEckdaten eck ON eb.kExternerBeleg = eck.kExternerBeleg
       LEFT JOIN Rechnung.tExternerBelegTransaktion et ON eb.kExternerBeleg = et.kExternerBeleg
