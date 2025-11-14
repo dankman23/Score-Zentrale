@@ -19,16 +19,15 @@ export default function KreditorZuordnung({ onUpdate }) {
   async function loadData() {
     setLoading(true)
     try {
-      // Lade EK ohne Kreditor
-      const ekRes = await fetch('/api/fibu/rechnungen/ek?from=2025-10-01&to=2025-11-30&limit=500')
+      // Neue API: Lade nur Rechnungen für Zuordnung (ohne Kreditor ODER Betrag=0)
+      const ekRes = await fetch('/api/fibu/zuordnung/ek-liste?from=2025-01-01&to=2025-12-31')
       const ekData = await ekRes.json()
-      const ohneKreditor = (ekData.rechnungen || []).filter(r => !r.kreditorKonto && r.gesamtBetrag > 0)
       
       // Lade Kreditoren
       const kredRes = await fetch('/api/fibu/kreditoren?limit=500')
       const kredData = await kredRes.json()
       
-      setRechnungen(ohneKreditor)
+      setRechnungen(ekData.rechnungen || [])
       setKreditoren(kredData.kreditoren || [])
     } catch (error) {
       console.error('Fehler:', error)
