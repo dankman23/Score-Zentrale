@@ -5,9 +5,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '../../../../lib/db/mongodb'
 import { getJTLConnection } from '../../../../lib/db/mssql'
 
+// Server-side Cache
+let cachedData: any = null
+let cacheTimestamp: number = 0
+const CACHE_TTL = 5 * 60 * 1000 // 5 Minuten Cache
+
 /**
  * Vollständige FIBU-Übersicht
  * Zeigt ALLE nicht zugeordneten Datensätze für Oktober + November
+ * Mit Server-Side Cache für schnellere Ladezeiten
  */
 export async function GET(request: NextRequest) {
   try {
