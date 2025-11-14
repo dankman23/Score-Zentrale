@@ -69,11 +69,16 @@ export async function GET(request: NextRequest) {
     const vkData = await vkResponse.json()
     const vkRechnungen = vkData.rechnungen || []
     
+    const gesamtUmsatz = vkRechnungen.reduce((sum: number, r: any) => sum + (r.brutto || 0), 0)
+    const nettoUmsatz = vkRechnungen.reduce((sum: number, r: any) => sum + (r.netto || 0), 0)
+    
     const vkStats = {
       total: vkRechnungen.length,
       offen: vkRechnungen.filter((r: any) => r.status !== 'Bezahlt').length,
       bezahlt: vkRechnungen.filter((r: any) => r.status === 'Bezahlt').length,
-      gesamtBetrag: vkRechnungen.reduce((sum: number, r: any) => sum + (r.brutto || 0), 0),
+      gesamtBetrag: gesamtUmsatz,
+      gesamtUmsatz: gesamtUmsatz,
+      nettoUmsatz: nettoUmsatz,
       offenerBetrag: vkRechnungen
         .filter((r: any) => r.status !== 'Bezahlt')
         .reduce((sum: number, r: any) => sum + (r.brutto || 0), 0)
