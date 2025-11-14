@@ -181,7 +181,15 @@ async function main() {
 function findBestMatch(zahlung, rechnungen) {
   const candidates = []
   
+  // WICHTIG: Amazon Payment darf NUR zu XRE-* Rechnungen gematcht werden!
+  const istAmazonPayment = zahlung.zahlungsart && zahlung.zahlungsart.toLowerCase().includes('amazon')
+  
   for (const rechnung of rechnungen) {
+    // Filtere: Amazon Payment nur zu XRE-* Rechnungen
+    if (istAmazonPayment && (!rechnung.cRechnungsNr || !rechnung.cRechnungsNr.startsWith('XRE-'))) {
+      continue // Überspringe diese Rechnung
+    }
+    
     let score = 0
     const reasons = []
     
