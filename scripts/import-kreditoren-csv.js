@@ -18,7 +18,7 @@ async function importKreditoren(csvPath) {
     console.log('✅ MongoDB verbunden');
     
     const db = client.db(DB_NAME);
-    const collection = db.collection('fibu_kreditoren');
+    const collection = db.collection('kreditoren');
     
     const kreditoren = [];
     
