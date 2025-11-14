@@ -69,8 +69,13 @@ export async function GET(request: NextRequest) {
     const vkData = await vkResponse.json()
     const vkRechnungen = vkData.rechnungen || []
     
-    const gesamtUmsatz = vkRechnungen.reduce((sum: number, r: any) => sum + (r.brutto || 0), 0)
+    // Berechne Umsätze - verwende brutto wenn vorhanden, sonst netto * 1.19 (Schätzung)
     const nettoUmsatz = vkRechnungen.reduce((sum: number, r: any) => sum + (r.netto || 0), 0)
+    const gesamtUmsatz = vkRechnungen.reduce((sum: number, r: any) => {
+      if (r.brutto && r.brutto > 0) return sum + r.brutto
+      if (r.netto && r.netto > 0) return sum + (r.netto * 1.19) // Schätzung mit 19% MwSt
+      return sum
+    }, 0)
     
     const vkStats = {
       total: vkRechnungen.length,
@@ -81,7 +86,11 @@ export async function GET(request: NextRequest) {
       nettoUmsatz: nettoUmsatz,
       offenerBetrag: vkRechnungen
         .filter((r: any) => r.status !== 'Bezahlt')
-        .reduce((sum: number, r: any) => sum + (r.brutto || 0), 0)
+        .reduce((sum: number, r: any) => {
+          if (r.brutto && r.brutto > 0) return sum + r.brutto
+          if (r.netto && r.netto > 0) return sum + (r.netto * 1.19)
+          return sum
+        }, 0)
     }
     
     // ========================================
