@@ -126,13 +126,13 @@ export async function GET(request: NextRequest) {
         status: status,  // IMMER "Bezahlt"
         quelle: 'Amazon/Extern',
         
-        // Zahlungsinformationen aus JTL DB (falls vorhanden)
-        zahlungId: r.kZahlung || null,
-        zahlungsdatum: r.zahlungsDatum || r.dBelegdatumUtc,  // Fallback auf Belegdatum
+        // Zahlungsinformationen aus JTL DB (via Matching)
+        zahlungId: hatZahlung ? besteZahlung.kZahlung : null,
+        zahlungsdatum: hatZahlung ? besteZahlung.dDatum : r.dBelegdatumUtc,  // Fallback auf Belegdatum
         zahlungsBetrag: hatZahlung ? zahlungsBetrag : rechnungsBetrag,  // Fallback auf Rechnungsbetrag
-        zahlungsHinweis: r.zahlungsHinweis || 'Amazon VCS-Lite',
-        bestellnummer: r.cBestellNr || '',
-        kBestellung: r.kBestellung || r.kExternerBeleg,
+        zahlungsHinweis: hatZahlung ? besteZahlung.cHinweis : 'Amazon VCS-Lite',
+        bestellnummer: '',
+        kBestellung: hatZahlung ? besteZahlung.kBestellung : r.kExternerBeleg,
         
         // Zusätzliche Infos
         betragDifferenz: hatZahlung ? Math.abs(rechnungsBetrag - zahlungsBetrag) : 0,
