@@ -146,6 +146,16 @@ export async function GET(request: NextRequest) {
     // DETAIL-LISTEN (Top 20 jeweils)
     // ========================================
     const details = {
+      ekRechnungen: ekRechnungen.map(r => ({
+        _id: r._id,
+        lieferant: r.lieferantName,
+        rechnungsNr: r.rechnungsNummer,
+        datum: r.rechnungsdatum,
+        betrag: r.gesamtBetrag || 0,
+        kreditorKonto: r.kreditorKonto || null,
+        zahlungId: r.zahlungId || null
+      })),
+      
       ekOhneBetrag: ekRechnungen
         .filter(r => !r.gesamtBetrag || r.gesamtBetrag <= 0)
         .slice(0, 20)
