@@ -138,7 +138,7 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
             <select
               value={zeitraum}
               onChange={(e) => setZeitraum(e.target.value)}
-              className="border border-gray-300 rounded-lg px-4 py-2 text-sm"
+              className="bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 text-sm"
             >
               <option value="2025-10-01_2025-10-31">Oktober 2025</option>
               <option value="2025-11-01_2025-11-30">November 2025</option>
