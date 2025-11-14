@@ -265,9 +265,8 @@ export default function KreditorZuordnung({ onUpdate }) {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">RgNr</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Betrag</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Beleg</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aktionen</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kreditor zuordnen</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aktion</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
