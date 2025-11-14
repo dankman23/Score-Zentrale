@@ -213,7 +213,7 @@ export default function ZahlungenView() {
             {zuordnungFilter !== 'alle' && (
               <button
                 onClick={() => setZuordnungFilter('alle')}
-                className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1"
+                className="bg-blue-600 text-white px-2 py-1 rounded text-xs flex items-center gap-1 hover:bg-blue-700"
               >
                 Zuordnung: {zuordnungFilter === 'zugeordnet' ? 'Ja' : 'Nein'} <span className="ml-1">×</span>
               </button>
@@ -221,7 +221,7 @@ export default function ZahlungenView() {
             {richtungFilter !== 'alle' && (
               <button
                 onClick={() => setRichtungFilter('alle')}
-                className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1"
+                className="bg-blue-600 text-white px-2 py-1 rounded text-xs flex items-center gap-1 hover:bg-blue-700"
               >
                 Richtung: {richtungFilter === 'eingang' ? 'Eingang' : 'Ausgang'} <span className="ml-1">×</span>
               </button>
@@ -229,7 +229,7 @@ export default function ZahlungenView() {
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
-                className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1"
+                className="bg-blue-600 text-white px-2 py-1 rounded text-xs flex items-center gap-1 hover:bg-blue-700"
               >
                 Suche: "{searchTerm}" <span className="ml-1">×</span>
               </button>
