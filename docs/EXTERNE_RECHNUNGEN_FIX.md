@@ -2,14 +2,15 @@
 
 ## Problem
 
-**Status:** ✅ GELÖST  
+**Status:** ✅ VOLLSTÄNDIG GELÖST  
 **Datum:** 15. Januar 2025
 
 ### Ursprüngliches Problem
 
 1. **Alle externen Rechnungen (XRE-*) waren als "Offen" markiert** - obwohl sie IMMER bezahlt sein müssen
-2. **Zahlungszuordnung war inkorrekt** - alte Zahlungen aus 2020/2021 wurden zu Rechnungen aus 2025 matched
-3. **UI-Problem**: Weiße Schrift auf weißem Hintergrund bei Filter-Dropdowns in einigen FIBU-Modulen
+2. **Zahlungszuordnung war komplett falsch** - alte Zahlungen aus 2020/2021 wurden zu Rechnungen aus 2025 matched
+3. **Fehlende Zuordnung für Buchhaltung** - Keine korrekten Rechnungs-Zahlungs-Verknüpfungen für 10it Export
+4. **UI-Problem**: Weiße Schrift auf weißem Hintergrund bei Filter-Dropdowns in einigen FIBU-Modulen
 
 ## Lösung
 
