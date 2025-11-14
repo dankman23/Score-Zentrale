@@ -81,8 +81,7 @@ async function testRelations() {
     const bestellung = await pool.request().query(`
       SELECT TOP 1
         b.kBestellung,
-        b.cBestellNr,
-        b.cZahlungsanbieter
+        b.cBestellNr
       FROM dbo.tBestellung b
       WHERE b.kBestellung = ${kExternerBeleg}
     `)
