@@ -2,29 +2,21 @@
  * Test um die JTL DB Relationen zu verstehen
  */
 
-require('dotenv').config()
 const sql = require('mssql')
 
 const config = {
-  server: process.env.JTL_SQL_HOST || '162.55.235.45',
-  port: parseInt(process.env.JTL_SQL_PORT || '49172'),
-  database: process.env.JTL_SQL_DATABASE || 'eazybusiness',
-  user: process.env.JTL_SQL_USER || 'sellermath',
-  password: process.env.JTL_SQL_PASSWORD,
+  server: '162.55.235.45',
+  port: 49172,
+  database: 'eazybusiness',
+  user: 'sellermath',
+  password: 'xbPWTh87rLtvQx11',
   options: {
-    encrypt: process.env.JTL_SQL_ENCRYPT === 'true',
-    trustServerCertificate: process.env.JTL_SQL_TRUST_CERT === 'true',
+    encrypt: false,
+    trustServerCertificate: true,
     connectTimeout: 30000,
     requestTimeout: 30000
   }
 }
-
-console.log('Config:', {
-  server: config.server,
-  port: config.port,
-  database: config.database,
-  user: config.user
-})
 
 async function testRelations() {
   try {
