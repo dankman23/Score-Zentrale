@@ -10,13 +10,17 @@ const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/score_zent
 const DB_NAME = new URL(MONGO_URL).pathname.substring(1) || 'score_zentrale';
 
 const MSSQL_CONFIG = {
-  server: 'localhost',
-  database: 'eazybusiness',
-  user: 'sa',
-  password: 'YourStrong@Passw0rd',
+  server: process.env.JTL_SQL_HOST || 'localhost',
+  port: parseInt(process.env.JTL_SQL_PORT || '1433'),
+  database: process.env.JTL_SQL_DATABASE || 'eazybusiness',
+  user: process.env.JTL_SQL_USER || 'sa',
+  password: process.env.JTL_SQL_PASSWORD || '',
+  connectionTimeout: 15000,
+  requestTimeout: 30000,
   options: {
-    encrypt: true,
-    trustServerCertificate: true
+    encrypt: process.env.JTL_SQL_ENCRYPT === 'true',
+    trustServerCertificate: process.env.JTL_SQL_TRUST_CERT === 'true',
+    enableArithAbort: true
   }
 };
 
