@@ -249,9 +249,9 @@ export default function KreditorZuordnung({ onUpdate }) {
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overflow-y-visible" style={{maxHeight: 'none'}}>
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
                 <th className="px-4 py-3 text-left">
                   <input
@@ -266,7 +266,7 @@ export default function KreditorZuordnung({ onUpdate }) {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Betrag</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aktionen</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kreditor zuordnen</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Kreditor</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
