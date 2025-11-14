@@ -119,7 +119,7 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
         <div>
           <h2 className="text-2xl font-bold text-gray-900">💳 Zahlungen (Alle Konten)</h2>
           <p className="text-sm text-gray-600 mt-1">
-            PayPal, Amazon, eBay, Commerzbank, Mollie und mehr
+            PayPal, Amazon, eBay, Postbank, Commerzbank, Mollie und mehr
           </p>
         </div>
         
