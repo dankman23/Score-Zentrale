@@ -267,6 +267,9 @@ export default function EKRechnungenView({ zeitraum: zeitraumProp, initialFilter
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   Status
                 </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Aktionen
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -301,6 +304,31 @@ export default function EKRechnungenView({ zeitraum: zeitraumProp, initialFilter
                         ○ Offen
                       </span>
                     )}
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      {ek.sourceEmailId && (
+                        <button
+                          onClick={() => window.open(`/api/fibu/beleg/${ek.sourceEmailId}`, '_blank')}
+                          className="text-blue-600 hover:text-blue-800 font-medium text-xs"
+                          title="PDF-Beleg öffnen"
+                        >
+                          📄 Beleg
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          if (confirm('Diese Rechnung zurück in die Zuordnung verschieben?')) {
+                            // TODO: API-Call zum Zurücksetzen
+                            alert('Funktion wird implementiert')
+                          }
+                        }}
+                        className="text-orange-600 hover:text-orange-800 font-medium text-xs"
+                        title="Zurück in Zuordnung"
+                      >
+                        ↩️ Zurück
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
