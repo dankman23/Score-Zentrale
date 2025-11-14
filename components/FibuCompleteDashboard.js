@@ -265,67 +265,7 @@ export default function FibuCompleteDashboard() {
         )}
 
         {activeTab === 'ek' && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">📥 EK-Rechnungen (Lieferanten)</h2>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lieferant</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">RgNr</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Betrag</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kreditor</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {(details.ekRechnungen || []).slice(0, 50).map((ek, idx) => (
-                      <tr key={idx} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {new Date(ek.datum).toLocaleDateString('de-DE')}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{ek.lieferant}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{ek.rechnungsNr}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-gray-900">
-                          {(ek.betrag || 0).toFixed(2)}€
-                        </td>
-                        <td className="px-6 py-4 text-sm">
-                          {ek.kreditorKonto ? (
-                            <span className="text-green-600 font-medium">{ek.kreditorKonto}</span>
-                          ) : (
-                            <span className="text-red-600">❌ Fehlt</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-sm">
-                          {ek.zahlungId ? (
-                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-                              ✓ Bezahlt
-                            </span>
-                          ) : (
-                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
-                              ○ Offen
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              {(details.ekRechnungen || []).length > 50 && (
-                <p className="mt-4 text-sm text-gray-500 text-center">
-                  Zeige erste 50 von {details.ekRechnungen.length} Rechnungen
-                </p>
-              )}
-              {(details.ekRechnungen || []).length === 0 && (
-                <p className="mt-4 text-sm text-gray-500 text-center">
-                  Keine EK-Rechnungen im gewählten Zeitraum gefunden.
-                </p>
-              )}
-            </div>
-          </div>
+          <EKRechnungenView zeitraum={selectedPeriod} initialFilter={tabFilters['ek']} />
         )}
 
         {activeTab === 'zuordnung' && (
