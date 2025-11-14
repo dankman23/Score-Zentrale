@@ -76,10 +76,31 @@ export async function GET(request: NextRequest) {
     
     const rechnungen = result.recordset.map((r: any) => {
       const mongoData = mongoMap.get(r.kExternerBeleg) || {}
-      
       const rechnungsBetrag = parseFloat(r.fVkBrutto || 0)
-      const zahlungsBetrag = r.zahlungsBetrag ? parseFloat(r.zahlungsBetrag) : 0
-      const hatZahlung = r.kZahlung > 0
+      const rechnungsDatum = new Date(r.dBelegdatumUtc)
+      
+      // MATCHING: Finde beste passende Amazon Payment (Betrag ±0.50 EUR, Datum ±1 Tag)
+      const passendezahlungen = zahlungenResult.recordset.filter((z: any) => {
+        const zahlungsBetrag = parseFloat(z.fBetrag || 0)
+        const zahlungsDatum = new Date(z.dDatum)
+        const betragDiff = Math.abs(zahlungsBetrag - rechnungsBetrag)
+        const tageDiff = Math.abs((zahlungsDatum.getTime() - rechnungsDatum.getTime()) / (1000 * 60 * 60 * 24))
+        
+        return betragDiff <= 0.50 && tageDiff <= 1
+      })
+      
+      // Nehme beste Übereinstimmung (kleinste Betrag-Differenz)
+      let besteZahlung = null
+      if (passendezahlungen.length > 0) {
+        besteZahlung = passendezahlungen.reduce((best: any, current: any) => {
+          const bestDiff = Math.abs(parseFloat(best.fBetrag) - rechnungsBetrag)
+          const currentDiff = Math.abs(parseFloat(current.fBetrag) - rechnungsBetrag)
+          return currentDiff < bestDiff ? current : best
+        })
+      }
+      
+      const hatZahlung = besteZahlung !== null
+      const zahlungsBetrag = hatZahlung ? parseFloat(besteZahlung.fBetrag) : 0
       
       // WICHTIG: Externe Rechnungen (XRE-*) sind IMMER bereits bezahlt!
       // Sie kommen aus Amazon VCS-Lite und sind bereits abgewickelte Transaktionen
