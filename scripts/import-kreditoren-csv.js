@@ -46,13 +46,15 @@ async function importKreditoren(csvPath) {
     
     console.log(`📄 ${kreditoren.length} Kreditoren aus CSV gelesen`);
     
-    // Lösche alte und füge neue ein
-    const deleteResult = await collection.deleteMany({ source: 'csv_import' });
+    // WICHTIG: Lösche ALLE alten Kreditoren und ersetze mit CSV-Daten
+    console.log('\n⚠️  ACHTUNG: Lösche ALLE bestehenden Kreditoren...');
+    const deleteResult = await collection.deleteMany({});
     console.log(`🗑️ ${deleteResult.deletedCount} alte Kreditoren gelöscht`);
     
     if (kreditoren.length > 0) {
       const insertResult = await collection.insertMany(kreditoren);
       console.log(`✅ ${insertResult.insertedCount} Kreditoren importiert`);
+      console.log('\n✅ CSV ist jetzt die EINZIGE Datenquelle für Kreditoren');
     }
     
     console.log('\n📊 Beispiele:');
