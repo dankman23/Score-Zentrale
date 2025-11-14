@@ -340,59 +340,53 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredZahlungen.map((zahlung, idx) => (
                 <tr key={idx} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {new Date(zahlung.zahlungsdatum).toLocaleDateString('de-DE')}
+                  <td className="px-2 py-2 text-xs text-gray-600 whitespace-nowrap">
+                    {new Date(zahlung.zahlungsdatum).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' })}
                   </td>
-                  <td className="px-4 py-3 text-sm">
+                  <td className="px-2 py-2 text-xs whitespace-nowrap">
                     <span className="font-medium text-gray-900">{zahlung.zahlungsanbieter}</span>
                   </td>
-                  <td className={`px-4 py-3 text-sm text-right font-bold ${
+                  <td className={`px-2 py-2 text-xs text-right font-bold whitespace-nowrap ${
                     zahlung.betrag >= 0 ? 'text-green-600' : 'text-red-600'
                   }`}>
                     {zahlung.betrag >= 0 ? '+' : ''}{zahlung.betrag.toFixed(2)}€
                   </td>
-                  <td className="px-4 py-3 text-sm">
+                  <td className="px-2 py-2 text-xs whitespace-nowrap">
                     {zahlung.kRechnung > 0 ? (
                       <span className="text-blue-600 font-medium">{zahlung.rechnungsNr}</span>
                     ) : (
                       <span className="text-gray-400">{zahlung.rechnungsNr}</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {zahlung.kundenName || '-'}
+                  <td className="px-2 py-2 text-xs text-gray-600 max-w-[120px]">
+                    <div className="truncate" title={zahlung.kundenName}>
+                      {zahlung.kundenName || '-'}
+                    </div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    <div className="max-w-xs">
+                  <td className="px-2 py-2 text-xs text-gray-600 max-w-xs">
+                    <div className="max-w-[200px]">
                       {zahlung.cBestellNr && (
-                        <div className="font-medium text-blue-600 mb-1">
+                        <div className="font-medium text-blue-600 truncate">
                           📦 {zahlung.cBestellNr}
                         </div>
                       )}
-                      <div className="text-xs truncate" title={zahlung.hinweis}>
+                      <div className="truncate" title={zahlung.hinweis}>
                         {zahlung.hinweis || '-'}
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-center">
+                  <td className="px-2 py-2 text-xs text-center whitespace-nowrap">
                     {zahlung.istZugeordnet ? (
-                      <div>
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-                          ✓ Zugeordnet
-                        </span>
-                        {zahlung.zuordnungstyp && (
-                          <div className="text-xs text-gray-500 mt-1">{zahlung.zuordnungstyp}</div>
-                        )}
-                        {zahlung.kRechnung > 0 && !zahlung.zuordnungstyp && (
-                          <div className="text-xs text-gray-500 mt-1">kRg: {zahlung.kRechnung}</div>
-                        )}
-                      </div>
+                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                        ✓
+                      </span>
                     ) : (
                       <span className="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">
-                        ○ Offen
+                        ○
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-sm">
+                  <td className="px-2 py-2 text-xs whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs rounded ${
                       zahlung.quelle === 'tZahlung' 
                         ? 'bg-blue-100 text-blue-700' 
