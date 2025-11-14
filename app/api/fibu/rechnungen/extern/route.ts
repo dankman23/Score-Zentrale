@@ -88,9 +88,8 @@ export async function GET(request: NextRequest) {
       }
     })
     
-    // MongoDB speichern
-    const db = await getDb()
-    const collection = db.collection('fibu_externe_rechnungen')
+    // MongoDB speichern (nutze mongoDb Variable von oben)
+    const collection = mongoDb.collection('fibu_externe_rechnungen')
     
     for (const rechnung of rechnungen) {
       await collection.updateOne(
