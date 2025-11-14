@@ -57,7 +57,6 @@ export default function VKRechnungenView({ zeitraum: zeitraumProp, initialFilter
     setLoading(false)
   }
 
-  const [statusFilter, setStatusFilter] = useState('alle')
   const [quelleFilter, setQuelleFilter] = useState('alle')
   const [searchTerm, setSearchTerm] = useState('')
 
