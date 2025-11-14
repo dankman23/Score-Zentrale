@@ -63,8 +63,7 @@ async function testAmazonTransactions() {
       if (r.kExternerBelegTransaktion) {
         belegeMap.get(r.kExternerBeleg).transaktionen.push({
           betrag: r.transaktionsBetrag,
-          datum: r.transaktionsDatum,
-          typ: r.cTransaktionsTyp
+          datum: r.transaktionsDatum
         })
       }
     })
