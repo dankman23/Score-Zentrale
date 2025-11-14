@@ -340,6 +340,32 @@ export default function EKRechnungenView({ zeitraum: zeitraumProp, initialFilter
                       >
                         ↩️ Zurück
                       </button>
+                      <button
+                        onClick={async () => {
+                          if (confirm(`⚠️ WARNUNG: Rechnung "${ek.rechnungsNummer}" von ${ek.lieferantName} KOMPLETT LÖSCHEN?\n\nDies kann nicht rückgängig gemacht werden!`)) {
+                            if (confirm('Wirklich löschen? Letzte Bestätigung!')) {
+                              try {
+                                const res = await fetch(`/api/fibu/rechnung/${ek._id}/loeschen`, {
+                                  method: 'DELETE'
+                                })
+                                if (res.ok) {
+                                  alert('✅ Rechnung wurde gelöscht!')
+                                  loadRechnungen() // Reload list
+                                } else {
+                                  alert('❌ Fehler beim Löschen')
+                                }
+                              } catch (error) {
+                                console.error('Fehler:', error)
+                                alert('❌ Fehler beim Löschen')
+                              }
+                            }
+                          }
+                        }}
+                        className="text-red-600 hover:text-red-800 font-medium text-xs"
+                        title="Rechnung komplett löschen"
+                      >
+                        🗑️ Löschen
+                      </button>
                     </div>
                   </td>
                 </tr>
