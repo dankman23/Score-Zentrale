@@ -33,10 +33,21 @@ export async function GET(request: NextRequest) {
         eb.cWaehrungISO,
         eck.fVkBrutto,
         eck.fVkNetto,
-        za.cName AS zahlungsartName
+        za.cName AS zahlungsartName,
+        -- Zahlungsinformationen aus tZahlung
+        z.kZahlung,
+        z.fBetrag AS zahlungsBetrag,
+        z.dDatum AS zahlungsDatum,
+        z.cHinweis AS zahlungsHinweis,
+        -- Bestellinformationen
+        b.cBestellNr,
+        b.kBestellung
       FROM Rechnung.tExternerBeleg eb
       LEFT JOIN Rechnung.tExternerBelegEckdaten eck ON eb.kExternerBeleg = eck.kExternerBeleg
       LEFT JOIN dbo.tZahlungsart za ON eb.kZahlungsart = za.kZahlungsart
+      -- WICHTIG: Zuordnung zu Amazon Payment über kBestellung
+      LEFT JOIN dbo.tZahlung z ON z.kBestellung = eb.kExternerBeleg
+      LEFT JOIN dbo.tBestellung b ON eb.kExternerBeleg = b.kBestellung
       WHERE eb.dBelegdatumUtc >= @from
         AND eb.dBelegdatumUtc < DATEADD(day, 1, @to)
         AND eb.nBelegtyp = 0
