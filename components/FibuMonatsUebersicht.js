@@ -30,14 +30,41 @@ function getRandomQuote() {
   return QUOTES[Math.floor(Math.random() * QUOTES.length)]
 }
 
-export default function FibuMonatsUebersicht({ selectedPeriod }) {
-  const [loading, setLoading] = useState(true)
+export default function FibuMonatsUebersicht({ selectedPeriod, summaryData }) {
+  const [loading, setLoading] = useState(!summaryData)
   const [stats, setStats] = useState(null)
   const [monat, setMonat] = useState('Oktober 2025')
 
   useEffect(() => {
-    loadMonatsStats()
-  }, [selectedPeriod])
+    if (summaryData) {
+      // Nutze direkt die übergebenen Daten (viel schneller!)
+      const [from, to] = selectedPeriod.split('_')
+      const fromDate = new Date(from)
+      const monatName = fromDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })
+      setMonat(monatName)
+      
+      // Konvertiere summaryData zu stats-Format
+      setStats({
+        vkRechnungenGesamt: summaryData.vkRechnungen?.total || 0,
+        vkRechnungenBezahlt: summaryData.vkRechnungen?.bezahlt || 0,
+        vkRechnungenOhneBezahlung: summaryData.vkRechnungen?.offen || 0,
+        vkRechnungenOhneDebitor: summaryData.issues?.vkOhneDebitor || 0,
+        ekRechnungenGesamt: summaryData.ekRechnungen?.total || 0,
+        ekRechnungenZugeordnet: (summaryData.ekRechnungen?.total || 0) - (summaryData.issues?.ekOhneKreditor || 0),
+        ekRechnungenOhneKreditor: summaryData.issues?.ekOhneKreditor || 0,
+        zahlungenGesamt: summaryData.zahlungen?.total || 0,
+        zahlungenZugeordnet: summaryData.zahlungen?.zugeordnet || 0,
+        zahlungenNichtZugeordnet: summaryData.zahlungen?.nichtZugeordnet || 0,
+        gesamtUmsatz: summaryData.vkRechnungen?.gesamtUmsatz || 0,
+        nettoUmsatz: summaryData.vkRechnungen?.nettoUmsatz || 0,
+        gesamtRechnungen: (summaryData.vkRechnungen?.total || 0) + (summaryData.ekRechnungen?.total || 0),
+        vollstaendigZugeordnet: ((summaryData.vkRechnungen?.bezahlt || 0) + ((summaryData.ekRechnungen?.total || 0) - (summaryData.issues?.ekOhneKreditor || 0)))
+      })
+      setLoading(false)
+    } else {
+      loadMonatsStats()
+    }
+  }, [selectedPeriod, summaryData])
 
   async function loadMonatsStats() {
     setLoading(true)
