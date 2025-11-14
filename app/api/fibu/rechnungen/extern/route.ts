@@ -48,6 +48,26 @@ export async function GET(request: NextRequest) {
       .input('to', to)
       .query(query)
     
+    // Hole Amazon Payments für Matching (Betrag + Datum)
+    const zahlungenQuery = `
+      SELECT 
+        z.kZahlung,
+        z.fBetrag,
+        z.dDatum,
+        z.cHinweis,
+        z.kBestellung
+      FROM dbo.tZahlung z
+      LEFT JOIN dbo.tZahlungsart za ON z.kZahlungsart = za.kZahlungsart
+      WHERE z.dDatum >= DATEADD(day, -2, @from)
+        AND z.dDatum < DATEADD(day, 2, @to)
+        AND za.cName LIKE '%Amazon%'
+    `
+    
+    const zahlungenResult = await pool.request()
+      .input('from', from)
+      .input('to', to)
+      .query(zahlungenQuery)
+    
     // Hole zusätzlich MongoDB-Daten für erweiterte Infos
     const mongoDb = await getDb()
     const mongoCollection = mongoDb.collection('fibu_externe_rechnungen')
