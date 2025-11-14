@@ -34,22 +34,24 @@ export async function GET(request: NextRequest) {
         eck.fVkBrutto,
         eck.fVkNetto,
         za.cName AS zahlungsartName,
-        -- Zahlungsinformationen aus tZahlung
+        -- KORREKTES MATCHING: Über Betrag + Datum (±1 Tag, ±0.50 EUR)
+        -- Amazon Payments haben andere kBestellung IDs als kExternerBeleg!
         z.kZahlung,
         z.fBetrag AS zahlungsBetrag,
         z.dDatum AS zahlungsDatum,
         z.cHinweis AS zahlungsHinweis,
-        -- Bestellinformationen
-        b.cBestellNr,
-        b.kBestellung
+        z.kBestellung
       FROM Rechnung.tExternerBeleg eb
       LEFT JOIN Rechnung.tExternerBelegEckdaten eck ON eb.kExternerBeleg = eck.kExternerBeleg
       LEFT JOIN dbo.tZahlungsart za ON eb.kZahlungsart = za.kZahlungsart
-      -- WICHTIG: Zuordnung zu Amazon Payment über kBestellung
-      -- In tZahlung ist kBestellung der Foreign Key zu kExternerBeleg
-      LEFT JOIN dbo.tZahlung z ON z.kBestellung = eb.kExternerBeleg
-      -- Hole auch die Bestellung um die Bestellnummer zu bekommen
-      LEFT JOIN dbo.tBestellung b ON z.kBestellung = b.kBestellung
+      -- MATCHING über Betrag + Datum (Amazon Payment zu externer Rechnung)
+      LEFT JOIN dbo.tZahlung z ON 
+        ABS(z.fBetrag - eck.fVkBrutto) <= 0.50  -- Betrag-Toleranz ±0.50 EUR
+        AND ABS(DATEDIFF(day, z.dDatum, eb.dBelegdatumUtc)) <= 1  -- Datum-Toleranz ±1 Tag
+        AND z.dDatum >= @from
+        AND z.dDatum < DATEADD(day, 2, @to)  -- +1 Tag Buffer
+      LEFT JOIN dbo.tZahlungsart za2 ON z.kZahlungsart = za2.kZahlungsart
+        AND za2.cName LIKE '%Amazon%'  -- Nur Amazon Payments
       WHERE eb.dBelegdatumUtc >= @from
         AND eb.dBelegdatumUtc < DATEADD(day, 1, @to)
         AND eb.nBelegtyp = 0
