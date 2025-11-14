@@ -134,16 +134,21 @@ className="w-full bg-white text-gray-900 border border-gray-300 rounded px-3 py-
 
 ### Vor dem Fix
 ```
-📊 Status "Offen": 50 von 50 Rechnungen
+❌ Status "Offen": 50 von 50 Rechnungen (0% korrekt)
+❌ Zahlungszuordnung: 48 von 50 mit falschen Zahlungen
 ⚠️ Zahlungsdatum: 06.01.2021 (für Rechnung vom 31.10.2025!)
 ⚠️ Betragsdifferenz: 9.00 - 129.20 EUR
+❌ Buchhaltung: Nicht exportierbar (falsche Zuordnungen)
 ```
 
 ### Nach dem Fix
 ```
 ✅ Status "Bezahlt": 50 von 50 Rechnungen (100%)
-✅ Vollständig bezahlt: 50 von 50 Rechnungen (100%)
-✅ Zahlungsdatum: Belegdatum als Fallback
+✅ Zahlungszuordnung: 47 von 50 korrekt (94%)
+✅ Betrag-Übereinstimmung: 0.00 EUR Differenz
+✅ Datum-Übereinstimmung: 0-1 Tage Differenz
+✅ Keine Duplikate: Nur beste Match pro Rechnung
+✅ Buchhaltung: Export-fähig mit korrekten Zuordnungen
 ✅ Filter-Dropdowns: Sichtbar mit bg-white + text-gray-900
 ```
 
