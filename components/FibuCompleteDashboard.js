@@ -12,6 +12,34 @@ import FibuMonatsUebersicht from './FibuMonatsUebersicht'
 import FuzzyMatchingView from './FuzzyMatchingView'
 import DateRangePicker from './DateRangePicker'
 
+// Groteske Zitate
+const QUOTES = [
+  '"Wer seine Zahlen kennt, braucht keine Glaskugel." - Aristoteles feat. Dieter Bohlen',
+  '"Das ungeprüfte Konto ist nicht wert, gebucht zu werden." - Sokrates feat. Daniela Katzenberger',
+  '"Ich denke, also buche ich." - René Descartes feat. Claudia Obert',
+  '"In der Buchhaltung liegt die wahre Weisheit." - Konfuzius feat. Dschungelcamp-Gina Lisa',
+  '"Ein Beleg ist mehr wert als tausend Worte." - Laozi feat. Michael Wendler',
+  '"Der kategorische Imperativ der Finanzen: Buche nur, was du selbst als Gesetz wollen kannst." - Immanuel Kant feat. Willi Herren',
+  '"Cogito, ergo sum solvent." - Descartes feat. Sarah Lombardi',
+  '"Das Sein bestimmt das Bankkonto." - Karl Marx feat. Carmen Geiss',
+  '"Alles fließt - auch das Geld." - Heraklit feat. Sophia Vegas',
+  '"Der Mensch ist die Summe seiner Rechnungen." - Jean-Paul Sartre feat. Natascha Ochsenknecht',
+  '"Geld verdirbt den Charakter - aber fehlende Buchungen noch mehr!" - Nietzsche feat. Micaela Schäfer',
+  '"Was du nicht willst, dass man dir tu, das buche auf Konto 42." - Goldene Regel feat. Iris Klein',
+  '"Ich weiß, dass ich nichts weiß - außer meinen Kontostand." - Sokrates feat. Evelyn Burdecki',
+  '"Zeit ist Geld, Buchhaltung ist beides." - Benjamin Franklin feat. Ennesto Monté',
+  '"Der Rubel muss rollen - und zwar SKR04-konform!" - Lenin feat. Katja Krasavice',
+  '"Erkenne dich selbst - und deine Verbindlichkeiten!" - Orakel von Delphi feat. Giulia Siegel',
+  '"Alles hat seinen Preis, auch die Steuerberatung." - Thomas von Aquin feat. Jenny Frankhauser',
+  '"Das Leben ist ein Cashflow-Problem." - Buddha feat. Bachelorette-Jessica',
+  '"Dubium sapientiae initium - Zweifel ist der Anfang der Weisheit, Buchung das Ende." - Cicero feat. Pietro Lombardi',
+  '"Carpe Diem, aber vergiss nicht den Jahresabschluss!" - Horaz feat. Matthias Mangiapane'
+]
+
+function getRandomQuote() {
+  return QUOTES[Math.floor(Math.random() * QUOTES.length)]
+}
+
 export default function FibuCompleteDashboard() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -19,6 +47,7 @@ export default function FibuCompleteDashboard() {
   const [activeTab, setActiveTab] = useState('overview')
   const [showExportDialog, setShowExportDialog] = useState(false)
   const [tabFilters, setTabFilters] = useState({}) // Store filters per tab
+  const [quote] = useState(() => getRandomQuote())
 
   // Parse URL parameters on mount and URL changes
   useEffect(() => {
@@ -103,28 +132,31 @@ export default function FibuCompleteDashboard() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-4 flex items-center justify-between">
-            <div>
+          <div className="py-4">
+            <div className="flex items-center justify-between mb-2">
               <h1 className="text-3xl font-bold text-gray-900">FIBU Dashboard</h1>
+              <div className="flex items-center gap-4">
+                <DateRangePicker 
+                  value={selectedPeriod}
+                  onChange={setSelectedPeriod}
+                />
+                <button
+                  onClick={() => setShowExportDialog(true)}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium flex items-center gap-2"
+                >
+                  📥 Export
+                </button>
+                <button
+                  onClick={loadData}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium"
+                >
+                  🔄 Aktualisieren
+                </button>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-              <DateRangePicker 
-                value={selectedPeriod}
-                onChange={setSelectedPeriod}
-              />
-              <button
-                onClick={() => setShowExportDialog(true)}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium flex items-center gap-2"
-              >
-                📥 Export
-              </button>
-              <button
-                onClick={loadData}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium"
-              >
-                🔄 Aktualisieren
-              </button>
-            </div>
+            <p className="text-sm text-gray-600 italic">
+              {quote}
+            </p>
           </div>
 
           {/* Tabs */}
@@ -222,7 +254,7 @@ export default function FibuCompleteDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {activeTab === 'overview' && (
-          <FibuMonatsUebersicht selectedPeriod={selectedPeriod} />
+          <FibuMonatsUebersicht selectedPeriod={selectedPeriod} summaryData={summary} />
         )}
 
         {activeTab === 'ek' && (
@@ -278,6 +310,11 @@ export default function FibuCompleteDashboard() {
               {(details.ekRechnungen || []).length > 50 && (
                 <p className="mt-4 text-sm text-gray-500 text-center">
                   Zeige erste 50 von {details.ekRechnungen.length} Rechnungen
+                </p>
+              )}
+              {(details.ekRechnungen || []).length === 0 && (
+                <p className="mt-4 text-sm text-gray-500 text-center">
+                  Keine EK-Rechnungen im gewählten Zeitraum gefunden.
                 </p>
               )}
             </div>
