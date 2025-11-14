@@ -286,6 +286,7 @@ export default function FibuCompleteDashboard() {
 
         {activeTab === 'kontenplan' && (
           <div className="space-y-6">
+            <KreditorenManagement />
             <KontenplanView />
             <ZahlungsEinstellungen />
           </div>
