@@ -2,6 +2,34 @@
 
 import { useState, useEffect } from 'react'
 
+// Groteske Zitate: Gelehrte feat. Trash-Promis
+const QUOTES = [
+  '"Wer seine Zahlen kennt, braucht keine Glaskugel." - Aristoteles feat. Dieter Bohlen',
+  '"Das ungeprüfte Konto ist nicht wert, gebucht zu werden." - Sokrates feat. Daniela Katzenberger',
+  '"Ich denke, also buche ich." - René Descartes feat. Claudia Obert',
+  '"In der Buchhaltung liegt die wahre Weisheit." - Konfuzius feat. Dschungelcamp-Gina Lisa',
+  '"Ein Beleg ist mehr wert als tausend Worte." - Laozi feat. Michael Wendler',
+  '"Der kategorische Imperativ der Finanzen: Buche nur, was du selbst als Gesetz wollen kannst." - Immanuel Kant feat. Willi Herren',
+  '"Cogito, ergo sum solvent." - Descartes feat. Sarah Lombardi',
+  '"Das Sein bestimmt das Bankkonto." - Karl Marx feat. Carmen Geiss',
+  '"Alles fließt - auch das Geld." - Heraklit feat. Sophia Vegas',
+  '"Der Mensch ist die Summe seiner Rechnungen." - Jean-Paul Sartre feat. Natascha Ochsenknecht',
+  '"Geld verdirbt den Charakter - aber fehlende Buchungen noch mehr!" - Nietzsche feat. Micaela Schäfer',
+  '"Was du nicht willst, dass man dir tu, das buche auf Konto 42." - Goldene Regel feat. Iris Klein',
+  '"Ich weiß, dass ich nichts weiß - außer meinen Kontostand." - Sokrates feat. Evelyn Burdecki',
+  '"Zeit ist Geld, Buchhaltung ist beides." - Benjamin Franklin feat. Ennesto Monté',
+  '"Der Rubel muss rollen - und zwar SKR04-konform!" - Lenin feat. Katja Krasavice',
+  '"Erkenne dich selbst - und deine Verbindlichkeiten!" - Orakel von Delphi feat. Giulia Siegel',
+  '"Alles hat seinen Preis, auch die Steuerberatung." - Thomas von Aquin feat. Jenny Frankhauser',
+  '"Das Leben ist ein Cashflow-Problem." - Buddha feat. Bachelorette-Jessica',
+  '"Dubium sapientiae initium - Zweifel ist der Anfang der Weisheit, Buchung das Ende." - Cicero feat. Pietro Lombardi',
+  '"Carpe Diem, aber vergiss nicht die Jahresabschluss!" - Horaz feat. Matthias Mangiapane'
+]
+
+function getRandomQuote() {
+  return QUOTES[Math.floor(Math.random() * QUOTES.length)]
+}
+
 export default function FibuMonatsUebersicht({ selectedPeriod }) {
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState(null)
