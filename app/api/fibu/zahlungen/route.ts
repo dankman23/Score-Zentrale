@@ -28,22 +28,56 @@ export async function GET(request: NextRequest) {
         }
       }).limit(limit).toArray()
       
-      if (cached.length > 0) {
-        console.log(`[Zahlungen API] Cache hit: ${cached.length} Zahlungen`)
+      // Lade auch Bank-Transaktionen (Postbank etc.)
+      const bankTransaktionen = await db.collection('fibu_bank_transaktionen').find({
+        datum: {
+          $gte: new Date(from + 'T00:00:00.000Z'),
+          $lte: new Date(to + 'T23:59:59.999Z')
+        }
+      }).limit(limit).toArray()
+      
+      // Konvertiere Bank-Transaktionen zu Zahlungs-Format
+      const bankZahlungen = bankTransaktionen.map((bt: any) => ({
+        zahlungsdatum: bt.datum,
+        zahlungsanbieter: bt.quelle === 'postbank' ? 'Postbank' : bt.auftraggeber,
+        betrag: bt.betrag,
+        hinweis: bt.verwendungszweck,
+        zahlungsart: bt.buchungstext,
+        quelle: bt.quelle,
+        
+        // Zuordnungs-Felder
+        rechnungsId: bt.matchedRechnungNr || null,
+        rechnungsNr: bt.matchedRechnungNr || null,
+        kRechnung: 0,
+        kundenName: bt.auftraggeber,
+        cBestellNr: bt.matchedBestellNr || null,
+        istZugeordnet: bt.matchedRechnungNr ? true : false,
+        
+        // Meta
+        _id: bt._id,
+        created_at: bt.created_at,
+        updated_at: bt.updated_at
+      }))
+      
+      // Kombiniere beide Listen
+      const alleZahlungen = [...cached, ...bankZahlungen]
+      
+      if (alleZahlungen.length > 0) {
+        console.log(`[Zahlungen API] Cache hit: ${cached.length} JTL + ${bankZahlungen.length} Bank = ${alleZahlungen.length} gesamt`)
         
         // Statistiken berechnen
         const stats = {
-          gesamt: cached.length,
-          zugeordnet: cached.filter((z: any) => z.istZugeordnet || z.kRechnung > 0).length,
-          nichtZugeordnet: cached.filter((z: any) => !z.istZugeordnet && (!z.kRechnung || z.kRechnung === 0)).length,
-          vonTZahlung: cached.filter((z: any) => z.quelle === 'tZahlung').length,
-          vonZahlungsabgleich: cached.filter((z: any) => z.quelle === 'tZahlungsabgleichUmsatz').length,
-          vonPostbank: cached.filter((z: any) => z.quelle === 'postbank').length
+          gesamt: alleZahlungen.length,
+          zugeordnet: alleZahlungen.filter((z: any) => z.istZugeordnet || z.kRechnung > 0).length,
+          nichtZugeordnet: alleZahlungen.filter((z: any) => !z.istZugeordnet && (!z.kRechnung || z.kRechnung === 0)).length,
+          vonTZahlung: alleZahlungen.filter((z: any) => z.quelle === 'tZahlung').length,
+          vonZahlungsabgleich: alleZahlungen.filter((z: any) => z.quelle === 'tZahlungsabgleichUmsatz').length,
+          vonPostbank: alleZahlungen.filter((z: any) => z.quelle === 'postbank').length
         }
         
         return NextResponse.json({
           ok: true,
-          zahlungen: cached,
+          zahlungen: alleZahlungen,
           stats,
           cached: true,
           zeitraum: { from, to }
