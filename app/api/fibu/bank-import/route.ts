@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
         const umsatzart = row['Umsatzart'] || row['Buchungstext'] || ''
         
         // WICHTIG: Postbank hat Soll (negativ) und Haben (positiv) Spalten
-        const solltBetrag = parseGermanAmount(row['Soll'] || '')
+        const sollBetrag = parseGermanAmount(row['Soll'] || '')
         const habenBetrag = parseGermanAmount(row['Haben'] || '')
         
         // Berechne finalen Betrag: Haben ist positiv, Soll ist negativ
