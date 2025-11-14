@@ -10,6 +10,7 @@ import ZahlungenView from './ZahlungenView'
 import ZahlungsEinstellungen from './ZahlungsEinstellungen'
 import FibuMonatsUebersicht from './FibuMonatsUebersicht'
 import FuzzyMatchingView from './FuzzyMatchingView'
+import DateRangePicker from './DateRangePicker'
 
 export default function FibuCompleteDashboard() {
   const [data, setData] = useState(null)
@@ -17,6 +18,36 @@ export default function FibuCompleteDashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState('2025-10-01_2025-11-30')
   const [activeTab, setActiveTab] = useState('overview')
   const [showExportDialog, setShowExportDialog] = useState(false)
+  const [tabFilters, setTabFilters] = useState({}) // Store filters per tab
+
+  // Parse URL parameters on mount and URL changes
+  useEffect(() => {
+    function handleHashChange() {
+      const hash = window.location.hash
+      const params = new URLSearchParams(hash.split('?')[1])
+      
+      const tab = params.get('tab')
+      const filter = params.get('filter')
+      
+      if (tab) {
+        setActiveTab(tab)
+      }
+      
+      if (filter) {
+        setTabFilters(prev => ({
+          ...prev,
+          [tab || activeTab]: filter
+        }))
+      }
+    }
+    
+    // Check on mount
+    handleHashChange()
+    
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
 
   useEffect(() => {
     loadData()
@@ -75,20 +106,12 @@ export default function FibuCompleteDashboard() {
           <div className="py-4 flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">FIBU Dashboard</h1>
-              <p className="text-sm text-gray-500 mt-1">
-                Vollständige Buchhaltungs-Übersicht • Zeitraum: {summary.zeitraum.from} bis {summary.zeitraum.to}
-              </p>
             </div>
             <div className="flex items-center gap-4">
-              <select 
+              <DateRangePicker 
                 value={selectedPeriod}
-                onChange={(e) => setSelectedPeriod(e.target.value)}
-                className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="2025-10-01_2025-10-31">Oktober 2025</option>
-                <option value="2025-11-01_2025-11-30">November 2025</option>
-                <option value="2025-10-01_2025-11-30">Okt + Nov 2025</option>
-              </select>
+                onChange={setSelectedPeriod}
+              />
               <button
                 onClick={() => setShowExportDialog(true)}
                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium flex items-center gap-2"
@@ -198,280 +221,94 @@ export default function FibuCompleteDashboard() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        {/* Overview Tab */}
         {activeTab === 'overview' && (
           <FibuMonatsUebersicht selectedPeriod={selectedPeriod} />
         )}
 
-        {/* Overview Tab (Alt - wird nicht mehr verwendet) */}
-        {activeTab === 'overview_old' && (
-          <div className="space-y-6">
-            
-            {/* Critical Issues Alert */}
-            {(issues.ekOhneBetrag > 0 || issues.ekOhneKreditor > 0 || issues.zahlungenNegativOhneZuordnung > 0 || issues.vkOffen > 0) && (
-              <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg">
-                <div className="flex items-start">
-                  <div className="text-red-600 text-3xl mr-4">⚠️</div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-red-900 mb-2">Nicht zugeordnete Datensätze gefunden</h3>
-                    <p className="text-red-700 text-sm mb-4">
-                      Folgende Datensätze benötigen Ihre Aufmerksamkeit für eine vollständige Buchhaltung:
-                    </p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {issues.ekOhneBetrag > 0 && (
-                        <div className="bg-white rounded-lg p-3 border border-red-200">
-                          <div className="text-2xl font-bold text-red-600">{issues.ekOhneBetrag}</div>
-                          <div className="text-xs text-red-700">EK ohne Betrag</div>
-                        </div>
-                      )}
-                      {issues.ekOhneKreditor > 0 && (
-                        <div className="bg-white rounded-lg p-3 border border-red-200 cursor-pointer hover:bg-red-50" onClick={() => setActiveTab('zuordnung')}>
-                          <div className="text-2xl font-bold text-red-600">{issues.ekOhneKreditor}</div>
-                          <div className="text-xs text-red-700">EK ohne Kreditor</div>
-                          <div className="text-xs text-blue-600 mt-1">→ Jetzt zuordnen</div>
-                        </div>
-                      )}
-                      {issues.zahlungenNegativOhneZuordnung > 0 && (
-                        <div className="bg-white rounded-lg p-3 border border-red-200">
-                          <div className="text-2xl font-bold text-red-600">{issues.zahlungenNegativOhneZuordnung}</div>
-                          <div className="text-xs text-red-700">Ausgaben ohne Konto</div>
-                        </div>
-                      )}
-                      {issues.vkOffen > 0 && (
-                        <div className="bg-white rounded-lg p-3 border border-red-200">
-                          <div className="text-2xl font-bold text-red-600">{issues.vkOffen}</div>
-                          <div className="text-xs text-red-700">VK offen</div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* KPI Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              
-              {/* EK-Rechnungen */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-gray-500">EK-Rechnungen</h3>
-                  <span className="text-2xl">📥</span>
-                </div>
-                <div className="text-3xl font-bold text-gray-900 mb-2">
-                  {summary.ekRechnungen.total}
-                </div>
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Mit Betrag:</span>
-                    <span className="font-medium text-green-600">{summary.ekRechnungen.mitBetrag}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Ohne Betrag:</span>
-                    <span className="font-medium text-red-600">{summary.ekRechnungen.ohneBetrag}</span>
-                  </div>
-                  <div className="pt-2 border-t">
-                    <div className="text-lg font-bold text-gray-900">
-                      {summary.ekRechnungen.gesamtBetrag.toFixed(2)}€
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* VK-Rechnungen */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-gray-500">VK-Rechnungen</h3>
-                  <span className="text-2xl">📤</span>
-                </div>
-                <div className="text-3xl font-bold text-gray-900 mb-2">
-                  {summary.vkRechnungen.total}
-                </div>
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Bezahlt:</span>
-                    <span className="font-medium text-green-600">{summary.vkRechnungen.bezahlt}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Offen:</span>
-                    <span className="font-medium text-orange-600">{summary.vkRechnungen.offen}</span>
-                  </div>
-                  <div className="pt-2 border-t">
-                    <div className="text-lg font-bold text-gray-900">
-                      {summary.vkRechnungen.gesamtBetrag.toFixed(2)}€
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Zahlungen Eingang */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-gray-500">Zahlungseingänge</h3>
-                  <span className="text-2xl">💰</span>
-                </div>
-                <div className="text-3xl font-bold text-green-600 mb-2">
-                  {summary.zahlungen.positiv}
-                </div>
-                <div className="space-y-1 text-sm">
-                  <div className="text-gray-600">Gesamt:</div>
-                  <div className="text-xl font-bold text-green-600">
-                    +{summary.zahlungen.positiverBetrag.toFixed(2)}€
-                  </div>
-                </div>
-              </div>
-
-              {/* Zahlungen Ausgang */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-gray-500">Zahlungsausgänge</h3>
-                  <span className="text-2xl">💳</span>
-                </div>
-                <div className="text-3xl font-bold text-red-600 mb-2">
-                  {summary.zahlungen.negativ}
-                </div>
-                <div className="space-y-1 text-sm">
-                  <div className="text-gray-600">Gesamt:</div>
-                  <div className="text-xl font-bold text-red-600">
-                    {summary.zahlungen.negativerBetrag.toFixed(2)}€
-                  </div>
-                  <div className="text-xs text-orange-600 font-medium mt-2">
-                    ⚠️ Müssen Konten zugeordnet werden
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Zahlungsanbieter Übersicht */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">💳 Zahlungen nach Anbieter</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {Object.entries(summary.zahlungen.byAnbieter).map(([anbieter, stats]) => (
-                  <div key={anbieter} className="border border-gray-200 rounded-lg p-4">
-                    <div className="text-sm font-medium text-gray-700 mb-2 truncate" title={anbieter}>
-                      {anbieter}
-                    </div>
-                    <div className="text-xs text-gray-500 mb-1">{stats.count} Zahlungen</div>
-                    <div className={`text-lg font-bold ${stats.betrag >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {stats.betrag.toFixed(2)}€
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* EK Tab */}
         {activeTab === 'ek' && (
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">📥 EK-Rechnungen ohne Betrag ({details.ekOhneBetrag.length})</h3>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">📥 EK-Rechnungen (Lieferanten)</h2>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lieferant</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">RgNr</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Grund</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aktion</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lieferant</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">RgNr</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Betrag</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kreditor</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {details.ekOhneBetrag.slice(0, 20).map((rechnung, idx) => (
+                    {(details.ekRechnungen || []).slice(0, 50).map((ek, idx) => (
                       <tr key={idx} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm text-gray-900">{rechnung.lieferant}</td>
-                        <td className="px-4 py-3 text-sm text-gray-600">{rechnung.rechnungsNr}</td>
-                        <td className="px-4 py-3 text-sm text-gray-600">
-                          {new Date(rechnung.datum).toLocaleDateString('de-DE')}
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          {new Date(ek.datum).toLocaleDateString('de-DE')}
                         </td>
-                        <td className="px-4 py-3 text-sm text-orange-600">{rechnung.grund}</td>
-                        <td className="px-4 py-3 text-sm">
-                          <button className="text-blue-600 hover:text-blue-800">Bearbeiten</button>
+                        <td className="px-6 py-4 text-sm text-gray-900">{ek.lieferant}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600">{ek.rechnungsNr}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-gray-900">
+                          {(ek.betrag || 0).toFixed(2)}€
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          {ek.kreditorKonto ? (
+                            <span className="text-green-600 font-medium">{ek.kreditorKonto}</span>
+                          ) : (
+                            <span className="text-red-600">❌ Fehlt</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          {ek.zahlungId ? (
+                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                              ✓ Bezahlt
+                            </span>
+                          ) : (
+                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                              ○ Offen
+                            </span>
+                          )}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">📥 EK-Rechnungen ohne Kreditor ({details.ekOhneKreditor.length})</h3>
-                <button
-                  onClick={() => setActiveTab('zuordnung')}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium"
-                >
-                  → Zur Zuordnung
-                </button>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lieferant</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">RgNr</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Betrag</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {details.ekOhneKreditor.slice(0, 20).map((rechnung, idx) => (
-                      <tr key={idx} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm text-gray-900">{rechnung.lieferant}</td>
-                        <td className="px-4 py-3 text-sm text-gray-600">{rechnung.rechnungsNr}</td>
-                        <td className="px-4 py-3 text-sm font-medium text-gray-900">{rechnung.betrag?.toFixed(2)}€</td>
-                        <td className="px-4 py-3 text-sm text-gray-600">
-                          {new Date(rechnung.datum).toLocaleDateString('de-DE')}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              {(details.ekRechnungen || []).length > 50 && (
+                <p className="mt-4 text-sm text-gray-500 text-center">
+                  Zeige erste 50 von {details.ekRechnungen.length} Rechnungen
+                </p>
+              )}
             </div>
           </div>
         )}
 
-        {/* Zuordnung Tab */}
         {activeTab === 'zuordnung' && (
-          <KreditorZuordnung onUpdate={loadData} />
+          <KreditorZuordnung zeitraum={selectedPeriod} />
         )}
 
-        {/* VK Tab */}
         {activeTab === 'vk' && (
-          <VKRechnungenView />
+          <VKRechnungenView zeitraum={selectedPeriod} initialFilter={tabFilters['vk']} />
         )}
 
-        {/* Zahlungen Tab */}
         {activeTab === 'zahlungen' && (
-          <ZahlungenView />
+          <ZahlungenView zeitraum={selectedPeriod} initialFilter={tabFilters['zahlungen']} />
         )}
 
-        {/* Bank-Import Tab */}
         {activeTab === 'bank-import' && (
-          <BankImport onSuccess={loadData} />
+          <BankImport />
         )}
 
-        {/* Kontenplan Tab */}
         {activeTab === 'kontenplan' && (
           <div className="space-y-6">
             <KontenplanView />
-            <div className="border-t-2 border-gray-200 my-8"></div>
             <ZahlungsEinstellungen />
           </div>
         )}
 
-        {/* Fuzzy Matching Tab */}
         {activeTab === 'fuzzy-matching' && (
-          <FuzzyMatchingView />
-        )}
-
-        {/* Zahlungen Tab */}
-        {activeTab === 'zahlungen' && (
-          <ZahlungenView />
+          <FuzzyMatchingView zeitraum={selectedPeriod} />
         )}
       </div>
 
@@ -479,7 +316,7 @@ export default function FibuCompleteDashboard() {
       {showExportDialog && (
         <ExportDialog 
           onClose={() => setShowExportDialog(false)}
-          period={selectedPeriod}
+          selectedPeriod={selectedPeriod}
         />
       )}
     </div>
