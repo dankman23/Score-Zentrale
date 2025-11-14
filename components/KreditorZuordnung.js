@@ -367,6 +367,119 @@ export default function KreditorZuordnung({ onUpdate }) {
           }}
         />
       )}
+
+      {/* Edit-Rechnung Modal */}
+      {editRechnung && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-gray-900">Rechnung bearbeiten</h3>
+                <button
+                  onClick={() => setEditRechnung(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {/* Lieferant */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Lieferant *
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.lieferantName}
+                    onChange={(e) => setEditForm({...editForm, lieferantName: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="z.B. DHL Paket GmbH"
+                  />
+                </div>
+
+                {/* Rechnungsnummer */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Rechnungsnummer *
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.rechnungsNummer}
+                    onChange={(e) => setEditForm({...editForm, rechnungsNummer: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="z.B. 2025-10-12345"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Betrag */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Betrag (€) *
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editForm.gesamtBetrag}
+                      onChange={(e) => setEditForm({...editForm, gesamtBetrag: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="0.00"
+                    />
+                  </div>
+
+                  {/* Datum */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Rechnungsdatum *
+                    </label>
+                    <input
+                      type="date"
+                      value={editForm.rechnungsdatum}
+                      onChange={(e) => setEditForm({...editForm, rechnungsdatum: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Hinweis */}
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded">
+                  <p className="text-sm text-blue-800">
+                    <strong>Hinweis:</strong> Nach dem Speichern muss die Rechnung noch einem Kreditor zugeordnet werden.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex items-center justify-end gap-3">
+                <button
+                  onClick={() => setEditRechnung(null)}
+                  disabled={saving}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium disabled:opacity-50"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  onClick={saveEdit}
+                  disabled={saving || !editForm.lieferantName || !editForm.rechnungsNummer || !editForm.gesamtBetrag}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {saving ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Speichere...
+                    </>
+                  ) : (
+                    '💾 Speichern'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
