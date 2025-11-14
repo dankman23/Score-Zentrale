@@ -151,37 +151,57 @@ const STANDARD_KONTENPLAN = {
 
 /**
  * GET /api/fibu/kontenplan
- * Liefert den vollständigen Kontenplan
+ * Liefert den dynamischen Kontenplan aus MongoDB (SKR04)
  */
 export async function GET(request: NextRequest) {
   try {
-    const db = await getDb()
+    const { searchParams } = new URL(request.url)
+    const klasse = searchParams.get('klasse') // Filter nach Kontenklasse
+    const gruppe = searchParams.get('gruppe') // Filter nach Kontengruppe
+    const aktiv = searchParams.get('aktiv') // Filter nur aktive
+    const search = searchParams.get('search') // Suchbegriff
     
-    // Lade zusätzlich die echten Kreditoren aus der DB
-    const kreditoren = await db.collection('kreditoren')
-      .find({})
-      .sort({ kreditorenNummer: 1 })
+    const db = await getDb()
+    const collection = db.collection('fibu_kontenplan')
+    
+    // Query zusammenbauen
+    const query: any = {}
+    
+    if (klasse) query.kontenklasse = parseInt(klasse)
+    if (gruppe) query.kontengruppe = gruppe
+    if (aktiv === 'true') query.istAktiv = true
+    if (search) {
+      query.$or = [
+        { kontonummer: { $regex: search, $options: 'i' } },
+        { bezeichnung: { $regex: search, $options: 'i' } }
+      ]
+    }
+    
+    const konten = await collection
+      .find(query)
+      .sort({ kontonummer: 1 })
       .toArray()
     
-    const kreditorenListe = kreditoren.map(k => ({
-      konto: k.kreditorenNummer,
-      bezeichnung: k.name,
-      standardKonto: k.standardAufwandskonto,
-      typ: 'Kreditor'
-    }))
+    // Gruppiere nach Kontenklasse
+    const grouped = konten.reduce((acc: any, konto: any) => {
+      const klasse = konto.kontenklasse
+      if (!acc[klasse]) {
+        acc[klasse] = {
+          klasse: klasse,
+          bezeichnung: konto.kontenklasseBezeichnung,
+          typ: konto.kontenklasseTyp,
+          konten: []
+        }
+      }
+      acc[klasse].konten.push(konto)
+      return acc
+    }, {})
     
     return NextResponse.json({
       ok: true,
-      kontenplan: {
-        ...STANDARD_KONTENPLAN,
-        kreditoren_aktiv: kreditorenListe
-      },
-      info: {
-        sachkonten: STANDARD_KONTENPLAN.sachkonten.length,
-        kreditoren: kreditorenListe.length,
-        debitoren: STANDARD_KONTENPLAN.debitoren.length,
-        kasse_bank: STANDARD_KONTENPLAN.kasse_bank.length
-      }
+      konten: konten,
+      grouped: Object.values(grouped),
+      total: konten.length
     })
     
   } catch (error: any) {
