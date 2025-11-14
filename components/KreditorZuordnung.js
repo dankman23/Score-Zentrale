@@ -46,6 +46,13 @@ export default function KreditorZuordnung({ onUpdate }) {
 
   async function saveKreditor(rechnungId, kreditorNr) {
     try {
+      // Finde die Rechnung um den Lieferanten zu bekommen
+      const rechnung = rechnungen.find(r => r._id === rechnungId)
+      if (!rechnung) return false
+      
+      const lieferant = rechnung.lieferantName
+      
+      // Speichere Kreditor für diese Rechnung
       const res = await fetch(`/api/fibu/rechnungen/ek/${rechnungId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -53,8 +60,40 @@ export default function KreditorZuordnung({ onUpdate }) {
       })
       
       if (res.ok) {
-        // Update local state
-        setRechnungen(prev => prev.filter(r => r._id !== rechnungId))
+        // Finde ALLE anderen Rechnungen vom gleichen Lieferanten
+        const gleicheLieferanten = rechnungen.filter(r => 
+          r._id !== rechnungId && 
+          r.lieferantName === lieferant
+        )
+        
+        if (gleicheLieferanten.length > 0) {
+          const confirmed = confirm(
+            `Es gibt noch ${gleicheLieferanten.length} weitere Rechnung(en) von "${lieferant}".\n\n` +
+            `Sollen diese auch automatisch dem Kreditor ${kreditorNr} zugeordnet werden?`
+          )
+          
+          if (confirmed) {
+            // Ordne alle anderen auch zu
+            let erfolg = 0
+            for (const r of gleicheLieferanten) {
+              const res2 = await fetch(`/api/fibu/rechnungen/ek/${r._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ kreditorKonto: kreditorNr })
+              })
+              if (res2.ok) erfolg++
+            }
+            
+            alert(`✅ ${erfolg + 1} Rechnungen von "${lieferant}" wurden dem Kreditor ${kreditorNr} zugeordnet!`)
+          }
+        }
+        
+        // Update local state - entferne alle zugeordneten
+        setRechnungen(prev => prev.filter(r => 
+          r._id !== rechnungId && 
+          !(gleicheLieferanten.some(gl => gl._id === r._id) && confirmed)
+        ))
+        
         return true
       }
     } catch (error) {
