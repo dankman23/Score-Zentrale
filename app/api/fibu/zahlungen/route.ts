@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const to = searchParams.get('to') || new Date().toISOString().split('T')[0]
     const limit = parseInt(searchParams.get('limit') || '10000', 10)
     
-    const pool = await getMssqlPool()
+    const pool = await getJTLConnection()
     
     /**
      * VERBESSERTE ZAHLUNGSABFRAGE MIT ZWEI QUELLEN:
