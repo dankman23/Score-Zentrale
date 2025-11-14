@@ -49,8 +49,8 @@ export async function GET(request: NextRequest) {
       .query(query)
     
     // Hole zusätzlich MongoDB-Daten für erweiterte Infos
-    const db = await getDb()
-    const mongoCollection = db.collection('fibu_externe_rechnungen')
+    const mongoDb = await getDb()
+    const mongoCollection = mongoDb.collection('fibu_externe_rechnungen')
     const mongoRechnungen = await mongoCollection.find({}).toArray()
     const mongoMap = new Map(mongoRechnungen.map(r => [r.kExternerBeleg, r]))
     
