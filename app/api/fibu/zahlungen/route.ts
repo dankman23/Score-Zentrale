@@ -12,11 +12,48 @@ import { getDb } from '../../../lib/db/mongodb'
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
-    // Dynamische Datumsbereiche - Standard: gesamter Zeitraum
-    const from = searchParams.get('from') || '2020-01-01'
-    const to = searchParams.get('to') || new Date().toISOString().split('T')[0]
-    const limit = parseInt(searchParams.get('limit') || '10000', 10)
+    const from = searchParams.get('from') || '2025-10-01'
+    const to = searchParams.get('to') || '2025-10-31'
+    const limit = parseInt(searchParams.get('limit') || '1000')
+    const reload = searchParams.get('reload') === 'true'  // Nur bei reload=true neu laden
     
+    const db = await getDb()
+    
+    // Prüfe ob Daten bereits in MongoDB vorhanden (Cache)
+    if (!reload) {
+      const cached = await db.collection('fibu_zahlungen').find({
+        zahlungsdatum: {
+          $gte: new Date(from + 'T00:00:00.000Z'),
+          $lte: new Date(to + 'T23:59:59.999Z')
+        }
+      }).limit(limit).toArray()
+      
+      if (cached.length > 0) {
+        console.log(`[Zahlungen API] Cache hit: ${cached.length} Zahlungen`)
+        
+        // Statistiken berechnen
+        const stats = {
+          gesamt: cached.length,
+          zugeordnet: cached.filter((z: any) => z.istZugeordnet || z.kRechnung > 0).length,
+          nichtZugeordnet: cached.filter((z: any) => !z.istZugeordnet && (!z.kRechnung || z.kRechnung === 0)).length,
+          vonTZahlung: cached.filter((z: any) => z.quelle === 'tZahlung').length,
+          vonZahlungsabgleich: cached.filter((z: any) => z.quelle === 'tZahlungsabgleichUmsatz').length,
+          vonPostbank: cached.filter((z: any) => z.quelle === 'postbank').length
+        }
+        
+        return NextResponse.json({
+          ok: true,
+          zahlungen: cached,
+          stats,
+          cached: true,
+          zeitraum: { from, to }
+        })
+      }
+    }
+    
+    console.log(`[Zahlungen API] Cache miss - lade aus JTL...`)
+    
+    // JTL Connection
     const pool = await getJTLConnection()
     
     /**
