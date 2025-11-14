@@ -44,14 +44,32 @@ export async function GET(request: NextRequest) {
       FROM Rechnung.tExternerBeleg eb
       LEFT JOIN Rechnung.tExternerBelegEckdaten eck ON eb.kExternerBeleg = eck.kExternerBeleg
       LEFT JOIN dbo.tZahlungsart za ON eb.kZahlungsart = za.kZahlungsart
-      -- MATCHING über Betrag + Datum (Amazon Payment zu externer Rechnung)
-      LEFT JOIN dbo.tZahlung z ON 
-        ABS(z.fBetrag - eck.fVkBrutto) <= 0.50  -- Betrag-Toleranz ±0.50 EUR
-        AND ABS(DATEDIFF(day, z.dDatum, eb.dBelegdatumUtc)) <= 1  -- Datum-Toleranz ±1 Tag
-        AND z.dDatum >= @from
-        AND z.dDatum < DATEADD(day, 2, @to)  -- +1 Tag Buffer
-      LEFT JOIN dbo.tZahlungsart za2 ON z.kZahlungsart = za2.kZahlungsart
-        AND za2.cName LIKE '%Amazon%'  -- Nur Amazon Payments
+      -- MATCHING über Betrag + Datum: Nehme die beste Übereinstimmung (kleinste Differenz)
+      LEFT JOIN (
+        SELECT 
+          z_inner.kZahlung,
+          z_inner.fBetrag,
+          z_inner.dDatum,
+          z_inner.cHinweis,
+          z_inner.kBestellung,
+          eck_inner.kExternerBeleg,
+          -- Ranking: Beste Übereinstimmung = kleinste Betrag-Differenz
+          ROW_NUMBER() OVER (
+            PARTITION BY eck_inner.kExternerBeleg 
+            ORDER BY ABS(z_inner.fBetrag - eck_inner.fVkBrutto) ASC, 
+                     ABS(DATEDIFF(day, z_inner.dDatum, eb_inner.dBelegdatumUtc)) ASC
+          ) as rn
+        FROM Rechnung.tExternerBeleg eb_inner
+        LEFT JOIN Rechnung.tExternerBelegEckdaten eck_inner ON eb_inner.kExternerBeleg = eck_inner.kExternerBeleg
+        LEFT JOIN dbo.tZahlung z_inner ON 
+          ABS(z_inner.fBetrag - eck_inner.fVkBrutto) <= 0.50
+          AND ABS(DATEDIFF(day, z_inner.dDatum, eb_inner.dBelegdatumUtc)) <= 1
+          AND z_inner.dDatum >= @from
+          AND z_inner.dDatum < DATEADD(day, 2, @to)
+        LEFT JOIN dbo.tZahlungsart za2_inner ON z_inner.kZahlungsart = za2_inner.kZahlungsart
+        WHERE eb_inner.nBelegtyp = 0
+          AND za2_inner.cName LIKE '%Amazon%'
+      ) z ON z.kExternerBeleg = eb.kExternerBeleg AND z.rn = 1
       WHERE eb.dBelegdatumUtc >= @from
         AND eb.dBelegdatumUtc < DATEADD(day, 1, @to)
         AND eb.nBelegtyp = 0
