@@ -33,11 +33,17 @@ const status = 'Bezahlt'
 **Geänderte Datei:**
 - `/app/app/api/fibu/rechnungen/extern/route.ts`
 
-### 2. Zahlungszuordnung aus JTL DB
+### 2. Korrekte Zahlungszuordnung für Buchhaltung
 
 **Problem:** Der ursprüngliche JOIN versuchte, Zahlungen über `tZahlung.kBestellung = tExternerBeleg.kExternerBeleg` zu laden. Dies führte zu:
-- Falschen Zuordnungen (Beträge stimmten nicht überein)
-- Alte Zahlungsdaten aus 2020/2021
+- ❌ Falschen Zuordnungen (Beträge stimmten nicht überein)
+- ❌ Alte Zahlungsdaten aus 2020/2021 zu aktuellen Rechnungen
+- ❌ Keine Zuordnungen für Buchhaltungs-Export
+
+**Ursache:** `kBestellung` in `tZahlung` ist NICHT gleich `kExternerBeleg`! 
+- Amazon Payments haben eigene `kBestellung` IDs (z.B. 266864)
+- Externe Belege haben `kExternerBeleg` IDs (z.B. 5105)
+- **Diese IDs sind komplett unterschiedlich!**
 
 **Analyse der JTL DB-Struktur:**
 ```sql
