@@ -8,6 +8,8 @@ export default function VKRechnungenView({ zeitraum: zeitraumProp, initialFilter
   const [zeitraum, setZeitraum] = useState(zeitraumProp || '2025-10-01_2025-10-31')
   const [alleAnzeigen, setAlleAnzeigen] = useState(false)
   const [statusFilter, setStatusFilter] = useState(initialFilter || 'alle')
+  const [quelleFilter, setQuelleFilter] = useState('alle')
+  const [searchTerm, setSearchTerm] = useState('')
 
   // Update zeitraum when prop changes
   useEffect(() => {
@@ -56,9 +58,6 @@ export default function VKRechnungenView({ zeitraum: zeitraumProp, initialFilter
     }
     setLoading(false)
   }
-
-  const [quelleFilter, setQuelleFilter] = useState('alle')
-  const [searchTerm, setSearchTerm] = useState('')
 
   function formatDate(dateStr) {
     if (!dateStr) return 'N/A'
