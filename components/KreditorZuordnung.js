@@ -294,17 +294,27 @@ export default function KreditorZuordnung({ onUpdate }) {
                     {new Date(rechnung.rechnungsdatum).toLocaleDateString('de-DE')}
                   </td>
                   <td className="px-4 py-3 text-sm">
-                    {rechnung.sourceEmailId ? (
+                    <div className="flex items-center gap-2">
+                      {rechnung.sourceEmailId ? (
+                        <button
+                          onClick={() => window.open(`/api/fibu/beleg/${rechnung.sourceEmailId}`, '_blank')}
+                          className="text-blue-600 hover:text-blue-800 font-medium text-xs"
+                          title="PDF-Beleg öffnen"
+                        >
+                          📄 PDF
+                        </button>
+                      ) : (
+                        <span className="text-gray-400 text-xs">-</span>
+                      )}
+                      <span className="text-gray-300">|</span>
                       <button
-                        onClick={() => window.open(`/api/fibu/beleg/${rechnung.sourceEmailId}`, '_blank')}
-                        className="text-blue-600 hover:text-blue-800 font-medium"
-                        title="PDF-Beleg öffnen"
+                        onClick={() => openEditDialog(rechnung)}
+                        className="text-gray-600 hover:text-gray-800 font-medium"
+                        title="Rechnung bearbeiten"
                       >
-                        📄 PDF
+                        ✏️
                       </button>
-                    ) : (
-                      <span className="text-gray-400">-</span>
-                    )}
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <select
@@ -332,15 +342,6 @@ export default function KreditorZuordnung({ onUpdate }) {
                         ))}
                       </optgroup>
                     </select>
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    <button
-                      onClick={() => openEditDialog(rechnung)}
-                      className="text-gray-600 hover:text-gray-800 font-medium"
-                      title="Rechnung bearbeiten"
-                    >
-                      ✏️
-                    </button>
                   </td>
                 </tr>
               ))}
