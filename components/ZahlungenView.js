@@ -361,8 +361,17 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
                   <td className="px-4 py-3 text-sm text-gray-600">
                     {zahlung.kundenName || '-'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate" title={zahlung.hinweis}>
-                    {zahlung.hinweis || '-'}
+                  <td className="px-4 py-3 text-sm text-gray-600">
+                    <div className="max-w-xs">
+                      {zahlung.bestellNr && (
+                        <div className="font-medium text-blue-600 mb-1">
+                          📦 {zahlung.bestellNr}
+                        </div>
+                      )}
+                      <div className="text-xs truncate" title={zahlung.hinweis}>
+                        {zahlung.hinweis || '-'}
+                      </div>
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-sm text-center">
                     {zahlung.istZugeordnet ? (
@@ -370,7 +379,10 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
                         <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
                           ✓ Zugeordnet
                         </span>
-                        {zahlung.kRechnung > 0 && (
+                        {zahlung.zuordnungstyp && (
+                          <div className="text-xs text-gray-500 mt-1">{zahlung.zuordnungstyp}</div>
+                        )}
+                        {zahlung.kRechnung > 0 && !zahlung.zuordnungstyp && (
                           <div className="text-xs text-gray-500 mt-1">kRg: {zahlung.kRechnung}</div>
                         )}
                       </div>
