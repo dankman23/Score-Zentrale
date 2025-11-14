@@ -90,7 +90,6 @@ async function testRelations() {
       console.log(`   ✅ Bestellung gefunden!`)
       console.log(`   kBestellung: ${bestellung.recordset[0].kBestellung}`)
       console.log(`   cBestellNr: ${bestellung.recordset[0].cBestellNr}`)
-      console.log(`   cZahlungsanbieter: ${bestellung.recordset[0].cZahlungsanbieter}`)
     } else {
       console.log(`   ❌ Keine Bestellung gefunden für kBestellung=${kExternerBeleg}`)
     }
