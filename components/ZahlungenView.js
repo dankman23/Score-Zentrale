@@ -2,17 +2,31 @@
 
 import { useState, useEffect } from 'react'
 
-export default function ZahlungenView() {
+export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter }) {
   const [zahlungen, setZahlungen] = useState([])
   const [loading, setLoading] = useState(true)
-  const [zeitraum, setZeitraum] = useState('2025-10-01_2025-11-30')
+  const [zeitraum, setZeitraum] = useState(zeitraumProp || '2025-10-01_2025-11-30')
   const [alleAnzeigen, setAlleAnzeigen] = useState(false)
   
   // Filter States
   const [anbieterFilter, setAnbieterFilter] = useState('alle')
-  const [zuordnungFilter, setZuordnungFilter] = useState('alle') // 'alle', 'zugeordnet', 'nicht_zugeordnet'
+  const [zuordnungFilter, setZuordnungFilter] = useState(initialFilter || 'alle') // 'alle', 'zugeordnet', 'nicht_zugeordnet'
   const [richtungFilter, setRichtungFilter] = useState('alle') // 'alle', 'eingang', 'ausgang'
   const [searchTerm, setSearchTerm] = useState('')
+
+  // Update zeitraum when prop changes
+  useEffect(() => {
+    if (zeitraumProp) {
+      setZeitraum(zeitraumProp)
+    }
+  }, [zeitraumProp])
+
+  // Update filter when initialFilter prop changes
+  useEffect(() => {
+    if (initialFilter) {
+      setZuordnungFilter(initialFilter)
+    }
+  }, [initialFilter])
 
   useEffect(() => {
     loadZahlungen()
