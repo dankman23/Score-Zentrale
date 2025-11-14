@@ -77,7 +77,7 @@ async function testAmazonTransactions() {
       if (data.transaktionen.length > 0) {
         console.log(`   ✅ ${data.transaktionen.length} Transaktion(en):`)
         data.transaktionen.forEach(t => {
-          console.log(`      - ${t.betrag?.toFixed(2) || 0} EUR am ${t.datum ? new Date(t.datum).toLocaleDateString('de-DE') : 'N/A'} (${t.typ || 'N/A'})`)
+          console.log(`      - ${t.betrag?.toFixed(2) || 0} EUR am ${t.datum ? new Date(t.datum).toLocaleDateString('de-DE') : 'N/A'}`)
         })
       } else {
         console.log(`   ❌ Keine Transaktionen gefunden`)
