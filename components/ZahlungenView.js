@@ -201,11 +201,11 @@ export default function ZahlungenView() {
         
         {(anbieterFilter !== 'alle' || zuordnungFilter !== 'alle' || richtungFilter !== 'alle' || searchTerm) && (
           <div className="mt-3 flex items-center gap-2">
-            <span className="text-gray-600 text-sm">Aktive Filter:</span>
+            <span className="text-gray-700 text-sm font-medium">Aktive Filter:</span>
             {anbieterFilter !== 'alle' && (
               <button
                 onClick={() => setAnbieterFilter('alle')}
-                className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1"
+                className="bg-blue-600 text-white px-2 py-1 rounded text-xs flex items-center gap-1 hover:bg-blue-700"
               >
                 Anbieter: {anbieterFilter} <span className="ml-1">×</span>
               </button>
