@@ -321,20 +321,20 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
         </div>
       </div>
 
-      {/* Tabelle */}
+      {/* Tabelle - Komprimiert mit horizontalem Scrollbalken */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto" style={{ maxWidth: '100vw' }}>
-          <table className="w-full divide-y divide-gray-200" style={{ minWidth: '1200px' }}>
-            <thead className="bg-gray-50">
+        <div className="overflow-x-auto">
+          <table className="w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50 sticky top-0">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Anbieter</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Betrag</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rechnung</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kunde</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hinweis/Bestellnr</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Zuordnung</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quelle</th>
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Datum</th>
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Anbieter</th>
+                <th className="px-2 py-2 text-right text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Betrag</th>
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Rechnung</th>
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Kunde</th>
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap max-w-xs">Hinweis</th>
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Zuordnung</th>
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Quelle</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
