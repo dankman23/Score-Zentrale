@@ -317,10 +317,22 @@ export default function EKRechnungenView({ zeitraum: zeitraumProp, initialFilter
                         </button>
                       )}
                       <button
-                        onClick={() => {
-                          if (confirm('Diese Rechnung zurück in die Zuordnung verschieben?')) {
-                            // TODO: API-Call zum Zurücksetzen
-                            alert('Funktion wird implementiert')
+                        onClick={async () => {
+                          if (confirm(`Rechnung "${ek.rechnungsNummer}" von ${ek.lieferantName} zurück in die Zuordnung verschieben?\n\nDer Kreditor wird entfernt.`)) {
+                            try {
+                              const res = await fetch(`/api/fibu/rechnung/${ek._id}/kreditor-entfernen`, {
+                                method: 'DELETE'
+                              })
+                              if (res.ok) {
+                                alert('✅ Rechnung wurde in die Zuordnung verschoben!')
+                                loadRechnungen() // Reload list
+                              } else {
+                                alert('❌ Fehler beim Verschieben')
+                              }
+                            } catch (error) {
+                              console.error('Fehler:', error)
+                              alert('❌ Fehler beim Verschieben')
+                            }
                           }
                         }}
                         className="text-orange-600 hover:text-orange-800 font-medium text-xs"
