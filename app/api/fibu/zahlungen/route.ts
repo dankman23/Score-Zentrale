@@ -92,6 +92,8 @@ export async function GET(request: NextRequest) {
       -- Indirekte Zuordnung über kBestellung (wichtig für Amazon!)
       LEFT JOIN dbo.tBestellung b ON z.kBestellung = b.kBestellung
       LEFT JOIN dbo.tRechnung r2 ON b.kBestellung = r2.tBestellung_kBestellung
+      -- WICHTIG: Externe Belege (XRE-* Rechnungen für Amazon Payment)
+      LEFT JOIN Rechnung.tExternerBeleg eb ON z.kBestellung = eb.kExternerBeleg AND eb.nBelegtyp = 0
       -- Zahlungsart
       LEFT JOIN dbo.tZahlungsart za ON z.kZahlungsart = za.kZahlungsart
       WHERE z.dDatum >= @from
