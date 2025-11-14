@@ -64,7 +64,9 @@ export default function FibuMonatsUebersicht({ selectedPeriod }) {
       {/* Header mit Monatsname */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
         <h2 className="text-3xl font-bold mb-2">📊 Monats-Übersicht: {monat}</h2>
-        <p className="text-blue-100">Status der Buchführung und offene Aufgaben</p>
+        <p className="text-blue-100 italic">
+          "Wer seine Zahlen kennt, braucht keine Glaskugel." - Aristoteles feat. Dieter Bohlen
+        </p>
       </div>
 
       {/* Monat abschließbar? */}
