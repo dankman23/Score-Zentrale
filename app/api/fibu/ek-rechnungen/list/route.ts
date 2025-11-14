@@ -62,12 +62,34 @@ export async function GET(request: NextRequest) {
     console.log(`[EK-Rechnungen] Nach Filterung: ${gereinigte.length} Einträge`)
     console.log(`[EK-Rechnungen] Herausgefiltert: ${alleRechnungen.length - gereinigte.length} Einträge`)
     
+    // WICHTIG: Entferne Duplikate (gleiche RechnungsNr + Lieferant + Betrag)
+    const seenKeys = new Set()
+    const ohneDuplikate = gereinigte.filter(r => {
+      // Erstelle eindeutigen Schlüssel
+      const key = `${r.lieferantName}|${r.rechnungsNummer}|${r.gesamtBetrag}|${r.rechnungsdatum}`
+      
+      if (seenKeys.has(key)) {
+        console.log(`[EK-Rechnungen] ⚠️ Duplikat entfernt: ${r.lieferantName} - ${r.rechnungsNummer} (${r.gesamtBetrag}€)`)
+        return false
+      }
+      
+      seenKeys.add(key)
+      return true
+    })
+    
+    const duplikateAnzahl = gereinigte.length - ohneDuplikate.length
+    
+    if (duplikateAnzahl > 0) {
+      console.log(`[EK-Rechnungen] 🧹 ${duplikateAnzahl} Duplikate entfernt`)
+    }
+    
     return NextResponse.json({
       ok: true,
-      rechnungen: gereinigte,
+      rechnungen: ohneDuplikate,
       stats: {
-        gesamt: gereinigte.length,
+        gesamt: ohneDuplikate.length,
         gefiltert: alleRechnungen.length - gereinigte.length,
+        duplikateEntfernt: duplikateAnzahl,
         zeitraum: { from, to }
       }
     })
