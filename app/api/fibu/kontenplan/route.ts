@@ -1,12 +1,53 @@
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '../../../lib/db/mongodb'
 
 /**
- * Vollständiger Kontenplan für die Buchhaltung
- * Basierend auf deutschem Standard (ähnlich SKR03/SKR04)
+ * Kontenplan API - SKR04 (Abschlussgliederungsprinzip)
+ * 
+ * DATEV Struktur:
+ * - 1. Ziffer: Kontenklasse (0-9)
+ * - 1.-2. Ziffer: Kontengruppe
+ * - 1.-3. Ziffer: Kontenuntergruppe
+ * - 4-stellig: Einzelkonto
  */
+
+// SKR04 Kontenklassen-Definition
+const SKR04_KLASSEN = {
+  0: { bezeichnung: 'Anlagevermögen', typ: 'aktiv' },
+  1: { bezeichnung: 'Umlaufvermögen', typ: 'aktiv' },
+  2: { bezeichnung: 'Eigenkapital', typ: 'passiv' },
+  3: { bezeichnung: 'Fremdkapital', typ: 'passiv' },
+  4: { bezeichnung: 'Betriebliche Erträge', typ: 'ertrag' },
+  5: { bezeichnung: 'Betriebliche Aufwendungen', typ: 'aufwand' },
+  6: { bezeichnung: 'Betriebliche Aufwendungen', typ: 'aufwand' },
+  7: { bezeichnung: 'Weitere Erträge und Aufwendungen', typ: 'aufwand' },
+  8: { bezeichnung: 'Zur freien Verfügung', typ: 'sonder' },
+  9: { bezeichnung: 'Vortrags-, Kapital-, Korrektur- und statistische Konten', typ: 'sonder' }
+}
+
+function analyzeKontonummer(kontonummer: string) {
+  const klasse = parseInt(kontonummer[0])
+  const gruppe = kontonummer.substring(0, 2)
+  const untergruppe = kontonummer.substring(0, 3)
+  
+  const klassenInfo = SKR04_KLASSEN[klasse as keyof typeof SKR04_KLASSEN] || {
+    bezeichnung: 'Unbekannt',
+    typ: 'sonder'
+  }
+  
+  return {
+    kontenklasse: klasse,
+    kontengruppe: gruppe,
+    kontenuntergruppe: untergruppe,
+    kontenklasseBezeichnung: klassenInfo.bezeichnung,
+    kontenklasseTyp: klassenInfo.typ
+  }
+}
+
+// FALLBACK: Alter Standard-Kontenplan (wird nicht mehr verwendet)
 const STANDARD_KONTENPLAN = {
   sachkonten: [
     // ERLÖSKONTEN (4xxx)
