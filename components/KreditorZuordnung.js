@@ -84,7 +84,17 @@ export default function KreditorZuordnung({ onUpdate }) {
               if (res2.ok) erfolg++
             }
             
-            alert(`✅ ${erfolg + 1} Rechnungen von "${lieferant}" wurden dem Kreditor ${kreditorNr} zugeordnet!`)
+            // Speichere Mapping für zukünftige Rechnungen
+            await fetch('/api/fibu/lieferant-mapping', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                lieferantName: lieferant,
+                kreditorKonto: kreditorNr
+              })
+            })
+            
+            alert(`✅ ${erfolg + 1} Rechnungen von "${lieferant}" wurden dem Kreditor ${kreditorNr} zugeordnet!\n\n💾 Mapping gespeichert: Zukünftige Rechnungen von diesem Lieferanten werden automatisch zugeordnet.`)
           }
         }
         
