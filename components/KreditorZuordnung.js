@@ -335,10 +335,7 @@ export default function KreditorZuordnung({ onUpdate }) {
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <button
-                      onClick={() => {
-                        // TODO: Edit-Dialog öffnen
-                        alert(`Edit-Funktion für ${rechnung.lieferantName}\nWird jetzt implementiert...`)
-                      }}
+                      onClick={() => openEditDialog(rechnung)}
                       className="text-gray-600 hover:text-gray-800 font-medium"
                       title="Rechnung bearbeiten"
                     >
