@@ -165,23 +165,76 @@ export default function FibuMonatsUebersicht({ selectedPeriod }) {
         </div>
       )}
 
-      {/* Statistik-Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Kritische Probleme - Kompakt mit direkten Links */}
+      {!istMonatAbschließbar && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+          <h3 className="text-lg font-bold text-red-900 mb-3 flex items-center gap-2">
+            ⚠️ Offene Aufgaben
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {stats.ekRechnungenOhneKreditor > 0 && (
+              <button
+                onClick={() => window.location.hash = '#/fibu?tab=zuordnung'}
+                className="bg-white p-3 rounded hover:bg-red-50 text-left border border-red-200"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-red-900">EK ohne Kreditor</span>
+                  <span className="bg-red-600 text-white px-3 py-1 rounded-full font-bold text-sm">
+                    {stats.ekRechnungenOhneKreditor}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-600 mt-1">→ Zur Zuordnung</p>
+              </button>
+            )}
+            
+            {stats.vkRechnungenOhneBezahlung > 0 && (
+              <button
+                onClick={() => window.location.hash = '#/fibu?tab=vk&filter=offen'}
+                className="bg-white p-3 rounded hover:bg-yellow-50 text-left border border-yellow-200"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-yellow-900">VK ohne Bezahlung</span>
+                  <span className="bg-yellow-600 text-white px-3 py-1 rounded-full font-bold text-sm">
+                    {stats.vkRechnungenOhneBezahlung}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-600 mt-1">→ Zu offenen Rechnungen</p>
+              </button>
+            )}
+            
+            {stats.zahlungenNichtZugeordnet > 0 && (
+              <button
+                onClick={() => window.location.hash = '#/fibu?tab=zahlungen&filter=nicht_zugeordnet'}
+                className="bg-white p-3 rounded hover:bg-orange-50 text-left border border-orange-200"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-orange-900">Zahlungen offen</span>
+                  <span className="bg-orange-600 text-white px-3 py-1 rounded-full font-bold text-sm">
+                    {stats.zahlungenNichtZugeordnet}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-600 mt-1">→ Zu Zahlungen</p>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Statistik-Grid - Kompakter */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
         {/* VK-Rechnungen */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-3xl">🧾</div>
-            <span className={`text-xs px-2 py-1 rounded ${
-              stats.vkRechnungenOhneDebitor === 0 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-            }`}>
-              {stats.vkRechnungenOhneDebitor === 0 ? '✓' : `${stats.vkRechnungenOhneDebitor} offen`}
-            </span>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="flex items-center justify-between mb-1">
+            <div className="text-2xl">🧾</div>
           </div>
-          <div className="text-2xl font-bold text-gray-900">{stats.vkRechnungenGesamt}</div>
-          <div className="text-sm text-gray-600">VK-Rechnungen</div>
-          <div className="mt-2 text-xs text-gray-500">
-            {stats.vkRechnungenBezahlt} bezahlt
-          </div>
+          <div className="text-xl font-bold text-gray-900">{stats.vkRechnungenGesamt}</div>
+          <div className="text-xs text-gray-600">VK-Rechnungen</div>
+          <button
+            onClick={() => window.location.hash = '#/fibu?tab=vk&filter=bezahlt'}
+            className="mt-1 text-xs text-green-600 hover:underline"
+          >
+            {stats.vkRechnungenBezahlt} bezahlt →
+          </button>
         </div>
 
         {/* EK-Rechnungen */}
