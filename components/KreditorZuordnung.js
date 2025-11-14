@@ -90,6 +90,46 @@ export default function KreditorZuordnung({ onUpdate }) {
     if (onUpdate) onUpdate()
   }
 
+  function openEditDialog(rechnung) {
+    setEditRechnung(rechnung)
+    setEditForm({
+      lieferantName: rechnung.lieferantName || '',
+      rechnungsNummer: rechnung.rechnungsNummer || '',
+      gesamtBetrag: rechnung.gesamtBetrag || 0,
+      rechnungsdatum: rechnung.rechnungsdatum ? rechnung.rechnungsdatum.split('T')[0] : ''
+    })
+  }
+
+  async function saveEdit() {
+    if (!editRechnung) return
+    
+    setSaving(true)
+    try {
+      const res = await fetch(`/api/fibu/rechnungen/ek/${editRechnung._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lieferantName: editForm.lieferantName,
+          rechnungsNummer: editForm.rechnungsNummer,
+          gesamtBetrag: parseFloat(editForm.gesamtBetrag),
+          rechnungsdatum: editForm.rechnungsdatum
+        })
+      })
+      
+      if (res.ok) {
+        alert('✅ Rechnung aktualisiert!')
+        setEditRechnung(null)
+        loadData() // Reload
+      } else {
+        alert('❌ Fehler beim Speichern')
+      }
+    } catch (error) {
+      console.error('Fehler:', error)
+      alert('❌ Fehler beim Speichern')
+    }
+    setSaving(false)
+  }
+
   function toggleSelection(id) {
     setSelectedItems(prev => {
       const newSet = new Set(prev)
