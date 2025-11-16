@@ -202,7 +202,7 @@ async function importKontenplan() {
   console.log('🔄 Starte Import von', KONTEN.length, 'Konten (SKR04)...\n')
   
   const client = await MongoClient.connect(MONGO_URL)
-  const db = client.db('score_zentrale')
+  const db = client.db('fibu')
   const collection = db.collection('fibu_kontenplan')
   
   let imported = 0
