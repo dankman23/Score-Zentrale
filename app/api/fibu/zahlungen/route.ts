@@ -41,6 +41,98 @@ function normalizeZahlungsanbieter(anbieter: string, zahlungsart: string, quelle
  * GET /api/fibu/zahlungen
  * Lädt alle Zahlungen aus JTL-Wawi für einen Zeitraum
  */
+/**
+ * PUT /api/fibu/zahlungen
+ * Zuordnung einer Zahlung zu Rechnung oder Konto
+ */
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { zahlungId, quelle, zuordnungsArt, rechnungsNr, kontonummer } = body
+    
+    if (!zahlungId || !quelle) {
+      return NextResponse.json(
+        { ok: false, error: 'zahlungId und quelle sind erforderlich' },
+        { status: 400 }
+      )
+    }
+    
+    if (!zuordnungsArt || (zuordnungsArt !== 'rechnung' && zuordnungsArt !== 'konto')) {
+      return NextResponse.json(
+        { ok: false, error: 'zuordnungsArt muss "rechnung" oder "konto" sein' },
+        { status: 400 }
+      )
+    }
+    
+    if (zuordnungsArt === 'rechnung' && !rechnungsNr) {
+      return NextResponse.json(
+        { ok: false, error: 'rechnungsNr ist erforderlich bei zuordnungsArt=rechnung' },
+        { status: 400 }
+      )
+    }
+    
+    if (zuordnungsArt === 'konto' && !kontonummer) {
+      return NextResponse.json(
+        { ok: false, error: 'kontonummer ist erforderlich bei zuordnungsArt=konto' },
+        { status: 400 }
+      )
+    }
+    
+    const db = await getDb()
+    const uniqueId = `${quelle}_${zahlungId}`
+    
+    // Update Zahlung
+    const updateData: any = {
+      zuordnungsArt,
+      istZugeordnet: true,
+      updated_at: new Date()
+    }
+    
+    if (zuordnungsArt === 'rechnung') {
+      updateData.rechnungsNr = rechnungsNr
+      updateData.rechnungsId = rechnungsNr
+      updateData.zugeordnetesKonto = null
+    } else {
+      updateData.zugeordnetesKonto = kontonummer
+      updateData.rechnungsNr = null
+      updateData.rechnungsId = null
+    }
+    
+    // Wenn es eine Postbank-Transaktion ist, update auch in fibu_bank_transaktionen
+    if (quelle === 'postbank') {
+      await db.collection('fibu_bank_transaktionen').updateOne(
+        { _id: zahlungId },
+        { $set: updateData }
+      )
+    }
+    
+    // Update in fibu_zahlungen
+    const result = await db.collection('fibu_zahlungen').updateOne(
+      { uniqueId },
+      { $set: updateData }
+    )
+    
+    if (result.matchedCount === 0) {
+      return NextResponse.json(
+        { ok: false, error: 'Zahlung nicht gefunden' },
+        { status: 404 }
+      )
+    }
+    
+    return NextResponse.json({
+      ok: true,
+      message: 'Zuordnung erfolgreich gespeichert'
+    })
+    
+  } catch (error: any) {
+    console.error('[Zahlungen PUT] Error:', error)
+    return NextResponse.json(
+      { ok: false, error: error.message },
+      { status: 500 }
+    )
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
