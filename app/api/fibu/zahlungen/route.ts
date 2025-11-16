@@ -8,32 +8,55 @@ import { getDb } from '../../../lib/db/mongodb'
 /**
  * Normalisiert Zahlungsanbieter-Namen
  * Erlaubt nur: PayPal, Amazon Payment, eBay, Mollie, Commerzbank, Otto.de, Postbank
+ * Filtert alle Zahlungsarten von Bestellungen (Ratepay, Vorkasse, Rechnung etc.)
  */
 function normalizeZahlungsanbieter(anbieter: string, zahlungsart: string, quelle: string): string {
-  // Normalisierungs-Map
+  // Normalisierungs-Map für echte Zahlungsanbieter
   const mapping: { [key: string]: string } = {
     'paypal': 'PayPal',
     'paypal (bank)': 'PayPal',
     'amazon payment': 'Amazon Payment',
+    'amazon': 'Amazon Payment',
     'ebay managed payments': 'eBay',
     'ebay (bank)': 'eBay',
+    'ebay': 'eBay',
     'mollie': 'Mollie',
     'commerzbank': 'Commerzbank',
     'otto.de': 'Otto.de',
+    'otto': 'Otto.de',
     'postbank': 'Postbank'
   }
   
-  const normalized = mapping[anbieter?.toLowerCase()] || mapping[zahlungsart?.toLowerCase()]
+  // Versuche beide Felder
+  const check1 = anbieter?.toLowerCase().trim()
+  const check2 = zahlungsart?.toLowerCase().trim()
+  
+  const normalized = mapping[check1] || mapping[check2]
   
   // Falls gefunden, return
   if (normalized) return normalized
   
-  // Fallback für Postbank-Transaktionen ohne Kategorie
-  if (quelle === 'postbank' || quelle === 'Postbank') {
+  // Spezialfall: Postbank/Bank-Quelle
+  if (quelle === 'postbank' || quelle === 'Postbank' || quelle === 'tZahlungsabgleichUmsatz') {
     return 'Postbank'
   }
   
-  // Default: Postbank (für Bank-Transaktionen)
+  // WICHTIG: Filtere Zahlungsarten von Bestellungen (nicht Zahlungsanbieter!)
+  // Diese sollten NICHT als Zahlungsanbieter erscheinen
+  const zahlungsartenFilter = [
+    'vorkasse', 'rechnung', 'lastschrift', 'überweisung', 
+    'ratepay', 'ratenkauf', 'nachnahme', 'bar', 'barzahlung',
+    'sofortüberweisung', 'giropay', 'klarna', 'paydirekt',
+    'kreditkarte', 'visa', 'mastercard', 'amex'
+  ]
+  
+  if (zahlungsartenFilter.includes(check1) || zahlungsartenFilter.includes(check2)) {
+    // Diese sind keine Anbieter, sondern Zahlungsarten
+    // Falls aus JTL: ignoriere diese Zahlung
+    return null as any
+  }
+  
+  // Fallback: Wenn unklar, dann Postbank
   return 'Postbank'
 }
 
