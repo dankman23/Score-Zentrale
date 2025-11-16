@@ -42,12 +42,12 @@ export async function GET() {
         ebp.fSteuersatz,
         ebp.nTyp,
         eb.cBelegNr,
-        eb.dErstellt
+        eb.dErstellDatum
       FROM Rechnung.tExternerBelegPosition ebp
       JOIN Rechnung.tExternerBeleg eb ON ebp.kExternerBeleg = eb.kExternerBeleg
       WHERE eb.cMarktplatz LIKE '%eBay%'
         AND (ebp.cName LIKE '%Gebühr%' OR ebp.cName LIKE '%Fee%' OR ebp.fPreisNetto < 0)
-      ORDER BY eb.dErstellt DESC
+      ORDER BY eb.dErstellDatum DESC
     `)
     
     return NextResponse.json({
