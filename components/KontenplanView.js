@@ -419,8 +419,8 @@ export default function KontenplanView() {
         </div>
       )}
       
-      {/* Edit/Create Modal */}
-      {(editingKonto || showCreateForm) && (
+      {/* Edit/Create Modal - only for kontenplan */}
+      {activeMainTab === 'kontenplan' && (editingKonto || showCreateForm) && (
         <KontoFormModal
           konto={editingKonto}
           onSave={saveKonto}
