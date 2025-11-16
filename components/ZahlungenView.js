@@ -708,21 +708,54 @@ function ZuordnungsModal({ zahlung, onClose, onSave }) {
         </div>
         
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition"
-            disabled={saving}
-          >
-            Abbrechen
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={saving || !zuordnungsArt}
-            className="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {saving ? 'Speichern...' : 'Speichern'}
-          </button>
+        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-between items-center">
+          <div>
+            {zahlung.istZugeordnet && (
+              <button
+                onClick={async () => {
+                  if (!confirm('Zuordnung wirklich löschen?')) return
+                  
+                  setSaving(true)
+                  try {
+                    const res = await fetch(
+                      `/api/fibu/zahlungen?zahlungId=${zahlung.zahlungsId || zahlung._id}&quelle=${zahlung.quelle}`,
+                      { method: 'DELETE' }
+                    )
+                    const data = await res.json()
+                    if (data.ok) {
+                      onSave()
+                    } else {
+                      setError(data.error)
+                      setSaving(false)
+                    }
+                  } catch (err) {
+                    setError('Fehler beim Löschen: ' + err.message)
+                    setSaving(false)
+                  }
+                }}
+                disabled={saving}
+                className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
+              >
+                🗑️ Zuordnung löschen
+              </button>
+            )}
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition"
+              disabled={saving}
+            >
+              Abbrechen
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving || !zuordnungsArt}
+              className="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {saving ? 'Speichern...' : 'Speichern'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
