@@ -136,37 +136,36 @@ export default function ZahlungsEinstellungen() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">⚙️ Zahlungseinstellungen</h2>
-          <p className="text-sm text-gray-600 mt-1">
-            Konten-Zuordnung für automatische Buchungen (wie in Amazon Seller Central)
+          <h2 className="text-lg font-bold text-gray-900">⚙️ Konten-Zuordnung</h2>
+          <p className="text-xs text-gray-600 mt-0.5">
+            Zuordnung von Debitorenkonten und Bankkonten zu Zahlungsarten
           </p>
         </div>
         
         <button
           onClick={saveSettings}
           disabled={saving}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium disabled:opacity-50"
         >
-          {saving ? '💾 Speichert...' : '💾 Alle Speichern'}
+          {saving ? '💾 Speichert...' : '💾 Speichern'}
         </button>
       </div>
 
-      {/* Info Box */}
-      <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-        <div className="flex">
-          <div className="text-blue-600 text-2xl mr-3">ℹ️</div>
+      {/* Info Box - KOMPAKT */}
+      <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
+        <div className="flex items-start">
+          <div className="text-blue-600 text-lg mr-2 mt-0.5">ℹ️</div>
           <div>
-            <p className="text-blue-900 font-medium">Kontenplan-Referenz (SKR03)</p>
-            <ul className="text-blue-800 text-sm mt-2 space-y-1">
-              <li><strong>1200-1299:</strong> Bank-Konten (Commerzbank, PayPal, Amazon, etc.)</li>
-              <li><strong>4400:</strong> Erlöse aus Warenverkauf (19% USt)</li>
-              <li><strong>4985:</strong> Sonstige betriebliche Aufwendungen (Gebühren)</li>
-              <li><strong>69001-69999:</strong> Sammel-Debitorenkonten (pro Zahlungsart)</li>
-            </ul>
+            <p className="text-blue-900 font-semibold text-sm">Kontenplan-Referenz (SKR04)</p>
+            <div className="text-blue-800 text-xs mt-1 space-y-0.5">
+              <div><strong>1200-1299:</strong> Bank-Konten (Commerzbank, PayPal, Amazon, etc.)</div>
+              <div><strong>69001-69999:</strong> Sammel-Debitorenkonten (pro Zahlungsart)</div>
+              <div><strong>4400:</strong> Erlöse • <strong>4985:</strong> Gebühren</div>
+            </div>
           </div>
         </div>
       </div>
