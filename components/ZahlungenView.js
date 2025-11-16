@@ -357,10 +357,18 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
                     {zahlung.betrag >= 0 ? '+' : ''}{zahlung.betrag.toFixed(2)}€
                   </td>
                   <td className="px-2 py-2 text-xs whitespace-nowrap">
-                    {zahlung.kRechnung > 0 ? (
+                    {zahlung.zuordnungsArt === 'rechnung' && zahlung.rechnungsNr ? (
+                      <div>
+                        <span className="text-blue-600 font-medium">📄 {zahlung.rechnungsNr}</span>
+                      </div>
+                    ) : zahlung.zuordnungsArt === 'konto' && zahlung.zugeordnetesKonto ? (
+                      <div>
+                        <span className="text-purple-600 font-medium">📊 {zahlung.zugeordnetesKonto}</span>
+                      </div>
+                    ) : zahlung.kRechnung > 0 ? (
                       <span className="text-blue-600 font-medium">{zahlung.rechnungsNr}</span>
                     ) : (
-                      <span className="text-gray-400">{zahlung.rechnungsNr}</span>
+                      <span className="text-gray-400">-</span>
                     )}
                   </td>
                   <td className="px-2 py-2 text-xs text-gray-600 max-w-[120px]">
