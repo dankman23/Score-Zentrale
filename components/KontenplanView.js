@@ -426,19 +426,37 @@ export default function KontenplanView() {
       
       {/* Content: Kostenstellen */}
       {activeMainTab === 'kostenstellen' && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+        <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl shadow-lg border-2 border-purple-200 p-8">
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">🏭</div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Kostenstellen-Verwaltung</h3>
-            <p className="text-gray-600 mb-6">
+            <div className="text-7xl mb-6 animate-bounce">🏭</div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Kostenstellen-Verwaltung</h3>
+            <p className="text-lg text-gray-700 mb-6 font-medium">
               Kostenstellen für Kostenrechnung definieren
             </p>
-            <p className="text-sm text-gray-500">
-              Kostenstellen ermöglichen Zuordnung von Kosten zu Abteilungen/Bereichen.<br/>
-              Beispiele: Vertrieb, Marketing, Verwaltung, Produktion
-            </p>
-            <button className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-              + Neue Kostenstelle
+            <div className="bg-purple-100 border-l-4 border-purple-600 p-6 max-w-2xl mx-auto text-left rounded-r-lg mb-6">
+              <p className="text-sm text-purple-900 font-medium mb-2">
+                💡 <strong>Was sind Kostenstellen?</strong>
+              </p>
+              <p className="text-sm text-purple-800 mb-3">
+                Kostenstellen ermöglichen die Zuordnung von Kosten zu Abteilungen oder Bereichen.
+              </p>
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <div className="bg-purple-200 px-3 py-2 rounded text-center text-xs font-bold text-purple-900">
+                  📊 Vertrieb
+                </div>
+                <div className="bg-purple-200 px-3 py-2 rounded text-center text-xs font-bold text-purple-900">
+                  📢 Marketing
+                </div>
+                <div className="bg-purple-200 px-3 py-2 rounded text-center text-xs font-bold text-purple-900">
+                  🏢 Verwaltung
+                </div>
+                <div className="bg-purple-200 px-3 py-2 rounded text-center text-xs font-bold text-purple-900">
+                  🏭 Produktion
+                </div>
+              </div>
+            </div>
+            <button className="mt-4 px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-bold text-base shadow-lg hover:shadow-xl transition-all">
+              + Neue Kostenstelle anlegen
             </button>
           </div>
         </div>
