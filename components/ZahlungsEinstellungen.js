@@ -170,39 +170,39 @@ export default function ZahlungsEinstellungen() {
         </div>
       </div>
 
-      {/* Einstellungen-Cards */}
-      <div className="grid grid-cols-1 gap-6">
+      {/* Einstellungen-Cards - KOMPAKT */}
+      <div className="space-y-2">
         {settings.map((setting) => (
           <div
             key={setting.id}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition"
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 hover:shadow transition"
           >
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">{setting.name}</h3>
-                <p className="text-sm text-gray-600">{setting.beschreibung}</p>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex-1">
+                <h3 className="text-sm font-bold text-gray-900">{setting.name}</h3>
+                <p className="text-xs text-gray-500">{setting.beschreibung}</p>
               </div>
               <button
                 onClick={() => setEditingId(editingId === setting.id ? null : setting.id)}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                className="text-blue-600 hover:text-blue-800 text-xs font-medium ml-4"
               >
                 {editingId === setting.id ? '✓ Fertig' : '✏️ Bearbeiten'}
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {/* Zahlungsart */}
               <div>
-                <label className="block text-gray-700 text-xs mb-1 font-medium">Zahlungsart (JTL)</label>
+                <label className="block text-gray-600 text-xs mb-0.5 font-medium">Zahlungsart (JTL)</label>
                 {editingId === setting.id ? (
                   <input
                     type="text"
                     value={setting.zahlungsart}
                     onChange={(e) => updateSetting(setting.id, 'zahlungsart', e.target.value)}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-xs"
                   />
                 ) : (
-                  <div className="bg-gray-50 px-3 py-2 rounded text-sm font-mono text-gray-900">
+                  <div className="bg-gray-50 px-2 py-1 rounded text-xs font-mono text-gray-900">
                     {setting.zahlungsart || '-'}
                   </div>
                 )}
@@ -210,53 +210,35 @@ export default function ZahlungsEinstellungen() {
 
               {/* Debitor-Konto */}
               <div>
-                <label className="block text-gray-700 text-xs mb-1 font-medium">Debitor (Sammelkonto)</label>
+                <label className="block text-gray-600 text-xs mb-0.5 font-medium">Debitor-Konto</label>
                 {editingId === setting.id ? (
                   <input
                     type="text"
                     value={setting.debitorKonto}
                     onChange={(e) => updateSetting(setting.id, 'debitorKonto', e.target.value)}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-xs"
                     placeholder="69xxx"
                   />
                 ) : (
-                  <div className="bg-green-50 px-3 py-2 rounded text-sm font-mono text-green-900 font-bold">
+                  <div className="bg-green-50 px-2 py-1 rounded text-xs font-mono text-green-900 font-bold">
                     {setting.debitorKonto || '-'}
-                  </div>
-                )}
-              </div>
-
-              {/* Erlöse-Konto */}
-              <div>
-                <label className="block text-gray-700 text-xs mb-1 font-medium">Erlöse-Konto</label>
-                {editingId === setting.id ? (
-                  <input
-                    type="text"
-                    value={setting.erloeseKonto}
-                    onChange={(e) => updateSetting(setting.id, 'erloeseKonto', e.target.value)}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                    placeholder="4400"
-                  />
-                ) : (
-                  <div className="bg-blue-50 px-3 py-2 rounded text-sm font-mono text-blue-900 font-bold">
-                    {setting.erloeseKonto || '-'}
                   </div>
                 )}
               </div>
 
               {/* Bank-Konto */}
               <div>
-                <label className="block text-gray-700 text-xs mb-1 font-medium">Bank-Konto</label>
+                <label className="block text-gray-600 text-xs mb-0.5 font-medium">Bank-Konto</label>
                 {editingId === setting.id ? (
                   <input
                     type="text"
                     value={setting.bankKonto}
                     onChange={(e) => updateSetting(setting.id, 'bankKonto', e.target.value)}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-xs"
                     placeholder="12xx"
                   />
                 ) : (
-                  <div className="bg-purple-50 px-3 py-2 rounded text-sm font-mono text-purple-900 font-bold">
+                  <div className="bg-purple-50 px-2 py-1 rounded text-xs font-mono text-purple-900 font-bold">
                     {setting.bankKonto || '-'}
                   </div>
                 )}
@@ -264,17 +246,17 @@ export default function ZahlungsEinstellungen() {
 
               {/* Gebühren-Konto */}
               <div>
-                <label className="block text-gray-700 text-xs mb-1 font-medium">Gebühren-Konto</label>
+                <label className="block text-gray-600 text-xs mb-0.5 font-medium">Gebühren-Konto</label>
                 {editingId === setting.id ? (
                   <input
                     type="text"
                     value={setting.gebuehrenKonto}
                     onChange={(e) => updateSetting(setting.id, 'gebuehrenKonto', e.target.value)}
-                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-xs"
                     placeholder="4985"
                   />
                 ) : (
-                  <div className="bg-orange-50 px-3 py-2 rounded text-sm font-mono text-orange-900 font-bold">
+                  <div className="bg-orange-50 px-2 py-1 rounded text-xs font-mono text-orange-900 font-bold">
                     {setting.gebuehrenKonto || '-'}
                   </div>
                 )}
