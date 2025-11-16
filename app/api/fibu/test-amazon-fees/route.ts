@@ -5,22 +5,20 @@ export async function GET() {
   try {
     const pool = await getJTLConnection()
     
-    // Prüfe externe Belege mit Gebühren
+    // Prüfe externe Belege
     const result1 = await pool.request().query(`
       SELECT TOP 5
         eb.cBelegNr,
         eb.dBelegdatumUtc,
-        eb.fGesamtsumme,
-        eb.cMarktplatz,
         (SELECT COUNT(*) FROM Rechnung.tExternerBelegPosition WHERE kExternerBeleg = eb.kExternerBeleg) as anzahl_positionen
       FROM Rechnung.tExternerBeleg eb
-      WHERE eb.cMarktplatz LIKE '%Amazon%'
+      WHERE eb.cBelegNr LIKE 'XRE-%' OR eb.cBelegNr LIKE 'AMZ-%'
       ORDER BY eb.dBelegdatumUtc DESC
     `)
     
-    // Prüfe Gebühren-Positionen
+    // Prüfe Gebühren-Positionen (negative Beträge = Gebühren)
     const result2 = await pool.request().query(`
-      SELECT TOP 20
+      SELECT TOP 50
         ebp.cName,
         ebp.fPreisNetto,
         ebp.fSteuersatz,
@@ -29,24 +27,7 @@ export async function GET() {
         eb.dBelegdatumUtc
       FROM Rechnung.tExternerBelegPosition ebp
       JOIN Rechnung.tExternerBeleg eb ON ebp.kExternerBeleg = eb.kExternerBeleg
-      WHERE eb.cMarktplatz LIKE '%Amazon%'
-        AND (ebp.cName LIKE '%Gebühr%' OR ebp.cName LIKE '%Fee%' OR ebp.cName LIKE '%FBA%' OR ebp.fPreisNetto < 0)
-      ORDER BY eb.dBelegdatumUtc DESC
-    `)
-    
-    // Prüfe auch eBay
-    const result3 = await pool.request().query(`
-      SELECT TOP 20
-        ebp.cName,
-        ebp.fPreisNetto,
-        ebp.fSteuersatz,
-        ebp.nTyp,
-        eb.cBelegNr,
-        eb.dBelegdatumUtc
-      FROM Rechnung.tExternerBelegPosition ebp
-      JOIN Rechnung.tExternerBeleg eb ON ebp.kExternerBeleg = eb.kExternerBeleg
-      WHERE eb.cMarktplatz LIKE '%eBay%'
-        AND (ebp.cName LIKE '%Gebühr%' OR ebp.cName LIKE '%Fee%' OR ebp.fPreisNetto < 0)
+      WHERE ebp.fPreisNetto < 0
       ORDER BY eb.dBelegdatumUtc DESC
     `)
     
