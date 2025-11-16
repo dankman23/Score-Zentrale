@@ -13,6 +13,10 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
   const [zuordnungFilter, setZuordnungFilter] = useState(initialFilter || 'alle') // 'alle', 'zugeordnet', 'nicht_zugeordnet'
   const [richtungFilter, setRichtungFilter] = useState('alle') // 'alle', 'eingang', 'ausgang'
   const [searchTerm, setSearchTerm] = useState('')
+  
+  // Zuordnungs-Modal
+  const [showZuordnungModal, setShowZuordnungModal] = useState(false)
+  const [selectedZahlung, setSelectedZahlung] = useState(null)
 
   // Update zeitraum when prop changes
   useEffect(() => {
