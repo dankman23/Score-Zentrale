@@ -1,5 +1,4 @@
 const { MongoClient } = require('mongodb');
-require('dotenv').config();
 
 async function checkKontenplan() {
   const client = await MongoClient.connect(process.env.MONGO_URL);
