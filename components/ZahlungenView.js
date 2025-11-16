@@ -339,6 +339,7 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
                 <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap max-w-xs">Hinweis</th>
                 <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Zuordnung</th>
                 <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Quelle</th>
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Aktion</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
