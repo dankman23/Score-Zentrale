@@ -9,13 +9,13 @@ export async function GET() {
     const result1 = await pool.request().query(`
       SELECT TOP 5
         eb.cBelegNr,
-        eb.dErstellDatum,
+        eb.dBelegdatumUtc,
         eb.fGesamtsumme,
         eb.cMarktplatz,
         (SELECT COUNT(*) FROM Rechnung.tExternerBelegPosition WHERE kExternerBeleg = eb.kExternerBeleg) as anzahl_positionen
       FROM Rechnung.tExternerBeleg eb
       WHERE eb.cMarktplatz LIKE '%Amazon%'
-      ORDER BY eb.dErstellDatum DESC
+      ORDER BY eb.dBelegdatumUtc DESC
     `)
     
     // Prüfe Gebühren-Positionen
@@ -26,12 +26,12 @@ export async function GET() {
         ebp.fSteuersatz,
         ebp.nTyp,
         eb.cBelegNr,
-        eb.dErstellDatum
+        eb.dBelegdatumUtc
       FROM Rechnung.tExternerBelegPosition ebp
       JOIN Rechnung.tExternerBeleg eb ON ebp.kExternerBeleg = eb.kExternerBeleg
       WHERE eb.cMarktplatz LIKE '%Amazon%'
         AND (ebp.cName LIKE '%Gebühr%' OR ebp.cName LIKE '%Fee%' OR ebp.cName LIKE '%FBA%' OR ebp.fPreisNetto < 0)
-      ORDER BY eb.dErstellDatum DESC
+      ORDER BY eb.dBelegdatumUtc DESC
     `)
     
     // Prüfe auch eBay
@@ -42,12 +42,12 @@ export async function GET() {
         ebp.fSteuersatz,
         ebp.nTyp,
         eb.cBelegNr,
-        eb.dErstellDatum
+        eb.dBelegdatumUtc
       FROM Rechnung.tExternerBelegPosition ebp
       JOIN Rechnung.tExternerBeleg eb ON ebp.kExternerBeleg = eb.kExternerBeleg
       WHERE eb.cMarktplatz LIKE '%eBay%'
         AND (ebp.cName LIKE '%Gebühr%' OR ebp.cName LIKE '%Fee%' OR ebp.fPreisNetto < 0)
-      ORDER BY eb.dErstellDatum DESC
+      ORDER BY eb.dBelegdatumUtc DESC
     `)
     
     return NextResponse.json({
