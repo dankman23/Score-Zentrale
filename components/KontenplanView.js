@@ -16,6 +16,9 @@ export default function KontenplanView() {
   const [editingKonto, setEditingKonto] = useState(null)
   const [showCreateForm, setShowCreateForm] = useState(false)
   
+  // Haupt-Tab-Navigation
+  const [activeMainTab, setActiveMainTab] = useState('kontenplan')
+  
   useEffect(() => {
     loadKontenplan()
   }, [])
