@@ -131,26 +131,6 @@ export default function KontenplanView() {
             className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           
-          <select
-            value={selectedKlasse || ''}
-            onChange={(e) => {
-              setSelectedKlasse(e.target.value ? parseInt(e.target.value) : null)
-              setTimeout(() => loadKontenplan(), 100)
-            }}
-            className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Alle Klassen</option>
-            <option value="0">0 - Anlagevermögen</option>
-            <option value="1">1 - Umlaufvermögen</option>
-            <option value="2">2 - Eigenkapital</option>
-            <option value="3">3 - Fremdkapital</option>
-            <option value="4">4 - Betriebliche Erträge</option>
-            <option value="5">5 - Betriebliche Aufwendungen</option>
-            <option value="6">6 - Betriebliche Aufwendungen</option>
-            <option value="7">7 - Weitere Erträge/Aufwendungen</option>
-            <option value="9">9 - Saldo/Statistik</option>
-          </select>
-          
           <button
             onClick={loadKontenplan}
             className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm font-medium"
