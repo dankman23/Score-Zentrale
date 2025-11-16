@@ -42,6 +42,71 @@ function normalizeZahlungsanbieter(anbieter: string, zahlungsart: string, quelle
  * Lädt alle Zahlungen aus JTL-Wawi für einen Zeitraum
  */
 /**
+ * DELETE /api/fibu/zahlungen
+ * Zuordnung einer Zahlung löschen
+ */
+export async function DELETE(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams
+    const zahlungId = searchParams.get('zahlungId')
+    const quelle = searchParams.get('quelle')
+    
+    if (!zahlungId || !quelle) {
+      return NextResponse.json(
+        { ok: false, error: 'zahlungId und quelle sind erforderlich' },
+        { status: 400 }
+      )
+    }
+    
+    const db = await getDb()
+    const uniqueId = `${quelle}_${zahlungId}`
+    
+    // Zuordnung löschen (nicht die Zahlung selbst!)
+    const updateData = {
+      zuordnungsArt: null,
+      istZugeordnet: false,
+      zugeordnetesKonto: null,
+      rechnungsNr: null,
+      rechnungsId: null,
+      updated_at: new Date()
+    }
+    
+    // Wenn es eine Postbank-Transaktion ist, update auch in fibu_bank_transaktionen
+    if (quelle === 'postbank') {
+      await db.collection('fibu_bank_transaktionen').updateOne(
+        { _id: zahlungId },
+        { $set: updateData }
+      )
+    }
+    
+    // Update in fibu_zahlungen
+    const result = await db.collection('fibu_zahlungen').updateOne(
+      { uniqueId },
+      { $set: updateData }
+    )
+    
+    if (result.matchedCount === 0) {
+      return NextResponse.json(
+        { ok: false, error: 'Zahlung nicht gefunden' },
+        { status: 404 }
+      )
+    }
+    
+    return NextResponse.json({
+      ok: true,
+      message: 'Zuordnung erfolgreich gelöscht'
+    })
+    
+  } catch (error: any) {
+    console.error('[Zahlungen DELETE] Error:', error)
+    return NextResponse.json(
+      { ok: false, error: error.message },
+      { status: 500 }
+    )
+  }
+}
+
+/**
  * PUT /api/fibu/zahlungen
  * Zuordnung einer Zahlung zu Rechnung oder Konto
  */
