@@ -10,9 +10,7 @@ export async function GET() {
       SELECT TOP 50
         kZahlungsart, 
         cName, 
-        cModulId,
-        nWaehrendBestellung,
-        nNutzbar
+        cModulId
       FROM dbo.tZahlungsart
       ORDER BY cName
     `)
