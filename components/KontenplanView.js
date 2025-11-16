@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import KreditorenManagement from './KreditorenManagement'
+import ZahlungsEinstellungen from './ZahlungsEinstellungen'
 
 /**
  * Kontenplan View - SKR04 (Abschlussgliederungsprinzip)
