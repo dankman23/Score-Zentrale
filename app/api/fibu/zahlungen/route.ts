@@ -346,6 +346,7 @@ export async function GET(request: NextRequest) {
       LEFT JOIN dbo.tZahlungsart za ON z.kZahlungsart = za.kZahlungsart
       WHERE z.dDatum >= @from
         AND z.dDatum < DATEADD(day, 1, @to)
+        AND z.kZahlungsart IN (6, 7, 8, 14, 19)  -- Nur echte Zahlungskonten: PayPal, eBay, Amazon, Otto, Mollie
       
       UNION ALL
       
