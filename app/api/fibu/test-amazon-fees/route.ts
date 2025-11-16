@@ -33,9 +33,8 @@ export async function GET() {
     
     return NextResponse.json({
       ok: true,
-      amazon_belege: result1.recordset,
-      amazon_gebuehren: result2.recordset,
-      ebay_gebuehren: result3.recordset
+      externe_belege: result1.recordset,
+      gebuehren_positionen: result2.recordset
     })
     
   } catch (error: any) {
