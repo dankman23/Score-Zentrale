@@ -23,7 +23,6 @@ export default function KontenplanView() {
   async function loadKontenplan() {
     try {
       const params = new URLSearchParams()
-      if (selectedKlasse !== null) params.append('klasse', selectedKlasse)
       if (searchTerm) params.append('search', searchTerm)
       
       const res = await fetch(`/api/fibu/kontenplan?${params}`)
@@ -32,21 +31,16 @@ export default function KontenplanView() {
       if (data.ok) {
         setKonten(data.konten)
         setGrouped(data.grouped)
+        
+        // Setze erste verfügbare Klasse als aktiv, wenn noch nicht gesetzt
+        if (data.grouped.length > 0 && selectedKlasse === null) {
+          setSelectedKlasse(data.grouped[0].klasse)
+        }
       }
     } catch (error) {
       console.error('Fehler beim Laden:', error)
     }
     setLoading(false)
-  }
-  
-  function toggleKlasse(klasse) {
-    const newExpanded = new Set(expandedKlassen)
-    if (newExpanded.has(klasse)) {
-      newExpanded.delete(klasse)
-    } else {
-      newExpanded.add(klasse)
-    }
-    setExpandedKlassen(newExpanded)
   }
   
   async function saveKonto(konto) {
