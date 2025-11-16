@@ -531,8 +531,82 @@ function KontoFormModal({ konto, onSave, onClose }) {
     istAktiv: true
   })
   
+  const [analysis, setAnalysis] = useState(null)
+  const [validationError, setValidationError] = useState('')
+  
+  // SKR04 Kontenklassen
+  const SKR04_KLASSEN = {
+    0: { bezeichnung: 'Anlagevermögen', typ: 'aktiv' },
+    1: { bezeichnung: 'Umlaufvermögen', typ: 'aktiv' },
+    2: { bezeichnung: 'Eigenkapital', typ: 'passiv' },
+    3: { bezeichnung: 'Fremdkapital', typ: 'passiv' },
+    4: { bezeichnung: 'Betriebliche Erträge', typ: 'ertrag' },
+    5: { bezeichnung: 'Betriebliche Aufwendungen', typ: 'aufwand' },
+    6: { bezeichnung: 'Betriebliche Aufwendungen', typ: 'aufwand' },
+    7: { bezeichnung: 'Weitere Erträge und Aufwendungen', typ: 'aufwand' },
+    8: { bezeichnung: 'Zur freien Verfügung', typ: 'sonder' },
+    9: { bezeichnung: 'Vortrags-, Kapital-, Korrektur- und statistische Konten', typ: 'sonder' }
+  }
+  
+  // Analysiere Kontonummer bei Änderung
+  function analyzeKontonummer(nummer) {
+    setValidationError('')
+    
+    if (!nummer) {
+      setAnalysis(null)
+      return
+    }
+    
+    // Validierung: Nur Zahlen
+    if (!/^\d+$/.test(nummer)) {
+      setValidationError('Kontonummer darf nur Zahlen enthalten')
+      setAnalysis(null)
+      return
+    }
+    
+    // Validierung: 4-stellig
+    if (nummer.length !== 4) {
+      if (nummer.length > 4) {
+        setValidationError('Kontonummer muss genau 4-stellig sein')
+      }
+      setAnalysis(null)
+      return
+    }
+    
+    const klasse = parseInt(nummer[0])
+    const gruppe = nummer.substring(0, 2)
+    const untergruppe = nummer.substring(0, 3)
+    
+    const klassenInfo = SKR04_KLASSEN[klasse] || {
+      bezeichnung: 'Unbekannt',
+      typ: 'sonder'
+    }
+    
+    setAnalysis({
+      kontenklasse: klasse,
+      kontengruppe: gruppe,
+      kontenuntergruppe: untergruppe,
+      kontenklasseBezeichnung: klassenInfo.bezeichnung,
+      kontenklasseTyp: klassenInfo.typ
+    })
+  }
+  
+  function handleKontonummerChange(value) {
+    // Nur Zahlen und max 4 Zeichen
+    const cleaned = value.replace(/\D/g, '').substring(0, 4)
+    setFormData({ ...formData, kontonummer: cleaned })
+    analyzeKontonummer(cleaned)
+  }
+  
   function handleSubmit(e) {
     e.preventDefault()
+    
+    // Finale Validierung
+    if (!/^\d{4}$/.test(formData.kontonummer)) {
+      setValidationError('Kontonummer muss genau 4-stellig sein')
+      return
+    }
+    
     onSave(formData)
   }
   
