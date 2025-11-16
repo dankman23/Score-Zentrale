@@ -186,28 +186,31 @@ export default function KontenplanView() {
         </div>
       </div>
       
-      {/* Search & Filter */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <div className="flex gap-4">
-          <input
-            type="text"
-            placeholder="Suche Kontonummer oder Bezeichnung..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyUp={(e) => e.key === 'Enter' && loadKontenplan()}
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+      {/* Content: Kontenplan */}
+      {activeMainTab === 'kontenplan' && (
+        <>
+          {/* Search & Filter */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="flex gap-4">
+              <input
+                type="text"
+                placeholder="Suche Kontonummer oder Bezeichnung..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyUp={(e) => e.key === 'Enter' && loadKontenplan()}
+                className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              
+              <button
+                onClick={loadKontenplan}
+                className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm font-medium"
+              >
+                🔍 Suchen
+              </button>
+            </div>
+          </div>
           
-          <button
-            onClick={loadKontenplan}
-            className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm font-medium"
-          >
-            🔍 Suchen
-          </button>
-        </div>
-      </div>
-      
-      {/* Tabs für Kontenklassen */}
+          {/* Tabs für Kontenklassen */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         {/* Tab Navigation */}
         <div className="border-b border-gray-200">
