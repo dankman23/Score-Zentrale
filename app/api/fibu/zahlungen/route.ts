@@ -6,6 +6,38 @@ import { getJTLConnection } from '../../../lib/db/mssql'
 import { getDb } from '../../../lib/db/mongodb'
 
 /**
+ * Normalisiert Zahlungsanbieter-Namen
+ * Erlaubt nur: PayPal, Amazon Payment, eBay, Mollie, Commerzbank, Otto.de, Postbank
+ */
+function normalizeZahlungsanbieter(anbieter: string, zahlungsart: string, quelle: string): string {
+  // Normalisierungs-Map
+  const mapping: { [key: string]: string } = {
+    'paypal': 'PayPal',
+    'paypal (bank)': 'PayPal',
+    'amazon payment': 'Amazon Payment',
+    'ebay managed payments': 'eBay',
+    'ebay (bank)': 'eBay',
+    'mollie': 'Mollie',
+    'commerzbank': 'Commerzbank',
+    'otto.de': 'Otto.de',
+    'postbank': 'Postbank'
+  }
+  
+  const normalized = mapping[anbieter?.toLowerCase()] || mapping[zahlungsart?.toLowerCase()]
+  
+  // Falls gefunden, return
+  if (normalized) return normalized
+  
+  // Fallback für Postbank-Transaktionen ohne Kategorie
+  if (quelle === 'postbank' || quelle === 'Postbank') {
+    return 'Postbank'
+  }
+  
+  // Default: Postbank (für Bank-Transaktionen)
+  return 'Postbank'
+}
+
+/**
  * GET /api/fibu/zahlungen
  * Lädt alle Zahlungen aus JTL-Wawi für einen Zeitraum
  */
