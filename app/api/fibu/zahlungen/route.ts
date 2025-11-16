@@ -222,8 +222,10 @@ export async function GET(request: NextRequest) {
       cBestellNr: z.cBestellNr || '',
       // Belegnummer: Verwende Hinweis oder generiere aus ID
       belegnummer: z.hinweis ? z.hinweis.substring(0, 50) : `${z.quelle}-${z.zahlungsId}`,
-      zahlungsanbieter: z.zahlungsart,
-      istZugeordnet: z.kRechnung > 0
+      zahlungsanbieter: normalizeZahlungsanbieter(z.zahlungsart, z.zahlungsart, z.quelle),
+      istZugeordnet: z.kRechnung > 0,
+      zugeordnetesKonto: null, // NEU: wird später aus MongoDB geladen falls vorhanden
+      zuordnungsArt: z.kRechnung > 0 ? 'rechnung' : null // NEU
     }))
     
     // Lade auch Postbank-Transaktionen
