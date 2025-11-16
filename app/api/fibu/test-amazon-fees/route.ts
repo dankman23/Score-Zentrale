@@ -22,7 +22,6 @@ export async function GET() {
         ebp.cName,
         ebp.fPreisNetto,
         ebp.fSteuersatz,
-        ebp.nTyp,
         eb.cBelegNr,
         eb.dBelegdatumUtc
       FROM Rechnung.tExternerBelegPosition ebp
