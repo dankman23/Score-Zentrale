@@ -683,11 +683,30 @@ function KontoFormModal({ konto, onSave, onClose }) {
               <input
                 type="text"
                 value={formData.bezeichnung}
-                onChange={(e) => setFormData({ ...formData, bezeichnung: e.target.value })}
-                placeholder="z.B. Postbank"
+                onChange={(e) => {
+                  const bez = e.target.value
+                  setFormData({ ...formData, bezeichnung: bez })
+                  
+                  // Auto-Erkennung: Wenn "USt" oder "Umsatzsteuer" im Namen, setze Steuersatz
+                  if (bez.includes('USt') || bez.includes('Umsatzsteuer')) {
+                    if (bez.includes('19')) {
+                      setFormData(prev => ({ ...prev, bezeichnung: bez, steuersatz: 19 }))
+                    } else if (bez.includes('7')) {
+                      setFormData(prev => ({ ...prev, bezeichnung: bez, steuersatz: 7 }))
+                    }
+                  }
+                  // Auto-Erkennung: Vorsteuer
+                  if (bez.includes('Vorsteuer') || bez.includes('VSt')) {
+                    setFormData(prev => ({ ...prev, bezeichnung: bez, vorsteuer: true }))
+                  }
+                }}
+                placeholder="z.B. Postbank oder Umsatzsteuer 19%"
                 required
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                💡 Tipp: Steuersatz wird automatisch erkannt (z.B. "Umsatzsteuer 19%" → 19%)
+              </p>
             </div>
             
             <div>
