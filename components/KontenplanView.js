@@ -346,24 +346,7 @@ export default function KontenplanView() {
       
       {/* Content: Kreditoren */}
       {activeMainTab === 'kreditoren' && (
-        <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-lg border-2 border-blue-200 p-8">
-          <div className="text-center py-12">
-            <div className="text-7xl mb-6 animate-bounce">🏢</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">Kreditoren-Verwaltung</h3>
-            <p className="text-lg text-gray-700 mb-6 font-medium">
-              Lieferanten und Gläubiger verwalten
-            </p>
-            <div className="bg-blue-100 border-l-4 border-blue-600 p-6 max-w-2xl mx-auto text-left rounded-r-lg">
-              <p className="text-sm text-blue-900 font-medium mb-3">
-                💡 <strong>Hinweis:</strong>
-              </p>
-              <p className="text-sm text-blue-800">
-                Dieser Bereich wird über das separate <strong>Kreditoren-Management Modul</strong> verwaltet.<br/>
-                Wechseln Sie zum Tab <strong>"Kreditoren-Zuordnung"</strong> im FIBU Dashboard.
-              </p>
-            </div>
-          </div>
-        </div>
+        <KreditorenManagement />
       )}
       
       {/* Content: Debitoren */}
