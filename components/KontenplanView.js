@@ -366,19 +366,24 @@ export default function KontenplanView() {
       
       {/* Content: Debitoren */}
       {activeMainTab === 'debitoren' && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+        <div className="bg-gradient-to-br from-green-50 to-white rounded-xl shadow-lg border-2 border-green-200 p-8">
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">👥</div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Debitoren-Verwaltung</h3>
-            <p className="text-gray-600 mb-6">
+            <div className="text-7xl mb-6 animate-bounce">👥</div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Debitoren-Verwaltung</h3>
+            <p className="text-lg text-gray-700 mb-6 font-medium">
               Kunden und Schuldner verwalten
             </p>
-            <p className="text-sm text-gray-500">
-              Kundenstammdaten werden aus der JTL-Datenbank synchronisiert.<br/>
-              Debitorenkonten: 10000-69999 (SKR04)
-            </p>
-            <button className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-              Debitoren aus JTL laden
+            <div className="bg-green-100 border-l-4 border-green-600 p-6 max-w-2xl mx-auto text-left rounded-r-lg mb-6">
+              <p className="text-sm text-green-900 font-medium mb-2">
+                💡 <strong>Information:</strong>
+              </p>
+              <p className="text-sm text-green-800">
+                Kundenstammdaten werden aus der <strong>JTL-Datenbank</strong> synchronisiert.<br/>
+                <span className="font-mono bg-green-200 px-2 py-1 rounded mt-2 inline-block">Debitorenkonten: 10000-69999 (SKR04)</span>
+              </p>
+            </div>
+            <button className="mt-4 px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-bold text-base shadow-lg hover:shadow-xl transition-all">
+              📥 Debitoren aus JTL laden
             </button>
           </div>
         </div>
