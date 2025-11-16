@@ -626,13 +626,54 @@ function KontoFormModal({ konto, onSave, onClose }) {
               <input
                 type="text"
                 value={formData.kontonummer}
-                onChange={(e) => setFormData({ ...formData, kontonummer: e.target.value })}
+                onChange={(e) => handleKontonummerChange(e.target.value)}
                 placeholder="z.B. 1802"
                 maxLength={4}
                 required
                 disabled={!!konto}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 disabled:bg-gray-100 ${
+                  validationError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                }`}
               />
+              
+              {/* Validierungsfehler */}
+              {validationError && (
+                <p className="text-sm text-red-600 mt-1">⚠️ {validationError}</p>
+              )}
+              
+              {/* Live-Analyse */}
+              {analysis && !validationError && (
+                <div className="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm font-semibold text-blue-900 mb-2">📊 Automatische Analyse:</p>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-blue-700 font-medium">Kontenklasse:</span>
+                      <div className="font-bold text-blue-900">{analysis.kontenklasse} - {analysis.kontenklasseBezeichnung}</div>
+                    </div>
+                    <div>
+                      <span className="text-blue-700 font-medium">Typ:</span>
+                      <div className="font-bold text-blue-900">
+                        <span className="px-2 py-0.5 bg-blue-200 rounded text-xs">{analysis.kontenklasseTyp}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-blue-700 font-medium">Kontengruppe:</span>
+                      <div className="font-mono font-bold text-blue-900">{analysis.kontengruppe}</div>
+                    </div>
+                    <div>
+                      <span className="text-blue-700 font-medium">Kontenuntergruppe:</span>
+                      <div className="font-mono font-bold text-blue-900">{analysis.kontenuntergruppe}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Hinweis bei noch nicht vollständiger Eingabe */}
+              {formData.kontonummer && formData.kontonummer.length < 4 && !validationError && (
+                <p className="text-sm text-gray-500 mt-1">
+                  ℹ️ Noch {4 - formData.kontonummer.length} Ziffer(n) eingeben...
+                </p>
+              )}
             </div>
             
             <div>
