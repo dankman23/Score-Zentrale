@@ -169,77 +169,95 @@ export default function KontenplanView() {
         </div>
       </div>
       
-      {/* Hierarchische Konten-Liste */}
+      {/* Tabs für Kontenklassen */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="divide-y divide-gray-200">
-          {grouped.map((klasseData) => (
-            <div key={klasseData.klasse}>
-              {/* Kontenklasse Header */}
-              <div
-                onClick={() => toggleKlasse(klasseData.klasse)}
-                className="px-6 py-4 cursor-pointer hover:bg-gray-50 flex items-center justify-between"
+        {/* Tab Navigation */}
+        <div className="border-b border-gray-200">
+          <div className="flex overflow-x-auto">
+            {grouped.map((klasseData) => (
+              <button
+                key={klasseData.klasse}
+                onClick={() => setSelectedKlasse(klasseData.klasse)}
+                className={`px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition ${
+                  selectedKlasse === klasseData.klasse
+                    ? 'border-blue-600 text-blue-600 bg-blue-50'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">
-                    {expandedKlassen.has(klasseData.klasse) ? '▼' : '▶'}
+                <div className="flex items-center gap-2">
+                  <span className="font-bold">{klasseData.klasse}</span>
+                  <span>{klasseData.bezeichnung}</span>
+                  <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs">
+                    {klasseData.konten.length}
                   </span>
-                  <div>
-                    <span className="text-lg font-bold text-gray-900">
-                      Klasse {klasseData.klasse}: {klasseData.bezeichnung}
-                    </span>
-                    <span className="ml-3 text-sm text-gray-500">
-                      ({klasseData.typ})
-                    </span>
-                  </div>
                 </div>
-                <span className="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-                  {klasseData.konten.length} Konten
-                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        {/* Tab Content */}
+        <div className="p-6">
+          {grouped.filter(k => k.klasse === selectedKlasse).map((klasseData) => (
+            <div key={klasseData.klasse}>
+              {/* Klassen-Info */}
+              <div className="mb-6 pb-4 border-b border-gray-200">
+                <h3 className="text-xl font-bold text-gray-900">
+                  Klasse {klasseData.klasse}: {klasseData.bezeichnung}
+                </h3>
+                <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
+                    {klasseData.typ}
+                  </span>
+                  <span>
+                    {klasseData.konten.length} Konten
+                  </span>
+                </div>
               </div>
               
-              {/* Konten in dieser Klasse */}
-              {expandedKlassen.has(klasseData.klasse) && (
-                <div className="bg-gray-50 px-6 py-4">
+              {/* Konten-Tabelle */}
+              {klasseData.konten.length > 0 ? (
+                <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="text-left text-xs font-medium text-gray-500 uppercase">
-                        <th className="pb-3">Konto</th>
-                        <th className="pb-3">Bezeichnung</th>
-                        <th className="pb-3">Gruppe</th>
-                        <th className="pb-3">Steuer</th>
-                        <th className="pb-3 text-center">Status</th>
+                      <tr className="text-left text-xs font-medium text-gray-500 uppercase border-b border-gray-200">
+                        <th className="pb-3 pr-4">Konto</th>
+                        <th className="pb-3 pr-4">Bezeichnung</th>
+                        <th className="pb-3 pr-4">Gruppe</th>
+                        <th className="pb-3 pr-4">Steuer</th>
+                        <th className="pb-3 pr-4 text-center">Status</th>
                         <th className="pb-3 text-right">Aktionen</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
+                    <tbody className="divide-y divide-gray-100">
                       {klasseData.konten.map((konto) => (
-                        <tr key={konto.kontonummer} className="hover:bg-white">
-                          <td className="py-3">
+                        <tr key={konto.kontonummer} className="hover:bg-gray-50">
+                          <td className="py-4 pr-4">
                             <span className="font-mono text-sm font-bold text-blue-600">
                               {konto.kontonummer}
                             </span>
                           </td>
-                          <td className="py-3">
-                            <div className="text-sm text-gray-900">{konto.bezeichnung}</div>
+                          <td className="py-4 pr-4">
+                            <div className="text-sm text-gray-900 font-medium">{konto.bezeichnung}</div>
                             {konto.beschreibung && (
                               <div className="text-xs text-gray-500 mt-1">{konto.beschreibung}</div>
                             )}
                           </td>
-                          <td className="py-3">
-                            <span className="text-xs font-mono text-gray-600">
+                          <td className="py-4 pr-4">
+                            <span className="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded">
                               {konto.kontengruppe}
                             </span>
                           </td>
-                          <td className="py-3">
+                          <td className="py-4 pr-4">
                             {konto.steuerrelevant && (
-                              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-medium">
                                 {konto.steuersatz ? `${konto.steuersatz}%` : 'VSt'}
                               </span>
                             )}
                           </td>
-                          <td className="py-3 text-center">
+                          <td className="py-4 pr-4 text-center">
                             <span
-                              className={`text-xs px-2 py-1 rounded ${
+                              className={`text-xs px-3 py-1 rounded-full font-medium ${
                                 konto.istAktiv
                                   ? 'bg-green-100 text-green-700'
                                   : 'bg-gray-100 text-gray-500'
@@ -248,18 +266,18 @@ export default function KontenplanView() {
                               {konto.istAktiv ? '✓ Aktiv' : '○ Inaktiv'}
                             </span>
                           </td>
-                          <td className="py-3 text-right">
-                            <div className="flex items-center justify-end gap-2">
+                          <td className="py-4 text-right">
+                            <div className="flex items-center justify-end gap-3">
                               <button
                                 onClick={() => setEditingKonto(konto)}
-                                className="text-blue-600 hover:text-blue-700 text-sm"
+                                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                               >
                                 ✏️ Bearbeiten
                               </button>
                               {!konto.istSystemkonto && (
                                 <button
                                   onClick={() => deleteKonto(konto.kontonummer)}
-                                  className="text-red-600 hover:text-red-700 text-sm"
+                                  className="text-red-600 hover:text-red-700 text-sm font-medium"
                                 >
                                   🗑️ Löschen
                                 </button>
@@ -270,6 +288,10 @@ export default function KontenplanView() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  Keine Konten in dieser Klasse
                 </div>
               )}
             </div>
