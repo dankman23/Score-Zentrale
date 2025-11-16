@@ -406,7 +406,7 @@ export async function GET(request: NextRequest) {
       istZugeordnet: z.kRechnung > 0,
       zugeordnetesKonto: null, // NEU: wird später aus MongoDB geladen falls vorhanden
       zuordnungsArt: z.kRechnung > 0 ? 'rechnung' : null // NEU
-    }))
+    })).filter((z: any) => z.zahlungsanbieter !== null) // WICHTIG: Filtere ungültige Zahlungsarten
     
     // Lade auch Postbank-Transaktionen
     const postbankCollection = db.collection('fibu_bank_transaktionen')
