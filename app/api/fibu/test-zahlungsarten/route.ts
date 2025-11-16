@@ -9,8 +9,7 @@ export async function GET() {
     const za = await pool.request().query(`
       SELECT TOP 50
         kZahlungsart, 
-        cName, 
-        cModulId
+        cName
       FROM dbo.tZahlungsart
       ORDER BY cName
     `)
