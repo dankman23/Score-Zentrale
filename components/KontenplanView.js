@@ -184,6 +184,17 @@ export default function KontenplanView() {
             >
               🏭 Kostenstellen
             </button>
+            
+            <button
+              onClick={() => setActiveMainTab('einstellungen')}
+              className={`px-8 py-5 text-base font-bold whitespace-nowrap border-b-4 transition-all ${
+                activeMainTab === 'einstellungen'
+                  ? 'border-blue-600 text-blue-700 bg-blue-100 shadow-inner'
+                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 hover:border-gray-300'
+              }`}
+            >
+              ⚙️ Einstellungen
+            </button>
           </div>
         </div>
       </div>
