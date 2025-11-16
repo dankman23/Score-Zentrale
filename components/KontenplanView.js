@@ -458,6 +458,11 @@ export default function KontenplanView() {
         </div>
       )}
       
+      {/* Content: Einstellungen */}
+      {activeMainTab === 'einstellungen' && (
+        <ZahlungsEinstellungen />
+      )}
+      
       {/* Edit/Create Modal - only for kontenplan */}
       {activeMainTab === 'kontenplan' && (editingKonto || showCreateForm) && (
         <KontoFormModal
