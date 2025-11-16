@@ -266,45 +266,18 @@ export default function ZahlungsEinstellungen() {
         ))}
       </div>
 
-      {/* Legende */}
-      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-        <h4 className="font-bold text-gray-900 mb-3">Konten-Legende</h4>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-          <div>
-            <div className="bg-green-100 px-2 py-1 rounded text-green-900 font-bold mb-1">69xxx</div>
-            <div className="text-gray-600 text-xs">Debitor (Kunde)</div>
-          </div>
-          <div>
-            <div className="bg-blue-100 px-2 py-1 rounded text-blue-900 font-bold mb-1">4400</div>
-            <div className="text-gray-600 text-xs">Erlöse (Haben)</div>
-          </div>
-          <div>
-            <div className="bg-purple-100 px-2 py-1 rounded text-purple-900 font-bold mb-1">12xx</div>
-            <div className="text-gray-600 text-xs">Bank (Soll)</div>
-          </div>
-          <div>
-            <div className="bg-orange-100 px-2 py-1 rounded text-orange-900 font-bold mb-1">4985</div>
-            <div className="text-gray-600 text-xs">Gebühren (Soll)</div>
-          </div>
-          <div>
-            <div className="bg-gray-100 px-2 py-1 rounded text-gray-900 font-bold mb-1">JTL</div>
-            <div className="text-gray-600 text-xs">Zahlungsart</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Beispiel-Buchungssatz */}
-      <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
-        <div className="flex">
-          <div className="text-yellow-600 text-2xl mr-3">💡</div>
-          <div>
-            <p className="text-yellow-900 font-medium mb-2">Beispiel-Buchungssatz (Amazon Payment)</p>
-            <div className="bg-white rounded p-3 text-sm font-mono text-gray-800">
-              <div>Soll: 1201 (Amazon Bank) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 100,00 €</div>
-              <div>Soll: 4985 (Gebühren) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 15,00 €</div>
+      {/* Beispiel-Buchungssatz - KOMPAKT */}
+      <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded">
+        <div className="flex items-start">
+          <div className="text-yellow-600 text-lg mr-2 mt-0.5">💡</div>
+          <div className="flex-1">
+            <p className="text-yellow-900 font-semibold text-xs mb-1.5">Beispiel-Buchungssatz (Amazon Payment)</p>
+            <div className="bg-white rounded p-2 text-xs font-mono text-gray-800 leading-relaxed">
+              <div>Soll: 1201 (Amazon Bank) • 100,00 €</div>
+              <div>Soll: 4985 (Gebühren) • 15,00 €</div>
               <div className="border-t border-gray-300 my-1"></div>
-              <div>Haben: 4400 (Erlöse) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 115,00 €</div>
-              <div className="text-gray-500 text-xs mt-2">Debitor: 69002 (Amazon Sammelkonto)</div>
+              <div>Haben: 4400 (Erlöse) • 115,00 €</div>
+              <div className="text-gray-500 text-xs mt-1">→ Debitor: 69002 (Amazon Sammelkonto)</div>
             </div>
           </div>
         </div>
