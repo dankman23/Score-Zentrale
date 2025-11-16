@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
       // Konvertiere Bank-Transaktionen zu Zahlungs-Format
       const bankZahlungen = bankTransaktionen.map((bt: any) => ({
         zahlungsdatum: bt.datum,
-        zahlungsanbieter: bt.quelle === 'postbank' ? 'Postbank' : bt.auftraggeber,
+        zahlungsanbieter: normalizeZahlungsanbieter(bt.quelle, bt.buchungstext, bt.quelle),
         betrag: bt.betrag,
         hinweis: bt.verwendungszweck,
         zahlungsart: bt.buchungstext,
@@ -84,6 +84,8 @@ export async function GET(request: NextRequest) {
         kundenName: bt.auftraggeber,
         cBestellNr: bt.matchedBestellNr || null,
         istZugeordnet: bt.matchedRechnungNr ? true : false,
+        zugeordnetesKonto: bt.zugeordnetesKonto || null, // NEU: Buchungskonto
+        zuordnungsArt: bt.matchedRechnungNr ? 'rechnung' : (bt.zugeordnetesKonto ? 'konto' : null), // NEU
         
         // Meta
         _id: bt._id,
