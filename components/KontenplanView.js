@@ -108,18 +108,82 @@ export default function KontenplanView() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">📋 Kontenplan SKR04</h2>
+          <h2 className="text-2xl font-bold text-gray-900">📋 Kontenplan & Stammdaten</h2>
           <p className="text-sm text-gray-600 mt-1">
-            {konten.length} Konten • Abschlussgliederungsprinzip
+            SKR04 Abschlussgliederungsprinzip
           </p>
         </div>
         
-        <button
-          onClick={() => setShowCreateForm(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
-        >
-          + Neues Konto
-        </button>
+        {activeMainTab === 'kontenplan' && (
+          <button
+            onClick={() => setShowCreateForm(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+          >
+            + Neues Konto
+          </button>
+        )}
+      </div>
+      
+      {/* Haupt-Tab-Navigation */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="border-b border-gray-200">
+          <div className="flex overflow-x-auto">
+            <button
+              onClick={() => setActiveMainTab('kontenplan')}
+              className={`px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition ${
+                activeMainTab === 'kontenplan'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              📊 Kontenplan ({konten.length})
+            </button>
+            
+            <button
+              onClick={() => setActiveMainTab('kreditoren')}
+              className={`px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition ${
+                activeMainTab === 'kreditoren'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              🏢 Kreditoren
+            </button>
+            
+            <button
+              onClick={() => setActiveMainTab('debitoren')}
+              className={`px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition ${
+                activeMainTab === 'debitoren'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              👥 Debitoren
+            </button>
+            
+            <button
+              onClick={() => setActiveMainTab('kostenarten')}
+              className={`px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition ${
+                activeMainTab === 'kostenarten'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              💰 Kostenarten
+            </button>
+            
+            <button
+              onClick={() => setActiveMainTab('kostenstellen')}
+              className={`px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition ${
+                activeMainTab === 'kostenstellen'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              🏭 Kostenstellen
+            </button>
+          </div>
+        </div>
       </div>
       
       {/* Search & Filter */}
