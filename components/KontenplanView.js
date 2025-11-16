@@ -126,16 +126,16 @@ export default function KontenplanView() {
         )}
       </div>
       
-      {/* Haupt-Tab-Navigation - VERBESSERT */}
-      <div className="bg-white rounded-xl shadow-lg border-2 border-gray-300">
-        <div className="border-b-2 border-gray-300">
+      {/* Haupt-Tab-Navigation - KOMPAKT */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="border-b border-gray-200">
           <div className="flex overflow-x-auto">
             <button
               onClick={() => setActiveMainTab('kontenplan')}
-              className={`px-8 py-5 text-base font-bold whitespace-nowrap border-b-4 transition-all ${
+              className={`px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 transition ${
                 activeMainTab === 'kontenplan'
-                  ? 'border-blue-600 text-blue-700 bg-blue-100 shadow-inner'
-                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50'
+                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
               📊 Kontenplan ({konten.length})
@@ -143,10 +143,10 @@ export default function KontenplanView() {
             
             <button
               onClick={() => setActiveMainTab('kreditoren')}
-              className={`px-8 py-5 text-base font-bold whitespace-nowrap border-b-4 transition-all ${
+              className={`px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 transition ${
                 activeMainTab === 'kreditoren'
-                  ? 'border-blue-600 text-blue-700 bg-blue-100 shadow-inner'
-                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50'
+                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
               🏢 Kreditoren
@@ -154,10 +154,10 @@ export default function KontenplanView() {
             
             <button
               onClick={() => setActiveMainTab('debitoren')}
-              className={`px-8 py-5 text-base font-bold whitespace-nowrap border-b-4 transition-all ${
+              className={`px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 transition ${
                 activeMainTab === 'debitoren'
-                  ? 'border-blue-600 text-blue-700 bg-blue-100 shadow-inner'
-                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50'
+                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
               👥 Debitoren
@@ -165,10 +165,10 @@ export default function KontenplanView() {
             
             <button
               onClick={() => setActiveMainTab('kostenarten')}
-              className={`px-8 py-5 text-base font-bold whitespace-nowrap border-b-4 transition-all ${
+              className={`px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 transition ${
                 activeMainTab === 'kostenarten'
-                  ? 'border-blue-600 text-blue-700 bg-blue-100 shadow-inner'
-                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50'
+                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
               💰 Kostenarten
@@ -176,10 +176,10 @@ export default function KontenplanView() {
             
             <button
               onClick={() => setActiveMainTab('kostenstellen')}
-              className={`px-8 py-5 text-base font-bold whitespace-nowrap border-b-4 transition-all ${
+              className={`px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 transition ${
                 activeMainTab === 'kostenstellen'
-                  ? 'border-blue-600 text-blue-700 bg-blue-100 shadow-inner'
-                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50'
+                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
               🏭 Kostenstellen
@@ -187,10 +187,10 @@ export default function KontenplanView() {
             
             <button
               onClick={() => setActiveMainTab('einstellungen')}
-              className={`px-8 py-5 text-base font-bold whitespace-nowrap border-b-4 transition-all ${
+              className={`px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 transition ${
                 activeMainTab === 'einstellungen'
-                  ? 'border-blue-600 text-blue-700 bg-blue-100 shadow-inner'
-                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50'
+                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
               ⚙️ Einstellungen
