@@ -243,15 +243,17 @@ export async function GET(request: NextRequest) {
       betrag: t.betrag,
       zahlungsdatum: t.datum,
       hinweis: t.verwendungszweck,
-      zahlungsart: t.kategorie === 'gehalt' ? 'Gehalt' : t.buchungstext,
+      zahlungsart: t.buchungstext,
       kZahlungsart: 0,
       kundenName: t.auftraggeber,
       zuordnungstyp: t.kategorie || 'Nicht zugeordnet',
       cBestellNr: t.matchedBestellNr || '',
       belegnummer: t.verwendungszweck?.substring(0, 50) || '',
-      zahlungsanbieter: t.kategorie === 'gehalt' ? 'Gehalt' : 'Postbank',
-      istZugeordnet: false,
-      kategorie: t.kategorie
+      zahlungsanbieter: normalizeZahlungsanbieter('postbank', t.buchungstext, 'postbank'),
+      istZugeordnet: t.matchedRechnungNr ? true : (t.zugeordnetesKonto ? true : false),
+      kategorie: t.kategorie,
+      zugeordnetesKonto: t.zugeordnetesKonto || null, // NEU
+      zuordnungsArt: t.matchedRechnungNr ? 'rechnung' : (t.zugeordnetesKonto ? 'konto' : null) // NEU
     }))
     
     // Kombiniere alle Zahlungen
