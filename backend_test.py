@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Get base URL from environment
-BASE_URL = "https://fibu-manager.preview.emergentagent.com"
+BASE_URL = "https://accounting-hub-52.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 def test_fibu_zahlungen_endpoint():
