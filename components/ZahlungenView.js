@@ -401,6 +401,17 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
                       {zahlung.quelle === 'tZahlung' ? 'JTL' : zahlung.quelle === 'postbank' ? 'Postbank' : 'Bank'}
                     </span>
                   </td>
+                  <td className="px-2 py-2 text-xs">
+                    <button
+                      onClick={() => {
+                        setSelectedZahlung(zahlung)
+                        setShowZuordnungModal(true)
+                      }}
+                      className="px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded-md transition"
+                    >
+                      {zahlung.istZugeordnet ? 'Bearbeiten' : 'Zuordnen'}
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
