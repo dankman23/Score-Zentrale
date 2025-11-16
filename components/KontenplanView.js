@@ -362,25 +362,67 @@ export default function KontenplanView() {
       
       {/* Content: Debitoren */}
       {activeMainTab === 'debitoren' && (
-        <div className="bg-gradient-to-br from-green-50 to-white rounded-xl shadow-lg border-2 border-green-200 p-8">
-          <div className="text-center py-12">
-            <div className="text-7xl mb-6 animate-bounce">👥</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">Debitoren-Verwaltung</h3>
-            <p className="text-lg text-gray-700 mb-6 font-medium">
-              Kunden und Schuldner verwalten
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-2">👥 Sammel-Debitorenkonten</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Debitorenkonten werden nach Zahlungsart gruppiert (siehe Einstellungen)
+          </p>
+          
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-4">
+            <p className="text-sm text-blue-900 font-semibold mb-2">
+              💡 Wie funktionieren Sammel-Debitorenkonten?
             </p>
-            <div className="bg-green-100 border-l-4 border-green-600 p-6 max-w-2xl mx-auto text-left rounded-r-lg mb-6">
-              <p className="text-sm text-green-900 font-medium mb-2">
-                💡 <strong>Information:</strong>
-              </p>
-              <p className="text-sm text-green-800">
-                Kundenstammdaten werden aus der <strong>JTL-Datenbank</strong> synchronisiert.<br/>
-                <span className="font-mono bg-green-200 px-2 py-1 rounded mt-2 inline-block">Debitorenkonten: 10000-69999 (SKR04)</span>
-              </p>
+            <p className="text-sm text-blue-800 mb-3">
+              Anstatt für jeden Kunden ein eigenes Debitorenkonto anzulegen, werden Kunden nach <strong>Zahlungsart gruppiert</strong>. 
+              Dies vereinfacht die Buchhaltung erheblich, besonders bei vielen Marketplace-Transaktionen.
+            </p>
+            <div className="bg-blue-100 rounded p-3 text-xs text-blue-900">
+              <strong>Beispiel:</strong><br/>
+              • Alle Amazon-Kunden → Debitor 69002<br/>
+              • Alle PayPal-Kunden → Debitor 69001<br/>
+              • Alle eBay-Kunden → Debitor 69003
             </div>
-            <button className="mt-4 px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-bold text-base shadow-lg hover:shadow-xl transition-all">
-              📥 Debitoren aus JTL laden
-            </button>
+          </div>
+          
+          <div className="space-y-3">
+            <h4 className="font-semibold text-gray-900 text-sm">Konfigurierte Debitorenkonten:</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="bg-gray-50 border border-gray-200 rounded p-3">
+                <div className="font-mono text-lg font-bold text-blue-600">69001</div>
+                <div className="text-sm text-gray-700 font-medium">PayPal-Kunden</div>
+                <div className="text-xs text-gray-500 mt-1">Zahlungsart: Paypal</div>
+              </div>
+              
+              <div className="bg-gray-50 border border-gray-200 rounded p-3">
+                <div className="font-mono text-lg font-bold text-blue-600">69002</div>
+                <div className="text-sm text-gray-700 font-medium">Amazon-Kunden</div>
+                <div className="text-xs text-gray-500 mt-1">Zahlungsart: Amazon Payment</div>
+              </div>
+              
+              <div className="bg-gray-50 border border-gray-200 rounded p-3">
+                <div className="font-mono text-lg font-bold text-blue-600">69003</div>
+                <div className="text-sm text-gray-700 font-medium">eBay-Kunden</div>
+                <div className="text-xs text-gray-500 mt-1">Zahlungsart: eBay Managed Payments</div>
+              </div>
+              
+              <div className="bg-gray-50 border border-gray-200 rounded p-3">
+                <div className="font-mono text-lg font-bold text-blue-600">69015</div>
+                <div className="text-sm text-gray-700 font-medium">Mollie-Kunden</div>
+                <div className="text-xs text-gray-500 mt-1">Zahlungsart: Mollie</div>
+              </div>
+              
+              <div className="bg-gray-50 border border-gray-200 rounded p-3">
+                <div className="font-mono text-lg font-bold text-blue-600">69050</div>
+                <div className="text-sm text-gray-700 font-medium">Vorkasse-Kunden</div>
+                <div className="text-xs text-gray-500 mt-1">Zahlungsart: Überweisung / Vorkasse</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-xs text-gray-500">
+              → Debitorenkonten werden in den <strong>Einstellungen</strong> konfiguriert und sind mit den Zahlungsarten aus JTL verknüpft.
+            </p>
           </div>
         </div>
       )}
