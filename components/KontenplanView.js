@@ -12,12 +12,9 @@ export default function KontenplanView() {
   const [grouped, setGrouped] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedKlasse, setSelectedKlasse] = useState(null)
+  const [selectedKlasse, setSelectedKlasse] = useState(0) // Start mit Klasse 0
   const [editingKonto, setEditingKonto] = useState(null)
   const [showCreateForm, setShowCreateForm] = useState(false)
-  
-  // Expandierte Gruppen
-  const [expandedKlassen, setExpandedKlassen] = useState(new Set())
   
   useEffect(() => {
     loadKontenplan()
