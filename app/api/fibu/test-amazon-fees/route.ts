@@ -9,13 +9,13 @@ export async function GET() {
     const result1 = await pool.request().query(`
       SELECT TOP 5
         eb.cBelegNr,
-        eb.dErstellt,
+        eb.dErstellDatum,
         eb.fGesamtsumme,
         eb.cMarktplatz,
         (SELECT COUNT(*) FROM Rechnung.tExternerBelegPosition WHERE kExternerBeleg = eb.kExternerBeleg) as anzahl_positionen
       FROM Rechnung.tExternerBeleg eb
       WHERE eb.cMarktplatz LIKE '%Amazon%'
-      ORDER BY eb.dErstellt DESC
+      ORDER BY eb.dErstellDatum DESC
     `)
     
     // Prüfe Gebühren-Positionen
