@@ -339,6 +339,85 @@ export default function KontenplanView() {
           ))}
         </div>
       </div>
+        </>
+      )}
+      
+      {/* Content: Kreditoren */}
+      {activeMainTab === 'kreditoren' && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">🏢</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Kreditoren-Verwaltung</h3>
+            <p className="text-gray-600 mb-6">
+              Lieferanten und Gläubiger verwalten
+            </p>
+            <p className="text-sm text-gray-500">
+              Dieser Bereich wird über das separate Kreditoren-Management Modul verwaltet.<br/>
+              Wechseln Sie zum Tab "Kreditoren-Zuordnung" im FIBU Dashboard.
+            </p>
+          </div>
+        </div>
+      )}
+      
+      {/* Content: Debitoren */}
+      {activeMainTab === 'debitoren' && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">👥</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Debitoren-Verwaltung</h3>
+            <p className="text-gray-600 mb-6">
+              Kunden und Schuldner verwalten
+            </p>
+            <p className="text-sm text-gray-500">
+              Kundenstammdaten werden aus der JTL-Datenbank synchronisiert.<br/>
+              Debitorenkonten: 10000-69999 (SKR04)
+            </p>
+            <button className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              Debitoren aus JTL laden
+            </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Content: Kostenarten */}
+      {activeMainTab === 'kostenarten' && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">💰</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Kostenarten-Verwaltung</h3>
+            <p className="text-gray-600 mb-6">
+              Kostenarten für Kostenrechnung definieren
+            </p>
+            <p className="text-sm text-gray-500">
+              Kostenarten ermöglichen eine detaillierte Kostenanalyse.<br/>
+              Beispiele: Personalkosten, Materialkosten, Vertriebskosten
+            </p>
+            <button className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              + Neue Kostenart
+            </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Content: Kostenstellen */}
+      {activeMainTab === 'kostenstellen' && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">🏭</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Kostenstellen-Verwaltung</h3>
+            <p className="text-gray-600 mb-6">
+              Kostenstellen für Kostenrechnung definieren
+            </p>
+            <p className="text-sm text-gray-500">
+              Kostenstellen ermöglichen Zuordnung von Kosten zu Abteilungen/Bereichen.<br/>
+              Beispiele: Vertrieb, Marketing, Verwaltung, Produktion
+            </p>
+            <button className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              + Neue Kostenstelle
+            </button>
+          </div>
+        </div>
+      )}
       
       {/* Edit/Create Modal */}
       {(editingKonto || showCreateForm) && (
