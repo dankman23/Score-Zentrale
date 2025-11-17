@@ -114,20 +114,49 @@ export async function GET(request: NextRequest) {
     // Formatiere und speichere in MongoDB
     const formattedTransactions = transactions
       .filter(t => paypal.isSuccessfulTransaction(t)) // Nur erfolgreiche Transaktionen
-      .map(t => paypal.formatForFibu(t))
+      .map(t => {
+        const formatted = paypal.formatForFibu(t)
+        // Konvertiere datum String zu Date für bessere Queries
+        return {
+          ...formatted,
+          datumDate: new Date(formatted.datum)
+        }
+      })
 
     console.log(`[PayPal] Saving ${formattedTransactions.length} successful transactions to MongoDB...`)
 
     // Upsert in MongoDB (basierend auf transactionId)
+    // WICHTIG: Bewahre User-Daten (Matching) mit $setOnInsert
     const bulkOps = formattedTransactions.map(t => ({
       updateOne: {
         filter: { transactionId: t.transactionId },
         update: {
           $set: {
-            ...t,
+            // PayPal-Original-Daten (können aktualisiert werden)
+            datum: t.datum,
+            datumDate: t.datumDate,
+            betrag: t.betrag,
+            waehrung: t.waehrung,
+            gebuehr: t.gebuehr,
+            nettoBetrag: t.nettoBetrag,
+            status: t.status,
+            ereignis: t.ereignis,
+            betreff: t.betreff,
+            notiz: t.notiz,
+            rechnungsNr: t.rechnungsNr,
+            kundenEmail: t.kundenEmail,
+            kundenName: t.kundenName,
+            quelle: t.quelle,
+            ursprungsdaten: t.ursprungsdaten,
             updated_at: new Date()
           },
           $setOnInsert: {
+            // User-Daten (werden nur beim ersten Insert gesetzt)
+            transactionId: t.transactionId,
+            istZugeordnet: false,
+            zugeordneteRechnung: null,
+            zugeordnetesKonto: null,
+            zuordnungsArt: null,
             imported_at: new Date()
           }
         },
