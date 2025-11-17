@@ -82,10 +82,8 @@ export class FinTSBankClient {
       console.error('[FinTS] Error fetching accounts:', error)
       throw new Error(`FinTS: Konten konnten nicht abgerufen werden: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
-      if (this.client) {
-        await this.client.close()
-        this.client = null
-      }
+      // FinTS Client hat keine close() Methode
+      this.client = null
     }
   }
 
@@ -145,10 +143,8 @@ export class FinTSBankClient {
       console.error('[FinTS] Error fetching transactions:', error)
       throw new Error(`FinTS: Transaktionen konnten nicht abgerufen werden: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
-      if (this.client) {
-        await this.client.close()
-        this.client = null
-      }
+      // FinTS Client hat keine close() Methode
+      this.client = null
     }
   }
 
@@ -177,10 +173,8 @@ export class FinTSBankClient {
       console.error('[FinTS] Error fetching balance:', error)
       throw new Error(`FinTS: Kontostand konnte nicht abgerufen werden: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
-      if (this.client) {
-        await this.client.close()
-        this.client = null
-      }
+      // FinTS Client hat keine close() Methode
+      this.client = null
     }
   }
 
