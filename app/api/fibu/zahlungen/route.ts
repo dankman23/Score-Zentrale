@@ -71,34 +71,62 @@ export async function GET(request: NextRequest) {
       console.log(`[Zahlungen] ${source.name}: ${payments.length} Transaktionen`)
 
       // Formatiere einheitlich
-      const formatted = payments.map(p => ({
-        _id: p._id?.toString(),
-        zahlungId: p.transactionId || p._id?.toString(),
-        datum: p.datum,
-        betrag: p.betrag || 0,
-        waehrung: p.waehrung || 'EUR',
-        anbieter: source.name,
-        quelle: source.collection,
+      const formatted = payments.map(p => {
+        // Amazon-spezifische Felder
+        let verwendungszweck = p.verwendungszweck || p.beschreibung || p.betreff || ''
+        let gegenkonto = p.gegenkonto || p.kundenName || ''
         
-        // Details je nach Quelle
-        verwendungszweck: p.verwendungszweck || p.beschreibung || p.betreff || '',
-        gegenkonto: p.gegenkonto || p.kundenName || '',
-        gegenkontoIban: p.gegenkontoIban || null,
+        if (source.name === 'Amazon') {
+          // Für Amazon: verwende amountDescription + orderId
+          const parts = []
+          if (p.amountDescription) parts.push(p.amountDescription)
+          if (p.transactionType) parts.push(p.transactionType)
+          if (p.orderId) parts.push(`Order: ${p.orderId}`)
+          verwendungszweck = parts.join(' | ')
+          
+          // Gegenkonto: SKU oder MerchantOrderID
+          if (p.sku) {
+            gegenkonto = `SKU: ${p.sku}`
+          } else if (p.merchantOrderId) {
+            gegenkonto = `Order: ${p.merchantOrderId}`
+          } else if (p.orderId) {
+            gegenkonto = `Order: ${p.orderId}`
+          }
+        }
         
-        // PayPal spezifisch
-        kundenEmail: p.kundenEmail || null,
-        gebuehr: p.gebuehr || null,
-        
-        // Mollie spezifisch
-        methode: p.methode || null,
-        status: p.status || null,
-        
-        // Zuordnung
-        istZugeordnet: p.istZugeordnet || false,
-        zugeordneteRechnung: p.zugeordneteRechnung || null,
-        zugeordnetesKonto: p.zugeordnetesKonto || null,
-        zuordnungsArt: p.zuordnungsArt || null,
-      }))
+        return {
+          _id: p._id?.toString(),
+          zahlungId: p.transactionId || p._id?.toString(),
+          datum: p.datum,
+          betrag: p.betrag || 0,
+          waehrung: p.waehrung || 'EUR',
+          anbieter: source.name,
+          quelle: source.collection,
+          
+          // Details je nach Quelle
+          verwendungszweck,
+          gegenkonto,
+          gegenkontoIban: p.gegenkontoIban || null,
+          
+          // PayPal spezifisch
+          kundenEmail: p.kundenEmail || null,
+          gebuehr: p.gebuehr || null,
+          
+          // Mollie spezifisch
+          methode: p.methode || null,
+          status: p.status || null,
+          
+          // Amazon spezifisch
+          kategorie: source.name === 'Amazon' ? p.kategorie : null,
+          amountType: source.name === 'Amazon' ? p.amountType : null,
+          
+          // Zuordnung
+          istZugeordnet: p.istZugeordnet || false,
+          zugeordneteRechnung: p.zugeordneteRechnung || null,
+          zugeordnetesKonto: p.zugeordnetesKonto || null,
+          zuordnungsArt: p.zuordnungsArt || null,
+        }
+      })
 
       allPayments.push(...formatted)
 
