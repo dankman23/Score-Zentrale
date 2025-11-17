@@ -270,8 +270,8 @@ DELETE /api/fibu/zahlungen (Zuordnung löschen)
 
 **Credentials (.env):**
 ```
-OTTO_CLIENT_ID=4df4dc52-0665-4389-a8ac-cf4da73600c0
-OTTO_CLIENT_SECRET=d222f46c-61ff-469b-860f-322858d096b5
+OTTO_CLIENT_ID=payment-flow-57
+OTTO_CLIENT_SECRET=payment-flow-57
 OTTO_API_URL=https://api.otto.market
 ```
 
@@ -447,8 +447,8 @@ MOLLIE_ACCESS_TOKEN=access_uSqEMGTGACQ2Aak5jUnQgSv65xvhcc
 MOLLIE_REFRESH_TOKEN=refresh_gTUUzembeQNR3av29aBT2uGKgWg9S6
 
 # Otto (noch nicht funktionsfähig)
-OTTO_CLIENT_ID=4df4dc52-0665-4389-a8ac-cf4da73600c0
-OTTO_CLIENT_SECRET=d222f46c-61ff-469b-860f-322858d096b5
+OTTO_CLIENT_ID=payment-flow-57
+OTTO_CLIENT_SECRET=payment-flow-57
 OTTO_API_URL=https://api.otto.market
 
 # Commerzbank FinTS (nicht verwendet, da Daten aus JTL kommen)

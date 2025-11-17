@@ -10,7 +10,7 @@ import sys
 from datetime import datetime, timedelta
 
 # Get base URL from environment
-BASE_URL = "https://finance-center-5.preview.emergentagent.com"
+BASE_URL = "https://payment-flow-57.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 def test_paypal_integration():

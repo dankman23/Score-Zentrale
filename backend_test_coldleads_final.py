@@ -8,7 +8,7 @@ import requests
 import json
 import time
 
-BASE_URL = "https://finance-center-5.preview.emergentagent.com/api"
+BASE_URL = "https://payment-flow-57.preview.emergentagent.com/api"
 
 def print_section(title):
     print(f"\n{'='*80}")
