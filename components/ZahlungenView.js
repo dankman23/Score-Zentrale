@@ -235,44 +235,44 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="text-gray-600 text-sm">Angezeigt</div>
-          <div className="text-2xl font-bold text-gray-900 mt-1">{stats.gesamt}</div>
-          <div className="text-xs text-gray-500">von {zahlungen.length} gesamt</div>
+          <div className="text-2xl font-bold text-gray-900 mt-1">{localStats.gesamt}</div>
+          <div className="text-xs text-gray-500">von {pagination.totalCount} gesamt</div>
         </div>
         
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="text-gray-600 text-sm">💰 Eingänge</div>
-          <div className="text-2xl font-bold text-green-600 mt-1">{stats.eingaenge}</div>
-          <div className="text-xs text-green-700 font-medium">+{stats.summeEingaenge.toFixed(2)}€</div>
+          <div className="text-2xl font-bold text-green-600 mt-1">{localStats.eingaenge}</div>
+          <div className="text-xs text-green-700 font-medium">+{localStats.summeEingaenge.toFixed(2)}€</div>
         </div>
         
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="text-gray-600 text-sm">💸 Ausgänge</div>
-          <div className="text-2xl font-bold text-red-600 mt-1">{stats.ausgaenge}</div>
-          <div className="text-xs text-red-700 font-medium">{stats.summeAusgaenge.toFixed(2)}€</div>
+          <div className="text-2xl font-bold text-red-600 mt-1">{localStats.ausgaenge}</div>
+          <div className="text-xs text-red-700 font-medium">{localStats.summeAusgaenge.toFixed(2)}€</div>
         </div>
         
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="text-gray-600 text-sm">✅ Zugeordnet</div>
-          <div className="text-2xl font-bold text-green-600 mt-1">{stats.zugeordnet}</div>
+          <div className="text-2xl font-bold text-green-600 mt-1">{localStats.zugeordnet}</div>
           <div className="text-xs text-gray-500">
-            {stats.gesamt > 0 ? Math.round((stats.zugeordnet / stats.gesamt) * 100) : 0}%
+            {localStats.gesamt > 0 ? Math.round((localStats.zugeordnet / localStats.gesamt) * 100) : 0}%
           </div>
         </div>
         
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="text-gray-600 text-sm">❌ Offen</div>
-          <div className="text-2xl font-bold text-orange-600 mt-1">{stats.nichtZugeordnet}</div>
+          <div className="text-2xl font-bold text-orange-600 mt-1">{localStats.nichtZugeordnet}</div>
           <div className="text-xs text-gray-500">
-            {stats.gesamt > 0 ? Math.round((stats.nichtZugeordnet / stats.gesamt) * 100) : 0}%
+            {localStats.gesamt > 0 ? Math.round((localStats.nichtZugeordnet / localStats.gesamt) * 100) : 0}%
           </div>
         </div>
         
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="text-gray-600 text-sm">💵 Saldo</div>
           <div className={`text-2xl font-bold mt-1 ${
-            (stats.summeEingaenge + stats.summeAusgaenge) >= 0 ? 'text-green-600' : 'text-red-600'
+            (localStats.summeEingaenge + localStats.summeAusgaenge) >= 0 ? 'text-green-600' : 'text-red-600'
           }`}>
-            {(stats.summeEingaenge + stats.summeAusgaenge).toFixed(2)}€
+            {(localStats.summeEingaenge + localStats.summeAusgaenge).toFixed(2)}€
           </div>
           <div className="text-xs text-gray-500">Gefiltert</div>
         </div>
