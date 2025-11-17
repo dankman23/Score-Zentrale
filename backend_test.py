@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend Test Suite for PayPal Transaction Search API Integration
-Testing PayPal API endpoints according to test_result.md requirements.
+Backend Test Suite for FIBU Zahlungen API
+Testing FIBU Zahlungen API endpoints according to review request requirements.
 """
 
 import requests
