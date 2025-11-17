@@ -92,8 +92,8 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
   // Unique providers
   const uniqueAnbieter = [...new Set(zahlungen.map(z => z.anbieter))].filter(Boolean).sort()
 
-  // Statistics
-  const stats = {
+  // Statistics (lokale Filter-Stats)
+  const localStats = {
     gesamt: filteredZahlungen.length,
     eingaenge: filteredZahlungen.filter(z => z.betrag > 0).length,
     ausgaenge: filteredZahlungen.filter(z => z.betrag < 0).length,
