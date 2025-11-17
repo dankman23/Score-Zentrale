@@ -55,7 +55,7 @@ export class FinTSBankClient {
       name: this.config.user,
       pin: this.config.pin,
       blz: this.config.blz,
-      productId: '0', // Wird für Kontoauszüge nicht benötigt
+      productId: 'FINTS4NODE', // Generisches Produkt für node-fints
     })
   }
 
