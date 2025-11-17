@@ -8,19 +8,6 @@ export async function GET(request: NextRequest) {
   try {
     const pool = await getMssqlPool()
     
-    // Suche nach Otto Bestellungen
-    const bestellungen = await pool.request().query(`
-      SELECT TOP 10
-        b.kBestellung,
-        b.cBestellNr,
-        b.dErstellt,
-        p.cName as Plattform
-      FROM tBestellung b
-      LEFT JOIN tPlattform p ON b.kPlattform = p.kPlattform
-      WHERE p.cName LIKE '%Otto%' OR p.cName LIKE '%OTTO%'
-      ORDER BY b.dErstellt DESC
-    `)
-    
     // Suche nach Otto in Zahlungsabgleich
     const zahlungen = await pool.request().query(`
       SELECT TOP 10
@@ -36,16 +23,19 @@ export async function GET(request: NextRequest) {
       ORDER BY dBuchungsdatum DESC
     `)
     
-    // Prüfe Plattformen
-    const plattformen = await pool.request().query(`
-      SELECT * FROM tPlattform WHERE cName LIKE '%Otto%' OR cName LIKE '%OTTO%'
+    // Alle Plattformen anzeigen
+    const alleTabs = await pool.request().query(`
+      SELECT TABLE_NAME 
+      FROM INFORMATION_SCHEMA.TABLES 
+      WHERE TABLE_TYPE = 'BASE TABLE' 
+        AND (TABLE_NAME LIKE '%otto%' OR TABLE_NAME LIKE '%Otto%' OR TABLE_NAME LIKE '%OTTO%' OR TABLE_NAME LIKE '%platt%' OR TABLE_NAME LIKE '%market%')
+      ORDER BY TABLE_NAME
     `)
     
     return NextResponse.json({
       ok: true,
-      bestellungen: bestellungen.recordset,
       zahlungen: zahlungen.recordset,
-      plattformen: plattformen.recordset
+      tables: alleTabs.recordset
     })
   } catch (error) {
     console.error('[Otto Check] Error:', error)
