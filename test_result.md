@@ -778,6 +778,18 @@ test_plan:
       - working: true
         agent: "main"
         comment: "✅ NEUE API: Übersichts-Dashboard für nicht zugeordnete Zahlungen und offene Rechnungen. Fetcht aus MongoDB Collections: fibu_zahlungen (istZugeordnet: false), fibu_rechnungen_vk (status != 'Bezahlt'), fibu_externe_rechnungen (alle). Liefert Statistiken mit Anzahl und Gesamtbeträgen. Oktober 2025 Test: 100 nicht zugeordnete Zahlungen (-483.24 EUR), 100 externe Rechnungen (6.133,85 EUR). Zeigt Top 20 pro Kategorie. Test erfolgreich: GET /api/fibu/uebersicht/nicht-zugeordnet?from=2025-10-01&to=2025-10-31"
+  
+  - task: "FIBU: PayPal Transaction Search API Integration - NEW"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/fibu/zahlungen/paypal/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ NEUE INTEGRATION: PayPal Transaction Search API vollständig implementiert. (1) PayPal Client Library (/app/lib/paypal-client.ts): OAuth 2.0 Client Credentials Flow, Transaction Search mit automatischer Pagination, Gebühren-Extraktion, Format-Konvertierung für FIBU. (2) GET /api/fibu/zahlungen/paypal: Lädt Transaktionen für Zeitraum (max 31 Tage wegen PayPal Limit), speichert in MongoDB Collection 'fibu_paypal_transactions', Caching-Unterstützung, Statistiken (Anzahl, Gesamtbetrag, Gebühren, Netto). (3) POST /api/fibu/zahlungen/paypal: Auto-Matching mit JTL Rechnungen über Invoice ID, Betreff-Parser, Betrag+Datum Matching. Response enthält: transactionId, datum, betrag, waehrung, gebuehr, nettoBetrag, status, ereignis, betreff, rechnungsNr, kundenEmail, kundenName. PayPal Credentials in .env: PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_MODE (live/sandbox). MANUELLER TEST ERFOLGREICH: Dezember 2024 lieferte 313 Transaktionen mit Gesamtbetrag €3,304.30 und Gebühren -€735.10."
 
 agent_communication:
   - agent: "main"
