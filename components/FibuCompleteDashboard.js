@@ -104,6 +104,65 @@ export default function FibuCompleteDashboard() {
     setLoading(false)
   }
 
+  async function refreshData(type = 'all') {
+    setRefreshing(true)
+    setShowRefreshMenu(false)
+    
+    try {
+      const [from, to] = selectedPeriod.split('_')
+      
+      if (type === 'all' || type === 'zahlungen') {
+        console.log('🔄 Aktualisiere Zahlungen von allen Quellen...')
+        
+        // PayPal (max 31 Tage, daher aufteilen wenn nötig)
+        const fromDate = new Date(from)
+        const toDate = new Date(to)
+        const daysDiff = Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24))
+        
+        if (daysDiff <= 31) {
+          await fetch(`/api/fibu/zahlungen/paypal?from=${from}&to=${to}&refresh=true`)
+        } else {
+          // Monat für Monat
+          let currentDate = new Date(fromDate)
+          while (currentDate <= toDate) {
+            const monthStart = currentDate.toISOString().split('T')[0]
+            const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).toISOString().split('T')[0]
+            const effectiveEnd = monthEnd < to ? monthEnd : to
+            
+            await fetch(`/api/fibu/zahlungen/paypal?from=${monthStart}&to=${effectiveEnd}&refresh=true`)
+            
+            currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+          }
+        }
+        
+        // Commerzbank & Postbank
+        await fetch(`/api/fibu/zahlungen/banks?bank=all&from=${from}&to=${to}&refresh=true`)
+        
+        // Mollie
+        await fetch(`/api/fibu/zahlungen/mollie?from=${from}&to=${to}&refresh=true`)
+        
+        // Amazon Settlements
+        await fetch(`/api/fibu/zahlungen/amazon-settlements?from=${from}&to=${to}&refresh=true`)
+        
+        console.log('✅ Zahlungen aktualisiert')
+      }
+      
+      if (type === 'all' || type === 'vk') {
+        console.log('🔄 Aktualisiere VK-Rechnungen...')
+        // VK-Rechnungen werden aus JTL geholt, kein spezifisches Refresh nötig
+        console.log('✅ VK-Rechnungen aktualisiert')
+      }
+      
+      // Reload data
+      await loadData(true)
+      
+    } catch (error) {
+      console.error('Fehler beim Aktualisieren:', error)
+    }
+    
+    setRefreshing(false)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
