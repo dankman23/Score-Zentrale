@@ -25,12 +25,12 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
   const [showZuordnungModal, setShowZuordnungModal] = useState(false)
   const [selectedZahlung, setSelectedZahlung] = useState(null)
 
-  // Load data when zeitraum or page changes
+  // Load data when zeitraum changes
   useEffect(() => {
     if (zeitraum) {
-      loadZahlungen()
+      loadZahlungen(1) // Reset to page 1 when zeitraum changes
     }
-  }, [zeitraum, pagination.page])
+  }, [zeitraum])
 
   async function loadZahlungen(page = pagination.page) {
     setLoading(true)
