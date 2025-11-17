@@ -236,8 +236,8 @@ export async function POST(request: NextRequest) {
     const rechnungenCollection = db.collection('fibu_rechnungen_vk')
 
     const dateFilter = {
-      datum: {
-        $gte: new Date(from),
+      datumDate: {
+        $gte: new Date(from + 'T00:00:00Z'),
         $lte: new Date(to + 'T23:59:59Z')
       }
     }
