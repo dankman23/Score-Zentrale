@@ -461,7 +461,7 @@ export default function App() {
   }, [activeTab])
 
   useEffect(() => {
-    const applyHash = () => { const h=(window.location.hash||'#dashboard').replace('#',''); if (['dashboard','sales','marketing','glossar','kaltakquise','warmakquise','outbound','produkte','preise'].includes(h)) setActiveTab(h) }
+    const applyHash = () => { const h=(window.location.hash||'#dashboard').replace('#',''); if (['dashboard','sales','marketing','glossar','kaltakquise','warmakquise','outbound','produkte','preise','fibu'].includes(h)) setActiveTab(h) }
     applyHash(); window.addEventListener('hashchange', applyHash)
     return () => window.removeEventListener('hashchange', applyHash)
   }, [])
