@@ -680,6 +680,79 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Neu implementiert: DACH-Crawler UI im Kaltakquise-Modul. (1) Neuer Tab 'DACH-Crawler' neben 'Google-Suche' mit grüner Gradient-Card, (2) Dropdown-Formular: Land (DE/AT/CH) → Region (alle Bundesländer/Kantone) → Branche (5 Kategorien) → Limit → 'Start Crawl' Button, (3) Live-Statistiken: 4 KPI-Cards (Regionen crawled, Firmen gefunden, Abdeckung %, In Datenbank), (4) Fortschritts-Tabelle mit letzten Crawls (Land, Region, Branche, Status Badge, Gefunden, Datum). State-Variablen: dachCrawlerForm, dachCrawlerStats, dachCrawlerProgress, dachCrawlerLoading. Funktionen: loadDachStats(), loadDachProgress(), startDachCrawl(). Integration mit bestehenden cold_prospects."
+
+  - task: "FIBU: Zahlungen Module Navigation & Loading"
+    implemented: true
+    working: false
+    file: "/app/components/ZahlungenView.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "CRITICAL ISSUE: FIBU tab exists in navigation but clicking it does not properly load the FIBU module. Hash navigation to #fibu shows loading state ('Lade FIBU-Daten...') but module never fully loads. Expected Zahlungen functionality with 5 providers (Amazon, PayPal, Commerzbank, Postbank, Mollie) is not accessible. Frontend routing or component loading issue."
+
+  - task: "FIBU: Zahlungen Time Period Selection (JTL-Style)"
+    implemented: true
+    working: false
+    file: "/app/components/ZahlungenView.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Cannot test time period selection (Oktober 2025, November 2025, Selbst definierte Spanne) because FIBU module is not loading properly. Component exists in code but not rendered."
+
+  - task: "FIBU: Zahlungen Refresh Button (Aktualisieren)"
+    implemented: true
+    working: false
+    file: "/app/components/ZahlungenView.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Cannot test Aktualisieren button functionality because FIBU module is not loading properly. Component exists in code but not rendered."
+
+  - task: "FIBU: Zahlungen Filter & Statistics"
+    implemented: true
+    working: false
+    file: "/app/components/ZahlungenView.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Cannot test provider filters and statistics because FIBU module is not loading properly. Component exists in code but not rendered."
+
+  - task: "FIBU: Zahlungen Table & Display"
+    implemented: true
+    working: false
+    file: "/app/components/ZahlungenView.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Cannot test data table with columns (Datum, Betrag, Anbieter, Verwendungszweck, Status) because FIBU module is not loading properly. Component exists in code but not rendered."
+
+  - task: "FIBU: 10it Export Functionality"
+    implemented: true
+    working: false
+    file: "/app/components/ExportDialog.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Cannot test 10it Export dialog and CSV download functionality because FIBU module is not loading properly. ExportDialog component exists in code but not accessible."
+
 metadata:
   created_by: "main_agent"
   version: "1.1"
