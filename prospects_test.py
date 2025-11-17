@@ -10,7 +10,7 @@ import os
 from datetime import datetime
 
 # Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://accounting-hub-52.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://finance-center-5.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def test_prospects_flow():
