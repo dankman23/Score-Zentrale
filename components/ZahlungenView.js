@@ -127,10 +127,11 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
     if (searchTerm) {
       const search = searchTerm.toLowerCase()
       return (
-        z.rechnungsNr?.toLowerCase().includes(search) ||
-        z.hinweis?.toLowerCase().includes(search) ||
-        z.kundenName?.toLowerCase().includes(search) ||
-        z.zahlungsanbieter?.toLowerCase().includes(search)
+        z.zahlungId?.toLowerCase().includes(search) ||
+        z.verwendungszweck?.toLowerCase().includes(search) ||
+        z.gegenkonto?.toLowerCase().includes(search) ||
+        z.anbieter?.toLowerCase().includes(search) ||
+        z.zugeordneteRechnung?.toLowerCase().includes(search)
       )
     }
     
