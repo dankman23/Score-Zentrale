@@ -687,10 +687,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "FIBU: GET /api/fibu/zahlungen/paypal (PayPal Transaction Search - verschiedene Zeiträume, Caching, 31-Tage Limit)"
-    - "FIBU: POST /api/fibu/zahlungen/paypal (Auto-Matching mit JTL Rechnungen)"
-    - "FIBU: PayPal Integration - Response-Struktur Validierung, Gebühren-Berechnung, MongoDB Storage"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
