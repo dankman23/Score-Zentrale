@@ -198,17 +198,6 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
           )}
           
           <button
-            onClick={() => {
-              if (confirm('Zahlungen neu aus JTL laden? Dies kann 30-40 Sekunden dauern.')) {
-                window.location.href = window.location.href + '&reload=true'
-              }
-            }}
-            className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 text-sm font-medium"
-          >
-            ⚡ Neu laden (JTL)
-          </button>
-          
-          <button
             onClick={aktualisierenVonQuellen}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium"
             title="Holt neue Zahlungen von PayPal, Commerzbank, Postbank und Mollie"
