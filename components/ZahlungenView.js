@@ -138,7 +138,7 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
   })
 
   // Einzigartige Zahlungsanbieter für Filter
-  const uniqueAnbieter = [...new Set(zahlungen.map(z => z.zahlungsanbieter))].sort()
+  const uniqueAnbieter = [...new Set(zahlungen.map(z => z.anbieter))].sort()
 
   // Statistiken
   const stats = {
