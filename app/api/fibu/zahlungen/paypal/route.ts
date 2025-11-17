@@ -51,14 +51,17 @@ export async function GET(request: NextRequest) {
 
     // Wenn refresh=false, versuche zuerst aus MongoDB zu laden
     if (!refresh) {
+      const startDateTime = new Date(startDate + 'T00:00:00Z')
+      const endDateTime = new Date(endDate + 'T23:59:59Z')
+      
       const cached = await collection
         .find({
-          datum: {
-            $gte: new Date(startDate),
-            $lte: new Date(endDate + 'T23:59:59Z')
+          datumDate: {
+            $gte: startDateTime,
+            $lte: endDateTime
           }
         })
-        .sort({ datum: -1 })
+        .sort({ datumDate: -1 })
         .toArray()
 
       if (cached.length > 0) {
@@ -92,6 +95,10 @@ export async function GET(request: NextRequest) {
             rechnungsNr: t.rechnungsNr,
             kundenEmail: t.kundenEmail,
             kundenName: t.kundenName,
+            istZugeordnet: t.istZugeordnet || false,
+            zugeordneteRechnung: t.zugeordneteRechnung || null,
+            zugeordnetesKonto: t.zugeordnetesKonto || null,
+            zuordnungsArt: t.zuordnungsArt || null,
           }))
         })
       }
