@@ -147,22 +147,40 @@ export async function GET(request: NextRequest) {
     // Sortiere nach Datum
     allPayments.sort((a, b) => new Date(b.datum).getTime() - new Date(a.datum).getTime())
 
-    // Limit anwenden
-    if (allPayments.length > limit) {
-      allPayments = allPayments.slice(0, limit)
-    }
+    // Berechne Gesamt-Stats VOR Pagination
+    const totalCount = allPayments.length
+    const totalSum = allPayments.reduce((sum, p) => sum + p.betrag, 0)
+    
+    stats.gesamt = totalCount
+    stats.gesamtsumme = totalSum
 
-    stats.gesamt = allPayments.length
-    stats.gesamtsumme = allPayments.reduce((sum, p) => sum + p.betrag, 0)
+    // Pagination anwenden
+    const startIndex = (page - 1) * pageSize
+    const endIndex = startIndex + pageSize
+    const paginatedPayments = limit > 0 
+      ? allPayments.slice(0, limit) 
+      : allPayments.slice(startIndex, endIndex)
+    
+    const totalPages = limit > 0 
+      ? 1 
+      : Math.ceil(totalCount / pageSize)
 
-    console.log(`[Zahlungen] Gesamt: ${stats.gesamt} Transaktionen, ${Object.keys(stats.anbieter).length} Anbieter`)
+    console.log(`[Zahlungen] Gesamt: ${totalCount} Transaktionen, Seite ${page}/${totalPages}, ${Object.keys(stats.anbieter).length} Anbieter`)
 
     return NextResponse.json({
       ok: true,
       from: startDate,
       to: endDate,
       stats,
-      zahlungen: allPayments
+      zahlungen: paginatedPayments,
+      pagination: {
+        page,
+        pageSize,
+        totalCount,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
+      }
     })
 
   } catch (error) {
