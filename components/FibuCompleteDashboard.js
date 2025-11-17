@@ -12,7 +12,7 @@ import ZahlungenView from './ZahlungenView'
 import ZahlungsEinstellungen from './ZahlungsEinstellungen'
 import FibuMonatsUebersicht from './FibuMonatsUebersicht'
 import FuzzyMatchingView from './FuzzyMatchingView'
-import DateRangePicker from './DateRangePicker'
+import DateRangeNavigator from './DateRangeNavigator'
 
 // Groteske Zitate
 const QUOTES = [
