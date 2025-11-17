@@ -220,7 +220,7 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
               <option value="alle">Alle Anbieter ({uniqueAnbieter.length})</option>
               {uniqueAnbieter.map(anbieter => (
                 <option key={anbieter} value={anbieter}>
-                  {anbieter} ({zahlungen.filter(z => z.zahlungsanbieter === anbieter).length})
+                  {anbieter} ({zahlungen.filter(z => z.anbieter === anbieter).length})
                 </option>
               ))}
             </select>
