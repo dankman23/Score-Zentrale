@@ -5,8 +5,9 @@ const nextConfig = {
   },
   experimental: {
     // Remove if not using Server Components
-    serverComponentsExternalPackages: ['mongodb'],
+    serverComponentsExternalPackages: ['mongodb', 'node-fints'],
   },
+  transpilePackages: ['date-fns'],
   webpack(config, { dev }) {
     if (dev) {
       // Reduce CPU/memory from file watching
