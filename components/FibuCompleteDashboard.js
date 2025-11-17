@@ -196,8 +196,10 @@ export default function FibuCompleteDashboard() {
     )
   }
 
-  const { summary, details } = data
-  const issues = summary.issues
+  // Only destructure data if it exists (for overview tab)
+  const summary = data?.summary || null
+  const details = data?.details || null
+  const issues = summary?.issues || null
 
   return (
     <div className="min-h-screen bg-gray-50">
