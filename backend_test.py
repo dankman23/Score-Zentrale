@@ -356,4 +356,4 @@ def test_paypal_integration():
     print("=" * 80)
 
 if __name__ == "__main__":
-    test_fibu_zahlungen_endpoint()
+    test_paypal_integration()
