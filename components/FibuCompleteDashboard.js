@@ -82,9 +82,12 @@ export default function FibuCompleteDashboard() {
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
 
+  // Lazy Loading - lade nur Overview-Daten wenn Overview-Tab aktiv ist
   useEffect(() => {
-    loadData()
-  }, [selectedPeriod])
+    if (activeTab === 'overview') {
+      loadData()
+    }
+  }, [selectedPeriod, activeTab])
 
   async function loadData(forceReload = false) {
     setLoading(true)
