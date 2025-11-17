@@ -180,34 +180,60 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
           </p>
         </div>
         
-        <div className="flex items-center gap-4">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={alleAnzeigen}
-              onChange={(e) => setAlleAnzeigen(e.target.checked)}
-              className="rounded"
-            />
-            <span className="text-sm">Alle anzeigen</span>
-          </label>
+        <div className="flex items-center gap-2">
+          <select
+            value={zeitraumAuswahl}
+            onChange={(e) => {
+              const val = e.target.value
+              setZeitraumAuswahl(val)
+              
+              if (val === 'Oktober 2025') {
+                setZeitraum('2025-10-01_2025-10-31')
+              } else if (val === 'November 2025') {
+                setZeitraum('2025-11-01_2025-11-30')
+              } else if (val === 'Oktober + November 2025') {
+                setZeitraum('2025-10-01_2025-11-30')
+              } else if (val === 'Gesamtes Jahr 2025') {
+                setZeitraum('2025-01-01_2025-12-31')
+              }
+            }}
+            className="bg-white text-gray-900 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          >
+            <option value="Oktober 2025">Oktober 2025</option>
+            <option value="November 2025">November 2025</option>
+            <option value="Oktober + November 2025">Oktober + November 2025</option>
+            <option value="Gesamtes Jahr 2025">Gesamtes Jahr 2025</option>
+            <option value="Selbst definiert">Selbst definierte Spanne</option>
+          </select>
           
-          {!alleAnzeigen && (
-            <select
-              value={zeitraum}
-              onChange={(e) => setZeitraum(e.target.value)}
-              className="bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 text-sm"
-            >
-              <option value="2025-10-01_2025-10-31">Oktober 2025</option>
-              <option value="2025-11-01_2025-11-30">November 2025</option>
-              <option value="2025-10-01_2025-11-30">Okt + Nov 2025</option>
-              <option value="2025-01-01_2025-12-31">Gesamtes Jahr 2025</option>
-            </select>
+          {zeitraumAuswahl === 'Selbst definiert' && (
+            <>
+              <input
+                type="date"
+                value={customVon}
+                onChange={(e) => setCustomVon(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              />
+              <span className="text-gray-600">bis</span>
+              <input
+                type="date"
+                value={customBis}
+                onChange={(e) => setCustomBis(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              />
+              <button
+                onClick={() => setZeitraum(`${customVon}_${customBis}`)}
+                className="bg-gray-600 text-white px-3 py-2 rounded-lg hover:bg-gray-700 text-sm"
+              >
+                Anwenden
+              </button>
+            </>
           )}
           
           <button
             onClick={aktualisierenVonQuellen}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium"
-            title="Holt neue Zahlungen von PayPal, Commerzbank, Postbank und Mollie"
+            title="Holt neue Zahlungen von Amazon, PayPal, Commerzbank, Postbank und Mollie"
           >
             🔄 Aktualisieren
           </button>
