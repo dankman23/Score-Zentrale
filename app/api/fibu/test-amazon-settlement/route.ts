@@ -5,32 +5,28 @@ export async function GET() {
   try {
     const pool = await getJTLConnection()
     
-    // Prüfe erstmal alle Spalten in tExternerBeleg
-    const columns1 = await pool.request().query(`
-      SELECT TOP 1 * FROM Rechnung.tExternerBeleg
-      WHERE cBelegNr LIKE 'XRE-%'
+    // Liste alle Tabellen im Schema Rechnung auf
+    const tables = await pool.request().query(`
+      SELECT TABLE_NAME 
+      FROM INFORMATION_SCHEMA.TABLES 
+      WHERE TABLE_SCHEMA = 'Rechnung'
+        AND TABLE_TYPE = 'BASE TABLE'
+      ORDER BY TABLE_NAME
     `)
     
-    // Prüfe alle Spalten in tExternerBelegPosition  
-    const columns2 = await pool.request().query(`
-      SELECT TOP 1 * FROM Rechnung.tExternerBelegPosition
-      WHERE kExternerBeleg IN (
-        SELECT TOP 1 kExternerBeleg FROM Rechnung.tExternerBeleg WHERE cBelegNr LIKE 'XRE-%'
-      )
-    `)
-    
-    // Zähle wie viele XRE Belege es gibt
-    const count = await pool.request().query(`
-      SELECT COUNT(*) as anzahl FROM Rechnung.tExternerBeleg WHERE cBelegNr LIKE 'XRE-%'
+    // Suche nach Tabellen die mit Amazon/Settlement zu tun haben
+    const amazonTables = await pool.request().query(`
+      SELECT TABLE_NAME 
+      FROM INFORMATION_SCHEMA.TABLES 
+      WHERE TABLE_TYPE = 'BASE TABLE'
+        AND (TABLE_NAME LIKE '%amazon%' OR TABLE_NAME LIKE '%settlement%' OR TABLE_NAME LIKE '%Extern%')
+      ORDER BY TABLE_NAME
     `)
     
     return NextResponse.json({
       ok: true,
-      anzahl_xre_belege: count.recordset[0],
-      beleg_spalten: columns1.recordset[0] ? Object.keys(columns1.recordset[0]) : [],
-      beleg_sample: columns1.recordset[0],
-      position_spalten: columns2.recordset[0] ? Object.keys(columns2.recordset[0]) : [],
-      position_sample: columns2.recordset[0]
+      rechnung_tables: tables.recordset,
+      amazon_related_tables: amazonTables.recordset
     })
     
   } catch (error: any) {
