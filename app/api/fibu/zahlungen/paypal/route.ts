@@ -21,9 +21,28 @@ export async function GET(request: NextRequest) {
     const to = searchParams.get('to')
     const refresh = searchParams.get('refresh') === 'true'
 
-    // Standard: Letzter Monat
-    const endDate = to || new Date().toISOString().split('T')[0]
-    const startDate = from || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    // Standard: Letzte 30 Tage (PayPal erlaubt max 31 Tage Range)
+    const now = new Date()
+    const endDate = to || now.toISOString().split('T')[0]
+    const defaultStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+    const startDate = from || defaultStart.toISOString().split('T')[0]
+    
+    // Validiere: Max 31 Tage Range
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    const daysDiff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+    
+    if (daysDiff > 31) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'PayPal Transaction Search API erlaubt maximal 31 Tage Zeitraum',
+          maxDays: 31,
+          requested: daysDiff
+        },
+        { status: 400 }
+      )
+    }
 
     console.log(`[PayPal] Fetching transactions from ${startDate} to ${endDate}`)
 
