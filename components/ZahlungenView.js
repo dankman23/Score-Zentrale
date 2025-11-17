@@ -6,6 +6,9 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
   const [zahlungen, setZahlungen] = useState([])
   const [loading, setLoading] = useState(true)
   const [zeitraum, setZeitraum] = useState(zeitraumProp || '2025-10-01_2025-11-30')
+  const [zeitraumAuswahl, setZeitraumAuswahl] = useState('Oktober + November 2025')
+  const [customVon, setCustomVon] = useState('2025-10-01')
+  const [customBis, setCustomBis] = useState('2025-11-30')
   const [alleAnzeigen, setAlleAnzeigen] = useState(false)
   
   // Filter States
