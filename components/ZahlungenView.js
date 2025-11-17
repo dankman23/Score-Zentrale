@@ -90,6 +90,9 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
       // Mollie
       await fetch(`/api/fibu/zahlungen/mollie?from=${from}&to=${to}&refresh=true`)
       
+      // Amazon Settlements
+      await fetch(`/api/fibu/zahlungen/amazon-settlements?from=${from}&to=${to}&refresh=true`)
+      
       console.log('✅ Aktualisierung abgeschlossen, lade Daten...')
       
       // Jetzt normale Daten laden
