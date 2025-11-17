@@ -32,23 +32,28 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
     }
   }, [zeitraum, pagination.page])
 
-  async function loadZahlungen() {
+  async function loadZahlungen(page = pagination.page) {
     setLoading(true)
     try {
       const [from, to] = zeitraum.split('_')
-      console.log(`[ZahlungenView] Loading from ${from} to ${to}`)
+      console.log(`[ZahlungenView] Loading from ${from} to ${to}, Page ${page}`)
       
-      const res = await fetch(`/api/fibu/zahlungen?from=${from}&to=${to}`)
+      const res = await fetch(`/api/fibu/zahlungen?from=${from}&to=${to}&page=${page}&pageSize=${pagination.pageSize}`)
       const data = await res.json()
       
       console.log('[ZahlungenView] API Response:', {
         ok: data.ok,
         zahlungenCount: data.zahlungen?.length,
+        pagination: data.pagination,
         sample: data.zahlungen?.[0]
       })
       
       if (data.ok) {
         setZahlungen(data.zahlungen || [])
+        setStats(data.stats)
+        if (data.pagination) {
+          setPagination(data.pagination)
+        }
       } else {
         console.error('[ZahlungenView] API Error:', data.error)
       }
@@ -56,6 +61,10 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
       console.error('[ZahlungenView] Fetch Error:', error)
     }
     setLoading(false)
+  }
+  
+  function handlePageChange(newPage) {
+    setPagination(prev => ({ ...prev, page: newPage }))
   }
 
   // Filter zahlungen
