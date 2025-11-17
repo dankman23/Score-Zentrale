@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Backend Test Suite for FIBU Zahlungen Endpoint
-Testing the critical payment data fixes implemented.
+Backend Test Suite for PayPal Transaction Search API Integration
+Testing PayPal API endpoints according to test_result.md requirements.
 """
 
 import requests
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Get base URL from environment
 BASE_URL = "https://finance-center-5.preview.emergentagent.com"
