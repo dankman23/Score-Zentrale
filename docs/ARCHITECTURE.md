@@ -1,391 +1,362 @@
-# System-Architektur - FIBU Manager
+# System-Architektur - FIBU Accounting Hub
 
 ## 🏗️ Übersicht
 
-Der FIBU Manager ist eine hybride Anwendung, die bestehende JTL-Daten mit erweiterten Buchhaltungsfunktionen kombiniert.
+Das FIBU Accounting Hub ist eine **Full-Stack Next.js Anwendung**, die als zentrale Buchhaltungsplattform fungiert und Daten aus mehreren Quellen konsolidiert.
 
-## 📐 Architektur-Diagramm
+## 📊 Architektur-Diagramm
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                     Browser (Client)                         │
-│  Next.js Frontend (React + Tailwind CSS)                    │
-└────────────────────┬────────────────────────────────────────┘
-                     │ HTTP/HTTPS
-                     ↓
-┌─────────────────────────────────────────────────────────────┐
-│              Next.js Backend (API Routes)                    │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │  /api/fibu/rechnungen/extern    (Rechnungen)         │  │
-│  │  /api/fibu/zahlungen            (Zahlungen)          │  │
-│  │  /api/fibu/kontenplan           (Konten CRUD)        │  │
-│  │  /api/fibu/kreditoren           (Lieferanten)        │  │
-│  │  /api/fibu/bank-import          (CSV-Import)         │  │
-│  │  /api/fibu/zahlungseinstellungen                     │  │
-│  └──────────────────────────────────────────────────────┘  │
-└───────┬──────────────────────────────────────┬─────────────┘
-        │                                      │
-        ↓ Read-Only                            ↓ Read/Write
-┌───────────────────┐              ┌─────────────────────────┐
-│  JTL MSSQL DB     │              │  MongoDB (fibu)         │
-│                   │              │                         │
-│  • tBestellung    │              │  • fibu_konten          │
-│  • tRechnungskopf │              │  • fibu_kreditoren      │
-│  • tZahlungseingang│              │  • fibu_bank_trans...  │
-│  • tZahlungsart   │              │  • fibu_zahlungs...    │
-│  • tLieferschein  │              │                         │
-└───────────────────┘              └─────────────────────────┘
+│                   Next.js Frontend (React)                   │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+                          │ HTTP/REST
+                          │
+┌─────────────────────────▼───────────────────────────────────┐
+│                  Next.js API Routes (Backend)                │
+│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐  │
+│  │ FIBU APIs    │  │ JTL APIs     │  │ Import APIs     │  │
+│  │ /api/fibu/*  │  │ /api/jtl/*   │  │ /api/import/*   │  │
+│  └──────────────┘  └──────────────┘  └─────────────────┘  │
+└────────┬─────────────────┬──────────────────┬──────────────┘
+         │                 │                  │
+         │                 │                  │
+    ┌────▼──────┐    ┌────▼──────┐    ┌─────▼──────────┐
+    │  MongoDB  │    │   MSSQL   │    │ External APIs  │
+    │  (Local)  │    │   (JTL)   │    │ Amazon, eBay,  │
+    │           │    │           │    │ PayPal         │
+    └───────────┘    └───────────┘    └────────────────┘
 ```
 
-## 🎯 Hybrid-Datenbank-Strategie
+## 🔧 Technologie-Stack
 
-### Warum zwei Datenbanken?
+### Frontend Layer
 
-1. **JTL MSSQL (Read-Only):**
-   - Enthält operative Geschäftsdaten (Bestellungen, Rechnungen, Kunden)
-   - Wird von JTL-Wawi verwaltet
-   - Änderungen nur über JTL-Software
-   - FIBU Manager liest nur
+**Framework:** Next.js 14 (App Router)
+- Server-Side Rendering (SSR)
+- Client Components für Interaktivität
+- Optimierte Performance durch Route Caching
 
-2. **MongoDB (Read/Write):**
-   - Speichert FIBU-spezifische Daten
-   - Kontenplan (SKR04)
-   - Importierte Bank-Transaktionen
-   - Kreditoren-Zuordnungen
-   - Zahlungseinstellungen
+**UI Libraries:**
+- React 18
+- Tailwind CSS (Utility-First)
+- Shadcn/ui (Komponenten-Bibliothek)
+- Lucide Icons
 
-### Datenfluss-Beispiel: Externe Rechnung
+**State Management:**
+- React useState/useEffect (Component State)
+- Keine externe State Library (bewusste Entscheidung)
 
-```
-1. Frontend ruft /api/fibu/rechnungen/extern auf
-   ↓
-2. Backend fetcht Rechnungen aus JTL MSSQL
-   SELECT * FROM tRechnungskopf WHERE cRechnungsnummer LIKE 'XRE-%'
-   ↓
-3. Backend fetcht Zahlungen aus JTL MSSQL
-   SELECT * FROM tZahlungseingang
-   ↓
-4. Node.js führt Matching durch (nach Betrag & Datum)
-   ↓
-5. Backend setzt Status in JTL auf "Bezahlt"
-   UPDATE tRechnungskopf SET cStatus = 'bezahlt'
-   ↓
-6. Ergebnis wird an Frontend zurückgegeben
-```
+### Backend Layer
 
-## 🔄 API-Architektur
+**API Framework:** Next.js API Routes
+- RESTful Endpoints
+- Server-only Code
+- TypeScript für Type Safety
 
-### RESTful Endpoints
-
-Alle FIBU-APIs folgen dem Schema: `/api/fibu/{ressource}`
-
-#### Externe Rechnungen
+**Datenbank-Verbindungen:**
 ```typescript
-GET /api/fibu/rechnungen/extern?from=2025-01-01&to=2025-12-31
+// MongoDB (Singleton Pattern)
+import { getDb } from '@/lib/db/mongodb'
 
-Response:
-{
-  ok: true,
-  rechnungen: [
-    {
-      rechnungsnummer: "XRE-12345",
-      datum: "2025-10-15",
-      betrag: 1234.56,
-      status: "bezahlt",
-      zahlung: {
-        datum: "2025-10-16",
-        betrag: 1234.56,
-        bank: "Amazon"
-      }
-    }
-  ]
-}
+// MSSQL (Connection Pool)
+import { getJTLConnection } from '@/lib/db/mssql'
 ```
 
-#### Kontenplan CRUD
+### Datenbank Layer
+
+#### MongoDB (Port 27017)
+**Zweck:** Finanzdaten, Cache, Mappings
+
+**Collections:**
+- `fibu_kontenplan` - SKR04 Kontenplan
+- `fibu_kreditoren` - Kreditorenstamm
+- `fibu_bank_transaktionen` - Postbank Import
+- `fibu_zahlungen` - Zahlungs-Cache
+- `kreditoren` - Legacy (wird migriert)
+
+#### MSSQL (JTL-Wawi Datenbank)
+**Zweck:** Read-Only Zugriff auf JTL-Daten
+
+**Wichtige Schemas:**
+- `dbo.*` - Standard-Tabellen
+- `Rechnung.*` - Rechnungen, Externe Belege
+
+**Wichtige Tabellen:**
+- `tZahlung` - Zahlungen
+- `tZahlungsabgleichUmsatz` - Bank-Abgleich
+- `tRechnung` - Rechnungen
+- `tLieferant` - Lieferanten
+- `pf_amazon_settlement` - Amazon Settlements
+- `pf_amazon_settlementpos` - Amazon Settlement-Positionen
+
+## 🔄 Datenfluss
+
+### Beispiel: Zahlung anzeigen
+
+```
+1. User öffnet /fibu → Zahlungen Tab
+   ↓
+2. Frontend: ZahlungenView.js lädt
+   ↓
+3. API Call: GET /api/fibu/zahlungen?from=...&to=...
+   ↓
+4. Backend:
+   a) Lädt aus MongoDB Cache
+   b) Falls leer/veraltet:
+      - Query JTL (tZahlung, tZahlungsabgleichUmsatz)
+      - Query MongoDB (fibu_bank_transaktionen)
+      - Kombiniert Daten
+      - Speichert Cache
+   ↓
+5. Response: JSON mit allen Zahlungen
+   ↓
+6. Frontend: Rendering in Tabelle
+```
+
+### Beispiel: Konten-Zuordnung
+
+```
+1. User klickt "Zuordnen" bei einer Zahlung
+   ↓
+2. Modal öffnet: ZuordnungsModal
+   ↓
+3. User wählt: "Mit Buchungskonto verknüpfen"
+   ↓
+4. User wählt Konto: 6850 (Telefon/Internet)
+   ↓
+5. API Call: PUT /api/fibu/zahlungen
+   Body: { zahlungId, quelle, zuordnungsArt: 'konto', kontonummer: '6850' }
+   ↓
+6. Backend:
+   - Update MongoDB (fibu_bank_transaktionen oder fibu_zahlungen)
+   - Setzt: zugeordnetesKonto, zuordnungsArt, istZugeordnet
+   ↓
+7. Response: { ok: true }
+   ↓
+8. Frontend: Reload & Anzeige-Update
+```
+
+## 🗂️ Code-Organisation
+
+### API-Routen Pattern
+
 ```typescript
-// Liste aller Konten
-GET /api/fibu/kontenplan
+// /app/app/api/fibu/[modul]/route.ts
 
-// Einzelnes Konto
-GET /api/fibu/kontenplan?kontonummer=1802
-
-// Neues Konto anlegen
-POST /api/fibu/kontenplan
-Body: { kontonummer, bezeichnung, kontenklasse, ... }
-
-// Konto bearbeiten
-PUT /api/fibu/kontenplan?kontonummer=1802
-Body: { bezeichnung, istAktiv, ... }
-
-// Konto löschen
-DELETE /api/fibu/kontenplan?kontonummer=1802
-```
-
-#### Bank-Import
-```typescript
-POST /api/fibu/bank-import
-Content-Type: multipart/form-data
-
-Body: FormData mit CSV-Datei
-
-Response:
-{
-  ok: true,
-  imported: 45,
-  errors: [],
-  message: "45 Transaktionen erfolgreich importiert"
-}
-```
-
-## 🧩 Component-Architektur
-
-### Frontend-Komponenten-Hierarchie
-
-```
-app/fibu/page.js
-  └─ FibuCompleteDashboard
-       ├─ Tab: Übersicht
-       ├─ Tab: Rechnungen
-       ├─ Tab: Zahlungen
-       │    └─ ZahlungenView
-       ├─ Tab: Kontenplan + Einstellungen
-       │    └─ KontenplanView
-       │         ├─ Tab: Kontenplan (SKR04-Hierarchie)
-       │         ├─ Tab: Kreditoren
-       │         │    └─ KreditorenManagement
-       │         ├─ Tab: Debitoren (Sammel-Debitorenkonten)
-       │         ├─ Tab: Kostenarten
-       │         ├─ Tab: Kostenstellen
-       │         └─ Tab: Einstellungen
-       │              └─ ZahlungsEinstellungen
-       └─ Tab: Bank-Import
-            └─ BankImport
-```
-
-### State Management
-
-Keine externe State-Management-Library. Nutzt:
-- **React `useState`** für lokalen Component-State
-- **React `useEffect`** für API-Calls
-- **Browser localStorage** für UI-Präferenzen
-
-## 🔍 Matching-Algorithmus (Rechnungen ↔ Zahlungen)
-
-### Problem
-Externe Amazon-Rechnungen (XRE-*) müssen mit Zahlungen verknüpft werden.
-
-### Lösung: Application-Layer Matching
-
-```javascript
-// 1. Rechnungen aus JTL holen
-const rechnungen = await fetchExterneRechnungen()
-
-// 2. Zahlungen aus JTL holen
-const zahlungen = await fetchZahlungen()
-
-// 3. Matching in Node.js durchführen
-for (const rechnung of rechnungen) {
-  const passendeZahlung = zahlungen.find(z => 
-    Math.abs(z.betrag - rechnung.betrag) < 0.01 &&  // Betrag-Match
-    isDateWithin7Days(z.datum, rechnung.datum)       // Datum-Match
-  )
-  
-  if (passendeZahlung) {
-    rechnung.status = 'bezahlt'
-    rechnung.zahlung = passendeZahlung
+export async function GET(request: NextRequest) {
+  try {
+    // 1. Parameter validieren
+    const searchParams = request.nextUrl.searchParams
     
-    // Status in JTL aktualisieren
-    await updateRechnungStatus(rechnung.id, 'bezahlt')
+    // 2. Datenbank-Abfrage
+    const db = await getDb()
+    const data = await db.collection('...').find().toArray()
+    
+    // 3. Response
+    return NextResponse.json({ ok: true, data })
+  } catch (error) {
+    return NextResponse.json(
+      { ok: false, error: error.message },
+      { status: 500 }
+    )
   }
 }
 ```
 
-### Warum nicht SQL JOIN?
+### Komponenten-Pattern
 
-❌ **Problematischer Ansatz (vermieden):**
-```sql
--- NICHT VERWENDEN! Führt zu Datenverlust!
-SELECT r.*, z.*
-FROM tRechnungskopf r
-LEFT JOIN tZahlungseingang z ON (
-  ABS(r.fBetrag - z.fBetrag) < 0.01 AND
-  DATEDIFF(day, r.dDatum, z.dDatum) < 7
-)
-```
-
-Probleme:
-- Komplexe JOIN-Bedingungen sind fehleranfällig
-- Bei Bugs verschwinden Daten aus der Ansicht
-- Schwer zu debuggen
-- Risiko von Dateninkonsistenzen
-
-✅ **Sicherer Ansatz (implementiert):**
-- Daten separat fetchen
-- Matching in Node.js (einfach zu testen)
-- Bei Fehlern: Keine Daten verloren
-- Einfaches Debugging
-
-## 📦 Deployment-Architektur
-
-### Produktiv-Setup
-
-```
-┌────────────────────────────────────────┐
-│  Reverse Proxy (nginx/Kubernetes)      │
-│  HTTPS Termination                     │
-└──────────────┬─────────────────────────┘
-               │
-               ↓
-┌────────────────────────────────────────┐
-│  Next.js App (Port 3000)               │
-│  - Supervisor für Process Management   │
-│  - Logs: /var/log/supervisor/          │
-└──────┬──────────────────┬──────────────┘
-       │                  │
-       ↓                  ↓
-┌──────────────┐   ┌─────────────────┐
-│  JTL MSSQL   │   │  MongoDB        │
-│  (Remote)    │   │  (Local/Remote) │
-└──────────────┘   └─────────────────┘
-```
-
-### Umgebungsvariablen
-
-**Entwicklung:**
-```env
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-JTL_DB_SERVER=localhost
-MONGO_URL=mongodb://localhost:27017/fibu
-```
-
-**Produktion:**
-```env
-NEXT_PUBLIC_BASE_URL=https://fibu.example.com
-JTL_DB_SERVER=jtl-prod.internal
-MONGO_URL=mongodb://mongo.internal:27017/fibu
-```
-
-## 🔐 Sicherheitsarchitektur
-
-### Zugriffskontrolle
-
-1. **JTL MSSQL:**
-   - Dedizierter Read-Only User
-   - Nur SELECT-Rechte auf benötigte Tabellen
-   - UPDATE nur auf tRechnungskopf.cStatus
-
-2. **MongoDB:**
-   - Full Access für FIBU-Collections
-   - Separate Database (`fibu`)
-
-### Datenvalidierung
-
-```typescript
-// Beispiel: Konto erstellen
-POST /api/fibu/kontenplan
-
-// Validierung im Backend:
-1. Kontonummer: 4-stellig, numerisch
-2. Bezeichnung: Nicht leer
-3. Kontenklasse: 0-9
-4. Keine Duplikate
-```
-
-## 📊 Performance-Optimierungen
-
-### Caching
-- Kontenplan wird im Frontend gecacht (selten Änderungen)
-- API-Responses mit Cache-Control Headers
-
-### Batch-Operations
-- Bank-Import verarbeitet CSV in Chunks
-- Bulk-Insert in MongoDB für bessere Performance
-
-### Indexierung
 ```javascript
-// MongoDB Indices
-db.fibu_konten.createIndex({ kontonummer: 1 }, { unique: true })
-db.fibu_konten.createIndex({ kontenklasse: 1, kontengruppe: 1 })
-db.fibu_bank_transaktionen.createIndex({ buchungsdatum: -1 })
-db.fibu_kreditoren.createIndex({ name: "text" })
-```
+// /app/components/ModulView.js
+'use client'
 
-## 🐛 Error Handling
+import { useState, useEffect } from 'react'
 
-### API Error Response Format
-
-```typescript
-{
-  ok: false,
-  error: "Detaillierte Fehlerbeschreibung",
-  code: "ERROR_CODE",  // Optional
-  details: { ... }      // Optional
+export default function ModulView() {
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(true)
+  
+  useEffect(() => {
+    async function loadData() {
+      const res = await fetch('/api/fibu/modul')
+      const json = await res.json()
+      setData(json.data)
+      setLoading(false)
+    }
+    loadData()
+  }, [])
+  
+  if (loading) return <div>Laden...</div>
+  
+  return (
+    <div className="p-6">
+      {/* UI */}
+    </div>
+  )
 }
 ```
 
-### Fehler-Kategorien
+## 🔐 Sicherheits-Architektur
 
-1. **Validierungs-Fehler** (400)
-2. **Nicht gefunden** (404)
-3. **Datenbank-Fehler** (500)
-4. **Externe API-Fehler** (502)
+### Environment Variables
 
-## 🔄 Datenfluss-Beispiele
-
-### CSV-Import-Flow
-
-```
-1. User wählt CSV-Datei aus
-   ↓
-2. Frontend sendet FormData an /api/fibu/bank-import
-   ↓
-3. Backend parst CSV Zeile für Zeile
-   ↓
-4. Jede Zeile wird validiert:
-   - Datum im korrekten Format?
-   - Betrag numerisch?
-   - Pflichtfelder vorhanden?
-   ↓
-5. Valide Zeilen werden in MongoDB eingefügt
-   ↓
-6. Response mit Import-Statistik
-   ↓
-7. Frontend zeigt Erfolgs-Meldung
+```bash
+# ⚠️ NIEMALS committen!
+MONGO_URL=mongodb://localhost:27017
+MSSQL_SERVER=localhost
+MSSQL_USER=SA
+MSSQL_PASSWORD=***
 ```
 
-### Kontenplan-Anzeige-Flow
+### API Security
 
+- **Server-Only:** Alle sensiblen Operations in API Routes
+- **No Client Secrets:** Keine API-Keys im Browser
+- **Input Validation:** Alle User-Inputs validiert
+- **SQL Injection Prevention:** Parameterized Queries
+
+## 📈 Performance-Optimierungen
+
+### 1. Caching-Strategie
+
+**MongoDB als Cache für JTL-Daten:**
+```javascript
+// Cache für 1 Stunde
+const cacheKey = `zahlungen_${from}_${to}`
+const cached = await db.collection('cache').findOne({ key: cacheKey })
+
+if (cached && Date.now() - cached.timestamp < 3600000) {
+  return cached.data
+}
+
+// Sonst: Fresh Load + Cache Update
 ```
-1. User öffnet Kontenplan-Tab
-   ↓
-2. Frontend ruft GET /api/fibu/kontenplan auf
-   ↓
-3. Backend fetcht alle Konten aus MongoDB
-   ↓
-4. Konten werden nach Klasse/Gruppe sortiert
-   ↓
-5. Response mit 137+ Konten
-   ↓
-6. Frontend gruppiert hierarchisch:
-   Klasse 0
-     └─ Gruppe 06 (EDV & Fahrzeuge)
-         └─ Untergruppe 065 (EDV-Software)
-             └─ Konto 0650
-   ↓
-7. Accordion-UI rendert Hierarchie
+
+### 2. Lazy Loading
+
+- Komponenten werden nur bei Bedarf geladen
+- Tabs laden Daten erst bei Aktivierung
+- Infinite Scroll für große Listen
+
+### 3. Query-Optimierung
+
+**MSSQL:**
+- Indexes auf häufig gefilterten Spalten
+- LIMIT/TOP für große Result Sets
+- JOIN nur wenn nötig
+
+**MongoDB:**
+- Compound Indexes für Filter-Kombinationen
+- Projection für große Dokumente
+
+## 🔄 Deployment-Architektur
+
+### Supervisor (Process Manager)
+
+```ini
+[program:nextjs]
+command=yarn start
+directory=/app
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/supervisor/nextjs.out.log
+stderr_logfile=/var/log/supervisor/nextjs.err.log
 ```
 
-## 🧪 Testing-Strategie
+### Port-Mapping
 
-### Manuelle Tests
-- Kritische APIs vor jedem Deployment
-- Test-Skript: `node scripts/test-critical-data.js`
+- **Next.js:** Intern 3000 → Extern via Nginx
+- **MongoDB:** Intern 27017 (nicht extern)
+- **MSSQL:** Intern 1433 (nicht extern)
 
-### Monitoring
-- Server-Logs überwachen
-- Import-Fehlerrate tracken
-- Matching-Erfolgsrate bei externen Rechnungen
+### Environment
+
+- **Production:** `NODE_ENV=production`
+- **Hot Reload:** Automatisch in Development
+- **Server Restart:** Nur bei Package-Changes nötig
+
+## 🧩 Erweiterbarkeit
+
+### Neue Zahlungsquelle hinzufügen
+
+1. **API-Route erstellen:**
+   ```typescript
+   /app/app/api/fibu/zahlungen/neue-quelle/route.ts
+   ```
+
+2. **Daten normalisieren:**
+   ```javascript
+   const zahlungen = data.map(item => ({
+     zahlungsdatum: item.date,
+     betrag: item.amount,
+     zahlungsanbieter: 'Neue Quelle',
+     // ...
+   }))
+   ```
+
+3. **In Haupt-Route einbinden:**
+   ```javascript
+   // /api/fibu/zahlungen/route.ts
+   const neueQuelle = await fetch('/api/fibu/zahlungen/neue-quelle')
+   alleZahlungen = [...alleZahlungen, ...neueQuelle]
+   ```
+
+### Neues Modul hinzufügen
+
+1. **Komponente:** `/app/components/NeuesModul.js`
+2. **API:** `/app/app/api/fibu/neues-modul/route.ts`
+3. **Tab in Dashboard:** `FibuCompleteDashboard.js` erweitern
+
+## 📝 Best Practices
+
+### API-Entwicklung
+
+✅ **DO:**
+- Immer try/catch verwenden
+- Sinnvolle Error Messages
+- HTTP Status Codes korrekt setzen
+- Input validieren
+
+❌ **DON'T:**
+- Sensible Daten im Response
+- Lange Queries ohne Timeout
+- Unvalidierte User-Inputs
+- Hardcoded Credentials
+
+### Frontend-Entwicklung
+
+✅ **DO:**
+- Loading States anzeigen
+- Error Handling
+- Debounce bei Sucheingaben
+- Optimistic UI Updates
+
+❌ **DON'T:**
+- API-Keys im Client
+- Große Datenmengen ungepaginiert
+- Blocking Operations im UI
+- Inline Styles (außer dynamisch)
+
+## 🔍 Debugging
+
+### Backend Logs
+
+```bash
+# Supervisor Logs
+tail -f /var/log/supervisor/nextjs.out.log
+tail -f /var/log/supervisor/nextjs.err.log
+
+# MongoDB Logs
+sudo journalctl -u mongodb -f
+```
+
+### Frontend Debugging
+
+- Browser DevTools Console
+- React DevTools Extension
+- Network Tab für API Calls
 
 ---
 

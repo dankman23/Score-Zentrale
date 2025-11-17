@@ -1,290 +1,248 @@
-# FIBU Manager - Integriertes Finanzbuchhaltungssystem
+# FIBU-Accounting-Hub - Finanzbuchhaltungs-System
 
-## 📋 Überblick
+## 🎯 Projektbeschreibung
 
-Der FIBU Manager ist eine spezialisierte Buchhaltungslösung für E-Commerce-Unternehmen, die JTL-Wawi nutzen. Das System integriert Finanzdaten aus JTL (MSSQL) und erweitert diese um moderne Buchhaltungsfunktionen in MongoDB.
+Das FIBU-Accounting-Hub ist ein maßgeschneidertes Finanzbuchhaltungs-System, das speziell für die Integration mit JTL-Wawi entwickelt wurde. Es vereint Daten aus verschiedenen Quellen (JTL-MSSQL, externe APIs, CSV-Importe) und bietet eine zentrale Plattform für:
 
-## 🎯 Hauptfunktionen
+- **Kontenplan-Verwaltung** (SKR04-basiert, 137 Konten)
+- **Zahlungsmanagement** mit automatischer Zuordnung
+- **Externe Rechnungen** (Amazon, eBay, Otto.de)
+- **Bank-Import** (Postbank CSV, Commerzbank)
+- **Kreditoren-/Debitorenverwaltung**
 
-### 1. Externe Rechnungen & Zahlungszuordnung
-- Automatische Erkennung von Amazon-Rechnungen (XRE-*)
-- Intelligente Zuordnung von Rechnungen zu Zahlungen
-- Matching nach Betrag und Datum
-- Automatische Statusaktualisierung auf "Bezahlt"
-
-### 2. Bank-Transaktionen Import
-- CSV-Import für Postbank-Kontoauszüge
-- Automatisches Parsing von Soll/Haben-Spalten
-- Integration in die Hauptzahlungsübersicht
-- Filterbare und durchsuchbare Transaktionsliste
-
-### 3. Kontenplan-Verwaltung (SKR04)
-- Vollständiger SKR04-Kontenrahmen (137+ Konten)
-- CRUD-Funktionalität für alle Konten
-- Hierarchische Darstellung (Klasse → Gruppe → Untergruppe → Konto)
-- Multi-Tab-Navigation für verschiedene Stammdatenbereiche
-
-### 4. Kreditoren-Management
-- Verwaltung von 117+ Lieferanten
-- Kategorisierung nach Lieferantentypen
-- Zuordnung zu Buchungskonten
-- Filterbare Übersicht
-
-### 5. Zahlungseinstellungen
-- Konfiguration von Sammel-Debitorenkonten
-- Zuordnung Zahlungsart → Debitor → Bankkonto
-- Gebührenkonto-Verwaltung
-- Beispiel-Buchungssätze für besseres Verständnis
-
-## 🏗️ Technologie-Stack
-
-### Frontend
-- **Next.js 14+** - React-Framework mit SSR
-- **React** - UI-Komponenten
-- **Tailwind CSS** - Styling
-
-### Backend
-- **Next.js API Routes** - RESTful API
-- **Node.js** - Runtime
-
-### Datenbanken
-- **JTL MSSQL** - Bestehende Geschäftsdaten (read-only)
-- **MongoDB** - Neue FIBU-Daten (read/write)
-
-### Zusätzliche Tools
-- **mssql** - MSSQL-Datenbankverbindung
-- **mongodb** - MongoDB-Treiber
-
-## 📁 Projektstruktur
-
-```
-/app/
-├── app/
-│   ├── api/              # Backend API Routes
-│   │   └── fibu/
-│   │       ├── bank-import/route.ts          # CSV-Import
-│   │       ├── kontenplan/route.ts           # Konten CRUD
-│   │       ├── kreditoren/route.ts           # Lieferanten
-│   │       ├── rechnungen/extern/route.ts    # Externe Rechnungen
-│   │       ├── zahlungen/route.ts            # Zahlungsübersicht
-│   │       └── zahlungseinstellungen/route.ts
-│   └── fibu/
-│       └── page.js        # FIBU Dashboard
-├── components/
-│   ├── BankImport.js                # CSV-Import UI
-│   ├── FibuCompleteDashboard.js     # Haupt-Dashboard
-│   ├── KontenplanView.js            # Kontenplan-Verwaltung
-│   ├── KreditorenManagement.js      # Lieferanten-UI
-│   ├── ZahlungsEinstellungen.js     # Einstellungen
-│   └── ZahlungenView.js             # Zahlungen
-├── docs/
-│   ├── ARCHITECTURE.md              # Architektur-Dokumentation
-│   ├── CRITICAL_APIS_DO_NOT_BREAK.md
-│   ├── EXTERNE_RECHNUNGEN.md        # Rechnungs-Matching
-│   ├── BANK_IMPORT.md               # CSV-Import
-│   ├── KONTENPLAN.md                # SKR04-Details
-│   ├── ZAHLUNGEN.md                 # Zahlungssystem
-│   └── DEVELOPER_GUIDE.md           # Entwickler-Leitfaden
-├── scripts/
-│   ├── import-kontenplan-skr04.js   # Kontenplan-Import
-│   └── test-critical-data.js        # Datenintegritäts-Tests
-└── README_FOR_AGENTS.md             # KI-Agenten-Anleitung
-```
-
-## 🚀 Setup & Installation
+## 🚀 Quick Start
 
 ### Voraussetzungen
-- Node.js 18+
-- Zugriff auf JTL MSSQL-Datenbank
-- MongoDB-Instanz
+
+- Node.js 20.x
+- MongoDB (läuft bereits in Docker)
+- MSSQL Server (JTL-Datenbank)
+- Yarn Package Manager
 
 ### Installation
 
-1. **Repository klonen**
 ```bash
-git clone <repository-url>
-cd fibu-manager
-```
-
-2. **Dependencies installieren**
-```bash
+# Dependencies installieren
+cd /app
 yarn install
-```
 
-3. **Umgebungsvariablen konfigurieren**
+# Environment-Variablen prüfen
+cat .env
 
-Erstellen Sie `.env` mit folgenden Variablen:
-
-```env
-# JTL MSSQL Datenbank (Read-Only)
-JTL_DB_SERVER=<server>
-JTL_DB_PORT=1433
-JTL_DB_DATABASE=<database_name>
-JTL_DB_USER=<username>
-JTL_DB_PASSWORD=<password>
-
-# MongoDB (Read/Write für FIBU-Daten)
-MONGO_URL=mongodb://localhost:27017/fibu
-
-# Next.js
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-```
-
-4. **Kontenplan importieren**
-```bash
-node scripts/import-kontenplan-skr04.js
-```
-
-5. **Entwicklungsserver starten**
-```bash
+# Development starten
 yarn dev
+
+# Oder via Supervisor (Production)
+sudo supervisorctl restart nextjs
 ```
 
-Die Anwendung läuft auf `http://localhost:3000`
+### Zugriff
 
-## 📊 Datenbank-Schema
+- **Frontend:** http://localhost:3000
+- **FIBU-Modul:** http://localhost:3000/fibu
+
+## 📁 Projekt-Struktur
+
+```
+/app/
+├── app/                          # Next.js App Directory
+│   ├── api/                      # API Routes
+│   │   ├── fibu/                 # FIBU-spezifische APIs
+│   │   │   ├── kontenplan/       # Kontenplan-Management
+│   │   │   ├── zahlungen/        # Zahlungsmodul
+│   │   │   │   └── amazon-settlements/  # Amazon Settlement Reports
+│   │   │   ├── rechnungen/       # Rechnungsmanagement
+│   │   │   └── kreditoren/       # Kreditorenverwaltung
+│   │   └── jtl/                  # JTL-Datenbank-Zugriff
+│   ├── fibu/                     # FIBU Frontend-Seiten
+│   │   └── page.js               # Haupt-Dashboard
+│   └── layout.js                 # Root Layout
+├── components/                   # React-Komponenten
+│   ├── FibuCompleteDashboard.js  # Haupt-Dashboard
+│   ├── KontenplanView.js         # Kontenplan & Stammdaten
+│   ├── ZahlungenView.js          # Zahlungsübersicht
+│   ├── KreditorenManagement.js   # Kreditoren-UI
+│   └── ZahlungsEinstellungen.js  # Zahlungskonto-Mappings
+├── lib/                          # Utilities & Helper
+│   └── db/                       # Datenbank-Verbindungen
+│       ├── mongodb.ts            # MongoDB Client
+│       └── mssql.ts              # MSSQL Client (JTL)
+├── scripts/                      # Maintenance-Scripts
+│   ├── import-kontenplan-skr04.js  # Kontenplan-Import
+│   └── check-kontenplan.js       # Kontenplan-Validierung
+└── docs/                         # Dokumentation
+    ├── ARCHITECTURE.md           # System-Architektur
+    ├── EXTERNE_RECHNUNGEN.md     # Externe Rechnungen
+    ├── BANK_IMPORT.md            # Bank-Import-Prozess
+    ├── KONTENPLAN.md             # Kontenplan-Details
+    └── DEVELOPER_GUIDE.md        # Entwickler-Leitfaden
+```
+
+## 🔧 Technologie-Stack
+
+### Frontend
+- **Next.js 14** (App Router)
+- **React 18**
+- **Tailwind CSS**
+- **Shadcn/ui** Komponenten
+
+### Backend
+- **Next.js API Routes** (Server-side)
+- **MongoDB** (Finanzdaten, Cache)
+- **MSSQL** (JTL-Wawi Datenbank)
+
+### Externe Integrationen
+- **Amazon Settlements** (aus JTL `pf_amazon_settlement`)
+- **eBay Finances API** (in Vorbereitung)
+- **PayPal Transaction Search API** (in Vorbereitung)
+- **Postbank CSV Import**
+
+## 🗄️ Datenbank-Schema
 
 ### MongoDB Collections
 
-#### `fibu_konten`
-Speichert den vollständigen SKR04-Kontenplan.
-
+#### `fibu_kontenplan`
 ```javascript
 {
-  kontonummer: "1802",          // 4-stellig
-  bezeichnung: "Postbank",
-  kontenklasse: 1,              // 0-9
-  kontengruppe: "18",           // 2-stellig
-  kontenuntergruppe: "180",     // 3-stellig
-  kontenklasseBezeichnung: "Umlaufvermögen",
-  kontenklasseTyp: "aktiv",     // aktiv/passiv/ertrag/aufwand
-  steuerrelevant: false,
-  istAktiv: true,
+  kontonummer: "1801",      // 4-stellig, SKR04
+  bezeichnung: "PayPal",
+  kontenklasse: 1,          // 0-9
+  kontengruppe: "18",       // 2-stellig
+  kontenuntergruppe: "180", // 3-stellig
+  kontenklasseTyp: "aktiv", // aktiv/passiv/ertrag/aufwand
   istSystemkonto: true,
-  created_at: ISODate,
-  updated_at: ISODate
-}
-```
-
-#### `fibu_bank_transaktionen`
-Importierte Bank-Transaktionen aus CSV.
-
-```javascript
-{
-  buchungsdatum: ISODate,
-  wertstellung: ISODate,
-  verwendungszweck: String,
-  betrag: Number,              // Positiv=Haben, Negativ=Soll
-  waehrung: "EUR",
-  saldo: Number,
-  quelle: "postbank_csv",
-  imported_at: ISODate
+  istAktiv: true
 }
 ```
 
 #### `fibu_kreditoren`
-Lieferanten-Stammdaten.
-
 ```javascript
 {
-  kreditorenNummer: String,
-  name: String,
-  kategorie: String,           // z.B. "4" für Warenlieferant
-  beschreibung: String,
-  kontoNummer: String,         // Zugeordnetes Kreditorenkonto
-  istAktiv: Boolean,
-  created_at: ISODate,
-  updated_at: ISODate
+  kreditorId: "KR-12345",
+  name: "Shopware AG",
+  email: "[email protected]",
+  jtlLieferantId: 123,
+  kontonummer: "70001",     // Zugewiesenes Kreditorenkonto
+  status: "aktiv"
 }
 ```
 
-#### `fibu_zahlungseinstellungen`
-Mapping: Zahlungsart → Debitor → Bank → Gebühren.
-
+#### `fibu_bank_transaktionen`
 ```javascript
 {
-  name: "Amazon Payment",
-  zahlungsart: "amazon",       // JTL-Zahlungsart
-  debitorKonto: "69002",       // Sammel-Debitor
-  bankKonto: "1817",           // Amazon-Bank
-  gebuehrenKonto: "4985",      // Gebühren
-  beschreibung: String,
-  istAktiv: Boolean
+  datum: ISODate("2025-10-15"),
+  betrag: 1234.56,
+  auftraggeber: "Kunde GmbH",
+  verwendungszweck: "RE2025-12345",
+  quelle: "postbank",
+  buchungstext: "SEPA-Überweisung",
+  matchedRechnungNr: "RE2025-12345",  // Nach Zuordnung
+  zugeordnetesKonto: "6850",          // Oder Buchungskonto
+  zuordnungsArt: "rechnung"            // oder "konto"
 }
 ```
 
-### JTL MSSQL Tabellen (Read-Only)
+### MSSQL (JTL) - Wichtigste Tabellen
 
-Die folgenden JTL-Tabellen werden gelesen:
+- `tZahlung` - Zahlungen aus Aufträgen
+- `tZahlungsabgleichUmsatz` - Bank-Abgleich (Commerzbank, PayPal)
+- `pf_amazon_settlement` / `pf_amazon_settlementpos` - Amazon Settlements
+- `tRechnung` - Rechnungen
+- `tLieferant` - Lieferanten
 
-- `dbo.tBestellung` - Bestellungen
-- `dbo.tRechnungskopf` - Rechnungen
-- `dbo.tZahlungseingang` - Zahlungseingänge
-- `dbo.tZahlungsart` - Zahlungsarten
-- `dbo.tLieferschein` - Lieferscheine
+## 🔑 Umgebungsvariablen
 
-## 🔐 Sicherheitshinweise
+```bash
+# .env Datei
+MONGO_URL=mongodb://localhost:27017
+NEXT_PUBLIC_BASE_URL=https://ihre-domain.de
 
-### Kritische APIs
+# JTL MSSQL (bereits konfiguriert)
+MSSQL_SERVER=localhost
+MSSQL_DATABASE=eazybusiness
+MSSQL_USER=SA
+MSSQL_PASSWORD=***
+```
 
-⚠️ **ACHTUNG:** Die folgenden APIs dürfen NICHT modifiziert werden ohne umfassende Tests:
+⚠️ **WICHTIG:** Diese Werte NIEMALS ändern, da sie für das Deployment vorkonfiguriert sind!
 
-1. **`/api/fibu/rechnungen/extern`**
-   - Führt Rechnungs-/Zahlungs-Matching durch
-   - Ändert Status in JTL-Datenbank
-   - Bei Fehlern: Datenverlust möglich!
+## 📊 Wichtige Features
 
-2. **`/api/fibu/zahlungen`**
-   - Kombiniert Daten aus JTL + MongoDB
-   - Fehler führen zu falschen Finanzberichten
+### 1. Kontenplan-Management
+- **137 SKR04-Konten** vorinstalliert
+- Manuelle Konten-Anlage mit automatischer SKR04-Klassifizierung
+- Echtzeit-Validierung (4-stellig, numerisch)
+- Live-Analyse der Kontenklasse beim Eingeben
 
-Siehe `docs/CRITICAL_APIS_DO_NOT_BREAK.md` für Details.
+### 2. Zahlungsmodul
+- **7 Zahlungsquellen:**
+  - Amazon Payment (mit Gebühren)
+  - eBay (in Vorbereitung)
+  - PayPal (in Vorbereitung)
+  - Mollie
+  - Commerzbank
+  - Postbank (CSV)
+  - Otto.de
+- **Zuordnungs-System:**
+  - Rechnung zuordnen
+  - Buchungskonto zuordnen (z.B. 6850 Gebühren)
+  - Manuelle Bearbeitung
+- **Filter & Statistiken**
 
-### Datenintegrität
+### 3. Amazon Settlement Reports
+- **Vollständige Daten** aus JTL `pf_amazon_settlement`
+- **319.109 Positionen** verfügbar
+- **Automatische Kategorisierung:**
+  - Erlöse (Artikel, Versand, Steuer)
+  - Gebühren (Provision, FBA, Versand)
+  - Rückerstattungen
+  - Transfers
 
-- **JTL-Datenbank:** IMMER read-only behandeln
-- **MongoDB:** Backups vor größeren Änderungen
-- **Test-Skript:** Vor Deployment `node scripts/test-critical-data.js` ausführen
+### 4. Bank-Import
+- CSV-Import für Postbank
+- Automatisches Matching mit Rechnungen
+- Fuzzy-Matching-Algorithmus
 
-## 📖 Weitere Dokumentation
+## 🔐 Sicherheit
 
-- [Architektur](docs/ARCHITECTURE.md) - Detaillierte System-Architektur
-- [Externe Rechnungen](docs/EXTERNE_RECHNUNGEN.md) - Rechnungs-Matching-Logik
-- [Bank-Import](docs/BANK_IMPORT.md) - CSV-Import-Funktionalität
-- [Kontenplan](docs/KONTENPLAN.md) - SKR04-Implementierung
-- [Zahlungen](docs/ZAHLUNGEN.md) - Zahlungssystem
-- [Developer Guide](docs/DEVELOPER_GUIDE.md) - Entwickler-Handbuch
+- Alle API-Routes sind server-side
+- Keine sensiblen Daten im Frontend
+- MongoDB-Verbindung über private Netzwerke
+- MSSQL mit Authentifizierung
 
-## 🤝 Beitragen
+## 🧪 Testing
 
-Dieses Projekt ist für interne Nutzung konzipiert. Bei Fragen oder Problemen:
+```bash
+# Kontenplan prüfen
+node scripts/check-kontenplan.js
 
-1. Dokumentation in `/docs` prüfen
-2. `README_FOR_AGENTS.md` für KI-Assistenten konsultieren
-3. Kritische APIs beachten!
+# Kontenplan neu importieren
+node scripts/import-kontenplan-skr04.js
+```
 
-## 📝 Lizenz
+## 📝 Weitere Dokumentation
 
-Internes Projekt - Alle Rechte vorbehalten.
+Detaillierte Dokumentation finden Sie in `/app/docs/`:
 
-## 🔧 Wartung
+- [ARCHITECTURE.md](docs/ARCHITECTURE.md) - System-Architektur
+- [EXTERNE_RECHNUNGEN.md](docs/EXTERNE_RECHNUNGEN.md) - Externe Rechnungen
+- [BANK_IMPORT.md](docs/BANK_IMPORT.md) - Bank-Import
+- [KONTENPLAN.md](docs/KONTENPLAN.md) - Kontenplan-Details
+- [DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md) - Entwickler-Leitfaden
 
-### Backup-Strategie
-- MongoDB: Täglich automatisches Backup
-- JTL-Datenbank: Wird vom JTL-System verwaltet
+## 🤝 Support
 
-### Monitoring
-- Logs: `/var/log/supervisor/nextjs.out.log`
-- Fehler-Rate bei externen Rechnungen überwachen
-- Import-Erfolgsrate bei Bank-CSVs prüfen
+Bei Fragen oder Problemen:
+1. Prüfen Sie die Dokumentation in `/app/docs/`
+2. Schauen Sie in die Code-Kommentare
+3. Kontaktieren Sie den ursprünglichen Entwickler
 
-### Updates
-- Vor Updates: Backup erstellen
-- Nach Updates: Test-Skript ausführen
-- Kritische APIs testen
+## 📜 Lizenz
+
+Proprietary - Alle Rechte vorbehalten
 
 ---
 
 **Version:** 1.0.0  
-**Letzte Aktualisierung:** November 2025  
-**Status:** Produktiv im Einsatz
+**Stand:** November 2025  
+**Hauptmodule:** FIBU, Kontenplan, Zahlungen, Externe Rechnungen
