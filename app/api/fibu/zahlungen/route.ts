@@ -75,22 +75,26 @@ export async function GET(request: NextRequest) {
         // Amazon-spezifische Felder
         let verwendungszweck = p.verwendungszweck || p.beschreibung || p.betreff || ''
         let gegenkonto = p.gegenkonto || p.kundenName || ''
+        let sku = null
         
         if (source.name === 'Amazon') {
-          // Für Amazon: verwende amountDescription + orderId
+          // Für Amazon: verwende amountDescription + transactionType
           const parts = []
           if (p.amountDescription) parts.push(p.amountDescription)
           if (p.transactionType) parts.push(p.transactionType)
-          if (p.orderId) parts.push(`Order: ${p.orderId}`)
+          if (p.amountType) parts.push(p.amountType)
           verwendungszweck = parts.join(' | ')
           
-          // Gegenkonto: SKU oder MerchantOrderID
-          if (p.sku) {
-            gegenkonto = `SKU: ${p.sku}`
+          // Kunde/Gegenkonto: Amazon Order ID
+          if (p.orderId) {
+            gegenkonto = `Amazon Order ${p.orderId}`
           } else if (p.merchantOrderId) {
-            gegenkonto = `Order: ${p.merchantOrderId}`
-          } else if (p.orderId) {
-            gegenkonto = `Order: ${p.orderId}`
+            gegenkonto = `Order ${p.merchantOrderId}`
+          }
+          
+          // SKU separat speichern
+          if (p.sku) {
+            sku = p.sku
           }
         }
         
