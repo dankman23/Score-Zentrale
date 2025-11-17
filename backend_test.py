@@ -13,23 +13,49 @@ from datetime import datetime, timedelta
 BASE_URL = "https://payment-flow-57.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
-def test_paypal_integration():
+def test_fibu_zahlungen_api():
     """
-    Test PayPal Transaction Search API Integration according to test_result.md requirements.
+    Test FIBU Zahlungen API according to review request requirements.
     
-    ENDPOINTS TO TEST:
-    1. GET /api/fibu/zahlungen/paypal - Transaction fetching with date ranges, caching, 31-day limit
-    2. POST /api/fibu/zahlungen/paypal - Auto-matching with JTL invoices
+    CRITICAL BACKEND TESTING REQUIRED:
     
-    EXPECTED RESULTS:
-    - GET für Dezember 2024 sollte ~313 Transaktionen liefern
-    - GET für Dezember 1-10 sollte ~108 Transaktionen liefern
-    - Gesamtbetrag und Gebühren sollten korrekt berechnet sein
-    - MongoDB Collection 'fibu_paypal_transactions' sollte gefüllt sein
+    API to Test: GET /api/fibu/zahlungen?from=2025-10-01&to=2025-10-31
+    
+    Test Requirements:
+    1. Data Structure Test - Verify all zahlungen have correct field names:
+       - datum (not zahlungsdatum)
+       - anbieter (not zahlungsanbieter)
+       - betrag (number)
+       - waehrung (string)
+       - verwendungszweck (string)
+       - gegenkonto (string)
+       - istZugeordnet (boolean)
+       - zugeordneteRechnung (nullable string)
+       - zugeordnetesKonto (nullable string)
+    
+    2. Stats Verification - Check stats object contains:
+       - gesamt (total count)
+       - gesamtsumme (total amount)
+       - anbieter object with breakdown per provider (Amazon, PayPal, Commerzbank, Postbank, Mollie)
+    
+    3. Provider Breakdown - Verify that for October 2025:
+       - Amazon should have ~8000+ transactions
+       - PayPal should have ~250+ transactions
+       - Commerzbank should have ~165 transactions
+       - Postbank should have 0 transactions
+       - Mollie should have 0 transactions
+    
+    4. Date Filtering - Test with different date ranges
+    
+    Expected Behavior:
+    - All zahlungen should have properly formatted datum field (ISO string)
+    - betrag should be numeric (can be positive or negative)
+    - Response should contain both zahlungen array and stats object
+    - API should return within 5 seconds for 1-month range
     """
     
     print("=" * 80)
-    print("TESTING PAYPAL TRANSACTION SEARCH API INTEGRATION")
+    print("TESTING FIBU ZAHLUNGEN API - CRITICAL BACKEND TESTING")
     print("=" * 80)
     
     # Test 1: GET PayPal Transactions - December 1-10, 2024 (Expected ~108 transactions)
