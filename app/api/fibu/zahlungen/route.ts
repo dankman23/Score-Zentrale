@@ -22,7 +22,9 @@ export async function GET(request: NextRequest) {
     const from = searchParams.get('from')
     const to = searchParams.get('to')
     const anbieter = searchParams.get('anbieter') // z.B. 'paypal', 'commerzbank', 'all'
-    const limit = parseInt(searchParams.get('limit') || '1000')
+    const page = parseInt(searchParams.get('page') || '1')
+    const pageSize = parseInt(searchParams.get('pageSize') || '500')
+    const limit = parseInt(searchParams.get('limit') || '0') // 0 = kein Limit (alle laden)
 
     // Standard: Letzter Monat
     const endDate = to || new Date().toISOString().split('T')[0]
