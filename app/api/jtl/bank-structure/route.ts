@@ -52,7 +52,8 @@ export async function GET(request: NextRequest) {
       ok: true,
       columns: columns.recordset,
       sample: sample.recordset,
-      konten: konten.recordset
+      konten: konten.recordset,
+      kontoIdentifikationen: kontoIdentifikationen.recordset
     })
   } catch (error) {
     console.error('[JTL Bank Structure] Error:', error)
