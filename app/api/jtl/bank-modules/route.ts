@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
         u.kZahlungsabgleichModul,
         COUNT(*) as AnzahlTransaktionen,
         MIN(u.dBuchungsdatum) as ErsteBuchung,
-        MAX(u.dBuchungsdatum) as LetzteB uchung,
+        MAX(u.dBuchungsdatum) as LetzteBuchung,
         (SELECT TOP 1 cName FROM tZahlungsabgleichUmsatz WHERE cKontoIdentifikation = u.cKontoIdentifikation ORDER BY dBuchungsdatum DESC) as BeispielName
       FROM tZahlungsabgleichUmsatz u
       GROUP BY u.cKontoIdentifikation, u.kZahlungsabgleichModul
