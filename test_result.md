@@ -688,9 +688,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Kaltakquise V3: POST /api/coldleads/analyze-v3 (Komplett-Analyse mit Glossar, LLM, Email-Gen)"
-    - "Kaltakquise V3: POST /api/coldleads/email-v3/send (Email-Versand + Follow-up Scheduling)"
-    - "Kaltakquise V3: GET /api/coldleads/followup/auto (Auto Follow-up Check & Send)"
+    - "FIBU: GET /api/fibu/zahlungen/paypal (PayPal Transaction Search - verschiedene Zeiträume, Caching, 31-Tage Limit)"
+    - "FIBU: POST /api/fibu/zahlungen/paypal (Auto-Matching mit JTL Rechnungen)"
+    - "FIBU: PayPal Integration - Response-Struktur Validierung, Gebühren-Berechnung, MongoDB Storage"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
