@@ -32,6 +32,17 @@ export async function GET(request: NextRequest) {
       ORDER BY kZahlungsabgleichUmsatz DESC
     `)
     
+    // Alle verschiedenen Konten-IDs
+    const kontoIdentifikationen = await pool.request().query(`
+      SELECT DISTINCT 
+        u.cKontoIdentifikation,
+        m.cName as ModulName,
+        COUNT(*) OVER (PARTITION BY u.cKontoIdentifikation) as AnzahlTransaktionen
+      FROM tZahlungsabgleichUmsatz u
+      LEFT JOIN tZahlungsabgleichModul m ON u.kZahlungsabgleichModul = m.kZahlungsabgleichModul
+      ORDER BY AnzahlTransaktionen DESC
+    `)
+    
     // Konto-Daten
     const konten = await pool.request().query(`
       SELECT * FROM tkontodaten
