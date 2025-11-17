@@ -64,7 +64,7 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
   }
   
   function handlePageChange(newPage) {
-    setPagination(prev => ({ ...prev, page: newPage }))
+    loadZahlungen(newPage)
   }
 
   // Filter zahlungen
