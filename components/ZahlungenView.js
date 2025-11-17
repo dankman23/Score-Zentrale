@@ -41,7 +41,7 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
     try {
       const [from, to] = alleAnzeigen ? ['2020-01-01', '2099-12-31'] : zeitraum.split('_')
       
-      // Lade Zahlungen aus API (holt aus JTL und speichert in MongoDB)
+      // Lade Zahlungen aus API (holt aus MongoDB Cache)
       const res = await fetch(`/api/fibu/zahlungen?from=${from}&to=${to}`)
       const data = await res.json()
       
@@ -52,6 +52,52 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
       console.error('Fehler:', error)
     }
     setLoading(false)
+  }
+
+  async function aktualisierenVonQuellen() {
+    setLoading(true)
+    try {
+      const [from, to] = alleAnzeigen ? ['2020-01-01', '2099-12-31'] : zeitraum.split('_')
+      
+      // Hole neue Daten von allen Quellen mit refresh=true
+      console.log('🔄 Aktualisiere Zahlungen von allen Quellen...')
+      
+      // PayPal (max 31 Tage, daher aufteilen wenn nötig)
+      const fromDate = new Date(from)
+      const toDate = new Date(to)
+      const daysDiff = Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24))
+      
+      if (daysDiff <= 31) {
+        // Kann in einem Request
+        await fetch(`/api/fibu/zahlungen/paypal?from=${from}&to=${to}&refresh=true`)
+      } else {
+        // Monat für Monat
+        let currentDate = new Date(fromDate)
+        while (currentDate <= toDate) {
+          const monthStart = currentDate.toISOString().split('T')[0]
+          const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).toISOString().split('T')[0]
+          const effectiveEnd = monthEnd < to ? monthEnd : to
+          
+          await fetch(`/api/fibu/zahlungen/paypal?from=${monthStart}&to=${effectiveEnd}&refresh=true`)
+          
+          currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+        }
+      }
+      
+      // Commerzbank & Postbank (zusammen)
+      await fetch(`/api/fibu/zahlungen/banks?bank=all&from=${from}&to=${to}&refresh=true`)
+      
+      // Mollie
+      await fetch(`/api/fibu/zahlungen/mollie?from=${from}&to=${to}&refresh=true`)
+      
+      console.log('✅ Aktualisierung abgeschlossen, lade Daten...')
+      
+      // Jetzt normale Daten laden
+      await loadZahlungen()
+    } catch (error) {
+      console.error('Fehler:', error)
+      setLoading(false)
+    }
   }
 
   // Filtern
