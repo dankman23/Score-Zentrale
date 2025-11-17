@@ -209,8 +209,9 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
           </button>
           
           <button
-            onClick={loadZahlungen}
+            onClick={aktualisierenVonQuellen}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium"
+            title="Holt neue Zahlungen von PayPal, Commerzbank, Postbank und Mollie"
           >
             🔄 Aktualisieren
           </button>
