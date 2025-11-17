@@ -416,4 +416,4 @@ def test_fibu_zahlungen_api():
     print("=" * 80)
 
 if __name__ == "__main__":
-    test_paypal_integration()
+    test_fibu_zahlungen_api()
