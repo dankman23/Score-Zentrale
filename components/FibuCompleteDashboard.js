@@ -50,6 +50,8 @@ export default function FibuCompleteDashboard() {
   const [showExportDialog, setShowExportDialog] = useState(false)
   const [tabFilters, setTabFilters] = useState({}) // Store filters per tab
   const [quote] = useState(() => getRandomQuote())
+  const [showRefreshMenu, setShowRefreshMenu] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
   // Parse URL parameters on mount and URL changes
   useEffect(() => {
