@@ -23,11 +23,8 @@ export async function GET() {
       SELECT TOP 50
         eb.cBelegNr,
         eb.dBelegdatumUtc,
-        eb.cKundenName,
         ebp.cName as position_name,
-        ebp.fPreisNetto,
-        ebp.cBestellNr,
-        ebp.cAuftragsnummer
+        ebp.fPreisNetto
       FROM Rechnung.tExternerBelegPosition ebp
       JOIN Rechnung.tExternerBeleg eb ON ebp.kExternerBeleg = eb.kExternerBeleg
       WHERE eb.cBelegNr LIKE 'XRE-%'
