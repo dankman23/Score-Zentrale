@@ -123,6 +123,7 @@ export async function GET(request: NextRequest) {
           // Amazon spezifisch
           kategorie: source.name === 'Amazon' ? p.kategorie : null,
           amountType: source.name === 'Amazon' ? p.amountType : null,
+          sku: sku,
           
           // Zuordnung
           istZugeordnet: p.istZugeordnet || false,
