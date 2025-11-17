@@ -14,7 +14,7 @@ import sys
 from datetime import datetime, timedelta
 
 # Base URL from environment
-BASE_URL = "https://payment-flow-57.preview.emergentagent.com/api"
+BASE_URL = "https://payment-view-fix.preview.emergentagent.com/api"
 
 # Color codes for output
 GREEN = '\033[92m'
