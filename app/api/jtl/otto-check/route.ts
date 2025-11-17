@@ -14,8 +14,6 @@ export async function GET(request: NextRequest) {
         b.kBestellung,
         b.cBestellNr,
         b.dErstellt,
-        b.fGesamtsumme,
-        b.cStatus,
         p.cName as Plattform
       FROM tBestellung b
       LEFT JOIN tPlattform p ON b.kPlattform = p.kPlattform
