@@ -5,6 +5,15 @@ import { useState, useEffect } from 'react'
 export default function ZahlungenView({ zeitraum, initialFilter }) {
   const [zahlungen, setZahlungen] = useState([])
   const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState(null)
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pageSize: 500,
+    totalCount: 0,
+    totalPages: 0,
+    hasNext: false,
+    hasPrev: false
+  })
   
   // Filter States
   const [anbieterFilter, setAnbieterFilter] = useState('alle')
@@ -16,12 +25,12 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
   const [showZuordnungModal, setShowZuordnungModal] = useState(false)
   const [selectedZahlung, setSelectedZahlung] = useState(null)
 
-  // Load data when zeitraum changes
+  // Load data when zeitraum or page changes
   useEffect(() => {
     if (zeitraum) {
       loadZahlungen()
     }
-  }, [zeitraum])
+  }, [zeitraum, pagination.page])
 
   async function loadZahlungen() {
     setLoading(true)
