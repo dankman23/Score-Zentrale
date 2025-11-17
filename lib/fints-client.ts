@@ -55,7 +55,8 @@ export class FinTSBankClient {
       name: this.config.user,
       pin: this.config.pin,
       blz: this.config.blz,
-      productId: 'FINTS4NODE', // Generisches Produkt für node-fints
+      productId: '9FA6681DEC0CF3046BFC2F8A6', // Beispiel-Produkt-ID
+      productVersion: '1.0',
     })
   }
 
