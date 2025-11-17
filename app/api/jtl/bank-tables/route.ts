@@ -10,7 +10,7 @@ import { getMssqlPool } from '../../../lib/db/mssql'
  */
 export async function GET(request: NextRequest) {
   try {
-    const pool = await getMssqlConnection()
+    const pool = await getMssqlPool()
     
     // Suche nach Bank-Tabellen
     const result = await pool.request().query(`
