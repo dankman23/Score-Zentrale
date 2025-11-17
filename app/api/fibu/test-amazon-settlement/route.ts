@@ -5,37 +5,32 @@ export async function GET() {
   try {
     const pool = await getJTLConnection()
     
-    // Prüfe tExternerBeleg für Amazon
-    const belege = await pool.request().query(`
-      SELECT TOP 10
-        eb.kExternerBeleg,
-        eb.cBelegNr,
-        eb.dBelegdatumUtc,
-        (SELECT COUNT(*) FROM Rechnung.tExternerBelegPosition WHERE kExternerBeleg = eb.kExternerBeleg) as anzahl_positionen
-      FROM Rechnung.tExternerBeleg eb
-      WHERE eb.cBelegNr LIKE 'XRE-%'
-        OR eb.cBelegNr LIKE 'AMZ-%'
-      ORDER BY eb.dBelegdatumUtc DESC
+    // Prüfe erstmal alle Spalten in tExternerBeleg
+    const columns1 = await pool.request().query(`
+      SELECT TOP 1 * FROM Rechnung.tExternerBeleg
+      WHERE cBelegNr LIKE 'XRE-%'
     `)
     
-    // Prüfe Positionen mit Details
-    const positionen = await pool.request().query(`
-      SELECT TOP 50
-        eb.cBelegNr,
-        eb.dBelegdatumUtc,
-        ebp.cName as position_name,
-        ebp.fPreisNetto
-      FROM Rechnung.tExternerBelegPosition ebp
-      JOIN Rechnung.tExternerBeleg eb ON ebp.kExternerBeleg = eb.kExternerBeleg
-      WHERE eb.cBelegNr LIKE 'XRE-%'
-        OR eb.cBelegNr LIKE 'AMZ-%'
-      ORDER BY eb.dBelegdatumUtc DESC
+    // Prüfe alle Spalten in tExternerBelegPosition  
+    const columns2 = await pool.request().query(`
+      SELECT TOP 1 * FROM Rechnung.tExternerBelegPosition
+      WHERE kExternerBeleg IN (
+        SELECT TOP 1 kExternerBeleg FROM Rechnung.tExternerBeleg WHERE cBelegNr LIKE 'XRE-%'
+      )
+    `)
+    
+    // Zähle wie viele XRE Belege es gibt
+    const count = await pool.request().query(`
+      SELECT COUNT(*) as anzahl FROM Rechnung.tExternerBeleg WHERE cBelegNr LIKE 'XRE-%'
     `)
     
     return NextResponse.json({
       ok: true,
-      belege: belege.recordset,
-      positionen: positionen.recordset
+      anzahl_xre_belege: count.recordset[0],
+      beleg_spalten: columns1.recordset[0] ? Object.keys(columns1.recordset[0]) : [],
+      beleg_sample: columns1.recordset[0],
+      position_spalten: columns2.recordset[0] ? Object.keys(columns2.recordset[0]) : [],
+      position_sample: columns2.recordset[0]
     })
     
   } catch (error: any) {
