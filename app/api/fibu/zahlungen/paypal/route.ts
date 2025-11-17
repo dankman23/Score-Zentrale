@@ -196,6 +196,10 @@ export async function GET(request: NextRequest) {
         rechnungsNr: t.rechnungsNr,
         kundenEmail: t.kundenEmail,
         kundenName: t.kundenName,
+        istZugeordnet: false,
+        zugeordneteRechnung: null,
+        zugeordnetesKonto: null,
+        zuordnungsArt: null,
       }))
     })
 
