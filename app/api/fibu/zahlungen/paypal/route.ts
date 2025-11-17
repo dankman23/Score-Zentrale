@@ -169,12 +169,26 @@ export async function GET(request: NextRequest) {
       console.log(`[PayPal] MongoDB bulk write: ${result.upsertedCount} inserted, ${result.modifiedCount} updated`)
     }
 
+    // Lade die aktualisierten Daten aus MongoDB (mit Matching-Informationen)
+    const startDateTime = new Date(startDate + 'T00:00:00Z')
+    const endDateTime = new Date(endDate + 'T23:59:59Z')
+    
+    const updatedTransactions = await collection
+      .find({
+        datumDate: {
+          $gte: startDateTime,
+          $lte: endDateTime
+        }
+      })
+      .sort({ datumDate: -1 })
+      .toArray()
+
     // Berechne Statistiken
     const stats = {
-      anzahl: formattedTransactions.length,
-      gesamtBetrag: formattedTransactions.reduce((sum, t) => sum + t.betrag, 0),
-      gesamtGebuehren: formattedTransactions.reduce((sum, t) => sum + t.gebuehr, 0),
-      nettoGesamt: formattedTransactions.reduce((sum, t) => sum + t.nettoBetrag, 0),
+      anzahl: updatedTransactions.length,
+      gesamtBetrag: updatedTransactions.reduce((sum, t) => sum + (t.betrag || 0), 0),
+      gesamtGebuehren: updatedTransactions.reduce((sum, t) => sum + (t.gebuehr || 0), 0),
+      nettoGesamt: updatedTransactions.reduce((sum, t) => sum + (t.nettoBetrag || 0), 0),
     }
 
     return NextResponse.json({
@@ -183,7 +197,8 @@ export async function GET(request: NextRequest) {
       to: endDate,
       cached: false,
       stats,
-      transactions: formattedTransactions.map(t => ({
+      transactions: updatedTransactions.map(t => ({
+        _id: t._id?.toString(),
         transactionId: t.transactionId,
         datum: t.datum,
         betrag: t.betrag,
@@ -196,10 +211,10 @@ export async function GET(request: NextRequest) {
         rechnungsNr: t.rechnungsNr,
         kundenEmail: t.kundenEmail,
         kundenName: t.kundenName,
-        istZugeordnet: false,
-        zugeordneteRechnung: null,
-        zugeordnetesKonto: null,
-        zuordnungsArt: null,
+        istZugeordnet: t.istZugeordnet || false,
+        zugeordneteRechnung: t.zugeordneteRechnung || null,
+        zugeordnetesKonto: t.zugeordnetesKonto || null,
+        zuordnungsArt: t.zuordnungsArt || null,
       }))
     })
 
