@@ -103,7 +103,7 @@ export default function ZahlungenView({ zeitraum: zeitraumProp, initialFilter })
   // Filtern
   const filteredZahlungen = zahlungen.filter(z => {
     // Anbieter-Filter
-    if (anbieterFilter !== 'alle' && z.zahlungsanbieter !== anbieterFilter) {
+    if (anbieterFilter !== 'alle' && z.anbieter !== anbieterFilter) {
       return false
     }
     
