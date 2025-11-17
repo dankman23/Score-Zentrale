@@ -66,7 +66,6 @@ export async function GET(request: NextRequest) {
       const payments = await collection
         .find(dateFilter)
         .sort({ datumDate: -1 })
-        .limit(limit)
         .toArray()
 
       console.log(`[Zahlungen] ${source.name}: ${payments.length} Transaktionen`)
