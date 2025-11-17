@@ -204,7 +204,7 @@ export default function FibuCompleteDashboard() {
             <div className="flex items-center justify-between mb-2">
               <h1 className="text-3xl font-bold text-gray-900">FIBU Dashboard</h1>
               <div className="flex items-center gap-4">
-                <DateRangePicker 
+                <DateRangeNavigator 
                   value={selectedPeriod}
                   onChange={setSelectedPeriod}
                 />
@@ -214,13 +214,54 @@ export default function FibuCompleteDashboard() {
                 >
                   📥 Export
                 </button>
-                <button
-                  onClick={() => loadData(true)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium"
-                  title="Daten neu aus Datenbank laden"
-                >
-                  🔄 Aktualisieren
-                </button>
+                
+                {/* Refresh Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowRefreshMenu(!showRefreshMenu)}
+                    disabled={refreshing}
+                    className={`bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium flex items-center gap-2 ${refreshing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    title="Daten aktualisieren"
+                  >
+                    {refreshing ? '⏳' : '🔄'} Aktualisieren
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  {showRefreshMenu && !refreshing && (
+                    <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50 py-2 min-w-[200px]">
+                      <button
+                        onClick={() => refreshData('all')}
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-gray-700"
+                      >
+                        🔄 Alles aktualisieren
+                      </button>
+                      <button
+                        onClick={() => refreshData('zahlungen')}
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-gray-700"
+                      >
+                        💳 Zahlungen
+                      </button>
+                      <button
+                        onClick={() => refreshData('vk')}
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-gray-700"
+                      >
+                        📄 VK-Rechnungen
+                      </button>
+                      <div className="border-t border-gray-200 my-2"></div>
+                      <button
+                        onClick={() => {
+                          setShowRefreshMenu(false)
+                          loadData(true)
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-gray-500"
+                      >
+                        🗄️ Nur aus Cache neu laden
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <p className="text-sm text-gray-600 italic">
