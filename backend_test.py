@@ -13,23 +13,23 @@ from datetime import datetime, timedelta
 BASE_URL = "https://finance-center-5.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
-def test_fibu_zahlungen_endpoint():
+def test_paypal_integration():
     """
-    Test the FIBU Zahlungen endpoint that was just fixed for critical payment data issues.
+    Test PayPal Transaction Search API Integration according to test_result.md requirements.
     
-    CONTEXT: The user reported 3 critical bugs:
-    1. Many payments showing as "unassigned" when they ARE assigned in JTL
-    2. Commerzbank transactions from October 30th completely missing
-    3. Hardcoded date range limiting access to historical data
+    ENDPOINTS TO TEST:
+    1. GET /api/fibu/zahlungen/paypal - Transaction fetching with date ranges, caching, 31-day limit
+    2. POST /api/fibu/zahlungen/paypal - Auto-matching with JTL invoices
     
-    FIXES IMPLEMENTED:
-    1. Completely rewritten SQL query with UNION ALL combining two data sources
-    2. Dynamic date ranges: Default from 2020-01-01 to today
-    3. Enhanced response with statistics object showing assignment breakdown
+    EXPECTED RESULTS:
+    - GET für Dezember 2024 sollte ~313 Transaktionen liefern
+    - GET für Dezember 1-10 sollte ~108 Transaktionen liefern
+    - Gesamtbetrag und Gebühren sollten korrekt berechnet sein
+    - MongoDB Collection 'fibu_paypal_transactions' sollte gefüllt sein
     """
     
     print("=" * 80)
-    print("TESTING FIBU ZAHLUNGEN ENDPOINT - CRITICAL PAYMENT DATA FIXES")
+    print("TESTING PAYPAL TRANSACTION SEARCH API INTEGRATION")
     print("=" * 80)
     
     # Test 1: October 30, 2025 - Verify Commerzbank & Assignments
