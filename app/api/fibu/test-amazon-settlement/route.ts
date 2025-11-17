@@ -11,8 +11,6 @@ export async function GET() {
         eb.kExternerBeleg,
         eb.cBelegNr,
         eb.dBelegdatumUtc,
-        eb.fGesamtsumme,
-        eb.cKundenName,
         (SELECT COUNT(*) FROM Rechnung.tExternerBelegPosition WHERE kExternerBeleg = eb.kExternerBeleg) as anzahl_positionen
       FROM Rechnung.tExternerBeleg eb
       WHERE eb.cBelegNr LIKE 'XRE-%'
