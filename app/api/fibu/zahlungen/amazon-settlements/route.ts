@@ -104,34 +104,66 @@ export async function GET(request: NextRequest) {
 function kategorisierePosition(pos: any): string {
   const { TransactionType, AmountType, AmountDescription } = pos
   
-  // Erlöse
+  // Erlöse - Artikel
   if (TransactionType === 'Order' && AmountType === 'ItemPrice' && AmountDescription === 'Principal') {
     return 'erloes_artikel'
   }
   if (TransactionType === 'Order' && AmountType === 'ItemPrice' && AmountDescription === 'Tax') {
     return 'erloes_steuer'
   }
+  
+  // Erlöse - Versand
   if (TransactionType === 'Order' && AmountType === 'ItemPrice' && AmountDescription === 'Shipping') {
     return 'erloes_versand'
   }
+  if (TransactionType === 'Order' && AmountType === 'ItemPrice' && AmountDescription === 'ShippingTax') {
+    return 'erloes_versand_steuer'
+  }
   
-  // Gebühren
+  // Gebühren - Provision
   if (AmountType === 'ItemFees' && AmountDescription === 'Commission') {
     return 'gebuehr_provision'
   }
-  if (AmountType === 'ItemFees' && AmountDescription === 'FBAFee') {
-    return 'gebuehr_fba'
+  if (AmountType === 'ItemFees' && AmountDescription === 'RefundCommission') {
+    return 'gebuehr_provision_rueck'
+  }
+  
+  // Gebühren - Versand
+  if (AmountType === 'ItemFees' && AmountDescription === 'ShippingHB') {
+    return 'gebuehr_versand'
   }
   if (AmountType === 'ItemFees' && AmountDescription === 'ShippingChargeback') {
     return 'gebuehr_versand'
   }
+  
+  // Gebühren - FBA
+  if (AmountType === 'ItemFees' && AmountDescription === 'FBAFee') {
+    return 'gebuehr_fba'
+  }
+  if (AmountType === 'ItemFees' && AmountDescription === 'FBAPerUnitFulfillmentFee') {
+    return 'gebuehr_fba'
+  }
+  if (AmountType === 'ItemFees' && AmountDescription === 'FBAWeightBasedFee') {
+    return 'gebuehr_fba'
+  }
+  
+  // Gebühren - Werbung
   if (AmountType === 'Promotion') {
+    return 'gebuehr_werbung'
+  }
+  if (TransactionType === 'SponsoredProducts') {
     return 'gebuehr_werbung'
   }
   
   // Rückerstattungen
-  if (TransactionType === 'Refund' && AmountType === 'ItemPrice') {
-    return 'rueckerstattung'
+  if (TransactionType === 'Refund' && AmountType === 'ItemPrice' && AmountDescription === 'Principal') {
+    return 'rueckerstattung_artikel'
+  }
+  if (TransactionType === 'Refund' && AmountType === 'ItemPrice' && AmountDescription === 'Tax') {
+    return 'rueckerstattung_steuer'
+  }
+  if (TransactionType === 'Refund' && AmountType === 'ItemPrice' && AmountDescription === 'Shipping') {
+    return 'rueckerstattung_versand'
   }
   
   // Transfers
@@ -139,12 +171,15 @@ function kategorisierePosition(pos: any): string {
     return 'transfer'
   }
   
-  // Sonstige
+  // Sonstige Gebühren
   if (TransactionType === 'ServiceFee') {
     return 'gebuehr_service'
   }
   if (TransactionType === 'Adjustment') {
     return 'korrektur'
+  }
+  if (TransactionType === 'FBA Inventory Fee') {
+    return 'gebuehr_lager'
   }
   
   return 'sonstiges'
