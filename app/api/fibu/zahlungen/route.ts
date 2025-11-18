@@ -251,9 +251,19 @@ export async function GET(request: NextRequest) {
           
           // Normalisiere AU-Nummer zum Standard-Format AU_12345_SW6
           if (auMatch) {
-            const cleaned = auMatch[0].replace(/\s/g, '').replace(/AU/i, 'AU_').replace(/SW/i, '_SW')
-            // Stelle sicher, dass Format korrekt ist: AU_xxxxx_SWx
-            referenz = cleaned.includes('_') ? cleaned : cleaned.replace(/AU_(\d+)SW/, 'AU_$1_SW')
+            // Entferne alle Leerzeichen und Bindestriche, dann setze Unterstriche
+            const cleaned = auMatch[0]
+              .replace(/\s/g, '')
+              .replace(/[-]/g, '')
+              .toUpperCase()
+            
+            // Extrahiere Nummer und SW-Teil
+            const match = cleaned.match(/AU(\d+)SW(\d+)/)
+            if (match) {
+              referenz = `AU_${match[1]}_SW${match[2]}`
+            } else {
+              referenz = auMatch[0]
+            }
           } else {
             referenz = reMatch ? reMatch[0] : ''
           }
