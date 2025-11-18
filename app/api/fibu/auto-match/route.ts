@@ -113,9 +113,16 @@ export async function POST(request: NextRequest) {
         
         // Strategie 1: AU-Nummer Matching (Mollie, PayPal)
         if (source.name === 'Mollie' || source.name === 'PayPal') {
-          const auNummer = source.name === 'Mollie' 
-            ? extractAuNummer(zahlung.verwendungszweck)
-            : zahlung.rechnungsNr // PayPal hat direkt rechnungsNr
+          // Extrahiere AU-Nummer aus verschiedenen Feldern
+          let auNummer = null
+          
+          if (source.name === 'Mollie') {
+            // Mollie: AU-Nummer kann in verwendungszweck sein
+            auNummer = extractAuNummer(zahlung.verwendungszweck)
+          } else if (source.name === 'PayPal') {
+            // PayPal: rechnungsNr oder verwendungszweck
+            auNummer = zahlung.rechnungsNr || extractAuNummer(zahlung.verwendungszweck || zahlung.betreff)
+          }
           
           if (auNummer) {
             // Suche Rechnung mit passender AU-Nummer
