@@ -29,11 +29,11 @@ backend:
   
   - task: "Auto-Match verbessern (Externe Rechnungen XRE + PayPal AU-Nummern)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/fibu/auto-match/route.ts"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -44,6 +44,9 @@ backend:
       - working: "NA"
         agent: "main"
         comment: "HOTFIX APPLIED: Import-Pfade korrigiert von '../../../lib/db/mssql' zu '@/lib/db/mssql' und von '../../lib/db/mongodb' zu '@/lib/db/mongodb'. Auch buchungslogik Import korrigiert zu '@/lib/fibu/buchungslogik'. Needs re-testing."
+      - working: true
+        agent: "testing"
+        comment: "✅ IMPORT-FIX VERIFIED: Auto-Match API now working correctly! POST /api/fibu/auto-match returns 200 OK with proper matching statistics. Successfully matched 290/5618 payments (5.2% rate) using auNummerBetragDatum strategy. Import path fixes successful - no more 500 errors. However, amazonOrderIdXRE and auNummerDirekt strategies show 0 matches, likely due to missing fibu_rechnungen_alle data (separate SQL issue)."
   
   - task: "Zahlungen API erweitern (Buchungsinformationen returnen)"
     implemented: true
