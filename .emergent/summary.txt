@@ -1,94 +1,101 @@
 <analysis>
-The trajectory documents an intensive, multi-phase development effort on a bespoke financial accounting (FIBU) application. The work was highly iterative and driven by a German-speaking user.
+The trajectory documents an extensive and iterative development and debugging process for a financial accounting (FIBU) module in a Next.js application. The work was performed for a German-speaking user, making German the required language for future interactions.
 
-The initial task was to implement a direct PayPal API integration to fetch detailed transaction and fee data. This involved creating a new API endpoint, a client library, and handling API limitations like the 31-day date range. Following user feedback, the logic was significantly enhanced to prevent overwriting manual transaction assignments () by implementing a sophisticated  strategy.
+The process began by fixing a critical architectural flaw where a slow, blocking API call in  prevented the entire FIBU UI from rendering. After resolving this, the focus shifted to implementing user-requested features and fixing data integrity issues.
 
-The focus then shifted to integrating bank accounts. An initial attempt to use the FinTS/HBCI standard for direct bank connections (Commerzbank) failed due to bank-side product registration requirements. The engineer pivoted to a more robust solution: sourcing bank transaction data directly from the user's JTL (MSSQL) database, where Commerzbank and newly-added Postbank data was already being imported. A unified API was created for this.
+Key feature developments include:
+1.  **Data Unification:** Refactoring the primary payments API () to aggregate data from multiple sources (Amazon, PayPal, Mollie, banks), filter out irrelevant transactions (e.g., failed payments), and standardize the data structure with new fields like  and .
+2.  **UI Enhancements:** Implementing server-side pagination in  to handle thousands of entries, fixing a complex timezone/off-by-one bug in the  component, and correcting various styling issues.
+3.  **Automatic & Manual Assignment:** A significant portion of the work involved creating a sophisticated payment-to-invoice/account assignment system. This included:
+    *   A new  API with multiple matching strategies (by order/invoice number, amount/date, and category).
+    *   A new manual assignment API and a  component inspired by Lexoffice, allowing users to handle discrepancies like discounts ('Skonto').
+    *   Ensuring data persistence so that manual assignments are not overwritten.
 
-Subsequently, integrations for Mollie (successful) and Otto Payments were tackled. The Otto integration proved complex, with multiple failed attempts using different API credentials and requiring IP whitelisting, ultimately leading to its postponement.
+The final request from the user was to analyze a provided Excel sheet () to reconcile Amazon payment data and further improve the auto-matching logic for it. The AI was in the process of creating handover documentation when this request was made.
 
-A major refactoring of the main  endpoint was performed to cleanse the data, ensuring it only displayed transactions from true payment providers (PayPal, Banks, Mollie, Amazon) and excluded simple payment methods from JTL orders.
-
-The final phase involved fixing a critical frontend routing issue that prevented the main FIBU module from loading. While the routing was fixed, the component still hangs on a loading screen. The last action was diagnosing this performance/rendering issue in the  component before the user requested this handover summary.
-
-The user's primary language is German. The next agent must respond in German.
+The next agent must respond in **German**.
 </analysis>
-
 <product_requirements>
-The primary goal is to build a centralized financial accounting (FIBU) application that aggregates transaction data from multiple sources into a unified Zahlungen (Payments) view.
+The goal is to build a robust and user-friendly Financial Accounting (FIBU) module.
 
-**Core Features Implemented:**
-1.  **Multi-Source Data Aggregation:** The system fetches financial transactions from several distinct sources:
-    *   **PayPal:** Direct integration with the Transaction Search API.
-    *   **Commerzbank & Postbank:** Data is pulled from an existing JTL (MSSQL) database where bank imports are stored.
-    *   **Mollie:** Direct integration with the Mollie API to capture payments from various methods like Billie and Klarna.
-    *   **Amazon:** Detailed settlement reports, including earnings and fees, are extracted from the JTL database.
+**Core Requirements:**
+1.  **Data Integrity & Display:** The primary Zahlungen (Payments) view must accurately display complete and consistent data from all integrated providers (Amazon, PayPal, Mollie, Commerzbank, Postbank). This involved fixing Invalid Date errors, mapping missing fields, and filtering out irrelevant data like failed transactions.
 
-2.  **Data Cleansing & Normalization:** A critical requirement was to differentiate between actual payment accounts and simple payment *methods*. The main payments view was refactored to show only data from the true sources listed above, filtering out noise like Cash, Invoice, or Prepayment from JTL orders.
+2.  **UI/UX Overhaul:**
+    *   Replace individual refresh buttons with a single global refresh dropdown.
+    *   Implement an advanced date navigator with presets and correct period navigation.
+    *   Implement pagination to handle large volumes of payments efficiently.
+    *   The UI must be intuitive, with clear statistics and consistent data presentation.
 
-3.  **Data Persistence:** When a user manually assigns a transaction to an invoice or account, this assignment must persist even when the source data is refreshed. This was implemented using a MongoDB  strategy.
+3.  **Payment-to-Document Matching:**
+    *   Implement a powerful **automatic matching** system to associate payments with sales invoices (VK-Rechnungen), purchase invoices (EK-Rechnungen), or general ledger accounts. Matching logic should be based on transaction/order numbers, amount, date, and transaction categories (especially for Amazon fees).
+    *   Implement a **manual assignment** modal, inspired by Lexoffice, allowing users to find and assign documents, handle partial payments, and record discrepancies (e.g., discounts, currency differences).
 
-4.  **Interactive UI:** The frontend includes a Zahlungen view with filtering by date and provider, and a global Aktualisieren (Refresh) button that re-fetches the latest data from all integrated sources.
+4.  **Data Scoping:** The entire FIBU module should strictly display data from **October 1, 2025, onwards**.
 </product_requirements>
-
 <key_technical_concepts>
-- **Backend:** Next.js API Routes (App Router), TypeScript.
-- **Databases:** MSSQL (for JTL data source), MongoDB (as the primary application database for normalized data).
-- **Frontend:** React ('use client'), , , Tailwind CSS.
-- **API Integrations:** REST API consumption for PayPal, Mollie, and Otto.
-- **Data Handling:**
-  - Complex SQL queries against JTL DB.
-  - Data aggregation from multiple asynchronous sources.
-  - MongoDB  operations (, ) to merge new data while preserving existing fields.
-- **Authentication:** OAuth 2.0 (Client Credentials Grant) for various APIs.
+- **Frontend:** React (, , , conditional rendering), State Management.
+- **Framework:** Next.js (App Router, API Routes).
+- **Backend:** TypeScript-based Next.js API Routes, data aggregation from multiple sources.
+- **Database:** MongoDB, accessed via native driver (using  for upserts).
+- **Styling:** Tailwind CSS, shadcn/ui.
+- **Key Architectural Patterns:**
+    - Refactoring to prevent UI blocking from slow APIs.
+    - Implementing server-side pagination.
+    - Building a multi-strategy data matching engine.
+    - Designing a unified data model from disparate sources.
 </key_technical_concepts>
-
 <code_architecture>
-The application is a Next.js full-stack app. The backend consists of API routes in  that fetch data from external APIs or the JTL MSSQL database, normalize it, and store it in MongoDB. The frontend is a single-page style application with different modules loaded based on user interaction.
+The application is a full-stack Next.js application. Development focused heavily on the FIBU module's backend APIs and frontend React components.
+
+**Directory Structure:**
 
 
-
--   ****
-    -   **Importance:** This is the primary, refactored endpoint for the main Zahlungen view. It acts as an aggregator.
-    -   **Summary of changes:** This file was completely rewritten. It no longer queries JTL directly. Instead, it queries the various normalized MongoDB collections (e.g., , ) to build a unified list of payments from all integrated sources (Amazon, Banks, Mollie, PayPal).
-
--   ** & **
-    -   **Importance:** Handles fetching data from the PayPal API and storing it in MongoDB.
-    -   **Summary of changes:** Created from scratch. Implemented logic to loop through monthly data to overcome the 31-day API limit. The core change was in the  (sync) function, which now uses  with  and an  operation to insert new transactions while using  to update fields and  to preserve manual assignment data on existing transactions.
+**File Details:**
 
 -   ****
-    -   **Importance:** Fetches Commerzbank and Postbank transactions from the JTL MSSQL database.
-    -   **Summary of changes:** Created from scratch after the FinTS API approach failed. It queries the  table in JTL, filters for the specific bank account IDs ( for Commerzbank,  for Postbank), normalizes the data, and upserts it into the  collection in MongoDB.
+    -   **Importance:** This is the core API for fetching all payments. It aggregates data from various collections (PayPal, Amazon, banks), standardizes them into a unified format, filters out irrelevant transactions (e.g., failed Mollie payments), and provides paginated results.
+    -   **Changes:** Heavily refactored to implement a unified data structure, add server-side pagination logic, and introduce a hard-coded minimum start date of October 2025.
 
 -   ****
-    -   **Importance:** Fetches detailed Amazon settlement reports from JTL.
-    -   **Summary of changes:** This route was completely rewritten from an older version. It now correctly queries the  tables in JTL, processes the data, and upserts it into a dedicated MongoDB collection.
+    -   **Importance:** A newly created API that contains the logic for automatically matching unassigned payments to invoices or ledger accounts.
+    -   **Changes:** Created from scratch. It fetches all unassigned payments and available invoices, then applies multiple matching strategies: by exact order/invoice number (), by amount and date proximity, and by category keyword for Amazon fees. The logic was refined to run on the entire dataset, not just a filtered view.
 
 -   ****
-    -   **Importance:** The main frontend component for displaying all payments.
-    -   **Summary of changes:** Significantly modified to add a global Aktualisieren button that triggers a refresh across all integrated payment sources by calling their respective APIs with . The date-range filter was also replaced with a more advanced, JTL-style component.
+    -   **Importance:** A new API to handle the manual assignment of payments to documents or accounts, triggered from the UI.
+    -   **Changes:** Created to receive payment IDs and a target (invoice or account), updating the payment record with assignment details, including reasons for any amount discrepancies ('skonto', etc.).
 
 -   ****
-    -   **Importance:** The main entry point for the application's UI.
-    -   **Summary of changes:** A critical fix was made to the  hook that handles hash-based navigation. The string  was added to an array of allowed tabs, which fixed the issue of the FIBU tab being un-clickable.
+    -   **Importance:** The main frontend component displaying the list of payments. It manages filtering, sorting, and pagination state.
+    -   **Changes:** Significantly refactored to handle API calls with pagination parameters, display global vs. local statistics, render the new unified data columns (, ), and integrate the new .
+
+-   ****
+    -   **Importance:** A new, complex UI component for manual payment assignment, inspired by user-provided screenshots of Lexoffice.
+    -   **Changes:** Created from scratch. It fetches assignment suggestions from its own API, allows searching for invoices/accounts, and handles the submission to the  API.
+
+-   ****
+    -   **Importance:** The primary date filtering component for the FIBU module.
+    -   **Changes:** Underwent multiple rounds of intense debugging to fix a critical timezone-related bug that caused month navigation to be off-by-one. The final implementation avoids using  and relies on careful  object manipulation and string formatting to ensure correctness across timezones. It also now prevents navigation to dates before October 2025.
 </code_architecture>
-
 <pending_tasks>
-- **Finalize Otto Payments Integration:** The integration is paused due to a persistent  error from the Otto API, even after creating new credentials and whitelisting the server's IP address. This needs further investigation, potentially with Otto support.
-- **Implement eBay API Integration:** This was mentioned as a future task in the initial context but has not been started.
-- **Refine Auto-Matching Logic:** The auto-matching of bank transactions to JTL invoices is not working effectively (0% match rate). The RegEx logic in the  needs to be reviewed and debugged.
+- **Analyze Amazon Data:** The user provided an Excel file () and requested a thorough analysis to:
+    1.  Verify if all October Amazon transactions are in the system.
+    2.  Confirm correct account/contra-account mapping for fees and other transaction types.
+    3.  Improve the automatic assignment logic for Amazon payments based on these findings.
 </pending_tasks>
-
 <current_work>
-The most recent task was to diagnose and fix a critical frontend issue where the entire FIBU module would not load, getting stuck on a Lade FIBU-Daten... (Loading FIBU data...) message.
+The immediate last task was a major feature implementation: creating a comprehensive manual payment assignment system.
 
-**Work Done:**
-1.  **Diagnosis:** The Frontend Testing Agent confirmed the UI was unresponsive. The AI traced the issue from the main page () to the component responsible for the tab navigation.
-2.  **Routing Fix:** A bug was found in  where the  tab was missing from a list of allowed  states. This was corrected, making the tab selectable.
-3.  **New Problem Identified:** After the fix, the FIBU tab became accessible but was stuck in an infinite loading state. The AI confirmed the underlying API endpoint () was working and returning data correctly.
-4.  **Final State:** The user provided a screenshot showing a Fehler beim Laden (Error while loading) message within the FIBU section. The problem was isolated to the frontend component , which is likely failing to parse or render the large dataset from the API. The AI was about to begin debugging this specific component when the user requested the handover. The backend APIs are considered robust and production-ready, but the main dashboard UI is non-functional.
+**Work Performed:**
+1.  **API Creation:** Built a new API endpoint () to handle the logic of linking one or more payments to an invoice or account, including storing discrepancy reasons like .
+2.  **Suggestion API:** Created another API () to provide intelligent suggestions for matching a selected payment.
+3.  **UI Modal Component:** Developed a new, complex React component, , modeled after Lexoffice. This modal allows users to view suggestions, search for invoices/accounts, and submit the manual assignment.
+4.  **Integration:** Integrated the  into the main  component, connecting the Zuordnen button to open the modal and handle the data refresh upon successful assignment.
+
+**Current State:**
+The manual assignment modal and its backend logic are implemented and integrated. However, immediately following this, the user made a new high-priority request to analyze an attached Excel file of Amazon payments to reconcile data and improve the Amazon-specific auto-matching. The AI then began creating handover documentation (, ) as requested, but the analysis of the Excel file has not yet been performed.
 </current_work>
-
 <optional_next_step>
-Debug the  component to correctly handle and render the data from the  API endpoint, resolving the infinite loading/error state.
+Analyze the user-provided  file to verify data and improve the auto-matching logic for Amazon payments, as per the last explicit user request.
 </optional_next_step>
+

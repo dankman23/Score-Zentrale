@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Base URL from environment
-BASE_URL = "https://payment-view-fix.preview.emergentagent.com/api"
+BASE_URL = "https://invoice-sync-7.preview.emergentagent.com/api"
 
 # Test date range
 START_DATE = "30daysAgo"
