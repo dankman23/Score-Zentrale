@@ -236,13 +236,21 @@ export default function FibuCompleteDashboard() {
                   </button>
                   
                   {showRefreshMenu && !refreshing && (
-                    <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50 py-2 min-w-[200px]">
+                    <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50 py-2 min-w-[220px]">
                       <button
                         onClick={() => refreshData('all')}
                         className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-gray-700"
                       >
                         🔄 Alles aktualisieren
                       </button>
+                      <div className="border-t border-gray-200 my-1"></div>
+                      <button
+                        onClick={runAutoMatch}
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-green-50 text-green-700 font-medium"
+                      >
+                        🤖 Auto-Zuordnung starten
+                      </button>
+                      <div className="border-t border-gray-200 my-1"></div>
                       <button
                         onClick={() => refreshData('zahlungen')}
                         className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-gray-700"
