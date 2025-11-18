@@ -214,9 +214,17 @@ export async function GET(request: NextRequest) {
     // Berechne Gesamt-Stats VOR Pagination
     const totalCount = allPayments.length
     const totalSum = allPayments.reduce((sum, p) => sum + p.betrag, 0)
+    const zugeordnetCount = allPayments.filter(p => p.istZugeordnet).length
+    const nichtZugeordnetCount = totalCount - zugeordnetCount
     
     stats.gesamt = totalCount
     stats.gesamtsumme = totalSum
+    stats.zuordnung = {
+      zugeordnet: zugeordnetCount,
+      zugeordnetProzent: totalCount > 0 ? Math.round((zugeordnetCount / totalCount) * 100) : 0,
+      nichtZugeordnet: nichtZugeordnetCount,
+      nichtZugeordnetProzent: totalCount > 0 ? Math.round((nichtZugeordnetCount / totalCount) * 100) : 0
+    }
 
     // Pagination anwenden
     const startIndex = (page - 1) * pageSize
