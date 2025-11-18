@@ -3579,16 +3579,16 @@ export default function App() {
                           <option value="Jura">Jura</option>
                         </>
                       )}
-                    </select>
-                  </div>
+                        </select>
+                      </div>
 
-                  <div className="col-md-3 mb-2">
-                    <label className="small text-white mb-1">Branche *</label>
-                    <select 
-                      className="form-control" 
-                      value={dachCrawlerForm.industry}
-                      onChange={e => setDachCrawlerForm({...dachCrawlerForm, industry: e.target.value})}
-                    >
+                      <div className="col-md-4 mb-2">
+                        <label className="small text-dark font-weight-semibold mb-1">Branche *</label>
+                        <select 
+                          className="form-control form-control-lg" 
+                          value={dachCrawlerForm.industry}
+                          onChange={e => setDachCrawlerForm({...dachCrawlerForm, industry: e.target.value})}
+                        >
                       <option value="">-- Wählen --</option>
                       <optgroup label="🚗 Automobilindustrie & Fahrzeugbau">
                         <option value="Automobilindustrie">Automobilindustrie</option>
