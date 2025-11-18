@@ -142,45 +142,63 @@ export async function POST(request: NextRequest) {
           }
           
           if (auNummer) {
-            // Suche Rechnung mit passender AU-Nummer
-            // Für JTL: AU_XXXXX_SW6 format
+            // Suche Rechnung mit passender AU-Nummer über cBestellNr
+            // Für JTL: AU_XXXXX_SW6 oder AU2025-XXXXX format
             const auMatch = auNummer.match(/AU[_-]?(\d+)/)
             if (auMatch) {
               const auNr = auMatch[1]
               
-              // Finde Rechnung: Mollie/PayPal Zahlungen sind Eingänge (positiv)
-              // Suche nach Rechnung mit ähnlichem Betrag und Zeitraum
-              const rechnungCandidates = vkRechnungen
-                .filter(r => {
-                  const betragMatch = Math.abs((r.brutto || 0) - Math.abs(zahlung.betrag)) < 0.50 // 50 Cent Toleranz
-                  const dateDiff = Math.abs(new Date(r.rechnungsdatum).getTime() - new Date(zahlung.datum || zahlung.datumDate).getTime())
-                  const daysDiff = dateDiff / (1000 * 60 * 60 * 24)
-                  
-                  return betragMatch && daysDiff <= 60 // 60 Tage Toleranz
-                })
-                .map(r => {
-                  // Score: je niedriger, desto besser
-                  const betragDiff = Math.abs((r.brutto || 0) - Math.abs(zahlung.betrag))
-                  const dateDiff = Math.abs(new Date(r.rechnungsdatum).getTime() - new Date(zahlung.datum || zahlung.datumDate).getTime())
-                  const daysDiff = dateDiff / (1000 * 60 * 60 * 24)
-                  const score = betragDiff + daysDiff * 0.1 // Betrag wichtiger als Datum
-                  
-                  return { rechnung: r, score, betragDiff, daysDiff }
-                })
-                .sort((a, b) => a.score - b.score) // Bester zuerst
+              // NEUE Strategie: Direktes Matching über cBestellNr in fibu_rechnungen_alle
+              let direktMatch = alleRechnungen.find(r => {
+                const bestellnr = r.cBestellNr || ''
+                // Match: AU_12345_SW6 oder AU2025-12345
+                return bestellnr.includes(`AU_${auNr}_`) || 
+                       bestellnr.includes(`AU2025-${auNr}`) ||
+                       bestellnr.includes(`AU-${auNr}`)
+              })
               
-              // Nehme besten Kandidaten wenn Score < 0.25 (sehr gut)
-              if (rechnungCandidates.length > 0) {
-                const best = rechnungCandidates[0]
+              if (direktMatch) {
+                match = {
+                  type: 'rechnung',
+                  rechnungId: direktMatch.uniqueId,
+                  rechnungsNr: direktMatch.belegnummer,
+                  confidence: 'high'
+                }
+                method = 'auNummerDirekt'
+              } else {
+                // Fallback: Betrag + Datum Matching
+                const rechnungCandidates = vkRechnungen
+                  .filter(r => {
+                    const betragMatch = Math.abs((r.brutto || 0) - Math.abs(zahlung.betrag)) < 0.50 // 50 Cent Toleranz
+                    const dateDiff = Math.abs(new Date(r.rechnungsdatum).getTime() - new Date(zahlung.datum || zahlung.datumDate).getTime())
+                    const daysDiff = dateDiff / (1000 * 60 * 60 * 24)
+                    
+                    return betragMatch && daysDiff <= 60 // 60 Tage Toleranz
+                  })
+                  .map(r => {
+                    // Score: je niedriger, desto besser
+                    const betragDiff = Math.abs((r.brutto || 0) - Math.abs(zahlung.betrag))
+                    const dateDiff = Math.abs(new Date(r.rechnungsdatum).getTime() - new Date(zahlung.datum || zahlung.datumDate).getTime())
+                    const daysDiff = dateDiff / (1000 * 60 * 60 * 24)
+                    const score = betragDiff + daysDiff * 0.1 // Betrag wichtiger als Datum
+                    
+                    return { rechnung: r, score, betragDiff, daysDiff }
+                  })
+                  .sort((a, b) => a.score - b.score) // Bester zuerst
                 
-                if (best.score < 1.0) { // Max 1€ Diff + 10 Tage
-                  match = {
-                    type: 'rechnung',
-                    rechnungId: best.rechnung._id.toString(),
-                    rechnungsNr: best.rechnung.cRechnungsNr || best.rechnung.rechnungsNr,
-                    confidence: best.score < 0.25 ? 'high' : 'medium'
+                // Nehme besten Kandidaten wenn Score < 1.0
+                if (rechnungCandidates.length > 0) {
+                  const best = rechnungCandidates[0]
+                  
+                  if (best.score < 1.0) { // Max 1€ Diff + 10 Tage
+                    match = {
+                      type: 'rechnung',
+                      rechnungId: best.rechnung._id.toString(),
+                      rechnungsNr: best.rechnung.cRechnungsNr || best.rechnung.rechnungsNr,
+                      confidence: best.score < 0.25 ? 'high' : 'medium'
+                    }
+                    method = 'auNummerBetragDatum'
                   }
-                  method = 'auNummer'
                 }
               }
             }
