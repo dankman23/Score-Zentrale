@@ -2,9 +2,9 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getMssqlPool } from '../../../lib/db/mssql'
-import { getDb } from '../../../lib/db/mongodb'
-import { berechneAmazonBuchung } from '../../../../../../lib/fibu/buchungslogik'
+import { getMssqlPool } from '@/lib/db/mssql'
+import { getDb } from '@/lib/db/mongodb'
+import { berechneAmazonBuchung } from '@/lib/fibu/buchungslogik'
 
 /**
  * GET /api/fibu/zahlungen/amazon-settlements
