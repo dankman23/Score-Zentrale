@@ -216,18 +216,31 @@ export async function GET(request: NextRequest) {
           gegenkonto = p.kundenName || ''  // Kundenname
           verwendungszweck = p.betreff || p.rechnungsNr || ''  // Betreff oder AU-Nummer als Fallback
           
-          // AUTO-ZUORDNUNG für PayPal über AU-Nummer (nur wenn noch nicht zugeordnet und AU-Nummer vorhanden)
-          if (!p.istZugeordnet && referenz && referenz.match(/^AU_\d+_SW\d+$/)) {
-            // PayPal-Zahlungen mit AU-Nummer werden als "zuordenbar" markiert
-            // Die tatsächliche Zuordnung zur Rechnung erfolgt später via Auto-Match
-            autoZugeordnet = true
-            autoGegenkonto = '69012'  // Paypal-Erlöskonto (Sammelkonto)
-            autoZuordnungsArt = 'PayPal Zahlung (AU-Nummer)'
-          } else if (!p.istZugeordnet && p.betrag < 0) {
-            // Negative PayPal-Beträge (Gebühren, Einkäufe)
-            autoZugeordnet = true
-            autoGegenkonto = '6855'  // Sonstige Aufwendungen
-            autoZuordnungsArt = 'PayPal Gebühr/Einkauf'
+          // AUTO-ZUORDNUNG für PayPal über AU-Nummer (nur wenn noch nicht zugeordnet)
+          if (!p.istZugeordnet) {
+            if (referenz && referenz.match(/^AU_\d+_SW\d+$/)) {
+              // Prüfe ob Rechnung mit dieser AU-Nummer existiert
+              const rechnung = rechnungenMap.get(referenz)
+              
+              if (rechnung) {
+                // Perfektes Match: AU-Nummer + Rechnung gefunden
+                autoZugeordnet = true
+                autoGegenkonto = '69012'  // Paypal-Erlöskonto (Sammelkonto)
+                autoZuordnungsArt = 'rechnung'  // Typ für Rechnungszuordnung
+                // Speichere auch die zugeordnete Rechnung
+                p.zugeordneteRechnung = rechnung.rechnungsNr
+              } else {
+                // AU-Nummer vorhanden, aber keine Rechnung gefunden
+                autoZugeordnet = true
+                autoGegenkonto = '69012'
+                autoZuordnungsArt = 'PayPal Zahlung (AU-Nummer, keine Rechnung)'
+              }
+            } else if (p.betrag < 0) {
+              // Negative PayPal-Beträge (Gebühren, Einkäufe)
+              autoZugeordnet = true
+              autoGegenkonto = '6855'  // Sonstige Aufwendungen
+              autoZuordnungsArt = 'PayPal Gebühr/Einkauf'
+            }
           }
           
         } else if (source.name === 'Commerzbank' || source.name === 'Postbank') {
