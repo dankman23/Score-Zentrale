@@ -87,12 +87,15 @@ export async function POST(request: NextRequest) {
             console.warn(`[Zuordnung] Warnung: ${zahlungId} bereits zugeordnet zu ${zahlung.zugeordneteRechnung}`)
           }
           
+          // Bestimme Zuordnungsart
+          const zuordnungsArt = rechnungId ? 'rechnung' : (body.kontoNr ? 'konto' : null)
+          
           // Update Zahlung
           const updateData: any = {
             istZugeordnet: true,
-            zugeordneteRechnung: rechnungsNr || rechnungId,
-            zugeordnetesKonto: null, // Keine Konto-Zuordnung wenn Rechnung
-            zuordnungsArt: 'rechnung',
+            zugeordneteRechnung: zuordnungsArt === 'rechnung' ? (rechnungsNr || rechnungId) : null,
+            zugeordnetesKonto: zuordnungsArt === 'konto' ? (body.kontoNr || null) : null,
+            zuordnungsArt,
             zuordnungsDatum: new Date(),
             zuordnungsMethode: 'manuell',
             abweichungsgrund: abweichungsgrund || null,
