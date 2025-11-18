@@ -477,6 +477,8 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Bitte Backend-Routen gemäß test_plan prüfen. Mongo steht über MONGO_URL bereit; Collections werden on-the-fly angelegt. Keine externen Keys erforderlich."
+  - agent: "main"
+    message: "KRITISCHE FIXES ANGEWENDET: Alle Import-Pfade in Auto-Match und Zahlungen APIs wurden von relativen Pfaden (../../) auf Alias-Pfade (@/) korrigiert. Bitte teste: (1) GET /api/fibu/auto-match?from=2025-10-01&to=2025-10-31 - sollte jetzt 200 OK returnen und Matching-Statistiken zeigen. (2) GET /api/fibu/zahlungen?from=2025-10-01&to=2025-10-07 - prüfe ob buchung-Feld jetzt befüllt ist für Amazon & PayPal Payments. (3) Verifiziere neue Matching-Strategien: Amazon AU-Nummern aus Transaktionsdetails, PayPal cBestellNr Matching."
   - agent: "testing"
     message: "✅ Backend testing completed successfully! All high-priority endpoints tested and working: GET /api/kpis (verified structure), Prospects flow (POST+GET with UUID, no _id), POST /api/analyze (returns productGroups/materials/hypotheses, creates DB entries), POST /api/mailer/compose (returns subject/text/html), Status endpoints (GET+POST working). Fixed minor _id cleanup issue in POST /api/prospects response. All 5/5 core backend tests PASSED. Ready for main agent to summarize and finish."
   - agent: "main"
