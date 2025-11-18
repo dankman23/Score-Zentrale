@@ -56,6 +56,22 @@ export async function POST(req: NextRequest) {
     
     console.log(`[Email Generator] E-Mail generiert: ${email.betreff}`)
     
+    // Optional: E-Mail sofort versenden
+    let emailSent = false
+    let sendResult = null
+    
+    if (sendNow && kontaktperson?.email) {
+      try {
+        console.log(`[Email Generator] Versende E-Mail an: ${kontaktperson.email}`)
+        sendResult = await sendEmail(kontaktperson.email, email.betreff, email.text)
+        emailSent = true
+        console.log(`[Email Generator] ✅ E-Mail versendet! Message-ID: ${sendResult.messageId}`)
+      } catch (sendError: any) {
+        console.error(`[Email Generator] ❌ Versand fehlgeschlagen:`, sendError)
+        // Fehler nicht werfen, E-Mail wurde trotzdem generiert
+      }
+    }
+    
     // Speichere E-Mail in Prospect
     await collection.updateOne(
       { _id: prospectId },
@@ -64,14 +80,22 @@ export async function POST(req: NextRequest) {
           email_generated: true,
           email_generated_at: new Date(),
           email_draft: email,
-          email_recipient: kontaktperson?.email || null
+          email_recipient: kontaktperson?.email || null,
+          ...(emailSent && {
+            email_sent: true,
+            email_sent_at: new Date(),
+            email_sent_to: kontaktperson.email,
+            status: 'contacted'
+          })
         }
       }
     )
     
     return NextResponse.json({
       success: true,
-      email
+      email,
+      sent: emailSent,
+      sendResult
     })
     
   } catch (error: any) {
