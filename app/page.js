@@ -1016,20 +1016,28 @@ export default function App() {
     if (coldLoading) return
     setColdLoading(true)
     try {
-      // Nutze neue V3 API
-      const res = await fetch('/api/coldleads/analyze-v3', {
+      // Nutze neue SCORE Deep-Analysis API
+      const res = await fetch('/api/coldleads/analyze-deep', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          website: prospect.website, 
-          industry: prospect.industry,
-          region: prospect.region,
-          company_name: prospect.company_name
+          website: prospect.website,
+          firmenname: prospect.company_name,
+          branche: prospect.industry,
+          prospectId: prospect.id
         })
       })
       const data = await res.json()
-      if (data.ok) {
-        console.log(`✓ ${prospect.company_name}: Score ${data.analysis.confidence_overall}%`)
+      
+      if (data.success) {
+        const analysis = data.analysis
+        console.log(`✓ ${prospect.company_name}: Qualität ${analysis.analyse_qualität}%`)
+        
+        // Erstelle Zusammenfassung
+        const kontakte = analysis.kontaktpersonen.length
+        const emails = analysis.kontaktpersonen.filter(k => k.email).length
+        const produkte = analysis.potenzielle_produkte.length
+        const werkstoffe = analysis.werkstoffe.map(w => w.name).join(', ')
         
         // WICHTIG: Stats UND Prospects-Liste neu laden
         await loadColdLeadStats()
@@ -1040,7 +1048,13 @@ export default function App() {
         // Dann Prospects mit explizitem 'analyzed' Filter laden
         await loadColdProspects('analyzed')
         
-        alert(`✅ Analyse abgeschlossen!\n\nScore: ${data.analysis.confidence_overall}%\nKontakt: ${data.analysis.contact_person.email || 'Nicht gefunden'}\nMarken: ${data.analysis.recommended_brands.join(', ')}\n\n➡️ Wechsle zu "Analysiert" Tab`)
+        alert(`✅ Analyse abgeschlossen!\n\n` +
+          `Qualität: ${analysis.analyse_qualität}%\n` +
+          `Branche: ${analysis.branche}\n` +
+          `Werkstoffe: ${werkstoffe || 'Keine gefunden'}\n` +
+          `Kontakte: ${kontakte} (${emails} mit E-Mail)\n` +
+          `Produktempfehlungen: ${produkte}\n\n` +
+          `➡️ Wechsle zu "Analysiert" Tab für Details`)
       } else {
         alert('❌ Fehler: ' + (data.error || 'Unbekannter Fehler'))
       }
