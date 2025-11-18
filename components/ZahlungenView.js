@@ -574,30 +574,38 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
       </div>
 
       {/* Zuordnungs-Modal */}
-      {showZuordnungModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-bold mb-4">Zahlung zuordnen</h3>
-            <p className="text-gray-600 mb-4">
-              Zahlung: {selectedZahlung?.betrag?.toFixed(2)}€ von {selectedZahlung?.anbieter}
-            </p>
-            <p className="text-sm text-gray-500 mb-4">Zuordnungsfunktion wird implementiert...</p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowZuordnungModal(false)}
-                className="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
-              >
-                Abbrechen
-              </button>
-              <button
-                onClick={() => setShowZuordnungModal(false)}
-                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-              >
-                Speichern
-              </button>
-            </div>
-          </div>
-        </div>
+      {showZuordnungModal && selectedZahlung && (
+        <ZuordnungsModal
+          zahlung={selectedZahlung}
+          onClose={() => {
+            setShowZuordnungModal(false)
+            setSelectedZahlung(null)
+          }}
+          onZuordnen={async (zuordnungData) => {
+            try {
+              const res = await fetch('/api/fibu/zahlungen/zuordnen', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(zuordnungData)
+              })
+              
+              const data = await res.json()
+              
+              if (data.ok) {
+                alert(`✅ Zuordnung erfolgreich!\n${data.updated} Zahlung(en) zugeordnet`)
+                setShowZuordnungModal(false)
+                setSelectedZahlung(null)
+                // Reload data
+                loadZahlungen()
+              } else {
+                alert(`❌ Fehler: ${data.error}`)
+              }
+            } catch (error) {
+              console.error('Zuordnungs-Fehler:', error)
+              alert(`❌ Fehler beim Zuordnen: ${error.message}`)
+            }
+          }}
+        />
       )}
     </div>
   )
