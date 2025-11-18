@@ -3650,33 +3650,32 @@ export default function App() {
                         <option value="Modellbau">Modellbau</option>
                         <option value="Messerschmiede">Messerschmiede</option>
                       </optgroup>
-                        </select>
-                      </div>
-
-                      <div className="col-md-1 mb-2">
-                        <label className="small text-dark font-weight-semibold mb-1">Limit</label>
-                        <input 
-                          type="number" 
-                          className="form-control form-control-lg" 
-                          value={dachCrawlerForm.limit}
-                          onChange={e => setDachCrawlerForm({...dachCrawlerForm, limit: parseInt(e.target.value) || 20})}
-                          min="5"
-                          max="50"
-                        />
-                      </div>
-
-                      <div className="col-md-1 mb-2">
-                        <label className="small text-dark font-weight-semibold mb-1">&nbsp;</label>
-                        <button 
-                          className="btn btn-primary btn-lg btn-block font-weight-bold shadow-sm" 
-                          onClick={startDachCrawl}
-                          disabled={dachCrawlerLoading || !dachCrawlerForm.region || !dachCrawlerForm.industry}
-                        >
-                          {dachCrawlerLoading ? <><span className="spinner-border spinner-border-sm mr-2"/>Crawle...</> : <><i className="bi bi-play-circle-fill mr-1"/>Start</>}
-                        </button>
-                      </div>
-                    </div>
+                    </select>
                   </div>
+
+                  <div className="col-md-1 mb-2">
+                    <label className="small text-white mb-1">Limit</label>
+                    <input 
+                      type="number" 
+                      className="form-control" 
+                      value={dachCrawlerForm.limit}
+                      onChange={e => setDachCrawlerForm({...dachCrawlerForm, limit: parseInt(e.target.value) || 20})}
+                      min="5"
+                      max="50"
+                    />
+                  </div>
+
+                  <div className="col-md-2 mb-2">
+                    <label className="small text-white mb-1">&nbsp;</label>
+                    <button 
+                      className="btn btn-light btn-block font-weight-bold" 
+                      onClick={startDachCrawl}
+                      disabled={dachCrawlerLoading || !dachCrawlerForm.region || !dachCrawlerForm.industry}
+                    >
+                      {dachCrawlerLoading ? <><span className="spinner-border spinner-border-sm mr-2"/>Crawle...</> : <><i className="bi bi-play-fill mr-1"/>Start Crawl</>}
+                    </button>
+                  </div>
+                </div>
 
                 {/* Progress Tabelle */}
                 {dachCrawlerProgress.length > 0 && (
