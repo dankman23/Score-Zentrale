@@ -28,15 +28,18 @@ backend:
   
   - task: "Amazon Settlements API erweitern (Buchungsinformationen)"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/app/api/fibu/zahlungen/amazon-settlements/route.ts"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Berechnet und speichert Buchungsinformationen (Soll/Haben, Netto/Brutto) für jede Amazon-Transaktion"
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL: Module import error - Cannot resolve '../../../lib/db/mssql' and buchungslogik import path. API returns 500 error due to incorrect import paths. Database files are in /app/app/lib/db/ but imports expect /app/lib/db/."
   
   - task: "Zahlungen API erweitern (Buchungsinformationen returnen)"
     implemented: true
