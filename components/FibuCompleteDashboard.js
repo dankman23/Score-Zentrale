@@ -45,7 +45,15 @@ function getRandomQuote() {
 export default function FibuCompleteDashboard() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(false) // Changed to false - no initial load
-  const [selectedPeriod, setSelectedPeriod] = useState('2025-10-01_2025-11-30')
+  const [selectedPeriod, setSelectedPeriod] = useState(() => {
+    // Aktueller Monat als Standard
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = today.getMonth() + 1
+    const firstDay = `${year}-${month.toString().padStart(2, '0')}-01`
+    const lastDay = new Date(year, month, 0).toISOString().split('T')[0]
+    return `${firstDay}_${lastDay}`
+  })
   const [activeTab, setActiveTab] = useState('zahlungen') // Start with zahlungen tab instead of overview
   const [showExportDialog, setShowExportDialog] = useState(false)
   const [tabFilters, setTabFilters] = useState({}) // Store filters per tab
