@@ -240,6 +240,11 @@ export async function GET(request: NextRequest) {
               autoZugeordnet = true
               autoGegenkonto = '6855'  // Sonstige Aufwendungen
               autoZuordnungsArt = 'PayPal Gebühr/Einkauf'
+            } else if (p.betrag > 0) {
+              // Positive PayPal-Beträge ohne Referenz
+              autoZugeordnet = true
+              autoGegenkonto = '69012'  // Erlöskonto
+              autoZuordnungsArt = 'PayPal Eingang (ohne Referenz)'
             }
           }
           
