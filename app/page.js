@@ -3402,24 +3402,8 @@ export default function App() {
             </div>
           </div>
 
-          {/* Tab Navigation */}
-          <div className="btn-group mb-4 w-100">
-            <button 
-              className={`btn ${coldLeadsTab === 'search' ? 'btn-primary' : 'btn-outline-secondary'}`}
-              onClick={() => setColdLeadsTab('search')}
-            >
-              <i className="bi bi-search mr-2"/>Google-Suche
-            </button>
-            <button 
-              className={`btn ${coldLeadsTab === 'dach' ? 'btn-primary' : 'btn-outline-secondary'}`}
-              onClick={() => { setColdLeadsTab('dach'); loadDachStats(); loadDachProgress(); }}
-            >
-              <i className="bi bi-globe-europe-africa mr-2"/>DACH-Crawler
-            </button>
-          </div>
-
-          {/* Google-Suchformular */}
-          {coldLeadsTab === 'search' && coldStatusFilter === 'all' && (
+          {/* DACH Crawler - Direkt anzeigen (Google-Suche entfernt) */}
+          {coldStatusFilter === 'all' && false && (
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-body">
                 <div className="d-flex align-items-center mb-3">
