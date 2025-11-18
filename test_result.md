@@ -50,11 +50,11 @@ backend:
   
   - task: "Zahlungen API erweitern (Buchungsinformationen returnen)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/fibu/zahlungen/route.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -65,6 +65,9 @@ backend:
       - working: "NA"
         agent: "main"
         comment: "HOTFIX APPLIED: Import-Pfade korrigiert. Needs re-testing to verify buchung-Field wird jetzt korrekt befüllt."
+      - working: true
+        agent: "testing"
+        comment: "✅ BUCHUNGSLOGIK INTEGRATION VERIFIED: Zahlungen API now correctly populates buchung field! Sample Amazon payment shows proper structure: sollKonto=1815, habenKonto=69001, nettoBetrag=14.76, mwstSatz=19%, buchungstext='Amazon ItemPrice 306-2426721-5897152', gegenkontoTyp='erloes'. Import fixes successful - buchung field no longer null for Amazon & PayPal payments. MwSt calculations working correctly (19% standard rate)."
 
 frontend:
   - task: "UI-Anzeige Gegenkonto"
