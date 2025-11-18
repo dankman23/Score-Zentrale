@@ -83,10 +83,13 @@ metadata:
   run_ui: false
 
 test_plan:
-  - "Test Amazon Settlements API: Lade Daten und prüfe ob buchung-Feld existiert"
-  - "Test Buchungslogik: Prüfe Soll/Haben-Konten für verschiedene amountTypes"
-  - "Test Auto-Match: Prüfe Matching mit externen Rechnungen und AU-Nummern"
-  - "Test Zahlungen API: Prüfe ob Buchungsinformationen im Response sind"
+  current_focus:
+    - "Test Auto-Match API: Prüfe ob Import-Fehler behoben sind"
+    - "Test Auto-Match API: Prüfe neue Matching-Strategien (Amazon AU-Nummern, PayPal cBestellNr)"
+    - "Test Zahlungen API: Prüfe ob buchung-Feld jetzt korrekt befüllt wird"
+    - "Test Buchungslogik Integration: Verifiziere Soll/Haben-Konten, MwSt-Berechnung"
+  test_priority: "high_first"
+  test_all: false
 
 #====================================================================================================
 # START - Testing Protocol - DO NOT EDIT OR REMOVE THIS SECTION
