@@ -145,6 +145,12 @@ export async function POST(request: NextRequest) {
                 return betragMatch && daysDiff <= 60 // 60 Tage Toleranz
               })
               
+              // Debug
+              if (source.name === 'PayPal' && zahlungen.indexOf(zahlung) < 1) {
+                console.log(`[Auto-Match DEBUG] PayPal ${zahlung.transactionId} AU: ${auNummer}, Candidates: ${rechnungCandidates.length}`, 
+                  rechnungCandidates.map(r => ({rg: r.cRechnungsNr, betrag: r.brutto, datum: r.rechnungsdatum})))
+              }
+              
               if (rechnungCandidates.length === 1) {
                 match = {
                   type: 'rechnung',
