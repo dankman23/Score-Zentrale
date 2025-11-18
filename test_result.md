@@ -90,10 +90,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Test Auto-Match API: Prüfe ob Import-Fehler behoben sind"
-    - "Test Auto-Match API: Prüfe neue Matching-Strategien (Amazon AU-Nummern, PayPal cBestellNr)"
-    - "Test Zahlungen API: Prüfe ob buchung-Feld jetzt korrekt befüllt wird"
-    - "Test Buchungslogik Integration: Verifiziere Soll/Haben-Konten, MwSt-Berechnung"
+    - "COMPLETED: Auto-Match API Import-Fehler behoben ✅"
+    - "COMPLETED: Zahlungen API buchung-Feld Integration ✅"
+    - "COMPLETED: Buchungslogik MwSt-Berechnung verifiziert ✅"
+  stuck_tasks: []
   test_priority: "high_first"
   test_all: false
 
