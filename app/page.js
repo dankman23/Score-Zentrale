@@ -3550,16 +3550,26 @@ export default function App() {
           </div>
           )}
 
-          {/* DACH Crawler Formular */}
-          {coldLeadsTab === 'dach' && (
-            <div className="card border-0 shadow-sm mb-4" style={{background:'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'}}>
+          {/* DACH Crawler - Optimiert & vereinfacht */}
+          {coldStatusFilter === 'all' && (
+            <div className="card border-0 shadow-lg mb-4" style={{background:'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
               <div className="card-body">
-                <div className="d-flex align-items-center mb-3">
-                  <i className="bi bi-globe-europe-africa text-white mr-2" style={{fontSize:'1.5rem'}}/>
-                  <div>
-                    <h5 className="mb-0 text-white">Systematisches DACH-Crawling</h5>
-                    <small className="text-white-50">Durchsuche strukturiert Firmenverzeichnisse in Deutschland, Österreich und Schweiz</small>
+                <div className="d-flex align-items-center justify-content-between mb-4">
+                  <div className="d-flex align-items-center">
+                    <div className="bg-white rounded-circle p-3 mr-3 shadow">
+                      <i className="bi bi-globe-europe-africa text-primary" style={{fontSize:'2rem'}}/>
+                    </div>
+                    <div>
+                      <h4 className="mb-1 text-white font-weight-bold">DACH Firmen-Crawler</h4>
+                      <p className="mb-0 text-white-50">Systematische B2B-Suche • 🇩🇪 Deutschland • 🇦🇹 Österreich • 🇨🇭 Schweiz</p>
+                    </div>
                   </div>
+                  <button 
+                    className="btn btn-light btn-sm shadow-sm"
+                    onClick={() => { loadDachStats(); loadDachProgress(); }}
+                  >
+                    <i className="bi bi-arrow-clockwise mr-1"/>Aktualisieren
+                  </button>
                 </div>
 
                 {/* Statistiken */}
