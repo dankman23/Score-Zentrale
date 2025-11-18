@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
       results.stats.totalZahlungen += zahlungen.length
       results.stats.byAnbieter[source.name] = { total: zahlungen.length, matched: 0 }
       
-      console.log(`[Auto-Match] ${source.name}: ${zahlungen.length} Zahlungen`)
+      console.log(`[Auto-Match] ${source.name}: ${zahlungen.length} Zahlungen geladen`)
       
       // Matche jede Zahlung
       let skippedCount = 0
