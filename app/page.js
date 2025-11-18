@@ -5783,12 +5783,48 @@ export default function App() {
                   <i className="bi bi-clipboard mr-1"/>In Zwischenablage
                 </button>
                 {emailPreview.kontaktperson?.email && (
-                  <a 
-                    href={`mailto:${emailPreview.kontaktperson.email}?subject=${encodeURIComponent(emailPreview.email.betreff)}&body=${encodeURIComponent(emailPreview.email.text)}`}
-                    className="btn btn-success"
-                  >
-                    <i className="bi bi-send-fill mr-1"/>In E-Mail-Client öffnen
-                  </a>
+                  <>
+                    <a 
+                      href={`mailto:${emailPreview.kontaktperson.email}?subject=${encodeURIComponent(emailPreview.email.betreff)}&body=${encodeURIComponent(emailPreview.email.text)}`}
+                      className="btn btn-info"
+                    >
+                      <i className="bi bi-envelope mr-1"/>In E-Mail-Client öffnen
+                    </a>
+                    <button
+                      className="btn btn-success"
+                      onClick={async () => {
+                        if (!confirm(`E-Mail jetzt an ${emailPreview.kontaktperson.email} senden?\n\nBCC wird automatisch an danki.leismann@gmx.de gesendet.`)) return
+                        
+                        try {
+                          const res = await fetch('/api/coldleads/generate-email', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              prospectId: emailPreview.prospect.id,
+                              kontaktpersonIndex: emailPreview.prospect.analysis.kontaktpersonen.findIndex(k => k.email === emailPreview.kontaktperson.email),
+                              sendNow: true
+                            })
+                          })
+                          
+                          const data = await res.json()
+                          
+                          if (data.success && data.sent) {
+                            alert(`✅ E-Mail erfolgreich versendet!\n\nAn: ${emailPreview.kontaktperson.email}\nBCC: danki.leismann@gmx.de\n\nMessage-ID: ${data.sendResult?.messageId || 'N/A'}`)
+                            setEmailPreview(null)
+                            await loadColdProspects()
+                            await loadColdLeadStats()
+                          } else {
+                            alert('❌ E-Mail-Versand fehlgeschlagen. Bitte prüfen Sie die SMTP-Konfiguration.')
+                          }
+                        } catch (err) {
+                          alert('❌ Fehler: ' + err.message)
+                        }
+                      }}
+                      disabled={generatingEmail}
+                    >
+                      <i className="bi bi-send-fill mr-1"/>Jetzt versenden (mit BCC)
+                    </button>
+                  </>
                 )}
               </div>
             </div>
