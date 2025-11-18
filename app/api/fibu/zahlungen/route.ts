@@ -163,6 +163,13 @@ export async function GET(request: NextRequest) {
           zugeordneteRechnung: p.zugeordneteRechnung || null,
           zugeordnetesKonto: p.zugeordnetesKonto || null,
           zuordnungsArt: p.zuordnungsArt || null,
+          zuordnungsDatum: p.zuordnungsDatum || null,
+          zuordnungsMethode: p.zuordnungsMethode || null,
+          
+          // Abweichungen (für Teilzahlungen, Skonto, Währung)
+          abweichungsgrund: p.abweichungsgrund || null,
+          abweichungsBetrag: p.abweichungsBetrag || null,
+          zuordnungsNotiz: p.zuordnungsNotiz || null,
         }
       })
 
