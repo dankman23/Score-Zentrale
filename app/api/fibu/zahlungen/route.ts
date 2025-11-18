@@ -38,6 +38,29 @@ export async function GET(request: NextRequest) {
     
     // FIBU-Modul: Nur Daten ab Oktober 2025
     const minDate = new Date('2025-10-01T00:00:00Z')
+    
+    // Prüfe ob Zeitraum vor Oktober 2025
+    if (endDateTime < minDate) {
+      console.log(`[Zahlungen] Zeitraum liegt vor Oktober 2025 (${startDate} - ${endDate})`)
+      return NextResponse.json({
+        ok: true,
+        from: startDate,
+        to: endDate,
+        stats: { gesamt: 0, gesamtsumme: 0, anbieter: {} },
+        zahlungen: [],
+        pagination: {
+          page,
+          pageSize,
+          totalCount: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false
+        },
+        info: 'FIBU-Modul enthält nur Daten ab Oktober 2025'
+      })
+    }
+    
+    // Wenn Start vor Oktober, beginne bei Oktober
     const effectiveStartDate = startDateTime < minDate ? minDate : startDateTime
 
     const dateFilter = {
