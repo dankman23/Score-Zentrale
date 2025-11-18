@@ -247,9 +247,46 @@ export async function GET(request: NextRequest) {
           // Bank: Verwendungszweck durchsuchen nach Mustern
           // Suche nach RE2025-xxxxx (Rechnungsnummer) oder AU-xxxxx (Auftragsnummer)
           const reMatch = verwendungszweck.match(/RE\d{4}-\d+/)
-          const auMatch = verwendungszweck.match(/AU[-_]?\d+/)
-          referenz = reMatch ? reMatch[0] : (auMatch ? auMatch[0] : '')
+          const auMatch = verwendungszweck.match(/AU[-_\s]?\d+[-_\s]?SW\d+/i)
+          referenz = reMatch ? reMatch[0] : (auMatch ? auMatch[0].replace(/\s/g, '_') : '')
           transaktionsId = p.transactionId || p._id?.toString() || ''
+          
+          // AUTO-ZUORDNUNG für Bank-Transaktionen
+          if (!p.istZugeordnet) {
+            if (referenz && referenz.match(/^AU_\d+_SW\d+$/)) {
+              // AU-Nummer gefunden - prüfe Rechnung
+              const rechnung = rechnungenMap.get(referenz)
+              
+              if (rechnung) {
+                autoZugeordnet = true
+                autoGegenkonto = '69012'  // Erlöskonto
+                autoZuordnungsArt = 'rechnung'
+                p.zugeordneteRechnung = rechnung.rechnungsNr
+              } else {
+                autoZugeordnet = true
+                autoGegenkonto = '69012'
+                autoZuordnungsArt = 'Bank Eingang (AU-Nummer, keine Rechnung)'
+              }
+            } else if (p.betrag < 0) {
+              // Negative Beträge: Wahrscheinlich Lieferantenrechnungen
+              // Prüfe ob Kreditor bekannt ist
+              const lieferant = p.gegenkonto || ''
+              if (lieferant && lieferant.length > 3) {
+                autoZugeordnet = true
+                autoGegenkonto = '70000'  // Kreditorenkonto (Wareneingang)
+                autoZuordnungsArt = 'Lieferantenrechnung (Kreditor: ' + lieferant + ')'
+              } else {
+                autoZugeordnet = true
+                autoGegenkonto = '6855'  // Sonstige Aufwendungen
+                autoZuordnungsArt = 'Bank Ausgang (Sonstige)'
+              }
+            } else if (p.betrag > 0 && !referenz) {
+              // Positive Beträge ohne Referenz
+              autoZugeordnet = true
+              autoGegenkonto = '69012'  // Erlöskonto
+              autoZuordnungsArt = 'Bank Eingang (ohne Referenz)'
+            }
+          }
         }
         
         return {
