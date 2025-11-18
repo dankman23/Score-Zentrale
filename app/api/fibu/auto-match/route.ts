@@ -47,7 +47,9 @@ export async function POST(request: NextRequest) {
         totalZahlungen: 0,
         matched: 0,
         byMethod: {
-          auNummer: 0,
+          auNummerDirekt: 0,
+          auNummerBetragDatum: 0,
+          amazonOrderIdXRE: 0,
           reNummer: 0,
           betragDatum: 0,
           kategorie: 0
