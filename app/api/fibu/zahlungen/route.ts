@@ -65,8 +65,18 @@ export async function GET(request: NextRequest) {
       }
 
       const collection = db.collection(source.collection)
+      
+      // Erweitere Filter für Mollie: nur erfolgreiche Transaktionen
+      let query = { ...dateFilter }
+      if (source.name === 'Mollie') {
+        query = {
+          ...dateFilter,
+          status: { $in: ['paid', 'authorized'] }  // Nur bezahlte/autorisierte Transaktionen
+        }
+      }
+      
       const payments = await collection
-        .find(dateFilter)
+        .find(query)
         .sort({ datumDate: -1 })
         .toArray()
 
