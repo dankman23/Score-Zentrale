@@ -235,13 +235,13 @@ export async function GET(request: NextRequest) {
           // Buchungsinformationen
           buchung: p.buchung || null,
           
-          // Zuordnung zu Rechnungen
-          istZugeordnet: p.istZugeordnet || false,
+          // Zuordnung zu Rechnungen (mit Auto-Zuordnung)
+          istZugeordnet: p.istZugeordnet || autoZugeordnet,
           zugeordneteRechnung: p.zugeordneteRechnung || null,
-          zugeordnetesKonto: p.zugeordnetesKonto || null,
-          zuordnungsArt: p.zuordnungsArt || null,
-          zuordnungsDatum: p.zuordnungsDatum || null,
-          zuordnungsMethode: p.zuordnungsMethode || null,
+          zugeordnetesKonto: p.zugeordnetesKonto || autoGegenkonto,
+          zuordnungsArt: p.zuordnungsArt || autoZuordnungsArt,
+          zuordnungsDatum: p.zuordnungsDatum || (autoZugeordnet ? new Date().toISOString() : null),
+          zuordnungsMethode: p.zuordnungsMethode || (autoZugeordnet ? 'auto-amazon-type' : null),
           
           // Abweichungen (für Teilzahlungen, Skonto, Währung)
           abweichungsgrund: p.abweichungsgrund || null,
