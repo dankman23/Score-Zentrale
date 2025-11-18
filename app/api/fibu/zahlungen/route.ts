@@ -285,6 +285,21 @@ export async function GET(request: NextRequest) {
                 autoGegenkonto = '69012'
                 autoZuordnungsArt = 'Bank Eingang (AU-Nummer, keine Rechnung)'
               }
+            } else if (referenz && referenz.match(/^RE\d{4}-\d+$/)) {
+              // Rechnungsnummer direkt gefunden
+              // Prüfe ob diese Rechnung existiert
+              const rechnungExists = rechnungenDocs.find(r => r.cRechnungsNr === referenz)
+              if (rechnungExists) {
+                autoZugeordnet = true
+                autoGegenkonto = '69012'  // Erlöskonto
+                autoZuordnungsArt = 'rechnung'
+                p.zugeordneteRechnung = referenz
+              } else {
+                // Rechnung nicht gefunden, aber Format stimmt
+                autoZugeordnet = true
+                autoGegenkonto = '69012'
+                autoZuordnungsArt = 'Bank Eingang (Rechnung nicht gefunden)'
+              }
             } else if (p.betrag < 0) {
               // Negative Beträge: Wahrscheinlich Lieferantenrechnungen
               // Prüfe ob Kreditor bekannt ist
