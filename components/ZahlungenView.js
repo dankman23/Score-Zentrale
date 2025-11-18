@@ -263,27 +263,67 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
 
       {/* Statistiken - Gesamt (von API) */}
       {stats && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <div className="text-sm font-medium text-blue-900">Gesamt im Zeitraum</div>
-              <div className="text-2xl font-bold text-blue-600">{stats.gesamt} Zahlungen</div>
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-blue-700">Gesamtsumme</div>
-              <div className={`text-xl font-bold ${stats.gesamtsumme >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {stats.gesamtsumme?.toFixed(2)}€
+        <div className="space-y-3">
+          {/* Haupt-Statistik */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <div className="text-sm font-medium text-blue-900">Gesamt im Zeitraum</div>
+                <div className="text-2xl font-bold text-blue-600">{stats.gesamt?.toLocaleString('de-DE')} Zahlungen</div>
+              </div>
+              <div className="text-right">
+                <div className="text-sm text-blue-700">Gesamtsumme</div>
+                <div className={`text-xl font-bold ${(stats.gesamtsumme || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {(stats.gesamtsumme || 0).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€
+                </div>
+              </div>
+              <div className="flex gap-4">
+                {Object.entries(stats.anbieter || {}).map(([name, data]) => (
+                  <div key={name} className="text-center">
+                    <div className="text-xs text-blue-700">{name}</div>
+                    <div className="text-sm font-bold text-blue-900">{data.anzahl?.toLocaleString('de-DE')}</div>
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="flex gap-4">
-              {Object.entries(stats.anbieter || {}).map(([name, data]) => (
-                <div key={name} className="text-center">
-                  <div className="text-xs text-blue-700">{name}</div>
-                  <div className="text-sm font-bold text-blue-900">{data.anzahl}</div>
-                </div>
-              ))}
-            </div>
           </div>
+          
+          {/* Zuordnungs-Statistik */}
+          {stats.zuordnung && (
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <div className="text-sm font-medium text-gray-700 mb-2">📊 Zuordnungsstatus</div>
+              <div className="flex items-center gap-6">
+                <div className="flex-1">
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span className="text-gray-600">✅ Zugeordnet</span>
+                    <span className="font-bold text-green-600">
+                      {stats.zuordnung.zugeordnet?.toLocaleString('de-DE')} ({stats.zuordnung.zugeordnetProzent}%)
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-green-500 h-2 rounded-full" 
+                      style={{ width: `${stats.zuordnung.zugeordnetProzent}%` }}
+                    ></div>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span className="text-gray-600">❌ Nicht zugeordnet</span>
+                    <span className="font-bold text-orange-600">
+                      {stats.zuordnung.nichtZugeordnet?.toLocaleString('de-DE')} ({stats.zuordnung.nichtZugeordnetProzent}%)
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-orange-500 h-2 rounded-full" 
+                      style={{ width: `${stats.zuordnung.nichtZugeordnetProzent}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
