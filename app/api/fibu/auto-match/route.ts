@@ -86,11 +86,11 @@ export async function POST(request: NextRequest) {
     for (const source of sources) {
       const collection = db.collection(source.collection)
       
-      // Lade ALLE nicht-zugeordneten Zahlungen (kein Zeitraum-Filter!)
+      // Lade ALLE nicht-zugeordneten Zahlungen ab Oktober 2025
       let query: any = {
         istZugeordnet: { $ne: true }, // Nur nicht-zugeordnete
         datumDate: {
-          $gte: new Date('2025-01-01') // Nur aktuelles Jahr
+          $gte: new Date('2025-10-01') // Nur ab Oktober 2025
         }
       }
       
