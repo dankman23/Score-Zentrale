@@ -126,32 +126,34 @@ export async function GET(request: NextRequest) {
         
         return {
           _id: p._id?.toString(),
-          zahlungId: p.transactionId || p._id?.toString(),
+          
+          // Haupt-Identifikatoren (für Matching)
+          transaktionsId,  // Eindeutige Transaction-ID
+          referenz,  // Auftragsnummer / Order-ID für Matching
+          
+          // Basis-Daten
           datum: p.datum,
           betrag: p.betrag || 0,
           waehrung: p.waehrung || 'EUR',
           anbieter: source.name,
           quelle: source.collection,
           
-          // Details je nach Quelle
+          // Beschreibung & Details
           verwendungszweck,
           gegenkonto,
           gegenkontoIban: p.gegenkontoIban || null,
-          
-          // PayPal spezifisch
           kundenEmail: p.kundenEmail || null,
-          gebuehr: p.gebuehr || null,
           
-          // Mollie spezifisch
+          // Gebühren & Kategorien (wichtig für Kontenzuordnung)
+          gebuehr: p.gebuehr || null,
+          kategorie: kategorie || null,
           methode: p.methode || null,
           status: p.status || null,
           
-          // Amazon spezifisch
-          kategorie: source.name === 'Amazon' ? p.kategorie : null,
-          amountType: source.name === 'Amazon' ? p.amountType : null,
-          sku: sku,
+          // Amazon-spezifisch
+          sku: sku || null,
           
-          // Zuordnung
+          // Zuordnung zu Rechnungen
           istZugeordnet: p.istZugeordnet || false,
           zugeordneteRechnung: p.zugeordneteRechnung || null,
           zugeordnetesKonto: p.zugeordnetesKonto || null,
