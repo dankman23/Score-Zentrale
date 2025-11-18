@@ -271,11 +271,11 @@ async function crawlGermanyRegion(
   
   console.log(`[DE Crawler] Searching ${region} for ${keywords.join(', ')}`)
   
-  // Mehrere Suchanfragen mit verschiedenen Keywords und Domains
+  // Mehrere Suchanfragen: Fokus auf direkte Firmenwebsites statt Verzeichnisse
   const searchQueries = [
-    `${keywords[0]} ${region} site:gelbeseiten.de OR site:firmenabc.de "impressum"`,
-    `${keywords[0]} ${region} site:11880.com OR site:wlw.de "kontakt"`,
-    `${keywords[1] || keywords[0]} ${region} site:.de "firma" OR "unternehmen"`
+    `${keywords[0]} ${region} site:.de -site:gelbeseiten.de -site:wikipedia.org "impressum" "kontakt"`,
+    `"${keywords[0]}" "${region}" site:.de "unternehmen" OR "firma" OR "betrieb"`,
+    `${keywords[1] || keywords[0]} ${region} site:.de -site:facebook.com -site:linkedin.com "über uns"`
   ]
   
   for (const query of searchQueries) {
