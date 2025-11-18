@@ -50,15 +50,15 @@ export default function DateRangeNavigator({ value, onChange, className = '' }) 
 
   // Navigate prev/next
   const navigate = (direction) => {
-    const from = new Date(currentFrom)
-    const to = new Date(currentTo)
-    
     // FIBU-Modul: Mindestdatum Oktober 2025
     const minDateStr = '2025-10-01'
+    
+    // Parse aktuelles Datum (als String, um Timezone-Probleme zu vermeiden)
+    const [year, month, day] = currentFrom.split('-').map(Number)
 
     if (mode === 'tag') {
-      from.setDate(from.getDate() + direction)
-      const newDateStr = from.toISOString().split('T')[0]
+      const newDate = new Date(year, month - 1, day + direction)
+      const newDateStr = `${newDate.getFullYear()}-${String(newDate.getMonth() + 1).padStart(2, '0')}-${String(newDate.getDate()).padStart(2, '0')}`
       
       // Prüfe Mindestdatum (String-Vergleich)
       if (newDateStr < minDateStr) {
@@ -66,48 +66,62 @@ export default function DateRangeNavigator({ value, onChange, className = '' }) 
         return
       }
       onChange(`${newDateStr}_${newDateStr}`)
-    } else if (mode === 'woche') {
-      from.setDate(from.getDate() + (direction * 7))
-      to.setDate(to.getDate() + (direction * 7))
-      const fromStr = from.toISOString().split('T')[0]
-      const toStr = to.toISOString().split('T')[0]
       
-      // Prüfe Mindestdatum (String-Vergleich)
+    } else if (mode === 'woche') {
+      const fromDate = new Date(year, month - 1, day + (direction * 7))
+      const [toYear, toMonth, toDay] = currentTo.split('-').map(Number)
+      const toDate = new Date(toYear, toMonth - 1, toDay + (direction * 7))
+      
+      const fromStr = `${fromDate.getFullYear()}-${String(fromDate.getMonth() + 1).padStart(2, '0')}-${String(fromDate.getDate()).padStart(2, '0')}`
+      const toStr = `${toDate.getFullYear()}-${String(toDate.getMonth() + 1).padStart(2, '0')}-${String(toDate.getDate()).padStart(2, '0')}`
+      
+      // Prüfe Mindestdatum
       if (toStr < minDateStr) {
         alert('FIBU-Modul enthält nur Daten ab Oktober 2025')
         return
       }
       onChange(`${fromStr}_${toStr}`)
+      
     } else if (mode === 'monat') {
-      // Wichtig: Setze auf den 1. des Monats, bevor wir navigieren!
-      from.setDate(1) // Erster Tag des aktuellen Monats
-      from.setMonth(from.getMonth() + direction) // Navigiere zum Vormonat/Nächsten
-      const fromStr = from.toISOString().split('T')[0]
+      // Berechne neuen Monat
+      let newYear = year
+      let newMonth = month + direction
       
-      // Prüfe Mindestdatum (String-Vergleich)
+      // Handle Monats-Überlauf
+      if (newMonth > 12) {
+        newMonth = 1
+        newYear++
+      } else if (newMonth < 1) {
+        newMonth = 12
+        newYear--
+      }
+      
+      // Erster Tag des neuen Monats
+      const fromStr = `${newYear}-${String(newMonth).padStart(2, '0')}-01`
+      
+      // Prüfe Mindestdatum
       if (fromStr < minDateStr) {
         alert('FIBU-Modul enthält nur Daten ab Oktober 2025')
         return
       }
       
-      const newTo = new Date(from.getFullYear(), from.getMonth() + 1, 0) // Letzter Tag des Monats
-      const toStr = newTo.toISOString().split('T')[0]
+      // Letzter Tag des neuen Monats
+      const lastDay = new Date(newYear, newMonth, 0).getDate()
+      const toStr = `${newYear}-${String(newMonth).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
+      
       onChange(`${fromStr}_${toStr}`)
-    } else if (mode === 'jahr') {
-      // Wichtig: Setze auf den 1. Januar, bevor wir navigieren!
-      from.setMonth(0) // Januar
-      from.setDate(1) // 1. Januar
-      from.setFullYear(from.getFullYear() + direction)
-      const fromStr = from.toISOString().split('T')[0]
       
-      // Prüfe Mindestdatum (String-Vergleich)
+    } else if (mode === 'jahr') {
+      const newYear = year + direction
+      const fromStr = `${newYear}-01-01`
+      
+      // Prüfe Mindestdatum
       if (fromStr < minDateStr) {
         alert('FIBU-Modul enthält nur Daten ab Oktober 2025')
         return
       }
       
-      const newTo = new Date(from.getFullYear(), 11, 31) // 31. Dezember
-      const toStr = newTo.toISOString().split('T')[0]
+      const toStr = `${newYear}-12-31`
       onChange(`${fromStr}_${toStr}`)
     }
   }
