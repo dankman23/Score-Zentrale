@@ -127,42 +127,56 @@ export async function GET(request: NextRequest) {
 
     // Upsert in MongoDB (basierend auf transactionId)
     // WICHTIG: Bewahre User-Daten (Matching) mit $setOnInsert
-    const bulkOps = formattedTransactions.map(t => ({
-      updateOne: {
-        filter: { transactionId: t.transactionId },
-        update: {
-          $set: {
-            // PayPal-Original-Daten (können aktualisiert werden)
-            datum: t.datum,
-            datumDate: t.datumDate,
-            betrag: t.betrag,
-            waehrung: t.waehrung,
-            gebuehr: t.gebuehr,
-            nettoBetrag: t.nettoBetrag,
-            status: t.status,
-            ereignis: t.ereignis,
-            betreff: t.betreff,
-            notiz: t.notiz,
-            rechnungsNr: t.rechnungsNr,
-            kundenEmail: t.kundenEmail,
-            kundenName: t.kundenName,
-            quelle: t.quelle,
-            ursprungsdaten: t.ursprungsdaten,
-            updated_at: new Date()
-          },
-          $setOnInsert: {
-            // User-Daten (werden nur beim ersten Insert gesetzt)
-            transactionId: t.transactionId,
-            istZugeordnet: false,
-            zugeordneteRechnung: null,
-            zugeordnetesKonto: null,
-            zuordnungsArt: null,
-            imported_at: new Date()
-          }
-        },
-        upsert: true
+    // Baue Bulk-Operations
+    // WICHTIG: Zugeordnete Zahlungen (istZugeordnet=true) dürfen NICHT überschrieben werden!
+    const bulkOps = []
+    
+    for (const t of formattedTransactions) {
+      // Prüfe, ob Transaktion bereits existiert und zugeordnet ist
+      const existing = await collection.findOne({ transactionId: t.transactionId })
+      
+      if (existing?.istZugeordnet) {
+        console.log(`[PayPal] ⚠️ Skipping ${t.transactionId} - bereits zugeordnet`)
+        continue // Überspringe zugeordnete Zahlungen
       }
-    }))
+      
+      bulkOps.push({
+        updateOne: {
+          filter: { transactionId: t.transactionId },
+          update: {
+            $set: {
+              // PayPal-Original-Daten (können aktualisiert werden)
+              datum: t.datum,
+              datumDate: t.datumDate,
+              betrag: t.betrag,
+              waehrung: t.waehrung,
+              gebuehr: t.gebuehr,
+              nettoBetrag: t.nettoBetrag,
+              status: t.status,
+              ereignis: t.ereignis,
+              betreff: t.betreff,
+              notiz: t.notiz,
+              rechnungsNr: t.rechnungsNr,
+              kundenEmail: t.kundenEmail,
+              kundenName: t.kundenName,
+              quelle: t.quelle,
+              ursprungsdaten: t.ursprungsdaten,
+              updated_at: new Date()
+            },
+            $setOnInsert: {
+              // User-Daten (werden nur beim ersten Insert gesetzt)
+              transactionId: t.transactionId,
+              istZugeordnet: false,
+              zugeordneteRechnung: null,
+              zugeordnetesKonto: null,
+              zuordnungsArt: null,
+              imported_at: new Date()
+            }
+          },
+          upsert: true
+        }
+      })
+    }
 
     if (bulkOps.length > 0) {
       const result = await collection.bulkWrite(bulkOps)
