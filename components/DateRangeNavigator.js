@@ -52,18 +52,38 @@ export default function DateRangeNavigator({ value, onChange, className = '' }) 
   const navigate = (direction) => {
     const from = new Date(currentFrom)
     const to = new Date(currentTo)
+    
+    // FIBU-Modul: Mindestdatum Oktober 2025
+    const minDate = new Date('2025-10-01')
 
     if (mode === 'tag') {
       from.setDate(from.getDate() + direction)
+      // Prüfe Mindestdatum
+      if (from < minDate) {
+        alert('FIBU-Modul enthält nur Daten ab Oktober 2025')
+        return
+      }
       onChange(`${from.toISOString().split('T')[0]}_${from.toISOString().split('T')[0]}`)
     } else if (mode === 'woche') {
       from.setDate(from.getDate() + (direction * 7))
       to.setDate(to.getDate() + (direction * 7))
+      // Prüfe Mindestdatum
+      if (to < minDate) {
+        alert('FIBU-Modul enthält nur Daten ab Oktober 2025')
+        return
+      }
       onChange(`${from.toISOString().split('T')[0]}_${to.toISOString().split('T')[0]}`)
     } else if (mode === 'monat') {
       // Wichtig: Setze auf den 1. des Monats, bevor wir navigieren!
       from.setDate(1) // Erster Tag des aktuellen Monats
       from.setMonth(from.getMonth() + direction) // Navigiere zum Vormonat/Nächsten
+      
+      // Prüfe Mindestdatum
+      if (from < minDate) {
+        alert('FIBU-Modul enthält nur Daten ab Oktober 2025')
+        return
+      }
+      
       const newTo = new Date(from.getFullYear(), from.getMonth() + 1, 0) // Letzter Tag des Monats
       onChange(`${from.toISOString().split('T')[0]}_${newTo.toISOString().split('T')[0]}`)
     } else if (mode === 'jahr') {
@@ -71,6 +91,13 @@ export default function DateRangeNavigator({ value, onChange, className = '' }) 
       from.setMonth(0) // Januar
       from.setDate(1) // 1. Januar
       from.setFullYear(from.getFullYear() + direction)
+      
+      // Prüfe Mindestdatum
+      if (from < minDate) {
+        alert('FIBU-Modul enthält nur Daten ab Oktober 2025')
+        return
+      }
+      
       const newTo = new Date(from.getFullYear(), 11, 31) // 31. Dezember
       onChange(`${from.toISOString().split('T')[0]}_${newTo.toISOString().split('T')[0]}`)
     }
