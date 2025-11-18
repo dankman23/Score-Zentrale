@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
           const auMatch = verwendungszweck.match(/AU_\d+_SW\d+/)
           referenz = auMatch ? auMatch[0] : ''
           transaktionsId = p.transactionId || ''
-          gegenkonto = p.gegenkonto || ''
+          // gegenkonto bleibt wie in Basis-Init (p.gegenkonto || p.kundenName)
           
         } else if (source.name === 'PayPal') {
           // PayPal: Transaction-ID als Referenz
