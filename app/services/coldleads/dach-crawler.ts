@@ -213,22 +213,28 @@ export async function crawlDACHRegion(
   switch (country) {
     case 'DE':
       // Gelbe Seiten / 11880.com scrapen (simuliert)
-      const deLeads = await crawlGermanyRegion(region, industry, limit)
-      leads.push(...deLeads)
+      const deLeads = await crawlGermanyRegion(region, industry, limit * 2) // 2x für Filter-Overhead
+      allLeads.push(...deLeads)
       break
       
     case 'AT':
       // Herold.at / firmenabc.at scrapen (simuliert)
-      const atLeads = await crawlAustriaRegion(region, industry, limit)
-      leads.push(...atLeads)
+      const atLeads = await crawlAustriaRegion(region, industry, limit * 2)
+      allLeads.push(...atLeads)
       break
       
     case 'CH':
       // local.ch / search.ch scrapen (simuliert)
-      const chLeads = await crawlSwitzerlandRegion(region, industry, limit)
-      leads.push(...chLeads)
+      const chLeads = await crawlSwitzerlandRegion(region, industry, limit * 2)
+      allLeads.push(...chLeads)
       break
   }
+  
+  // Filter anwenden: Nur echte Firmen, keine Schulen/Plattformen
+  const filteredLeads = allLeads.filter(isValidCompanyLead)
+  console.log(`[DACH Crawler] Filtered: ${allLeads.length} → ${filteredLeads.length} (removed ${allLeads.length - filteredLeads.length})`)
+  
+  const leads = filteredLeads.slice(0, limit)
   
   // Progress tracken
   const progress: CrawlProgress = {
