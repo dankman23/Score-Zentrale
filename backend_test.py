@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-FIBU Backend Testing - Buchungslogik & Auto-Match Verbesserungen
-Tests für die spezifischen APIs aus dem Review Request
+FIBU Backend Testing - Import-Fix Verification
+Tests nach Korrektur der Import-Pfade von relativen Pfaden auf Alias-Pfade (@/)
 """
 
 import requests
