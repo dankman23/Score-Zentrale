@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
         let sku = null
         let kategorie = null
         
-        // AUTO-ZUORDNUNG: Amazon-Transaktionen werden automatisch zugeordnet
+        // AUTO-ZUORDNUNG: Amazon-Transaktionen werden automatisch zugeordnet (nur wenn noch nicht zugeordnet)
         let autoZugeordnet = false
         let autoGegenkonto = null
         let autoZuordnungsArt = null
@@ -134,50 +134,52 @@ export async function GET(request: NextRequest) {
           sku = p.sku || ''
           transaktionsId = p.transactionId || ''
           
-          // AUTO-ZUORDNUNG für Amazon basierend auf amountType
-          const amountTypeKey = (p.amountType || '').split('/').pop() // z.B. "Order/ItemPrice/Principal" → "Principal"
-          
-          if (amountTypeKey === 'Principal' || p.amountType?.includes('ItemPrice')) {
-            autoZugeordnet = true
-            autoGegenkonto = '69001'  // Umsatzerlöse
-            autoZuordnungsArt = 'Amazon Erlös (Principal)'
-          } else if (amountTypeKey === 'Commission' || p.amountType?.includes('ItemFees/Commission')) {
-            autoZugeordnet = true
-            autoGegenkonto = '6770'  // Amazon Kommission
-            autoZuordnungsArt = 'Amazon Gebühr (Kommission)'
-          } else if (amountTypeKey === 'Shipping' || p.amountType?.includes('Shipping')) {
-            autoZugeordnet = true
-            autoGegenkonto = '4800'  // Versanderlöse
-            autoZuordnungsArt = 'Amazon Versand'
-          } else if (p.amountType?.includes('Tax')) {
-            autoZugeordnet = true
-            autoGegenkonto = '1776'  // Umsatzsteuer
-            autoZuordnungsArt = 'Amazon Steuer'
-          } else if (p.amountType?.includes('MarketplaceFacilitatorVAT')) {
-            autoZugeordnet = true
-            autoGegenkonto = '1370'  // Abziehbare Vorsteuer
-            autoZuordnungsArt = 'Amazon MwSt (von Amazon abgeführt)'
-          } else if (p.amountType?.includes('FBA')) {
-            autoZugeordnet = true
-            autoGegenkonto = '4950'  // FBA Gebühren
-            autoZuordnungsArt = 'Amazon FBA Gebühr'
-          } else if (p.amountType?.includes('Refund')) {
-            autoZugeordnet = true
-            autoGegenkonto = '69001'  // Rückerstattungen gegen Erlöse
-            autoZuordnungsArt = 'Amazon Rückerstattung'
-          } else if (p.amountType?.includes('Transfer')) {
-            autoZugeordnet = true
-            autoGegenkonto = '1200'  // Forderungen
-            autoZuordnungsArt = 'Amazon Transfer/Auszahlung'
-          } else if (p.transactionType === 'other-transaction') {
-            autoZugeordnet = true
-            autoGegenkonto = '6855'  // Sonstige Aufwendungen
-            autoZuordnungsArt = 'Amazon Sonstige Transaktion'
-          } else {
-            // Fallback: Unbekannte Amazon-Transaktionen werden auch zugeordnet
-            autoZugeordnet = true
-            autoGegenkonto = '1815'  // Amazon Settlement-Konto (neutral)
-            autoZuordnungsArt = 'Amazon (automatisch zugeordnet)'
+          // AUTO-ZUORDNUNG für Amazon basierend auf amountType (nur wenn noch NICHT zugeordnet)
+          if (!p.istZugeordnet) {
+            const amountTypeKey = (p.amountType || '').split('/').pop() // z.B. "Order/ItemPrice/Principal" → "Principal"
+            
+            if (amountTypeKey === 'Principal' || p.amountType?.includes('ItemPrice')) {
+              autoZugeordnet = true
+              autoGegenkonto = '69001'  // Umsatzerlöse
+              autoZuordnungsArt = 'Amazon Erlös (Principal)'
+            } else if (amountTypeKey === 'Commission' || p.amountType?.includes('ItemFees/Commission')) {
+              autoZugeordnet = true
+              autoGegenkonto = '6770'  // Amazon Kommission
+              autoZuordnungsArt = 'Amazon Gebühr (Kommission)'
+            } else if (amountTypeKey === 'Shipping' || p.amountType?.includes('Shipping')) {
+              autoZugeordnet = true
+              autoGegenkonto = '4800'  // Versanderlöse
+              autoZuordnungsArt = 'Amazon Versand'
+            } else if (p.amountType?.includes('Tax')) {
+              autoZugeordnet = true
+              autoGegenkonto = '1776'  // Umsatzsteuer
+              autoZuordnungsArt = 'Amazon Steuer'
+            } else if (p.amountType?.includes('MarketplaceFacilitatorVAT')) {
+              autoZugeordnet = true
+              autoGegenkonto = '1370'  // Abziehbare Vorsteuer
+              autoZuordnungsArt = 'Amazon MwSt (von Amazon abgeführt)'
+            } else if (p.amountType?.includes('FBA')) {
+              autoZugeordnet = true
+              autoGegenkonto = '4950'  // FBA Gebühren
+              autoZuordnungsArt = 'Amazon FBA Gebühr'
+            } else if (p.amountType?.includes('Refund')) {
+              autoZugeordnet = true
+              autoGegenkonto = '69001'  // Rückerstattungen gegen Erlöse
+              autoZuordnungsArt = 'Amazon Rückerstattung'
+            } else if (p.amountType?.includes('Transfer')) {
+              autoZugeordnet = true
+              autoGegenkonto = '1200'  // Forderungen
+              autoZuordnungsArt = 'Amazon Transfer/Auszahlung'
+            } else if (p.transactionType === 'other-transaction') {
+              autoZugeordnet = true
+              autoGegenkonto = '6855'  // Sonstige Aufwendungen
+              autoZuordnungsArt = 'Amazon Sonstige Transaktion'
+            } else {
+              // Fallback: Unbekannte Amazon-Transaktionen werden auch zugeordnet
+              autoZugeordnet = true
+              autoGegenkonto = '1815'  // Amazon Settlement-Konto (neutral)
+              autoZuordnungsArt = 'Amazon (automatisch zugeordnet)'
+            }
           }
           
         } else if (source.name === 'Mollie') {
