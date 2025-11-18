@@ -35,10 +35,14 @@ export async function GET(request: NextRequest) {
     const db = await getDb()
     const startDateTime = new Date(startDate + 'T00:00:00Z')
     const endDateTime = new Date(endDate + 'T23:59:59Z')
+    
+    // FIBU-Modul: Nur Daten ab Oktober 2025
+    const minDate = new Date('2025-10-01T00:00:00Z')
+    const effectiveStartDate = startDateTime < minDate ? minDate : startDateTime
 
     const dateFilter = {
       datumDate: {
-        $gte: startDateTime,
+        $gte: effectiveStartDate,
         $lte: endDateTime
       }
     }
