@@ -324,9 +324,9 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Anbieter</th>
                 <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase">Betrag</th>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rechnung</th>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Referenz/Auftrag</th>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kunde</th>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hinweis</th>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Verwendungszweck</th>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Zuordnung</th>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aktion</th>
               </tr>
