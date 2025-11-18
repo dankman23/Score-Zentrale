@@ -109,12 +109,21 @@ export async function GET(request: NextRequest) {
     // Formatiere für MongoDB
     const formattedTransactions = result.recordset.map((pos: any) => {
       const kategorie = kategorisierePosition(pos)
+      const betrag = parseFloat(pos.Amount || 0)
+      
+      // Berechne Buchungsinformationen
+      const buchung = berechneAmazonBuchung(
+        betrag,
+        pos.AmountType,
+        pos.OrderID,
+        pos.TransactionType
+      )
       
       return {
         transactionId: `AMZ-${pos.kMessageId}`,
         datum: pos.PostedDateTime?.toISOString() || null,
         datumDate: pos.PostedDateTime || null,
-        betrag: parseFloat(pos.Amount || 0),
+        betrag: betrag,
         waehrung: 'EUR',
         
         settlementId: pos.SettlementID?.toString(),
@@ -132,6 +141,10 @@ export async function GET(request: NextRequest) {
         
         kategorie,
         quelle: 'Amazon',
+        
+        // NEU: Buchungsinformationen
+        buchung: buchung,
+        
         ursprungsdaten: pos,
       }
     })
