@@ -4213,7 +4213,16 @@ export default function App() {
                                           <div className="col-md-12 mb-3">
                                             <div className="card bg-secondary border-0">
                                               <div className="card-body">
-                                                <h6 className="text-primary mb-3"><i className="bi bi-person-badge-fill mr-2"/>Kontaktpersonen ({p.analysis.kontaktpersonen.length})</h6>
+                                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                                  <h6 className="text-primary mb-0"><i className="bi bi-person-badge-fill mr-2"/>Kontaktpersonen ({p.analysis.kontaktpersonen.length})</h6>
+                                                  <button 
+                                                    className="btn btn-sm btn-success"
+                                                    onClick={() => generateEmail(p)}
+                                                    disabled={coldLoading}
+                                                  >
+                                                    <i className="bi bi-envelope-plus-fill mr-1"/>E-Mail generieren
+                                                  </button>
+                                                </div>
                                                 {p.analysis.kontaktpersonen.map((k, idx) => (
                                                   <div key={idx} className="d-flex justify-content-between align-items-center mb-2 p-2 bg-dark rounded">
                                                     <div>
@@ -4223,12 +4232,22 @@ export default function App() {
                                                     </div>
                                                     <div>
                                                       {k.email && (
-                                                        <a href={`mailto:${k.email}`} className="btn btn-sm btn-primary mr-2">
-                                                          <i className="bi bi-envelope mr-1"/>{k.email}
-                                                        </a>
+                                                        <>
+                                                          <a href={`mailto:${k.email}`} className="btn btn-sm btn-outline-primary mr-2">
+                                                            <i className="bi bi-envelope mr-1"/>{k.email}
+                                                          </a>
+                                                          <button 
+                                                            className="btn btn-sm btn-success"
+                                                            onClick={() => generateEmail(p, idx)}
+                                                            disabled={coldLoading}
+                                                            title="E-Mail für diese Person generieren"
+                                                          >
+                                                            <i className="bi bi-send-fill"/>
+                                                          </button>
+                                                        </>
                                                       )}
                                                       {k.telefon && (
-                                                        <span className="text-white-50"><i className="bi bi-telephone mr-1"/>{k.telefon}</span>
+                                                        <span className="text-white-50 ml-2"><i className="bi bi-telephone mr-1"/>{k.telefon}</span>
                                                       )}
                                                     </div>
                                                   </div>
