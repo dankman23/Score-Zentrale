@@ -104,9 +104,13 @@ export async function POST(request: NextRequest) {
       console.log(`[Auto-Match] ${source.name}: ${zahlungen.length} Zahlungen`)
       
       // Matche jede Zahlung
+      let skippedCount = 0
       for (const zahlung of zahlungen) {
         // Skip wenn bereits zugeordnet
-        if (zahlung.istZugeordnet) continue
+        if (zahlung.istZugeordnet) {
+          skippedCount++
+          continue
+        }
         
         let match = null
         let method = ''
