@@ -129,18 +129,26 @@ export async function GET(request: NextRequest) {
     // WICHTIG: Bewahre User-Daten (Matching) mit $setOnInsert
     // Baue Bulk-Operations
     // WICHTIG: Zugeordnete Zahlungen (istZugeordnet=true) dürfen NICHT überschrieben werden!
-    const bulkOps = []
     
-    for (const t of formattedTransactions) {
-      // Prüfe, ob Transaktion bereits existiert und zugeordnet ist
-      const existing = await collection.findOne({ transactionId: t.transactionId })
-      
-      if (existing?.istZugeordnet) {
-        console.log(`[PayPal] ⚠️ Skipping ${t.transactionId} - bereits zugeordnet`)
-        continue // Überspringe zugeordnete Zahlungen
-      }
-      
-      bulkOps.push({
+    // Hole alle zugeordneten TransactionIDs in einem Query
+    const transactionIds = formattedTransactions.map(t => t.transactionId)
+    const zugeordnete = await collection
+      .find({
+        transactionId: { $in: transactionIds },
+        istZugeordnet: true
+      })
+      .project({ transactionId: 1 })
+      .toArray()
+    
+    const zugeordneteIds = new Set(zugeordnete.map(z => z.transactionId))
+    
+    if (zugeordneteIds.size > 0) {
+      console.log(`[PayPal] ⚠️ ${zugeordneteIds.size} bereits zugeordnete Transaktionen werden geschützt`)
+    }
+    
+    const bulkOps = formattedTransactions
+      .filter(t => !zugeordneteIds.has(t.transactionId)) // Überspringe zugeordnete
+      .map(t => ({
         updateOne: {
           filter: { transactionId: t.transactionId },
           update: {
@@ -175,8 +183,7 @@ export async function GET(request: NextRequest) {
           },
           upsert: true
         }
-      })
-    }
+      }))
 
     if (bulkOps.length > 0) {
       const result = await collection.bulkWrite(bulkOps)
