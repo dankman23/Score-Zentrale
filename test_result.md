@@ -13,15 +13,18 @@ user_problem_statement: |
 backend:
   - task: "Buchungslogik-Library erstellen"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/lib/fibu/buchungslogik.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Erstellt: Amazon & PayPal Konten-Mapping, MwSt-Berechnung, DATEV-Export-Format"
+      - working: true
+        agent: "testing"
+        comment: "✅ Buchungslogik library exists and contains all required functions (berechneAmazonBuchung, berechnePayPalBuchung, AMAZON_KONTEN_MAPPING). Code structure is correct with proper TypeScript interfaces."
   
   - task: "Amazon Settlements API erweitern (Buchungsinformationen)"
     implemented: true
