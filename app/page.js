@@ -4155,6 +4155,135 @@ export default function App() {
                                   </div>
                                 ) : (
                                 <div className="bg-dark border-top border-bottom p-4">
+                                  {/* SCORE Deep Analysis Display - NEU */}
+                                  {p.analysis && p.analysis.firmenprofil && (
+                                    <div className="mb-4">
+                                      <div className="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 className="text-white mb-0">
+                                          <i className="bi bi-gem text-primary mr-2"/>
+                                          SCORE Firmen-Analyse
+                                        </h5>
+                                        <span className={`badge badge-lg badge-${p.analysis_quality >= 70 ? 'success' : p.analysis_quality >= 50 ? 'warning' : 'secondary'} px-3 py-2`} style={{fontSize: '1.1rem'}}>
+                                          Qualität: {p.analysis_quality || 0}%
+                                        </span>
+                                      </div>
+                                      
+                                      {/* Firmenprofil */}
+                                      <div className="alert alert-info mb-3">
+                                        <strong><i className="bi bi-building mr-2"/>Firmenprofil:</strong> {p.analysis.firmenprofil}
+                                      </div>
+                                      
+                                      <div className="row">
+                                        {/* Werkstoffe */}
+                                        {p.analysis.werkstoffe && p.analysis.werkstoffe.length > 0 && (
+                                          <div className="col-md-6 mb-3">
+                                            <div className="card bg-secondary border-0">
+                                              <div className="card-body">
+                                                <h6 className="text-warning mb-3"><i className="bi bi-layers-fill mr-2"/>Werkstoffe</h6>
+                                                {p.analysis.werkstoffe.map((w, idx) => (
+                                                  <div key={idx} className="mb-2">
+                                                    <span className="badge badge-warning">{w.name}</span>
+                                                    <small className="text-white-50 ml-2">{w.kontext}</small>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+                                        
+                                        {/* Werkstücke */}
+                                        {p.analysis.werkstücke && p.analysis.werkstücke.length > 0 && (
+                                          <div className="col-md-6 mb-3">
+                                            <div className="card bg-secondary border-0">
+                                              <div className="card-body">
+                                                <h6 className="text-success mb-3"><i className="bi bi-box-seam mr-2"/>Werkstücke</h6>
+                                                {p.analysis.werkstücke.map((w, idx) => (
+                                                  <div key={idx} className="mb-2">
+                                                    <span className="badge badge-success">{w.name}</span>
+                                                    <small className="text-white-50 ml-2">{w.beschreibung}</small>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+                                        
+                                        {/* Kontaktpersonen */}
+                                        {p.analysis.kontaktpersonen && p.analysis.kontaktpersonen.length > 0 && (
+                                          <div className="col-md-12 mb-3">
+                                            <div className="card bg-secondary border-0">
+                                              <div className="card-body">
+                                                <h6 className="text-primary mb-3"><i className="bi bi-person-badge-fill mr-2"/>Kontaktpersonen ({p.analysis.kontaktpersonen.length})</h6>
+                                                {p.analysis.kontaktpersonen.map((k, idx) => (
+                                                  <div key={idx} className="d-flex justify-content-between align-items-center mb-2 p-2 bg-dark rounded">
+                                                    <div>
+                                                      <strong className="text-white">{k.name}</strong>
+                                                      <span className="badge badge-info ml-2">{k.position}</span>
+                                                      <span className="badge badge-secondary ml-1">{k.bereich}</span>
+                                                    </div>
+                                                    <div>
+                                                      {k.email && (
+                                                        <a href={`mailto:${k.email}`} className="btn btn-sm btn-primary mr-2">
+                                                          <i className="bi bi-envelope mr-1"/>{k.email}
+                                                        </a>
+                                                      )}
+                                                      {k.telefon && (
+                                                        <span className="text-white-50"><i className="bi bi-telephone mr-1"/>{k.telefon}</span>
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+                                        
+                                        {/* Potenzielle Produkte */}
+                                        {p.analysis.potenzielle_produkte && p.analysis.potenzielle_produkte.length > 0 && (
+                                          <div className="col-md-12 mb-3">
+                                            <div className="card bg-secondary border-0">
+                                              <div className="card-body">
+                                                <h6 className="text-success mb-3"><i className="bi bi-cart-check-fill mr-2"/>Empfohlene SCORE-Produkte ({p.analysis.potenzielle_produkte.length})</h6>
+                                                {p.analysis.potenzielle_produkte.map((prod, idx) => (
+                                                  <div key={idx} className="alert alert-success mb-2">
+                                                    <div className="d-flex justify-content-between align-items-start">
+                                                      <div>
+                                                        <strong className="text-dark">{prod.kategorie}</strong>
+                                                        <br/>
+                                                        <small>
+                                                          <span className="badge badge-warning mr-1">Werkstoff: {prod.für_werkstoff}</span>
+                                                          <span className="badge badge-info">Anwendung: {prod.für_anwendung}</span>
+                                                        </small>
+                                                        <br/>
+                                                        <small className="text-muted">{prod.begründung}</small>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+                                        
+                                        {/* Anwendungen */}
+                                        {p.analysis.anwendungen && p.analysis.anwendungen.length > 0 && (
+                                          <div className="col-md-12 mb-3">
+                                            <div className="card bg-secondary border-0">
+                                              <div className="card-body">
+                                                <h6 className="text-info mb-3"><i className="bi bi-tools mr-2"/>Anwendungen</h6>
+                                                <div className="d-flex flex-wrap">
+                                                  {p.analysis.anwendungen.map((app, idx) => (
+                                                    <span key={idx} className="badge badge-info mr-1 mb-1">{app}</span>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                  
                                   {/* V3 Analysis Display */}
                                   {p.analysis_v3 && (
                                     <div className="mb-4">
