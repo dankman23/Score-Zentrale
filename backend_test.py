@@ -1,17 +1,65 @@
 #!/usr/bin/env python3
 """
-Backend Test Suite for FIBU Zahlungen API
-Testing FIBU Zahlungen API endpoints according to review request requirements.
+FIBU Backend Testing - Buchungslogik & Auto-Match Verbesserungen
+Tests für die spezifischen APIs aus dem Review Request
 """
 
 import requests
 import json
 import sys
 from datetime import datetime, timedelta
+from typing import Dict, Any, List
 
-# Get base URL from environment
+# Base URL aus .env
 BASE_URL = "https://invoice-sync-7.preview.emergentagent.com"
-API_BASE = f"{BASE_URL}/api"
+
+class FIBUBackendTester:
+    def __init__(self):
+        self.base_url = BASE_URL
+        self.results = []
+        self.errors = []
+        
+    def log_result(self, test_name: str, success: bool, details: str, response_data: Any = None):
+        """Log test result"""
+        result = {
+            'test': test_name,
+            'success': success,
+            'details': details,
+            'timestamp': datetime.now().isoformat(),
+            'response_data': response_data
+        }
+        self.results.append(result)
+        
+        status = "✅ PASS" if success else "❌ FAIL"
+        print(f"{status} {test_name}: {details}")
+        
+        if not success:
+            self.errors.append(result)
+    
+    def make_request(self, method: str, endpoint: str, **kwargs) -> tuple[bool, Any]:
+        """Make HTTP request and handle errors"""
+        try:
+            url = f"{self.base_url}{endpoint}"
+            print(f"🔄 {method} {url}")
+            
+            response = requests.request(method, url, timeout=30, **kwargs)
+            
+            # Log response status
+            print(f"   Status: {response.status_code}")
+            
+            if response.status_code >= 400:
+                print(f"   Error Response: {response.text[:500]}")
+                return False, {"error": response.text, "status": response.status_code}
+            
+            try:
+                data = response.json()
+                return True, data
+            except:
+                return True, response.text
+                
+        except Exception as e:
+            print(f"   Exception: {str(e)}")
+            return False, {"error": str(e)}
 
 def test_fibu_zahlungen_api():
     """
