@@ -124,15 +124,15 @@ export async function POST() {
         try {
           console.log(`[Autopilot Tick] Analyzing ${prospect.company_name}...`)
           
-          // Nutze neue V3-Analyze API
-          const analyzeResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/coldleads/analyze-v3`, {
+          // Nutze neue Deep-Analyze API
+          const analyzeResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/coldleads/analyze-deep`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               website: prospect.website,
-              company_name: prospect.company_name,
-              industry: nextQuery.industry,
-              region: nextQuery.region
+              firmenname: prospect.company_name,
+              branche: nextQuery.industry,
+              prospectId: prospect.id
             })
           })
           
