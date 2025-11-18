@@ -32,20 +32,37 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
     }
   }, [zeitraum])
 
-  async function loadZahlungen(page = pagination.page) {
+  async function loadZahlungen(page = 1, pageSize = 500) {
     setLoading(true)
+    const abortController = new AbortController()
+    
     try {
       const [from, to] = zeitraum.split('_')
-      console.log(`[ZahlungenView] Loading from ${from} to ${to}, Page ${page}`)
+      console.log(`[ZahlungenView] Loading from ${from} to ${to}, Page ${page}, PageSize ${pageSize}`)
       
-      const res = await fetch(`/api/fibu/zahlungen?from=${from}&to=${to}&page=${page}&pageSize=${pagination.pageSize}`)
+      const url = `/api/fibu/zahlungen?from=${from}&to=${to}&page=${page}&pageSize=${pageSize}`
+      console.log(`[ZahlungenView] Fetching from: ${url}`)
+      
+      const res = await fetch(url, {
+        signal: abortController.signal,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      console.log(`[ZahlungenView] Response status: ${res.status}`)
+      
+      if (!res.ok) {
+        throw new Error(`HTTP Error: ${res.status} ${res.statusText}`)
+      }
+      
       const data = await res.json()
       
       console.log('[ZahlungenView] API Response:', {
         ok: data.ok,
         zahlungenCount: data.zahlungen?.length,
         pagination: data.pagination,
-        sample: data.zahlungen?.[0]
+        statsGesamt: data.stats?.gesamt
       })
       
       if (data.ok) {
@@ -56,11 +73,20 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
         }
       } else {
         console.error('[ZahlungenView] API Error:', data.error)
+        setZahlungen([])
       }
     } catch (error) {
-      console.error('[ZahlungenView] Fetch Error:', error)
+      if (error.name === 'AbortError') {
+        console.log('[ZahlungenView] Fetch aborted')
+      } else {
+        console.error('[ZahlungenView] Fetch Error:', error.message, error)
+      }
+      setZahlungen([])
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
+    
+    return () => abortController.abort()
   }
   
   function handlePageChange(newPage) {
