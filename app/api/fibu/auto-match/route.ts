@@ -66,17 +66,17 @@ export async function POST(request: NextRequest) {
       { name: 'Mollie', collection: 'fibu_mollie_transactions' }
     ]
     
-    // Lade ALLE VK-Rechnungen (kein Zeitraum-Filter!)
+    // Lade ALLE VK-Rechnungen ab Oktober 2025
     // Grund: Zahlungen können vor der Rechnung kommen (z.B. PayPal bei Bestellung, Rechnung erst bei Versand)
     const vkRechnungen = await db.collection('fibu_vk_rechnungen')
       .find({
         rechnungsdatum: {
-          $gte: new Date('2025-01-01') // Nur aktuelles Jahr
+          $gte: new Date('2025-10-01') // Nur ab Oktober 2025
         }
       })
       .toArray()
     
-    console.log('[Auto-Match] Geladene VK-Rechnungen:', vkRechnungen.length, '(alle aus 2025)')
+    console.log('[Auto-Match] Geladene VK-Rechnungen:', vkRechnungen.length, '(ab Okt 2025)')
     
     // Lade Kontenplan für Amazon Gebühren
     const kontenplan = await db.collection('fibu_kontenplan').find({}).toArray()
