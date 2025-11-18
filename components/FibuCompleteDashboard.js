@@ -107,6 +107,57 @@ export default function FibuCompleteDashboard() {
     setLoading(false)
   }
 
+  async function runAutoMatch() {
+    setShowRefreshMenu(false)
+    
+    if (!confirm('Auto-Zuordnung für den gewählten Zeitraum starten?\n\nDies ordnet Zahlungen automatisch Rechnungen und Konten zu.')) {
+      return
+    }
+    
+    setRefreshing(true)
+    
+    try {
+      console.log('🤖 Starte Auto-Matching...')
+      
+      const res = await fetch('/api/fibu/auto-match', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          zeitraum: selectedPeriod,
+          dryRun: false 
+        })
+      })
+      
+      const data = await res.json()
+      
+      if (data.ok) {
+        const { matched, stats } = data
+        
+        alert(`✅ Auto-Zuordnung abgeschlossen!\n\n` +
+          `📊 Ergebnis:\n` +
+          `• ${stats.matched} von ${stats.totalZahlungen} Zahlungen zugeordnet\n\n` +
+          `📝 Details:\n` +
+          `• ${stats.byMethod.auNummer} über AU-Nummer\n` +
+          `• ${stats.byMethod.reNummer} über RE-Nummer\n` +
+          `• ${stats.byMethod.betragDatum} über Betrag+Datum\n` +
+          `• ${stats.byMethod.kategorie} über Kategorie (Gebühren)\n\n` +
+          `👉 ${stats.totalZahlungen - stats.matched} Zahlungen benötigen manuelle Zuordnung`
+        )
+        
+        // Reload data
+        await loadData(true)
+      } else {
+        alert('❌ Fehler beim Auto-Matching:\n' + data.error)
+      }
+      
+    } catch (error) {
+      console.error('Fehler beim Auto-Matching:', error)
+      alert('❌ Fehler beim Auto-Matching:\n' + error.message)
+    }
+    
+    setRefreshing(false)
+  }
+  
   async function refreshData(type = 'all') {
     setRefreshing(true)
     setShowRefreshMenu(false)
