@@ -246,7 +246,7 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
               </div>
             </div>
             <div className="flex gap-4">
-              {Object.entries(stats.anbieter || {}).map(([name, data]: [string, any]) => (
+              {Object.entries(stats.anbieter || {}).map(([name, data]) => (
                 <div key={name} className="text-center">
                   <div className="text-xs text-blue-700">{name}</div>
                   <div className="text-sm font-bold text-blue-900">{data.anzahl}</div>
