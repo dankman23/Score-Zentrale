@@ -371,13 +371,19 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
                         {(zahlung.betrag || 0) >= 0 ? '+' : ''}{(zahlung.betrag || 0).toFixed(2)}€
                       </td>
                       <td className="px-3 py-3 text-sm whitespace-nowrap">
-                        {zahlung.istZugeordnet && zahlung.zugeordneteRechnung ? (
-                          <span className="text-blue-600 font-medium">📄 {zahlung.zugeordneteRechnung}</span>
-                        ) : zahlung.zugeordnetesKonto ? (
-                          <span className="text-purple-600 font-medium">📊 {zahlung.zugeordnetesKonto}</span>
-                        ) : (
-                          <span className="text-gray-400">-</span>
-                        )}
+                        <div className="flex flex-col gap-1">
+                          {zahlung.referenz && (
+                            <span className="text-blue-600 font-medium">🔖 {zahlung.referenz}</span>
+                          )}
+                          {zahlung.transaktionsId && (
+                            <span className="text-xs text-gray-500 font-mono truncate max-w-[120px]" title={zahlung.transaktionsId}>
+                              {zahlung.transaktionsId}
+                            </span>
+                          )}
+                          {!zahlung.referenz && !zahlung.transaktionsId && (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-3 py-3 text-sm text-gray-600 max-w-[150px]">
                         <div className="truncate" title={zahlung.gegenkonto || zahlung.kundenEmail}>
