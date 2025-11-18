@@ -1086,6 +1086,46 @@ export default function App() {
     }
   }
 
+  // E-Mail generieren
+  const [emailPreview, setEmailPreview] = useState(null)
+  const [generatingEmail, setGeneratingEmail] = useState(false)
+
+  const generateEmail = async (prospect, kontaktpersonIndex = null) => {
+    if (generatingEmail) return
+    setGeneratingEmail(true)
+    
+    try {
+      const res = await fetch('/api/coldleads/generate-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          prospectId: prospect.id,
+          kontaktpersonIndex
+        })
+      })
+      
+      const data = await res.json()
+      
+      if (data.success) {
+        // Zeige E-Mail Vorschau
+        setEmailPreview({
+          prospect,
+          email: data.email,
+          kontaktperson: kontaktpersonIndex !== null && prospect.analysis.kontaktpersonen[kontaktpersonIndex]
+            ? prospect.analysis.kontaktpersonen[kontaktpersonIndex]
+            : null
+        })
+      } else {
+        alert('❌ Fehler: ' + (data.error || 'Unbekannter Fehler'))
+      }
+    } catch (err) {
+      console.error(err)
+      alert('❌ Fehler beim Generieren: ' + err.message)
+    } finally {
+      setGeneratingEmail(false)
+    }
+  }
+
   // Bulk-Analyse für ausgewählte Prospects
   const bulkAnalyzeProspects = async () => {
     if (selectedProspectsForBulk.length === 0) return
