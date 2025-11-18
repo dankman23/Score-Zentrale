@@ -20,11 +20,12 @@ import { getDb } from '../../../lib/db/mongodb'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { zeitraum, dryRun = false } = body
+    const { zeitraum, dryRun = false, limit } = body
     
     const db = await getDb()
     
-    // Parse Zeitraum
+    // WICHTIG: Auto-Match läuft über ALLE nicht-zugeordneten Daten, nicht nur Zeitraum!
+    // Zeitraum wird nur für Statistik-Ausgabe verwendet
     let startDate, endDate
     if (zeitraum) {
       const [from, to] = zeitraum.split('_')
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
       startDate.setMonth(startDate.getMonth() - 1)
     }
     
-    console.log('[Auto-Match] Starte für Zeitraum:', startDate.toISOString().split('T')[0], 'bis', endDate.toISOString().split('T')[0])
+    console.log('[Auto-Match] Starte für ALLE nicht-zugeordneten Daten (Statistik-Zeitraum:', startDate.toISOString().split('T')[0], 'bis', endDate.toISOString().split('T')[0], ')')
     
     const results = {
       zeitraum: { from: startDate, to: endDate },
