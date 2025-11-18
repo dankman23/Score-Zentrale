@@ -3572,42 +3572,66 @@ export default function App() {
                   </button>
                 </div>
 
-                {/* Statistiken */}
+                {/* Statistiken - Verbessert */}
                 {dachCrawlerStats && (
                   <div className="row mb-4">
-                    <div className="col-md-3">
-                      <div className="card bg-white border-0">
-                        <div className="card-body text-center py-3">
-                          <div className="h4 mb-1 font-weight-bold text-info">{dachCrawlerStats.stats.total_crawl_jobs}</div>
-                          <div className="text-muted small">Crawl-Jobs</div>
-                          <div className="text-muted" style={{fontSize:'0.7rem'}}>Region+Branche Kombinationen</div>
+                    <div className="col-md-3 mb-3">
+                      <div className="card bg-white border-0 shadow-sm h-100">
+                        <div className="card-body text-center">
+                          <div className="text-info mb-2"><i className="bi bi-list-task" style={{fontSize:'2rem'}}/></div>
+                          <div className="h3 mb-1 font-weight-bold text-dark">{dachCrawlerStats.stats.total_crawl_jobs || 0}</div>
+                          <div className="text-muted font-weight-semibold">Kombinationen</div>
+                          <div className="progress mt-2" style={{height: '4px'}}>
+                            <div className="progress-bar bg-info" style={{width: '100%'}}></div>
+                          </div>
+                          <small className="text-muted d-block mt-1">Region × Branche</small>
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-3">
-                      <div className="card bg-white border-0">
-                        <div className="card-body text-center py-3">
-                          <div className="h4 mb-1 font-weight-bold text-success">{dachCrawlerStats.stats.completed_jobs}</div>
-                          <div className="text-muted small">Abgeschlossen</div>
-                          <div className="text-muted" style={{fontSize:'0.7rem'}}>vollständig durchsucht</div>
+                    <div className="col-md-3 mb-3">
+                      <div className="card bg-white border-0 shadow-sm h-100">
+                        <div className="card-body text-center">
+                          <div className="text-success mb-2"><i className="bi bi-check-circle-fill" style={{fontSize:'2rem'}}/></div>
+                          <div className="h3 mb-1 font-weight-bold text-dark">{dachCrawlerStats.stats.completed_jobs || 0}</div>
+                          <div className="text-muted font-weight-semibold">Abgeschlossen</div>
+                          <div className="progress mt-2" style={{height: '4px'}}>
+                            <div 
+                              className="progress-bar bg-success" 
+                              style={{width: `${dachCrawlerStats.stats.total_crawl_jobs > 0 ? Math.round((dachCrawlerStats.stats.completed_jobs / dachCrawlerStats.stats.total_crawl_jobs) * 100) : 0}%`}}
+                            ></div>
+                          </div>
+                          <small className="text-muted d-block mt-1">
+                            {dachCrawlerStats.stats.total_crawl_jobs > 0 
+                              ? `${Math.round((dachCrawlerStats.stats.completed_jobs / dachCrawlerStats.stats.total_crawl_jobs) * 100)}% durchsucht`
+                              : 'Starte ersten Crawl'
+                            }
+                          </small>
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-3">
-                      <div className="card bg-white border-0">
-                        <div className="card-body text-center py-3">
-                          <div className="h4 mb-1 font-weight-bold text-warning">{dachCrawlerStats.stats.total_companies_found}</div>
-                          <div className="text-muted small">Firmen gefunden</div>
-                          <div className="text-muted" style={{fontSize:'0.7rem'}}>aus allen Crawls</div>
+                    <div className="col-md-3 mb-3">
+                      <div className="card bg-white border-0 shadow-sm h-100">
+                        <div className="card-body text-center">
+                          <div className="text-warning mb-2"><i className="bi bi-building" style={{fontSize:'2rem'}}/></div>
+                          <div className="h3 mb-1 font-weight-bold text-dark">{(dachCrawlerStats.stats.total_companies_found || 0).toLocaleString('de-DE')}</div>
+                          <div className="text-muted font-weight-semibold">Firmen gefunden</div>
+                          <div className="progress mt-2" style={{height: '4px'}}>
+                            <div className="progress-bar bg-warning" style={{width: '100%'}}></div>
+                          </div>
+                          <small className="text-muted d-block mt-1">Alle Crawls</small>
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-3">
-                      <div className="card bg-white border-0">
-                        <div className="card-body text-center py-3">
-                          <div className="h4 mb-1 font-weight-bold text-primary">{dachCrawlerStats.stats.dach_prospects_in_db}</div>
-                          <div className="text-muted small">In Datenbank</div>
-                          <div className="text-muted" style={{fontSize:'0.7rem'}}>bereit für Kontakt</div>
+                    <div className="col-md-3 mb-3">
+                      <div className="card bg-white border-0 shadow-sm h-100">
+                        <div className="card-body text-center">
+                          <div className="text-primary mb-2"><i className="bi bi-database-fill" style={{fontSize:'2rem'}}/></div>
+                          <div className="h3 mb-1 font-weight-bold text-dark">{(dachCrawlerStats.stats.dach_prospects_in_db || 0).toLocaleString('de-DE')}</div>
+                          <div className="text-muted font-weight-semibold">In Datenbank</div>
+                          <div className="progress mt-2" style={{height: '4px'}}>
+                            <div className="progress-bar bg-primary" style={{width: '100%'}}></div>
+                          </div>
+                          <small className="text-muted d-block mt-1">Bereit für Kontakt</small>
                         </div>
                       </div>
                     </div>
