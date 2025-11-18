@@ -516,6 +516,8 @@ agent_communication:
     message: "✅ Backend testing completed successfully! All high-priority endpoints tested and working: GET /api/kpis (verified structure), Prospects flow (POST+GET with UUID, no _id), POST /api/analyze (returns productGroups/materials/hypotheses, creates DB entries), POST /api/mailer/compose (returns subject/text/html), Status endpoints (GET+POST working). Fixed minor _id cleanup issue in POST /api/prospects response. All 5/5 core backend tests PASSED. Ready for main agent to summarize and finish."
   - agent: "main"
     message: "KALTAKQUISE EMAIL-GENERIERUNG: Habe emailer.ts aktualisiert - Prompt erweitert um (1) Beratungsangebot per Email/Telefon 0221-25999901, (2) Jahresbedarfs-Angebot für Artikel. Signatur hinzugefügt mit Christian Berres, Score Handels GmbH & Co. KG, berres@score-schleifwerkzeuge.de. Backend muss getestet werden."
+  - agent: "testing"
+    message: "❌ FIBU BACKEND TESTING RESULTS: CRITICAL MODULE IMPORT ERRORS FOUND. Main Zahlungen API (/api/fibu/zahlungen) is working correctly and returns proper data structure with 1,891 payments for Oct 1-7. However, 3 critical APIs have module import path errors: Amazon Settlements API, Auto-Match API, and Alle Rechnungen API all fail with 'Cannot resolve ../../../lib/db/mssql' error. Database files are located in /app/app/lib/db/ but imports expect /app/lib/db/. Buchungslogik library exists and is correct. URGENT: Fix import paths in these 3 APIs to enable buchung field population and auto-match functionality."
   - task: "JTL Sales: GET /api/jtl/ping"
     implemented: true
     working: true
