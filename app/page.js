@@ -3402,120 +3402,247 @@ export default function App() {
             </div>
           </div>
 
-          {/* DACH Crawler - Optimiert */}
-          {coldStatusFilter === 'all' && (
-            <div className="card border-0 shadow-lg mb-4" style={{background:'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
+          {/* Tab Navigation */}
+          <div className="btn-group mb-4 w-100">
+            <button 
+              className={`btn ${coldLeadsTab === 'search' ? 'btn-primary' : 'btn-outline-secondary'}`}
+              onClick={() => setColdLeadsTab('search')}
+            >
+              <i className="bi bi-search mr-2"/>Google-Suche
+            </button>
+            <button 
+              className={`btn ${coldLeadsTab === 'dach' ? 'btn-primary' : 'btn-outline-secondary'}`}
+              onClick={() => { setColdLeadsTab('dach'); loadDachStats(); loadDachProgress(); }}
+            >
+              <i className="bi bi-globe-europe-africa mr-2"/>DACH-Crawler
+            </button>
+          </div>
+
+          {/* Google-Suchformular */}
+          {coldLeadsTab === 'search' && coldStatusFilter === 'all' && (
+            <div className="card border-0 shadow-sm mb-4">
               <div className="card-body">
-                <div className="d-flex align-items-center justify-content-between mb-4">
-                  <div className="d-flex align-items-center">
-                    <div className="bg-white rounded-circle p-3 mr-3">
-                      <i className="bi bi-globe-europe-africa text-primary" style={{fontSize:'2rem'}}/>
-                    </div>
-                    <div>
-                      <h4 className="mb-1 text-white font-weight-bold">DACH Firmen-Crawler</h4>
-                      <p className="mb-0 text-white-50">Systematische Suche in 🇩🇪 Deutschland, 🇦🇹 Österreich und 🇨🇭 Schweiz</p>
-                    </div>
+                <div className="d-flex align-items-center mb-3">
+                  <i className="bi bi-search text-primary mr-2" style={{fontSize:'1.5rem'}}/>
+                  <div>
+                    <h5 className="mb-0">Neue Firmen finden</h5>
+                    <small className="text-muted">Durchsuche das Web nach passenden B2B-Kunden</small>
                   </div>
-                  <button 
-                    className="btn btn-light btn-sm"
-                    onClick={() => { loadDachStats(); loadDachProgress(); }}
+                </div>
+              <div className="row">
+                <div className="col-md-4 mb-2">
+                  <label className="small text-muted mb-1">Branche *</label>
+                  <select 
+                    className="form-control" 
+                    value={coldSearchForm.industry}
+                    onChange={e => setColdSearchForm({...coldSearchForm, industry: e.target.value})}
                   >
-                    <i className="bi bi-arrow-clockwise mr-1"/>Aktualisieren
+                    <option value="">-- Branche wählen --</option>
+                    <optgroup label="🔩 Metallverarbeitung">
+                      <option value="Metallbau">🔩 Metallbau</option>
+                      <option value="Stahlbau">🏭 Stahlbau</option>
+                      <option value="Edelstahlverarbeitung">✨ Edelstahlverarbeitung</option>
+                      <option value="Maschinenbau">⚙️ Maschinenbau</option>
+                      <option value="Anlagenbau">🏭 Anlagenbau</option>
+                      <option value="Schlosserei">🔑 Schlosserei</option>
+                      <option value="Schweißtechnik">🔥 Schweißtechnik</option>
+                    </optgroup>
+                    <optgroup label="🚗 Automotive">
+                      <option value="Karosseriebau">🚗 Karosseriebau</option>
+                      <option value="Automotive Zulieferer">🚙 Automotive Zulieferer</option>
+                    </optgroup>
+                    <optgroup label="🪵 Holzverarbeitung">
+                      <option value="Schreinerei">🪵 Schreinerei</option>
+                      <option value="Tischlerei">🪵 Tischlerei</option>
+                      <option value="Möbelbau">🛋️ Möbelbau</option>
+                      <option value="Holzbearbeitung">🌲 Holzbearbeitung</option>
+                    </optgroup>
+                    <optgroup label="✨ Oberflächenbearbeitung">
+                      <option value="Lackiererei">🎨 Lackiererei</option>
+                      <option value="Oberflächentechnik">✨ Oberflächentechnik</option>
+                      <option value="Schleiferei">🔩 Schleiferei</option>
+                      <option value="Poliererei">✨ Poliererei</option>
+                    </optgroup>
+                    <optgroup label="🏭 Fertigung">
+                      <option value="Fertigungsbetrieb">🏭 Fertigungsbetrieb</option>
+                      <option value="Industriebetrieb">🏭 Industriebetrieb</option>
+                      <option value="Werkstatt">🔧 Werkstatt</option>
+                    </optgroup>
+                  </select>
+                </div>
+                <div className="col-md-4 mb-2">
+                  <label className="small text-muted mb-1">Region *</label>
+                  <select 
+                    className="form-control" 
+                    value={coldSearchForm.region}
+                    onChange={e => setColdSearchForm({...coldSearchForm, region: e.target.value})}
+                  >
+                    <option value="">-- Region wählen --</option>
+                    <optgroup label="📍 Bundesländer">
+                      <option value="Baden-Württemberg">Baden-Württemberg</option>
+                      <option value="Bayern">Bayern</option>
+                      <option value="Berlin">Berlin</option>
+                      <option value="Brandenburg">Brandenburg</option>
+                      <option value="Bremen">Bremen</option>
+                      <option value="Hamburg">Hamburg</option>
+                      <option value="Hessen">Hessen</option>
+                      <option value="Niedersachsen">Niedersachsen</option>
+                      <option value="Nordrhein-Westfalen">Nordrhein-Westfalen</option>
+                      <option value="Rheinland-Pfalz">Rheinland-Pfalz</option>
+                      <option value="Saarland">Saarland</option>
+                      <option value="Sachsen">Sachsen</option>
+                      <option value="Schleswig-Holstein">Schleswig-Holstein</option>
+                      <option value="Thüringen">Thüringen</option>
+                    </optgroup>
+                    <optgroup label="🏛️ NRW - Top Städte">
+                      <option value="Köln">Köln</option>
+                      <option value="Düsseldorf">Düsseldorf</option>
+                      <option value="Dortmund">Dortmund</option>
+                      <option value="Essen">Essen</option>
+                      <option value="Duisburg">Duisburg</option>
+                      <option value="Bochum">Bochum</option>
+                      <option value="Wuppertal">Wuppertal</option>
+                      <option value="Bielefeld">Bielefeld</option>
+                      <option value="Bonn">Bonn</option>
+                      <option value="Münster">Münster</option>
+                    </optgroup>
+                    <optgroup label="🏛️ Bayern - Top Städte">
+                      <option value="München">München</option>
+                      <option value="Nürnberg">Nürnberg</option>
+                      <option value="Augsburg">Augsburg</option>
+                      <option value="Regensburg">Regensburg</option>
+                      <option value="Ingolstadt">Ingolstadt</option>
+                      <option value="Würzburg">Würzburg</option>
+                      <option value="Fürth">Fürth</option>
+                      <option value="Erlangen">Erlangen</option>
+                      <option value="Bayreuth">Bayreuth</option>
+                      <option value="Bamberg">Bamberg</option>
+                    </optgroup>
+                    <optgroup label="🏛️ BW - Top Städte">
+                      <option value="Stuttgart">Stuttgart</option>
+                      <option value="Mannheim">Mannheim</option>
+                      <option value="Karlsruhe">Karlsruhe</option>
+                      <option value="Freiburg">Freiburg</option>
+                      <option value="Heidelberg">Heidelberg</option>
+                      <option value="Ulm">Ulm</option>
+                      <option value="Heilbronn">Heilbronn</option>
+                      <option value="Pforzheim">Pforzheim</option>
+                      <option value="Reutlingen">Reutlingen</option>
+                      <option value="Esslingen">Esslingen</option>
+                    </optgroup>
+                    <optgroup label="🏛️ Weitere Top-Städte">
+                      <option value="Frankfurt am Main">Frankfurt am Main</option>
+                      <option value="Leipzig">Leipzig</option>
+                      <option value="Dresden">Dresden</option>
+                      <option value="Hannover">Hannover</option>
+                      <option value="Bremen">Bremen</option>
+                    </optgroup>
+                  </select>
+                </div>
+                <div className="col-md-2 mb-2">
+                  <label className="small text-muted mb-1">Anzahl</label>
+                  <input 
+                    type="number" 
+                    className="form-control" 
+                    placeholder="10" 
+                    value={coldSearchForm.limit}
+                    onChange={e => setColdSearchForm({...coldSearchForm, limit: parseInt(e.target.value) || 10})}
+                    min="1"
+                    max="50"
+                  />
+                </div>
+                <div className="col-md-2 mb-2">
+                  <label className="small text-muted mb-1">&nbsp;</label>
+                  <button 
+                    className="btn btn-primary btn-block" 
+                    onClick={searchColdLeads}
+                    disabled={coldLoading || !coldSearchForm.industry || !coldSearchForm.region}
+                  >
+                    {coldLoading ? <><span className="spinner-border spinner-border-sm mr-2"/>Suche...</> : <><i className="bi bi-search mr-1"/>Suchen</>}
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+          )}
 
-                {/* Statistiken - Verbessert */}
+          {/* DACH Crawler Formular */}
+          {coldLeadsTab === 'dach' && (
+            <div className="card border-0 shadow-sm mb-4" style={{background:'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'}}>
+              <div className="card-body">
+                <div className="d-flex align-items-center mb-3">
+                  <i className="bi bi-globe-europe-africa text-white mr-2" style={{fontSize:'1.5rem'}}/>
+                  <div>
+                    <h5 className="mb-0 text-white">Systematisches DACH-Crawling</h5>
+                    <small className="text-white-50">Durchsuche strukturiert Firmenverzeichnisse in Deutschland, Österreich und Schweiz</small>
+                  </div>
+                </div>
+
+                {/* Statistiken */}
                 {dachCrawlerStats && (
                   <div className="row mb-4">
-                    <div className="col-md-3 mb-3">
-                      <div className="card bg-white border-0 shadow-sm h-100">
-                        <div className="card-body text-center">
-                          <div className="text-info mb-2"><i className="bi bi-list-task" style={{fontSize:'2rem'}}/></div>
-                          <div className="h3 mb-1 font-weight-bold text-dark">{dachCrawlerStats.stats.total_crawl_jobs || 0}</div>
-                          <div className="text-muted font-weight-semibold">Crawl-Kombinationen</div>
-                          <div className="progress mt-2" style={{height: '4px'}}>
-                            <div className="progress-bar bg-info" style={{width: '100%'}}></div>
-                          </div>
-                          <small className="text-muted d-block mt-1">Region × Branche</small>
+                    <div className="col-md-3">
+                      <div className="card bg-white border-0">
+                        <div className="card-body text-center py-3">
+                          <div className="h4 mb-1 font-weight-bold text-info">{dachCrawlerStats.stats.total_crawl_jobs}</div>
+                          <div className="text-muted small">Crawl-Jobs</div>
+                          <div className="text-muted" style={{fontSize:'0.7rem'}}>Region+Branche Kombinationen</div>
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-3 mb-3">
-                      <div className="card bg-white border-0 shadow-sm h-100">
-                        <div className="card-body text-center">
-                          <div className="text-success mb-2"><i className="bi bi-check-circle-fill" style={{fontSize:'2rem'}}/></div>
-                          <div className="h3 mb-1 font-weight-bold text-dark">{dachCrawlerStats.stats.completed_jobs || 0}</div>
-                          <div className="text-muted font-weight-semibold">Abgeschlossen</div>
-                          <div className="progress mt-2" style={{height: '4px'}}>
-                            <div 
-                              className="progress-bar bg-success" 
-                              style={{width: `${dachCrawlerStats.stats.total_crawl_jobs > 0 ? (dachCrawlerStats.stats.completed_jobs / dachCrawlerStats.stats.total_crawl_jobs * 100) : 0}%`}}
-                            ></div>
-                          </div>
-                          <small className="text-muted d-block mt-1">
-                            {dachCrawlerStats.stats.total_crawl_jobs > 0 
-                              ? `${Math.round((dachCrawlerStats.stats.completed_jobs / dachCrawlerStats.stats.total_crawl_jobs) * 100)}% durchsucht`
-                              : 'Starte ersten Crawl'
-                            }
-                          </small>
+                    <div className="col-md-3">
+                      <div className="card bg-white border-0">
+                        <div className="card-body text-center py-3">
+                          <div className="h4 mb-1 font-weight-bold text-success">{dachCrawlerStats.stats.completed_jobs}</div>
+                          <div className="text-muted small">Abgeschlossen</div>
+                          <div className="text-muted" style={{fontSize:'0.7rem'}}>vollständig durchsucht</div>
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-3 mb-3">
-                      <div className="card bg-white border-0 shadow-sm h-100">
-                        <div className="card-body text-center">
-                          <div className="text-warning mb-2"><i className="bi bi-building" style={{fontSize:'2rem'}}/></div>
-                          <div className="h3 mb-1 font-weight-bold text-dark">{dachCrawlerStats.stats.total_companies_found?.toLocaleString('de-DE') || 0}</div>
-                          <div className="text-muted font-weight-semibold">Firmen gefunden</div>
-                          <div className="progress mt-2" style={{height: '4px'}}>
-                            <div className="progress-bar bg-warning" style={{width: '100%'}}></div>
-                          </div>
-                          <small className="text-muted d-block mt-1">Alle Crawls</small>
+                    <div className="col-md-3">
+                      <div className="card bg-white border-0">
+                        <div className="card-body text-center py-3">
+                          <div className="h4 mb-1 font-weight-bold text-warning">{dachCrawlerStats.stats.total_companies_found}</div>
+                          <div className="text-muted small">Firmen gefunden</div>
+                          <div className="text-muted" style={{fontSize:'0.7rem'}}>aus allen Crawls</div>
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-3 mb-3">
-                      <div className="card bg-white border-0 shadow-sm h-100">
-                        <div className="card-body text-center">
-                          <div className="text-primary mb-2"><i className="bi bi-database-fill" style={{fontSize:'2rem'}}/></div>
-                          <div className="h3 mb-1 font-weight-bold text-dark">{dachCrawlerStats.stats.dach_prospects_in_db?.toLocaleString('de-DE') || 0}</div>
-                          <div className="text-muted font-weight-semibold">In Datenbank</div>
-                          <div className="progress mt-2" style={{height: '4px'}}>
-                            <div className="progress-bar bg-primary" style={{width: '100%'}}></div>
-                          </div>
-                          <small className="text-muted d-block mt-1">Bereit für Kontakt</small>
+                    <div className="col-md-3">
+                      <div className="card bg-white border-0">
+                        <div className="card-body text-center py-3">
+                          <div className="h4 mb-1 font-weight-bold text-primary">{dachCrawlerStats.stats.dach_prospects_in_db}</div>
+                          <div className="text-muted small">In Datenbank</div>
+                          <div className="text-muted" style={{fontSize:'0.7rem'}}>bereit für Kontakt</div>
                         </div>
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* Crawler Form - Optimiert */}
-                <div className="card bg-white border-0 shadow-sm mb-3">
-                  <div className="card-body">
-                    <h6 className="font-weight-bold mb-3"><i className="bi bi-funnel-fill mr-2 text-primary"/>Neue Suche starten</h6>
-                    <div className="row">
-                      <div className="col-md-3 mb-2">
-                        <label className="small text-dark font-weight-semibold mb-1">Land *</label>
-                        <select 
-                          className="form-control form-control-lg" 
-                          value={dachCrawlerForm.country}
-                          onChange={e => setDachCrawlerForm({...dachCrawlerForm, country: e.target.value, region: ''})}
-                        >
-                          <option value="DE">🇩🇪 Deutschland</option>
-                          <option value="AT">🇦🇹 Österreich</option>
-                          <option value="CH">🇨🇭 Schweiz</option>
-                        </select>
-                      </div>
+                {/* Crawler Form */}
+                <div className="row">
+                  <div className="col-md-3 mb-2">
+                    <label className="small text-white mb-1">Land *</label>
+                    <select 
+                      className="form-control" 
+                      value={dachCrawlerForm.country}
+                      onChange={e => setDachCrawlerForm({...dachCrawlerForm, country: e.target.value, region: ''})}
+                    >
+                      <option value="DE">🇩🇪 Deutschland</option>
+                      <option value="AT">🇦🇹 Österreich</option>
+                      <option value="CH">🇨🇭 Schweiz</option>
+                    </select>
+                  </div>
 
-                      <div className="col-md-3 mb-2">
-                        <label className="small text-dark font-weight-semibold mb-1">Region/Bundesland *</label>
-                        <select 
-                          className="form-control form-control-lg" 
-                          value={dachCrawlerForm.region}
-                          onChange={e => setDachCrawlerForm({...dachCrawlerForm, region: e.target.value})}
-                        >
-                          <option value="">-- Wählen --</option>
+                  <div className="col-md-3 mb-2">
+                    <label className="small text-white mb-1">Region/Bundesland *</label>
+                    <select 
+                      className="form-control" 
+                      value={dachCrawlerForm.region}
+                      onChange={e => setDachCrawlerForm({...dachCrawlerForm, region: e.target.value})}
+                    >
+                      <option value="">-- Wählen --</option>
                       {dachCrawlerForm.country === 'DE' && (
                         <>
                           <option value="Baden-Württemberg">Baden-Württemberg</option>
@@ -3579,16 +3706,16 @@ export default function App() {
                           <option value="Jura">Jura</option>
                         </>
                       )}
-                        </select>
-                      </div>
+                    </select>
+                  </div>
 
-                      <div className="col-md-4 mb-2">
-                        <label className="small text-dark font-weight-semibold mb-1">Branche *</label>
-                        <select 
-                          className="form-control form-control-lg" 
-                          value={dachCrawlerForm.industry}
-                          onChange={e => setDachCrawlerForm({...dachCrawlerForm, industry: e.target.value})}
-                        >
+                  <div className="col-md-3 mb-2">
+                    <label className="small text-white mb-1">Branche *</label>
+                    <select 
+                      className="form-control" 
+                      value={dachCrawlerForm.industry}
+                      onChange={e => setDachCrawlerForm({...dachCrawlerForm, industry: e.target.value})}
+                    >
                       <option value="">-- Wählen --</option>
                       <optgroup label="🚗 Automobilindustrie & Fahrzeugbau">
                         <option value="Automobilindustrie">Automobilindustrie</option>
@@ -3650,33 +3777,32 @@ export default function App() {
                         <option value="Modellbau">Modellbau</option>
                         <option value="Messerschmiede">Messerschmiede</option>
                       </optgroup>
-                        </select>
-                      </div>
-
-                      <div className="col-md-1 mb-2">
-                        <label className="small text-dark font-weight-semibold mb-1">Limit</label>
-                        <input 
-                          type="number" 
-                          className="form-control form-control-lg" 
-                          value={dachCrawlerForm.limit}
-                          onChange={e => setDachCrawlerForm({...dachCrawlerForm, limit: parseInt(e.target.value) || 20})}
-                          min="5"
-                          max="50"
-                        />
-                      </div>
-
-                      <div className="col-md-1 mb-2">
-                        <label className="small text-dark font-weight-semibold mb-1">&nbsp;</label>
-                        <button 
-                          className="btn btn-primary btn-lg btn-block font-weight-bold shadow-sm" 
-                          onClick={startDachCrawl}
-                          disabled={dachCrawlerLoading || !dachCrawlerForm.region || !dachCrawlerForm.industry}
-                        >
-                          {dachCrawlerLoading ? <><span className="spinner-border spinner-border-sm mr-2"/>Crawle...</> : <><i className="bi bi-play-circle-fill mr-1"/>Start</>}
-                        </button>
-                      </div>
-                    </div>
+                    </select>
                   </div>
+
+                  <div className="col-md-1 mb-2">
+                    <label className="small text-white mb-1">Limit</label>
+                    <input 
+                      type="number" 
+                      className="form-control" 
+                      value={dachCrawlerForm.limit}
+                      onChange={e => setDachCrawlerForm({...dachCrawlerForm, limit: parseInt(e.target.value) || 20})}
+                      min="5"
+                      max="50"
+                    />
+                  </div>
+
+                  <div className="col-md-2 mb-2">
+                    <label className="small text-white mb-1">&nbsp;</label>
+                    <button 
+                      className="btn btn-light btn-block font-weight-bold" 
+                      onClick={startDachCrawl}
+                      disabled={dachCrawlerLoading || !dachCrawlerForm.region || !dachCrawlerForm.industry}
+                    >
+                      {dachCrawlerLoading ? <><span className="spinner-border spinner-border-sm mr-2"/>Crawle...</> : <><i className="bi bi-play-fill mr-1"/>Start Crawl</>}
+                    </button>
+                  </div>
+                </div>
 
                 {/* Progress Tabelle */}
                 {dachCrawlerProgress.length > 0 && (
