@@ -2,6 +2,104 @@
 # START - Testing Protocol - DO NOT EDIT OR REMOVE THIS SECTION
 #====================================================================================================
 
+## AKTUELLER STAND: Buchungslogik & Auto-Match Verbesserungen implementiert
+## Bereit für Backend-Testing
+
+user_problem_statement: |
+  Analyse von Amazon & PayPal Excel-Dateien für Oktober 2025.
+  Implementierung der Buchungslogik mit Soll/Haben-Konten, MwSt-Berechnung.
+  Verbesserung der Auto-Match-Logik für Amazon (XRE-Rechnungen) und PayPal (AU-Nummern).
+
+backend:
+  - task: "Buchungslogik-Library erstellen"
+    implemented: true
+    working: "NA"
+    file: "/app/lib/fibu/buchungslogik.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Erstellt: Amazon & PayPal Konten-Mapping, MwSt-Berechnung, DATEV-Export-Format"
+  
+  - task: "Amazon Settlements API erweitern (Buchungsinformationen)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/fibu/zahlungen/amazon-settlements/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Berechnet und speichert Buchungsinformationen (Soll/Haben, Netto/Brutto) für jede Amazon-Transaktion"
+  
+  - task: "Zahlungen API erweitern (Buchungsinformationen returnen)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/fibu/zahlungen/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Returniert jetzt Buchungsinformationen in der Response"
+  
+  - task: "Auto-Match verbessern (Externe Rechnungen XRE)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/fibu/auto-match/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Lädt fibu_rechnungen_alle, matched Amazon Order-IDs mit XRE-Rechnungen"
+  
+  - task: "Auto-Match verbessern (PayPal AU-Nummern direkt)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/fibu/auto-match/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Direktes Matching über cBestellNr statt nur Betrag+Datum"
+
+frontend:
+  - task: "UI-Anzeige Gegenkonto"
+    implemented: false
+    working: "NA"
+    file: "components/ZahlungenView.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Noch nicht implementiert - wird nach Backend-Testing gemacht"
+
+metadata:
+  created_by: "main_agent"
+  version: "2.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  - "Test Amazon Settlements API: Lade Daten und prüfe ob buchung-Feld existiert"
+  - "Test Buchungslogik: Prüfe Soll/Haben-Konten für verschiedene amountTypes"
+  - "Test Auto-Match: Prüfe Matching mit externen Rechnungen und AU-Nummern"
+  - "Test Zahlungen API: Prüfe ob Buchungsinformationen im Response sind"
+
+#====================================================================================================
+# START - Testing Protocol - DO NOT EDIT OR REMOVE THIS SECTION
+#====================================================================================================
+
 # THIS SECTION CONTAINS CRITICAL TESTING INSTRUCTIONS FOR BOTH AGENTS
 # BOTH MAIN_AGENT AND TESTING_AGENT MUST PRESERVE THIS ENTIRE BLOCK
 
