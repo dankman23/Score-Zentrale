@@ -58,27 +58,48 @@ backend:
   
   - task: "Auto-Match verbessern (Externe Rechnungen XRE)"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/app/api/fibu/auto-match/route.ts"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Lädt fibu_rechnungen_alle, matched Amazon Order-IDs mit XRE-Rechnungen"
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL: Module import error - Cannot resolve '../../../lib/db/mssql'. API returns 500 error due to incorrect import paths. Same issue as other FIBU APIs."
   
   - task: "Auto-Match verbessern (PayPal AU-Nummern direkt)"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/app/api/fibu/auto-match/route.ts"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Direktes Matching über cBestellNr statt nur Betrag+Datum"
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL: Same as above - Auto-Match API has module import errors preventing testing of improved matching logic."
+  
+  - task: "Alle Rechnungen API (inkl. cBestellNr)"
+    implemented: true
+    working: false
+    file: "/app/app/api/fibu/rechnungen/alle/route.ts"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Loads all invoice types (RECHNUNG, EXTERN, GUTSCHRIFT) with cBestellNr field for external invoices"
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL: Module import error - Cannot resolve '../../../lib/db/mssql'. API returns 500 error due to incorrect import paths."
 
 frontend:
   - task: "UI-Anzeige Gegenkonto"
