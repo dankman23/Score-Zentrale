@@ -39,6 +39,26 @@ export async function GET(request: NextRequest) {
     // FIBU-Modul: Nur Daten ab Oktober 2025
     const minDate = new Date('2025-10-01T00:00:00Z')
     
+    // Lade Rechnungen für Auto-Matching (für PayPal AU-Nummern)
+    const vkRechnungen = db.collection('fibu_vk_rechnungen')
+    const rechnungenMap = new Map()
+    
+    // Lade alle Rechnungen mit cBestellNr für schnelles Lookup
+    const rechnungenDocs = await vkRechnungen.find({
+      cBestellNr: { $exists: true, $ne: null, $ne: '' }
+    }, {
+      projection: { cBestellNr: 1, cRechnungsNr: 1, brutto: 1 }
+    }).toArray()
+    
+    rechnungenDocs.forEach(r => {
+      rechnungenMap.set(r.cBestellNr, {
+        rechnungsNr: r.cRechnungsNr,
+        betrag: r.brutto
+      })
+    })
+    
+    console.log(`[Zahlungen] Rechnungen geladen für Auto-Matching: ${rechnungenMap.size}`)
+    
     // Prüfe ob Zeitraum vor Oktober 2025
     if (endDateTime < minDate) {
       console.log(`[Zahlungen] Zeitraum liegt vor Oktober 2025 (${startDate} - ${endDate})`)
