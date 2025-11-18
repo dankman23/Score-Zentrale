@@ -129,6 +129,68 @@ interface CrawlProgress {
 }
 
 /**
+ * Filter für unerwünschte Ergebnisse
+ * Sortiert Schulen, Plattformen, Verzeichnisse, etc. aus
+ */
+function isValidCompanyLead(lead: CompanyLead): boolean {
+  const name = lead.name.toLowerCase()
+  const website = (lead.website || '').toLowerCase()
+  
+  // Blacklist: Unerwünschte Domains und Keywords
+  const blacklistDomains = [
+    'wikipedia.org', 'facebook.com', 'instagram.com', 'linkedin.com', 'xing.com',
+    'youtube.com', 'twitter.com', 'kununu.com', 'jobware.de', 'stepstone.de',
+    'indeed.com', 'monster.de', 'gelbeseiten.de', 'firmenabc.de', '11880.com',
+    'golocal.de', 'yelp.de', 'tripadvisor.de', 'foursquare.com',
+    'wlw.de', 'wer-liefert-was.de', 'europages.de', 'kompass.com',
+    'markt.de', 'ebay-kleinanzeigen.de', 'quoka.de', 'kalaydo.de',
+    'unternehmensregister.de', 'handelsregister.de', 'northdata.de',
+    'creditreform.de', 'bundesanzeiger.de', 'handwerkskammer.de', 'ihk.de'
+  ]
+  
+  const blacklistKeywords = [
+    'schule', 'hochschule', 'universität', 'fachhochschule', 'berufsschule',
+    'ausbildung', 'lehrstelle', 'praktikum', 'studium',
+    'verband', 'verein', 'vereinigung', 'kammer', 'innung',
+    'plattform', 'portal', 'verzeichnis', 'branchenbuch', 'katalog',
+    'marktplatz', 'kleinanzeigen', 'anzeigen', 'stellenangebote',
+    'jobbörse', 'recruiting', 'personalvermittlung',
+    'wikipedia', 'ratgeber', 'forum', 'blog', 'news'
+  ]
+  
+  // Prüfe Domain-Blacklist
+  for (const domain of blacklistDomains) {
+    if (website.includes(domain)) {
+      console.log(`[Filter] Blocked (Blacklist-Domain): ${lead.name} (${domain})`)
+      return false
+    }
+  }
+  
+  // Prüfe Keyword-Blacklist
+  for (const keyword of blacklistKeywords) {
+    if (name.includes(keyword)) {
+      console.log(`[Filter] Blocked (Blacklist-Keyword): ${lead.name} (${keyword})`)
+      return false
+    }
+  }
+  
+  // Website muss vorhanden sein
+  if (!lead.website || lead.website.trim() === '') {
+    console.log(`[Filter] Blocked (No Website): ${lead.name}`)
+    return false
+  }
+  
+  // Website muss valide sein (eigene Domain, nicht Plattform)
+  const urlPattern = /^https?:\/\/[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/
+  if (!urlPattern.test(website)) {
+    console.log(`[Filter] Blocked (Invalid URL): ${lead.name}`)
+    return false
+  }
+  
+  return true
+}
+
+/**
  * Haupt-Crawler-Funktion
  * Crawlt systematisch durch DACH nach Branchen
  */
@@ -145,7 +207,7 @@ export async function crawlDACHRegion(
   
   console.log(`[DACH Crawler] Starting: ${country} / ${region} / ${industry}`)
   
-  const leads: CompanyLead[] = []
+  const allLeads: CompanyLead[] = []
   
   // Strategie basierend auf Land
   switch (country) {
