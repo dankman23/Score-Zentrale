@@ -260,6 +260,16 @@ export async function POST(request: NextRequest) {
           }
         }
         
+        // Debug: Log wenn keine Matches gefunden
+        if (!match && source.name === 'PayPal' && zahlungen.indexOf(zahlung) < 3) {
+          console.log(`[Auto-Match DEBUG] PayPal Zahlung ${zahlung.transactionId}: Kein Match`, {
+            rechnungsNr: zahlung.rechnungsNr,
+            verwendungszweck: zahlung.verwendungszweck,
+            betreff: zahlung.betreff,
+            betrag: zahlung.betrag
+          })
+        }
+        
         // Speichere Match
         if (match) {
           results.matched.push({
