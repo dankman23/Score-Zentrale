@@ -82,32 +82,46 @@ export async function GET(request: NextRequest) {
 
       console.log(`[Zahlungen] ${source.name}: ${payments.length} Transaktionen`)
 
-      // Formatiere einheitlich
+      // Formatiere einheitlich mit Fokus auf Zuordnung
       const formatted = payments.map(p => {
-        // Amazon-spezifische Felder
+        // Basis-Felder
         let verwendungszweck = p.verwendungszweck || p.beschreibung || p.betreff || ''
         let gegenkonto = p.gegenkonto || p.kundenName || ''
+        let referenz = ''  // Haupt-Referenz für Matching (Auftragsnummer, Order-ID)
+        let transaktionsId = p.transactionId || p._id?.toString() || ''
         let sku = null
+        let kategorie = null
         
+        // Anbieter-spezifische Anpassungen
         if (source.name === 'Amazon') {
-          // Für Amazon: verwende amountDescription + transactionType
-          const parts = []
-          if (p.amountDescription) parts.push(p.amountDescription)
-          if (p.transactionType) parts.push(p.transactionType)
-          if (p.amountType) parts.push(p.amountType)
-          verwendungszweck = parts.join(' | ')
+          // Amazon: Order-ID als Referenz, amountType als Kategorie
+          referenz = p.orderId || p.merchantOrderId || ''
+          kategorie = p.amountType || ''  // ItemPrice, ItemFees, etc.
+          verwendungszweck = p.amountDescription || ''
+          gegenkonto = ''  // Amazon hat keinen Kundennamen
+          sku = p.sku || ''
+          transaktionsId = p.transactionId || ''
           
-          // Kunde/Gegenkonto: Amazon Order ID
-          if (p.orderId) {
-            gegenkonto = `Amazon Order ${p.orderId}`
-          } else if (p.merchantOrderId) {
-            gegenkonto = `Order ${p.merchantOrderId}`
-          }
+        } else if (source.name === 'Mollie') {
+          // Mollie: AU-Nummer aus Verwendungszweck extrahieren
+          const auMatch = verwendungszweck.match(/AU_\d+_SW\d+/)
+          referenz = auMatch ? auMatch[0] : ''
+          transaktionsId = p.transactionId || ''
+          gegenkonto = p.gegenkonto || ''
           
-          // SKU separat speichern
-          if (p.sku) {
-            sku = p.sku
-          }
+        } else if (source.name === 'PayPal') {
+          // PayPal: Transaction-ID als Referenz
+          referenz = ''  // PayPal hat meist keine Auftragsnummer im System
+          transaktionsId = p.transactionId || ''
+          gegenkonto = p.gegenkonto || ''
+          
+        } else if (source.name === 'Commerzbank' || source.name === 'Postbank') {
+          // Bank: Verwendungszweck durchsuchen nach Mustern
+          // Suche nach RE2025-xxxxx (Rechnungsnummer) oder AU-xxxxx (Auftragsnummer)
+          const reMatch = verwendungszweck.match(/RE\d{4}-\d+/)
+          const auMatch = verwendungszweck.match(/AU[-_]?\d+/)
+          referenz = reMatch ? reMatch[0] : (auMatch ? auMatch[0] : '')
+          transaktionsId = p.transactionId || p._id?.toString() || ''
         }
         
         return {
