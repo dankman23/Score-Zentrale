@@ -181,6 +181,9 @@ export async function GET(request: NextRequest) {
           // Amazon-spezifisch
           sku: sku || null,
           
+          // Buchungsinformationen
+          buchung: p.buchung || null,
+          
           // Zuordnung zu Rechnungen
           istZugeordnet: p.istZugeordnet || false,
           zugeordneteRechnung: p.zugeordneteRechnung || null,
