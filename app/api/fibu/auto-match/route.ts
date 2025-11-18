@@ -78,6 +78,17 @@ export async function POST(request: NextRequest) {
     
     console.log('[Auto-Match] Geladene VK-Rechnungen:', vkRechnungen.length, '(ab Okt 2025)')
     
+    // Lade ALLE Rechnungen (inkl. externe XRE und Auftragnummern)
+    const alleRechnungen = await db.collection('fibu_rechnungen_alle')
+      .find({
+        belegdatum: {
+          $gte: new Date('2025-10-01')
+        }
+      })
+      .toArray()
+    
+    console.log('[Auto-Match] Geladene alle Rechnungen:', alleRechnungen.length, '(inkl. externe XRE)')
+    
     // Lade Kontenplan für Amazon Gebühren
     const kontenplan = await db.collection('fibu_kontenplan').find({}).toArray()
     console.log('[Auto-Match] Kontenplan geladen:', kontenplan.length, 'Konten')
