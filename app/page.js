@@ -3490,20 +3490,23 @@ export default function App() {
                   </div>
                 )}
 
-                {/* Crawler Form */}
-                <div className="row">
-                  <div className="col-md-3 mb-2">
-                    <label className="small text-white mb-1">Land *</label>
-                    <select 
-                      className="form-control" 
-                      value={dachCrawlerForm.country}
-                      onChange={e => setDachCrawlerForm({...dachCrawlerForm, country: e.target.value, region: ''})}
-                    >
-                      <option value="DE">🇩🇪 Deutschland</option>
-                      <option value="AT">🇦🇹 Österreich</option>
-                      <option value="CH">🇨🇭 Schweiz</option>
-                    </select>
-                  </div>
+                {/* Crawler Form - Optimiert */}
+                <div className="card bg-white border-0 shadow-sm mb-3">
+                  <div className="card-body">
+                    <h6 className="font-weight-bold mb-3"><i className="bi bi-funnel-fill mr-2 text-primary"/>Neue Suche starten</h6>
+                    <div className="row">
+                      <div className="col-md-3 mb-2">
+                        <label className="small text-dark font-weight-semibold mb-1">Land *</label>
+                        <select 
+                          className="form-control form-control-lg" 
+                          value={dachCrawlerForm.country}
+                          onChange={e => setDachCrawlerForm({...dachCrawlerForm, country: e.target.value, region: ''})}
+                        >
+                          <option value="DE">🇩🇪 Deutschland</option>
+                          <option value="AT">🇦🇹 Österreich</option>
+                          <option value="CH">🇨🇭 Schweiz</option>
+                        </select>
+                      </div>
 
                   <div className="col-md-3 mb-2">
                     <label className="small text-white mb-1">Region/Bundesland *</label>
