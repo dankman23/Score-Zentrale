@@ -4,7 +4,7 @@
  * Testet alle kritischen JTL-Endpoints nach Deployment
  */
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://invoice-sync-7.preview.emergentagent.com'
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://buchungslogik.preview.emergentagent.com'
 
 const colors = {
   green: '\x1b[32m',
