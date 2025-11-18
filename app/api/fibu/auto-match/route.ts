@@ -173,20 +173,49 @@ export async function POST(request: NextRequest) {
           }
         }
         
-        // Strategie 3: Amazon Gebühren → Kontenplan
+        // Strategie 3: Amazon → Kontenplan oder Rechnung
         if (!match && source.name === 'Amazon') {
           const kategorie = zahlung.amountType || zahlung.kategorie
+          const orderId = zahlung.orderId
           
-          if (kategorie) {
+          // 3a) ItemPrice (Verkaufserlöse) → Versuche Rechnung zu finden
+          if (kategorie === 'ItemPrice' && orderId) {
+            // Suche Rechnung mit ähnlichem Betrag und Zeitraum
+            const rechnungCandidates = vkRechnungen.filter(r => {
+              const betragMatch = Math.abs((r.brutto || 0) - Math.abs(zahlung.betrag)) < 0.50
+              const dateDiff = Math.abs(new Date(r.rechnungsdatum).getTime() - new Date(zahlung.datum || zahlung.datumDate).getTime())
+              const daysDiff = dateDiff / (1000 * 60 * 60 * 24)
+              
+              return betragMatch && daysDiff <= 30
+            })
+            
+            // Nur zuordnen wenn eindeutig (genau 1 Match)
+            if (rechnungCandidates.length === 1) {
+              match = {
+                type: 'rechnung',
+                rechnungId: rechnungCandidates[0]._id.toString(),
+                rechnungsNr: rechnungCandidates[0].cRechnungsNr || rechnungCandidates[0].rechnungsNr,
+                confidence: 'medium'
+              }
+              method = 'betragDatum'
+            }
+          }
+          
+          // 3b) Gebühren/Kosten → Kontenplan
+          if (!match && kategorie) {
             // Mapping: Amazon Kategorie → Sachkonto
             const kontoMapping: {[key: string]: string} = {
-              'ItemFees': '4910', // Sonstige betriebliche Aufwendungen
+              'ItemFees': '4910', // Sonstige betriebliche Aufwendungen - Verkaufsgebühren
               'FBAPerUnitFulfillmentFee': '4950', // Amazon FBA Gebühren
               'Commission': '4970', // Provisionen
               'ShippingHB': '4800', // Frachtkosten
               'Shipping': '4800',
               'RefundCommission': '4970',
-              'ServiceFee': '4910'
+              'ServiceFee': '4910',
+              'FBAWeightBasedFee': '4950',
+              'StorageFee': '4950',
+              'Goodwill': '4960', // Kulanz
+              'AdvertisingFee': '4630' // Werbekosten
             }
             
             const sachkonto = kontoMapping[kategorie]
@@ -199,7 +228,7 @@ export async function POST(request: NextRequest) {
                   type: 'konto',
                   sachkonto: sachkonto,
                   kontoName: konto.bezeichnung || konto.name,
-                  confidence: 'medium'
+                  confidence: 'high'
                 }
                 method = 'kategorie'
               }
