@@ -248,7 +248,15 @@ export async function GET(request: NextRequest) {
           // Suche nach RE2025-xxxxx (Rechnungsnummer) oder AU-xxxxx (Auftragsnummer)
           const reMatch = verwendungszweck.match(/RE\d{4}-\d+/)
           const auMatch = verwendungszweck.match(/AU[-_\s]?\d+[-_\s]?SW\d+/i)
-          referenz = reMatch ? reMatch[0] : (auMatch ? auMatch[0].replace(/\s/g, '_') : '')
+          
+          // Normalisiere AU-Nummer zum Standard-Format AU_12345_SW6
+          if (auMatch) {
+            const cleaned = auMatch[0].replace(/\s/g, '').replace(/AU/i, 'AU_').replace(/SW/i, '_SW')
+            // Stelle sicher, dass Format korrekt ist: AU_xxxxx_SWx
+            referenz = cleaned.includes('_') ? cleaned : cleaned.replace(/AU_(\d+)SW/, 'AU_$1_SW')
+          } else {
+            referenz = reMatch ? reMatch[0] : ''
+          }
           transaktionsId = p.transactionId || p._id?.toString() || ''
           
           // AUTO-ZUORDNUNG für Bank-Transaktionen
