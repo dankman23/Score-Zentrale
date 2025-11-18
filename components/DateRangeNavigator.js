@@ -54,52 +54,61 @@ export default function DateRangeNavigator({ value, onChange, className = '' }) 
     const to = new Date(currentTo)
     
     // FIBU-Modul: Mindestdatum Oktober 2025
-    const minDate = new Date('2025-10-01')
+    const minDateStr = '2025-10-01'
 
     if (mode === 'tag') {
       from.setDate(from.getDate() + direction)
-      // Prüfe Mindestdatum
-      if (from < minDate) {
+      const newDateStr = from.toISOString().split('T')[0]
+      
+      // Prüfe Mindestdatum (String-Vergleich)
+      if (newDateStr < minDateStr) {
         alert('FIBU-Modul enthält nur Daten ab Oktober 2025')
         return
       }
-      onChange(`${from.toISOString().split('T')[0]}_${from.toISOString().split('T')[0]}`)
+      onChange(`${newDateStr}_${newDateStr}`)
     } else if (mode === 'woche') {
       from.setDate(from.getDate() + (direction * 7))
       to.setDate(to.getDate() + (direction * 7))
-      // Prüfe Mindestdatum
-      if (to < minDate) {
+      const fromStr = from.toISOString().split('T')[0]
+      const toStr = to.toISOString().split('T')[0]
+      
+      // Prüfe Mindestdatum (String-Vergleich)
+      if (toStr < minDateStr) {
         alert('FIBU-Modul enthält nur Daten ab Oktober 2025')
         return
       }
-      onChange(`${from.toISOString().split('T')[0]}_${to.toISOString().split('T')[0]}`)
+      onChange(`${fromStr}_${toStr}`)
     } else if (mode === 'monat') {
       // Wichtig: Setze auf den 1. des Monats, bevor wir navigieren!
       from.setDate(1) // Erster Tag des aktuellen Monats
       from.setMonth(from.getMonth() + direction) // Navigiere zum Vormonat/Nächsten
+      const fromStr = from.toISOString().split('T')[0]
       
-      // Prüfe Mindestdatum
-      if (from < minDate) {
+      // Prüfe Mindestdatum (String-Vergleich)
+      if (fromStr < minDateStr) {
         alert('FIBU-Modul enthält nur Daten ab Oktober 2025')
         return
       }
       
       const newTo = new Date(from.getFullYear(), from.getMonth() + 1, 0) // Letzter Tag des Monats
-      onChange(`${from.toISOString().split('T')[0]}_${newTo.toISOString().split('T')[0]}`)
+      const toStr = newTo.toISOString().split('T')[0]
+      onChange(`${fromStr}_${toStr}`)
     } else if (mode === 'jahr') {
       // Wichtig: Setze auf den 1. Januar, bevor wir navigieren!
       from.setMonth(0) // Januar
       from.setDate(1) // 1. Januar
       from.setFullYear(from.getFullYear() + direction)
+      const fromStr = from.toISOString().split('T')[0]
       
-      // Prüfe Mindestdatum
-      if (from < minDate) {
+      // Prüfe Mindestdatum (String-Vergleich)
+      if (fromStr < minDateStr) {
         alert('FIBU-Modul enthält nur Daten ab Oktober 2025')
         return
       }
       
       const newTo = new Date(from.getFullYear(), 11, 31) // 31. Dezember
-      onChange(`${from.toISOString().split('T')[0]}_${newTo.toISOString().split('T')[0]}`)
+      const toStr = newTo.toISOString().split('T')[0]
+      onChange(`${fromStr}_${toStr}`)
     }
   }
 
