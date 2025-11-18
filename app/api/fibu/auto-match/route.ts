@@ -221,7 +221,11 @@ export async function POST(request: NextRequest) {
             const sachkonto = kontoMapping[kategorie]
             
             if (sachkonto) {
-              const konto = kontenplan.find(k => k.kontoNr === sachkonto || k.nummer === sachkonto)
+              const konto = kontenplan.find(k => 
+                k.kontonummer === sachkonto || 
+                k.kontoNr === sachkonto || 
+                k.nummer === sachkonto
+              )
               
               if (konto) {
                 match = {
@@ -229,6 +233,15 @@ export async function POST(request: NextRequest) {
                   sachkonto: sachkonto,
                   kontoName: konto.bezeichnung || konto.name,
                   confidence: 'high'
+                }
+                method = 'kategorie'
+              } else {
+                // Auch ohne Konto-Details zuordnen (Konto existiert im SKR)
+                match = {
+                  type: 'konto',
+                  sachkonto: sachkonto,
+                  kontoName: kategorie, // Fallback: Kategorie als Name
+                  confidence: 'medium'
                 }
                 method = 'kategorie'
               }
