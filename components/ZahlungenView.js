@@ -164,10 +164,10 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
               onChange={(e) => setAnbieterFilter(e.target.value)}
               className="w-full bg-white text-gray-900 border border-gray-300 rounded px-3 py-2 text-sm"
             >
-              <option value="alle">Alle ({zahlungen.length})</option>
-              {uniqueAnbieter.map(anbieter => (
-                <option key={anbieter} value={anbieter}>
-                  {anbieter} ({zahlungen.filter(z => z.anbieter === anbieter).length})
+              <option value="alle">Alle ({stats?.gesamt?.toLocaleString('de-DE') || '0'})</option>
+              {Object.entries(stats?.anbieter || {}).map(([name, data]) => (
+                <option key={name} value={name}>
+                  {name} ({data.anzahl?.toLocaleString('de-DE') || '0'})
                 </option>
               ))}
             </select>
@@ -180,9 +180,9 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
               onChange={(e) => setZuordnungFilter(e.target.value)}
               className="w-full bg-white text-gray-900 border border-gray-300 rounded px-3 py-2 text-sm"
             >
-              <option value="alle">Alle</option>
-              <option value="zugeordnet">✅ Zugeordnet</option>
-              <option value="nicht_zugeordnet">❌ Nicht zugeordnet</option>
+              <option value="alle">Alle ({stats?.gesamt?.toLocaleString('de-DE') || '0'})</option>
+              <option value="zugeordnet">✅ Zugeordnet ({stats?.zuordnung?.zugeordnet?.toLocaleString('de-DE') || '0'})</option>
+              <option value="nicht_zugeordnet">❌ Nicht zugeordnet ({stats?.zuordnung?.nichtZugeordnet?.toLocaleString('de-DE') || '0'})</option>
             </select>
           </div>
           
