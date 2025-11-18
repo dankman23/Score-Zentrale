@@ -110,10 +110,11 @@ export async function GET(request: NextRequest) {
           // gegenkonto bleibt wie in Basis-Init (p.gegenkonto || p.kundenName)
           
         } else if (source.name === 'PayPal') {
-          // PayPal: Transaction-ID als Referenz
-          referenz = ''  // PayPal hat meist keine Auftragsnummer im System
+          // PayPal: rechnungsNr (AU-Nummer) als Referenz, kundenName als Gegenkonto
+          referenz = p.rechnungsNr || ''  // AU_12450_SW6
           transaktionsId = p.transactionId || ''
-          gegenkonto = p.gegenkonto || ''
+          gegenkonto = p.kundenName || ''  // Kundenname
+          verwendungszweck = p.betreff || p.rechnungsNr || ''  // Betreff oder AU-Nummer als Fallback
           
         } else if (source.name === 'Commerzbank' || source.name === 'Postbank') {
           // Bank: Verwendungszweck durchsuchen nach Mustern
