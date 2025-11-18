@@ -61,12 +61,17 @@ export default function DateRangeNavigator({ value, onChange, className = '' }) 
       to.setDate(to.getDate() + (direction * 7))
       onChange(`${from.toISOString().split('T')[0]}_${to.toISOString().split('T')[0]}`)
     } else if (mode === 'monat') {
-      from.setMonth(from.getMonth() + direction)
-      const newTo = new Date(from.getFullYear(), from.getMonth() + 1, 0) // Last day of month
+      // Wichtig: Setze auf den 1. des Monats, bevor wir navigieren!
+      from.setDate(1) // Erster Tag des aktuellen Monats
+      from.setMonth(from.getMonth() + direction) // Navigiere zum Vormonat/Nächsten
+      const newTo = new Date(from.getFullYear(), from.getMonth() + 1, 0) // Letzter Tag des Monats
       onChange(`${from.toISOString().split('T')[0]}_${newTo.toISOString().split('T')[0]}`)
     } else if (mode === 'jahr') {
+      // Wichtig: Setze auf den 1. Januar, bevor wir navigieren!
+      from.setMonth(0) // Januar
+      from.setDate(1) // 1. Januar
       from.setFullYear(from.getFullYear() + direction)
-      const newTo = new Date(from.getFullYear(), 11, 31) // Dec 31
+      const newTo = new Date(from.getFullYear(), 11, 31) // 31. Dezember
       onChange(`${from.toISOString().split('T')[0]}_${newTo.toISOString().split('T')[0]}`)
     }
   }
