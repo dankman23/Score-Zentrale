@@ -122,10 +122,10 @@ export async function POST(request: NextRequest) {
           
           if (source.name === 'Mollie') {
             // Mollie: AU-Nummer kann in verwendungszweck sein
-            auNummer = extractAuNummer(zahlung.verwendungszweck)
+            auNummer = extractAuNummer(zahlung.verwendungszweck || zahlung.beschreibung)
           } else if (source.name === 'PayPal') {
-            // PayPal: rechnungsNr oder verwendungszweck
-            auNummer = zahlung.rechnungsNr || extractAuNummer(zahlung.verwendungszweck || zahlung.betreff)
+            // PayPal: rechnungsNr ist direkt die AU-Nummer
+            auNummer = zahlung.rechnungsNr
           }
           
           if (auNummer) {
