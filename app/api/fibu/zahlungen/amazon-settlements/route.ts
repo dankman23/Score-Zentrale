@@ -172,6 +172,7 @@ export async function GET(request: NextRequest) {
             quantity: t.quantity,
             kategorie: t.kategorie,
             quelle: t.quelle,
+            buchung: t.buchung,
             ursprungsdaten: t.ursprungsdaten,
             updated_at: new Date()
           },
