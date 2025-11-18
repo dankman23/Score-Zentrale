@@ -1103,14 +1103,14 @@ export default function App() {
       if (!prospect) continue
       
       try {
-        const res = await fetch('/api/coldleads/analyze-v3', {
+        const res = await fetch('/api/coldleads/analyze-deep', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            website: prospect.website, 
-            industry: prospect.industry,
-            region: prospect.region,
-            company_name: prospect.company_name
+            website: prospect.website,
+            firmenname: prospect.company_name,
+            branche: prospect.industry,
+            prospectId: prospect.id
           })
         })
         const data = await res.json()
