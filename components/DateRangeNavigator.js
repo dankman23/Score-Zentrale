@@ -166,6 +166,7 @@ export default function DateRangeNavigator({ value, onChange, className = '' }) 
                       value={customFrom || currentFrom}
                       onChange={(e) => setCustomFrom(e.target.value)}
                       className="w-full border border-gray-300 rounded px-2 py-1 text-sm bg-white text-gray-900"
+                      style={{ colorScheme: 'light' }}
                     />
                   </div>
                   <div>
@@ -175,6 +176,7 @@ export default function DateRangeNavigator({ value, onChange, className = '' }) 
                       value={customTo || currentTo}
                       onChange={(e) => setCustomTo(e.target.value)}
                       className="w-full border border-gray-300 rounded px-2 py-1 text-sm bg-white text-gray-900"
+                      style={{ colorScheme: 'light' }}
                     />
                   </div>
                   <button
