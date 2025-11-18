@@ -213,13 +213,39 @@ export async function POST(request: NextRequest) {
           }
         }
         
-        // Strategie 3: Amazon → Kontenplan oder Rechnung
+        // Strategie 3: Amazon → Externe Rechnungen (XRE) oder normale Rechnungen
         if (!match && source.name === 'Amazon') {
           const kategorie = zahlung.amountType || zahlung.kategorie
           const orderId = zahlung.orderId
+          const merchantOrderId = zahlung.merchantOrderId
           
-          // 3a) ItemPrice (Verkaufserlöse) → Versuche Rechnung zu finden
-          if (kategorie === 'ItemPrice' && orderId) {
+          // 3a) Suche externe Rechnung (XRE) über Order-ID
+          if (orderId || merchantOrderId) {
+            // Suche in fibu_rechnungen_alle nach externen Rechnungen
+            const externeRechnung = alleRechnungen.find(r => {
+              if (r.quelle !== 'EXTERN') return false
+              
+              // Match über cBestellNr oder Herkunft
+              const bestellnr = r.cBestellNr || ''
+              const herkunft = r.herkunft || ''
+              
+              return (orderId && (bestellnr.includes(orderId) || herkunft.includes(orderId))) ||
+                     (merchantOrderId && (bestellnr.includes(merchantOrderId) || herkunft.includes(merchantOrderId)))
+            })
+            
+            if (externeRechnung) {
+              match = {
+                type: 'rechnung',
+                rechnungId: externeRechnung.uniqueId,
+                rechnungsNr: externeRechnung.belegnummer,
+                confidence: 'high'
+              }
+              method = 'amazonOrderIdXRE'
+            }
+          }
+          
+          // 3b) ItemPrice (Verkaufserlöse) → Versuche normale Rechnung zu finden
+          if (!match && kategorie === 'ItemPrice' && orderId) {
             // Suche Rechnung mit ähnlichem Betrag und Zeitraum
             const rechnungCandidates = vkRechnungen.filter(r => {
               const betragMatch = Math.abs((r.brutto || 0) - Math.abs(zahlung.betrag)) < 0.50
