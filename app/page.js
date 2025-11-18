@@ -5715,6 +5715,86 @@ export default function App() {
           )}
         </div>
       )}
+
+      {/* E-Mail Vorschau Modal */}
+      {emailPreview && (
+        <div className="modal" style={{display: 'block', backgroundColor: 'rgba(0,0,0,0.8)'}} onClick={() => setEmailPreview(null)}>
+          <div className="modal-dialog modal-lg modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-content bg-dark text-white">
+              <div className="modal-header border-bottom border-secondary">
+                <h5 className="modal-title">
+                  <i className="bi bi-envelope-check text-success mr-2"/>
+                  E-Mail Vorschau - {emailPreview.prospect.company_name}
+                </h5>
+                <button className="close text-white" onClick={() => setEmailPreview(null)}>
+                  <span>&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                {/* Empfänger Info */}
+                {emailPreview.kontaktperson && (
+                  <div className="alert alert-info mb-3">
+                    <strong>An:</strong> {emailPreview.kontaktperson.name} ({emailPreview.kontaktperson.position})
+                    <br/>
+                    <strong>E-Mail:</strong> {emailPreview.kontaktperson.email}
+                  </div>
+                )}
+                
+                {/* Betreff */}
+                <div className="form-group">
+                  <label className="font-weight-bold">Betreff:</label>
+                  <input 
+                    type="text" 
+                    className="form-control form-control-lg bg-secondary text-white border-0" 
+                    value={emailPreview.email.betreff}
+                    readOnly
+                  />
+                </div>
+                
+                {/* E-Mail Text */}
+                <div className="form-group">
+                  <label className="font-weight-bold">Nachricht:</label>
+                  <textarea 
+                    className="form-control bg-secondary text-white border-0" 
+                    rows="15"
+                    value={emailPreview.email.text}
+                    readOnly
+                    style={{whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: '0.9rem'}}
+                  />
+                </div>
+                
+                {/* Statistik */}
+                <div className="d-flex justify-content-between text-muted small">
+                  <span>Wörter: {emailPreview.email.text.split(' ').length}</span>
+                  <span>Zeichen: {emailPreview.email.text.length}</span>
+                </div>
+              </div>
+              <div className="modal-footer border-top border-secondary">
+                <button className="btn btn-secondary" onClick={() => setEmailPreview(null)}>
+                  <i className="bi bi-x-circle mr-1"/>Schließen
+                </button>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => {
+                    navigator.clipboard.writeText(emailPreview.email.text)
+                    alert('✅ E-Mail in Zwischenablage kopiert!')
+                  }}
+                >
+                  <i className="bi bi-clipboard mr-1"/>In Zwischenablage
+                </button>
+                {emailPreview.kontaktperson?.email && (
+                  <a 
+                    href={`mailto:${emailPreview.kontaktperson.email}?subject=${encodeURIComponent(emailPreview.email.betreff)}&body=${encodeURIComponent(emailPreview.email.text)}`}
+                    className="btn btn-success"
+                  >
+                    <i className="bi bi-send-fill mr-1"/>In E-Mail-Client öffnen
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
