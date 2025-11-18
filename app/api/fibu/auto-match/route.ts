@@ -137,28 +137,38 @@ export async function POST(request: NextRequest) {
               
               // Finde Rechnung: Mollie/PayPal Zahlungen sind Eingänge (positiv)
               // Suche nach Rechnung mit ähnlichem Betrag und Zeitraum
-              const rechnungCandidates = vkRechnungen.filter(r => {
-                const betragMatch = Math.abs((r.brutto || 0) - Math.abs(zahlung.betrag)) < 0.50 // 50 Cent Toleranz
-                const dateDiff = Math.abs(new Date(r.rechnungsdatum).getTime() - new Date(zahlung.datum || zahlung.datumDate).getTime())
-                const daysDiff = dateDiff / (1000 * 60 * 60 * 24)
+              const rechnungCandidates = vkRechnungen
+                .filter(r => {
+                  const betragMatch = Math.abs((r.brutto || 0) - Math.abs(zahlung.betrag)) < 0.50 // 50 Cent Toleranz
+                  const dateDiff = Math.abs(new Date(r.rechnungsdatum).getTime() - new Date(zahlung.datum || zahlung.datumDate).getTime())
+                  const daysDiff = dateDiff / (1000 * 60 * 60 * 24)
+                  
+                  return betragMatch && daysDiff <= 60 // 60 Tage Toleranz
+                })
+                .map(r => {
+                  // Score: je niedriger, desto besser
+                  const betragDiff = Math.abs((r.brutto || 0) - Math.abs(zahlung.betrag))
+                  const dateDiff = Math.abs(new Date(r.rechnungsdatum).getTime() - new Date(zahlung.datum || zahlung.datumDate).getTime())
+                  const daysDiff = dateDiff / (1000 * 60 * 60 * 24)
+                  const score = betragDiff + daysDiff * 0.1 // Betrag wichtiger als Datum
+                  
+                  return { rechnung: r, score, betragDiff, daysDiff }
+                })
+                .sort((a, b) => a.score - b.score) // Bester zuerst
+              
+              // Nehme besten Kandidaten wenn Score < 0.25 (sehr gut)
+              if (rechnungCandidates.length > 0) {
+                const best = rechnungCandidates[0]
                 
-                return betragMatch && daysDiff <= 60 // 60 Tage Toleranz
-              })
-              
-              // Debug
-              if (source.name === 'PayPal' && zahlungen.indexOf(zahlung) < 1) {
-                console.log(`[Auto-Match DEBUG] PayPal ${zahlung.transactionId} AU: ${auNummer}, Candidates: ${rechnungCandidates.length}`, 
-                  rechnungCandidates.map(r => ({rg: r.cRechnungsNr, betrag: r.brutto, datum: r.rechnungsdatum})))
-              }
-              
-              if (rechnungCandidates.length === 1) {
-                match = {
-                  type: 'rechnung',
-                  rechnungId: rechnungCandidates[0]._id.toString(),
-                  rechnungsNr: rechnungCandidates[0].cRechnungsNr || rechnungCandidates[0].rechnungsNr,
-                  confidence: 'high'
+                if (best.score < 1.0) { // Max 1€ Diff + 10 Tage
+                  match = {
+                    type: 'rechnung',
+                    rechnungId: best.rechnung._id.toString(),
+                    rechnungsNr: best.rechnung.cRechnungsNr || best.rechnung.rechnungsNr,
+                    confidence: best.score < 0.25 ? 'high' : 'medium'
+                  }
+                  method = 'auNummer'
                 }
-                method = 'auNummer'
               }
             }
           }
