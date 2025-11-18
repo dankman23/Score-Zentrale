@@ -196,6 +196,20 @@ export async function GET(request: NextRequest) {
           gegenkonto = p.kundenName || ''  // Kundenname
           verwendungszweck = p.betreff || p.rechnungsNr || ''  // Betreff oder AU-Nummer als Fallback
           
+          // AUTO-ZUORDNUNG für PayPal über AU-Nummer (nur wenn noch nicht zugeordnet und AU-Nummer vorhanden)
+          if (!p.istZugeordnet && referenz && referenz.match(/^AU_\d+_SW\d+$/)) {
+            // PayPal-Zahlungen mit AU-Nummer werden als "zuordenbar" markiert
+            // Die tatsächliche Zuordnung zur Rechnung erfolgt später via Auto-Match
+            autoZugeordnet = true
+            autoGegenkonto = '69012'  // Paypal-Erlöskonto (Sammelkonto)
+            autoZuordnungsArt = 'PayPal Zahlung (AU-Nummer)'
+          } else if (!p.istZugeordnet && p.betrag < 0) {
+            // Negative PayPal-Beträge (Gebühren, Einkäufe)
+            autoZugeordnet = true
+            autoGegenkonto = '6855'  // Sonstige Aufwendungen
+            autoZuordnungsArt = 'PayPal Gebühr/Einkauf'
+          }
+          
         } else if (source.name === 'Commerzbank' || source.name === 'Postbank') {
           // Bank: Verwendungszweck durchsuchen nach Mustern
           // Suche nach RE2025-xxxxx (Rechnungsnummer) oder AU-xxxxx (Auftragsnummer)
