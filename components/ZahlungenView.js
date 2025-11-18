@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import ZuordnungsModal from './ZuordnungsModal'
 
 export default function ZahlungenView({ zeitraum, initialFilter }) {
   const [zahlungen, setZahlungen] = useState([])
