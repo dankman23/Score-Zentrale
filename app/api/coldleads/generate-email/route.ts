@@ -1,10 +1,12 @@
 /**
- * API: E-Mail Generator für Kaltakquise
+ * API: E-Mail Generator & Versand für Kaltakquise
  * Generiert personalisierte E-Mails basierend auf Firmen-Analyse
+ * Optional: Versendet E-Mails direkt per SMTP
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { generatePersonalizedEmail } from '@/services/coldleads/email-generator'
+import { sendEmail } from '@/services/coldleads/emailer'
 import { connectToDb } from '@/lib/db/mongodb'
 
 export const runtime = 'nodejs'
@@ -12,7 +14,7 @@ export const maxDuration = 30
 
 export async function POST(req: NextRequest) {
   try {
-    const { prospectId, kontaktpersonIndex } = await req.json()
+    const { prospectId, kontaktpersonIndex, sendNow } = await req.json()
     
     if (!prospectId) {
       return NextResponse.json(
