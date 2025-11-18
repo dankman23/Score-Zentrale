@@ -205,7 +205,7 @@ export async function sendEmail(to: string, subject: string, body: string) {
 
   // Email-Optionen mit Reply-To und BCC
   const replyTo = process.env.SMTP_REPLY_TO || from
-  const bcc = process.env.SMTP_REPLY_TO || null // BCC an keyaccount@ für Archivierung
+  const bcc = process.env.SMTP_BCC || process.env.SMTP_REPLY_TO || null // BCC für Tests oder Archivierung
   
   const mailOptions: any = {
     from: `${fromName} <${from}>`,
@@ -219,6 +219,7 @@ export async function sendEmail(to: string, subject: string, body: string) {
   // BCC nur wenn gesetzt
   if (bcc) {
     mailOptions.bcc = bcc
+    console.log(`[Emailer] BCC set to: ${bcc}`)
   }
 
   try {
