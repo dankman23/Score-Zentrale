@@ -3676,6 +3676,8 @@ export default function App() {
                     </button>
                   </div>
                 </div>
+              </div>
+            </div>
 
                 {/* Progress Tabelle */}
                 {dachCrawlerProgress.length > 0 && (
