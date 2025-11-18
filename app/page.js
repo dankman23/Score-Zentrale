@@ -3508,14 +3508,14 @@ export default function App() {
                         </select>
                       </div>
 
-                  <div className="col-md-3 mb-2">
-                    <label className="small text-white mb-1">Region/Bundesland *</label>
-                    <select 
-                      className="form-control" 
-                      value={dachCrawlerForm.region}
-                      onChange={e => setDachCrawlerForm({...dachCrawlerForm, region: e.target.value})}
-                    >
-                      <option value="">-- Wählen --</option>
+                      <div className="col-md-3 mb-2">
+                        <label className="small text-dark font-weight-semibold mb-1">Region/Bundesland *</label>
+                        <select 
+                          className="form-control form-control-lg" 
+                          value={dachCrawlerForm.region}
+                          onChange={e => setDachCrawlerForm({...dachCrawlerForm, region: e.target.value})}
+                        >
+                          <option value="">-- Wählen --</option>
                       {dachCrawlerForm.country === 'DE' && (
                         <>
                           <option value="Baden-Württemberg">Baden-Württemberg</option>
