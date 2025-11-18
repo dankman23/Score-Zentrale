@@ -118,7 +118,7 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
   // Unique providers
   const uniqueAnbieter = [...new Set(zahlungen.map(z => z.anbieter))].filter(Boolean).sort()
 
-  // Statistics (lokale Filter-Stats)
+  // Statistics (lokale Filter-Stats - nur für aktuelle Seite)
   const localStats = {
     gesamt: filteredZahlungen.length,
     eingaenge: filteredZahlungen.filter(z => z.betrag > 0).length,
@@ -128,6 +128,9 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
     summeEingaenge: filteredZahlungen.filter(z => z.betrag > 0).reduce((sum, z) => sum + (z.betrag || 0), 0),
     summeAusgaenge: filteredZahlungen.filter(z => z.betrag < 0).reduce((sum, z) => sum + (z.betrag || 0), 0)
   }
+  
+  // Check if any filter is active
+  const hasActiveFilters = anbieterFilter !== 'alle' || zuordnungFilter !== 'alle' || richtungFilter !== 'alle' || searchTerm !== ''
 
   if (loading) {
     return (
