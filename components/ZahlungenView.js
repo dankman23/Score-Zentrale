@@ -397,9 +397,17 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
                       </td>
                       <td className="px-3 py-3 text-sm whitespace-nowrap">
                         {zahlung.istZugeordnet ? (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            ✅ {zahlung.zuordnungsArt || 'Zugeordnet'}
-                          </span>
+                          <div className="flex flex-col gap-1">
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              ✅ {zahlung.zuordnungsArt || 'Zugeordnet'}
+                            </span>
+                            {zahlung.zugeordneteRechnung && (
+                              <span className="text-xs text-blue-600">📄 {zahlung.zugeordneteRechnung}</span>
+                            )}
+                            {zahlung.zugeordnetesKonto && (
+                              <span className="text-xs text-purple-600">📊 {zahlung.zugeordnetesKonto}</span>
+                            )}
+                          </div>
                         ) : (
                           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                             ⚪ Offen
