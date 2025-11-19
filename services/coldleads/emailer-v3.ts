@@ -265,23 +265,21 @@ function generateMail3(
   anrede: string
 ): { subject: string; body: string; word_count: number } {
   
-  const signature = getEmailSignature()
-  
-  const subject = `Kurzer Anruf zu Schleifwerkzeugen?`
+  const subject = `Kurzer Anruf?`
   
   const body = `${anrede},
 
-ich möchte nicht weiter stören - vielleicht passt unser Angebot gerade nicht.
+ich möchte nicht nerven - vielleicht passt es gerade nicht.
 
-<b>Falls doch Interesse besteht:</b> Darf ich Sie diese Woche kurz (10 Min) anrufen?
+<b>Falls doch:</b> Darf ich kurz (10 Min) anrufen? Z.B. <b>Donnerstag 14 Uhr</b> oder <b>Freitag 10 Uhr</b>?
 
-Z.B. <b>Donnerstag 14 Uhr</b> oder <b>Freitag 10 Uhr</b>?
+📞 <a href="tel:+4922125999901">0221-25999901</a>
 
-📞 <a href="tel:+4922125999901">(+49) 0221-25999901</a>
+Kurze Info reicht. Danke!
 
-Eine kurze Info reicht. Danke!
-
-${signature}`
+Viele Grüße
+<b>Daniel Leismann</b>
+Score Schleifwerkzeuge`
   
   return {
     subject,
