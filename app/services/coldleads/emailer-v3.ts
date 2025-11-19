@@ -276,7 +276,7 @@ Schreibe jetzt NUR die E-Mail-Text (120-180 Wörter):`
     const signature = `\n\nViele Grüße\n<b>Daniel Leismann</b>\nScore Schleifwerkzeuge\n📞 <a href="tel:+4922125999901">0221-25999901</a> (Mo-Fr 10-18 Uhr)\n📧 <a href="mailto:leismann@score-schleifwerkzeuge.de">leismann@score-schleifwerkzeuge.de</a>
 
 -- 
-Besuchen Sie auch unseren Schleifmittel-Shop auf www.score-schleifwerkzeuge.de und kaufen Sie dort Schleifscheiben, Schleifbänder etc. zu Staffelpreisen unabhängig von den handelsüblichen OVP-Größen. 
+Besuchen Sie auch unseren Schleifmittel-Shop auf <a href="https://score-schleifwerkzeuge.de/business">https://score-schleifwerkzeuge.de/business</a> und kaufen Sie dort Schleifscheiben, Schleifbänder etc. zu Staffelpreisen unabhängig von den handelsüblichen OVP-Größen. 
 _____________________________
 Score Handels GmbH & Co. KG 
 
