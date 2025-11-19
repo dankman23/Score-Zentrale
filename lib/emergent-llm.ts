@@ -86,8 +86,10 @@ export async function emergentChatCompletion(
 
   let lastError: Error | null = null
   
-  // Use OpenAI endpoint with Emergent Universal Key
-  const apiEndpoint = 'https://api.openai.com/v1/chat/completions'
+  // Use correct endpoint based on key type
+  const apiEndpoint = apiKey.startsWith('sk-emergent') 
+    ? 'https://api.emergent.sh/v1/chat/completions'  // Emergent Universal Key
+    : 'https://api.openai.com/v1/chat/completions'   // OpenAI direct
   
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
