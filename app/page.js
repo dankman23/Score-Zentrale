@@ -222,6 +222,16 @@ function MailPromptsView() {
                       >
                         <i className="bi bi-eye"/>
                       </button>
+                      <button
+                        className="btn btn-outline-secondary"
+                        title="Bearbeiten"
+                        onClick={() => {
+                          setEditingPrompt({...prompt})
+                          setShowEditPromptModal(true)
+                        }}
+                      >
+                        <i className="bi bi-pencil"/>
+                      </button>
                       {!prompt.active && (
                         <button
                           className="btn btn-outline-success"
