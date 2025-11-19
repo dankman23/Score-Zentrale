@@ -19,6 +19,7 @@ export async function POST() {
         $set: { 
           running: false,
           currentPhase: null,
+          dailyCount: 0, // WICHTIG: Reset bei Stop (Session-basiert)
           lastActivity: new Date().toISOString()
         }
       }
