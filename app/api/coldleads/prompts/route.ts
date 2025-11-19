@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import clientPromise from '../../../lib/db/mongodb'
+import { connectToMongoDB } from '../../../../lib/mongodb'
 
 /**
  * GET /api/coldleads/prompts
@@ -10,8 +10,7 @@ import clientPromise from '../../../lib/db/mongodb'
  */
 export async function GET() {
   try {
-    const client = await clientPromise
-    const db = client.db()
+    const db = await connectToMongoDB()
     const promptsCollection = db.collection('email_prompts')
     const prospectsCollection = db.collection('prospects')
     
