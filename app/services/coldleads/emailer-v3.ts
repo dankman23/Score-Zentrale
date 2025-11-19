@@ -444,6 +444,8 @@ Falls es passt: Wir bieten <b>Rahmenverträge für den Jahresbedarf</b> mit Staf
 📞 Einfach anrufen: <a href="tel:+4922125999901">0221-25999901</a> (10-18 Uhr)
 📧 Oder auf diese Mail antworten
 
+Mehr Infos: <a href="https://score-schleifwerkzeuge.de/business">https://score-schleifwerkzeuge.de/business</a>
+
 Viele Grüße
 <b>Daniel Leismann</b>
 Score Schleifwerkzeuge
