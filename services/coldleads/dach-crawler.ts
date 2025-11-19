@@ -24,6 +24,58 @@ interface CompanyLead {
 }
 
 /**
+ * Bereinigt Firmennamen von unnötigen Präfixen
+ * Entfernt: "Impressum - ", "Kontakt - ", "Über uns - ", etc.
+ */
+function cleanCompanyName(name: string): string {
+  if (!name) return name
+  
+  // Entferne typische Seiten-Titel-Präfixe
+  const prefixesToRemove = [
+    'Impressum - ',
+    'Impressum: ',
+    'Kontakt - ',
+    'Kontakt: ',
+    'Über uns - ',
+    'Über uns: ',
+    'About - ',
+    'Contact - ',
+    'Imprint - ',
+    'Home - ',
+    'Startseite - ',
+    'Willkommen - ',
+    'Welcome - '
+  ]
+  
+  let cleaned = name
+  for (const prefix of prefixesToRemove) {
+    if (cleaned.startsWith(prefix)) {
+      cleaned = cleaned.substring(prefix.length)
+      break
+    }
+  }
+  
+  // Entferne auch Suffix wie " - Impressum", " | Kontakt"
+  const suffixesToRemove = [
+    ' - Impressum',
+    ' | Impressum',
+    ' - Kontakt',
+    ' | Kontakt',
+    ' - Über uns',
+    ' | Über uns'
+  ]
+  
+  for (const suffix of suffixesToRemove) {
+    if (cleaned.endsWith(suffix)) {
+      cleaned = cleaned.substring(0, cleaned.length - suffix.length)
+      break
+    }
+  }
+  
+  return cleaned.trim()
+}
+
+/**
  * Systematisches Crawling-Framework
  * 
  * Quellen-Hierarchie:
