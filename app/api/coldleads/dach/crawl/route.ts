@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     // Speichere gefundene Leads in MongoDB
     const { db } = await connectToDatabase()
-    const prospectsCollection = db.collection('cold_prospects')
+    const prospectsCollection = db.collection('prospects')
     const progressCollection = db.collection('dach_crawl_progress')
 
     const savedProspects = []
