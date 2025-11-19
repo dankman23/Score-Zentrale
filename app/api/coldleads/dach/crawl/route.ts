@@ -49,11 +49,27 @@ export async function POST(request: NextRequest) {
     const progressCollection = db.collection('dach_crawl_progress')
 
     const savedProspects = []
+    
+    // Hilfsfunktion: Normalisiere URL zu Hauptdomain (ohne /impressum/, /kontakt/ etc.)
+    const normalizeWebsite = (url: string): string => {
+      if (!url) return url
+      try {
+        const urlObj = new URL(url.startsWith('http') ? url : 'https://' + url)
+        return `${urlObj.protocol}//${urlObj.hostname}`
+      } catch (e) {
+        // Fallback: Entferne nur den Pfad
+        return url.replace(/\/[^\/]*\/?$/, '')
+      }
+    }
 
     for (const lead of result.leads) {
+      // Normalisiere Website-URL zu Hauptdomain
+      const normalizedWebsite = normalizeWebsite(lead.website || '')
+      
       const prospectData = {
         company_name: lead.name,
-        website: lead.website || '',
+        website: normalizedWebsite,
+        website_original: lead.website, // Speichere Original-URL für Referenz
         description: lead.address || '',
         industry: lead.industry,
         region: lead.city,
@@ -68,10 +84,10 @@ export async function POST(request: NextRequest) {
         updated_at: new Date()
       }
 
-      // Upsert: Update wenn existiert (via website), sonst Insert
-      if (lead.website) {
+      // Upsert: Update wenn existiert (via normalisierte website), sonst Insert
+      if (normalizedWebsite) {
         await prospectsCollection.updateOne(
-          { website: lead.website },
+          { website: normalizedWebsite },
           {
             $set: prospectData,
             $setOnInsert: { created_at: new Date() }
