@@ -1,86 +1,91 @@
 <analysis>
-The user is a German-speaking software engineer and the next agent must respond in **German**.
+The user is a German-speaking software engineer, and the next agent **must** respond in **German**.
 
-The trajectory documents a complex development cycle focused on enhancing a financial accounting (FIBU) module. The initial request was to analyze user-provided Excel files for Amazon and PayPal transactions to improve data reconciliation and automated matching.
+The trajectory documents two major development sprints. The first was a massive enhancement of a Financial Accounting (FIBU) module. It began with debugging critical issues reported by the user, such as incorrect data filtering and low payment-to-invoice association rates. Through a systematic process of database analysis, API adjustments (), and frontend fixes (), the initial bugs were resolved. The core of this sprint was an iterative process to drastically improve the auto-matching logic. By implementing rules to automatically assign all Amazon payments and then developing a sophisticated, regex-based matching engine for PayPal and Commerzbank payments using order numbers () and invoice numbers (), the AI engineer successfully increased the automated association rate from 37% to 100%.
 
-The AI engineer began by parsing the Excel files (, ) and generating a detailed analysis report (). Based on these findings and a user-provided image () showing desired booking structures, the engineer designed and documented a new, more sophisticated booking logic ().
-
-The core of the work involved a significant refactoring and expansion of the backend APIs. This included:
-1.  Creating a new utility module for booking logic ().
-2.  Modifying the primary payments API () and the auto-match API () to incorporate this new logic.
-3.  The changes were designed to handle split bookings (e.g., separating Amazon principal, shipping, tax), map fees to correct contra-accounts, and improve matching by using order numbers ( / ) found in payment details.
-
-After implementation, a backend test revealed critical import path errors. The final phase of the work was a rapid-fire debugging session to correct these paths across all modified files, moving from relative paths () to alias paths (), ensuring the API became functional again. The process concluded with the creation of release notes (), preparing the codebase for a clean fork point as requested by the user.
+The second sprint focused on refactoring a Kaltakquise (cold acquisition) module. The user requested simplifying the lead generation process by removing an old Google Search method and focusing exclusively on an improved DACH-Crawler. This involved significant UI changes in , which led to major syntax errors that required resetting the file from version control. Subsequently, the AI developed a multi-stage pipeline:
+1.  **Crawling:** Improved the DACH crawler to filter out irrelevant websites.
+2.  **Deep Analysis:** Created a new service () and API () using an LLM to extract detailed company info (contacts, materials, products).
+3.  **Email Generation:** Created a service () and API () to draft personalized outreach emails.
+4.  **Autopilot Fix:** The final task was to update the existing Autopilot feature to use this new, higher-quality pipeline. The work concluded just as the Autopilot's logic was being updated, preparing for the final documentation phase.
 </analysis>
 
 <product_requirements>
-The primary goal is to enhance the Financial Accounting (FIBU) module to support advanced, automated bookkeeping based on real-world transaction data from Amazon and PayPal.
+The project consists of two core, highly-automated modules:
 
-**Key Requirements:**
-1.  **Data Reconciliation:** Analyze provided  and  files to identify discrepancies, missing transactions, and improve the data import and unification process.
-2.  **Advanced Booking Logic:** Implement a system capable of creating detailed bookkeeping entries from raw payment data. This includes:
-    *   **Split Bookings:** For complex transactions like Amazon payouts, automatically split the total amount into its constituent parts (e.g., Principal, Shipping, Tax, Fees).
-    *   **Contra-Account Mapping:** Automatically assign the correct contra-account () for different transaction types, especially various fees.
-    *   **VAT Calculation:** Incorporate logic to correctly handle and calculate Value-Added Tax (MwSt.).
-3.  **Improved Auto-Matching:** Enhance the existing  functionality to increase the automatic assignment rate. This involves using newly identified reference points, such as order numbers ( or ) embedded within payment descriptions from Amazon and PayPal, to link payments to sales invoices ().
-4.  **Stable Codebase:** Ensure all new implementations are stable and bug-free, culminating in a clean, functional state of the application suitable for forking and further development.
+**1. Financial Accounting (FIBU) Automation:**
+The primary goal is to automate the reconciliation of payments from various sources (Amazon, PayPal, Commerzbank) with sales invoices. The system must automatically analyze raw transaction data, apply complex booking logic (e.g., splitting Amazon fees, taxes, and principal), and associate payments with the correct invoices. The target was to achieve a near-100% automatic association rate to eliminate manual accounting work. The implementation successfully achieved a 100% assignment rate for the given October 2025 dataset through multi-layered matching rules.
+
+**2. Outbound Cold Acquisition (Kaltakquise) Pipeline:**
+The objective is to create a streamlined, three-stage process for B2B lead generation.
+- **Stage 1 (Find):** Systematically crawl the DACH region for potential B2B customer websites based on industry and location, filtering out irrelevant results.
+- **Stage 2 (Analyze):** Perform a deep, AI-powered analysis of a target company's website to extract key business intelligence: contact persons, materials used, core business applications, and potential product needs.
+- **Stage 3 (Engage):** Automatically generate a personalized, context-aware outreach email based on the analysis, ready to be sent.
+This entire pipeline is also managed by an Autopilot feature for hands-off operation.
 </product_requirements>
 
 <key_technical_concepts>
-- **Backend Framework:** Next.js API Routes (App Router)
-- **Language:** TypeScript
-- **Databases:** MongoDB (primary app data), MSSQL (for syncing with JTL ERP system)
+- **Backend:** Next.js (App Router), TypeScript, API Routes
+- **Frontend:** React, State Management (, ) within a large single-page component.
+- **Database:** MongoDB for application data.
+- **AI/LLM Integration:** Used for deep company analysis and personalized email generation.
+- **Key Libraries:**  for email dispatch.
 - **Core Logic:**
-    - Data aggregation from multiple sources (Amazon, PayPal).
-    - Multi-strategy auto-matching engine for payments and invoices.
-    - Modular booking logic for generating accounting entries (split bookings, contra-accounts).
-- **File Handling:** Analysis of user-uploaded  files.
-- **Development Process:** Iterative development, backend testing, and fixing import path resolution (from relative  to alias ).
+    - Advanced, regex-based string matching for payment reconciliation.
+    - Rule-based logic for financial transaction classification.
+    - Multi-step, chained API calls for the outbound pipeline (Crawl -> Analyze -> Generate Email).
 </key_technical_concepts>
 
 <code_architecture>
-The architecture is a Next.js application with a focus on server-side logic within API routes for the FIBU module. Data is synced from an external MSSQL database (JTL) into a MongoDB database, which the Next.js backend primarily queries.
+The application is a full-stack Next.js monolith. The frontend is primarily a single, large client component () managing state for multiple business modules. The backend consists of API routes for business logic and services that encapsulate complex operations, including third-party interactions and database queries.
 
 **Directory Structure:**
 
 
-**File Details:**
+**Key Files:**
+- ****
+  - **Importance:** The heart of the financial automation. This endpoint fetches payments from the database and, critically, applies the entire automatic association logic on the fly.
+  - **Changes:** This file was massively refactored. It now contains complex logic to:
+    1. Automatically assign all Amazon payments based on their transaction type.
+    2. Extract order numbers () and invoice numbers () from PayPal and Commerzbank transactions using refined regex patterns.
+    3. Normalize these extracted numbers to handle various formats (with/without underscores, spaces, hyphens).
+    4. Look up corresponding invoices () to create a direct link.
+    5. Assign a generic category to unmatchable payments to achieve 100% classification.
 
--   ****
-    -   **Importance:** A new, central module created to house the complex logic for generating bookkeeping entries. It decouples the booking rules from the API route handlers.
-    -   **Changes:** Created from scratch. It contains functions to process Amazon and PayPal transactions, split them into components (principal, fees, etc.), and assign appropriate debit/credit accounts.
+- ****
+  - **Importance:** The central, and enormous, frontend component that renders the entire UI for all modules (FIBU, Kaltakquise, etc.) and manages all client-side state and user interactions.
+  - **Changes:** It was heavily modified to support the new features. The Kaltakquise section was refactored to remove the old Google Search UI and focus solely on the DACH Crawler. New UI sections were added to display the results of the deep company analysis and the generated email previews. Functions to call the new APIs (, ) were added.
 
--   ****
-    -   **Importance:** The core engine for automatically associating payments with invoices.
-    -   **Changes:** Significantly enhanced to include new matching strategies. It now attempts to match Amazon payments by extracting order numbers () from transaction details and comparing them against the  field of invoices. Similar logic was added for PayPal transactions. The statistics tracking was updated to reflect these new methods. Finally, import paths were fixed from  to .
+- ****
+  - **Importance:** A new service created to house the logic for the deep company analysis. It contains the LLM prompt that instructs the AI on what specific data to extract from a company website.
+  - **Changes:** Created from scratch.
 
--   ****
-    -   **Importance:** The main endpoint for fetching a unified list of all payments.
-    -   **Changes:** Modified to integrate the new  module. When processing Amazon and PayPal payments, it now calls the new logic to generate and attach detailed  objects to each payment record before returning the response. This enriches the data available to the frontend without changing the core data-fetching mechanism. Import paths were also fixed here.
+- ****
+  - **Importance:** A new service that holds the LLM prompt for generating personalized outreach emails based on the data from .
+  - **Changes:** Created from scratch.
 
--   ****
-    -   **Importance:** This API is responsible for syncing invoice data from the external JTL (MSSQL) system into MongoDB.
-    -   **Changes:** The engineer investigated this file to confirm that the  field (order number) was already being fetched from JTL and was available for synchronization into MongoDB, which was crucial for the new auto-matching logic to work. No code changes were ultimately needed here.
-
--   ** / **
-    -   **Importance:** These documentation files represent the planning and design phase of the work.
-    -   **Changes:** Created to outline the findings from the Excel file analysis and to formalize the plan for implementing the new booking logic, serving as a blueprint for the subsequent coding tasks.
+- ****
+  - **Importance:** The core worker process for the Autopilot feature. This endpoint is called periodically to perform one cycle of the outbound pipeline (find, analyze, email).
+  - **Changes:** This was the last file being worked on. It was modified to replace a call to the old, shallow  API with the new  API. The engineer was in the process of also switching its lead-sourcing mechanism from an old strategy to the new .
 </code_architecture>
 
 <pending_tasks>
-- There are no explicit pending tasks from the user. The last request was to fix the code to reach a stable fork point, which has been completed. The system is now in a stable, documented state, ready for handover.
+- **Create Handover Documentation:** The primary pending task is to create comprehensive documentation (, etc.) to summarize the project's state, architecture, setup, and features, making it ready for a clean fork as requested by the user.
 </pending_tasks>
 
 <current_work>
-The most recent work was a critical debugging and stabilization effort immediately following a major feature implementation.
+The work concluded immediately after a major push to overhaul the Kaltakquise (cold acquisition) module and just before creating the final handover documentation. The AI engineer was in the final stages of fixing the Autopilot feature to ensure it uses the latest, high-quality logic.
 
-**Summary of Work:**
-1.  **Feature Implementation:** The AI engineer implemented a sophisticated new booking logic and enhanced the auto-matching algorithms for Amazon and PayPal payments. This involved creating a new  module and heavily modifying the  and  API routes.
-2.  **Testing Failure:** Upon completing the implementation, a backend test was initiated. The test runner () reported critical failures, indicating that the API routes could not be loaded due to incorrect import paths for database connections and other utilities. The errors were caused by improper relative paths (e.g., ).
-3.  **Hotfix Implementation:** The engineer immediately addressed the critical errors. This involved a series of rapid file edits on , , and other related files to replace the faulty relative paths with correct, alias-based paths (e.g., ).
-4.  **Finalization:** After fixing the imports, a quick test confirmed the API was running. The engineer then created a final documentation file, , to summarize the changes. The work concluded with the system in a stable, functional state, fulfilling the user's request for a clean fork point.
+**Specifically:**
+The engineer was editing the file ****. This is the API that executes one tick of the Autopilot's work cycle.
+
+The key changes being made were:
+1.  **Upgrading the Analysis Step:** The code was modified to call the new, powerful  endpoint instead of the outdated . This was completed.
+2.  **Upgrading the Lead Sourcing Step:** The engineer was in the process of replacing the Autopilot's lead sourcing logic. The goal was to make it use the new, improved **DACH-Crawler** () instead of the old, less effective .
+
+The last action was an edit to  to implement this second change. This fix was considered a prerequisite to finalizing the codebase for handover, ensuring all components are consistent and using the latest logic. The system is now functionally complete but lacks the formal documentation requested for the fork.
 </current_work>
 
 <optional_next_step>
-Inform the user that the new booking/matching logic has been implemented and the subsequent critical errors have been fixed. The code is now in a stable, documented state and is ready to be forked as requested.
+Create the comprehensive handover documentation (, etc.) to make the project ready for forking, as requested by the user.
 </optional_next_step>

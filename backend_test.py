@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, List
 
 # Base URL aus .env
-BASE_URL = "https://buchungslogik.preview.emergentagent.com"
+BASE_URL = "https://fibu-automation.preview.emergentagent.com"
 
 class FIBUBackendTester:
     def __init__(self):
