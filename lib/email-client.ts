@@ -57,7 +57,7 @@ export async function sendEmail(to: string, subject: string, html: string, text?
   
   const mailOptions: any = {
     from: `Score Schleifwerkzeuge <${process.env.EMAIL_FROM || 'vertrieb@score-schleifwerkzeuge.de'}>`,
-    bcc: 'leismann@score-schleifwerkzeuge.de, danki.leismann@gmx.de', // Automatische BCC-Kopie an beide Adressen
+    bcc: 'leismann@score-schleifwerkzeuge.de', // BCC nur noch an leismann
     subject: testMode ? `[TEST] ${subject}` : subject,
     html: fullHTML,
     text: text || html.replace(/<[^>]*>/g, '')
@@ -71,6 +71,7 @@ export async function sendEmail(to: string, subject: string, html: string, text?
     console.log(`[Email] TEST MODE: Email würde an ${to} gesendet, geht nur an BCC`)
   } else {
     mailOptions.to = to
+    console.log(`[Email] LIVE MODE: Sende an ${to} mit BCC an leismann@score-schleifwerkzeuge.de`)
   }
 
   try {
