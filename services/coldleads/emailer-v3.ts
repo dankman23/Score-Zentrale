@@ -208,17 +208,38 @@ Schreibe jetzt die E-Mail (mindestens 180 Wörter!):`
   } catch (error) {
     console.error('[Mail1] ChatGPT error, using fallback:', error)
     
-    // Fallback: Einfache Template-basierte E-Mail
-    const subject = `Schleifwerkzeuge für ${analysis.company}`
+    // Fallback: Template-basierte E-Mail mit mehr Details
+    const subject = `Schleifwerkzeuge für ${firmendaten.werkstoffe} – ${analysis.company}`
+    
+    // Werkstoff-spezifische Empfehlungen
+    let produktempfehlung = ''
+    const werkstoffeLower = firmendaten.werkstoffe.toLowerCase()
+    
+    if (werkstoffeLower.includes('edelstahl') || werkstoffeLower.includes('inox')) {
+      produktempfehlung = `\n\nFür Edelstahl-Bearbeitung haben wir speziell <b>Fächerscheiben, Fiberscheiben und INOX-Trennscheiben</b>, die Verfärbungen vermeiden und saubere Oberflächen garantieren. Gerade bei sichtbaren Teilen wie ${firmendaten.werkstucke} ist das entscheidend.`
+    } else if (werkstoffeLower.includes('aluminium') || werkstoffeLower.includes('alu')) {
+      produktempfehlung = `\n\nFür Aluminium haben wir <b>Anti-Clog-Scheiben und spezielle Alu-Trennscheiben</b>, die nicht zusetzen und sehr saubere Schnitte ermöglichen. Das spart Zeit und Material.`
+    } else {
+      produktempfehlung = `\n\nJe nach Material - ob Edelstahl, Aluminium oder Stahl - haben wir die passenden Werkzeuge für <b>Schnitt, Schliff und Finish</b>. Von der groben Bearbeitung bis zur Hochglanzpolitur.`
+    }
+    
     const body = `${anrede},
 
-ich bin auf Ihre Firma ${analysis.company} gestoßen und fand interessant, dass Sie mit ${firmendaten.werkstoffe} arbeiten.
+ich bin auf Ihre Firma ${analysis.company} gestoßen und habe gesehen, dass Sie im Bereich ${firmendaten.anwendungen} tätig sind und mit ${firmendaten.werkstoffe} arbeiten${firmendaten.werkstucke !== 'Metallprodukte' ? `, besonders bei ${firmendaten.werkstucke}` : ''}.
 
-Wir bei Score Schleifwerkzeuge arbeiten mit allen führenden Herstellern (Klingspor, 3M, Norton) zusammen und können Ihren kompletten Jahresbedarf an Schleifwerkzeugen abdecken. Staffelpreise und schnelle Lieferung deutschlandweit inklusive.
+Wir bei Score Schleifwerkzeuge arbeiten mit <b>allen führenden Herstellern</b> (Klingspor, 3M, Norton, Saint-Gobain) zusammen und können dadurch Ihren <b>kompletten Jahresbedarf</b> an Schleifmitteln und Trennwerkzeugen optimal abdecken.${produktempfehlung}
 
-Wenn Sie möchten, schaue ich mir Ihren Bedarf an und erstelle ein Angebot.
+<b>Was wir Ihnen bieten:</b>
+• Staffelpreise und Rahmenverträge für planbare Kosten
+• Sehr schnelle Lieferung deutschlandweit (oft nächster Tag)
+• Persönliche Beratung für die richtige Werkzeugauswahl
+• Alle gängigen Marken aus einer Hand
 
-Einfach per Mail melden oder anrufen: <a href="tel:+4922125999901">0221-25999901</a> (10-18 Uhr)
+Wenn Sie möchten, schaue ich mir Ihren aktuellen Bedarf an und erstelle ein individuelles Angebot - abgestimmt auf Ihre Werkstoffe und Anwendungen.
+
+<b>Einfach melden:</b>
+📞 Anrufen: <a href="tel:+4922125999901">0221-25999901</a> (Mo-Fr 10-18 Uhr)
+📧 Oder auf diese Mail antworten
 
 Viele Grüße
 <b>Daniel Leismann</b>
