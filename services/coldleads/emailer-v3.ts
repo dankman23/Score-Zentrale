@@ -324,7 +324,10 @@ Schreibe jetzt NUR die E-Mail-Text (120-180 Wörter):`
       ? cleanedFirmenname 
       : 'Ihre Firma'
     
-    const body = `${anrede},
+    // Verwende Anrede oder Fallback
+    const greeting = anrede ? anrede : 'Guten Tag'
+    
+    const body = `${greeting},
 
 ich bin auf ${firmenReferenz} gestoßen und habe gesehen, dass Sie mit ${firmendaten.werkstoffe} arbeiten und ${firmendaten.werkstucke} fertigen. Das passt gut zu dem, was wir bei Score Schleifwerkzeuge anbieten.
 
