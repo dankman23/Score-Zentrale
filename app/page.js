@@ -3370,9 +3370,25 @@ export default function App() {
                   <div className="text-white-50 small">
                     Automatische Suche, Analyse & Email-Versand (1 Email/Minute)
                   </div>
-                  {autopilotState.currentPhase && (
-                    <div className="text-white small mt-2">
-                      <i className="bi bi-arrow-repeat mr-1"/>Phase: {autopilotState.currentPhase}
+                  {autopilotState.currentPhase && autopilotState.running && (
+                    <div className="mt-2">
+                      <span className={`badge badge-${
+                        autopilotState.currentPhase === 'searching' ? 'primary' :
+                        autopilotState.currentPhase === 'analyzing' ? 'info' :
+                        autopilotState.currentPhase === 'sending_email' ? 'success' :
+                        autopilotState.currentPhase === 'error' ? 'danger' : 'secondary'
+                      }`}>
+                        {autopilotState.currentPhase === 'searching' && '🔍 Suche neue Firmen...'}
+                        {autopilotState.currentPhase === 'analyzing' && '🧠 Analyse läuft...'}
+                        {autopilotState.currentPhase === 'sending_email' && '📧 Sende Email...'}
+                        {autopilotState.currentPhase === 'idle' && '⏸️ Bereit'}
+                        {autopilotState.currentPhase === 'error' && '⚠️ Fehler'}
+                      </span>
+                      {autopilotState.lastActivity && (
+                        <span className="text-white-50 small ml-2">
+                          • {new Date(autopilotState.lastActivity).toLocaleTimeString('de-DE')}
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>
