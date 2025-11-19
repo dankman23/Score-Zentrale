@@ -85,7 +85,7 @@ export async function generateEmailSequenceV3FromAnalysis(
     product_categories: [],
     confidence_overall: analysis_v3.analysis_quality || 50,
     notes: analysis_v3.firmenprofil || '',
-    recommended_brands: SCORE_CONFIG.brands.slice(0, 3)
+    recommended_brands: SCORE_CONFIG.brands.primary.slice(0, 3)
   }
   
   return generateEmailSequenceV3(analysisResult)
