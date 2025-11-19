@@ -14,6 +14,42 @@ user_problem_statement: |
   5. Postausgang: Details-Accordion für kontaktierte Prospects mit Email-Historie
 
 backend:
+  - task: "Autopilot: Collections vereinheitlichen (alle → prospects)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/coldleads/**/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "CRITICAL FIX: Alle coldleads APIs verwenden jetzt 'prospects' Collection statt cold_prospects/coldleads_prospects. Geändert: dach/crawl, analyze-deep, generate-email, stats, email, status, followup, followup/check, analyze, dach/stats. Autopilot und normale Kaltakquise-Ansicht nutzen jetzt DIESELBE Datenbank!"
+
+  - task: "Email BCC erweitert (danki.leismann@gmx.de)"
+    implemented: true
+    working: "NA"
+    file: "/app/lib/email-client.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "BCC-Zeile in email-client.ts erweitert: Alle Mails gehen jetzt an 'leismann@score-schleifwerkzeuge.de, danki.leismann@gmx.de'"
+
+  - task: "Autopilot Tick API (DACH-Crawler + analyze-deep + email-v3)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/coldleads/autopilot/tick/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Autopilot nutzt: (1) DACH-Crawler für Firmen-Suche, (2) analyze-deep für detaillierte Analyse, (3) email-v3/send für Email-Versand mit Follow-ups. Rotiert durch Regionen & Branchen via search-strategy.ts. Speichert in 'prospects' Collection."
+
   - task: "Buchungslogik-Library erstellen"
     implemented: true
     working: true
