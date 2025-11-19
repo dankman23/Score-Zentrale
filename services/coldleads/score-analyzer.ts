@@ -108,13 +108,17 @@ export async function analyzeFirmaForScore(
  */
 async function crawlWebsite(url: string): Promise<string> {
   try {
+    console.log(`[SCORE Analyzer] Fetching: ${url}`)
+    
     // Haupt-Seite laden
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
       },
       signal: AbortSignal.timeout(15000)
     })
+    
+    console.log(`[SCORE Analyzer] Response status: ${response.status}`)
     
     if (!response.ok) {
       console.error(`[SCORE Analyzer] HTTP ${response.status} für ${url}`)
@@ -122,6 +126,7 @@ async function crawlWebsite(url: string): Promise<string> {
     }
     
     const html = await response.text()
+    console.log(`[SCORE Analyzer] HTML length: ${html.length}`)
     
     // Extrahiere Text (einfache Variante - entfernt HTML-Tags)
     const text = html
@@ -131,11 +136,16 @@ async function crawlWebsite(url: string): Promise<string> {
       .replace(/\s+/g, ' ')
       .trim()
     
-    // Limitiere auf erste 15.000 Zeichen für LLM
-    return text.substring(0, 15000)
+    console.log(`[SCORE Analyzer] Extracted text length: ${text.length}`)
     
-  } catch (error) {
-    console.error(`[SCORE Analyzer] Fehler beim Crawlen von ${url}:`, error)
+    // Limitiere auf erste 15.000 Zeichen für LLM
+    const result = text.substring(0, 15000)
+    console.log(`[SCORE Analyzer] Final content length: ${result.length}`)
+    
+    return result
+    
+  } catch (error: any) {
+    console.error(`[SCORE Analyzer] Fehler beim Crawlen von ${url}:`, error.message)
     return ''
   }
 }
