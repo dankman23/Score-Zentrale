@@ -1350,7 +1350,7 @@ export default function App() {
         if (data.action === 'email_sent') {
           console.log('[Autopilot] Email gesendet an:', data.prospect.company_name)
         } else if (data.action === 'limit_reached') {
-          setToast('Tages-Limit erreicht!')
+          setToast('Session-Limit erreicht!')
           stopAutopilot()
         }
       }
