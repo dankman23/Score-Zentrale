@@ -145,7 +145,7 @@ ${signature}`
 }
 
 /**
- * Mail 3 - Follow-up 2 (≤90 Wörter)
+ * Mail 3 - Follow-up 2 (HTML)
  */
 function generateMail3(
   analysis: AnalyzerV3Result,
@@ -160,9 +160,11 @@ function generateMail3(
 
 ich möchte nicht weiter stören - vielleicht passt unser Angebot gerade nicht.
 
-Falls doch Interesse besteht: Darf ich Sie diese Woche kurz (10 Min) anrufen?
+<b>Falls doch Interesse besteht:</b> Darf ich Sie diese Woche kurz (10 Min) anrufen?
 
-Z.B. Donnerstag 14 Uhr oder Freitag 10 Uhr?
+Z.B. <b>Donnerstag 14 Uhr</b> oder <b>Freitag 10 Uhr</b>?
+
+📞 <a href="tel:+4922125999901">(+49) 0221-25999901</a>
 
 Eine kurze Info reicht. Danke!
 
