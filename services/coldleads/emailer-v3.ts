@@ -236,38 +236,55 @@ Schreibe jetzt NUR die E-Mail-Text (120-180 Wörter):`
   } catch (error) {
     console.error('[Mail1] ChatGPT error, using fallback:', error)
     
-    // Fallback: Template-basierte E-Mail mit mehr Details
-    const subject = `Schleifwerkzeuge für ${firmendaten.werkstoffe} – ${analysis.company}`
+    // FIRMENNAMEN BEREINIGEN auch im Fallback
+    let cleanedFirmenname = analysis.company
+    const prefixesToRemove = [
+      /^Impressum\s*[-–|:]\s*/i,
+      /^Startseite\s*[-–|:]\s*/i,
+      /^Über uns\s*[-–|:]\s*/i,
+      /^Kontakt\s*[-–|:]\s*/i
+    ]
+    for (const pattern of prefixesToRemove) {
+      cleanedFirmenname = cleanedFirmenname.replace(pattern, '').trim()
+    }
+    if (!cleanedFirmenname || cleanedFirmenname.length < 3) {
+      cleanedFirmenname = 'Ihr Unternehmen'
+    }
     
-    // Werkstoff-spezifische Empfehlungen
+    // Subject
+    const subject = `Schleifwerkzeuge für ${firmendaten.werkstoffe}${cleanedFirmenname !== 'Ihr Unternehmen' ? ` – ${cleanedFirmenname}` : ''}`
+    
+    // Werkstoff-spezifische Produktempfehlung (kurz!)
     let produktempfehlung = ''
     const werkstoffeLower = firmendaten.werkstoffe.toLowerCase()
     
     if (werkstoffeLower.includes('edelstahl') || werkstoffeLower.includes('inox')) {
-      produktempfehlung = `\n\nFür Edelstahl-Bearbeitung haben wir speziell <b>Fächerscheiben, Fiberscheiben und INOX-Trennscheiben</b>, die Verfärbungen vermeiden und saubere Oberflächen garantieren. Gerade bei sichtbaren Teilen wie ${firmendaten.werkstucke} ist das entscheidend.`
+      produktempfehlung = ` Für Edelstahl haben wir speziell Fächerscheiben, Fiberscheiben und INOX-Trennscheiben.`
     } else if (werkstoffeLower.includes('aluminium') || werkstoffeLower.includes('alu')) {
-      produktempfehlung = `\n\nFür Aluminium haben wir <b>Anti-Clog-Scheiben und spezielle Alu-Trennscheiben</b>, die nicht zusetzen und sehr saubere Schnitte ermöglichen. Das spart Zeit und Material.`
+      produktempfehlung = ` Für Aluminium haben wir Anti-Clog-Scheiben und Alu-Trennscheiben, die nicht zusetzen.`
     } else {
-      produktempfehlung = `\n\nJe nach Material - ob Edelstahl, Aluminium oder Stahl - haben wir die passenden Werkzeuge für <b>Schnitt, Schliff und Finish</b>. Von der groben Bearbeitung bis zur Hochglanzpolitur.`
+      produktempfehlung = ` Für verschiedene Materialien haben wir die passenden Werkzeuge.`
     }
+    
+    // E-Mail-Body (120-180 Wörter!)
+    const firmenReferenz = cleanedFirmenname !== 'Ihr Unternehmen' 
+      ? cleanedFirmenname 
+      : 'Ihre Firma'
     
     const body = `${anrede},
 
-ich bin auf Ihre Firma ${analysis.company} gestoßen und habe gesehen, dass Sie im Bereich ${firmendaten.anwendungen} tätig sind und mit ${firmendaten.werkstoffe} arbeiten${firmendaten.werkstucke !== 'Metallprodukte' ? `, besonders bei ${firmendaten.werkstucke}` : ''}.
+ich bin auf ${firmenReferenz} gestoßen und habe gesehen, dass Sie mit ${firmendaten.werkstoffe} arbeiten und ${firmendaten.werkstucke} fertigen. Das passt gut zu dem, was wir bei Score Schleifwerkzeuge anbieten.
 
-Wir bei Score Schleifwerkzeuge arbeiten mit <b>allen führenden Herstellern</b> (Klingspor, 3M, Norton, Saint-Gobain) zusammen und können dadurch Ihren <b>kompletten Jahresbedarf</b> an Schleifmitteln und Trennwerkzeugen optimal abdecken.${produktempfehlung}
+Wir arbeiten mit allen führenden Herstellern (Klingspor, 3M, Norton, VSM, PFERD, Rhodius) zusammen und können Ihren <b>kompletten Jahresbedarf</b> an Schleif- und Trennwerkzeugen abdecken.${produktempfehlung}
 
-<b>Was wir Ihnen bieten:</b>
-• Staffelpreise und Rahmenverträge für planbare Kosten
-• Sehr schnelle Lieferung deutschlandweit (oft nächster Tag)
-• Persönliche Beratung für die richtige Werkzeugauswahl
-• Alle gängigen Marken aus einer Hand
+Was wir bieten:
+• <b>Staffelpreise und Rahmenverträge</b>
+• Schnelle Lieferung deutschlandweit
+• Individuelle Werkzeugempfehlungen für Ihre Anwendung
 
-Wenn Sie möchten, schaue ich mir Ihren aktuellen Bedarf an und erstelle ein individuelles Angebot - abgestimmt auf Ihre Werkstoffe und Anwendungen.
+Wenn Sie möchten, schaue ich mir Ihren Bedarf an und erstelle ein individuelles Angebot.
 
-<b>Einfach melden:</b>
-📞 Anrufen: <a href="tel:+4922125999901">0221-25999901</a> (Mo-Fr 10-18 Uhr)
-📧 Oder auf diese Mail antworten
+<b>Einfach kurz antworten oder anrufen: <a href="tel:+4922125999901">0221-25999901</a> (10–18 Uhr).</b>
 
 Viele Grüße
 <b>Daniel Leismann</b>
