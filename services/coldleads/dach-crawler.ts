@@ -243,8 +243,11 @@ async function crawlGermanyRegion(
         continue
       }
       
+      const cleanedName = cleanCompanyName(result.title)
+      console.log(`[Clean Name] "${result.title}" → "${cleanedName}"`)
+      
       leads.push({
-        name: cleanCompanyName(result.title),
+        name: cleanedName,
         website: result.link,
         address: result.snippet,
         city: region,
