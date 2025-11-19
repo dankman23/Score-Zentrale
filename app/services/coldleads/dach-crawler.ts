@@ -250,7 +250,7 @@ async function crawlGermanyRegion(
     for (const result of searchResults) {
       // Filtere Blacklist zusätzlich
       const url = result.link.toLowerCase()
-      if (blacklistedDomains.some(domain => url.includes(domain))) {
+      if (BLACKLISTED_DOMAINS.some(domain => url.includes(domain))) {
         console.log(`[DE Crawler] Filtered blacklisted: ${result.link}`)
         continue
       }
