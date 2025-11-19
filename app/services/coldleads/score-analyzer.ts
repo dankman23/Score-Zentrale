@@ -223,7 +223,7 @@ Antworte NUR mit dem JSON-Objekt, ohne zusätzlichen Text.`
       max_tokens: 2000
     })
     
-    const responseText = llmResponse.choices[0].message.content.trim()
+    const responseText = llmResponse.trim()
     
     // Extrahiere JSON (falls in ```json``` wrapped)
     let jsonText = responseText
