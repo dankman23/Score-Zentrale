@@ -1,19 +1,32 @@
 #!/usr/bin/env python3
 """
-FIBU Backend Testing - Import-Fix Verification
-Tests nach Korrektur der Import-Pfade von relativen Pfaden auf Alias-Pfade (@/)
+AUTOPILOT-SYSTEM KOMPLETT TESTEN
+Backend Testing für Kaltakquise-Autopilot-System
+
+Tests:
+1. Collections-Vereinheitlichung (alle APIs nutzen 'prospects')
+2. DACH-Crawler schreibt in 'prospects'
+3. analyze-deep liest/schreibt 'prospects'
+4. Stats API liest aus 'prospects'
+5. Search/List liest aus 'prospects'
+6. Autopilot Tick API (kompletter Flow)
+7. Email BCC Verifikation
+8. Duplikats-Vermeidung
+9. Collection-Isolation (keine cold_prospects mehr)
 """
 
 import requests
 import json
-import sys
-from datetime import datetime, timedelta
-from typing import Dict, Any, List
+import time
+import os
+import subprocess
+from datetime import datetime
 
-# Base URL aus .env
-BASE_URL = "https://fibu-automation.preview.emergentagent.com"
+# Backend URL
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://fibu-automation.preview.emergentagent.com')
+API_BASE = f"{BASE_URL}/api"
 
-class FIBUBackendTester:
+class AutopilotBackendTester:
     def __init__(self):
         self.base_url = BASE_URL
         self.results = []
