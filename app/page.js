@@ -4029,6 +4029,9 @@ export default function App() {
                             <i className="bi bi-envelope-check mr-1"/>Antworten ({coldStats.replied || 0})
                             {coldLeadStats.unreadReplies > 0 && <span className="badge badge-danger ml-1">{coldLeadStats.unreadReplies}</span>}
                           </button>
+                          <button className={`btn ${coldStatusFilter==='prompts'?'btn-dark':'btn-outline-dark'}`} onClick={()=>{setColdStatusFilter('prompts'); setShowColdProspectDetails(null)}}>
+                            <i className="bi bi-gear mr-1"/>Mail Prompts
+                          </button>
                         </div>
                       </>
                     )}
