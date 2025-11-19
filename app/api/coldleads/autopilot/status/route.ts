@@ -31,21 +31,7 @@ export async function GET() {
       await collection.insertOne(state)
     }
     
-    // Reset daily count wenn neuer Tag
-    const today = new Date().toISOString().slice(0, 10)
-    if (state.lastReset !== today) {
-      await collection.updateOne(
-        { id: 'kaltakquise' },
-        { 
-          $set: { 
-            dailyCount: 0, 
-            lastReset: today 
-          } 
-        }
-      )
-      state.dailyCount = 0
-      state.lastReset = today
-    }
+    // Session-basiert: Kein automatischer Reset mehr
     
     return NextResponse.json({
       ok: true,
