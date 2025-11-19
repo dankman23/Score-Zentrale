@@ -4,7 +4,7 @@
  * Testet alle kritischen JTL-Endpoints nach Deployment
  */
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://lead-autopilot-2.preview.emergentagent.com'
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://prospect-pipeline-2.preview.emergentagent.com'
 
 const colors = {
   green: '\x1b[32m',
