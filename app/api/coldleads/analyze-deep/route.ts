@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     
     // Speichere Analyse in DB (wenn prospectId vorhanden)
     if (prospectId) {
-      const db = await getDb()
+      const { db } = await connectToDatabase()
       const collection = db.collection('prospects')
       
       await collection.updateOne(
