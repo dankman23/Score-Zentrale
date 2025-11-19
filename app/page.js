@@ -3971,10 +3971,10 @@ export default function App() {
                       <i className="bi bi-envelope-check mr-1"/>Antworten ({coldStats.replied || 0})
                       {coldLeadStats.unreadReplies > 0 && <span className="badge badge-danger ml-1">{coldLeadStats.unreadReplies}</span>}
                     </button>
-                    <button className={`btn btn-outline-info`} onClick={()=>setShowInbox(!showInbox)}>
+                    <button className={`btn btn-outline-info`} onClick={()=>{setShowInbox(!showInbox); if(!showInbox) window.scrollTo({top: document.getElementById('kaltakquise-section')?.offsetTop || 0, behavior: 'smooth'})}}>
                       <i className="bi bi-inbox-fill mr-1"/>Posteingang
                     </button>
-                    <button className={`btn btn-outline-success`} onClick={()=>window.open('/api/coldleads/postausgang', '_blank')}>
+                    <button className={`btn btn-outline-success`} onClick={()=>{setShowOutbox(!showOutbox); if(!showOutbox) window.scrollTo({top: document.getElementById('kaltakquise-section')?.offsetTop || 0, behavior: 'smooth'})}}>
                       <i className="bi bi-send-fill mr-1"/>Postausgang
                     </button>
                   </div>
