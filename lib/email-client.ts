@@ -20,15 +20,44 @@ export function getEmailTransporter() {
   return transporter
 }
 
+/**
+ * Konvertiert einfache Text-Email mit <b> und <a> Tags in vollständiges HTML
+ */
+function wrapInHTML(body: string): string {
+  // Ersetze Zeilenumbrüche mit <br>
+  let html = body.replace(/\n/g, '<br>\n')
+  
+  // Bereits vorhandene HTML-Tags bleiben
+  // Wrap in HTML-Struktur
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; }
+    a { color: #0066cc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    b { font-weight: bold; }
+  </style>
+</head>
+<body>
+${html}
+</body>
+</html>`
+}
+
 export async function sendEmail(to: string, subject: string, html: string, text?: string) {
   const transporter = getEmailTransporter()
+  
+  // Wrap in vollständiges HTML wenn nötig
+  const fullHTML = html.includes('<!DOCTYPE') ? html : wrapInHTML(html)
   
   const mailOptions = {
     from: `Score Schleifwerkzeuge <${process.env.EMAIL_FROM || 'vertrieb@score-schleifwerkzeuge.de'}>`,
     to,
     bcc: 'leismann@score-schleifwerkzeuge.de, danki.leismann@gmx.de', // Automatische BCC-Kopie an beide Adressen
     subject,
-    html,
+    html: fullHTML,
     text: text || html.replace(/<[^>]*>/g, '')
   }
 
