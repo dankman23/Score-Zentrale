@@ -239,7 +239,7 @@ async function crawlGermanyRegion(
       }
       
       leads.push({
-        name: result.title,
+        name: cleanCompanyName(result.title),
         website: result.link,
         address: result.snippet,
         city: region,
