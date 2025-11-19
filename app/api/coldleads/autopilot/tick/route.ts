@@ -129,12 +129,22 @@ export async function POST() {
         try {
           console.log(`[Autopilot Tick] Analyzing ${prospect.company_name}...`)
           
-          // Nutze neue Deep-Analyze API
+          // Extrahiere Haupt-URL (ohne /impressum, /kontakt, etc.)
+          let baseWebsite = prospect.website
+          try {
+            const url = new URL(prospect.website)
+            baseWebsite = `${url.protocol}//${url.hostname}`
+          } catch (e) {
+            // Falls URL-Parsing fehlschlägt, nutze Original
+            baseWebsite = prospect.website
+          }
+          
+          // Nutze neue Deep-Analyze API mit Haupt-URL
           const analyzeResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/coldleads/analyze-deep`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              website: prospect.website,
+              website: baseWebsite,
               firmenname: prospect.company_name,
               branche: nextQuery.industry,
               prospectId: prospect.id
