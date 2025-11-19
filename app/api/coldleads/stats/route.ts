@@ -11,7 +11,7 @@ import { connectToDatabase } from '../../../lib/api'
 export async function GET(request: NextRequest) {
   try {
     const { db } = await connectToDatabase()
-    const collection = db.collection('cold_prospects')
+    const collection = db.collection('prospects')
 
     // Count unread replies
     const unreadReplies = await collection.countDocuments({
