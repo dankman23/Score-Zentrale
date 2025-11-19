@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
       )
     }
     
-    const db = await connectToDb()
+    const db = await connectToMongoDB()
     const collection = db.collection('prospects')
     
     const prospect = await collection.findOne({ _id: prospectId })
