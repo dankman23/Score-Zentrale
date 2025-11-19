@@ -282,7 +282,7 @@ async function crawlAustriaRegion(
       
       for (const result of searchResults) {
         leads.push({
-          name: result.title,
+          name: cleanCompanyName(result.title),
           website: result.link,
           address: result.snippet,
           city: region,
