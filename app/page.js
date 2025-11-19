@@ -704,6 +704,21 @@ export default function App() {
     }
   }
 
+  const loadOutbox = async () => {
+    setOutboxLoading(true)
+    try {
+      const res = await fetch('/api/coldleads/postausgang?limit=100')
+      const data = await res.json()
+      if (data.ok) {
+        setOutboxEmails(data.emails || [])
+      }
+    } catch (e) {
+      console.error('Outbox load failed:', e)
+    } finally {
+      setOutboxLoading(false)
+    }
+  }
+
   const loadGoogleAds = async () => {
     setGoogleAdsLoading(true)
     try {
