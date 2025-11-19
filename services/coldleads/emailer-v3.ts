@@ -76,14 +76,16 @@ export async function generateEmailSequenceV3FromAnalysis(
   // Konvertiere analysis_v3 Format zu AnalyzerV3Result
   const analysisResult: AnalyzerV3Result = {
     company: company_name,
-    contact_person: analysis_v3.contact_person || {},
-    materials: (analysis_v3.materials || []).map((m: string) => ({ term: m, confidence: 0.8 })),
-    applications: (analysis_v3.applications || []).map((a: string) => ({ term: a, confidence: 0.8 })),
-    machines: (analysis_v3.machines || []).map((m: string) => ({ term: m, confidence: 0.8 })),
-    products_recommended: analysis_v3.products_recommended || [],
-    recommended_brands: SCORE_CONFIG.brands.slice(0, 3),
-    firmenprofil: analysis_v3.firmenprofil || '',
-    analysis_quality: analysis_v3.analysis_quality || 50
+    url: '',
+    branch_guess: [],
+    contact_person: analysis_v3.contact_person || { name: '', role: '', email: '', confidence: 0 },
+    materials: (analysis_v3.materials || []).map((m: string) => ({ term: m, evidence: '' })),
+    applications: (analysis_v3.applications || []).map((a: string) => ({ term: a, evidence: '' })),
+    machines: (analysis_v3.machines || []).map((m: string) => ({ term: m, evidence: '' })),
+    product_categories: [],
+    confidence_overall: analysis_v3.analysis_quality || 50,
+    notes: analysis_v3.firmenprofil || '',
+    recommended_brands: SCORE_CONFIG.brands.slice(0, 3)
   }
   
   return generateEmailSequenceV3(analysisResult)
