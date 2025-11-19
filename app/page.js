@@ -3934,7 +3934,6 @@ export default function App() {
                         onFocus={(e) => e.target.select()}
                         min="1"
                         max="500"
-                        disabled={autopilotState.running}
                       />
                     </div>
                     <div className="mr-3 text-center">
