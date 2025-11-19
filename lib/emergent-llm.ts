@@ -31,28 +31,57 @@ interface EmergentChatResponse {
 
 /**
  * Sends a chat completion request to Emergent's LLM API
+ * Supports both old format (messages, options) and new format (options object)
  */
 export async function emergentChatCompletion(
-  options: EmergentChatOptions,
+  messagesOrOptions: ChatMessage[] | EmergentChatOptions,
+  optionsOrRetries?: { model?: string; temperature?: number; max_tokens?: number } | number,
   retries = 2
 ): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY // OpenAI or Emergent Key
+  const apiKey = process.env.EMERGENT_LLM_KEY || process.env.OPENAI_API_KEY
   
   console.log(`[EmergentLLM] API Key present: ${!!apiKey}, starts with sk-: ${apiKey?.startsWith('sk-')}`)
   
   if (!apiKey) {
-    throw new Error('OpenAI API Key not configured - missing from environment')
+    throw new Error('LLM API Key not configured - missing EMERGENT_LLM_KEY or OPENAI_API_KEY')
   }
   
   if (!apiKey.startsWith('sk-')) {
-    throw new Error(`OpenAI API Key invalid format - got: ${apiKey.substring(0, 10)}...`)
+    throw new Error(`LLM API Key invalid format - got: ${apiKey.substring(0, 10)}...`)
+  }
+
+  // Handle both old and new calling formats
+  let messages: ChatMessage[]
+  let model: string
+  let temperature: number
+  let max_tokens: number
+  
+  if (Array.isArray(messagesOrOptions)) {
+    // Old format: emergentChatCompletion(messages, {model, temperature, max_tokens})
+    messages = messagesOrOptions
+    const opts = (optionsOrRetries as any) || {}
+    model = opts.model || 'gpt-4o-mini'
+    temperature = opts.temperature ?? 0.3
+    max_tokens = opts.max_tokens ?? 1000
+    if (typeof optionsOrRetries === 'number') {
+      retries = optionsOrRetries
+    }
+  } else {
+    // New format: emergentChatCompletion({messages, model, temperature, max_tokens})
+    messages = messagesOrOptions.messages
+    model = messagesOrOptions.model || 'gpt-4o-mini'
+    temperature = messagesOrOptions.temperature ?? 0.3
+    max_tokens = messagesOrOptions.max_tokens ?? 1000
+    if (typeof optionsOrRetries === 'number') {
+      retries = optionsOrRetries
+    }
   }
 
   const requestBody = {
-    model: options.model || 'gpt-4',
-    messages: options.messages,
-    temperature: options.temperature ?? 0.3,
-    max_tokens: options.max_tokens ?? 1000
+    model,
+    messages,
+    temperature,
+    max_tokens
   }
 
   let lastError: Error | null = null
