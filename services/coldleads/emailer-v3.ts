@@ -119,18 +119,29 @@ async function generateMail1(
   // FIRMENNAMEN BEREINIGEN - extrem wichtig!
   let cleanedFirmenname = firmendaten.name
   
-  // Entferne typische Präfixe wie "Impressum -", "Startseite |", etc.
-  const prefixesToRemove = [
+  // Entferne typische Präfixe und problematische Teile
+  const cleanupPatterns = [
     /^Impressum\s*[-–|:]\s*/i,
     /^Startseite\s*[-–|:]\s*/i,
     /^Über uns\s*[-–|:]\s*/i,
     /^Kontakt\s*[-–|:]\s*/i,
     /^Home\s*[-–|:]\s*/i,
-    /^Willkommen\s*[-–|:]\s*/i
+    /^Willkommen\s*[-–|:]\s*/i,
+    /^UNTERNEHMEN:\s*/i,
+    /^Firma:\s*/i,
+    /\s*[-–|]\s*Impressum$/i,
+    /\s*[-–|]\s*Kontakt$/i,
+    /\s*[-–|]\s*Über uns$/i
   ]
   
-  for (const pattern of prefixesToRemove) {
+  for (const pattern of cleanupPatterns) {
     cleanedFirmenname = cleanedFirmenname.replace(pattern, '').trim()
+  }
+  
+  // Entferne auch Duplikate wie "Name - Name"
+  const parts = cleanedFirmenname.split(/\s*[-–|]\s*/)
+  if (parts.length > 1 && parts[0].toLowerCase() === parts[parts.length - 1].toLowerCase()) {
+    cleanedFirmenname = parts[0]
   }
   
   // Wenn kein eindeutiger Name übrig bleibt, verwende "Ihr Unternehmen"
