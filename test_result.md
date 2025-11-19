@@ -757,6 +757,30 @@ agent_communication:
         agent: "testing"
         comment: "✅ JTL Articles Filters API working perfectly! GET /api/jtl/articles/filters returns 200 OK with complete structure: ok=true, hersteller array (13 manufacturers with name/count), warengruppen array (35 product groups with name/count). All required fields present and valid structure. MongoDB aggregation working correctly - unique values with counts sorted by count DESC. Sample manufacturers: 3M, KLINGSPOR, PFERD, etc. Sample warengruppen: Schleifscheiben, Trennscheiben, Schleifbänder, etc. Filter options ready for frontend integration."
 frontend:
+  - task: "Kaltakquise: Autopilot Live-Statusanzeige verbessert"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Autopilot-Statusanzeige mit Live-Phase-Indicator: 🔍 Suche neue Firmen, 🧠 Analyse läuft, 📧 Sende Email, ⏸️ Bereit, ⚠️ Fehler. Badge-Farben je nach Phase (primary/info/success/danger). Zeigt lastActivity Timestamp."
+
+  - task: "Kaltakquise: Gesendete Mails sichtbar im 'Kontaktiert' Tab"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Neue Spalte 'Gesendet am' im Kontaktiert-Filter. Zeigt: Datum & Uhrzeit von mail_1_sent_at, Follow-up-Badges (FU1 ✓, FU2 ✓). Details-Button für kontaktierte Prospects zum Anzeigen der Email-Historie."
+
   - task: "Hero sichtbar + abgeschwächt (Overlay, Shield)"
     implemented: true
     working: "NA"
