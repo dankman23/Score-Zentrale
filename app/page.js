@@ -4886,8 +4886,7 @@ export default function App() {
               {/* POSTAUSGANG-ANSICHT */}
               {mailView === 'outbox' && (
               <>
-            <div className="card border-0 shadow-sm">
-              <div className="card-header bg-success text-white d-flex align-items-center justify-content-between">
+                <div className="p-3 bg-success text-white d-flex align-items-center justify-content-between border-bottom">
                 <h5 className="mb-0"><i className="bi bi-send-fill mr-2"/>Email-Postausgang</h5>
                 <div>
                   <button className="btn btn-sm btn-light mr-2" onClick={loadOutbox} disabled={outboxLoading}>
