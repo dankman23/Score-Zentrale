@@ -77,13 +77,7 @@ function MailPromptsView() {
         </h4>
         <button 
           className="btn btn-sm btn-success"
-          onClick={() => {
-            const name = prompt('Name für neuen Prompt:')
-            if (name) {
-              // TODO: Create new prompt
-              alert('Funktion wird noch implementiert')
-            }
-          }}
+          onClick={() => setShowCreatePromptModal(true)}
         >
           <i className="bi bi-plus-circle mr-1"/>Neuer Prompt
         </button>
