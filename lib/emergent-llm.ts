@@ -77,11 +77,27 @@ export async function emergentChatCompletion(
     }
   }
 
-  const requestBody = {
+  // Build request body based on key type
+  const requestBody: any = {
     model,
     messages,
     temperature,
     max_tokens
+  }
+  
+  // For Emergent API, we need to specify the provider
+  if (apiKey.startsWith('sk-emergent')) {
+    // Detect provider from model name
+    if (model.startsWith('gpt')) {
+      requestBody.provider = 'openai'
+    } else if (model.startsWith('claude')) {
+      requestBody.provider = 'anthropic'
+    } else if (model.startsWith('gemini')) {
+      requestBody.provider = 'gemini'
+    } else {
+      // Default to OpenAI for unknown models
+      requestBody.provider = 'openai'
+    }
   }
 
   let lastError: Error | null = null
