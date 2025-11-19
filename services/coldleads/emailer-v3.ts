@@ -260,7 +260,9 @@ Schreibe jetzt NUR die E-Mail-Text (120-180 Wörter):`
     return {
       subject,
       body: fullBody,
-      word_count: fullBody.split(/\s+/).length
+      word_count: fullBody.split(/\s+/).length,
+      prompt_version: promptVersion,
+      model: promptModel
     }
     
   } catch (error) {
