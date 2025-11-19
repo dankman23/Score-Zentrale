@@ -230,23 +230,25 @@ function generateMail2(
   brandsText: string
 ): { subject: string; body: string; word_count: number } {
   
-  const signature = getEmailSignature()
   const mainMat = analysis.materials.length > 0 ? analysis.materials[0].term : 'Ihre Fertigung'
   
-  const subject = `Nachfrage: Jahresbedarf Schleifwerkzeuge für ${analysis.company}`
+  const subject = `Nochmal wegen Schleifwerkzeuge – ${analysis.company}`
   
   const body = `${anrede},
 
-vor einigen Tagen hatte ich Ihnen geschrieben wegen passender Schleifwerkzeuge für ${mainMat}.
+vor ein paar Tagen hatte ich Ihnen geschrieben wegen Schleifwerkzeuge für ${mainMat}.
 
-<b>Kurzer Hinweis:</b> Wir bieten <b>Rahmenverträge für den kompletten Jahresbedarf</b> mit Staffelpreisen an. Das spart Zeit beim Einkauf und bringt bessere Konditionen.
+Falls es passt: Wir bieten <b>Rahmenverträge für den Jahresbedarf</b> mit Staffelpreisen. Spart Zeit beim Einkauf und bringt bessere Konditionen.
 
-<b>Bei Interesse:</b>
-• 📞 Einfach anrufen: <a href="tel:+4922125999901">(+49) 0221-25999901</a> (Mo-Fr 10-18 Uhr)
-• 📧 Oder auf diese Mail antworten für Beratungstermin
-• 🔗 Infos: <a href="https://score-schleifwerkzeuge.de/business">https://score-schleifwerkzeuge.de/business</a>
+<b>Interesse?</b>
+📞 Einfach anrufen: <a href="tel:+4922125999901">0221-25999901</a> (10-18 Uhr)
+📧 Oder auf diese Mail antworten
 
-${signature}`
+Viele Grüße
+<b>Daniel Leismann</b>
+Score Schleifwerkzeuge
+📞 <a href="tel:+4922125999901">0221-25999901</a>
+📧 <a href="mailto:leismann@score-schleifwerkzeuge.de">leismann@score-schleifwerkzeuge.de</a>`
   
   return {
     subject,
