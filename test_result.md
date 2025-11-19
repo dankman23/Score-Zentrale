@@ -520,6 +520,8 @@ test_plan:
 
 agent_communication:
   - agent: "main"
+    message: "🚀 AUTOPILOT-OPTIMIERUNG ABGESCHLOSSEN! Alle Änderungen implementiert: (1) Collections vereinheitlicht - ALLE APIs nutzen jetzt 'prospects' (vorher: 3 verschiedene Collections!), (2) BCC erweitert auf beide Adressen, (3) Frontend-Statusanzeige mit Live-Phase-Indicator, (4) Gesendete Mails sichtbar im Kontaktiert-Tab mit Follow-up-Status. BITTE TESTEN: (a) POST /api/coldleads/dach/crawl → prüfe dass in 'prospects' gespeichert wird, (b) POST /api/coldleads/analyze-deep → prüfe 'prospects' Collection, (c) POST /api/coldleads/autopilot/tick → kompletter Flow (crawl → analyze → email), (d) Frontend: Autopilot-Statusanzeige, Kontaktiert-Tab mit Gesendet-Spalte."
+  - agent: "main"
     message: "Bitte Backend-Routen gemäß test_plan prüfen. Mongo steht über MONGO_URL bereit; Collections werden on-the-fly angelegt. Keine externen Keys erforderlich."
   - agent: "main"
     message: "KRITISCHE FIXES ANGEWENDET: Alle Import-Pfade in Auto-Match und Zahlungen APIs wurden von relativen Pfaden (../../) auf Alias-Pfade (@/) korrigiert. Bitte teste: (1) GET /api/fibu/auto-match?from=2025-10-01&to=2025-10-31 - sollte jetzt 200 OK returnen und Matching-Statistiken zeigen. (2) GET /api/fibu/zahlungen?from=2025-10-01&to=2025-10-07 - prüfe ob buchung-Feld jetzt befüllt ist für Amazon & PayPal Payments. (3) Verifiziere neue Matching-Strategien: Amazon AU-Nummern aus Transaktionsdetails, PayPal cBestellNr Matching."
