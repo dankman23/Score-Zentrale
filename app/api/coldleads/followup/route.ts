@@ -12,7 +12,7 @@ import { sendEmail } from '../../../../services/coldleads/emailer'
 export async function GET(request: NextRequest) {
   try {
     const { db } = await connectToDatabase()
-    const collection = db.collection('cold_prospects')
+    const collection = db.collection('prospects')
 
     // Calculate 6 business days ago
     const now = new Date()
