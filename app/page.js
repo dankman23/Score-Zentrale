@@ -67,6 +67,69 @@ function MailPromptsView() {
     }
   }
   
+  async function createNewPrompt() {
+    if (!newPromptData.name || !newPromptData.prompt) {
+      alert('❌ Bitte Name und Prompt ausfüllen')
+      return
+    }
+    
+    try {
+      const response = await fetch('/api/coldleads/prompts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create',
+          name: newPromptData.name,
+          model: newPromptData.model,
+          prompt: newPromptData.prompt
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (data.ok) {
+        await loadPrompts()
+        setShowCreatePromptModal(false)
+        setNewPromptData({ name: '', model: 'gpt-4o-mini', prompt: '' })
+        alert(`✅ Prompt v${data.version} erstellt!`)
+      } else {
+        alert('❌ Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('❌ Fehler beim Erstellen: ' + e.message)
+    }
+  }
+  
+  async function updatePrompt() {
+    if (!editingPrompt) return
+    
+    try {
+      const response = await fetch('/api/coldleads/prompts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          version: editingPrompt.version,
+          name: editingPrompt.name,
+          model: editingPrompt.model,
+          prompt: editingPrompt.prompt
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (data.ok) {
+        await loadPrompts()
+        setShowEditPromptModal(false)
+        setEditingPrompt(null)
+        alert('✅ Prompt aktualisiert!')
+      } else {
+        alert('❌ Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('❌ Fehler beim Aktualisieren: ' + e.message)
+    }
+  }
+  
   if (loading) {
     return (
       <div className="p-5 text-center">
