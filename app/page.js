@@ -5480,11 +5480,6 @@ export default function App() {
                     </table>
                   </div>
                 )}
-                
-                {/* MAIL PROMPTS VIEW */}
-                {coldStatusFilter === 'prompts' && (
-                  <MailPromptsView />
-                )}
               </div>
               <div className="card-footer bg-transparent">
                 <div className="d-flex align-items-center justify-content-between">
@@ -5497,6 +5492,13 @@ export default function App() {
                 </div>
               </div>
               </>
+              )}
+              
+              {/* MAIL PROMPTS VIEW */}
+              {mailView === 'prospects' && coldStatusFilter === 'prompts' && (
+                <div className="card-body">
+                  <MailPromptsView />
+                </div>
               )}
             </div>
           )}
