@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const limit = parseInt(searchParams.get('limit') || '100')
     
-    const { db } = await connectToDatabase()
+    const db = await connectToMongoDB()
     const prospects = db.collection('prospects')
     
     // Hole alle Prospects die mindestens 1 Mail gesendet haben
