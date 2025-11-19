@@ -205,7 +205,7 @@ export async function POST() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        prospect_id: nextProspect.id,
+        prospect_id: nextProspect.id || nextProspect._id?.toString(),
         mail_number: 1  // Erstansprache
       })
     })
