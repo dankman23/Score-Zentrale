@@ -15,10 +15,12 @@ async function checkLatestEmail() {
     
     console.log('🔍 Suche letzte versendete E-Mail...\n')
     
-    const latestProspect = await collection.findOne(
-      { 'email_sequence.mail_1': { $exists: true } },
-      { sort: { 'followup_schedule.mail_1_sent_at': -1 } }
-    )
+    const latestProspect = await collection
+      .find({ 'email_sequence.mail_1': { $exists: true } })
+      .sort({ 'followup_schedule.mail_1_sent_at': -1 })
+      .limit(1)
+      .toArray()
+      .then(arr => arr[0])
     
     if (!latestProspect || !latestProspect.email_sequence) {
       console.log('❌ Keine E-Mail gefunden')
