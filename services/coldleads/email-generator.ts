@@ -3,7 +3,7 @@
  * Erstellt personalisierte B2B-Anschreiben basierend auf Firmen-Analyse
  */
 
-import { emergentChatCompletion } from '../../lib/emergent-llm'
+import { emergentChatCompletion } from '@/lib/emergent-llm'
 import type { ScoreAnalyzerResult } from './score-analyzer'
 
 export interface EmailTemplate {
