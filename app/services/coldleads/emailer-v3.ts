@@ -101,7 +101,26 @@ async function generateMail1(
   anrede: string,
   brandsText: string,
   valueProps: string[]
-): Promise<{ subject: string; body: string; word_count: number }> {
+): Promise<{ subject: string; body: string; word_count: number; prompt_version: number; model: string }> {
+  
+  // Lade aktiven Prompt aus Datenbank
+  let activePrompt: any = null
+  let promptVersion = 1
+  let promptModel = 'gpt-4o-mini'
+  
+  try {
+    const { connectToMongoDB } = require('../../lib/mongodb')
+    const db = await connectToMongoDB()
+    activePrompt = await db.collection('email_prompts').findOne({ active: true })
+    
+    if (activePrompt) {
+      promptVersion = activePrompt.version
+      promptModel = activePrompt.model
+      console.log(`[Mail1] Using active prompt v${promptVersion} (${promptModel})`)
+    }
+  } catch (error) {
+    console.error('[Mail1] Failed to load active prompt, using default:', error)
+  }
   
   // Extrahiere Daten aus Analyse
   const werkstoffe = analysis.materials.map(m => m.term).slice(0, 3)
@@ -149,8 +168,24 @@ async function generateMail1(
     cleanedFirmenname = 'Ihr Unternehmen'
   }
   
-  // ChatGPT Prompt für individuelle, menschliche E-Mail
-  const prompt = `Du bist Daniel Leismann von Score-Schleifwerkzeuge. Schreibe eine INDIVIDUELLE, menschlich klingende B2B-E-Mail.
+  // ChatGPT Prompt: Verwende aktiven Prompt aus DB oder Default
+  let promptTemplate = ''
+  
+  if (activePrompt && activePrompt.prompt) {
+    // Verwende Prompt aus Datenbank
+    promptTemplate = activePrompt.prompt
+    // Ersetze Platzhalter mit echten Daten
+    promptTemplate = promptTemplate
+      .replace(/{cleanedFirmenname}/g, cleanedFirmenname)
+      .replace(/{werkstoffe}/g, firmendaten.werkstoffe)
+      .replace(/{werkstucke}/g, firmendaten.werkstucke)
+      .replace(/{anwendungen}/g, firmendaten.anwendungen)
+      .replace(/{firmenname}/g, cleanedFirmenname !== 'Ihr Unternehmen' ? cleanedFirmenname : 'Ihre Firma')
+    
+    console.log(`[Mail1] Using prompt v${promptVersion} from database`)
+  } else {
+    // Default Prompt (Fallback)
+    promptTemplate = `Du bist Daniel Leismann von Score-Schleifwerkzeuge. Schreibe eine INDIVIDUELLE, menschlich klingende B2B-E-Mail.
 
 **FIRMENDATEN (vom Analyzer):**
 - Firma: ${cleanedFirmenname}
@@ -213,14 +248,17 @@ Du MUSST konkret erwähnen:
 - NUR die E-Mail, sonst NICHTS
 
 Schreibe jetzt NUR die E-Mail-Text (120-180 Wörter):`
+  }
+  
+  const prompt = promptTemplate
 
   try {
-    // Rufe ChatGPT auf
+    // Rufe ChatGPT auf mit dem konfigurierten Modell
     const aiResponse = await emergentChatCompletion([
       { role: 'system', content: 'Du bist ein Experte für natürliche, menschliche B2B-Kommunikation. Du schreibst kurze, direkte E-Mails ohne Marketing-Floskeln.' },
       { role: 'user', content: prompt }
     ], {
-      model: 'gpt-4o-mini',
+      model: promptModel,
       temperature: 0.9, // Höher für mehr Variation
       max_tokens: 500
     })
@@ -241,7 +279,9 @@ Schreibe jetzt NUR die E-Mail-Text (120-180 Wörter):`
     return {
       subject,
       body: fullBody,
-      word_count: fullBody.split(/\s+/).length
+      word_count: fullBody.split(/\s+/).length,
+      prompt_version: promptVersion,
+      model: promptModel
     }
     
   } catch (error) {
@@ -306,7 +346,9 @@ Score Schleifwerkzeuge
     return {
       subject,
       body,
-      word_count: body.split(/\s+/).length
+      word_count: body.split(/\s+/).length,
+      prompt_version: promptVersion,
+      model: promptModel
     }
   }
 }
