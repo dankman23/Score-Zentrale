@@ -380,7 +380,33 @@ Viele Grüße
 <b>Daniel Leismann</b>
 Score Schleifwerkzeuge
 📞 <a href="tel:+4922125999901">0221-25999901</a>
-📧 <a href="mailto:leismann@score-schleifwerkzeuge.de">leismann@score-schleifwerkzeuge.de</a>`
+📧 <a href="mailto:leismann@score-schleifwerkzeuge.de">leismann@score-schleifwerkzeuge.de</a>
+
+-- 
+Besuchen Sie auch unseren Schleifmittel-Shop auf www.score-schleifwerkzeuge.de und kaufen Sie dort Schleifscheiben, Schleifbänder etc. zu Staffelpreisen unabhängig von den handelsüblichen OVP-Größen. 
+_____________________________
+Score Handels GmbH & Co. KG 
+
+Sülzburgstr. 187 
+50937 Köln 
+
+Telefon: +49(0)221-25999901 
+
+email: support@score-schleifwerkzeuge.de
+
+Amtsgericht Köln, HRA 31021 
+
+Persönlich haftende Gesellschafterin der SCORE Handels GmbH & Co. KG: 
+
+SCORE Handels Verwaltungs GmbH 
+
+Sülzburgstraße 187 
+50937 Köln 
+
+Amtsgericht Köln, HRB 83408 
+
+Geschäftsführer: 
+Dr. Alexander Biehl`
     
     return {
       subject,
