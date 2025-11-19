@@ -213,7 +213,7 @@ WICHTIGE HINWEISE:
 Antworte NUR mit dem JSON-Objekt, ohne zusätzlichen Text.`
 
   try {
-    const llmResponse = await emergentChatCompletion({
+    const llmResponse = await chatCompletion({
       messages: [
         { role: 'system', content: 'Du bist ein präziser B2B-Datenanalyst. Du antwortest immer im exakten JSON-Format.' },
         { role: 'user', content: prompt }
