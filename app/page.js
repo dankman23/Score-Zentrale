@@ -4891,34 +4891,70 @@ export default function App() {
                   </div>
                 ) : (
                   <div className="table-responsive">
-                    <table className="table table-hover mb-0">
+                    <table className="table mb-0">
                       <thead className="thead-light">
                         <tr>
-                          <th style={{width: '180px'}}>Datum</th>
-                          <th style={{width: '200px'}}>Firma</th>
-                          <th style={{width: '200px'}}>Empfänger</th>
-                          <th>Betreff</th>
-                          <th style={{width: '120px'}} className="text-center">Typ</th>
+                          <th style={{width: '140px'}}>DATUM</th>
+                          <th style={{width: '220px'}}>FIRMA</th>
+                          <th style={{width: '220px'}}>EMPFÄNGER</th>
+                          <th>BETREFF</th>
+                          <th style={{width: '120px'}} className="text-center">TYP</th>
                         </tr>
                       </thead>
                       <tbody>
                         {outboxEmails.map((email, i) => (
-                          <tr key={email.id || i}>
-                            <td>
-                              <div className="font-weight-bold">{new Date(email.sent_at).toLocaleDateString('de-DE')}</div>
-                              <small className="text-muted">{new Date(email.sent_at).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'})}</small>
-                            </td>
-                            <td className="font-weight-bold">{email.company_name}</td>
-                            <td>
-                              <a href={`mailto:${email.recipient}`} className="text-primary">{email.recipient}</a>
-                            </td>
-                            <td>{email.subject}</td>
-                            <td className="text-center">
-                              <span className={`badge badge-${email.mail_number === 1 ? 'success' : email.mail_number === 2 ? 'info' : 'warning'}`}>
-                                {email.mail_type}
-                              </span>
-                            </td>
-                          </tr>
+                          <>
+                            <tr 
+                              key={email.id || i} 
+                              onClick={() => setSelectedOutboxEmail(selectedOutboxEmail?.id === email.id ? null : email)}
+                              style={{cursor: 'pointer'}}
+                              className={selectedOutboxEmail?.id === email.id ? 'table-active' : ''}
+                            >
+                              <td>
+                                <div className="font-weight-bold">{new Date(email.sent_at).toLocaleDateString('de-DE')}</div>
+                                <small className="text-muted">{new Date(email.sent_at).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'})}</small>
+                              </td>
+                              <td className="font-weight-bold">{email.company_name}</td>
+                              <td>
+                                <a href={`mailto:${email.recipient}`} className="text-primary" onClick={(e) => e.stopPropagation()}>
+                                  {email.recipient}
+                                </a>
+                              </td>
+                              <td>{email.subject}</td>
+                              <td className="text-center">
+                                <span className={`badge badge-${email.mail_number === 1 ? 'success' : email.mail_number === 2 ? 'info' : 'warning'}`}>
+                                  {email.mail_type}
+                                </span>
+                              </td>
+                            </tr>
+                            {selectedOutboxEmail?.id === email.id && (
+                              <tr key={`${email.id}-detail`}>
+                                <td colSpan="5" className="p-0">
+                                  <div className="bg-light p-4 border-top">
+                                    <div className="d-flex justify-content-between align-items-start mb-3">
+                                      <div>
+                                        <h6 className="mb-1"><i className="bi bi-envelope-fill mr-2 text-success"/>Email-Inhalt</h6>
+                                        <small className="text-muted">
+                                          Gesendet am {new Date(email.sent_at).toLocaleString('de-DE')} an {email.recipient}
+                                        </small>
+                                      </div>
+                                      <button className="btn btn-sm btn-outline-secondary" onClick={() => setSelectedOutboxEmail(null)}>
+                                        <i className="bi bi-x-lg"/>
+                                      </button>
+                                    </div>
+                                    <div className="card">
+                                      <div className="card-header bg-white">
+                                        <strong>Betreff:</strong> {email.subject}
+                                      </div>
+                                      <div className="card-body" style={{maxHeight: '400px', overflowY: 'auto'}}>
+                                        <div dangerouslySetInnerHTML={{ __html: email.body?.replace(/\n/g, '<br>') || 'Email-Inhalt nicht verfügbar' }} />
+                                      </div>
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </>
                         ))}
                       </tbody>
                     </table>
