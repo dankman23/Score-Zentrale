@@ -4166,7 +4166,16 @@ export default function App() {
                             </td>
                             <td className="align-middle">
                               <a href={p.website} target="_blank" rel="noopener" className="text-info text-truncate d-inline-block small" style={{maxWidth:'190px'}} title={p.website}>
-                                {p.website.replace('https://','').replace('http://','').replace('www.','')}
+                                {(() => {
+                                  try {
+                                    // Extrahiere nur Hostname (ohne /impressum/, /kontakt/ etc.)
+                                    const url = new URL(p.website.startsWith('http') ? p.website : 'https://' + p.website)
+                                    return url.hostname.replace('www.', '')
+                                  } catch (e) {
+                                    // Fallback bei ungültiger URL
+                                    return p.website.replace('https://','').replace('http://','').replace('www.','').split('/')[0]
+                                  }
+                                })()}
                               </a>
                             </td>
                             <td className="align-middle">
