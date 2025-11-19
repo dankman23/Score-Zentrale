@@ -93,7 +93,8 @@ export async function generateEmailSequenceV3FromAnalysis(
 
 
 /**
- * Mail 1 - Erstansprache (HTML)
+ * Mail 1 - Erstansprache (HTML) - NEUE VERSION mit ChatGPT
+ * Basiert auf Daniel Leismann's Vorgaben für persönlichen, menschlichen Stil
  */
 async function generateMail1(
   analysis: AnalyzerV3Result,
@@ -102,40 +103,121 @@ async function generateMail1(
   valueProps: string[]
 ): Promise<{ subject: string; body: string; word_count: number }> {
   
-  const signature = getEmailSignature()
+  // Extrahiere Daten aus Analyse
+  const werkstoffe = analysis.materials.map(m => m.term).slice(0, 3)
+  const werkstucke = analysis.workpieces?.map(w => w.term).slice(0, 3) || []
+  const anwendungen = analysis.applications.map(a => a.term).slice(0, 3)
   
-  // Material/Anwendung für personalisierte Ansprache
-  const mainApp = analysis.applications[0]?.term || 'Ihre Fertigung'
-  const mainMat = analysis.materials[0]?.term || 'Metall'
+  // Baue Kontext für ChatGPT
+  const firmendaten = {
+    name: analysis.company,
+    werkstoffe: werkstoffe.length > 0 ? werkstoffe.join(', ') : 'verschiedene Metalle',
+    werkstucke: werkstucke.length > 0 ? werkstucke.join(', ') : 'Metallprodukte',
+    anwendungen: anwendungen.length > 0 ? anwendungen.join(', ') : 'Metallbearbeitung'
+  }
   
-  const subject = `Schleifwerkzeuge für ${mainApp} – Jahresbedarf & Beratung`
-  
-  const body = `${anrede},
+  // ChatGPT Prompt für menschliche, persönliche E-Mail
+  const prompt = `Du bist Daniel Leismann von Score-Schleifwerkzeuge und schreibst eine kurze, persönliche B2B-E-Mail.
 
-ich bin auf Ihre Firma ${analysis.company} gestoßen und habe gesehen, dass Sie im Bereich ${mainApp} tätig sind.
+**Firmendaten aus Analyse:**
+- Firma: ${firmendaten.name}
+- Werkstoffe: ${firmendaten.werkstoffe}
+- Produkte/Werkstücke: ${firmendaten.werkstucke}
+- Tätigkeiten: ${firmendaten.anwendungen}
 
-Wir bei Score Schleifwerkzeuge arbeiten mit allen führenden Herstellern der Branche zusammen (${brandsText}) und können dadurch Ihren <b>kompletten Jahresbedarf</b> an Schleifwerkzeugen optimal abdecken.
+**WICHTIG - Tonalität:**
+- Locker und menschlich, kein Marketing-Blabla
+- Kein "wir freuen uns", keine Worthülsen
+- Kein perfektes Hochdeutsch, eher natürlich
+- Direkt, freundlich, kurz
 
-<b>Was wir anbieten:</b>
-• Passgenaue Produktauswahl für ${mainMat} und ${mainApp}
-• Staffelpreise und Rahmenverträge für Ihren Jahresbedarf
-• Schnelle Lieferung deutschlandweit
+**Inhalt (in dieser Reihenfolge):**
 
-<b>Persönliche Beratung – jederzeit zwischen 10 und 18 Uhr:</b>
-📞 <a href="tel:+4922125999901">(+49) 0221-25999901</a>
+1. **Persönlicher Bezug** (1-2 Sätze):
+   - Nenne KONKRET was du über die Firma gelernt hast (Werkstoffe, Produkte, Tätigkeiten)
+   - Beispiel: "Ich bin auf Ihre Firma gestoßen und fand interessant, dass Sie viel mit Edelstahl arbeiten."
 
-<b>Oder Beratungstermin per Mail vereinbaren:</b>
-Antworten Sie einfach auf diese Mail, und ich melde mich bei Ihnen.
+2. **Unser Angebot** (2-3 Sätze):
+   - Wir arbeiten mit allen führenden Herstellern (Klingspor, 3M, Norton)
+   - Können den kompletten Jahresbedarf an Schleifmitteln & Trennwerkzeugen abdecken
+   - Bieten Staffelpreise und Rahmenverträge
+   - Sehr schnelle Lieferung deutschlandweit
+   
+   WENN Edelstahl erkannt: Erwähne Fächerscheiben, Fiberscheiben, INOX-Trennscheiben
+   WENN Aluminium erkannt: Erwähne Anti-Clog-Scheiben, Alu-Trennscheiben
 
-<b>Mehr Infos für Großkunden:</b>
-🔗 <a href="https://score-schleifwerkzeuge.de/business">https://score-schleifwerkzeuge.de/business</a>
+3. **Klare Handlungsaufforderung:**
+   - "Einfach per Mail melden oder anrufen: 0221-25999901 (10-18 Uhr)"
+   - Optional: "Gerne erstelle ich Ihnen ein individuelles Angebot, sobald ich weiß, welche Werkstoffe bei Ihnen am wichtigsten sind."
 
-${signature}`
-  
-  return {
-    subject,
-    body,
-    word_count: body.split(/\s+/).length
+**Format:**
+- Nutze <b> für Fettdruck
+- Nutze <a href="tel:+4922125999901">0221-25999901</a> für Telefon
+- KEIN Markdown
+- Maximal 150 Wörter
+- Signatur NICHT einschließen (wird später hinzugefügt)
+
+**Beispiel-Stil (NICHT wortwörtlich verwenden):**
+"Ich bin auf ${firmendaten.name} aufmerksam geworden und sah, dass Sie viel mit ${firmendaten.werkstoffe} arbeiten. Wir sind auf Schleifwerkzeuge spezialisiert und könnten Ihnen da einiges abnehmen..."
+
+Schreibe jetzt die E-Mail:`
+
+  try {
+    // Rufe ChatGPT auf
+    const aiResponse = await emergentChatCompletion([
+      { role: 'system', content: 'Du bist ein Experte für natürliche, menschliche B2B-Kommunikation. Du schreibst kurze, direkte E-Mails ohne Marketing-Floskeln.' },
+      { role: 'user', content: prompt }
+    ], {
+      model: 'gpt-4o-mini',
+      temperature: 0.9, // Höher für mehr Variation
+      max_tokens: 500
+    })
+    
+    const body = aiResponse.trim()
+    
+    // Füge Signatur hinzu
+    const signature = `\n\nViele Grüße\n<b>Daniel Leismann</b>\nScore Schleifwerkzeuge\n📞 <a href="tel:+4922125999901">0221-25999901</a> (Mo-Fr 10-18 Uhr)\n📧 <a href="mailto:leismann@score-schleifwerkzeuge.de">leismann@score-schleifwerkzeuge.de</a>`
+    
+    const fullBody = body + signature
+    
+    // Subject basierend auf Werkstoff
+    let subject = `Schleifwerkzeuge für ${analysis.company}`
+    if (werkstoffe.length > 0) {
+      subject = `Schleifwerkzeuge für ${werkstoffe[0]} – ${analysis.company}`
+    }
+    
+    return {
+      subject,
+      body: fullBody,
+      word_count: fullBody.split(/\s+/).length
+    }
+    
+  } catch (error) {
+    console.error('[Mail1] ChatGPT error, using fallback:', error)
+    
+    // Fallback: Einfache Template-basierte E-Mail
+    const subject = `Schleifwerkzeuge für ${analysis.company}`
+    const body = `${anrede},
+
+ich bin auf Ihre Firma ${analysis.company} gestoßen und fand interessant, dass Sie mit ${firmendaten.werkstoffe} arbeiten.
+
+Wir bei Score Schleifwerkzeuge arbeiten mit allen führenden Herstellern (Klingspor, 3M, Norton) zusammen und können Ihren kompletten Jahresbedarf an Schleifwerkzeugen abdecken. Staffelpreise und schnelle Lieferung deutschlandweit inklusive.
+
+Wenn Sie möchten, schaue ich mir Ihren Bedarf an und erstelle ein Angebot.
+
+Einfach per Mail melden oder anrufen: <a href="tel:+4922125999901">0221-25999901</a> (10-18 Uhr)
+
+Viele Grüße
+<b>Daniel Leismann</b>
+Score Schleifwerkzeuge
+📞 <a href="tel:+4922125999901">0221-25999901</a>
+📧 <a href="mailto:leismann@score-schleifwerkzeuge.de">leismann@score-schleifwerkzeuge.de</a>`
+    
+    return {
+      subject,
+      body,
+      word_count: body.split(/\s+/).length
+    }
   }
 }
 
