@@ -5493,13 +5493,15 @@ export default function App() {
               </div>
               </>
               )}
-              
-              {/* MAIL PROMPTS VIEW */}
-              {mailView === 'prospects' && coldStatusFilter === 'prompts' && (
-                <div className="card-body">
-                  <MailPromptsView />
-                </div>
-              )}
+            </div>
+          )}
+          
+          {/* MAIL PROMPTS VIEW - AUSSERHALB der coldProspects.length Bedingung */}
+          {mailView === 'prospects' && coldStatusFilter === 'prompts' && (
+            <div className="card border-0 shadow-sm">
+              <div className="card-body">
+                <MailPromptsView />
+              </div>
             </div>
           )}
 
