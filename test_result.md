@@ -939,12 +939,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Autopilot: Collections-Vereinheitlichung testen (alle APIs nutzen 'prospects')"
-    - "Autopilot Tick API: DACH-Crawler → analyze-deep → email-v3 Flow testen"
-    - "Email BCC: Beide Adressen verifizieren"
-    - "Frontend: Autopilot-Statusanzeige testen"
-    - "Frontend: Gesendete Mails im Kontaktiert-Tab sichtbar"
-  stuck_tasks: []
+    - "COMPLETED: Collections-Vereinheitlichung ✅ (alle APIs nutzen 'prospects')"
+    - "COMPLETED: Email BCC Verifikation ✅ (beide Adressen konfiguriert)"
+    - "PARTIAL: Autopilot Tick API ⚠️ (DACH-Crawler + analyze-deep working, email step needs contact emails)"
+    - "PENDING: Frontend Autopilot-Statusanzeige testen"
+    - "PENDING: Frontend Gesendete Mails im Kontaktiert-Tab sichtbar"
+  stuck_tasks: 
+    - "Autopilot Email Step: Missing contact emails in analyzed prospects"
   test_all: false
   test_priority: "high_first"
 
