@@ -24,6 +24,63 @@ interface CompanyLead {
 }
 
 /**
+ * Bereinigt Firmennamen von unnötigen Präfixen
+ * Entfernt: "Impressum - ", "Kontakt - ", "Über uns - ", etc.
+ */
+function cleanCompanyName(name: string): string {
+  if (!name) return name
+  
+  // Entferne typische Seiten-Titel-Präfixe
+  const prefixesToRemove = [
+    'Impressum - ',
+    'Impressum: ',
+    'Impressum | ',
+    'Impressum – ',
+    'Kontakt - ',
+    'Kontakt: ',
+    'Kontakt | ',
+    'Kontakt – ',
+    'Über uns - ',
+    'Über uns: ',
+    'Über uns | ',
+    'About - ',
+    'Contact - ',
+    'Imprint - ',
+    'Home - ',
+    'Startseite - ',
+    'Willkommen - ',
+    'Welcome - '
+  ]
+  
+  let cleaned = name
+  for (const prefix of prefixesToRemove) {
+    if (cleaned.startsWith(prefix)) {
+      cleaned = cleaned.substring(prefix.length)
+      break
+    }
+  }
+  
+  // Entferne auch Suffix wie " - Impressum", " | Kontakt"
+  const suffixesToRemove = [
+    ' - Impressum',
+    ' | Impressum',
+    ' - Kontakt',
+    ' | Kontakt',
+    ' - Über uns',
+    ' | Über uns'
+  ]
+  
+  for (const suffix of suffixesToRemove) {
+    if (cleaned.endsWith(suffix)) {
+      cleaned = cleaned.substring(0, cleaned.length - suffix.length)
+      break
+    }
+  }
+  
+  return cleaned.trim()
+}
+
+/**
  * Systematisches Crawling-Framework
  * 
  * Quellen-Hierarchie:
@@ -52,67 +109,24 @@ const DACH_REGIONS = {
   ]
 }
 
-// Branchen-Mapping mit Suchbegriffen (aus PDF "Relevante Branchen für Schleifwerkzeuge")
+// Branchen-Mapping mit Suchbegriffen
 const INDUSTRY_KEYWORDS = {
-  // 🚗 Automobilindustrie & Fahrzeugbau
-  'Automobilindustrie': ['automobilindustrie', 'fahrzeugbau', 'automobilzulieferer', 'kfz industrie'],
-  'Karosseriebau': ['karosseriebau', 'karosseriewerkstatt', 'blechbearbeitung fahrzeug', 'autolackierung'],
-  'KFZ-Werkstatt': ['kfz werkstatt', 'autowerkstatt', 'kfz reparatur', 'fahrzeugreparatur'],
-  
-  // 🔩 Metallverarbeitung & Stahlbau
-  'Metallverarbeitung': ['metallverarbeitung', 'metallbau', 'blechbearbeitung', 'stahlverarbeitung'],
-  'Schlosserei': ['schlosserei', 'bauschlosserei', 'metallbau', 'schlossereibetrieb'],
-  'Stahlbau': ['stahlbau', 'stahlkonstruktion', 'metallkonstruktion', 'profilbearbeitung'],
-  'Schweißtechnik': ['schweißtechnik', 'schweißbetrieb', 'schweißerei', 'schweißnahtbearbeitung'],
-  
-  // ⚙️ Maschinen- und Apparatebau
-  'Maschinenbau': ['maschinenbau', 'sondermaschinenbau', 'präzisionsmaschinenbau'],
-  'Apparatebau': ['apparatebau', 'anlagenbau', 'behälterbau', 'rohrbau'],
-  'Werkzeugbau': ['werkzeugbau', 'formenbau', 'vorrichtungsbau', 'stanzerei'],
-  
-  // ✈️ Luft- und Raumfahrt
-  'Luftfahrt': ['luftfahrt', 'flugzeugbau', 'flugzeugwartung', 'triebwerksbau'],
-  'Raumfahrt': ['raumfahrt', 'aerospace', 'luftfahrtindustrie'],
-  
-  // 🚢 Schiff- und Bahnindustrie
-  'Schiffbau': ['schiffbau', 'werft', 'marinebau', 'bootsbau'],
-  'Bahnindustrie': ['bahnindustrie', 'schienenfahrzeugbau', 'gleisbau', 'zugbau'],
-  
-  // 🪵 Holz- und Möbelindustrie
-  'Holzverarbeitung': ['holzverarbeitung', 'holzbearbeitung', 'sägewerk'],
-  'Schreinerei': ['schreinerei', 'tischlerei', 'schreinereibetrieb'],
-  'Möbelindustrie': ['möbelindustrie', 'möbelbau', 'möbelherstellung', 'innenausbau'],
-  'Parkettverlegung': ['parkett', 'parkettverlegung', 'bodenleger'],
-  
-  // 🔥 Gießereien und Schmieden
-  'Gießerei': ['gießerei', 'metallguss', 'gussteile', 'eisengießerei'],
-  'Schmiede': ['schmiede', 'schmiedebetrieb', 'metallschmiede', 'kunstschmiede'],
-  
-  // 🎨 Maler- und Ausbauhandwerk
-  'Malerhandwerk': ['malerhandwerk', 'malerbetrieb', 'maler lackierer'],
-  'Trockenbau': ['trockenbau', 'innenausbau', 'gipskartonbau'],
-  'Stuckateur': ['stuckateur', 'stukkateur', 'putzarbeiten'],
-  
-  // 🎨 Oberflächentechnik
-  'Oberflächentechnik': ['oberflächentechnik', 'oberflächenbehandlung', 'oberflächenveredelung'],
-  'Lackiererei': ['lackiererei', 'industrielackierung', 'pulverbeschichtung'],
-  'Galvanik': ['galvanik', 'galvanisierung', 'verzinkerei', 'verchromung'],
-  
-  // 💎 Glas, Stein & Keramik
-  'Glasverarbeitung': ['glasverarbeitung', 'glastechnik', 'glaserei', 'glasschleiferei'],
-  'Steinmetz': ['steinmetz', 'steinbearbeitung', 'natursteinbearbeitung', 'marmorbearbeitung'],
-  
-  // 🦷 Dental & Medizintechnik
-  'Dentallabor': ['dentallabor', 'zahntechnik', 'dentaltechnik', 'zahnersatz'],
-  
-  // 💍 Schmuck & Gravur
-  'Schmuckherstellung': ['goldschmied', 'schmuckherstellung', 'juwelier', 'schmuckwerkstatt'],
-  'Gravurbetrieb': ['gravur', 'gravierwerkstatt', 'lasergravur', 'gravierdienst'],
-  
-  // 🔧 Kunststoff & Sonstige
-  'Kunststoffverarbeitung': ['kunststoffverarbeitung', 'kunststofftechnik', 'spritzguss'],
-  'Modellbau': ['modellbau', 'prototypenbau', 'modellbauer'],
-  'Messerschmiede': ['messerschmiede', 'messermacher', 'messerherstellung']
+  'Metallverarbeitung': [
+    'metallbau', 'metallverarbeitung', 'stahlbau', 'blechbearbeitung',
+    'maschinenbau', 'schweißtechnik', 'schlosserei'
+  ],
+  'Schreinerei': [
+    'schreinerei', 'tischlerei', 'möbelbau', 'holzverarbeitung'
+  ],
+  'Automobilindustrie': [
+    'kfz', 'autolackierung', 'karosseriebau', 'fahrzeugbau'
+  ],
+  'Oberflächentechnik': [
+    'pulverbeschichtung', 'lackiererei', 'galvanik', 'oberflächenbehandlung'
+  ],
+  'Werkzeugbau': [
+    'werkzeugbau', 'formenbau', 'stanzerei'
+  ]
 }
 
 /**
@@ -126,68 +140,6 @@ interface CrawlProgress {
   companies_found: number
   last_updated: Date
   next_page?: string
-}
-
-/**
- * Filter für unerwünschte Ergebnisse
- * Sortiert Schulen, Plattformen, Verzeichnisse, etc. aus
- */
-function isValidCompanyLead(lead: CompanyLead): boolean {
-  const name = lead.name.toLowerCase()
-  const website = (lead.website || '').toLowerCase()
-  
-  // Blacklist: Unerwünschte Domains und Keywords
-  const blacklistDomains = [
-    'wikipedia.org', 'facebook.com', 'instagram.com', 'linkedin.com', 'xing.com',
-    'youtube.com', 'twitter.com', 'kununu.com', 'jobware.de', 'stepstone.de',
-    'indeed.com', 'monster.de', 'gelbeseiten.de', 'firmenabc.de', '11880.com',
-    'golocal.de', 'yelp.de', 'tripadvisor.de', 'foursquare.com',
-    'wlw.de', 'wer-liefert-was.de', 'europages.de', 'kompass.com',
-    'markt.de', 'ebay-kleinanzeigen.de', 'quoka.de', 'kalaydo.de',
-    'unternehmensregister.de', 'handelsregister.de', 'northdata.de',
-    'creditreform.de', 'bundesanzeiger.de', 'handwerkskammer.de', 'ihk.de'
-  ]
-  
-  const blacklistKeywords = [
-    'schule', 'hochschule', 'universität', 'fachhochschule', 'berufsschule',
-    'ausbildung', 'lehrstelle', 'praktikum', 'studium',
-    'verband', 'verein', 'vereinigung', 'kammer', 'innung',
-    'plattform', 'portal', 'verzeichnis', 'branchenbuch', 'katalog',
-    'marktplatz', 'kleinanzeigen', 'anzeigen', 'stellenangebote',
-    'jobbörse', 'recruiting', 'personalvermittlung',
-    'wikipedia', 'ratgeber', 'forum', 'blog', 'news'
-  ]
-  
-  // Prüfe Domain-Blacklist
-  for (const domain of blacklistDomains) {
-    if (website.includes(domain)) {
-      console.log(`[Filter] Blocked (Blacklist-Domain): ${lead.name} (${domain})`)
-      return false
-    }
-  }
-  
-  // Prüfe Keyword-Blacklist
-  for (const keyword of blacklistKeywords) {
-    if (name.includes(keyword)) {
-      console.log(`[Filter] Blocked (Blacklist-Keyword): ${lead.name} (${keyword})`)
-      return false
-    }
-  }
-  
-  // Website muss vorhanden sein
-  if (!lead.website || lead.website.trim() === '') {
-    console.log(`[Filter] Blocked (No Website): ${lead.name}`)
-    return false
-  }
-  
-  // Website muss valide sein (eigene Domain, nicht Plattform)
-  const urlPattern = /^https?:\/\/[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/
-  if (!urlPattern.test(website)) {
-    console.log(`[Filter] Blocked (Invalid URL): ${lead.name}`)
-    return false
-  }
-  
-  return true
 }
 
 /**
@@ -207,34 +159,40 @@ export async function crawlDACHRegion(
   
   console.log(`[DACH Crawler] Starting: ${country} / ${region} / ${industry}`)
   
-  const allLeads: CompanyLead[] = []
+  // Blacklist: Verzeichnisse, Schulen, Plattformen
+  const blacklistedDomains = [
+    'gelbenseiten.de', 'gelbeseiten.de',
+    'wlw.de', 'wer-liefert-was.de',
+    'lehrer-online.de', 'lehreronline.de',
+    'schule-bw.de', 'schulewirtschaft.de',
+    'wikipedia.org', 'youtube.com',
+    'facebook.com', 'linkedin.com',
+    'xing.com', 'kununu.com',
+    'indeed.de', 'stepstone.de'
+  ]
+  
+  const leads: CompanyLead[] = []
   
   // Strategie basierend auf Land
   switch (country) {
     case 'DE':
       // Gelbe Seiten / 11880.com scrapen (simuliert)
-      const deLeads = await crawlGermanyRegion(region, industry, limit * 2) // 2x für Filter-Overhead
-      allLeads.push(...deLeads)
+      const deLeads = await crawlGermanyRegion(region, industry, limit)
+      leads.push(...deLeads)
       break
       
     case 'AT':
       // Herold.at / firmenabc.at scrapen (simuliert)
-      const atLeads = await crawlAustriaRegion(region, industry, limit * 2)
-      allLeads.push(...atLeads)
+      const atLeads = await crawlAustriaRegion(region, industry, limit)
+      leads.push(...atLeads)
       break
       
     case 'CH':
       // local.ch / search.ch scrapen (simuliert)
-      const chLeads = await crawlSwitzerlandRegion(region, industry, limit * 2)
-      allLeads.push(...chLeads)
+      const chLeads = await crawlSwitzerlandRegion(region, industry, limit)
+      leads.push(...chLeads)
       break
   }
-  
-  // Filter anwenden: Nur echte Firmen, keine Schulen/Plattformen
-  const filteredLeads = allLeads.filter(isValidCompanyLead)
-  console.log(`[DACH Crawler] Filtered: ${allLeads.length} → ${filteredLeads.length} (removed ${allLeads.length - filteredLeads.length})`)
-  
-  const leads = filteredLeads.slice(0, limit)
   
   // Progress tracken
   const progress: CrawlProgress = {
@@ -258,7 +216,7 @@ export async function crawlDACHRegion(
 
 /**
  * Deutschland: Gelbe Seiten / 11880 / WLW scrapen
- * Nutzt Google Custom Search wie der funktionierende Prospector
+ * Nutzt Google Custom Search mit site: Operatoren
  */
 async function crawlGermanyRegion(
   region: string,
@@ -271,43 +229,37 @@ async function crawlGermanyRegion(
   
   console.log(`[DE Crawler] Searching ${region} for ${keywords.join(', ')}`)
   
-  // Mehrere Suchanfragen: Fokus auf direkte Firmenwebsites statt Verzeichnisse
-  const searchQueries = [
-    `${keywords[0]} ${region} site:.de -site:gelbeseiten.de -site:wikipedia.org "impressum" "kontakt"`,
-    `"${keywords[0]}" "${region}" site:.de "unternehmen" OR "firma" OR "betrieb"`,
-    `${keywords[1] || keywords[0]} ${region} site:.de -site:facebook.com -site:linkedin.com "über uns"`
-  ]
-  
-  for (const query of searchQueries) {
-    try {
-      const searchResults = await performGoogleSearch(query, Math.ceil(limit / searchQueries.length))
-      
-      for (const result of searchResults) {
-        // Bestimme Quelle aus URL
-        let sourceName = 'Google'
-        if (result.link.includes('gelbeseiten.de')) sourceName = 'Gelbe Seiten'
-        else if (result.link.includes('firmenabc.de')) sourceName = 'FirmenABC'
-        else if (result.link.includes('11880.com')) sourceName = '11880.com'
-        else if (result.link.includes('wlw.de')) sourceName = 'WLW'
-        
-        leads.push({
-          name: result.title,
-          website: result.link,
-          address: result.snippet,
-          city: region,
-          region: region,
-          country: 'DE',
-          industry: industry,
-          source: sourceName
-        })
+  // Direkte Firmen-Suche (NICHT über Verzeichnisse)
+  try {
+    // Suche nach echten Firmen-Websites mit Impressum/Kontakt
+    const query = `${keywords[0]} ${region} (impressum OR kontakt) -site:gelbeseiten.de -site:wlw.de -site:lehrer-online.de -site:schule-bw.de`
+    const searchResults = await performGoogleSearch(query, limit)
+    
+    for (const result of searchResults) {
+      // Filtere Blacklist zusätzlich
+      const url = result.link.toLowerCase()
+      if (blacklistedDomains.some(domain => url.includes(domain))) {
+        console.log(`[DE Crawler] Filtered blacklisted: ${result.link}`)
+        continue
       }
       
-      // Rate limiting
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      const cleanedName = cleanCompanyName(result.title)
+      console.log(`[Clean Name] "${result.title}" → "${cleanedName}"`)
       
-    } catch (error) {
-      console.error(`[DE Crawler] Error with query "${query}":`, error)
+      leads.push({
+        name: cleanedName,
+        website: result.link,
+        address: result.snippet,
+        city: region,
+        region: region,
+        country: 'DE',
+        industry: industry,
+        source: 'Google Organic'
+      })
     }
+    
+  } catch (error) {
+    console.error(`[DE Crawler] Search error:`, error)
   }
   
   return leads.slice(0, limit)
@@ -326,36 +278,33 @@ async function crawlAustriaRegion(
   
   console.log(`[AT Crawler] Searching ${region} for ${industry}`)
   
-  const searchQueries = [
-    `${keywords[0]} ${region} site:herold.at OR site:firmenabc.at "impressum"`,
-    `${keywords[0]} ${region} site:.at "firma" OR "unternehmen"`
+  const sources = [
+    { domain: 'herold.at', name: 'Herold.at' },
+    { domain: 'firmenabc.at', name: 'FirmenABC.at' }
   ]
   
-  for (const query of searchQueries) {
+  for (const source of sources) {
     try {
-      const searchResults = await performGoogleSearch(query, Math.ceil(limit / searchQueries.length))
+      const query = `site:${source.domain} ${keywords[0]} ${region}`
+      const searchResults = await performGoogleSearch(query, Math.ceil(limit / sources.length))
       
       for (const result of searchResults) {
-        let sourceName = 'Google'
-        if (result.link.includes('herold.at')) sourceName = 'Herold.at'
-        else if (result.link.includes('firmenabc.at')) sourceName = 'FirmenABC.at'
-        
         leads.push({
-          name: result.title,
+          name: cleanCompanyName(result.title),
           website: result.link,
           address: result.snippet,
           city: region,
           region: region,
           country: 'AT',
           industry: industry,
-          source: sourceName
+          source: source.name
         })
       }
       
       await new Promise(resolve => setTimeout(resolve, 1000))
       
     } catch (error) {
-      console.error(`[AT Crawler] Error with query "${query}":`, error)
+      console.error(`[AT Crawler] Error with ${source.name}:`, error)
     }
   }
   
@@ -375,36 +324,33 @@ async function crawlSwitzerlandRegion(
   
   console.log(`[CH Crawler] Searching ${region} for ${industry}`)
   
-  const searchQueries = [
-    `${keywords[0]} ${region} site:local.ch OR site:search.ch "kontakt"`,
-    `${keywords[0]} ${region} site:.ch "firma" OR "unternehmen"`
+  const sources = [
+    { domain: 'local.ch', name: 'local.ch' },
+    { domain: 'search.ch', name: 'search.ch' }
   ]
   
-  for (const query of searchQueries) {
+  for (const source of sources) {
     try {
-      const searchResults = await performGoogleSearch(query, Math.ceil(limit / searchQueries.length))
+      const query = `site:${source.domain} ${keywords[0]} ${region}`
+      const searchResults = await performGoogleSearch(query, Math.ceil(limit / sources.length))
       
       for (const result of searchResults) {
-        let sourceName = 'Google'
-        if (result.link.includes('local.ch')) sourceName = 'local.ch'
-        else if (result.link.includes('search.ch')) sourceName = 'search.ch'
-        
         leads.push({
-          name: result.title,
+          name: cleanCompanyName(result.title),
           website: result.link,
           address: result.snippet,
           city: region,
           region: region,
           country: 'CH',
           industry: industry,
-          source: sourceName
+          source: source.name
         })
       }
       
       await new Promise(resolve => setTimeout(resolve, 1000))
       
     } catch (error) {
-      console.error(`[CH Crawler] Error with query "${query}":`, error)
+      console.error(`[CH Crawler] Error with ${source.name}:`, error)
     }
   }
   
@@ -412,7 +358,7 @@ async function crawlSwitzerlandRegion(
 }
 
 /**
- * Führt Google-Suche aus (GLEICHE METHODE wie funktionierender Prospector)
+ * Führt Google-Suche aus (nutzt Google Custom Search API direkt)
  */
 async function performGoogleSearch(
   query: string,
@@ -430,27 +376,23 @@ async function performGoogleSearch(
   }
   
   try {
-    // EXAKT wie im funktionierenden Prospector
     const url = new URL('https://www.googleapis.com/customsearch/v1')
     url.searchParams.set('key', apiKey!)
     url.searchParams.set('cx', engineId!)
     url.searchParams.set('q', query)
     url.searchParams.set('num', Math.min(limit, 10).toString())
-    url.searchParams.set('gl', 'de') // Germany
-    url.searchParams.set('lr', 'lang_de') // German
-    
-    console.log('[DACH Crawler] Query:', query)
+    url.searchParams.set('gl', 'de')
+    url.searchParams.set('lr', 'lang_de')
     
     const response = await fetch(url.toString())
     const data = await response.json()
     
     if (!response.ok) {
-      console.error('[DACH Crawler] Google API Error:', data.error?.message || 'Unknown')
+      console.error('[DACH Crawler] Google API Error:', data.error?.message)
       return []
     }
     
     if (data.items && Array.isArray(data.items)) {
-      console.log(`[DACH Crawler] Found ${data.items.length} results`)
       return data.items.map((item: any) => ({
         title: item.title,
         link: item.link,
@@ -458,11 +400,10 @@ async function performGoogleSearch(
       }))
     }
     
-    console.log('[DACH Crawler] No results found')
     return []
     
   } catch (error) {
-    console.error('[DACH Crawler] Exception:', error)
+    console.error('[DACH Crawler] Error:', error)
     return []
   }
 }
