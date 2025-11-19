@@ -24,8 +24,13 @@ export async function POST(request: Request) {
     const db = await connectToMongoDB()
     const prospectsCollection = db.collection('prospects')
     
-    // Lade Prospect
-    const prospect = await prospectsCollection.findOne({ id: prospect_id })
+    // Lade Prospect (prüfe sowohl id als auch _id)
+    const prospect = await prospectsCollection.findOne({ 
+      $or: [
+        { id: prospect_id },
+        { _id: prospect_id }
+      ]
+    })
     
     if (!prospect) {
       return NextResponse.json({
