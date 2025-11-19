@@ -3919,7 +3919,7 @@ export default function App() {
                 <div className="col-md-6">
                   <div className="d-flex align-items-center justify-content-end">
                     <div className="mr-3">
-                      <div className="text-white small mb-1">Tages-Limit</div>
+                      <div className="text-white small mb-1">Session-Limit</div>
                       <input 
                         type="number" 
                         className="form-control form-control-sm bg-white text-dark" 
