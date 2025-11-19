@@ -7,11 +7,11 @@ export function getEmailTransporter() {
 
   transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'mail.agenturserver.de',
-    port: parseInt(process.env.SMTP_PORT || '465'),
-    secure: process.env.SMTP_SECURE === 'true' || true,
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: process.env.SMTP_SECURE === 'true', // false für Port 587
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD
+      user: process.env.SMTP_USER || process.env.EMAIL_USER,
+      pass: process.env.SMTP_PASSWORD || process.env.EMAIL_PASSWORD
     },
     tls: {
       rejectUnauthorized: false
