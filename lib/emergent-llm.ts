@@ -38,7 +38,7 @@ export async function emergentChatCompletion(
   optionsOrRetries?: { model?: string; temperature?: number; max_tokens?: number } | number,
   retries = 2
 ): Promise<string> {
-  const apiKey = process.env.EMERGENT_LLM_KEY || process.env.OPENAI_API_KEY
+  const apiKey = process.env.OPENAI_API_KEY || process.env.EMERGENT_LLM_KEY
   
   console.log(`[EmergentLLM] API Key present: ${!!apiKey}, starts with sk-: ${apiKey?.startsWith('sk-')}`)
   
