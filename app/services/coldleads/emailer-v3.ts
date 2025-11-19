@@ -265,10 +265,11 @@ Schreibe jetzt NUR die E-Mail-Text (120-180 Wörter):`
     
     const body = aiResponse.trim()
     
-    // Füge Signatur hinzu
+    // Füge Anrede und Signatur hinzu
+    const greeting = anrede ? `${anrede},\n\n` : 'Guten Tag,\n\n'
     const signature = `\n\nViele Grüße\n<b>Daniel Leismann</b>\nScore Schleifwerkzeuge\n📞 <a href="tel:+4922125999901">0221-25999901</a> (Mo-Fr 10-18 Uhr)\n📧 <a href="mailto:leismann@score-schleifwerkzeuge.de">leismann@score-schleifwerkzeuge.de</a>`
     
-    const fullBody = body + signature
+    const fullBody = greeting + body + signature
     
     // Subject basierend auf Werkstoff
     let subject = `Schleifwerkzeuge für ${analysis.company}`
@@ -323,7 +324,10 @@ Schreibe jetzt NUR die E-Mail-Text (120-180 Wörter):`
       ? cleanedFirmenname 
       : 'Ihre Firma'
     
-    const body = `${anrede},
+    // Verwende Anrede oder Fallback
+    const greeting = anrede ? anrede : 'Guten Tag'
+    
+    const body = `${greeting},
 
 ich bin auf ${firmenReferenz} gestoßen und habe gesehen, dass Sie mit ${firmendaten.werkstoffe} arbeiten und ${firmendaten.werkstucke} fertigen. Das passt gut zu dem, was wir bei Score Schleifwerkzeuge anbieten.
 
