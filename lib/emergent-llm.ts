@@ -52,7 +52,7 @@ export async function emergentChatCompletion(
   let lastError: Error | null = null
   
   // Use environment variable for API endpoint (deployment-ready)
-  const apiEndpoint = process.env.EMERGENT_API_URL || 'https://api.emergent.sh/v1/chat/completions'
+  const apiEndpoint = process.env.EMERGENT_API_URL || 'https://api.emergentagent.com/v1/chat/completions'
   
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
