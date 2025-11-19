@@ -147,7 +147,7 @@ export async function POST() {
               website: baseWebsite,
               firmenname: prospect.company_name,
               branche: nextQuery.industry,
-              prospectId: prospect.id
+              prospectId: prospect.id || prospect._id?.toString()
             })
           })
           
