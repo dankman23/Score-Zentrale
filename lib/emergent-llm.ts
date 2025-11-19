@@ -51,8 +51,8 @@ export async function emergentChatCompletion(
 
   let lastError: Error | null = null
   
-  // Use environment variable for API endpoint (deployment-ready)
-  const apiEndpoint = process.env.EMERGENT_API_URL || 'https://api.emergentagent.com/v1/chat/completions'
+  // Use OpenAI endpoint with Emergent Universal Key
+  const apiEndpoint = 'https://api.openai.com/v1/chat/completions'
   
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
