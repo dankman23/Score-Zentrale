@@ -343,6 +343,166 @@ function MailPromptsView() {
           </div>
         </div>
       )}
+      
+      {/* Create Prompt Modal */}
+      {showCreatePromptModal && (
+        <div 
+          className="modal d-block" 
+          style={{backgroundColor: 'rgba(0,0,0,0.5)'}}
+          onClick={() => setShowCreatePromptModal(false)}
+        >
+          <div 
+            className="modal-dialog modal-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  <i className="bi bi-plus-circle mr-2"/>Neuen Prompt erstellen
+                </h5>
+                <button 
+                  type="button" 
+                  className="close"
+                  onClick={() => setShowCreatePromptModal(false)}
+                >
+                  <span>&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label><strong>Name:</strong></label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={newPromptData.name}
+                    onChange={(e) => setNewPromptData({...newPromptData, name: e.target.value})}
+                    placeholder="z.B. Prompt 2 (Direkter Stil)"
+                  />
+                </div>
+                <div className="form-group">
+                  <label><strong>Modell:</strong></label>
+                  <select
+                    className="form-control"
+                    value={newPromptData.model}
+                    onChange={(e) => setNewPromptData({...newPromptData, model: e.target.value})}
+                  >
+                    <option value="gpt-4o-mini">gpt-4o-mini (schnell & günstig)</option>
+                    <option value="gpt-4o">gpt-4o (beste Qualität)</option>
+                    <option value="gpt-4-turbo">gpt-4-turbo</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label><strong>Prompt-Text:</strong></label>
+                  <textarea
+                    className="form-control"
+                    rows="15"
+                    value={newPromptData.prompt}
+                    onChange={(e) => setNewPromptData({...newPromptData, prompt: e.target.value})}
+                    placeholder="Prompt hier einfügen... Verwenden Sie Platzhalter: {cleanedFirmenname}, {werkstoffe}, {werkstucke}, {anwendungen}"
+                    style={{fontFamily: 'monospace', fontSize: '0.9rem'}}
+                  />
+                  <small className="text-muted">
+                    Verfügbare Platzhalter: <code>{'{cleanedFirmenname}'}</code>, <code>{'{werkstoffe}'}</code>, <code>{'{werkstucke}'}</code>, <code>{'{anwendungen}'}</code>
+                  </small>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => setShowCreatePromptModal(false)}
+                >
+                  Abbrechen
+                </button>
+                <button
+                  className="btn btn-success"
+                  onClick={createNewPrompt}
+                >
+                  <i className="bi bi-check-circle mr-1"/>Erstellen
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Edit Prompt Modal */}
+      {showEditPromptModal && editingPrompt && (
+        <div 
+          className="modal d-block" 
+          style={{backgroundColor: 'rgba(0,0,0,0.5)'}}
+          onClick={() => setShowEditPromptModal(false)}
+        >
+          <div 
+            className="modal-dialog modal-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  <i className="bi bi-pencil mr-2"/>Prompt bearbeiten (v{editingPrompt.version})
+                </h5>
+                <button 
+                  type="button" 
+                  className="close"
+                  onClick={() => setShowEditPromptModal(false)}
+                >
+                  <span>&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label><strong>Name:</strong></label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={editingPrompt.name}
+                    onChange={(e) => setEditingPrompt({...editingPrompt, name: e.target.value})}
+                  />
+                </div>
+                <div className="form-group">
+                  <label><strong>Modell:</strong></label>
+                  <select
+                    className="form-control"
+                    value={editingPrompt.model}
+                    onChange={(e) => setEditingPrompt({...editingPrompt, model: e.target.value})}
+                  >
+                    <option value="gpt-4o-mini">gpt-4o-mini (schnell & günstig)</option>
+                    <option value="gpt-4o">gpt-4o (beste Qualität)</option>
+                    <option value="gpt-4-turbo">gpt-4-turbo</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label><strong>Prompt-Text:</strong></label>
+                  <textarea
+                    className="form-control"
+                    rows="15"
+                    value={editingPrompt.prompt}
+                    onChange={(e) => setEditingPrompt({...editingPrompt, prompt: e.target.value})}
+                    style={{fontFamily: 'monospace', fontSize: '0.9rem'}}
+                  />
+                  <small className="text-muted">
+                    Verfügbare Platzhalter: <code>{'{cleanedFirmenname}'}</code>, <code>{'{werkstoffe}'}</code>, <code>{'{werkstucke}'}</code>, <code>{'{anwendungen}'}</code>
+                  </small>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => setShowEditPromptModal(false)}
+                >
+                  Abbrechen
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={updatePrompt}
+                >
+                  <i className="bi bi-save mr-1"/>Speichern
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
