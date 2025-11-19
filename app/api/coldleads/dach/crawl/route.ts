@@ -95,11 +95,14 @@ export async function POST(request: NextRequest) {
           { upsert: true }
         )
 
-        const savedDoc = await prospectsCollection.findOne({ website: lead.website })
-        savedProspects.push({
-          id: savedDoc!._id.toString(),
-          ...prospectData
-        })
+        // FIXED: Suche nach normalisierter Website, nicht Original
+        const savedDoc = await prospectsCollection.findOne({ website: normalizedWebsite })
+        if (savedDoc) {
+          savedProspects.push({
+            id: savedDoc._id.toString(),
+            ...prospectData
+          })
+        }
       }
     }
 
