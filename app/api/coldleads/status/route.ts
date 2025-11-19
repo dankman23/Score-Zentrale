@@ -30,7 +30,7 @@ export async function PUT(request: NextRequest) {
     }
     
     const db = await connectToMongoDB()
-    const collection = db.collection('cold_prospects')
+    const collection = db.collection('prospects')
     
     const result = await collection.updateOne(
       { _id: new ObjectId(id) },
