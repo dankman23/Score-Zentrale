@@ -4475,64 +4475,72 @@ export default function App() {
             </div>
           )}
 
+          {/* Navigation Tabs - IMMER sichtbar */}
+          <div className="card border-0 shadow-sm mb-3">
+            <div className="card-body py-2">
+              <div className="d-flex justify-content-between align-items-center flex-wrap">
+                <div className="d-flex align-items-center flex-wrap">
+                  {/* Mail-Ansicht Tabs */}
+                  <div className="btn-group btn-group-sm mr-3 mb-2">
+                    <button className={`btn ${mailView==='prospects'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setMailView('prospects')}>
+                      <i className="bi bi-people-fill mr-1"/>Prospects
+                    </button>
+                    <button className={`btn ${mailView==='inbox'?'btn-info':'btn-outline-info'}`} onClick={()=>setMailView('inbox')}>
+                      <i className="bi bi-inbox-fill mr-1"/>Posteingang
+                    </button>
+                    <button className={`btn ${mailView==='outbox'?'btn-success':'btn-outline-success'}`} onClick={()=>setMailView('outbox')}>
+                      <i className="bi bi-send-fill mr-1"/>Postausgang
+                    </button>
+                  </div>
+                  
+                  {/* Prospects Filter - nur bei Prospects-Ansicht */}
+                  {mailView === 'prospects' && (
+                    <>
+                      <button 
+                        className="btn btn-outline-warning btn-sm mr-2 mb-2"
+                        onClick={sendFollowups}
+                        disabled={coldLoading}
+                      >
+                        <i className="bi bi-arrow-repeat mr-1"/>Follow-ups
+                      </button>
+                      <div className="btn-group btn-group-sm mb-2">
+                        <button className={`btn ${coldStatusFilter==='all'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('all'); setShowColdProspectDetails(null)}}>
+                          <i className="bi bi-list mr-1"/>Alle ({coldStats.total})
+                        </button>
+                        <button className={`btn ${coldStatusFilter==='new'?'btn-secondary':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('new'); setShowColdProspectDetails(null)}}>
+                          🆕 Neu ({coldStats.new})
+                        </button>
+                        <button className={`btn ${coldStatusFilter==='analyzed'?'btn-info':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('analyzed'); setShowColdProspectDetails(null)}}>
+                          🔍 Analysiert ({coldStats.analyzed})
+                        </button>
+                        <button className={`btn ${coldStatusFilter==='contacted'?'btn-success':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('contacted'); setShowColdProspectDetails(null)}}>
+                          📧 Kontaktiert ({coldStats.contacted})
+                        </button>
+                        <button className={`btn ${coldStatusFilter==='replied'?'btn-warning':'btn-outline-warning'}`} onClick={()=>{setColdStatusFilter('replied'); setShowColdProspectDetails(null)}}>
+                          <i className="bi bi-envelope-check mr-1"/>Antworten ({coldStats.replied || 0})
+                          {coldLeadStats.unreadReplies > 0 && <span className="badge badge-danger ml-1">{coldLeadStats.unreadReplies}</span>}
+                        </button>
+                        <button className={`btn ${coldStatusFilter==='prompts'?'btn-dark':'btn-outline-dark'}`} onClick={()=>{setColdStatusFilter('prompts'); setShowColdProspectDetails(null)}}>
+                          <i className="bi bi-gear mr-1"/>Mail Prompts
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+                {coldProspects.length > 0 && (
+                  <div className="d-flex align-items-center mb-2">
+                    <i className="bi bi-building text-primary mr-2"/>
+                    <h6 className="mb-0">{coldProspects.length} Firmen</h6>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Ergebnis-Tabelle - moderner */}
           {coldProspects.length > 0 && (
             <div className="card border-0 shadow-sm">
               <div className="card-header bg-transparent border-bottom">
-                <div className="d-flex justify-content-between align-items-center flex-wrap">
-                  <div className="d-flex align-items-center mb-2">
-                    <i className="bi bi-building text-primary mr-2"/>
-                    <h5 className="mb-0">{coldProspects.length} Firmen gefunden</h5>
-                  </div>
-                  <div className="d-flex align-items-center flex-wrap">
-                    {/* Mail-Ansicht Tabs - wie Mailprogramm */}
-                    <div className="btn-group btn-group-sm mr-3">
-                      <button className={`btn ${mailView==='prospects'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setMailView('prospects')}>
-                        <i className="bi bi-people-fill mr-1"/>Prospects
-                      </button>
-                      <button className={`btn ${mailView==='inbox'?'btn-info':'btn-outline-info'}`} onClick={()=>setMailView('inbox')}>
-                        <i className="bi bi-inbox-fill mr-1"/>Posteingang
-                      </button>
-                      <button className={`btn ${mailView==='outbox'?'btn-success':'btn-outline-success'}`} onClick={()=>setMailView('outbox')}>
-                        <i className="bi bi-send-fill mr-1"/>Postausgang
-                      </button>
-                    </div>
-                    
-                    {/* Nur bei Prospects-Ansicht */}
-                    {mailView === 'prospects' && (
-                      <>
-                        <button 
-                          className="btn btn-outline-warning btn-sm mr-2"
-                          onClick={sendFollowups}
-                          disabled={coldLoading}
-                        >
-                          <i className="bi bi-arrow-repeat mr-1"/>Follow-ups senden
-                        </button>
-                        <div className="btn-group btn-group-sm">
-                          <button className={`btn ${coldStatusFilter==='all'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('all'); setShowColdProspectDetails(null)}}>
-                            <i className="bi bi-list mr-1"/>Alle ({coldStats.total})
-                          </button>
-                          <button className={`btn ${coldStatusFilter==='new'?'btn-secondary':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('new'); setShowColdProspectDetails(null)}}>
-                            🆕 Neu ({coldStats.new})
-                          </button>
-                          <button className={`btn ${coldStatusFilter==='analyzed'?'btn-info':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('analyzed'); setShowColdProspectDetails(null)}}>
-                            🔍 Analysiert ({coldStats.analyzed})
-                          </button>
-                          <button className={`btn ${coldStatusFilter==='contacted'?'btn-success':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('contacted'); setShowColdProspectDetails(null)}}>
-                            📧 Kontaktiert ({coldStats.contacted})
-                          </button>
-                          <button className={`btn ${coldStatusFilter==='replied'?'btn-warning':'btn-outline-warning'}`} onClick={()=>{setColdStatusFilter('replied'); setShowColdProspectDetails(null)}}>
-                            <i className="bi bi-envelope-check mr-1"/>Antworten ({coldStats.replied || 0})
-                            {coldLeadStats.unreadReplies > 0 && <span className="badge badge-danger ml-1">{coldLeadStats.unreadReplies}</span>}
-                          </button>
-                          <button className={`btn ${coldStatusFilter==='prompts'?'btn-dark':'btn-outline-dark'}`} onClick={()=>{setColdStatusFilter('prompts'); setShowColdProspectDetails(null)}}>
-                            <i className="bi bi-gear mr-1"/>Mail Prompts
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
               </div>
               
               {/* PROSPECTS-ANSICHT */}
