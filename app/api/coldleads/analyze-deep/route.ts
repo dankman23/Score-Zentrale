@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
         { _id: prospectId },
         {
           $set: {
+            status: 'analyzed', // WICHTIG: Status auf analyzed setzen!
             analyzed: true,
             analyzed_at: new Date(),
             analysis: result,
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
         }
       )
       
-      console.log(`[Deep Analysis] Gespeichert für Prospect: ${prospectId}`)
+      console.log(`[Deep Analysis] Gespeichert für Prospect: ${prospectId} - Status: analyzed`)
     }
     
     return NextResponse.json({
