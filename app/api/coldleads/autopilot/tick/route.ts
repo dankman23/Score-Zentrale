@@ -41,7 +41,7 @@ export async function POST() {
     
     // Prüfe Session Limit
     if (state.dailyCount >= state.dailyLimit) {
-      console.log(`[Autopilot Tick] Daily limit reached: ${state.dailyCount}/${state.dailyLimit}`)
+      console.log(`[Autopilot Tick] Session limit reached: ${state.dailyCount}/${state.dailyLimit}`)
       return NextResponse.json({
         ok: true,
         action: 'limit_reached',
