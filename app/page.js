@@ -108,11 +108,10 @@ export default function App() {
   const [coldStats, setColdStats] = useState({ total: 0, new: 0, analyzed: 0, contacted: 0, replied: 0 })
   const [coldLeadStats, setColdLeadStats] = useState({ unreadReplies: 0, recentReplies: 0, awaitingFollowup: 0 })
   const [showColdProspectDetails, setShowColdProspectDetails] = useState(null)
-  const [showInbox, setShowInbox] = useState(false)
+  const [mailView, setMailView] = useState('prospects') // 'prospects', 'inbox', 'outbox'
   const [inboxEmails, setInboxEmails] = useState([])
   const [inboxLoading, setInboxLoading] = useState(false)
   const [selectedInboxEmail, setSelectedInboxEmail] = useState(null)
-  const [showOutbox, setShowOutbox] = useState(false)
   const [outboxEmails, setOutboxEmails] = useState([])
   const [outboxLoading, setOutboxLoading] = useState(false)
   const [selectedOutboxEmail, setSelectedOutboxEmail] = useState(null)
