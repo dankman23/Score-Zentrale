@@ -63,6 +63,33 @@ export async function generateEmailSequenceV3(
   }
 }
 
+
+/**
+ * Wrapper für analysis_v3 Format aus DB
+ * Konvertiert analysis_v3 zu AnalyzerV3Result Format
+ */
+export async function generateEmailSequenceV3FromAnalysis(
+  analysis_v3: any,
+  company_name: string
+): Promise<EmailV3Result> {
+  
+  // Konvertiere analysis_v3 Format zu AnalyzerV3Result
+  const analysisResult: AnalyzerV3Result = {
+    company: company_name,
+    contact_person: analysis_v3.contact_person || {},
+    materials: (analysis_v3.materials || []).map((m: string) => ({ term: m, confidence: 0.8 })),
+    applications: (analysis_v3.applications || []).map((a: string) => ({ term: a, confidence: 0.8 })),
+    machines: (analysis_v3.machines || []).map((m: string) => ({ term: m, confidence: 0.8 })),
+    products_recommended: analysis_v3.products_recommended || [],
+    recommended_brands: SCORE_CONFIG.brands.slice(0, 3),
+    firmenprofil: analysis_v3.firmenprofil || '',
+    analysis_quality: analysis_v3.analysis_quality || 50
+  }
+  
+  return generateEmailSequenceV3(analysisResult)
+}
+
+
 /**
  * Mail 1 - Erstansprache (HTML)
  */
