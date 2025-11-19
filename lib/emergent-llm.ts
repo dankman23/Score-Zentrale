@@ -38,8 +38,14 @@ export async function emergentChatCompletion(
 ): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY // OpenAI or Emergent Key
   
-  if (!apiKey || !apiKey.startsWith('sk-')) {
-    throw new Error('OpenAI API Key not configured')
+  console.log(`[EmergentLLM] API Key present: ${!!apiKey}, starts with sk-: ${apiKey?.startsWith('sk-')}`)
+  
+  if (!apiKey) {
+    throw new Error('OpenAI API Key not configured - missing from environment')
+  }
+  
+  if (!apiKey.startsWith('sk-')) {
+    throw new Error(`OpenAI API Key invalid format - got: ${apiKey.substring(0, 10)}...`)
   }
 
   const requestBody = {
