@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
     }
     
     return NextResponse.json({
+      ok: true,
       success: true,
       analysis: result
     })
