@@ -29,6 +29,14 @@ function MailPromptsView() {
   const [prompts, setPrompts] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedPrompt, setSelectedPrompt] = useState(null)
+  const [showCreatePromptModal, setShowCreatePromptModal] = useState(false)
+  const [showEditPromptModal, setShowEditPromptModal] = useState(false)
+  const [editingPrompt, setEditingPrompt] = useState(null)
+  const [newPromptData, setNewPromptData] = useState({
+    name: '',
+    model: 'gpt-4o-mini',
+    prompt: ''
+  })
   
   useEffect(() => {
     loadPrompts()
