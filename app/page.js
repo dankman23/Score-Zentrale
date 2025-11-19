@@ -4840,6 +4840,81 @@ export default function App() {
           </div>
           )}
 
+          {/* EMAIL POSTAUSGANG */}
+          {showOutbox && (
+            <div className="card mb-4">
+              <div className="card-header bg-success text-white d-flex align-items-center justify-content-between">
+                <h5 className="mb-0"><i className="bi bi-send-fill mr-2"/>Email-Postausgang</h5>
+                <div>
+                  <button className="btn btn-sm btn-light mr-2" onClick={loadOutbox} disabled={outboxLoading}>
+                    <i className="bi bi-arrow-repeat mr-1"/>{outboxLoading ? 'Lädt...' : 'Aktualisieren'}
+                  </button>
+                  <button className="btn btn-sm btn-outline-light" onClick={()=>setShowOutbox(false)}>
+                    <i className="bi bi-x-lg"/>
+                  </button>
+                </div>
+              </div>
+              <div className="card-body p-0">
+                {outboxLoading ? (
+                  <div className="p-5 text-center">
+                    <div className="spinner-border text-success" role="status">
+                      <span className="sr-only">Loading...</span>
+                    </div>
+                  </div>
+                ) : outboxEmails.length === 0 ? (
+                  <div className="p-5 text-center text-muted">
+                    <i className="bi bi-inbox display-4 d-block mb-3"/>
+                    <p>Keine gesendeten Mails</p>
+                  </div>
+                ) : (
+                  <div className="table-responsive">
+                    <table className="table table-hover mb-0">
+                      <thead className="thead-light">
+                        <tr>
+                          <th style={{width: '180px'}}>Datum</th>
+                          <th style={{width: '200px'}}>Firma</th>
+                          <th style={{width: '200px'}}>Empfänger</th>
+                          <th>Betreff</th>
+                          <th style={{width: '120px'}} className="text-center">Typ</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {outboxEmails.map((email, i) => (
+                          <tr key={email.id || i}>
+                            <td>
+                              <div className="font-weight-bold">{new Date(email.sent_at).toLocaleDateString('de-DE')}</div>
+                              <small className="text-muted">{new Date(email.sent_at).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'})}</small>
+                            </td>
+                            <td className="font-weight-bold">{email.company_name}</td>
+                            <td>
+                              <a href={`mailto:${email.recipient}`} className="text-primary">{email.recipient}</a>
+                            </td>
+                            <td>{email.subject}</td>
+                            <td className="text-center">
+                              <span className={`badge badge-${email.mail_number === 1 ? 'success' : email.mail_number === 2 ? 'info' : 'warning'}`}>
+                                {email.mail_type}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+              <div className="card-footer bg-transparent">
+                <div className="d-flex align-items-center justify-content-between">
+                  <small className="text-muted">
+                    <i className="bi bi-info-circle mr-1"/>Von: <strong>daniel@score-schleifwerkzeuge.de</strong> | BCC: leismann@score-schleifwerkzeuge.de, danki.leismann@gmx.de
+                  </small>
+                  <button className="btn btn-sm btn-outline-secondary" onClick={()=>setShowOutbox(false)}>
+                    Schließen
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* EMAIL POSTEINGANG */}
           {showInbox && (
             <div className="card mb-4">
