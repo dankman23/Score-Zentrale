@@ -60,7 +60,7 @@ export async function POST() {
     // 2. Hole nächsten Prospect der analysiert aber noch nicht kontaktiert wurde
     let nextProspect = await prospectsCollection.findOne({
       status: 'analyzed',
-      email_sent_at: { $exists: false }
+      'followup_schedule.mail_1_sent': { $ne: true }
     })
     
     // Wenn keine analysierten Prospects vorhanden, suche neue Firmen
