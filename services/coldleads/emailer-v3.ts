@@ -327,7 +327,9 @@ Score Schleifwerkzeuge
     return {
       subject,
       body,
-      word_count: body.split(/\s+/).length
+      word_count: body.split(/\s+/).length,
+      prompt_version: promptVersion,
+      model: promptModel
     }
   }
 }
