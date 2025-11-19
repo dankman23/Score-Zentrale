@@ -25,19 +25,20 @@ export async function POST(request: NextRequest) {
     
     const today = new Date().toISOString().slice(0, 10)
     
-    // Update oder erstelle State
+    // Update oder erstelle State - Session-basiert, Counter wird bei jedem Start zurückgesetzt
     await collection.updateOne(
       { id: 'kaltakquise' },
       { 
         $set: { 
           running: true,
           dailyLimit,
+          dailyCount: 0, // WICHTIG: Reset bei jedem Start (Session-basiert)
           lastActivity: new Date().toISOString(),
-          currentPhase: 'idle'
+          currentPhase: 'idle',
+          sessionStartedAt: new Date().toISOString()
         },
         $setOnInsert: {
           id: 'kaltakquise',
-          dailyCount: 0,
           lastReset: today,
           totalProcessed: 0,
           errors: []
