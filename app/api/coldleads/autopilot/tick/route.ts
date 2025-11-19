@@ -36,17 +36,10 @@ export async function POST() {
       })
     }
     
-    // Reset daily count wenn neuer Tag
-    const today = new Date().toISOString().slice(0, 10)
-    if (state.lastReset !== today) {
-      await stateCollection.updateOne(
-        { id: 'kaltakquise' },
-        { $set: { dailyCount: 0, lastReset: today } }
-      )
-      state.dailyCount = 0
-    }
+    // Session-basiert: Kein Reset mehr basierend auf Datum
+    // Der Counter wird nur bei Start/Stop zurückgesetzt
     
-    // Prüfe Daily Limit
+    // Prüfe Session Limit
     if (state.dailyCount >= state.dailyLimit) {
       console.log(`[Autopilot Tick] Daily limit reached: ${state.dailyCount}/${state.dailyLimit}`)
       return NextResponse.json({
