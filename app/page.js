@@ -142,23 +142,10 @@ function MailPromptsView() {
   
   return (
     <div className="p-4">
-      <div className="alert alert-info mb-3">
-        <i className="bi bi-info-circle mr-2"/>
-        <strong>Tipp:</strong> Um zurück zur Prospects-Übersicht zu kommen, klicken Sie oben auf einen der Filter-Buttons (Alle, Neu, Analysiert, etc.) oder laden Sie die Seite neu (F5).
-      </div>
       <div className="d-flex align-items-center justify-content-between mb-4">
-        <div className="d-flex align-items-center">
-          <button
-            className="btn btn-sm btn-outline-secondary mr-3"
-            onClick={() => window.location.reload()}
-            title="Seite neu laden"
-          >
-            <i className="bi bi-arrow-left mr-1"/>Zurück (Seite neu laden)
-          </button>
-          <h4 className="mb-0">
-            <i className="bi bi-gear mr-2"/>Mail Prompts Verwaltung
-          </h4>
-        </div>
+        <h4 className="mb-0">
+          <i className="bi bi-gear mr-2"/>Mail Prompts Verwaltung
+        </h4>
         <button 
           className="btn btn-sm btn-success"
           onClick={() => setShowCreatePromptModal(true)}
