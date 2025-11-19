@@ -117,7 +117,7 @@ async function generateMail1(
   }
   
   // ChatGPT Prompt für menschliche, persönliche E-Mail
-  const prompt = `Du bist Daniel Leismann von Score-Schleifwerkzeuge und schreibst eine kurze, persönliche B2B-E-Mail.
+  const prompt = `Du bist Daniel Leismann von Score-Schleifwerkzeuge und schreibst eine persönliche B2B-E-Mail an einen Metallbau-Betrieb.
 
 **Firmendaten aus Analyse:**
 - Firma: ${firmendaten.name}
@@ -128,39 +128,52 @@ async function generateMail1(
 **WICHTIG - Tonalität:**
 - Locker und menschlich, kein Marketing-Blabla
 - Kein "wir freuen uns", keine Worthülsen
-- Kein perfektes Hochdeutsch, eher natürlich
-- Direkt, freundlich, kurz
+- Kein perfektes Hochdeutsch, eher natürlich und direkt
+- Persönlich, freundlich
 
 **Inhalt (in dieser Reihenfolge):**
 
-1. **Persönlicher Bezug** (1-2 Sätze):
-   - Nenne KONKRET was du über die Firma gelernt hast (Werkstoffe, Produkte, Tätigkeiten)
-   - Beispiel: "Ich bin auf Ihre Firma gestoßen und fand interessant, dass Sie viel mit Edelstahl arbeiten."
+1. **Persönlicher Bezug** (2-3 Sätze):
+   - Nenne KONKRET was du über die Firma gelernt hast
+   - Zeige dass du dich mit ihrer Arbeit beschäftigt hast
+   - Gehe auf die Werkstoffe UND Produkte ein
+   - Beispiel: "Ich bin auf Ihre Firma gestoßen und habe gesehen, dass Sie im Bereich Edelstahl-Geländer und Treppengeländer tätig sind. Das ist genau unser Kerngebiet bei den Schleifwerkzeugen."
 
-2. **Unser Angebot** (2-3 Sätze):
-   - Wir arbeiten mit allen führenden Herstellern (Klingspor, 3M, Norton)
-   - Können den kompletten Jahresbedarf an Schleifmitteln & Trennwerkzeugen abdecken
-   - Bieten Staffelpreise und Rahmenverträge
-   - Sehr schnelle Lieferung deutschlandweit
+2. **Unser Angebot** (3-4 Sätze mit konkreten Details):
+   - Wir arbeiten mit ALLEN führenden Herstellern (Klingspor, 3M, Norton, Saint-Gobain)
+   - Können den KOMPLETTEN Jahresbedarf an Schleifmitteln & Trennwerkzeugen abdecken
+   - Bieten Staffelpreise und Rahmenverträge für planbare Kosten
+   - Sehr schnelle Lieferung deutschlandweit (oft nächster Tag)
    
-   WENN Edelstahl erkannt: Erwähne Fächerscheiben, Fiberscheiben, INOX-Trennscheiben
-   WENN Aluminium erkannt: Erwähne Anti-Clog-Scheiben, Alu-Trennscheiben
+   **WICHTIG - Produktempfehlungen basierend auf Werkstoff:**
+   WENN Edelstahl erkannt: 
+   "Für Edelstahl-Bearbeitung haben wir speziell Fächerscheiben, Fiberscheiben und INOX-Trennscheiben, die Verfärbungen vermeiden und saubere Oberflächen garantieren."
+   
+   WENN Aluminium erkannt:
+   "Für Aluminium haben wir Anti-Clog-Scheiben und spezielle Alu-Trennscheiben, die nicht zusetzen und sehr saubere Schnitte ermöglichen."
+   
+   WENN beides oder allgemein Metall:
+   "Je nach Material - ob Edelstahl, Aluminium oder Stahl - haben wir die passenden Werkzeuge für Schnitt, Schliff und Finish."
 
-3. **Klare Handlungsaufforderung:**
-   - "Einfach per Mail melden oder anrufen: 0221-25999901 (10-18 Uhr)"
-   - Optional: "Gerne erstelle ich Ihnen ein individuelles Angebot, sobald ich weiß, welche Werkstoffe bei Ihnen am wichtigsten sind."
+3. **Zusätzlicher Mehrwert** (1-2 Sätze):
+   - Erwähne dass wir auch beraten können welche Werkzeuge für welche Anwendung am besten sind
+   - "Wenn Sie möchten, schaue ich mir Ihren aktuellen Bedarf an und erstelle ein individuelles Angebot - abgestimmt auf Ihre Werkstoffe und Anwendungen."
+
+4. **Klare Handlungsaufforderung:**
+   - "Einfach per Mail melden oder direkt anrufen: <a href="tel:+4922125999901">0221-25999901</a> (10-18 Uhr)"
 
 **Format:**
-- Nutze <b> für Fettdruck
+- Nutze <b> für wichtige Begriffe (z.B. <b>Staffelpreise</b>, <b>Jahresbedarf</b>)
 - Nutze <a href="tel:+4922125999901">0221-25999901</a> für Telefon
 - KEIN Markdown
-- Maximal 150 Wörter
+- Zwischen 180-220 Wörter (nicht zu kurz!)
 - Signatur NICHT einschließen (wird später hinzugefügt)
+- Absätze für bessere Lesbarkeit
 
 **Beispiel-Stil (NICHT wortwörtlich verwenden):**
-"Ich bin auf ${firmendaten.name} aufmerksam geworden und sah, dass Sie viel mit ${firmendaten.werkstoffe} arbeiten. Wir sind auf Schleifwerkzeuge spezialisiert und könnten Ihnen da einiges abnehmen..."
+"Ich bin auf ${firmendaten.name} gestoßen und habe gesehen, dass Sie viel mit ${firmendaten.werkstoffe} arbeiten, besonders bei ${firmendaten.werkstucke}. Das ist genau das, wo wir mit unseren Schleifwerkzeugen sehr gut unterstützen können..."
 
-Schreibe jetzt die E-Mail:`
+Schreibe jetzt die E-Mail (mindestens 180 Wörter!):`
 
   try {
     // Rufe ChatGPT auf
