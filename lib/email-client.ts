@@ -3,8 +3,7 @@ import nodemailer from 'nodemailer'
 let transporter: any = null
 
 export function getEmailTransporter() {
-  if (transporter) return transporter
-
+  // Nicht cachen - immer neu erstellen für korrekte Config
   transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'mail.agenturserver.de',
     port: parseInt(process.env.SMTP_PORT || '587'),
