@@ -60,8 +60,10 @@ export async function POST() {
     // 2. Hole nächsten Prospect der eine Email-Adresse hat und noch nicht kontaktiert wurde
     // Egal welcher Status - Hauptsache analysis_v3 mit Email vorhanden!
     let nextProspect = await prospectsCollection.findOne({
-      'analysis_v3.contact_person.email': { $exists: true, $ne: '', $ne: null },
-      'followup_schedule.mail_1_sent': { $ne: true }
+      'analysis_v3': { $exists: true },
+      'analysis_v3.contact_person.email': { $exists: true, $type: 'string', $ne: '' },
+      'followup_schedule.mail_1_sent': { $ne: true },
+      $expr: { $gt: [{ $strLenCP: { $ifNull: ['$analysis_v3.contact_person.email', ''] } }, 5] } // Email mindestens 6 Zeichen (a@b.de)
     })
     
     // Wenn keine analysierten Prospects vorhanden, suche neue Firmen
