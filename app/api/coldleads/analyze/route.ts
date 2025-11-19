@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
 
     // 3. In MongoDB speichern
     const { db } = await connectToDatabase()
-    const collection = db.collection('cold_prospects')
+    const collection = db.collection('prospects')
 
     const updateData: any = {
       analysis,
