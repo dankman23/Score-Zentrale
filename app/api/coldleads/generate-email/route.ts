@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     
     // Lade Prospect aus DB
     const db = await connectToDb()
-    const collection = db.collection('coldleads_prospects')
+    const collection = db.collection('prospects')
     
     const prospect = await collection.findOne({ _id: prospectId })
     
