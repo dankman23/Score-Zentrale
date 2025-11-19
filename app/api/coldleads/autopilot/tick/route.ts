@@ -193,22 +193,28 @@ export async function POST() {
     if (!emailResult.ok) {
       console.error('[Autopilot Tick] Email failed:', emailResult.error)
       
-      // Markiere Prospect als fehlgeschlagen
+      // Markiere Prospect als fehlgeschlagen UND setze Status auf 'new' damit er nicht wieder versucht wird
       await prospectsCollection.updateOne(
         { id: nextProspect.id },
         { 
           $set: { 
+            status: 'new', // Zurück zu 'new' damit Autopilot ihn überspringt
             email_error: emailResult.error,
-            email_error_at: new Date()
+            email_error_at: new Date(),
+            note: `Email-Versand fehlgeschlagen: ${emailResult.error}`
           } 
         }
       )
       
+      console.log('[Autopilot Tick] Prospect marked as failed, continuing with next...')
+      
+      // NICHT mit Fehler returnen - stattdessen nochmal versuchen mit nächstem Prospect
       return NextResponse.json({
-        ok: false,
-        action: 'email_failed',
+        ok: true,
+        action: 'email_failed_continue',
         error: emailResult.error,
-        prospect: nextProspect.company_name
+        prospect: nextProspect.company_name,
+        message: 'Email failed, will try next prospect'
       })
     }
     
