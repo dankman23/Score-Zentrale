@@ -3965,7 +3965,7 @@ export default function App() {
                         🔍 Analysiert ({coldStats.analyzed})
                       </button>
                       <button className={`btn ${coldStatusFilter==='contacted'?'btn-success':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('contacted'); setShowColdProspectDetails(null)}}>
-                        📧 Postausgang ({coldStats.contacted})
+                        📧 Kontaktiert ({coldStats.contacted})
                     </button>
                     <button className={`btn ${coldStatusFilter==='replied'?'btn-warning':'btn-outline-warning'}`} onClick={()=>{setColdStatusFilter('replied'); setShowColdProspectDetails(null)}}>
                       <i className="bi bi-envelope-check mr-1"/>Antworten ({coldStats.replied || 0})
