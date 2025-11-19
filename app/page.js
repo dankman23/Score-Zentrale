@@ -4054,6 +4054,7 @@ export default function App() {
                         <th className="border-0" style={{width: '100px'}}><i className="bi bi-geo-alt mr-1"/>Region</th>
                         <th className="border-0 text-center" style={{width: '80px'}}><i className="bi bi-star mr-1"/>Score</th>
                         <th className="border-0 text-center" style={{width: '110px'}}>Status</th>
+                        {coldStatusFilter === 'contacted' && <th className="border-0 text-center" style={{width: '140px'}}><i className="bi bi-calendar mr-1"/>Gesendet am</th>}
                         <th className="border-0 text-right" style={{width: '150px'}}>Aktionen</th>
                       </tr>
                     </thead>
