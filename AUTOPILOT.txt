@@ -1,0 +1,326 @@
+=============================================================================
+AUTOPILOT - DETAILLIERTE DOKUMENTATION
+=============================================================================
+
+=============================================================================
+1. AUTOPILOT-KONZEPT
+=============================================================================
+
+Der Autopilot ist ein vollautomatisches System für B2B-Lead-Generierung.
+
+DREI HAUPTPHASEN:
+
+  PHASE 1: FIND (Finden)
+    → Sucht neue Firmen via Google Search
+    → Zielgruppe: Metallbau, Schlossereien, Edelstahlverarbeitung
+    → DACH-Raum: Deutschland, Österreich, Schweiz
+
+  PHASE 2: ANALYZE (Analysieren)
+    → Crawlt Firmen-Websites
+    → Extrahiert Geschäftsinformationen
+    → Findet E-Mail-Adressen
+    → Bewertet Fit für Score-Produkte
+
+  PHASE 3: ENGAGE (Kontaktieren)
+    → Generiert personalisierte E-Mails
+    → Versendet an gefundene Kontakte
+    → Plant Follow-up-Sequenzen
+
+=============================================================================
+2. AUTOPILOT-TICK LOGIK
+=============================================================================
+
+JEDER TICK DURCHLÄUFT:
+
+1. STATUS-PRÜFUNG
+   → Ist Autopilot aktiv?
+   → Daily Limit erreicht?
+   → Wenn nein → weiter
+
+2. SUCHE ANALYSIERTE PROSPECTS
+   → Query: status='analyzed' + email vorhanden + nicht contacted
+   → Wenn gefunden → springe zu Schritt 5
+   → Wenn nicht → weiter
+
+3. CRAWLE NEUE FIRMEN
+   → Wähle Region aus Strategie
+   → Wähle Branche aus Strategie
+   → Google Search API Call
+   → Speichere Ergebnisse als "new"
+   → Wenn keine Ergebnisse → Schritt 6
+
+4. ANALYSIERE NEUE PROSPECTS
+   → Für jeden neuen Prospect:
+     - Crawle Website (Homepage, Impressum, Kontakt)
+     - LLM-Analyse (GPT-4o-mini)
+     - Extrahiere: Werkstoffe, Produkte, Anwendungen
+     - Suche E-Mail-Adressen
+     - Score berechnen
+     - Speichern als "analyzed"
+   → Zurück zu Schritt 2
+
+5. SENDE E-MAIL
+   → Lade aktiven Prompt
+   → Generiere personalisierte E-Mail
+   → Versende (TO + BCC)
+   → Markiere als "contacted"
+   → Plane Follow-ups
+   → Daily Counter +1
+
+6. FERTIG
+   → Warte auf nächsten Tick
+
+=============================================================================
+3. SUCH-STRATEGIE
+=============================================================================
+
+REGIONEN (Deutschland - rotierend):
+
+  Großstädte:
+  Berlin, Hamburg, München, Köln, Frankfurt, Stuttgart, 
+  Düsseldorf, Dortmund, Essen, Leipzig, Bremen, Dresden, 
+  Hannover, Nürnberg, Duisburg, Bochum, Wuppertal, Bielefeld
+
+  Mittelstädte:
+  Bonn, Münster, Karlsruhe, Mannheim, Augsburg, Wiesbaden,
+  Gelsenkirchen, Mönchengladbach, Braunschweig, Chemnitz, Kiel
+
+BRANCHEN:
+
+  • Metallbau
+  • Schlosserei
+  • Stahlbau
+  • Edelstahlverarbeitung
+  • Aluminiumverarbeitung
+  • Feinblechbearbeitung
+  • Blechbearbeitung
+
+SUCH-QUERY FORMAT:
+
+  "Metallbau [Region]" site:de
+  "Schlosserei [Region]" site:de
+
+BLACKLIST (automatisch gefiltert):
+
+  • Verzeichnisse (gelbeseiten.de, wlw.de)
+  • Job-Plattformen (indeed.de, stepstone.de)
+  • Social Media (linkedin.com, facebook.com)
+  • Wikipedia, YouTube
+
+=============================================================================
+4. ANALYSE-PROZESS
+=============================================================================
+
+SCHRITT 1: WEBSITE CRAWLEN
+
+  Seiten (in dieser Reihenfolge):
+  1. Homepage (https://firma.de)
+  2. Impressum (https://firma.de/impressum)
+  3. Kontakt (https://firma.de/kontakt)
+
+  Extrahiert:
+  • HTML-Content
+  • Text-Content
+  • Strukturierte Daten
+
+SCHRITT 2: E-MAIL-SUCHE
+
+  Regex-Muster:
+  • info@firma.de
+  • kontakt@firma.de
+  • mail@firma.de
+  • Jede gültige E-Mail-Adresse
+
+  Priorisierung:
+  1. info@
+  2. kontakt@
+  3. mail@
+  4. andere
+
+SCHRITT 3: LLM-ANALYSE (ChatGPT)
+
+  Prompt:
+  "Analysiere diese Firma und extrahiere:
+   - Werkstoffe (Edelstahl, Aluminium, Stahl)
+   - Produkte (Geländer, Türen, Fenster)
+   - Anwendungen (Schweißen, Schleifen, Montage)
+   - Maschinen
+   - Kontaktpersonen"
+
+  Output:
+  Strukturiertes JSON mit allen Daten
+
+SCHRITT 4: SCORING
+
+  Faktoren:
+  • Hat Website? (+10)
+  • Hat E-Mail? (+20)
+  • Werkstoffe erkannt? (+15)
+  • Produkte erkannt? (+15)
+  • Kontaktperson erkannt? (+10)
+
+  Score-Bereiche:
+  • 0-30: Niedrig
+  • 31-60: Mittel
+  • 61-100: Hoch
+
+=============================================================================
+5. E-MAIL-GENERIERUNG
+=============================================================================
+
+PROZESS:
+
+1. Lade aktiven Prompt aus Datenbank
+2. Ersetze Platzhalter:
+   {cleanedFirmenname} → "ABC Metallbau GmbH"
+   {werkstoffe} → "Edelstahl, Aluminium"
+   {werkstucke} → "Geländer, Türen"
+   {anwendungen} → "Schweißen, Montage"
+
+3. ChatGPT API Call:
+   Model: gpt-4o-mini (oder aus Prompt-Config)
+   Temperature: 0.9 (für Variation)
+   Max Tokens: 500
+
+4. Response verarbeiten:
+   • Füge Anrede hinzu ("Guten Tag," oder personalisiert)
+   • Füge persönliche Signatur hinzu
+   • Füge rechtliche Signatur hinzu
+
+5. Speichern:
+   • email_sequence.mail_1
+   • Inkl. prompt_version und model
+
+FALLBACK:
+
+  Falls ChatGPT-API fehlschlägt:
+  → Verwende Template-basierte Generierung
+  → Gleiche Qualität und Länge
+  → Automatischer Fallback, keine Fehler
+
+=============================================================================
+6. FOLLOW-UP-SEQUENZEN
+=============================================================================
+
+MAIL 1: ERSTANSPRACHE (sofort)
+
+  • 120-180 Wörter
+  • Persönlicher Bezug zur Firma
+  • Score's Angebot
+  • Klare CTA
+
+MAIL 2: FOLLOW-UP 1 (nach 5 Tagen)
+
+  • 80-100 Wörter
+  • Kurze Erinnerung
+  • Rahmenverträge erwähnen
+  • Nochmals CTA
+
+MAIL 3: FOLLOW-UP 2 (nach 10 Tagen)
+
+  • 60-80 Wörter
+  • Sehr kurz und freundlich
+  • Vorschlag für kurzen Anruf
+  • Abschluss: "Falls nicht interessant, kurz Bescheid geben"
+
+AUTOMATISCHE PLANUNG:
+
+  Bei Mail-1-Versand:
+  • followup_schedule.mail_2_scheduled = +5 Tage
+  • followup_schedule.mail_3_scheduled = +10 Tage
+
+  Follow-ups werden automatisch versendet durch separaten Prozess.
+
+=============================================================================
+7. AUTOPILOT-STEUERUNG
+=============================================================================
+
+STARTEN:
+
+  UI: Button "Autopilot starten"
+  API: POST /api/coldleads/autopilot/start
+  Body: { dailyLimit: 50 }
+
+STOPPEN:
+
+  UI: Button "Autopilot stoppen"
+  API: POST /api/coldleads/autopilot/stop
+
+STATUS:
+
+  GET /api/coldleads/autopilot/status
+  Response: { running, dailyLimit, dailyCount, currentPhase }
+
+DAILY LIMIT ANPASSEN:
+
+  Stoppen → Neu starten mit neuem Limit
+
+DAILY COUNTER ZURÜCKSETZEN:
+
+  Automatisch täglich um Mitternacht
+  Oder manuell:
+  db.autopilot_state.updateOne(
+    {id: "kaltakquise"}, 
+    {$set: {dailyCount: 0, lastReset: "2025-11-19"}}
+  )
+
+=============================================================================
+8. MONITORING
+=============================================================================
+
+LIVE-DASHBOARD:
+
+  UI zeigt:
+  • Total Prospects
+  • Neu / Analysiert / Kontaktiert
+  • Autopilot Status (AKTIV/INAKTIV)
+  • Daily Counter (z.B. 15/50)
+
+LOGS:
+
+  tail -f /var/log/supervisor/nextjs.out.log | grep "Autopilot"
+
+  Wichtige Log-Zeilen:
+  • [Autopilot Tick] Processing...
+  • [DACH Crawler] Found X results
+  • [Deep Analysis] Analyzing...
+  • [Email] LIVE MODE: Sende an...
+  • [EmailV3] Mail 1 sent to...
+
+FEHLER-HANDLING:
+
+  Der Autopilot ist resilient:
+  • API-Fehler → Überspringt Prospect, macht weiter
+  • Keine E-Mail gefunden → Nächster Prospect
+  • Daily Limit erreicht → Stoppt automatisch
+  • Fehler werden geloggt, System läuft weiter
+
+=============================================================================
+9. PERFORMANCE
+=============================================================================
+
+TYPISCHE ZEITEN:
+
+  • Crawl (5 Firmen): 2-5 Sekunden
+  • Analyse (1 Firma): 3-8 Sekunden
+  • E-Mail-Generierung: 2-5 Sekunden
+  • E-Mail-Versand: 1-2 Sekunden
+  
+  GESAMT PRO PROSPECT: ~8-15 Sekunden
+
+BEI 50 E-MAILS/TAG:
+
+  • Crawl-Zeit: ~5-10 Crawls = 10-50 Sekunden
+  • Analyse-Zeit: ~50 Prospects = 250-400 Sekunden
+  • E-Mail-Zeit: ~50 E-Mails = 150-250 Sekunden
+  
+  GESAMT: ~7-12 Minuten verteilt über den Tag
+
+OPTIMIERUNGEN:
+
+  • MongoDB Indexe auf website, status, email
+  • Connection Pooling
+  • Caching von aktiven Prompts (geplant)
+  • Parallele Analyse (geplant)
+
+=============================================================================

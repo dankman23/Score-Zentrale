@@ -1,0 +1,394 @@
+=============================================================================
+API DOKUMENTATION - KALTAKQUISE AUTOPILOT
+=============================================================================
+
+BASE URL: http://localhost:3000
+PRODUKTION: https://your-domain.com
+
+=============================================================================
+AUTOPILOT ENDPOINTS
+=============================================================================
+
+1. AUTOPILOT STARTEN
+-------------------
+
+POST /api/coldleads/autopilot/start
+
+Request Body:
+{
+  "dailyLimit": 50
+}
+
+Response:
+{
+  "ok": true,
+  "message": "Autopilot gestartet mit Limit: 50 Emails/Tag"
+}
+
+Fehler:
+{
+  "ok": false,
+  "error": "Autopilot läuft bereits"
+}
+
+-------------------
+
+2. AUTOPILOT STOPPEN
+-------------------
+
+POST /api/coldleads/autopilot/stop
+
+Response:
+{
+  "ok": true,
+  "message": "Autopilot gestoppt"
+}
+
+-------------------
+
+3. AUTOPILOT TICK (Hauptlogik)
+-------------------
+
+POST /api/coldleads/autopilot/tick
+
+Response (Email gesendet):
+{
+  "ok": true,
+  "action": "email_sent",
+  "prospect": {
+    "company_name": "ABC Metallbau GmbH",
+    "email": "info@abc.de",
+    "website": "https://abc.de"
+  },
+  "dailyCount": 15,
+  "dailyLimit": 50,
+  "duration": 8542
+}
+
+Response (Crawling):
+{
+  "ok": true,
+  "action": "crawling",
+  "query": {
+    "country": "DE",
+    "region": "Berlin",
+    "industry": "Metallbau",
+    "limit": 5
+  }
+}
+
+Response (Daily Limit erreicht):
+{
+  "ok": true,
+  "action": "limit_reached",
+  "dailyCount": 50,
+  "dailyLimit": 50
+}
+
+Response (Nicht aktiv):
+{
+  "ok": true,
+  "action": "skip",
+  "reason": "Autopilot nicht aktiv"
+}
+
+-------------------
+
+4. AUTOPILOT STATUS
+-------------------
+
+GET /api/coldleads/autopilot/status
+
+Response:
+{
+  "ok": true,
+  "state": {
+    "running": true,
+    "currentPhase": "emailing",
+    "dailyLimit": 50,
+    "dailyCount": 15,
+    "lastReset": "2025-11-19",
+    "totalProcessed": 1247
+  }
+}
+
+=============================================================================
+PROMPTS ENDPOINTS
+=============================================================================
+
+1. ALLE PROMPTS ABRUFEN
+-------------------
+
+GET /api/coldleads/prompts
+
+Response:
+{
+  "ok": true,
+  "prompts": [
+    {
+      "_id": "...",
+      "version": 1,
+      "name": "Prompt 1 (Original)",
+      "model": "gpt-4o-mini",
+      "prompt": "Du bist Daniel Leismann...",
+      "active": true,
+      "created_at": "2025-11-19T10:00:00.000Z",
+      "updated_at": "2025-11-19T15:30:00.000Z",
+      "stats": {
+        "versendet": 100,
+        "antworten": 5,
+        "conversionRate": 5.00
+      }
+    }
+  ]
+}
+
+-------------------
+
+2. PROMPT ERSTELLEN
+-------------------
+
+POST /api/coldleads/prompts
+
+Request Body:
+{
+  "action": "create",
+  "name": "Prompt 2 (Direkter Stil)",
+  "model": "gpt-4o-mini",
+  "prompt": "Du bist Daniel Leismann von Score..."
+}
+
+Response:
+{
+  "ok": true,
+  "message": "Neuer Prompt erstellt",
+  "version": 2
+}
+
+-------------------
+
+3. PROMPT AKTIVIEREN
+-------------------
+
+POST /api/coldleads/prompts
+
+Request Body:
+{
+  "action": "activate",
+  "version": 2
+}
+
+Response:
+{
+  "ok": true,
+  "message": "Prompt 2 aktiviert"
+}
+
+Effekt:
+  • Prompt 2 wird auf active: true gesetzt
+  • Alle anderen Prompts werden auf active: false gesetzt
+  • Nächste E-Mail nutzt Prompt 2
+
+-------------------
+
+4. PROMPT BEARBEITEN
+-------------------
+
+PUT /api/coldleads/prompts
+
+Request Body:
+{
+  "version": 1,
+  "name": "Prompt 1 (Optimiert)",
+  "model": "gpt-4o",
+  "prompt": "Neuer Prompt-Text..."
+}
+
+Response:
+{
+  "ok": true,
+  "message": "Prompt aktualisiert"
+}
+
+=============================================================================
+PROSPECTS ENDPOINTS
+=============================================================================
+
+1. STATISTIKEN
+-------------------
+
+GET /api/coldleads/stats
+
+Response:
+{
+  "ok": true,
+  "unreadReplies": 0,
+  "recentReplies": 0,
+  "awaitingFollowup": 10,
+  "stats": {
+    "new": 424,
+    "analyzed": 73,
+    "contacted": 0,
+    "replied": 0
+  },
+  "total": 497
+}
+
+-------------------
+
+2. PROSPECTS SUCHEN
+-------------------
+
+GET /api/coldleads/search?status=all&limit=1000
+
+Parameter:
+  status: 'all' | 'new' | 'analyzed' | 'contacted' | 'replied'
+  limit: Number (max 1000)
+
+Response:
+{
+  "ok": true,
+  "prospects": [
+    {
+      "_id": "...",
+      "company_name": "ABC Metallbau",
+      "website": "https://abc.de",
+      "status": "analyzed",
+      "analysis_v3": { ... },
+      "email_sequence": { ... }
+    }
+  ]
+}
+
+-------------------
+
+3. WEBSITE ANALYSIEREN
+-------------------
+
+POST /api/coldleads/analyze-deep
+
+Request Body:
+{
+  "website": "https://example.de",
+  "firmenname": "Example GmbH",
+  "branche": "Metallbau"
+}
+
+Response:
+{
+  "ok": true,
+  "analysis": {
+    "company_info": { ... },
+    "contact_person": {
+      "name": "Max Mustermann",
+      "email": "info@example.de"
+    },
+    "materials": [ ... ],
+    "workpieces": [ ... ],
+    "applications": [ ... ]
+  }
+}
+
+-------------------
+
+4. E-MAIL VERSENDEN
+-------------------
+
+POST /api/coldleads/email-v3/send
+
+Request Body:
+{
+  "prospect_id": "691e36cc37d7b658c8d2a4c5"
+}
+
+Response:
+{
+  "ok": true,
+  "message": "Email sent successfully",
+  "email": "info@firma.de",
+  "scheduled_followups": 2
+}
+
+-------------------
+
+5. FIRMEN CRAWLEN
+-------------------
+
+POST /api/coldleads/dach/crawl
+
+Request Body:
+{
+  "country": "DE",
+  "region": "Berlin",
+  "industry": "Metallbau",
+  "limit": 5
+}
+
+Response:
+{
+  "ok": true,
+  "count": 5,
+  "prospects": [
+    {
+      "id": "...",
+      "company_name": "ABC Metallbau",
+      "website": "https://abc.de",
+      "region": "Berlin"
+    }
+  ],
+  "progress": {
+    "country": "DE",
+    "region": "Berlin",
+    "industry": "Metallbau"
+  }
+}
+
+=============================================================================
+FEHLER-CODES
+=============================================================================
+
+200 OK
+  Erfolgreiche Anfrage
+
+400 Bad Request
+  • Ungültige Parameter
+  • Fehlende Pflichtfelder
+
+404 Not Found
+  • Prospect nicht gefunden
+  • Prompt nicht gefunden
+
+500 Internal Server Error
+  • Datenbank-Fehler
+  • API-Fehler (OpenAI, Google)
+  • SMTP-Fehler
+
+FEHLER-FORMAT:
+
+{
+  "ok": false,
+  "error": "Beschreibung des Fehlers"
+}
+
+=============================================================================
+RATE LIMITS
+=============================================================================
+
+OPENAI API:
+  • gpt-4o-mini: 500 requests/minute
+  • Retry bei 429 (Rate Limit)
+
+GOOGLE SEARCH API:
+  • 100 queries/day (Free Tier)
+  • 10,000 queries/day (Paid)
+
+SMTP:
+  • Abhängig vom Provider
+  • Empfohlen: Max 50-100 E-Mails/Tag
+
+AUTOPILOT DAILY LIMIT:
+  • Standard: 50/Tag
+  • Empfohlen: 30-50 für Warmup
+  • Max: 100/Tag (bei guter Reputation)
+
+=============================================================================

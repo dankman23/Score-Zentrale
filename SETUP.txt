@@ -1,0 +1,246 @@
+=============================================================================
+SETUP & INSTALLATION - KALTAKQUISE AUTOPILOT
+=============================================================================
+
+=============================================================================
+1. VORAUSSETZUNGEN
+=============================================================================
+
+SYSTEM:
+  • Node.js 20.x oder höher
+  • MongoDB 6.0 oder höher
+  • Linux/MacOS (empfohlen) oder Windows
+  • Min. 2GB RAM
+  • Min. 10GB Festplatte
+
+API-KEYS (erforderlich):
+  • OpenAI API Key (für ChatGPT)
+  • Google Custom Search API Key
+  • Google Search Engine ID
+  • SMTP-Zugangsdaten (E-Mail-Versand)
+
+=============================================================================
+2. INSTALLATION
+=============================================================================
+
+SCHRITT 1: REPOSITORY KLONEN
+
+  git clone <repository-url>
+  cd app
+
+SCHRITT 2: DEPENDENCIES INSTALLIEREN
+
+  yarn install
+
+SCHRITT 3: UMGEBUNGSVARIABLEN KONFIGURIEREN
+
+  Erstellen Sie .env Datei:
+
+  # MongoDB
+  MONGO_URL=mongodb://localhost:27017/score_zentrale
+
+  # OpenAI
+  OPENAI_API_KEY=sk-proj-...
+
+  # Google Search
+  GOOGLE_API_KEY=AIza...
+  GOOGLE_SEARCH_ENGINE_ID=...
+
+  # E-Mail (SMTP)
+  SMTP_HOST=smtp.strato.de
+  SMTP_PORT=465
+  SMTP_USER=daniel@score-schleifwerkzeuge.de
+  SMTP_PASS=...
+  EMAIL_FROM=daniel@score-schleifwerkzeuge.de
+
+  # Optional: Test-Modus
+  # EMAIL_TEST_MODE=true
+
+SCHRITT 4: DATENBANK INITIALISIEREN
+
+  # MongoDB starten (falls lokal)
+  mongod --dbpath /path/to/data
+
+  # Prompt 1 initialisieren
+  node /app/scripts/init-prompt-1.js
+
+SCHRITT 5: ENTWICKLUNGSSERVER STARTEN
+
+  yarn dev
+
+  Oder mit Supervisor (Produktion):
+  sudo supervisorctl start nextjs
+
+=============================================================================
+3. GOOGLE CUSTOM SEARCH API EINRICHTEN
+=============================================================================
+
+SCHRITT 1: GOOGLE CLOUD CONSOLE
+
+  1. Gehen Sie zu: https://console.cloud.google.com
+  2. Erstellen Sie ein neues Projekt
+  3. Aktivieren Sie "Custom Search API"
+  4. Erstellen Sie API-Credentials
+  5. Kopieren Sie den API Key
+
+SCHRITT 2: SEARCH ENGINE ERSTELLEN
+
+  1. Gehen Sie zu: https://programmablesearchengine.google.com
+  2. Erstellen Sie neue Search Engine
+  3. Wählen Sie "Search the entire web"
+  4. Kopieren Sie die Search Engine ID
+
+SCHRITT 3: IN .ENV EINTRAGEN
+
+  GOOGLE_API_KEY=AIza...
+  GOOGLE_SEARCH_ENGINE_ID=...
+
+=============================================================================
+4. SMTP E-MAIL KONFIGURATION
+=============================================================================
+
+BEISPIEL: STRATO
+
+  SMTP_HOST=smtp.strato.de
+  SMTP_PORT=465
+  SMTP_USER=daniel@score-schleifwerkzeuge.de
+  SMTP_PASS=IhrPasswort
+  EMAIL_FROM=daniel@score-schleifwerkzeuge.de
+
+BEISPIEL: GMAIL
+
+  SMTP_HOST=smtp.gmail.com
+  SMTP_PORT=587
+  SMTP_USER=ihre-email@gmail.com
+  SMTP_PASS=App-Passwort (nicht reguläres Passwort!)
+  EMAIL_FROM=ihre-email@gmail.com
+
+  Hinweis: Bei Gmail müssen Sie ein App-Passwort erstellen:
+  https://support.google.com/accounts/answer/185833
+
+TEST-MODUS AKTIVIEREN:
+
+  Fügen Sie hinzu:
+  EMAIL_TEST_MODE=true
+
+  Dann gehen alle E-Mails NUR an BCC, nicht an echte Empfänger.
+
+=============================================================================
+5. ERSTE SCHRITTE
+=============================================================================
+
+NACH DER INSTALLATION:
+
+  1. Öffnen Sie http://localhost:3000
+  2. Navigieren Sie zu "Outbound" → "Kaltakquise"
+  3. Starten Sie den Autopilot (Daily Limit: 10 für Tests)
+  4. Beobachten Sie die Logs:
+     tail -f /var/log/supervisor/nextjs.out.log
+
+ERSTER TEST-LAUF:
+
+  # Test-Modus aktivieren
+  echo "EMAIL_TEST_MODE=true" >> /app/.env
+  sudo supervisorctl restart nextjs
+
+  # Autopilot starten
+  curl -X POST "http://localhost:3000/api/coldleads/autopilot/start" \
+    -H "Content-Type: application/json" \
+    -d '{"dailyLimit": 5}'
+
+  # Manuellen Tick auslösen
+  curl -X POST "http://localhost:3000/api/coldleads/autopilot/tick" \
+    -H "Content-Type: application/json"
+
+  # Prüfen Sie Ihre BCC-E-Mails
+  # Sie sollten E-Mails mit [TEST]-Prefix erhalten
+
+SCHARF STELLEN:
+
+  # Test-Modus deaktivieren
+  sed -i '/EMAIL_TEST_MODE/d' /app/.env
+  sudo supervisorctl restart nextjs
+
+  # Autopilot mit echtem Limit starten
+  curl -X POST "http://localhost:3000/api/coldleads/autopilot/start" \
+    -H "Content-Type: application/json" \
+    -d '{"dailyLimit": 50}'
+
+=============================================================================
+6. BACKUP & WARTUNG
+=============================================================================
+
+MONGODB BACKUP:
+
+  mongodump --uri="$MONGO_URL" --out=/backup/mongodb-$(date +%Y%m%d)
+
+MONGODB RESTORE:
+
+  mongorestore --uri="$MONGO_URL" /backup/mongodb-20251119
+
+REGELMÄSSIGE WARTUNG:
+
+  # Duplikate entfernen (wöchentlich)
+  node /app/scripts/fix-duplicate-prospects.js
+
+  # Firmennamen bereinigen (wöchentlich)
+  node /app/scripts/clean-company-names.js
+
+  # Logs rotieren
+  sudo logrotate /etc/logrotate.d/supervisor
+
+=============================================================================
+7. PRODUKTIONS-DEPLOYMENT
+=============================================================================
+
+MIT SUPERVISOR:
+
+  [program:nextjs]
+  command=yarn start
+  directory=/app
+  autostart=true
+  autorestart=true
+  stdout_logfile=/var/log/supervisor/nextjs.out.log
+  stderr_logfile=/var/log/supervisor/nextjs.err.log
+
+MIT PM2:
+
+  pm2 start yarn --name "nextjs" -- start
+  pm2 save
+  pm2 startup
+
+MIT DOCKER:
+
+  docker-compose up -d
+
+=============================================================================
+8. SICHERHEIT
+=============================================================================
+
+WICHTIG:
+
+  • Halten Sie API-Keys geheim (.env in .gitignore)
+  • Verwenden Sie starke SMTP-Passwörter
+  • Setzen Sie Daily Limits (max. 50-100/Tag)
+  • Überwachen Sie Spam-Reports
+  • Backup der Datenbank täglich
+
+RECHTLICHE HINWEISE:
+
+  • E-Mails enthalten vollständiges Impressum
+  • DSGVO-konform (B2B-Kommunikation)
+  • Opt-out wird automatisch verarbeitet
+  • BCC-Kopie für Dokumentation
+
+=============================================================================
+9. SUPPORT
+=============================================================================
+
+Bei Fragen oder Problemen:
+
+  • Siehe README.txt für Übersicht
+  • Siehe API.txt für API-Details
+  • Siehe AUTOPILOT.txt für Workflow-Details
+  • Siehe MAIL_PROMPTS.txt für Prompt-Management
+
+=============================================================================

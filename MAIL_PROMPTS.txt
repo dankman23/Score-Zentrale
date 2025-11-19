@@ -1,0 +1,284 @@
+=============================================================================
+MAIL-PROMPT-MANAGEMENT SYSTEM
+=============================================================================
+
+=============================================================================
+1. KONZEPT
+=============================================================================
+
+Das Mail-Prompt-System erlaubt A/B-Testing verschiedener E-Mail-Stile.
+
+VORTEILE:
+
+  • Verschiedene Prompts parallel testen
+  • Conversion Rates vergleichen
+  • Datenbasierte Optimierung
+  • Schnelles Umschalten ohne Code-Änderung
+  • Vollständige Versions-Historie
+
+=============================================================================
+2. PROMPT-STRUKTUR
+=============================================================================
+
+EIN PROMPT BESTEHT AUS:
+
+  version: Number          - Eindeutige ID (1, 2, 3, ...)
+  name: String            - Beschreibender Name
+  model: String           - ChatGPT-Modell (gpt-4o-mini, gpt-4o)
+  prompt: String          - Vollständiger Prompt-Text
+  active: Boolean         - Ist dieser Prompt aktiv?
+  created_at: Date        - Erstellungsdatum
+  updated_at: Date        - Letzte Änderung
+
+=============================================================================
+3. PLATZHALTER-SYSTEM
+=============================================================================
+
+VERFÜGBARE PLATZHALTER:
+
+  {cleanedFirmenname}
+    → Bereinigter Firmenname ohne "Impressum -" etc.
+    → Beispiel: "ABC Metallbau GmbH"
+
+  {werkstoffe}
+    → Komma-separierte Liste erkannter Werkstoffe
+    → Beispiel: "Edelstahl, Aluminium, Stahl"
+
+  {werkstucke}
+    → Komma-separierte Liste erkannter Produkte
+    → Beispiel: "Geländer, Türen, Fenster"
+
+  {anwendungen}
+    → Komma-separierte Liste erkannter Tätigkeiten
+    → Beispiel: "Schweißen, Schleifen, Montage"
+
+  {firmenname}
+    → Für Satzkonstruktionen
+    → Falls "Ihr Unternehmen" → Verwende "Ihre Firma"
+
+ERSETZUNG:
+
+  Vor dem ChatGPT-Call werden alle Platzhalter ersetzt:
+  
+  Prompt-Template:
+  "Schreibe E-Mail an {cleanedFirmenname}, sie arbeiten mit {werkstoffe}..."
+
+  Nach Ersetzung:
+  "Schreibe E-Mail an ABC Metallbau GmbH, sie arbeiten mit Edelstahl..."
+
+=============================================================================
+4. PROMPT ERSTELLEN
+=============================================================================
+
+UI:
+
+  1. Klicke auf Tab "Mail Prompts"
+  2. Klicke auf "Neuer Prompt"
+  3. Fülle Formular aus:
+     - Name: "Prompt 2 (Direkter Stil)"
+     - Modell: gpt-4o-mini
+     - Prompt-Text: [Vollständiger Prompt]
+  4. Klicke "Erstellen"
+
+API:
+
+  POST /api/coldleads/prompts
+  Body: {
+    action: "create",
+    name: "Prompt 2 (Direkter Stil)",
+    model: "gpt-4o-mini",
+    prompt: "Du bist Daniel Leismann..."
+  }
+
+  Response: {
+    ok: true,
+    message: "Neuer Prompt erstellt",
+    version: 2
+  }
+
+BEST PRACTICES:
+
+  • Kopieren Sie Prompt 1 als Basis
+  • Ändern Sie nur kleine Details (z.B. Tonalität)
+  • Testen Sie mit 50-100 E-Mails
+  • Vergleichen Sie Conversion Rates
+  • Aktivieren Sie den besten Prompt
+
+=============================================================================
+5. PROMPT BEARBEITEN
+=============================================================================
+
+UI:
+
+  1. Klicke auf Stift-Symbol bei einem Prompt
+  2. Bearbeite Name, Modell oder Prompt-Text
+  3. Klicke "Speichern"
+
+API:
+
+  PUT /api/coldleads/prompts
+  Body: {
+    version: 1,
+    name: "Prompt 1 (Optimiert)",
+    model: "gpt-4o",
+    prompt: "Neuer Prompt-Text..."
+  }
+
+WICHTIG:
+
+  • Änderungen wirken SOFORT
+  • Nächste E-Mail nutzt den neuen Prompt
+  • Kein Neustart erforderlich
+  • Version-Nummer bleibt gleich
+
+=============================================================================
+6. PROMPT AKTIVIEREN
+=============================================================================
+
+UI:
+
+  1. Klicke auf Aktivieren-Button (✓) bei einem Prompt
+  2. Bestätigung erscheint
+  3. Alle anderen Prompts werden automatisch deaktiviert
+
+API:
+
+  POST /api/coldleads/prompts
+  Body: {
+    action: "activate",
+    version: 2
+  }
+
+VERHALTEN:
+
+  • Nur EIN Prompt kann aktiv sein
+  • Alle neuen E-Mails nutzen den aktiven Prompt
+  • Bereits versendete E-Mails behalten ihren Prompt
+  • Tracking ermöglicht Vergleich
+
+=============================================================================
+7. STATISTIKEN & TRACKING
+=============================================================================
+
+PRO PROMPT WIRD GETRACKT:
+
+  Versendet:
+    → Anzahl E-Mails mit diesem Prompt versendet
+    → Query: email_sequence.mail_1.prompt_version = X
+
+  Antworten:
+    → Anzahl Prospects die geantwortet haben
+    → Query: prompt_version = X AND hasReply = true
+
+  Conversion Rate:
+    → (Antworten / Versendet) * 100
+    → Automatisch berechnet
+    → In Prozent angezeigt
+
+BEISPIEL:
+
+  Prompt 1: 100 versendet, 5 Antworten → 5.00% Conversion
+  Prompt 2: 50 versendet, 4 Antworten → 8.00% Conversion
+  
+  → Prompt 2 ist besser! Aktivieren!
+
+=============================================================================
+8. A/B-TESTING WORKFLOW
+=============================================================================
+
+SCHRITT 1: BASELINE ERSTELLEN
+
+  • Prompt 1 läuft und sammelt Daten
+  • Min. 50-100 E-Mails versenden
+  • Conversion Rate notieren
+
+SCHRITT 2: VARIANTE ERSTELLEN
+
+  • Erstelle Prompt 2 mit Änderungen:
+    - Anderer Tonfall (formeller/lockerer)
+    - Andere Produktempfehlungen
+    - Andere Call-to-Action
+    - Anderes Modell (gpt-4o statt gpt-4o-mini)
+
+SCHRITT 3: TESTEN
+
+  • Aktiviere Prompt 2
+  • Lasse 50-100 E-Mails versenden
+  • Warte auf Antworten (7-14 Tage)
+
+SCHRITT 4: VERGLEICHEN
+
+  • Öffne "Mail Prompts" Tab
+  • Vergleiche Conversion Rates
+  • Entscheide welcher Prompt besser ist
+
+SCHRITT 5: OPTIMIEREN
+
+  • Aktiviere den besseren Prompt
+  • Oder: Erstelle Prompt 3 basierend auf Learnings
+  • Wiederhole Prozess
+
+=============================================================================
+9. PROMPT-BEST-PRACTICES
+=============================================================================
+
+WAS FUNKTIONIERT GUT:
+
+  ✓ Konkreter Bezug auf Firma (Werkstoffe, Produkte)
+  ✓ Lockerer, persönlicher Tonfall
+  ✓ Klare, einfache Sprache
+  ✓ Werkstoff-spezifische Produktempfehlungen
+  ✓ Deutliche Call-to-Action
+  ✓ 120-180 Wörter (nicht zu kurz, nicht zu lang)
+
+WAS VERMEIDEN:
+
+  ✗ "Sehr geehrte Damen und Herren"
+  ✗ "Wir freuen uns"
+  ✗ "Als führender Anbieter"
+  ✗ Marketing-Floskeln
+  ✗ Zu formeller Stil
+  ✗ Zu lange E-Mails (>200 Wörter)
+
+MODELL-WAHL:
+
+  gpt-4o-mini:
+  • Schnell (~2-3 Sekunden)
+  • Günstig
+  • Gute Qualität
+  • Empfohlen für Volumen
+
+  gpt-4o:
+  • Langsamer (~4-6 Sekunden)
+  • Teurer
+  • Beste Qualität
+  • Für Premium-Prospects
+
+=============================================================================
+10. TROUBLESHOOTING
+=============================================================================
+
+PROMPTS WERDEN NICHT GELADEN:
+
+  • Prüfe: GET /api/coldleads/prompts
+  • Initialisiere: node /app/scripts/init-prompt-1.js
+
+PROMPT-ÄNDERUNGEN WIRKEN NICHT:
+
+  • Prüfe: Ist Prompt aktiv?
+  • Browser-Cache leeren (Strg+F5)
+  • Server neu starten: sudo supervisorctl restart nextjs
+
+CONVERSION RATE FALSCH:
+
+  • Statistiken werden bei jedem API-Call neu berechnet
+  • Daten aus MongoDB: prospects Collection
+  • Prüfe: Haben E-Mails prompt_version gespeichert?
+
+PLATZHALTER WERDEN NICHT ERSETZT:
+
+  • Prüfe: Verwendet der Prompt die richtigen Platzhalter?
+  • Syntax: {cleanedFirmenname} (mit geschweiften Klammern)
+  • Groß-/Kleinschreibung beachten
+
+=============================================================================
