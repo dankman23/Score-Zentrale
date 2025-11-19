@@ -64,7 +64,7 @@ export async function generateEmailSequenceV3(
 }
 
 /**
- * Mail 1 - Erstansprache
+ * Mail 1 - Erstansprache (HTML)
  */
 async function generateMail1(
   analysis: AnalyzerV3Result,
@@ -75,62 +75,39 @@ async function generateMail1(
   
   const signature = getEmailSignature()
   
-  // LLM-generierte Mail mit strikten Vorgaben
-  const prompt = `Du schreibst eine B2B-Erstmail für Score Schleifwerkzeuge (Köln).
-
-**Firmen-Analyse:**
-- Firma: ${analysis.company}
-- Branche: ${analysis.branch_guess.join(', ')}
-- Anwendungen: ${analysis.applications.map(a => a.term).join(', ')}
-- Werkstoffe: ${analysis.materials.map(m => m.term).join(', ')}
-- Maschinen: ${analysis.machines.map(m => m.term).join(', ')}
-- Empfohlene Marken: ${brandsText}
-
-**Regeln:**
-1. Betreff: 55-70 Zeichen, Nutzen + Bezug (Material/Maschine/Anwendung)
-2. Anrede: ${anrede}
-3. Hook: 1-2 Sätze Website-Bezug (z.B. "${analysis.applications[0]?.evidence || 'Ihre Metallbearbeitung'}")
-4. Passgenaue Angebote: 3-5 kurze Sätze OHNE Aufzählungszeichen
-5. Marken: ${brandsText}
-6. CTA: Genau EINE Option (Telefon ${SCORE_CONFIG.company.phone} ODER Business-Link)
-7. PS: Optional 1 Satz (Muster/Staffelpreise/Rahmenvertrag)
-8. KEIN Markdown/Sternchen!
-9. MAX 180 Wörter!
-
-**Ausgabe als JSON:**
-{
-  "subject": "...",
-  "body": "..."
-}
-
-Nur JSON, keine Erklärungen.`
-
-  try {
-    const response = await emergentChatCompletion({
-      messages: [{ role: 'user', content: prompt }],
-      model: 'gpt-4o',
-      temperature: 0.7,
-      max_tokens: 800
-    })
-    
-    const jsonMatch = response.match(/\{[\s\S]*\}/)
-    if (jsonMatch) {
-      const parsed = JSON.parse(jsonMatch[0])
-      const fullBody = `${parsed.body}\n\n${signature}`
-      const wordCount = fullBody.split(/\s+/).length
-      
-      return {
-        subject: parsed.subject,
-        body: fullBody,
-        word_count: wordCount
-      }
-    }
-  } catch (e) {
-    console.error('Mail 1 Generation Error:', e)
-  }
+  // Material/Anwendung für personalisierte Ansprache
+  const mainApp = analysis.applications[0]?.term || 'Ihre Fertigung'
+  const mainMat = analysis.materials[0]?.term || 'Metall'
   
-  // Fallback
-  return generateFallbackMail1(analysis, anrede, brandsText, signature)
+  const subject = `Schleifwerkzeuge für ${mainApp} – Jahresbedarf & Beratung`
+  
+  const body = `${anrede},
+
+ich bin auf Ihre Firma ${analysis.company} gestoßen und habe gesehen, dass Sie im Bereich ${mainApp} tätig sind.
+
+Wir bei Score Schleifwerkzeuge arbeiten mit allen führenden Herstellern der Branche zusammen (${brandsText}) und können dadurch Ihren <b>kompletten Jahresbedarf</b> an Schleifwerkzeugen optimal abdecken.
+
+<b>Was wir anbieten:</b>
+• Passgenaue Produktauswahl für ${mainMat} und ${mainApp}
+• Staffelpreise und Rahmenverträge für Ihren Jahresbedarf
+• Schnelle Lieferung deutschlandweit
+
+<b>Persönliche Beratung – jederzeit zwischen 10 und 18 Uhr:</b>
+📞 <a href="tel:+4922125999901">(+49) 0221-25999901</a>
+
+<b>Oder Beratungstermin per Mail vereinbaren:</b>
+Antworten Sie einfach auf diese Mail, und ich melde mich bei Ihnen.
+
+<b>Mehr Infos für Großkunden:</b>
+🔗 <a href="https://score-schleifwerkzeuge.de/business">https://score-schleifwerkzeuge.de/business</a>
+
+${signature}`
+  
+  return {
+    subject,
+    body,
+    word_count: body.split(/\s+/).length
+  }
 }
 
 /**
