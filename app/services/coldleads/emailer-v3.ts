@@ -238,7 +238,8 @@ Du MUSST konkret erwähnen:
    "Wenn Sie möchten, schaue ich mir Ihren Bedarf an und erstelle ein individuelles Angebot."
 
 4. **Call-to-Action:**
-   "Einfach kurz antworten oder anrufen: 0221-25999901 (10–18 Uhr)."
+   "Einfach kurz antworten oder anrufen: 0221-25999901 (10–18 Uhr).
+   Ein paar Infos und auch ein Anfrageformular für Geschäftskunden finden Sie auch unter: https://score-schleifwerkzeuge.de/business"
 
 **FORMAT:**
 - 120-180 Wörter (NICHT mehr!)
