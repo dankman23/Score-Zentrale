@@ -81,11 +81,16 @@ export async function POST() {
       
       console.log(`[Autopilot Tick] Searching: ${nextQuery.industry} in ${nextQuery.region}`)
       
-      // Führe Suche aus
-      const searchResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/coldleads/search`, {
+      // Führe DACH-Crawler aus (bessere Qualität, Stats werden aktualisiert)
+      const searchResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/coldleads/dach/crawl`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(nextQuery)
+        body: JSON.stringify({
+          country: 'DE',
+          region: nextQuery.region,
+          industry: nextQuery.industry,
+          limit: nextQuery.limit || 5
+        })
       })
       
       const searchResult = await searchResponse.json()
