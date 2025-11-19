@@ -57,14 +57,23 @@ export async function POST() {
       })
     }
     
-    // 2. Hole nächsten Prospect der eine Email-Adresse hat und noch nicht kontaktiert wurde
-    // Egal welcher Status - Hauptsache analysis_v3 mit Email vorhanden!
-    let nextProspect = await prospectsCollection.findOne({
+    // 2. Hole ALLE Prospects mit analysis_v3 die noch nicht kontaktiert wurden
+    const candidates = await prospectsCollection.find({
       'analysis_v3': { $exists: true },
-      'analysis_v3.contact_person.email': { $exists: true, $type: 'string', $ne: '' },
-      'followup_schedule.mail_1_sent': { $ne: true },
-      $expr: { $gt: [{ $strLenCP: { $ifNull: ['$analysis_v3.contact_person.email', ''] } }, 5] } // Email mindestens 6 Zeichen (a@b.de)
-    })
+      'followup_schedule.mail_1_sent': { $ne: true }
+    }).limit(20).toArray()
+    
+    // Filtere die mit gültiger Email
+    let nextProspect = null
+    for (const candidate of candidates) {
+      const email = candidate.analysis_v3?.contact_person?.email
+      if (email && typeof email === 'string' && email.length > 5 && email.includes('@')) {
+        nextProspect = candidate
+        break
+      }
+    }
+    
+    console.log(`[Autopilot Tick] Found ${candidates.length} candidates, selected:`, nextProspect?.company_name || 'none')
     
     // Wenn keine analysierten Prospects vorhanden, suche neue Firmen
     if (!nextProspect) {
