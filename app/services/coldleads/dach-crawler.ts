@@ -171,18 +171,6 @@ export async function crawlDACHRegion(
   
   console.log(`[DACH Crawler] Starting: ${country} / ${region} / ${industry}`)
   
-  // Blacklist: Verzeichnisse, Schulen, Plattformen
-  const blacklistedDomains = [
-    'gelbenseiten.de', 'gelbeseiten.de',
-    'wlw.de', 'wer-liefert-was.de',
-    'lehrer-online.de', 'lehreronline.de',
-    'schule-bw.de', 'schulewirtschaft.de',
-    'wikipedia.org', 'youtube.com',
-    'facebook.com', 'linkedin.com',
-    'xing.com', 'kununu.com',
-    'indeed.de', 'stepstone.de'
-  ]
-  
   const leads: CompanyLead[] = []
   
   // Strategie basierend auf Land
