@@ -477,6 +477,8 @@ ich möchte nicht nerven - vielleicht passt es gerade nicht.
 
 📞 <a href="tel:+4922125999901">0221-25999901</a>
 
+Mehr Infos: <a href="https://score-schleifwerkzeuge.de/business">https://score-schleifwerkzeuge.de/business</a>
+
 Kurze Info reicht. Danke!
 
 Viele Grüße
