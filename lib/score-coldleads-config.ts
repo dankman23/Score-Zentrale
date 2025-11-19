@@ -63,10 +63,27 @@ export const SCORE_CONFIG = {
  */
 export function getEmailSignature(): string {
   return `Beste Grüße
-${SCORE_CONFIG.sender.display_name}
-${SCORE_CONFIG.company.name} • ${SCORE_CONFIG.company.location}
-T: ${SCORE_CONFIG.company.phone}  •  E: ${SCORE_CONFIG.company.email_main}
-${SCORE_CONFIG.company.business_form_url}`
+Daniel Leismann
+
+Score-Schleifwerkzeuge
+B2B-Kundenbetreuer
+
+-- 
+Besuchen Sie auch unseren Schleifmittel-Shop auf www.score-schleifwerkzeuge.de und kaufen Sie dort Schleifscheiben, Schleifbänder etc. zu Staffelpreisen unabhängig von den handelsüblichen OVP-Größen. 
+
+Score Handels GmbH & Co. KG 
+Sülzburgstr. 187 
+50937 Köln 
+Telefon: +49(0)221-25999901 
+email: support@score-schleifwerkzeuge.de
+
+Amtsgericht Köln, HRA 31021 
+Persönlich haftende Gesellschafterin der SCORE Handels GmbH & Co. KG: 
+SCORE Handels Verwaltungs GmbH 
+Sülzburgstraße 187 
+50937 Köln 
+Amtsgericht Köln, HRB 83408 
+Geschäftsführer: Dr. Alexander Biehl`
 }
 
 /**
