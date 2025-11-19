@@ -3370,7 +3370,7 @@ export default function App() {
                   <div className="text-white-50 small">
                     Automatische Suche, Analyse & Email-Versand (1 Email/Minute)
                   </div>
-                  {autopilotState.currentPhase && autopilotState.running && (
+                  {autopilotState.running && (
                     <div className="mt-2">
                       <span className={`badge badge-${
                         autopilotState.currentPhase === 'searching' ? 'primary' :
@@ -3381,14 +3381,19 @@ export default function App() {
                         {autopilotState.currentPhase === 'searching' && '🔍 Suche neue Firmen...'}
                         {autopilotState.currentPhase === 'analyzing' && '🧠 Analyse läuft...'}
                         {autopilotState.currentPhase === 'sending_email' && '📧 Sende Email...'}
-                        {autopilotState.currentPhase === 'idle' && '⏸️ Bereit'}
-                        {autopilotState.currentPhase === 'error' && '⚠️ Fehler'}
+                        {autopilotState.currentPhase === 'idle' && '⏸️ Bereit für nächste Email'}
+                        {autopilotState.currentPhase === 'error' && '⚠️ Fehler aufgetreten'}
+                        {!autopilotState.currentPhase && '⏳ Initialisiert...'}
                       </span>
                       {autopilotState.lastActivity && (
                         <span className="text-white-50 small ml-2">
-                          • {new Date(autopilotState.lastActivity).toLocaleTimeString('de-DE')}
+                          • Letzte Aktivität: {new Date(autopilotState.lastActivity).toLocaleTimeString('de-DE')}
                         </span>
                       )}
+                      <div className="text-white-50 small mt-1">
+                        {autopilotState.dailyCount === 0 && autopilotState.currentPhase === 'idle' && '💡 Tipp: Autopilot arbeitet automatisch - 1 Email pro Minute'}
+                        {autopilotState.dailyCount > 0 && `✉️ Heute versendet: ${autopilotState.dailyCount} von ${autopilotState.dailyLimit}`}
+                      </div>
                     </div>
                   )}
                 </div>
