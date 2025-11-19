@@ -36,10 +36,10 @@ export async function emergentChatCompletion(
   options: EmergentChatOptions,
   retries = 2
 ): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY // Emergent Key stored here
+  const apiKey = process.env.OPENAI_API_KEY // OpenAI or Emergent Key
   
-  if (!apiKey || !apiKey.startsWith('sk-emergent-')) {
-    throw new Error('Emergent Universal Key not configured')
+  if (!apiKey || !apiKey.startsWith('sk-')) {
+    throw new Error('OpenAI API Key not configured')
   }
 
   const requestBody = {
