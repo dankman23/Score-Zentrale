@@ -4871,6 +4871,7 @@ export default function App() {
                 </div>
               </div>
             </div>
+              )}
               
               {/* POSTAUSGANG-ANSICHT */}
               {mailView === 'outbox' && (
