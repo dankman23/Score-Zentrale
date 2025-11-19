@@ -4139,12 +4139,17 @@ export default function App() {
                                     <div className="text-muted" style={{fontSize:'0.75rem'}}>
                                       {new Date(p.followup_schedule.mail_1_sent_at).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'})}
                                     </div>
-                                    {p.followup_schedule.mail_2_sent && (
-                                      <div className="badge badge-info badge-pill mt-1" title="Follow-up 1 gesendet">FU1 ✓</div>
-                                    )}
-                                    {p.followup_schedule.mail_3_sent && (
-                                      <div className="badge badge-info badge-pill mt-1" title="Follow-up 2 gesendet">FU2 ✓</div>
-                                    )}
+                                    <div className="mt-1">
+                                      {!p.followup_schedule.mail_2_sent && !p.followup_schedule.mail_3_sent && (
+                                        <span className="badge badge-success badge-pill" title="Erstansprache versendet">Kontaktiert</span>
+                                      )}
+                                      {p.followup_schedule.mail_2_sent && !p.followup_schedule.mail_3_sent && (
+                                        <span className="badge badge-info badge-pill" title="1x nachgefasst">1x nachgefasst</span>
+                                      )}
+                                      {p.followup_schedule.mail_3_sent && (
+                                        <span className="badge badge-warning badge-pill" title="2x nachgefasst">2x nachgefasst</span>
+                                      )}
+                                    </div>
                                   </>
                                 ) : (
                                   <span className="text-muted">-</span>
