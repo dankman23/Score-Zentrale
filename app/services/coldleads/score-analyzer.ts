@@ -11,7 +11,7 @@
  * 6. Potenzielle SCORE-Produkte
  */
 
-import { emergentChatCompletion } from '../../lib/emergent-llm'
+import { emergentChatCompletion } from '@/lib/emergent-llm'
 
 // SCORE Produktkategorien
 const SCORE_PRODUCTS = [
