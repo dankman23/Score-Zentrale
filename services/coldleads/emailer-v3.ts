@@ -101,7 +101,26 @@ async function generateMail1(
   anrede: string,
   brandsText: string,
   valueProps: string[]
-): Promise<{ subject: string; body: string; word_count: number }> {
+): Promise<{ subject: string; body: string; word_count: number; prompt_version: number; model: string }> {
+  
+  // Lade aktiven Prompt aus Datenbank
+  let activePrompt: any = null
+  let promptVersion = 1
+  let promptModel = 'gpt-4o-mini'
+  
+  try {
+    const { connectToMongoDB } = require('../../lib/mongodb')
+    const db = await connectToMongoDB()
+    activePrompt = await db.collection('email_prompts').findOne({ active: true })
+    
+    if (activePrompt) {
+      promptVersion = activePrompt.version
+      promptModel = activePrompt.model
+      console.log(`[Mail1] Using active prompt v${promptVersion} (${promptModel})`)
+    }
+  } catch (error) {
+    console.error('[Mail1] Failed to load active prompt, using default:', error)
+  }
   
   // Extrahiere Daten aus Analyse
   const werkstoffe = analysis.materials.map(m => m.term).slice(0, 3)
