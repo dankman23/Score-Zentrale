@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { analyzeFirmaForScore } from '@/services/coldleads/score-analyzer'
-import { connectToMongoDB } from '@/lib/mongodb'
+import { getDb } from '@/lib/db/mongodb'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
