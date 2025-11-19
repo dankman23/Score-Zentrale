@@ -24,6 +24,254 @@ const getJson = async (url, init) => {
   return r.data
 }
 
+// Mail Prompts View Component
+function MailPromptsView() {
+  const [prompts, setPrompts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [selectedPrompt, setSelectedPrompt] = useState(null)
+  
+  useEffect(() => {
+    loadPrompts()
+  }, [])
+  
+  async function loadPrompts() {
+    try {
+      const data = await getJson('/api/coldleads/prompts')
+      setPrompts(data.prompts || [])
+    } catch (e) {
+      console.error('Failed to load prompts:', e)
+    } finally {
+      setLoading(false)
+    }
+  }
+  
+  async function activatePrompt(version) {
+    try {
+      await fetch('/api/coldleads/prompts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'activate', version })
+      })
+      await loadPrompts()
+      alert(`✅ Prompt ${version} ist jetzt aktiv`)
+    } catch (e) {
+      alert('❌ Fehler beim Aktivieren: ' + e.message)
+    }
+  }
+  
+  if (loading) {
+    return (
+      <div className="p-5 text-center">
+        <div className="spinner-border text-primary" role="status">
+          <span className="sr-only">Laden...</span>
+        </div>
+      </div>
+    )
+  }
+  
+  return (
+    <div className="p-4">
+      <div className="d-flex align-items-center justify-content-between mb-4">
+        <h4 className="mb-0">
+          <i className="bi bi-gear mr-2"/>Mail Prompts Verwaltung
+        </h4>
+        <button 
+          className="btn btn-sm btn-success"
+          onClick={() => {
+            const name = prompt('Name für neuen Prompt:')
+            if (name) {
+              // TODO: Create new prompt
+              alert('Funktion wird noch implementiert')
+            }
+          }}
+        >
+          <i className="bi bi-plus-circle mr-1"/>Neuer Prompt
+        </button>
+      </div>
+      
+      {prompts.length === 0 ? (
+        <div className="alert alert-info">
+          Noch keine Prompts vorhanden. Erstellen Sie Ihren ersten Prompt!
+        </div>
+      ) : (
+        <div className="table-responsive">
+          <table className="table table-hover table-sm">
+            <thead className="thead-dark">
+              <tr>
+                <th style={{width:'80px'}}>Version</th>
+                <th style={{width:'150px'}}>Name</th>
+                <th style={{width:'120px'}}>Modell</th>
+                <th style={{width:'130px'}}>Änderungsdatum</th>
+                <th style={{width:'100px'}}>Versendet</th>
+                <th style={{width:'100px'}}>Antworten</th>
+                <th style={{width:'120px'}}>Conversion</th>
+                <th style={{width:'100px'}}>Status</th>
+                <th style={{width:'120px'}}>Aktionen</th>
+              </tr>
+            </thead>
+            <tbody>
+              {prompts.map(prompt => (
+                <tr key={prompt._id} className={prompt.active ? 'table-success' : ''}>
+                  <td>
+                    <span className="badge badge-secondary">v{prompt.version}</span>
+                  </td>
+                  <td>{prompt.name}</td>
+                  <td>
+                    <code className="small">{prompt.model}</code>
+                  </td>
+                  <td className="small">
+                    {new Date(prompt.updated_at).toLocaleDateString('de-DE', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </td>
+                  <td>
+                    <span className="badge badge-info">{prompt.stats.versendet}</span>
+                  </td>
+                  <td>
+                    <span className="badge badge-success">{prompt.stats.antworten}</span>
+                  </td>
+                  <td>
+                    <span className={`badge ${prompt.stats.conversionRate > 0 ? 'badge-success' : 'badge-secondary'}`}>
+                      {prompt.stats.conversionRate.toFixed(2)}%
+                    </span>
+                  </td>
+                  <td>
+                    {prompt.active ? (
+                      <span className="badge badge-success">
+                        <i className="bi bi-check-circle mr-1"/>Aktiv
+                      </span>
+                    ) : (
+                      <span className="badge badge-secondary">Inaktiv</span>
+                    )}
+                  </td>
+                  <td>
+                    <div className="btn-group btn-group-sm">
+                      <button
+                        className="btn btn-outline-primary"
+                        title="Prompt ansehen"
+                        onClick={() => setSelectedPrompt(prompt)}
+                      >
+                        <i className="bi bi-eye"/>
+                      </button>
+                      {!prompt.active && (
+                        <button
+                          className="btn btn-outline-success"
+                          title="Aktivieren"
+                          onClick={() => activatePrompt(prompt.version)}
+                        >
+                          <i className="bi bi-check-circle"/>
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      
+      {/* Prompt Detail Modal */}
+      {selectedPrompt && (
+        <div 
+          className="modal d-block" 
+          style={{backgroundColor: 'rgba(0,0,0,0.5)'}}
+          onClick={() => setSelectedPrompt(null)}
+        >
+          <div 
+            className="modal-dialog modal-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  <i className="bi bi-file-text mr-2"/>
+                  {selectedPrompt.name} (v{selectedPrompt.version})
+                </h5>
+                <button 
+                  type="button" 
+                  className="close"
+                  onClick={() => setSelectedPrompt(null)}
+                >
+                  <span>&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <div className="mb-3">
+                  <strong>Modell:</strong> <code>{selectedPrompt.model}</code>
+                </div>
+                <div className="mb-3">
+                  <strong>Prompt:</strong>
+                  <pre 
+                    className="bg-light p-3 rounded border" 
+                    style={{
+                      maxHeight: '400px',
+                      overflow: 'auto',
+                      fontSize: '0.85rem',
+                      whiteSpace: 'pre-wrap'
+                    }}
+                  >
+                    {selectedPrompt.prompt}
+                  </pre>
+                </div>
+                <div className="row">
+                  <div className="col-md-4">
+                    <div className="card bg-light">
+                      <div className="card-body text-center">
+                        <h3 className="mb-0">{selectedPrompt.stats.versendet}</h3>
+                        <small className="text-muted">Versendet</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="card bg-light">
+                      <div className="card-body text-center">
+                        <h3 className="mb-0">{selectedPrompt.stats.antworten}</h3>
+                        <small className="text-muted">Antworten</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="card bg-light">
+                      <div className="card-body text-center">
+                        <h3 className="mb-0">{selectedPrompt.stats.conversionRate.toFixed(2)}%</h3>
+                        <small className="text-muted">Conversion Rate</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => setSelectedPrompt(null)}
+                >
+                  Schließen
+                </button>
+                {!selectedPrompt.active && (
+                  <button
+                    className="btn btn-success"
+                    onClick={() => {
+                      activatePrompt(selectedPrompt.version)
+                      setSelectedPrompt(null)
+                    }}
+                  >
+                    <i className="bi bi-check-circle mr-1"/>Aktivieren
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function KpiTile({ title, value, sub, demo }) {
   return (
     <div className="col-md-4 mb-3">
