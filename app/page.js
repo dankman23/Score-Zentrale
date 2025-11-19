@@ -4881,7 +4881,7 @@ export default function App() {
                   </table>
                 </div>
               </div>
-            </div>
+              </>
               )}
               
               {/* POSTAUSGANG-ANSICHT */}
