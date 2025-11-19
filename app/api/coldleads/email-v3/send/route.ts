@@ -58,11 +58,29 @@ export async function POST(request: Request) {
       }, { status: 404 })
     }
     
-    if (!prospect.email_sequence) {
+    // Prüfe ob analysis_v3 vorhanden ist
+    if (!prospect.analysis_v3) {
       return NextResponse.json({
         ok: false,
-        error: 'No email sequence generated. Please analyze first.'
+        error: 'Prospect not analyzed yet. Missing analysis_v3.'
       }, { status: 400 })
+    }
+    
+    // Generiere email_sequence on-the-fly wenn fehlt
+    if (!prospect.email_sequence) {
+      console.log('[EmailV3] Generating email_sequence on-the-fly...')
+      
+      const { generateEmailSequenceV3FromAnalysis } = await import('../../../../../services/coldleads/emailer-v3')
+      const emailSequence = await generateEmailSequenceV3FromAnalysis(prospect.analysis_v3, prospect.company_name)
+      
+      // Speichere email_sequence in DB
+      await prospectsCollection.updateOne(
+        query,
+        { $set: { email_sequence: emailSequence } }
+      )
+      
+      prospect.email_sequence = emailSequence
+      console.log('[EmailV3] Email sequence generated and saved')
     }
     
     // Wähle richtige Mail
