@@ -109,6 +109,18 @@ const DACH_REGIONS = {
   ]
 }
 
+// Blacklist: Verzeichnisse, Schulen, Plattformen (GLOBAL für alle Crawler)
+const BLACKLISTED_DOMAINS = [
+  'gelbenseiten.de', 'gelbeseiten.de',
+  'wlw.de', 'wer-liefert-was.de',
+  'lehrer-online.de', 'lehreronline.de',
+  'schule-bw.de', 'schulewirtschaft.de',
+  'wikipedia.org', 'youtube.com',
+  'facebook.com', 'linkedin.com',
+  'xing.com', 'kununu.com',
+  'indeed.de', 'stepstone.de'
+]
+
 // Branchen-Mapping mit Suchbegriffen
 const INDUSTRY_KEYWORDS = {
   'Metallverarbeitung': [
