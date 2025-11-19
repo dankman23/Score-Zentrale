@@ -3974,6 +3974,9 @@ export default function App() {
                     <button className={`btn btn-outline-info`} onClick={()=>setShowInbox(!showInbox)}>
                       <i className="bi bi-inbox-fill mr-1"/>Posteingang
                     </button>
+                    <button className={`btn btn-outline-success`} onClick={()=>window.open('/api/coldleads/postausgang', '_blank')}>
+                      <i className="bi bi-send-fill mr-1"/>Postausgang
+                    </button>
                   </div>
                 </div>
               </div>
