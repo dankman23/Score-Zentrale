@@ -39,6 +39,7 @@ export async function GET(request: Request) {
           company_name: p.company_name,
           recipient: recipientEmail,
           subject: p.email_sequence?.mail_1?.subject || 'Erstansprache',
+          body: p.email_sequence?.mail_1?.body || '',
           sent_at: schedule.mail_1_sent_at,
           mail_type: 'Erstansprache',
           mail_number: 1
@@ -53,6 +54,7 @@ export async function GET(request: Request) {
           company_name: p.company_name,
           recipient: recipientEmail,
           subject: p.email_sequence?.mail_2?.subject || 'Follow-up 1',
+          body: p.email_sequence?.mail_2?.body || '',
           sent_at: schedule.mail_2_sent_at,
           mail_type: 'Follow-up 1',
           mail_number: 2
@@ -67,6 +69,7 @@ export async function GET(request: Request) {
           company_name: p.company_name,
           recipient: recipientEmail,
           subject: p.email_sequence?.mail_3?.subject || 'Follow-up 2',
+          body: p.email_sequence?.mail_3?.body || '',
           sent_at: schedule.mail_3_sent_at,
           mail_type: 'Follow-up 2',
           mail_number: 3
