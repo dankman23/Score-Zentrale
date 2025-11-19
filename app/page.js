@@ -4996,7 +4996,7 @@ export default function App() {
           )}
 
           {/* EMAIL POSTEINGANG */}
-          {showInbox && (
+          {false && showInbox && (
             <div className="card mb-4">
               <div className="card-header bg-transparent d-flex align-items-center justify-content-between">
                 <h5 className="mb-0"><i className="bi bi-inbox-fill mr-2"/>Email-Posteingang</h5>
