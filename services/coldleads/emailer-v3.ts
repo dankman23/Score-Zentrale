@@ -328,8 +328,11 @@ Schreibe jetzt NUR die E-Mail-Text (120-180 Wörter):`
       ? cleanedFirmenname 
       : 'Ihre Firma'
     
-    // Verwende Anrede oder Fallback
-    const greeting = anrede ? anrede : 'Guten Tag'
+    // Verwende Anrede oder Fallback (filter "Unbekannt")
+    let greeting = 'Guten Tag'
+    if (anrede && !anrede.toLowerCase().includes('unbekannt')) {
+      greeting = anrede
+    }
     
     const body = `${greeting},
 
