@@ -12,7 +12,7 @@ import { emergentChatCompletion } from '../../lib/emergent-llm'
 import type { AnalyzerV3Result } from './analyzer-v3'
 
 export interface EmailV3Result {
-  mail_1: { subject: string; body: string; word_count: number }
+  mail_1: { subject: string; body: string; word_count: number; prompt_version?: number; model?: string }
   mail_2: { subject: string; body: string; word_count: number }
   mail_3: { subject: string; body: string; word_count: number }
   crm_tags: string[]
