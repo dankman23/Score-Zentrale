@@ -377,6 +377,8 @@ Wenn Sie möchten, schaue ich mir Ihren Bedarf an und erstelle ein individuelles
 
 <b>Einfach kurz antworten oder anrufen: <a href="tel:+4922125999901">0221-25999901</a> (10–18 Uhr).</b>
 
+Ein paar Infos und auch ein Anfrageformular für Geschäftskunden finden Sie auch unter <a href="https://score-schleifwerkzeuge.de/business">https://score-schleifwerkzeuge.de/business</a>.
+
 Viele Grüße
 <b>Daniel Leismann</b>
 Score Schleifwerkzeuge
