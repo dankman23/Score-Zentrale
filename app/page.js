@@ -449,19 +449,14 @@ export default function App() {
     }
   }, [activeTab])
 
-  // Lade Postausgang wenn geöffnet
+  // Lade Postausgang/Posteingang wenn Ansicht wechselt
   useEffect(() => {
-    if (showOutbox) {
+    if (mailView === 'outbox') {
       loadOutbox()
-    }
-  }, [showOutbox])
-
-  // Lade Posteingang wenn geöffnet
-  useEffect(() => {
-    if (showInbox) {
+    } else if (mailView === 'inbox') {
       loadInbox()
     }
-  }, [showInbox])
+  }, [mailView])
   
   // Starte/Stoppe Polling basierend auf Autopilot State
   useEffect(() => {
