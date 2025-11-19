@@ -16,39 +16,48 @@ user_problem_statement: |
 backend:
   - task: "Autopilot: Collections vereinheitlichen (alle → prospects)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/coldleads/**/route.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "CRITICAL FIX: Alle coldleads APIs verwenden jetzt 'prospects' Collection statt cold_prospects/coldleads_prospects. Geändert: dach/crawl, analyze-deep, generate-email, stats, email, status, followup, followup/check, analyze, dach/stats. Autopilot und normale Kaltakquise-Ansicht nutzen jetzt DIESELBE Datenbank!"
+      - working: true
+        agent: "testing"
+        comment: "✅ COLLECTIONS-VEREINHEITLICHUNG VERIFIED! Comprehensive testing completed: (1) DACH-Crawler API ✅ writes to 'prospects' collection (3 prospects found), (2) analyze-deep API ✅ reads/writes 'prospects' (analysis completed successfully), (3) Stats API ✅ reads from 'prospects' (22 total prospects), (4) Search API ✅ reads from 'prospects' (10 prospects returned), (5) Collection isolation ✅ verified - no references to old 'cold_prospects' or 'coldleads_prospects' found in codebase. Fixed critical import path issues in services/coldleads/*.ts files (emergent-llm imports). All APIs now consistently use unified 'prospects' collection as intended."
 
   - task: "Email BCC erweitert (danki.leismann@gmx.de)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/lib/email-client.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "BCC-Zeile in email-client.ts erweitert: Alle Mails gehen jetzt an 'leismann@score-schleifwerkzeuge.de, danki.leismann@gmx.de'"
+      - working: true
+        agent: "testing"
+        comment: "✅ EMAIL BCC CONFIGURATION VERIFIED! Both BCC addresses confirmed in email-client.ts: 'leismann@score-schleifwerkzeuge.de, danki.leismann@gmx.de'. Correct format with both addresses in single BCC line as required."
 
   - task: "Autopilot Tick API (DACH-Crawler + analyze-deep + email-v3)"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/app/api/coldleads/autopilot/tick/route.ts"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Autopilot nutzt: (1) DACH-Crawler für Firmen-Suche, (2) analyze-deep für detaillierte Analyse, (3) email-v3/send für Email-Versand mit Follow-ups. Rotiert durch Regionen & Branchen via search-strategy.ts. Speichert in 'prospects' Collection."
+      - working: false
+        agent: "testing"
+        comment: "❌ AUTOPILOT TICK PARTIAL FAILURE: Core flow working but email step fails. ✅ Autopilot start/stop APIs working, ✅ Status API working (shows running: true, phase: sending_email), ✅ DACH-Crawler integration working, ✅ analyze-deep integration working. ❌ Email sending fails with 'No recipient email found' error. Issue: Prospects analyzed but missing email addresses for email-v3/send step. Email generation step requires valid contact email from analysis results."
 
   - task: "Buchungslogik-Library erstellen"
     implemented: true
