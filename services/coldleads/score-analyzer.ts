@@ -121,6 +121,38 @@ export async function analyzeFirmaForScore(
 }
 
 /**
+ * Crawlt mehrere Seiten einer Website (Homepage + Kontakt/Impressum)
+ */
+async function crawlMultiplePages(baseUrl: string): Promise<string> {
+  const pages = [
+    baseUrl,
+    `${baseUrl}/impressum`,
+    `${baseUrl}/kontakt`,
+    `${baseUrl}/contact`,
+    `${baseUrl}/ueber-uns`,
+    `${baseUrl}/about`
+  ]
+  
+  let combinedContent = ''
+  
+  for (const url of pages) {
+    try {
+      const content = await crawlWebsite(url)
+      if (content && content.length > 100) {
+        combinedContent += '\n\n' + content
+        // Limitiere Gesamtlänge
+        if (combinedContent.length > 20000) break
+      }
+    } catch (e) {
+      // Ignoriere Fehler für Unterseiten
+      continue
+    }
+  }
+  
+  return combinedContent.substring(0, 20000)
+}
+
+/**
  * Crawlt Website und extrahiert relevanten Text
  */
 async function crawlWebsite(url: string): Promise<string> {
@@ -132,18 +164,14 @@ async function crawlWebsite(url: string): Promise<string> {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
       },
-      signal: AbortSignal.timeout(15000)
+      signal: AbortSignal.timeout(10000)  // Reduziert von 15s auf 10s
     })
     
-    console.log(`[SCORE Analyzer] Response status: ${response.status}`)
-    
     if (!response.ok) {
-      console.error(`[SCORE Analyzer] HTTP ${response.status} für ${url}`)
       return ''
     }
     
     const html = await response.text()
-    console.log(`[SCORE Analyzer] HTML length: ${html.length}`)
     
     // Extrahiere Text (einfache Variante - entfernt HTML-Tags)
     const text = html
@@ -153,17 +181,30 @@ async function crawlWebsite(url: string): Promise<string> {
       .replace(/\s+/g, ' ')
       .trim()
     
-    console.log(`[SCORE Analyzer] Extracted text length: ${text.length}`)
-    
-    // Limitiere auf erste 15.000 Zeichen für LLM
-    const result = text.substring(0, 15000)
-    console.log(`[SCORE Analyzer] Final content length: ${result.length}`)
-    
-    return result
+    // Limitiere auf erste 8.000 Zeichen pro Seite
+    return text.substring(0, 8000)
     
   } catch (error: any) {
-    console.error(`[SCORE Analyzer] Fehler beim Crawlen von ${url}:`, error.message)
+    // Stille Fehler für Unterseiten
     return ''
+  }
+}
+
+/**
+ * Generiert Fallback Email-Adresse aus Domain
+ */
+function generateFallbackEmail(websiteUrl: string): string | null {
+  try {
+    const url = new URL(websiteUrl)
+    const domain = url.hostname.replace('www.', '')
+    
+    // Typische Business Email-Prefixe
+    const prefixes = ['info', 'kontakt', 'vertrieb', 'office']
+    
+    // Verwende erstes Prefix
+    return `${prefixes[0]}@${domain}`
+  } catch (e) {
+    return null
   }
 }
 
