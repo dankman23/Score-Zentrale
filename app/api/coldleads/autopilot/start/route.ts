@@ -47,11 +47,11 @@ export async function POST(request: NextRequest) {
       { upsert: true }
     )
     
-    console.log(`[Autopilot] Started with daily limit: ${dailyLimit}`)
+    console.log(`[Autopilot] Started with session limit: ${dailyLimit}`)
     
     return NextResponse.json({
       ok: true,
-      message: `Autopilot gestartet mit Limit: ${dailyLimit} Emails/Tag`
+      message: `Autopilot gestartet mit Session-Limit: ${dailyLimit} Emails`
     })
   } catch (error: any) {
     console.error('[Autopilot Start] Error:', error)
