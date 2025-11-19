@@ -4108,6 +4108,28 @@ export default function App() {
                                 <option value="discarded">❌ Verworfen</option>
                               </select>
                             </td>
+                            {coldStatusFilter === 'contacted' && (
+                              <td className="align-middle text-center small">
+                                {p.followup_schedule?.mail_1_sent_at ? (
+                                  <>
+                                    <div className="text-success font-weight-bold">
+                                      {new Date(p.followup_schedule.mail_1_sent_at).toLocaleDateString('de-DE')}
+                                    </div>
+                                    <div className="text-muted" style={{fontSize:'0.75rem'}}>
+                                      {new Date(p.followup_schedule.mail_1_sent_at).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'})}
+                                    </div>
+                                    {p.followup_schedule.mail_2_sent && (
+                                      <div className="badge badge-info badge-pill mt-1" title="Follow-up 1 gesendet">FU1 ✓</div>
+                                    )}
+                                    {p.followup_schedule.mail_3_sent && (
+                                      <div className="badge badge-info badge-pill mt-1" title="Follow-up 2 gesendet">FU2 ✓</div>
+                                    )}
+                                  </>
+                                ) : (
+                                  <span className="text-muted">-</span>
+                                )}
+                              </td>
+                            )}
                             <td className="align-middle text-right" style={{whiteSpace: 'nowrap'}}>
                               {p.status === 'new' && (
                                 <div className="btn-group btn-group-sm">
