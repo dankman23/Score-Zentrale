@@ -439,6 +439,28 @@ export default function App() {
       stopAutopilotPolling()
     }
   }, [])
+  // Autopilot Status regelmäßig laden
+  useEffect(() => {
+    if (activeTab === 'kaltakquise') {
+      loadAutopilotStatus()
+      const interval = setInterval(loadAutopilotStatus, 5000)
+      return () => clearInterval(interval)
+    }
+  }, [activeTab])
+
+  // Lade Postausgang wenn geöffnet
+  useEffect(() => {
+    if (showOutbox) {
+      loadOutbox()
+    }
+  }, [showOutbox])
+
+  // Lade Posteingang wenn geöffnet
+  useEffect(() => {
+    if (showInbox) {
+      loadInbox()
+    }
+  }, [showInbox])
   
   // Starte/Stoppe Polling basierend auf Autopilot State
   useEffect(() => {
