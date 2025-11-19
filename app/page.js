@@ -4007,21 +4007,16 @@ export default function App() {
                       <i className="bi bi-envelope-check mr-1"/>Antworten ({coldStats.replied || 0})
                       {coldLeadStats.unreadReplies > 0 && <span className="badge badge-danger ml-1">{coldLeadStats.unreadReplies}</span>}
                     </button>
-                    </div>
                     {/* Mail-Navigation - wie Mailprogramm */}
-                    <div className="btn-group">
-                      <button className={`btn ${mailView==='prospects'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>setMailView('prospects')}>
-                        <i className="bi bi-people-fill mr-1"/>Prospects
-                      </button>
-                      <button className={`btn ${mailView==='inbox'?'btn-info':'btn-outline-info'}`} onClick={()=>setMailView('inbox')}>
-                        <i className="bi bi-inbox-fill mr-1"/>Posteingang
-                      </button>
-                      <button className={`btn ${mailView==='outbox'?'btn-success':'btn-outline-success'}`} onClick={()=>setMailView('outbox')}>
-                        <i className="bi bi-send-fill mr-1"/>Postausgang
-                      </button>
-                    </div>
-                  </div>
-                  <div className="btn-group">
+                    <button className={`btn ${mailView==='prospects'?'btn-primary':'btn-outline-secondary'} ml-3`} onClick={()=>setMailView('prospects')}>
+                      <i className="bi bi-people-fill mr-1"/>Prospects
+                    </button>
+                    <button className={`btn ${mailView==='inbox'?'btn-info':'btn-outline-info'}`} onClick={()=>setMailView('inbox')}>
+                      <i className="bi bi-inbox-fill mr-1"/>Posteingang
+                    </button>
+                    <button className={`btn ${mailView==='outbox'?'btn-success':'btn-outline-success'}`} onClick={()=>setMailView('outbox')}>
+                      <i className="bi bi-send-fill mr-1"/>Postausgang
+                    </button>
                   </div>
                 </div>
               </div>
