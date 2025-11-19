@@ -25,6 +25,8 @@ export async function POST(request: Request) {
     const prospectsCollection = db.collection('prospects')
     
     // Lade Prospect (prüfe sowohl id als auch _id)
+    console.log(`[EmailV3] Looking for prospect with ID: ${prospect_id}, type: ${typeof prospect_id}`)
+    
     const prospect = await prospectsCollection.findOne({ 
       $or: [
         { id: prospect_id },
@@ -33,6 +35,12 @@ export async function POST(request: Request) {
     })
     
     if (!prospect) {
+      console.error(`[EmailV3] Prospect not found! Tried id=${prospect_id} and _id=${prospect_id}`)
+      
+      // Debug: Zeige die ersten IDs in der DB
+      const sample = await prospectsCollection.findOne({})
+      console.log(`[EmailV3] Sample prospect ID: ${sample?.id || sample?._id}, type: ${typeof (sample?.id || sample?._id)}`)
+      
       return NextResponse.json({
         ok: false,
         error: 'Prospect not found'
