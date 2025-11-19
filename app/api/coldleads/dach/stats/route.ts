@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   try {
     const { db } = await connectToDatabase()
     const progressCollection = db.collection('dach_crawl_progress')
-    const prospectsCollection = db.collection('cold_prospects')
+    const prospectsCollection = db.collection('prospects')
 
     // Gesamt-Statistiken
     const allProgress = await progressCollection.find({}).toArray()
