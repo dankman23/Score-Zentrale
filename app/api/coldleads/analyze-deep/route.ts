@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
     }
     
     const db = await connectToDb()
-    const collection = db.collection('coldleads_prospects')
+    const collection = db.collection('prospects')
     
     const prospect = await collection.findOne({ _id: prospectId })
     
