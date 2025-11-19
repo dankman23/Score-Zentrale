@@ -140,8 +140,7 @@ export async function PUT(request: NextRequest) {
     const body = await request.json()
     const { version, name, model, prompt } = body
     
-    const client = await clientPromise
-    const db = client.db()
+    const db = await connectToMongoDB()
     const promptsCollection = db.collection('email_prompts')
     
     await promptsCollection.updateOne(
