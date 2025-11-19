@@ -111,6 +111,7 @@ export default function App() {
   const [showInbox, setShowInbox] = useState(false)
   const [inboxEmails, setInboxEmails] = useState([])
   const [inboxLoading, setInboxLoading] = useState(false)
+  const [selectedInboxEmail, setSelectedInboxEmail] = useState(null)
   const [showOutbox, setShowOutbox] = useState(false)
   const [outboxEmails, setOutboxEmails] = useState([])
   const [outboxLoading, setOutboxLoading] = useState(false)
