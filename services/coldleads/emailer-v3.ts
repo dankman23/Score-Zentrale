@@ -111,7 +111,7 @@ ${signature}`
 }
 
 /**
- * Mail 2 - Follow-up 1 (≤110 Wörter)
+ * Mail 2 - Follow-up 1 (HTML)
  */
 function generateMail2(
   analysis: AnalyzerV3Result,
@@ -120,19 +120,20 @@ function generateMail2(
 ): { subject: string; body: string; word_count: number } {
   
   const signature = getEmailSignature()
+  const mainMat = analysis.materials.length > 0 ? analysis.materials[0].term : 'Ihre Fertigung'
   
-  const subject = `Nachfrage: Schleifwerkzeuge für ${analysis.company}`
+  const subject = `Nachfrage: Jahresbedarf Schleifwerkzeuge für ${analysis.company}`
   
   const body = `${anrede},
 
-vor einigen Tagen hatte ich Ihnen geschrieben wegen passender Schleifwerkzeuge für ${analysis.materials.length > 0 ? analysis.materials[0].term : 'Ihre Fertigung'}.
+vor einigen Tagen hatte ich Ihnen geschrieben wegen passender Schleifwerkzeuge für ${mainMat}.
 
-Ein kurzer Hinweis: Wir bieten auch Rahmenverträge mit Staffelpreisen an. Das spart Zeit beim Einkauf und bringt bessere Konditionen.
+<b>Kurzer Hinweis:</b> Wir bieten <b>Rahmenverträge für den kompletten Jahresbedarf</b> mit Staffelpreisen an. Das spart Zeit beim Einkauf und bringt bessere Konditionen.
 
-Bei Interesse können Sie hier direkt ein kurzes Formular ausfüllen:
-${SCORE_CONFIG.company.business_form_url}
-
-Oder einfach anrufen: ${SCORE_CONFIG.company.phone}
+<b>Bei Interesse:</b>
+• 📞 Einfach anrufen: <a href="tel:+4922125999901">(+49) 0221-25999901</a> (Mo-Fr 10-18 Uhr)
+• 📧 Oder auf diese Mail antworten für Beratungstermin
+• 🔗 Infos: <a href="https://score-schleifwerkzeuge.de/business">https://score-schleifwerkzeuge.de/business</a>
 
 ${signature}`
   
