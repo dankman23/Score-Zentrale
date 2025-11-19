@@ -12,7 +12,7 @@ import { connectToMongoDB } from '../../../../../lib/mongodb'
 export async function POST() {
   try {
     const db = await connectToMongoDB()
-    const collection = db.collection('cold_prospects')
+    const collection = db.collection('prospects')
     
     // Berechne Datum vor 6 Tagen
     const sixDaysAgo = new Date()
