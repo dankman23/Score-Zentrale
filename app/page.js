@@ -4875,7 +4875,6 @@ export default function App() {
               {/* POSTAUSGANG-ANSICHT */}
               {mailView === 'outbox' && (
             <div className="card border-0 shadow-sm">
-                <div className="card-body p-0">
               <div className="card-header bg-success text-white d-flex align-items-center justify-content-between">
                 <h5 className="mb-0"><i className="bi bi-send-fill mr-2"/>Email-Postausgang</h5>
                 <div>
