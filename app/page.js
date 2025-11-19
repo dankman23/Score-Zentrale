@@ -114,6 +114,7 @@ export default function App() {
   const [showOutbox, setShowOutbox] = useState(false)
   const [outboxEmails, setOutboxEmails] = useState([])
   const [outboxLoading, setOutboxLoading] = useState(false)
+  const [selectedOutboxEmail, setSelectedOutboxEmail] = useState(null)
   
   // DACH Crawler
   const [dachCrawlerForm, setDachCrawlerForm] = useState({ country: 'DE', region: '', industry: '', limit: 20 })
