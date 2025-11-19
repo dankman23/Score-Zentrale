@@ -4029,6 +4029,9 @@ export default function App() {
                   </div>
                 </div>
               </div>
+              
+              {/* PROSPECTS-ANSICHT */}
+              {mailView === 'prospects' && (
               <div className="card-body p-0">
                 {/* Bulk-Analyse Controls (nur bei "Neu" Tab) */}
                 {coldStatusFilter === 'new' && coldProspects.filter(p => p.status === 'new').length > 0 && (
