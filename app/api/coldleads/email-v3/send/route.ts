@@ -147,8 +147,9 @@ export async function POST(request: Request) {
       updates['followup_schedule.sequence_complete'] = true
     }
     
+    // CRITICAL FIX: Use same query logic as when loading the prospect
     await prospectsCollection.updateOne(
-      { id: prospect_id },
+      query,  // Verwendet dieselbe $or-Query (id oder _id)
       { $set: updates }
     )
     
