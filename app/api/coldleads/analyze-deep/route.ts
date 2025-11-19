@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { ObjectId } from 'mongodb'
 import { analyzeFirmaForScore } from '@/services/coldleads/score-analyzer'
 import { connectToDatabase } from '../../../lib/api'
 
@@ -35,8 +36,19 @@ export async function POST(req: NextRequest) {
       const { db } = await connectToDatabase()
       const collection = db.collection('prospects')
       
-      await collection.updateOne(
-        { _id: prospectId },
+      // Konvertiere prospectId zu ObjectId für MongoDB
+      let query
+      try {
+        query = { _id: new ObjectId(prospectId) }
+      } catch (e) {
+        // Falls keine gültige ObjectId, suche nach custom id field
+        query = { id: prospectId }
+      }
+      
+      console.log(`[Deep Analysis] Updating prospect with query:`, query)
+      
+      const updateResult = await collection.updateOne(
+        query,
         {
           $set: {
             status: 'analyzed', // WICHTIG: Status auf analyzed setzen!
