@@ -143,9 +143,18 @@ function MailPromptsView() {
   return (
     <div className="p-4">
       <div className="d-flex align-items-center justify-content-between mb-4">
-        <h4 className="mb-0">
-          <i className="bi bi-gear mr-2"/>Mail Prompts Verwaltung
-        </h4>
+        <div className="d-flex align-items-center">
+          <button
+            className="btn btn-sm btn-outline-secondary mr-3"
+            onClick={() => window.location.reload()}
+            title="Zurück zur Übersicht"
+          >
+            <i className="bi bi-arrow-left mr-1"/>Zurück
+          </button>
+          <h4 className="mb-0">
+            <i className="bi bi-gear mr-2"/>Mail Prompts Verwaltung
+          </h4>
+        </div>
         <button 
           className="btn btn-sm btn-success"
           onClick={() => setShowCreatePromptModal(true)}
