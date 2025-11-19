@@ -3938,7 +3938,7 @@ export default function App() {
                       />
                     </div>
                     <div className="mr-3 text-center">
-                      <div className="text-white small mb-1">Heute</div>
+                      <div className="text-white small mb-1">Session</div>
                       <div className="h5 text-white mb-0 font-weight-bold">
                         {autopilotState.dailyCount}/{autopilotState.dailyLimit}
                       </div>
