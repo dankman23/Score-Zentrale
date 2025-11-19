@@ -928,10 +928,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "FIBU Zahlungen Module Testing"
-    - "FIBU 10it Export Testing"
-  stuck_tasks:
-    - "FIBU Module Navigation Issue"
+    - "Autopilot: Collections-Vereinheitlichung testen (alle APIs nutzen 'prospects')"
+    - "Autopilot Tick API: DACH-Crawler → analyze-deep → email-v3 Flow testen"
+    - "Email BCC: Beide Adressen verifizieren"
+    - "Frontend: Autopilot-Statusanzeige testen"
+    - "Frontend: Gesendete Mails im Kontaktiert-Tab sichtbar"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
