@@ -52,13 +52,25 @@ export async function sendEmail(to: string, subject: string, html: string, text?
   // Wrap in vollständiges HTML wenn nötig
   const fullHTML = html.includes('<!DOCTYPE') ? html : wrapInHTML(html)
   
-  const mailOptions = {
+  // TEST MODE: Wenn EMAIL_TEST_MODE aktiviert ist, sende ALLE Mails nur an BCC
+  const testMode = process.env.EMAIL_TEST_MODE === 'true'
+  
+  const mailOptions: any = {
     from: `Score Schleifwerkzeuge <${process.env.EMAIL_FROM || 'vertrieb@score-schleifwerkzeuge.de'}>`,
-    to,
     bcc: 'leismann@score-schleifwerkzeuge.de, danki.leismann@gmx.de', // Automatische BCC-Kopie an beide Adressen
-    subject,
+    subject: testMode ? `[TEST] ${subject}` : subject,
     html: fullHTML,
     text: text || html.replace(/<[^>]*>/g, '')
+  }
+  
+  // Im Test-Modus: Sende NUR an BCC (kein TO)
+  // Im Produktiv-Modus: Sende an TO + BCC
+  if (testMode) {
+    // Füge Hinweis in E-Mail-Body ein
+    mailOptions.html = `<div style="background: #fff3cd; border: 2px solid #ffc107; padding: 10px; margin-bottom: 20px;"><strong>🧪 TEST-MODUS:</strong> Diese E-Mail würde normalerweise an <strong>${to}</strong> gesendet.</div>` + mailOptions.html
+    console.log(`[Email] TEST MODE: Email würde an ${to} gesendet, geht nur an BCC`)
+  } else {
+    mailOptions.to = to
   }
 
   try {
