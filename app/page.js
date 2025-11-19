@@ -3439,10 +3439,16 @@ export default function App() {
                       <div className="text-white small mb-1">Tages-Limit</div>
                       <input 
                         type="number" 
-                        className="form-control form-control-sm" 
-                        style={{width:'100px'}}
+                        className="form-control form-control-sm bg-white text-dark" 
+                        style={{width:'100px', color: '#000 !important', backgroundColor: '#fff !important'}}
                         value={autopilotLimit}
-                        onChange={(e) => setAutopilotLimit(parseInt(e.target.value) || 1)}
+                        onChange={(e) => {
+                          const val = e.target.value === '' ? '' : parseInt(e.target.value)
+                          if (val === '' || (val >= 1 && val <= 500)) {
+                            setAutopilotLimit(val === '' ? 1 : val)
+                          }
+                        }}
+                        onFocus={(e) => e.target.select()}
                         min="1"
                         max="500"
                         disabled={autopilotState.running}
