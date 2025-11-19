@@ -4192,7 +4192,25 @@ export default function App() {
                                 </div>
                               )}
                               {p.status === 'contacted' && (
-                                <span className="badge badge-pill badge-success"><i className="bi bi-check-circle"/></span>
+                                <div className="btn-group btn-group-sm">
+                                  <button className="btn btn-outline-info" onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    setSelectedProspect(selectedProspect?.website === p.website ? null : p) 
+                                  }} disabled={coldLoading} title="Details & Emails anzeigen">
+                                    <i className={`bi bi-chevron-${selectedProspect?.website === p.website ? 'up' : 'down'}`}/>
+                                  </button>
+                                  <button 
+                                    className="btn btn-danger" 
+                                    onClick={(e) => { 
+                                      e.stopPropagation(); 
+                                      if (confirm(`${p.company_name} wirklich löschen?`)) deleteProspect(p.id)
+                                    }} 
+                                    disabled={coldLoading} 
+                                    title="Löschen"
+                                  >
+                                    <i className="bi bi-trash"/>
+                                  </button>
+                                </div>
                               )}
                             </td>
                           </tr>
