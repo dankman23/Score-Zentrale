@@ -4857,7 +4857,7 @@ export default function App() {
                                   </div>
                                   <div className="d-flex justify-content-end">
                                     <button className="btn btn-success btn-lg" onClick={sendColdEmail} disabled={coldLoading}>
-                                      {coldLoading ? <><span className="spinner-border spinner-border-sm mr-2"/>Wird versendet...</> : <><i className="bi bi-send-fill mr-2"/>Jetzt versenden</>}
+                                      {coldLoading ? <><span className="spinner-border spinner-border-sm mr-2"></span>Wird versendet...</> : <><i className="bi bi-send-fill mr-2"></i>Jetzt versenden</>}
                                     </button>
                                   </div>
                                 </div>
