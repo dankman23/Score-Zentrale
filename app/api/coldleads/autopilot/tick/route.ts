@@ -178,17 +178,27 @@ export async function POST() {
         { $set: { lastSearchQuery: nextQuery, currentPhase: 'idle' } }
       )
       
-      // Hole nun ersten analysierten Prospect
-      nextProspect = await prospectsCollection.findOne({
-        status: 'analyzed',
-        email_sent_at: { $exists: false }
-      })
+      // Hole nun ersten analysierten Prospect mit gültiger E-Mail
+      const newCandidates = await prospectsCollection.find({
+        'analysis_v3': { $exists: true },
+        'followup_schedule.mail_1_sent': { $ne: true },
+        'autopilot_skip': { $ne: true }
+      }).limit(20).toArray()
+      
+      // Filtere die mit gültiger Email
+      for (const candidate of newCandidates) {
+        const email = candidate.analysis_v3?.contact_person?.email
+        if (email && typeof email === 'string' && email.length > 5 && email.includes('@')) {
+          nextProspect = candidate
+          break
+        }
+      }
       
       if (!nextProspect) {
         return NextResponse.json({
           ok: true,
-          action: 'analyzed_but_not_ready',
-          message: 'Firmen gefunden und analysiert, aber noch nicht bereit'
+          action: 'analyzed_but_no_email',
+          message: 'Firmen analysiert, aber keine gültige E-Mail gefunden'
         })
       }
     }
