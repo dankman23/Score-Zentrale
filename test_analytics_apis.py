@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Base URL from environment
-BASE_URL = "https://fibu-automation.preview.emergentagent.com/api"
+BASE_URL = "https://lead-autopilot-2.preview.emergentagent.com/api"
 
 # Test date range
 START_DATE = "30daysAgo"

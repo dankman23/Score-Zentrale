@@ -1,91 +1,85 @@
 <analysis>
 The user is a German-speaking software engineer, and the next agent **must** respond in **German**.
 
-The trajectory documents two major development sprints. The first was a massive enhancement of a Financial Accounting (FIBU) module. It began with debugging critical issues reported by the user, such as incorrect data filtering and low payment-to-invoice association rates. Through a systematic process of database analysis, API adjustments (), and frontend fixes (), the initial bugs were resolved. The core of this sprint was an iterative process to drastically improve the auto-matching logic. By implementing rules to automatically assign all Amazon payments and then developing a sophisticated, regex-based matching engine for PayPal and Commerzbank payments using order numbers () and invoice numbers (), the AI engineer successfully increased the automated association rate from 37% to 100%.
+The trajectory documents an extensive debugging and feature enhancement sprint on a Kaltakquise (Cold Acquisition) Autopilot module. The user reported that the Autopilot was not sending emails and its status was unclear. The AI engineer initiated a deep-dive investigation, revealing several critical issues.
 
-The second sprint focused on refactoring a Kaltakquise (cold acquisition) module. The user requested simplifying the lead generation process by removing an old Google Search method and focusing exclusively on an improved DACH-Crawler. This involved significant UI changes in , which led to major syntax errors that required resetting the file from version control. Subsequently, the AI developed a multi-stage pipeline:
-1.  **Crawling:** Improved the DACH crawler to filter out irrelevant websites.
-2.  **Deep Analysis:** Created a new service () and API () using an LLM to extract detailed company info (contacts, materials, products).
-3.  **Email Generation:** Created a service () and API () to draft personalized outreach emails.
-4.  **Autopilot Fix:** The final task was to update the existing Autopilot feature to use this new, higher-quality pipeline. The work concluded just as the Autopilot's logic was being updated, preparing for the final documentation phase.
+First, a data architecture problem was found: three separate MongoDB collections (, , ) were causing data silos, preventing the Autopilot's work from appearing in the UI. This was resolved by migrating all APIs to a single  collection.
+
+Next, a series of complex, nested bugs within the Autopilot's  process were systematically identified and resolved. This involved:
+1.  **Fixing a failing LLM API:** The  service was returning 404s. The engineer switched to a user-provided OpenAI key, which required creating a new  and debugging a persistent webpack cache issue caused by a duplicate  file.
+2.  **Resolving ID mismatches:** The application was inconsistently using MongoDB's  (ObjectID) and a custom uid=0(root) gid=0(root) groups=0(root) (UUID string), causing Prospect not found errors. This was fixed by standardizing the use of the correct ID field across API calls.
+3.  **Breaking an infinite loop:** The Autopilot was repeatedly processing the same prospects that had no email addresses. The final fix was implementing an  flag in the database to mark and ignore failed prospects, allowing the pipeline to advance.
+
+Finally, the AI addressed several UI/UX requests, including adding a BCC to emails, overhauling the email template to use HTML, creating a proper Postausgang (Outbox) view, and fixing UI bugs in the Autopilot controls. The work concluded just after fixing a minor UI bug on the daily limit input, before starting the final documentation for forking.
 </analysis>
-
 <product_requirements>
-The project consists of two core, highly-automated modules:
+The project's goal is to build and maintain a highly automated application with two primary modules:
 
 **1. Financial Accounting (FIBU) Automation:**
-The primary goal is to automate the reconciliation of payments from various sources (Amazon, PayPal, Commerzbank) with sales invoices. The system must automatically analyze raw transaction data, apply complex booking logic (e.g., splitting Amazon fees, taxes, and principal), and associate payments with the correct invoices. The target was to achieve a near-100% automatic association rate to eliminate manual accounting work. The implementation successfully achieved a 100% assignment rate for the given October 2025 dataset through multi-layered matching rules.
+This module automates the reconciliation of payments from sources like Amazon, PayPal, and Commerzbank with internal sales invoices. The system was successfully enhanced to achieve a 100% automatic association rate by implementing a multi-layered rules engine, including regex-based matching for invoice/order numbers, effectively eliminating manual accounting work for the specified period.
 
 **2. Outbound Cold Acquisition (Kaltakquise) Pipeline:**
-The objective is to create a streamlined, three-stage process for B2B lead generation.
-- **Stage 1 (Find):** Systematically crawl the DACH region for potential B2B customer websites based on industry and location, filtering out irrelevant results.
-- **Stage 2 (Analyze):** Perform a deep, AI-powered analysis of a target company's website to extract key business intelligence: contact persons, materials used, core business applications, and potential product needs.
-- **Stage 3 (Engage):** Automatically generate a personalized, context-aware outreach email based on the analysis, ready to be sent.
-This entire pipeline is also managed by an Autopilot feature for hands-off operation.
+This module is a three-stage B2B lead generation engine.
+-   **Stage 1 (Find):** The DACH-Crawler automatically finds potential customer websites.
+-   **Stage 2 (Analyze):** An AI-powered service () performs a deep analysis of the websites to extract business intelligence like contacts and product needs.
+-   **Stage 3 (Engage):** A service () generates personalized HTML outreach emails.
+An Autopilot feature fully automates this pipeline. The most recent work focused heavily on debugging and refining this Autopilot to make it fully functional, ensuring it correctly finds, analyzes, and contacts new leads without getting stuck.
 </product_requirements>
-
 <key_technical_concepts>
 - **Backend:** Next.js (App Router), TypeScript, API Routes
-- **Frontend:** React, State Management (, ) within a large single-page component.
-- **Database:** MongoDB for application data.
-- **AI/LLM Integration:** Used for deep company analysis and personalized email generation.
-- **Key Libraries:**  for email dispatch.
+- **Frontend:** React (, ) in a single large client component ()
+- **Database:** MongoDB
+- **AI/LLM Integration:** OpenAI API for deep company analysis and email generation.
+- **Email:**  for SMTP dispatch.
 - **Core Logic:**
-    - Advanced, regex-based string matching for payment reconciliation.
-    - Rule-based logic for financial transaction classification.
-    - Multi-step, chained API calls for the outbound pipeline (Crawl -> Analyze -> Generate Email).
+    - Chained API calls for the outbound pipeline (Crawl → Analyze → Email).
+    - Complex database queries (, , ) to manage the Autopilot prospect queue.
+    - Stateful Autopilot logic with error handling and retry-skipping ( flag).
 </key_technical_concepts>
-
 <code_architecture>
-The application is a full-stack Next.js monolith. The frontend is primarily a single, large client component () managing state for multiple business modules. The backend consists of API routes for business logic and services that encapsulate complex operations, including third-party interactions and database queries.
+The application is a Next.js monolith. A large client component () handles the UI for all modules, while the backend consists of API routes and services.
 
 **Directory Structure:**
 
 
-**Key Files:**
-- ****
-  - **Importance:** The heart of the financial automation. This endpoint fetches payments from the database and, critically, applies the entire automatic association logic on the fly.
-  - **Changes:** This file was massively refactored. It now contains complex logic to:
-    1. Automatically assign all Amazon payments based on their transaction type.
-    2. Extract order numbers () and invoice numbers () from PayPal and Commerzbank transactions using refined regex patterns.
-    3. Normalize these extracted numbers to handle various formats (with/without underscores, spaces, hyphens).
-    4. Look up corresponding invoices () to create a direct link.
-    5. Assign a generic category to unmatchable payments to achieve 100% classification.
+**Key Files & Recent Changes:**
 
 - ****
-  - **Importance:** The central, and enormous, frontend component that renders the entire UI for all modules (FIBU, Kaltakquise, etc.) and manages all client-side state and user interactions.
-  - **Changes:** It was heavily modified to support the new features. The Kaltakquise section was refactored to remove the old Google Search UI and focus solely on the DACH Crawler. New UI sections were added to display the results of the deep company analysis and the generated email previews. Functions to call the new APIs (, ) were added.
+  - **Importance:** The core of the Autopilot. This endpoint is periodically called to execute one cycle of the find-analyze-engage pipeline.
+  - **Changes:** This file was the subject of intense debugging. The query to find the next prospect was significantly improved to filter out already-attempted prospects using an  flag. Logic was added to handle cases where prospects have no email addresses, preventing infinite loops. The API calls to  and  were corrected to pass the proper uid=0(root) gid=0(root) groups=0(root) field ( vs uid=0(root) gid=0(root) groups=0(root)).
 
 - ****
-  - **Importance:** A new service created to house the logic for the deep company analysis. It contains the LLM prompt that instructs the AI on what specific data to extract from a company website.
-  - **Changes:** Created from scratch.
+  - **Importance:** Contains the logic to crawl a website and use an LLM to extract business data.
+  - **Changes:** A critical bug was found where two versions of this file existed. The correct one () was modified to use a new  instead of a failing . The LLM call was also corrected to properly parse the JSON response.
 
 - ****
-  - **Importance:** A new service that holds the LLM prompt for generating personalized outreach emails based on the data from .
-  - **Changes:** Created from scratch.
+  - **Importance:** New file created to encapsulate interaction with the OpenAI API.
+  - **Changes:** Created from scratch to replace the failing  library. Uses a user-provided API key from .
 
 - ****
-  - **Importance:** The core worker process for the Autopilot feature. This endpoint is called periodically to perform one cycle of the outbound pipeline (find, analyze, email).
-  - **Changes:** This was the last file being worked on. It was modified to replace a call to the old, shallow  API with the new  API. The engineer was in the process of also switching its lead-sourcing mechanism from an old strategy to the new .
+  - **Importance:** Contains the LLM prompts for generating personalized outreach emails.
+  - **Changes:** The prompts were completely overhauled to generate rich HTML emails, including bold text, links, a full signature, and specific business-related content as requested by the user.
+
+- ****
+  - **Importance:** Handles the actual sending of emails via SMTP.
+  - **Changes:** Fixed an SMTP connection bug by changing the port from 465 to 587 and enabling  for STARTTLS. The BCC field was updated to include a second address.
+
+- ****
+  - **Importance:** The massive central UI component.
+  - **Changes:** Refactored to display Posteingang (Inbox) and Postausgang (Outbox) as persistent tab views instead of modals, which involved significant JSX restructuring. An  was added to the Outbox to show the full email body on click. A UI bug in the Autopilot's daily limit input field was fixed to allow proper number entry and correct styling.
 </code_architecture>
-
 <pending_tasks>
-- **Create Handover Documentation:** The primary pending task is to create comprehensive documentation (, etc.) to summarize the project's state, architecture, setup, and features, making it ready for a clean fork as requested by the user.
+- **Finalize Handover Documentation:** The primary task is to update the  file with a comprehensive summary of the project architecture, setup instructions, and feature overview to prepare the repository for forking.
 </pending_tasks>
-
 <current_work>
-The work concluded immediately after a major push to overhaul the Kaltakquise (cold acquisition) module and just before creating the final handover documentation. The AI engineer was in the final stages of fixing the Autopilot feature to ensure it uses the latest, high-quality logic.
+The AI engineer had just successfully completed a major, multi-day debugging and enhancement effort on the Kaltakquise (Cold Acquisition) Autopilot. The system is now fully functional: it correctly crawls for new leads, analyzes them using OpenAI, filters for prospects with valid emails, sends out personalized HTML emails, and correctly skips prospects that fail or have no email, thus avoiding previous infinite loops.
 
-**Specifically:**
-The engineer was editing the file ****. This is the API that executes one tick of the Autopilot's work cycle.
+Immediately before the summary request, the engineer was finalizing the UI based on user feedback. The last two actions were:
 
-The key changes being made were:
-1.  **Upgrading the Analysis Step:** The code was modified to call the new, powerful  endpoint instead of the outdated . This was completed.
-2.  **Upgrading the Lead Sourcing Step:** The engineer was in the process of replacing the Autopilot's lead sourcing logic. The goal was to make it use the new, improved **DACH-Crawler** () instead of the old, less effective .
+1.  **Fixing a UI Bug:** Corrected an input field for the Autopilot's Tageslimit (Daily Limit) in . The user reported that the number couldn't be edited correctly and the text color was wrong. The  was changed from number to text with a numeric pattern, and the  was bound to a separate state variable to fix the issue.
 
-The last action was an edit to  to implement this second change. This fix was considered a prerequisite to finalizing the codebase for handover, ensuring all components are consistent and using the latest logic. The system is now functionally complete but lacks the formal documentation requested for the fork.
+2.  **Preparing for Documentation:** The user confirmed they wanted to fork the project. The engineer's next step was to create the final handover documentation in . An attempt to create a new  failed because the file already existed, indicating the next step is to *edit* the existing file.
 </current_work>
-
 <optional_next_step>
-Create the comprehensive handover documentation (, etc.) to make the project ready for forking, as requested by the user.
+Update the existing  file with comprehensive project documentation, as requested by the user for forking.
 </optional_next_step>
