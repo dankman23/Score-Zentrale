@@ -273,7 +273,8 @@ Schreibe jetzt NUR die E-Mail-Text (120-180 Wörter):`
     // Subject basierend auf Werkstoff
     let subject = `Schleifwerkzeuge für ${analysis.company}`
     if (werkstoffe.length > 0) {
-      subject = `Schleifwerkzeuge für ${werkstoffe[0]} – ${analysis.company}`
+      const werkstoffName = typeof werkstoffe[0] === 'string' ? werkstoffe[0] : werkstoffe[0].term
+      subject = `Schleifwerkzeuge für ${werkstoffName} – ${analysis.company}`
     }
     
     return {
