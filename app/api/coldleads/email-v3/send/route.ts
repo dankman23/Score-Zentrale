@@ -111,7 +111,12 @@ export async function POST(request: Request) {
     }
     
     // Versende Email (sendEmail erwartet: to, subject, htmlBody, textBody)
-    await sendEmail(recipientEmail, mailData.subject, mailData.body, mailData.body)
+    // Stelle sicher dass subject ein String ist
+    const subject = typeof mailData.subject === 'string' ? mailData.subject : String(mailData.subject || 'Schleifwerkzeuge Angebot')
+    
+    console.log(`[EmailV3] Sending email with subject: "${subject}"`)
+    
+    await sendEmail(recipientEmail, subject, mailData.body, mailData.body)
     
     console.log(`[EmailV3] Mail ${mail_number} sent to ${recipientEmail}`)
     
