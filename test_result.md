@@ -2,14 +2,16 @@
 # START - Testing Protocol - DO NOT EDIT OR REMOVE THIS SECTION
 #====================================================================================================
 
-## AKTUELLER STAND: Import-Fehler behoben - Ready for Re-Testing
-## Buchungslogik & Auto-Match Features implementiert - Import-Pfade korrigiert
+## AKTUELLER STAND: Autopilot-Optimierung abgeschlossen - Ready for Testing
+## Collections vereinheitlicht, BCC erweitert, Frontend-Statusanzeige verbessert
 
 user_problem_statement: |
-  Analyse von Amazon & PayPal Excel-Dateien für Oktober 2025.
-  Implementierung der Buchungslogik mit Soll/Haben-Konten, MwSt-Berechnung.
-  Verbesserung der Auto-Match-Logik für Amazon (XRE-Rechnungen) und PayPal (AU-Nummern).
-  HOTFIX: Alle Import-Pfade von relativen Pfaden auf Alias-Pfade (@/) korrigiert.
+  AUTOPILOT-ÜBERARBEITUNG für Kaltakquise-Modul:
+  1. Collections-Chaos behoben: Alle APIs nutzen jetzt 'prospects' (vorher: cold_prospects, coldleads_prospects, prospects)
+  2. BCC erweitert: Mails gehen jetzt an leismann@score-schleifwerkzeuge.de UND danki.leismann@gmx.de
+  3. Autopilot-Statusanzeige verbessert: Live-Phase-Indicator mit Icons (🔍 Suche, 🧠 Analyse, 📧 Email)
+  4. Gesendete Mails sichtbar: Neue Spalte "Gesendet am" im "Kontaktiert"-Tab mit Follow-up-Status
+  5. Postausgang: Details-Accordion für kontaktierte Prospects mit Email-Historie
 
 backend:
   - task: "Buchungslogik-Library erstellen"
