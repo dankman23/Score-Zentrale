@@ -168,8 +168,24 @@ async function generateMail1(
     cleanedFirmenname = 'Ihr Unternehmen'
   }
   
-  // ChatGPT Prompt für individuelle, menschliche E-Mail
-  const prompt = `Du bist Daniel Leismann von Score-Schleifwerkzeuge. Schreibe eine INDIVIDUELLE, menschlich klingende B2B-E-Mail.
+  // ChatGPT Prompt: Verwende aktiven Prompt aus DB oder Default
+  let promptTemplate = ''
+  
+  if (activePrompt && activePrompt.prompt) {
+    // Verwende Prompt aus Datenbank
+    promptTemplate = activePrompt.prompt
+    // Ersetze Platzhalter mit echten Daten
+    promptTemplate = promptTemplate
+      .replace(/{cleanedFirmenname}/g, cleanedFirmenname)
+      .replace(/{werkstoffe}/g, firmendaten.werkstoffe)
+      .replace(/{werkstucke}/g, firmendaten.werkstucke)
+      .replace(/{anwendungen}/g, firmendaten.anwendungen)
+      .replace(/{firmenname}/g, cleanedFirmenname !== 'Ihr Unternehmen' ? cleanedFirmenname : 'Ihre Firma')
+    
+    console.log(`[Mail1] Using prompt v${promptVersion} from database`)
+  } else {
+    // Default Prompt (Fallback)
+    promptTemplate = `Du bist Daniel Leismann von Score-Schleifwerkzeuge. Schreibe eine INDIVIDUELLE, menschlich klingende B2B-E-Mail.
 
 **FIRMENDATEN (vom Analyzer):**
 - Firma: ${cleanedFirmenname}
