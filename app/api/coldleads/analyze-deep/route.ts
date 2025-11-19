@@ -42,7 +42,16 @@ export async function POST(req: NextRequest) {
             status: 'analyzed', // WICHTIG: Status auf analyzed setzen!
             analyzed: true,
             analyzed_at: new Date(),
-            analysis: result,
+            analysis: result, // Kompatibilität
+            analysis_v3: {
+              contact_person: result.kontaktpersonen[0] || {},
+              materials: result.werkstoffe.map(w => w.name),
+              applications: result.anwendungen || [],
+              machines: result.werkstücke.map(w => w.name),
+              products_recommended: result.potenzielle_produkte.map(p => p.kategorie),
+              firmenprofil: result.firmenprofil,
+              analysis_quality: result.analyse_qualität
+            },
             // Flatten wichtige Felder für einfacheren Zugriff
             branche: result.branche,
             werkstoffe: result.werkstoffe.map(w => w.name),
