@@ -109,6 +109,18 @@ const DACH_REGIONS = {
   ]
 }
 
+// Blacklist: Verzeichnisse, Schulen, Plattformen (GLOBAL für alle Crawler)
+const BLACKLISTED_DOMAINS = [
+  'gelbenseiten.de', 'gelbeseiten.de',
+  'wlw.de', 'wer-liefert-was.de',
+  'lehrer-online.de', 'lehreronline.de',
+  'schule-bw.de', 'schulewirtschaft.de',
+  'wikipedia.org', 'youtube.com',
+  'facebook.com', 'linkedin.com',
+  'xing.com', 'kununu.com',
+  'indeed.de', 'stepstone.de'
+]
+
 // Branchen-Mapping mit Suchbegriffen
 const INDUSTRY_KEYWORDS = {
   'Metallverarbeitung': [
@@ -158,18 +170,6 @@ export async function crawlDACHRegion(
 }> {
   
   console.log(`[DACH Crawler] Starting: ${country} / ${region} / ${industry}`)
-  
-  // Blacklist: Verzeichnisse, Schulen, Plattformen
-  const blacklistedDomains = [
-    'gelbenseiten.de', 'gelbeseiten.de',
-    'wlw.de', 'wer-liefert-was.de',
-    'lehrer-online.de', 'lehreronline.de',
-    'schule-bw.de', 'schulewirtschaft.de',
-    'wikipedia.org', 'youtube.com',
-    'facebook.com', 'linkedin.com',
-    'xing.com', 'kununu.com',
-    'indeed.de', 'stepstone.de'
-  ]
   
   const leads: CompanyLead[] = []
   
@@ -238,7 +238,7 @@ async function crawlGermanyRegion(
     for (const result of searchResults) {
       // Filtere Blacklist zusätzlich
       const url = result.link.toLowerCase()
-      if (blacklistedDomains.some(domain => url.includes(domain))) {
+      if (BLACKLISTED_DOMAINS.some(domain => url.includes(domain))) {
         console.log(`[DE Crawler] Filtered blacklisted: ${result.link}`)
         continue
       }
