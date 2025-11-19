@@ -266,7 +266,11 @@ Schreibe jetzt NUR die E-Mail-Text (120-180 Wörter):`
     const body = aiResponse.trim()
     
     // Füge Anrede und Signatur hinzu
-    const greeting = anrede ? `${anrede},\n\n` : 'Guten Tag,\n\n'
+    // Filter "Unbekannt" aus der Anrede
+    let greeting = 'Guten Tag,\n\n'
+    if (anrede && !anrede.toLowerCase().includes('unbekannt')) {
+      greeting = `${anrede},\n\n`
+    }
     const signature = `\n\nViele Grüße\n<b>Daniel Leismann</b>\nScore Schleifwerkzeuge\n📞 <a href="tel:+4922125999901">0221-25999901</a> (Mo-Fr 10-18 Uhr)\n📧 <a href="mailto:leismann@score-schleifwerkzeuge.de">leismann@score-schleifwerkzeuge.de</a>`
     
     const fullBody = greeting + body + signature
