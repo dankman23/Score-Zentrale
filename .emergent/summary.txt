@@ -1,73 +1,96 @@
 <analysis>
-The user, who communicates in German, requested to debug the Kaltakquise (Cold Acquisition) Autopilot module. The initial report was that the Autopilot was running but not sending emails or moving prospects to the analyzed stage.
+The user, communicating in German, initiated a debugging session for a Kaltakquise (Cold Acquisition) Autopilot module that was stuck. My predecessor, an AI engineer, undertook an extensive and complex series of debugging and feature enhancement tasks.
 
-My predecessor, the AI engineer, embarked on a deep-dive debugging session. The investigation revealed a cascade of critical, interconnected bugs. The primary issue was a data type mismatch: the application was using a string uid=0(root) gid=0(root) groups=0(root) to query MongoDB records by , which is an . This caused the status update after a successful analysis to fail silently, creating the illusion that no prospects were being analyzed.
+The initial investigation revealed that the Autopilot was repeatedly emailing the same prospect because a database status update was failing silently due to a data type mismatch (string uid=0(root) gid=0(root) groups=0(root) vs. MongoDB ). After fixing this, a cascade of further issues was identified and resolved.
 
-After fixing the  issue, a second bug emerged in the email-sending step: the required  data was never being generated. This was resolved by modifying the email-sending API to create this data on-the-fly if it was missing.
+Key actions included:
+1.  **Debugging & Data Integrity:** Correcting the  issue, normalizing website URLs to remove sub-paths (e.g., ), and cleaning company names (e.g., removing Impressum - ) both in the code and via data-cleanup scripts (, ). A critical bug involving duplicate service files ( vs. ) was also found and fixed.
+2.  **Test Mode Implementation:** An  was introduced using an environment variable to redirect all outgoing emails to a BCC address for safe testing. This required an emergency stop and restart when it was discovered that emails were still going out live.
+3.  **Email Content Overhaul:** The user provided a detailed brief to improve email quality. This led to a complete rewrite of the email generation logic in , integrating  with a detailed, structured prompt to create highly personalized, human-like emails.
+4.  **Prompt Management UI:** A new feature was built to manage and A/B test different email prompts. This involved creating a new MongoDB collection (), a new API endpoint (), and a complex new UI view within the main  file, which required significant debugging to render correctly.
+5.  **Go-Live:** After all fixes and features were implemented and tested, the system was put into live mode by disabling the test mode and resetting test prospects.
 
-Further debugging uncovered several pathing and configuration errors, including a broken module alias () that caused API calls to return HTML error pages instead of JSON, leading to parsing failures. This was fixed by using relative paths and correcting a bug in how configuration data was accessed.
-
-After systematically resolving these issues, the Autopilot became fully functional. The AI engineer confirmed via API calls and a final screenshot that prospects were being correctly analyzed, their statuses updated, and emails successfully sent. The UI now reflects the correct operational status. The next agent must respond in **German**.
+The session concluded with several final small-but-critical bug fixes, such as  in the subject line and adding a proper salutation and legal signature. The user's final request was to update documentation. The next agent must respond in **German**.
 </analysis>
 
 <product_requirements>
-The user's goal is to have a fully functional and reliable automated B2B cold acquisition pipeline. This Autopilot system is responsible for the entire lead generation workflow:
+The primary goal is a fully automated B2B cold acquisition Autopilot. The system must find new prospects, analyze their websites to extract contact information and business context, and engage them with personalized emails.
 
-1.  **Find:** Automatically discover new potential customers (prospects).
-2.  **Analyze:** Analyze the prospect's website using an AI/LLM to extract business intelligence and, crucially, find valid email addresses.
-3.  **Engage:** Send personalized outreach emails to initiate contact.
+**Initial Problem:** The Autopilot was stalled, not processing new leads, and sending repetitive emails to the same address. The UI did not reflect the system's true state.
 
-The immediate requirement for this work session was to debug the Autopilot, which had stalled. Despite being active, it failed to process new leads, with none appearing in the Analyzed or Contacted stages of the pipeline. The core task was to identify and resolve the underlying bugs to make the system process leads from start to finish automatically and reliably, ensuring the UI accurately reflects its progress.
+**Implemented Solution & Features:**
+1.  **Functional Autopilot:** The core bugs were fixed. The Autopilot now reliably moves prospects through the pipeline:  ->  -> .
+2.  **Data Cleaning:** Prospect data is automatically cleaned. Website URLs are normalized to the root domain, and company names are sanitized (e.g., Impressum - Company becomes Company).
+3.  **Advanced Email Generation:** Emails are now generated by  using a highly specific, user-defined prompt to ensure a personal, non-robotic tone, incorporating details from the prospect analysis.
+4.  **Prompt Management System:** A new Mail Prompts tab was added to the UI, allowing the user to create, edit, and A/B test different email prompts. The system tracks which prompt version was used for each sent email.
+5.  **Live & Test Modes:** The application can be switched between a live mode (sending real emails) and a test mode (sending all emails to a predefined BCC address).
 </product_requirements>
 
 <key_technical_concepts>
-- **Backend:** Next.js API Routes (TypeScript)
-- **Database:** MongoDB, with a critical focus on handling the  data type versus standard strings for queries and updates.
-- **Debugging:** Analyzing server logs () to trace chained API call failures, identifying JSON parsing errors, and resolving  issues.
-- **Core Logic:** A multi-step, asynchronous pipeline () orchestrated by the Autopilot's  function.
+- **Backend:** Next.js API Routes (TypeScript).
+- **Database:** MongoDB. Critical fixes involved handling  correctly, running complex aggregation and update queries, and managing multiple collections (, ).
+- **AI Integration:** Using  via an API for dynamic, prompt-driven email content generation. The logic includes a robust fallback template.
+- **Environment & Debugging:** Use of  variables (, API keys) and code-server                      STOPPED   Not started
+jtl-import                       STOPPED   Not started
+mongodb                          RUNNING   pid 28, uptime 0:00:02
+nextjs                           STOPPED   Nov 19 11:26 PM
+nginx-code-proxy                 RUNNING   pid 26, uptime 0:00:02
+supervisor>  for service restarts. Debugging relied on server logs and direct database inspection.
+- **Frontend:** A large, monolithic React component () with complex state management (, ) to handle different UI views and data fetching.
 </key_technical_concepts>
 
 <code_architecture>
-The application is a Next.js monolith with a large client component for the UI and a series of API routes for the backend logic.
+The application is a Next.js monolith. The backend is built with API routes and services, and the frontend is a single large client component.
 
 **Directory Structure:**
 
 
 - ****
-    - **Importance:** This API endpoint is called by the Autopilot to perform a deep analysis of a prospect's website.
-    - **Changes:** This was the site of the most critical fix. The database update query was corrected to convert the incoming string  into a MongoDB  before updating the prospect's status. This allowed prospects to correctly move to the analyzed state.
+  - **Importance:** The core of the Autopilot. This endpoint orchestrates the entire workflow: finding prospects to contact, triggering analysis, or finding new companies to crawl.
+  - **Changes:** Logic was improved to first prioritize sending emails to already-analyzed prospects before crawling for new ones, making it more efficient.
 
 - ****
-    - **Importance:** Handles the final step of generating and sending the personalized email.
-    - **Changes:** Logic was added to generate the required  object on-the-fly if it was missing for a prospect. The database lookup was also hardened to correctly handle  conversion.
+  - **Importance:** Contains all logic for generating email content. This file was the focus of major feature enhancements.
+  - **Changes:** It was completely refactored to integrate with . It now constructs a detailed prompt based on user specifications, fetches the active prompt from the database, calls the AI, parses the response, and has a robust fallback. It also adds a proper salutation and a full legal signature. The  is now saved with the email.
 
 - ****
-    - **Importance:** Contains the logic for crawling websites to find contact information.
-    - **Changes:** The crawling logic was enhanced to not only check the homepage but also common subpages like  and  to increase the chances of finding an email address.
+  - **Importance:** The main UI file for the entire Kaltakquise tool. It handles rendering for all prospects, stats, and tabs.
+  - **Changes:** A new Mail Prompts tab and a corresponding view () were added. This involved adding state, fetch logic for prompts, and modals for CRUD operations. A significant amount of debugging was done to fix rendering and navigation issues, ensuring the main navigation tabs are always visible. A Zurück (Back) button was added and later removed in favor of a persistent tab bar.
 
-- ****
-    - **Importance:** Contains the logic and prompts for generating the personalized email content.
-    - **Changes:** A new function  was added. A critical bug was fixed where an import was using a non-functional path alias (); this was changed to a relative path (). Another bug related to accessing a configuration object was also fixed.
+- ** (directory)**
+  - **Importance:** Contains one-off scripts for database maintenance and initialization.
+  - **Changes:** Several scripts were created to perform critical data cleanup (, ) and to initialize the new prompt management feature ().
+
+- ** & **
+  - **Importance:** Contains logic for crawling websites. A critical bug was discovered where two versions of this file existed, causing fixes to not apply.
+  - **Changes:** The correct file () was updated to normalize URLs upon saving and to properly clean company names derived from page titles.
 </code_architecture>
 
 <pending_tasks>
-- **Project Documentation:** The user explicitly requested to postpone creating/updating the  file. This task should only be undertaken when the user is ready to fork the project.
+- **Project Documentation:** The user has explicitly requested to create/update the project documentation in  files now that the feature work is complete. This task is pending.
 </pending_tasks>
 
 <current_work>
-The AI engineer has just successfully completed a major debugging session on the Kaltakquise Autopilot. The system is now fully operational and no longer stalled.
+The last set of tasks involved final polish and going live with the Autopilot.
 
-The core problem was a silent failure in the database update logic within the  API due to an  vs. string mismatch. This prevented prospects from ever being marked as analyzed. This primary bug was fixed by correctly converting the ID type.
+1.  **Final Polish:** The user requested several final adjustments:
+    *   Fixed Herr Unbekannt in salutations by adding a filter for the name Unbekannt.
+    *   Added a full legal signature to the bottom of all emails.
+    *   Modified the call-to-action (CTA) text in the email, which involved updating both the ChatGPT prompt in the database and the fallback template in .
 
-A series of subsequent bugs were also resolved:
-1.  The email-sending API was enhanced to generate missing  data.
-2.  The website crawler was improved to search for emails on multiple pages.
-3.  A critical module import path error in  was fixed, which had been causing API calls to fail with JSON parsing errors.
-4.  A minor bug in accessing a configuration variable was corrected.
+2.  **Going Live:** At the user's request, the system was switched from test mode to live mode.
+    *   The  environment variable was set to .
+    *   The BCC list in  was updated to the single required address.
+    *   ~50 prospects who were contacted during testing were reset to the analyzed status so they could receive a real email.
+    *   The server was restarted, and a live email send was verified via the logs, confirming the correct  and  recipients.
 
-The session concluded after verifying that the entire pipeline now works as expected. A final UI screenshot confirmed that the frontend stats correctly show prospects moving through the Neu gefunden, Analysiert, and Kontaktiert stages, and the Autopilot status is correctly displayed as AKTIV.
+3.  **Final Bug Fixes Post-Live:**
+    *   A critical bug causing  in email subjects was fixed by correcting how a variable was accessed in .
+    *   A bug where the salutation was missing was fixed by explicitly prepending it to the generated email body.
+
+The system is now fully operational, live, and incorporates all user-requested features and bug fixes. The immediate task before this summary was updating the CTA.
 </current_work>
 
 <optional_next_step>
-The Autopilot is now functional. I will confirm with the user that its current performance meets their expectations and ask if they have any further adjustments or debugging requests for this module.
+Complete the user's final request: create and update the project documentation in  files.
 </optional_next_step>
