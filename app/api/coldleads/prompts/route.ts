@@ -73,8 +73,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { action, version, name, model, prompt } = body
     
-    const client = await clientPromise
-    const db = client.db()
+    const db = await connectToMongoDB()
     const promptsCollection = db.collection('email_prompts')
     
     if (action === 'activate') {
