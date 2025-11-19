@@ -193,6 +193,8 @@ export async function POST() {
     }
     
     console.log(`[Autopilot Tick] Processing prospect: ${nextProspect.company_name}`)
+    const prospectId = nextProspect.id || nextProspect._id?.toString()
+    console.log(`[Autopilot Tick] Using prospect_id: ${prospectId}`)
     
     // 3. Sende Email (Mail 1 - Erstansprache)
     await stateCollection.updateOne(
@@ -205,7 +207,7 @@ export async function POST() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        prospect_id: nextProspect.id || nextProspect._id?.toString(),
+        prospect_id: prospectId,
         mail_number: 1  // Erstansprache
       })
     })
