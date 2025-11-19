@@ -90,8 +90,8 @@ export async function analyzeFirmaForScore(
   
   console.log(`[SCORE Analyzer] Analysiere: ${websiteUrl}`)
   
-  // Schritt 1: Website-Content laden
-  const content = await crawlWebsite(websiteUrl)
+  // Schritt 1: Website-Content laden (mehrere Seiten für bessere Email-Findung)
+  const content = await crawlMultiplePages(websiteUrl)
   
   if (!content || content.length < 100) {
     throw new Error('Website-Content zu kurz oder nicht erreichbar')
@@ -99,6 +99,23 @@ export async function analyzeFirmaForScore(
   
   // Schritt 2: LLM-Analyse mit strukturiertem Prompt
   const analysisResult = await analyzeWithLLM(content, firmenname, branche, websiteUrl)
+  
+  // Schritt 3: Fallback Email-Adresse generieren wenn keine gefunden
+  if (!analysisResult.kontaktpersonen || analysisResult.kontaktpersonen.length === 0 || !analysisResult.kontaktpersonen[0]?.email) {
+    console.log('[SCORE Analyzer] Keine Email gefunden, generiere Fallback...')
+    const fallbackEmail = generateFallbackEmail(websiteUrl)
+    
+    if (fallbackEmail) {
+      analysisResult.kontaktpersonen = [{
+        name: 'Vertrieb',
+        position: 'Vertrieb/Info',
+        bereich: 'Vertrieb',
+        email: fallbackEmail,
+        confidence: 40  // Niedrige Confidence für generierte Emails
+      }]
+      console.log(`[SCORE Analyzer] Fallback Email generiert: ${fallbackEmail}`)
+    }
+  }
   
   return analysisResult
 }
