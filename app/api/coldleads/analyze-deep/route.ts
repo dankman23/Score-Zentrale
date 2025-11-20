@@ -47,11 +47,18 @@ export async function POST(req: NextRequest) {
       
       console.log(`[Deep Analysis] Updating prospect with query:`, query)
       
+      // Prüfe ob gültige E-Mail gefunden wurde
+      const contactEmail = result.kontaktpersonen[0]?.email
+      const hasValidEmail = contactEmail && typeof contactEmail === 'string' && contactEmail.length > 5 && contactEmail.includes('@')
+      
+      // Status: 'analyzed' wenn E-Mail vorhanden, sonst 'no_email'
+      const newStatus = hasValidEmail ? 'analyzed' : 'no_email'
+      
       const updateResult = await collection.updateOne(
         query,
         {
           $set: {
-            status: 'analyzed', // WICHTIG: Status auf analyzed setzen!
+            status: newStatus,
             analyzed: true,
             analyzed_at: new Date(),
             analysis: result, // Kompatibilität
