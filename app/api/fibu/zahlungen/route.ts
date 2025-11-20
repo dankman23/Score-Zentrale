@@ -99,6 +99,7 @@ export async function GET(request: NextRequest) {
     // Sammle von allen Quellen
     const sources = [
       { name: 'Amazon', collection: 'fibu_amazon_settlements' },
+      { name: 'eBay', collection: 'fibu_ebay_transactions' },
       { name: 'PayPal', collection: 'fibu_paypal_transactions' },
       { name: 'Commerzbank', collection: 'fibu_commerzbank_transactions' },
       { name: 'Postbank', collection: 'fibu_postbank_transactions' },
