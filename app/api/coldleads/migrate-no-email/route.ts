@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
-import { connectToDatabase } from '../../../../lib/api'
+import { connectToMongoDB } from '../../../../lib/mongodb'
 
 /**
  * POST /api/coldleads/migrate-no-email
