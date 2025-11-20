@@ -239,11 +239,11 @@ Du MUSST konkret erwähnen:
 
 4. **Call-to-Action:**
    "Einfach kurz antworten oder anrufen: 0221-25999901 (10–18 Uhr).
-   Ein paar Infos und auch ein Anfrageformular für Geschäftskunden finden Sie auch unter: https://score-schleifwerkzeuge.de/business"
+   Ein paar Infos und auch ein Anfrageformular für Geschäftskunden finden Sie auch unter: <a href='https://score-schleifwerkzeuge.de/business'>https://score-schleifwerkzeuge.de/business</a>"
 
 **FORMAT:**
 - 120-180 Wörter (NICHT mehr!)
-- Nutze <b> für wichtige Begriffe
+- Nutze <b> für wichtige Begriffe UND <a href='...'>Link</a> für URLs
 - Absätze für Lesbarkeit
 - KEINE Signatur (wird separat hinzugefügt)
 - NUR die E-Mail, sonst NICHTS
