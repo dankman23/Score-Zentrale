@@ -46,7 +46,7 @@ export async function POST() {
     
     // Update in DB
     await collection.updateOne(
-      { version: 'v1' },
+      { active: true },
       {
         $set: {
           prompt: updatedPrompt,
