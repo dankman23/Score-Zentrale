@@ -27,9 +27,9 @@ export async function POST() {
     // Ersetze den CTA-Teil mit klickbarem Link
     const oldCTA = `4. Call-to-Action:
    Klar und direkt:
-   "Einfach kurz antworten oder anrufen: 0221-25999901 (10–18 Uhr)."
+   „Einfach kurz antworten oder anrufen: 0221-25999901 (10–18 Uhr)."
    Optional 1 Satz mit Link:
-   "Ein paar Infos und auch ein Anfrageformular für Geschäftskunden finden Sie auch unter:
+   „Ein paar Infos und auch ein Anfrageformular für Geschäftskunden finden Sie auch unter:
  https://score-schleifwerkzeuge.de/business."
 Wobei bitte nach "unter:" ein Zeilenumbruch und den bitte den link verlinken.`
     
