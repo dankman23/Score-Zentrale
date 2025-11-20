@@ -13,12 +13,24 @@ export async function GET() {
     const db = await connectToMongoDB()
     const collection = db.collection('prospects')
     
+    // Prüfe verschiedene Queries
+    const totalAnalyzed = await collection.countDocuments({ status: 'analyzed' })
+    const withAnalysisV3 = await collection.countDocuments({ 'analysis_v3': { $exists: true } })
+    const notSent = await collection.countDocuments({ 'followup_schedule.mail_1_sent': { $ne: true } })
+    
     // Gleiche Query wie Autopilot
     const candidates = await collection.find({
+      status: 'analyzed',  // WICHTIG: Muss analyzed sein!
       'analysis_v3': { $exists: true },
       'followup_schedule.mail_1_sent': { $ne: true },
       'autopilot_skip': { $ne: true }
     }).limit(10).toArray()
+    
+    const debug = {
+      total_analyzed: totalAnalyzed,
+      with_analysis_v3: withAnalysisV3,
+      not_sent: notSent
+    }
     
     const results = []
     
