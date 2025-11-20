@@ -141,26 +141,27 @@ export default function KreditorZuordnung({ onUpdate }) {
   }
 
   async function bulkSave() {
-    if (selectedItems.size === 0 || !bulkKreditor) return
+    if (selectedItems.size === 0 || !bulkKreditor || !bulkAufwandskonto) return
     
     setSaving(true)
     let success = 0
     let failed = 0
     
     for (const id of selectedItems) {
-      const saved = await saveKreditor(id, bulkKreditor)
+      const saved = await saveKreditor(id, bulkKreditor, bulkAufwandskonto)
       if (saved) success++
       else failed++
     }
     
     setSelectedItems(new Set())
     setBulkKreditor('')
+    setBulkAufwandskonto('')
     setSaving(false)
     
     if (failed > 0) {
       alert(`${success} Rechnungen zugeordnet, ${failed} fehlgeschlagen!`)
     } else {
-      alert(`✅ ${success} Rechnungen erfolgreich zugeordnet!`)
+      alert(`✅ ${success} Rechnungen erfolgreich zugeordnet!\n\nKreditor: ${bulkKreditor}\nAufwandskonto: ${bulkAufwandskonto}`)
     }
     
     // Trigger reload in parent
