@@ -470,10 +470,11 @@ Falls es passt: Wir bieten <b>Rahmenverträge für den Jahresbedarf</b> mit Staf
 Mehr Infos: <a href="https://score-schleifwerkzeuge.de/business">https://score-schleifwerkzeuge.de/business</a>
 
 Viele Grüße
-<b>Daniel Leismann</b>
+Daniel Leismann
+
 Score Schleifwerkzeuge
-📞 <a href="tel:+4922125999901">0221-25999901</a>
-📧 <a href="mailto:leismann@score-schleifwerkzeuge.de">leismann@score-schleifwerkzeuge.de</a>`
+📞 0221-25999901 (Mo-Fr 10-18 Uhr)
+📧 <a href="mailto:daniel@score-schleifwerkzeuge.de">daniel@score-schleifwerkzeuge.de</a>`
   
   return {
     subject,
