@@ -502,15 +502,17 @@ ich möchte nicht nerven - vielleicht passt es gerade nicht.
 
 <b>Falls doch:</b> Darf ich kurz (10 Min) anrufen? Z.B. <b>Donnerstag 14 Uhr</b> oder <b>Freitag 10 Uhr</b>?
 
-📞 <a href="tel:+4922125999901">0221-25999901</a>
+📞 0221-25999901 (Mo-Fr 10-18 Uhr)
 
 Mehr Infos: <a href="https://score-schleifwerkzeuge.de/business">https://score-schleifwerkzeuge.de/business</a>
 
 Kurze Info reicht. Danke!
 
 Viele Grüße
-<b>Daniel Leismann</b>
-Score Schleifwerkzeuge`
+Daniel Leismann
+
+Score Schleifwerkzeuge
+📧 <a href="mailto:daniel@score-schleifwerkzeuge.de">daniel@score-schleifwerkzeuge.de</a>`
   
   return {
     subject,
