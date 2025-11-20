@@ -24,13 +24,15 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const from = searchParams.get('from') || '2025-01-01'
-    const to = searchParams.get('to') || '2025-01-31'
+    const to = searchParams.get('to') || '2025-12-31'
     const type = searchParams.get('type') || 'alle'  // 'alle', 'vk', 'ek'
     
     const startDate = new Date(from)
     const endDate = new Date(to + 'T23:59:59.999Z')
     
-    // Hole Kontenplan aus MongoDB für Bezeichnungen
+    console.log(`[10it Export] Exportiere ${type} von ${from} bis ${to}`)
+    
+    // Hole Kontenplan aus MongoDB
     const db = await getDb()
     const kontenplanCollection = db.collection('kontenplan')
     const kontenplanData = await kontenplanCollection.find({}).toArray()
@@ -43,280 +45,110 @@ export async function GET(request: NextRequest) {
     
     const buchungen: Booking10itFormat[] = []
     const validationErrors: string[] = []
+    let exportedVK = 0
+    let exportedEK = 0
+    let skippedVK = 0
+    let skippedEK = 0
     
     // ========================================
     // 1. VK-RECHNUNGEN (Verkaufsrechnungen)
     // ========================================
-    let vkRechnungen: any[] = []
     if (type === 'alle' || type === 'vk') {
       const vkRechnungenCol = db.collection('fibu_vk_rechnungen')
-      vkRechnungen = await vkRechnungenCol.find({
-        rechnungsdatum: {
-          $gte: startDate,
-          $lte: endDate
-        }
+      const vkRechnungen = await vkRechnungenCol.find({
+        $or: [
+          { rechnungsdatum: { $gte: startDate, $lte: endDate } },
+          { datum: { $gte: startDate, $lte: endDate } }
+        ]
       }).toArray()
-    }
-    
-    for (const rechnung of vkRechnungen) {
-      const brutto = rechnung.brutto || 0
-      const netto = rechnung.netto || 0
-      const mwst = rechnung.mwst || 0
-      const mwstSatz = rechnung.mwstSatz || 19
-      const steuersatz = getSteuersatz(mwstSatz)
       
-      // Debitorenkonto (z.B. 69018, 69002, etc.)
-      const debitorKonto = rechnung.debitorKonto || '69015'
+      console.log(`[10it Export] Gefundene VK-Rechnungen: ${vkRechnungen.length}`)
       
-      // Sachkonto (Erlöskonto, z.B. 4400)
-      const sachkonto = rechnung.sachkonto || '4400'
-      
-      // Buchung: Forderung an Erlöskonto (gemäß Tennet-Vorlage)
-      // SOLL: 1200 Forderungen (Forderung steigt)
-      // HABEN: 4400 Erlöse (Umsatz)
-      const booking = {
-        konto: '1200',  // Forderungen aus Lieferungen und Leistungen
-        kontobezeichnung: 'Forderungen aus Lieferungen und Leistungen',
-        datum: new Date(rechnung.rechnungsdatum),
-        belegnummer: rechnung.cBestellNr || rechnung.cRechnungsNr || String(rechnung.kRechnung),
-        text: `${rechnung.cRechnungsNr} - ${rechnung.kundenLand || 'DE'}`,
-        gegenkonto: sachkonto,
-        soll: brutto,
-        haben: 0,
-        steuer: steuersatz,
-        steuerkonto: getSteuerkonto(steuersatz, false)
-      }
-      
-      bookings.push(booking)
-    }
-    
-    // ========================================
-    // 2. VK-ZAHLUNGEN (Zahlungseingänge)
-    // ========================================
-    let zahlungen: any[] = []
-    if (type === 'alle' || type === 'vk') {
-      const zahlungenCol = db.collection('fibu_zahlungen')
-      zahlungen = await zahlungenCol.find({
-        zahlungsdatum: {
-          $gte: startDate,
-          $lt: endDate
+      for (const rechnung of vkRechnungen) {
+        // Validiere Kontozuordnung
+        const validation = validateKontoZuordnung(rechnung, 'vk')
+        
+        if (!validation.valid) {
+          validationErrors.push(...validation.errors)
+          skippedVK++
+          continue
         }
-      }).toArray()
-    }
-    
-    for (const zahlung of zahlungen) {
-      const betrag = zahlung.betrag || 0
-      
-      // Überspringe 0-Beträge und Postbank-Zahlungen (werden separat behandelt)
-      if (betrag === 0 || zahlung.quelle === 'postbank') continue
-      
-      const rechnungsNr = zahlung.rechnungsNr || 'Unbekannt'
-      
-      // Finde zugehörige Rechnung für Debitorenkonto
-      const rechnung = vkRechnungen.find((r: any) => r.kRechnung === zahlung.kRechnung)
-      const debitorKonto = rechnung?.debitorKonto || '69015'
-      
-      // Belegnummer: Nutze zahlungsId oder kRechnung
-      const zahlungsId = zahlung.zahlungsId || zahlung.kZahlung || 'UNBEKANNT'
-      const belegnummer = `ZE-${zahlungsId}`
-      
-      // Bestimme Bankkonto basierend auf Zahlungsanbieter (gemäß Tennet-Vorlage)
-      let bankKonto = '1800'  // Standard: Bank
-      const anbieter = (zahlung.zahlungsanbieter || '').toLowerCase()
-      
-      if (anbieter.includes('paypal')) {
-        bankKonto = '1820'  // PayPal-Konto
-      } else if (anbieter.includes('amazon')) {
-        bankKonto = '1825'  // Amazon-Konto
-      } else if (anbieter.includes('ebay')) {
-        bankKonto = '1840'  // eBay-Konto
-      } else if (anbieter.includes('mollie')) {
-        bankKonto = '1830'  // Mollie-Konto
-      } else if (anbieter.includes('commerzbank') || anbieter.includes('überweisung')) {
-        bankKonto = '1802'  // Commerzbank Girokonto
-      } else if (anbieter.includes('kreditkarte')) {
-        bankKonto = '1850'  // Kreditkartenkonto
-      } else if (anbieter.includes('bar')) {
-        bankKonto = '1600'  // Kasse
-      }
-      
-      // Bei positiven Beträgen: Bank SOLL, Debitor HABEN (Zahlung eingegangen)
-      // Bei negativen Beträgen: Bank HABEN, Debitor SOLL (Rückzahlung)
-      if (betrag > 0) {
-        // Zahlungseingang
-        bookings.push({
-          konto: bankKonto,
-          kontobezeichnung: getBezeichnung(bankKonto),
-          datum: new Date(zahlung.zahlungsdatum),
-          belegnummer: belegnummer,
-          text: `Zahlungseing. ${rechnungsNr} via ${zahlung.zahlungsanbieter || 'Bank'}`,
-          gegenkonto: debitorKonto,
-          soll: betrag,
-          haben: 0,
-          steuer: 0,
-          steuerkonto: ''
-        })
-      } else {
-        // Rückzahlung/Gutschrift
-        bookings.push({
-          konto: bankKonto,
-          kontobezeichnung: getBezeichnung(bankKonto),
-          datum: new Date(zahlung.zahlungsdatum),
-          belegnummer: belegnummer,
-          text: `Rückzahlung ${rechnungsNr}`,
-          gegenkonto: debitorKonto,
-          soll: 0,
-          haben: Math.abs(betrag),
-          steuer: 0,
-          steuerkonto: ''
-        })
+        
+        // Erstelle Buchung
+        const rechnungBuchungen = createVKBuchung(rechnung, kontoMap)
+        buchungen.push(...rechnungBuchungen)
+        exportedVK++
       }
     }
     
     // ========================================
-    // 3. EXTERNE RECHNUNGEN (Amazon VCS-Lite etc.)
+    // 2. EK-RECHNUNGEN (Einkaufsrechnungen)
     // ========================================
-    let externeRechnungen: any[] = []
-    if (type === 'alle' || type === 'vk') {
-      const externeRechnungenCol = db.collection('fibu_externe_rechnungen')
-      externeRechnungen = await externeRechnungenCol.find({
-        belegdatum: {
-          $gte: startDate,
-          $lt: endDate
-        }
-      }).toArray()
-    }
-    
-    for (const rechnung of externeRechnungen) {
-      const brutto = rechnung.brutto || 0
-      const netto = rechnung.netto || 0
-      const steuer = rechnung.steuer || 0
-      const mwstSatz = rechnung.mwstSatz || 19
-      const steuersatz = getSteuersatz(mwstSatz)
-      
-      // Externe Rechnungen = Amazon → Debitorenkonto 69002 (Amazon)
-      const debitorKonto = '69002'
-      const sachkonto = '4400'  // Erlöse Waren
-      
-      // Buchung: Forderung an Erlös
-      bookings.push({
-        konto: '1200',
-        kontobezeichnung: 'Forderungen aus Lieferungen und Leistungen',
-        datum: new Date(rechnung.belegdatum),
-        belegnummer: rechnung.belegnummer || `EXT-${rechnung.kExternerBeleg}`,
-        text: `${rechnung.belegnummer} (${rechnung.herkunft}) - ${rechnung.kundenLand || 'DE'}`,
-        gegenkonto: sachkonto,
-        soll: brutto,
-        haben: 0,
-        steuer: steuersatz,
-        steuerkonto: getSteuerkonto(steuersatz, false)
-      })
-    }
-    
-    // ========================================
-    // 4. GUTSCHRIFTEN (negative Rechnungen)
-    // ========================================
-    let gutschriften: any[] = []
-    if (type === 'alle' || type === 'vk') {
-      const gutschriftenCol = db.collection('fibu_gutschriften')
-      gutschriften = await gutschriftenCol.find({
-        belegdatum: {
-          $gte: startDate,
-          $lt: endDate
-        }
-      }).toArray()
-    }
-    
-    for (const gutschrift of gutschriften) {
-      // Beträge sind bereits negativ
-      const brutto = gutschrift.brutto || 0  // z.B. -100
-      const netto = gutschrift.netto || 0
-      const mwst = gutschrift.mwst || 0
-      const mwstSatz = gutschrift.mwstSatz || 19
-      const steuersatz = getSteuersatz(mwstSatz)
-      
-      const debitorKonto = '69015'  // Standard-Debitor
-      const sachkonto = '4400'
-      
-      // Gutschrift = STORNO der Rechnung
-      // HABEN: Forderung sinkt (negative Buchung)
-      // SOLL: Erlös sinkt
-      bookings.push({
-        konto: '1200',
-        kontobezeichnung: 'Forderungen aus Lieferungen und Leistungen',
-        datum: new Date(gutschrift.belegdatum),
-        belegnummer: gutschrift.belegnummer || `GU-${gutschrift.kGutschrift}`,
-        text: `Gutschrift ${gutschrift.originalRechnungNr || ''} - DE`,
-        gegenkonto: sachkonto,
-        soll: 0,
-        haben: Math.abs(brutto),  // Positiver Wert im HABEN
-        steuer: steuersatz,
-        steuerkonto: getSteuerkonto(steuersatz, false)
-      })
-    }
-    
-    // ========================================
-    // 5. EK-RECHNUNGEN (Lieferantenrechnungen)
-    // ========================================
-    let ekRechnungen: any[] = []
     if (type === 'alle' || type === 'ek') {
       const ekRechnungenCol = db.collection('fibu_ek_rechnungen')
-      ekRechnungen = await ekRechnungenCol.find({
-        rechnungsdatum: {
-          $gte: startDate,
-          $lt: endDate
-        }
+      const ekRechnungen = await ekRechnungenCol.find({
+        rechnungsdatum: { $gte: startDate, $lte: endDate },
+        kreditorKonto: { $exists: true, $ne: null }  // Nur Rechnungen mit Kreditor
       }).toArray()
+      
+      console.log(`[10it Export] Gefundene EK-Rechnungen: ${ekRechnungen.length}`)
+      
+      for (const rechnung of ekRechnungen) {
+        // Validiere Kontozuordnung
+        const validation = validateKontoZuordnung(rechnung, 'ek')
+        
+        if (!validation.valid) {
+          validationErrors.push(...validation.errors)
+          skippedEK++
+          continue
+        }
+        
+        // Erstelle Buchung
+        const rechnungBuchungen = createEKBuchung(rechnung, kontoMap)
+        buchungen.push(...rechnungBuchungen)
+        exportedEK++
+      }
     }
     
-    for (const rechnung of ekRechnungen) {
-      // Nur wenn Kreditorenkonto vorhanden
-      if (!rechnung.kreditorKonto) continue
-      
-      const brutto = rechnung.gesamtBetrag || rechnung.betrag || 0
-      const netto = rechnung.nettoBetrag || (brutto / 1.19)
-      const mwst = brutto - netto
-      const steuersatz = rechnung.steuersatz || 19
-      
-      const kreditorKonto = rechnung.kreditorKonto
-      const aufwandskonto = rechnung.aufwandskonto || '5200'
-      const lieferantName = rechnung.lieferantName || 'Lieferant'
-      
-      // Buchung: Aufwand an Kreditor
-      // SOLL: (leer)
-      // HABEN: Verbindlichkeit steigt
-      bookings.push({
-        konto: kreditorKonto,
-        kontobezeichnung: lieferantName,
-        datum: new Date(rechnung.rechnungsdatum),
-        belegnummer: rechnung.rechnungsNummer || String(rechnung._id),
-        text: `${lieferantName} ${rechnung.beschreibung || 'Wareneinkauf'}`,
-        gegenkonto: aufwandskonto,
-        soll: 0,
-        haben: brutto,
-        steuer: steuersatz,
-        steuerkonto: getSteuerkonto(steuersatz, true)
-      })
+    // ========================================
+    // 3. CSV GENERIEREN
+    // ========================================
+    const csv = generate10itCSV(buchungen)
+    
+    // Log Statistik
+    console.log(`[10it Export] Export abgeschlossen:`)
+    console.log(`  - VK-Rechnungen exportiert: ${exportedVK}`)
+    console.log(`  - VK-Rechnungen übersprungen: ${skippedVK}`)
+    console.log(`  - EK-Rechnungen exportiert: ${exportedEK}`)
+    console.log(`  - EK-Rechnungen übersprungen: ${skippedEK}`)
+    console.log(`  - Gesamt Buchungen: ${buchungen.length}`)
+    
+    if (validationErrors.length > 0) {
+      console.warn(`[10it Export] ⚠️ ${validationErrors.length} Validierungsfehler:`))
+      validationErrors.forEach(err => console.warn(`  - ${err}`))
     }
     
-    // Sortiere nach Datum
-    bookings.sort((a, b) => a.datum.getTime() - b.datum.getTime())
+    // Als CSV-Download zurückgeben
+    const filename = `EXTF_Buchungsstapel_${from}_${to}.csv`
     
-    // Generiere CSV
-    const csv = generate10itCSV(bookings)
-    
-    // Dateiname mit Export-Typ
-    const typeLabel = type === 'vk' ? 'VK' : type === 'ek' ? 'EK' : 'Alle'
-    const filename = `Export_${typeLabel}_von_${from}_bis_${to}.csv`
-    
-    return new Response(csv, {
+    return new NextResponse(csv, {
+      status: 200,
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
-        'Content-Disposition': `attachment; filename="${filename}"`
+        'Content-Disposition': `attachment; filename="${filename}"`,
+        'X-Export-Stats': JSON.stringify({
+          exportedVK,
+          exportedEK,
+          skippedVK,
+          skippedEK,
+          totalBuchungen: buchungen.length,
+          validationErrorsCount: validationErrors.length
+        })
       }
     })
+    
   } catch (error: any) {
-    console.error('[10it Export] Error:', error)
+    console.error('[10it Export] Fehler:', error)
     return NextResponse.json(
       { ok: false, error: error.message },
       { status: 500 }
