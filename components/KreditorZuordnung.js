@@ -52,7 +52,7 @@ export default function KreditorZuordnung({ onUpdate }) {
     setLoading(false)
   }
 
-  async function saveKreditor(rechnungId, kreditorNr) {
+  async function saveKreditor(rechnungId, kreditorNr, aufwandskonto = null) {
     try {
       // Finde die Rechnung um den Lieferanten zu bekommen
       const rechnung = rechnungen.find(r => r._id === rechnungId)
@@ -60,11 +60,16 @@ export default function KreditorZuordnung({ onUpdate }) {
       
       const lieferant = rechnung.lieferantName
       
-      // Speichere Kreditor für diese Rechnung
+      // Speichere Kreditor UND Aufwandskonto für diese Rechnung
+      const updateData = { kreditorKonto: kreditorNr }
+      if (aufwandskonto) {
+        updateData.aufwandskonto = aufwandskonto
+      }
+      
       const res = await fetch(`/api/fibu/rechnungen/ek/${rechnungId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kreditorKonto: kreditorNr })
+        body: JSON.stringify(updateData)
       })
       
       if (res.ok) {
