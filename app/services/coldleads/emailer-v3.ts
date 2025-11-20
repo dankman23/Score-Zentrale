@@ -264,7 +264,15 @@ Schreibe jetzt NUR die E-Mail-Text (120-180 Wörter):`
       max_tokens: 500
     })
     
-    const body = aiResponse.trim()
+    let body = aiResponse.trim()
+    
+    // Konvertiere Plain-Text-Link zu HTML-Link (falls ChatGPT ihn nicht als HTML zurückgibt)
+    if (body.includes('https://score-schleifwerkzeuge.de/business') && !body.includes('<a href=')) {
+      body = body.replace(
+        /https:\/\/score-schleifwerkzeuge\.de\/business/g,
+        `<a href="https://score-schleifwerkzeuge.de/business">https://score-schleifwerkzeuge.de/business</a>`
+      )
+    }
     
     // Füge Anrede und Signatur hinzu
     // Filter "Unbekannt" aus der Anrede
