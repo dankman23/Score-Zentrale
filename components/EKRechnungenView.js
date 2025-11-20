@@ -258,6 +258,9 @@ export default function EKRechnungenView({ zeitraum: zeitraumProp, initialFilter
                 >
                   Betrag {getSortIcon('betrag')}
                 </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Aufwandskonto
+                </th>
                 <th 
                   onClick={() => handleSort('kreditor')}
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
