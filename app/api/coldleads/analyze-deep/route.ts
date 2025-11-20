@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
       )
       
       console.log(`[Deep Analysis] Update result - matched: ${updateResult.matchedCount}, modified: ${updateResult.modifiedCount}`)
-      console.log(`[Deep Analysis] Gespeichert für Prospect: ${prospectId} - Status: analyzed`)
+      console.log(`[Deep Analysis] Gespeichert für Prospect: ${prospectId} - Status: ${newStatus}${!hasValidEmail ? ' (KEINE E-MAIL)' : ''}`)
     }
     
     return NextResponse.json({
