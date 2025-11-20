@@ -267,11 +267,26 @@ Schreibe jetzt NUR die E-Mail-Text (120-180 Wörter):`
     let body = aiResponse.trim()
     
     // Konvertiere Plain-Text-Link zu HTML-Link (falls ChatGPT ihn nicht als HTML zurückgibt)
-    if (body.includes('https://score-schleifwerkzeuge.de/business') && !body.includes('<a href=')) {
+    // Prüfe ob Link als Plain-Text vorkommt (nicht bereits als <a href> Tag)
+    const hasPlainLink = body.includes('https://score-schleifwerkzeuge.de/business')
+    const hasHtmlLink = body.includes('<a href="https://score-schleifwerkzeuge.de/business">') || 
+                        body.includes("<a href='https://score-schleifwerkzeuge.de/business'>")
+    
+    if (hasPlainLink && !hasHtmlLink) {
       body = body.replace(
         /https:\/\/score-schleifwerkzeuge\.de\/business/g,
         `<a href="https://score-schleifwerkzeuge.de/business">https://score-schleifwerkzeuge.de/business</a>`
       )
+      console.log('[Mail1] Link konvertiert: Plain-Text → HTML')
+    }
+    
+    // Konvertiere einfache Anführungszeichen zu doppelten (für Konsistenz)
+    if (body.includes("<a href='https://score-schleifwerkzeuge.de/business'>")) {
+      body = body.replace(
+        /<a href='https:\/\/score-schleifwerkzeuge\.de\/business'>/g,
+        `<a href="https://score-schleifwerkzeuge.de/business">`
+      )
+      console.log('[Mail1] Link-Anführungszeichen normalisiert')
     }
     
     // Füge Anrede und Signatur hinzu
