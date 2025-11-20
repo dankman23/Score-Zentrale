@@ -39,8 +39,13 @@ export default function KreditorZuordnung({ onUpdate }) {
       const kredRes = await fetch('/api/fibu/kreditoren?limit=500')
       const kredData = await kredRes.json()
       
+      // Lade Kontenplan für Kostenkonten
+      const kontenRes = await fetch('/api/fibu/kontenplan?typ=kosten')
+      const kontenData = await kontenRes.json()
+      
       setRechnungen(ekData.rechnungen || [])
       setKreditoren(kredData.kreditoren || [])
+      setKontenplan(kontenData.konten || [])
     } catch (error) {
       console.error('Fehler:', error)
     }
