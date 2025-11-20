@@ -257,10 +257,23 @@ export default function KreditorZuordnung({ onUpdate }) {
                 {selectedItems.size} Rechnungen ausgewählt
               </p>
               <p className="text-xs text-blue-700 mt-1">
-                Wähle einen Kreditor und klicke auf "Zuordnen"
+                Wähle Aufwandskonto + Kreditor und klicke auf "Zuordnen"
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <select
+                value={bulkAufwandskonto}
+                onChange={(e) => setBulkAufwandskonto(e.target.value)}
+                disabled={saving}
+                className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="">Aufwandskonto wählen...</option>
+                {kontenplan.map(k => (
+                  <option key={k.kontonummer} value={k.kontonummer}>
+                    {k.kontonummer} - {k.bezeichnung}
+                  </option>
+                ))}
+              </select>
               <select
                 value={bulkKreditor}
                 onChange={(e) => setBulkKreditor(e.target.value)}
@@ -276,7 +289,7 @@ export default function KreditorZuordnung({ onUpdate }) {
               </select>
               <button
                 onClick={bulkSave}
-                disabled={saving || !bulkKreditor}
+                disabled={saving || !bulkKreditor || !bulkAufwandskonto}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {saving ? (
