@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 
 import { NextResponse } from 'next/server'
 import { ObjectId } from 'mongodb'
-import { connectToDatabase } from '../../../../lib/api'
+import { connectToDatabase } from '../../../../../app/lib/api'
 import { sendEmail } from '../../../../../lib/email-client'
 import { SCORE_CONFIG } from '../../../../../lib/score-coldleads-config'
 
