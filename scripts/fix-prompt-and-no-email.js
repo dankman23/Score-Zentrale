@@ -59,19 +59,12 @@ async function fixAll() {
     console.log(`📊 Gefunden: ${noEmailProspects.length} Prospects ohne E-Mail`)
     
     if (noEmailProspects.length > 0) {
-      // Update zu "no_email" Status
+      // Update zu "no_email" Status - hole IDs
+      const idsToUpdate = noEmailProspects.map(p => p._id)
+      
       const result = await prospectsCollection.updateMany(
-        {
-          status: 'analyzed',
-          $or: [
-            { 'analysis_v3.contact_person.email': { $exists: false } },
-            { 'analysis_v3.contact_person.email': null },
-            { 'analysis_v3.contact_person.email': '' }
-          ]
-        },
-        {
-          $set: { status: 'no_email' }
-        }
+        { _id: { $in: idsToUpdate } },
+        { $set: { status: 'no_email' } }
       )
       
       console.log(`✅ ${result.modifiedCount} Prospects markiert als "no_email"\n`)
