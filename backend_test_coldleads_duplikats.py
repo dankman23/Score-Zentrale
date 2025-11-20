@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 # Backend URL
-BASE_URL = "https://lead-autopilot-3.preview.emergentagent.com/api"
+BASE_URL = "https://cold-lead-autopilot.preview.emergentagent.com/api"
 
 def print_section(title):
     """Print a section header"""

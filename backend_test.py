@@ -23,7 +23,7 @@ import subprocess
 from datetime import datetime
 
 # Backend URL
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://lead-autopilot-3.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://cold-lead-autopilot.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def log_test(test_name, status, details=""):
