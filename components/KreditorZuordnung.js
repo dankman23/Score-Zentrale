@@ -578,6 +578,25 @@ export default function KreditorZuordnung({ onUpdate }) {
                   </div>
                 </div>
 
+                {/* Aufwandskonto */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Aufwandskonto (optional)
+                  </label>
+                  <select
+                    value={editForm.aufwandskonto}
+                    onChange={(e) => setEditForm({...editForm, aufwandskonto: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="">Kein Aufwandskonto</option>
+                    {kontenplan.map(k => (
+                      <option key={k.kontonummer} value={k.kontonummer}>
+                        {k.kontonummer} - {k.bezeichnung}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 {/* Hinweis */}
                 <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded">
                   <p className="text-sm text-blue-800">
