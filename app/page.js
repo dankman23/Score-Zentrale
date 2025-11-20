@@ -1438,6 +1438,7 @@ export default function App() {
             total: all.length,
             new: all.filter(p => p.status === 'new').length,
             analyzed: all.filter(p => p.status === 'analyzed').length,
+            no_email: all.filter(p => p.status === 'no_email').length,
             contacted: all.filter(p => p.status === 'contacted').length,
             replied: all.filter(p => p.hasReply === true).length
           })
