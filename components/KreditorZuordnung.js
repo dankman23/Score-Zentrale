@@ -378,6 +378,48 @@ export default function KreditorZuordnung({ onUpdate }) {
                   </td>
                   <td className="px-4 py-3">
                     <select
+                      className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500 bg-white text-gray-900 w-48"
+                      value={rechnung.aufwandskonto || ''}
+                      onChange={async (e) => {
+                        if (e.target.value) {
+                          try {
+                            const res = await fetch(`/api/fibu/rechnungen/ek/${rechnung._id}`, {
+                              method: 'PUT',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ aufwandskonto: e.target.value })
+                            })
+                            if (res.ok) {
+                              setRechnungen(prev => prev.map(r => 
+                                r._id === rechnung._id ? {...r, aufwandskonto: e.target.value} : r
+                              ))
+                            }
+                          } catch (error) {
+                            console.error('Fehler:', error)
+                          }
+                        }
+                      }}
+                    >
+                      <option value="" className="text-gray-900">Kostenkonto wählen...</option>
+                      {kontenplan
+                        .filter(k => k.bezeichnung?.toLowerCase().includes('waren') || k.bezeichnung?.toLowerCase().includes('lizenz'))
+                        .slice(0, 5)
+                        .map(k => (
+                          <option key={k.kontonummer} value={k.kontonummer} className="text-gray-900">
+                            {k.kontonummer} - {k.bezeichnung.substring(0, 30)}
+                          </option>
+                        ))
+                      }
+                      <optgroup label="Alle Kostenkonten">
+                        {kontenplan.map(k => (
+                          <option key={k.kontonummer} value={k.kontonummer} className="text-gray-900">
+                            {k.kontonummer} - {k.bezeichnung}
+                          </option>
+                        ))}
+                      </optgroup>
+                    </select>
+                  </td>
+                  <td className="px-4 py-3">
+                    <select
                       className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 w-40"
                       onChange={(e) => e.target.value && saveKreditor(rechnung._id, e.target.value)}
                     >
