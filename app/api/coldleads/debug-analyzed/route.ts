@@ -53,6 +53,7 @@ export async function GET() {
     
     return NextResponse.json({
       ok: true,
+      debug,
       total_candidates: results.length,
       valid_email_count: validCount,
       candidates: results
