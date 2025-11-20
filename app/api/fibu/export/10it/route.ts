@@ -4,12 +4,12 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '../../../../lib/db/mongodb'
 import { 
-  Booking10it, 
-  generate10itCSV, 
-  getSteuersatz, 
-  getSteuerkonto,
-  formatDateGerman
-} from '../../../../lib/export-utils'
+  Booking10itFormat,
+  generate10itCSV,
+  createEKBuchung,
+  createVKBuchung,
+  validateKontoZuordnung
+} from '../../../../lib/export-10it-format'
 
 /**
  * GET /api/fibu/export/10it
