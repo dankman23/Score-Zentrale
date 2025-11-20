@@ -174,7 +174,8 @@ export default function KreditorZuordnung({ onUpdate }) {
       lieferantName: rechnung.lieferantName || '',
       rechnungsNummer: rechnung.rechnungsNummer || '',
       gesamtBetrag: rechnung.gesamtBetrag || 0,
-      rechnungsdatum: rechnung.rechnungsdatum ? rechnung.rechnungsdatum.split('T')[0] : ''
+      rechnungsdatum: rechnung.rechnungsdatum ? rechnung.rechnungsdatum.split('T')[0] : '',
+      aufwandskonto: rechnung.aufwandskonto || ''
     })
   }
 
