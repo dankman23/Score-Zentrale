@@ -320,7 +320,15 @@ export default function VKRechnungenView({ zeitraum: zeitraumProp, initialFilter
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-300">{rechnung.debitor || 'N/A'}</td>
-                  <td className="px-4 py-3 text-sm text-gray-300">{rechnung.sachkonto || 'N/A'}</td>
+                  <td className="px-4 py-3 text-sm">
+                    {rechnung.sachkonto ? (
+                      <span className="text-green-400 font-medium bg-green-900 bg-opacity-30 px-2 py-1 rounded">
+                        {rechnung.sachkonto}
+                      </span>
+                    ) : (
+                      <span className="text-orange-400 text-xs">⚠️ Nicht zugeordnet</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
