@@ -15,7 +15,7 @@ export async function POST() {
     
     console.log('[Update] Suche Prompt v1...')
     
-    const promptV1 = await collection.findOne({ version: 'v1' })
+    const promptV1 = await collection.findOne({ active: true })
     
     if (!promptV1) {
       return NextResponse.json({
