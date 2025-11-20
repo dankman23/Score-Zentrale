@@ -5,12 +5,14 @@ import { useState, useEffect } from 'react'
 export default function KreditorZuordnung({ onUpdate }) {
   const [rechnungen, setRechnungen] = useState([])
   const [kreditoren, setKreditoren] = useState([])
+  const [kontenplan, setKontenplan] = useState([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedItems, setSelectedItems] = useState(new Set())
   const [showNewKreditorDialog, setShowNewKreditorDialog] = useState(false)
   const [bulkKreditor, setBulkKreditor] = useState('')
+  const [bulkAufwandskonto, setBulkAufwandskonto] = useState('')
   
   // Edit-Modal State
   const [editRechnung, setEditRechnung] = useState(null)
@@ -18,7 +20,8 @@ export default function KreditorZuordnung({ onUpdate }) {
     lieferantName: '',
     rechnungsNummer: '',
     gesamtBetrag: 0,
-    rechnungsdatum: ''
+    rechnungsdatum: '',
+    aufwandskonto: ''
   })
 
   useEffect(() => {
