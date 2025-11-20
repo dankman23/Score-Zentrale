@@ -160,16 +160,18 @@ export async function GET(request: NextRequest) {
     const gruppe = searchParams.get('gruppe') // Filter nach Kontengruppe
     const aktiv = searchParams.get('aktiv') // Filter nur aktive
     const search = searchParams.get('search') // Suchbegriff
+    const typ = searchParams.get('typ') // Filter nach Typ (erloes, kosten, kreditor, debitor)
     
     const db = await getDb()
-    const collection = db.collection('fibu_kontenplan')
+    const collection = db.collection('kontenplan') // UPDATED: Nutze neue Collection
     
     // Query zusammenbauen
     const query: any = {}
     
-    if (klasse) query.kontenklasse = parseInt(klasse)
+    if (klasse) query.klasse = parseInt(klasse)
     if (gruppe) query.kontengruppe = gruppe
     if (aktiv === 'true') query.istAktiv = true
+    if (typ) query.typ = typ
     if (search) {
       query.$or = [
         { kontonummer: { $regex: search, $options: 'i' } },
@@ -184,12 +186,12 @@ export async function GET(request: NextRequest) {
     
     // Gruppiere nach Kontenklasse
     const grouped = konten.reduce((acc: any, konto: any) => {
-      const klasse = konto.kontenklasse
+      const klasse = konto.klasse || 0
       if (!acc[klasse]) {
         acc[klasse] = {
           klasse: klasse,
-          bezeichnung: konto.kontenklasseBezeichnung,
-          typ: konto.kontenklasseTyp,
+          bezeichnung: konto.kontenklasseBezeichnung || '',
+          typ: konto.typ,
           konten: []
         }
       }
@@ -199,7 +201,12 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       ok: true,
-      konten: konten,
+      konten: konten.map((k: any) => ({
+        kontonummer: k.kontonummer,
+        bezeichnung: k.bezeichnung,
+        klasse: k.klasse,
+        typ: k.typ
+      })),
       grouped: Object.values(grouped),
       total: konten.length
     })
