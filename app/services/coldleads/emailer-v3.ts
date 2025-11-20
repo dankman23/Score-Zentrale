@@ -403,10 +403,13 @@ Wenn Sie möchten, schaue ich mir Ihren Bedarf an und erstelle ein individuelles
 Ein paar Infos und auch ein Anfrageformular für Geschäftskunden finden Sie auch unter: <a href="https://score-schleifwerkzeuge.de/business">https://score-schleifwerkzeuge.de/business</a>
 
 Viele Grüße
-<b>Daniel Leismann</b>
+Daniel Leismann
+
 Score Schleifwerkzeuge
-📞 <a href="tel:+4922125999901">0221-25999901</a>
-📧 <a href="mailto:leismann@score-schleifwerkzeuge.de">leismann@score-schleifwerkzeuge.de</a>
+📞 0221-25999901 (Mo-Fr 10-18 Uhr)
+📧 Oder auf diese Mail antworten: <a href="mailto:daniel@score-schleifwerkzeuge.de">daniel@score-schleifwerkzeuge.de</a>
+
+Mehr Infos: <a href="https://score-schleifwerkzeuge.de/business">https://score-schleifwerkzeuge.de/business</a>
 
 -- 
 Besuchen Sie auch unseren Schleifmittel-Shop auf <a href="https://score-schleifwerkzeuge.de/business">https://score-schleifwerkzeuge.de/business</a> und kaufen Sie dort Schleifscheiben, Schleifbänder etc. zu Staffelpreisen unabhängig von den handelsüblichen OVP-Größen. 
