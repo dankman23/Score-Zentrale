@@ -146,7 +146,18 @@ export async function GET(request: NextRequest) {
         let autoZuordnungsArt = null
         
         // Anbieter-spezifische Anpassungen
-        if (source.name === 'Amazon') {
+        if (source.name === 'eBay') {
+          // eBay: Order-ID als Referenz
+          referenz = p.orderId || ''
+          verwendungszweck = `${p.transaktionsTyp || 'eBay Payment'} - ${referenz}`
+          gegenkonto = p.kundenName || p.gegenkonto || 'eBay Käufer'
+          transaktionsId = p.transactionId || p._id?.toString() || ''
+          
+          // eBay Gebühren
+          if (p.gebuehren && p.gebuehren > 0) {
+            verwendungszweck += ` (Gebühren: ${p.gebuehren.toFixed(2)}€)`
+          }
+        } else if (source.name === 'Amazon') {
           // Amazon: Order-ID als Referenz, amountType als Kategorie
           referenz = p.orderId || p.merchantOrderId || ''
           kategorie = p.amountType || ''  // ItemPrice, ItemFees, etc.
