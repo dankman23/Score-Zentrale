@@ -33,20 +33,16 @@ export async function GET(request: NextRequest) {
     // Hole Kontenplan aus MongoDB für Bezeichnungen
     const db = await getDb()
     const kontenplanCollection = db.collection('kontenplan')
-    const kontenplan = await kontenplanCollection.find({}).toArray()
+    const kontenplanData = await kontenplanCollection.find({}).toArray()
     
     // Erstelle Map für schnellen Zugriff
     const kontoMap = new Map<string, string>()
-    kontenplan.forEach((k: any) => {
+    kontenplanData.forEach((k: any) => {
       kontoMap.set(k.kontonummer, k.bezeichnung || '')
     })
     
-    // Funktion zum Holen der Kontobezeichnung
-    const getBezeichnung = (kontonummer: string): string => {
-      return kontoMap.get(kontonummer) || `Konto ${kontonummer}`
-    }
-    
-    const bookings: Booking10it[] = []
+    const buchungen: Booking10itFormat[] = []
+    const validationErrors: string[] = []
     
     // ========================================
     // 1. VK-RECHNUNGEN (Verkaufsrechnungen)
