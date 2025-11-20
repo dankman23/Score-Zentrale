@@ -84,32 +84,44 @@ export default function KreditorZuordnung({ onUpdate }) {
         if (gleicheLieferanten.length > 0) {
           confirmed = confirm(
             `Es gibt noch ${gleicheLieferanten.length} weitere Rechnung(en) von "${lieferant}".\n\n` +
-            `Sollen diese auch automatisch dem Kreditor ${kreditorNr} zugeordnet werden?`
+            `Sollen diese auch automatisch dem Kreditor ${kreditorNr}${aufwandskonto ? ' und Aufwandskonto ' + aufwandskonto : ''} zugeordnet werden?`
           )
           
           if (confirmed) {
             // Ordne alle anderen auch zu
             let erfolg = 0
             for (const r of gleicheLieferanten) {
+              const updateData2 = { kreditorKonto: kreditorNr }
+              if (aufwandskonto) {
+                updateData2.aufwandskonto = aufwandskonto
+              }
+              
               const res2 = await fetch(`/api/fibu/rechnungen/ek/${r._id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ kreditorKonto: kreditorNr })
+                body: JSON.stringify(updateData2)
               })
               if (res2.ok) erfolg++
             }
             
             // Speichere Mapping für zukünftige Rechnungen
+            const mappingData = {
+              lieferantName: lieferant,
+              kreditorKonto: kreditorNr
+            }
+            if (aufwandskonto) {
+              mappingData.aufwandskonto = aufwandskonto
+            }
+            
             await fetch('/api/fibu/lieferant-mapping', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                lieferantName: lieferant,
-                kreditorKonto: kreditorNr
-              })
+              body: JSON.stringify(mappingData)
             })
             
-            alert(`✅ ${erfolg + 1} Rechnungen von "${lieferant}" wurden dem Kreditor ${kreditorNr} zugeordnet!\n\n💾 Mapping gespeichert: Zukünftige Rechnungen von diesem Lieferanten werden automatisch zugeordnet.`)
+            alert(`✅ ${erfolg + 1} Rechnungen von "${lieferant}" wurden zugeordnet!\n\n` +
+                  `Kreditor: ${kreditorNr}${aufwandskonto ? '\nAufwandskonto: ' + aufwandskonto : ''}\n\n` +
+                  `💾 Mapping gespeichert: Zukünftige Rechnungen werden automatisch zugeordnet.`)
           }
         }
         
