@@ -4499,6 +4499,9 @@ export default function App() {
                         <button className={`btn ${coldStatusFilter==='analyzed'?'btn-info':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('analyzed'); setShowColdProspectDetails(null)}}>
                           🔍 Analysiert ({coldStats.analyzed})
                         </button>
+                        <button className={`btn ${coldStatusFilter==='no_email'?'btn-warning':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('no_email'); setShowColdProspectDetails(null)}}>
+                          ⚠️ Keine E-Mail ({coldStats.no_email || 0})
+                        </button>
                         <button className={`btn ${coldStatusFilter==='contacted'?'btn-success':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('contacted'); setShowColdProspectDetails(null)}}>
                           📧 Kontaktiert ({coldStats.contacted})
                         </button>
