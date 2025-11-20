@@ -291,8 +291,17 @@ export default function EKRechnungenView({ zeitraum: zeitraumProp, initialFilter
                     {(ek.gesamtBetrag || 0).toFixed(2)}€
                   </td>
                   <td className="px-4 py-3 text-sm">
+                    {ek.aufwandskonto ? (
+                      <span className="text-green-700 font-medium bg-green-50 px-2 py-1 rounded">
+                        {ek.aufwandskonto}
+                      </span>
+                    ) : (
+                      <span className="text-orange-600 text-xs">⚠️ Nicht zugeordnet</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-sm">
                     {ek.kreditorKonto ? (
-                      <span className="text-green-600 font-medium">{ek.kreditorKonto}</span>
+                      <span className="text-blue-600 font-medium">{ek.kreditorKonto}</span>
                     ) : (
                       <span className="text-red-600">❌ Fehlt</span>
                     )}
