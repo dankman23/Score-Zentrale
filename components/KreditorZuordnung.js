@@ -190,7 +190,8 @@ export default function KreditorZuordnung({ onUpdate }) {
           lieferantName: editForm.lieferantName,
           rechnungsNummer: editForm.rechnungsNummer,
           gesamtBetrag: parseFloat(editForm.gesamtBetrag),
-          rechnungsdatum: editForm.rechnungsdatum
+          rechnungsdatum: editForm.rechnungsdatum,
+          aufwandskonto: editForm.aufwandskonto
         })
       })
       
