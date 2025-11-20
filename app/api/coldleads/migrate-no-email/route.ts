@@ -10,7 +10,7 @@ import { connectToMongoDB } from '../../../../lib/mongodb'
  */
 export async function POST() {
   try {
-    const { db } = await connectToDatabase()
+    const db = await connectToMongoDB()
     const collection = db.collection('prospects')
     
     console.log('[Migration] Starte Migration: analyzed → no_email')
