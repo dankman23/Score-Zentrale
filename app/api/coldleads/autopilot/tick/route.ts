@@ -52,6 +52,7 @@ export async function POST() {
     
     // 2. Hole ALLE Prospects mit analysis_v3 die noch nicht kontaktiert wurden
     const candidates = await prospectsCollection.find({
+      status: 'analyzed',  // WICHTIG: Nur analyzed Prospects (mit E-Mail)!
       'analysis_v3': { $exists: true },
       'followup_schedule.mail_1_sent': { $ne: true },
       'autopilot_skip': { $ne: true }  // Skip failed Prospects
