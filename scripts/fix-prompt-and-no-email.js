@@ -45,15 +45,16 @@ async function fixAll() {
     
     const prospectsCollection = db.collection('prospects')
     
-    // Finde alle analysierten ohne E-Mail
-    const noEmailProspects = await prospectsCollection.find({
-      status: 'analyzed',
-      $or: [
-        { 'analysis_v3.contact_person.email': { $exists: false } },
-        { 'analysis_v3.contact_person.email': null },
-        { 'analysis_v3.contact_person.email': '' }
-      ]
+    // Finde ALLE analysierten Prospects
+    const allAnalyzed = await prospectsCollection.find({
+      status: 'analyzed'
     }).toArray()
+    
+    // Filtere die ohne gültige E-Mail
+    const noEmailProspects = allAnalyzed.filter(p => {
+      const email = p.analysis_v3?.contact_person?.email
+      return !email || typeof email !== 'string' || email.length < 5 || !email.includes('@')
+    })
     
     console.log(`📊 Gefunden: ${noEmailProspects.length} Prospects ohne E-Mail`)
     
