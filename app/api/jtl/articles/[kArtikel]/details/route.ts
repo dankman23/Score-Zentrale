@@ -24,7 +24,7 @@ export async function GET(
 
     const pool = await getMssqlPool()
     
-    // 1. Basis-Artikeldaten
+    // 1. Basis-Artikeldaten - nur sichere Spalten
     const artikelResult = await pool.request()
       .input('kArtikel', kArtikel)
       .query(`
@@ -37,14 +37,10 @@ export async function GET(
           a.fEKNetto,
           a.fUVP,
           a.nLagerbestand,
-          a.nMindestbestellmaenge,
           a.fGewicht,
-          ab.cName,
-          ab.cKurzBeschreibung,
           h.cName as cHerstellerName,
           w.cName as cWarengruppenName
         FROM tArtikel a
-        LEFT JOIN tArtikelBeschreibung ab ON a.kArtikel = ab.kArtikel AND ab.kSprache = 1
         LEFT JOIN tHersteller h ON a.kHersteller = h.kHersteller
         LEFT JOIN tWarengruppe w ON a.kWarengruppe = w.kWarengruppe
         WHERE a.kArtikel = @kArtikel
