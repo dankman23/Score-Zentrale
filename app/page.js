@@ -1783,6 +1783,24 @@ export default function App() {
     }
   }
 
+  const loadAmazonPrompts = async () => {
+    try {
+      setLoadingPrompts(true)
+      const res = await fetch('/api/amazon/prompts')
+      const data = await res.json()
+      if (data.ok) {
+        setAmazonPrompts(data.prompts || [])
+        console.log('[Amazon Prompts]', `Loaded ${data.prompts?.length || 0} prompts`)
+      } else {
+        console.error('Error loading Amazon prompts:', data.error)
+      }
+    } catch (e) {
+      console.error('Error loading Amazon prompts:', e)
+    } finally {
+      setLoadingPrompts(false)
+    }
+  }
+
   // Status-Polling: Prüfe alle 3 Sekunden ob Import läuft
   useEffect(() => {
     const interval = setInterval(() => {
