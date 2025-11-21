@@ -6375,13 +6375,163 @@ export default function App() {
                                   {expandedArtikel === artikel.kArtikel && (
                                     <tr>
                                       <td colSpan="10" className="bg-light">
-                                        {loadingPresence ? (
-                                          <div className="text-center py-3">
-                                            <span className="spinner-border spinner-border-sm mr-2"/>Lade Präsenz-Daten...
-                                          </div>
-                                        ) : artikelPresence ? (
+                                        {/* Artikel Detail Tabs */}
+                                        <div className="btn-group btn-group-sm mb-3">
+                                          <button 
+                                            className={`btn ${artikelDetailTab === 'jtl' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                            onClick={() => setArtikelDetailTab('jtl')}
+                                          >
+                                            <i className="bi bi-database mr-1"/>JTL-Daten
+                                          </button>
+                                          <button 
+                                            className={`btn ${artikelDetailTab === 'bulletpoints' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                            onClick={() => {
+                                              setArtikelDetailTab('bulletpoints')
+                                              loadBulletpointsForArtikel(artikel.kArtikel)
+                                            }}
+                                          >
+                                            <i className="bi bi-chat-left-text mr-1"/>Amazon Bulletpoints
+                                          </button>
+                                          <button 
+                                            className={`btn ${artikelDetailTab === 'presence' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                            onClick={() => setArtikelDetailTab('presence')}
+                                          >
+                                            <i className="bi bi-info-circle mr-1"/>Präsenz
+                                          </button>
+                                        </div>
+
+                                        {/* JTL-Daten Tab */}
+                                        {artikelDetailTab === 'jtl' && (
                                           <div className="py-2 px-3">
-                                            <h6 className="mb-2"><i className="bi bi-info-circle mr-2"/>Artikel-Präsenz</h6>
+                                            <h6 className="mb-3"><i className="bi bi-database mr-2"/>JTL-Daten & Merkmale</h6>
+                                            <div className="row">
+                                              <div className="col-md-6">
+                                                <table className="table table-sm table-bordered">
+                                                  <tbody>
+                                                    <tr>
+                                                      <td><strong>Artikel-Nr:</strong></td>
+                                                      <td>{artikel.cArtNr}</td>
+                                                    </tr>
+                                                    <tr>
+                                                      <td><strong>Name:</strong></td>
+                                                      <td>{artikel.cName}</td>
+                                                    </tr>
+                                                    <tr>
+                                                      <td><strong>Barcode/EAN:</strong></td>
+                                                      <td>{artikel.cBarcode || '-'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                      <td><strong>HAN:</strong></td>
+                                                      <td>{artikel.cHAN || '-'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                      <td><strong>Lagerbestand:</strong></td>
+                                                      <td>{artikel.nLagerbestand}</td>
+                                                    </tr>
+                                                    <tr>
+                                                      <td><strong>Gewicht (kg):</strong></td>
+                                                      <td>{artikel.fGewicht || '-'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                      <td><strong>VK Preis:</strong></td>
+                                                      <td>{artikel.fVKNetto?.toFixed(2)}€</td>
+                                                    </tr>
+                                                    <tr>
+                                                      <td><strong>EK Preis:</strong></td>
+                                                      <td>{artikel.fEKNetto?.toFixed(2)}€</td>
+                                                    </tr>
+                                                    <tr>
+                                                      <td><strong>Marge:</strong></td>
+                                                      <td>{artikel.margin_percent?.toFixed(1)}%</td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                              </div>
+                                              <div className="col-md-6">
+                                                <h6><i className="bi bi-tag mr-2"/>Merkmale</h6>
+                                                {artikel.merkmale && artikel.merkmale.length > 0 ? (
+                                                  <table className="table table-sm table-bordered">
+                                                    <tbody>
+                                                      {artikel.merkmale.map((m, idx) => (
+                                                        <tr key={idx}>
+                                                          <td><strong>{m.name}:</strong></td>
+                                                          <td>{m.wert}</td>
+                                                        </tr>
+                                                      ))}
+                                                    </tbody>
+                                                  </table>
+                                                ) : (
+                                                  <p className="text-muted">Keine Merkmale vorhanden</p>
+                                                )}
+                                              </div>
+                                            </div>
+                                            {artikel.cKurzBeschreibung && (
+                                              <div className="mt-3">
+                                                <h6><i className="bi bi-file-text mr-2"/>Kurzbeschreibung</h6>
+                                                <p className="small">{artikel.cKurzBeschreibung}</p>
+                                              </div>
+                                            )}
+                                          </div>
+                                        )}
+
+                                        {/* Amazon Bulletpoints Tab */}
+                                        {artikelDetailTab === 'bulletpoints' && (
+                                          <div className="py-2 px-3">
+                                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                              <h6 className="mb-0"><i className="bi bi-chat-left-text mr-2"/>Amazon Bulletpoints</h6>
+                                              <button 
+                                                className="btn btn-primary btn-sm"
+                                                onClick={() => generateBulletpointsForArtikel(artikel)}
+                                                disabled={generatingBulletpoints}
+                                              >
+                                                {generatingBulletpoints ? (
+                                                  <>
+                                                    <span className="spinner-border spinner-border-sm mr-2"/>
+                                                    Generiere...
+                                                  </>
+                                                ) : (
+                                                  <>
+                                                    <i className="bi bi-magic mr-2"/>
+                                                    Bulletpoints generieren
+                                                  </>
+                                                )}
+                                              </button>
+                                            </div>
+                                            
+                                            {artikelBulletpoints ? (
+                                              <div>
+                                                <div className="alert alert-success">
+                                                  <i className="bi bi-check-circle mr-2"/>Bulletpoints wurden generiert
+                                                </div>
+                                                <div className="bg-white p-3 rounded border">
+                                                  {artikelBulletpoints.split(';').map((bp, idx) => (
+                                                    <div key={idx} className="mb-2">
+                                                      <strong>Bulletpoint {idx + 1}:</strong>
+                                                      <p className="mb-0 ml-3">{bp.trim()}</p>
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            ) : (
+                                              <div className="alert alert-info">
+                                                <i className="bi bi-info-circle mr-2"/>
+                                                Für diesen Artikel wurden noch keine Bulletpoints generiert.
+                                                Klicken Sie auf "Bulletpoints generieren" um welche zu erstellen.
+                                              </div>
+                                            )}
+                                          </div>
+                                        )}
+
+                                        {/* Präsenz Tab */}
+                                        {artikelDetailTab === 'presence' && (
+                                          <>
+                                            {loadingPresence ? (
+                                              <div className="text-center py-3">
+                                                <span className="spinner-border spinner-border-sm mr-2"/>Lade Präsenz-Daten...
+                                              </div>
+                                            ) : artikelPresence ? (
+                                              <div className="py-2 px-3">
+                                                <h6 className="mb-2"><i className="bi bi-info-circle mr-2"/>Artikel-Präsenz</h6>
                                             
                                             {/* Zusammenfassung */}
                                             <div className="row mb-3">
