@@ -1801,6 +1801,168 @@ export default function App() {
     }
   }
 
+  const activatePrompt = async (version) => {
+    try {
+      const res = await fetch('/api/amazon/prompts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'activate', version })
+      })
+      const data = await res.json()
+      if (data.ok) {
+        alert(`✅ Prompt ${version} ist jetzt aktiv`)
+        await loadAmazonPrompts()
+      } else {
+        alert('❌ Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('❌ Fehler: ' + e.message)
+    }
+  }
+
+  const savePrompt = async () => {
+    if (!newPromptData.name || !newPromptData.prompt) {
+      alert('❌ Bitte Name und Prompt ausfüllen')
+      return
+    }
+
+    try {
+      const action = promptModalMode === 'edit' ? 'update' : 'create'
+      const payload = {
+        action,
+        name: newPromptData.name,
+        beschreibung: newPromptData.beschreibung,
+        prompt: newPromptData.prompt
+      }
+
+      if (promptModalMode === 'edit') {
+        payload.version = editingPrompt.version
+      }
+
+      const res = await fetch('/api/amazon/prompts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+
+      const data = await res.json()
+      if (data.ok) {
+        alert(`✅ Prompt ${promptModalMode === 'edit' ? 'aktualisiert' : 'erstellt'}!`)
+        setShowPromptModal(false)
+        setNewPromptData({ name: '', beschreibung: '', prompt: '' })
+        setEditingPrompt(null)
+        await loadAmazonPrompts()
+      } else {
+        alert('❌ Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('❌ Fehler: ' + e.message)
+    }
+  }
+
+  const deletePrompt = async (version) => {
+    if (!confirm(`Prompt ${version} wirklich löschen?`)) return
+
+    try {
+      const res = await fetch('/api/amazon/prompts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', version })
+      })
+
+      const data = await res.json()
+      if (data.ok) {
+        alert('✅ Prompt gelöscht')
+        await loadAmazonPrompts()
+      } else {
+        alert('❌ Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('❌ Fehler: ' + e.message)
+    }
+  }
+
+  const openPromptModal = (mode, prompt = null) => {
+    setPromptModalMode(mode)
+    if (mode === 'edit' && prompt) {
+      setEditingPrompt(prompt)
+      setNewPromptData({
+        name: prompt.name,
+        beschreibung: prompt.beschreibung,
+        prompt: prompt.prompt
+      })
+    } else {
+      setNewPromptData({ name: '', beschreibung: '', prompt: '' })
+    }
+    setShowPromptModal(true)
+  }
+
+  const generateBulletpointsForArtikel = async (artikel) => {
+    try {
+      setGeneratingBulletpoints(true)
+      
+      // Hole aktiven Prompt
+      const activePrompt = amazonPrompts.find(p => p.isActive)
+      if (!activePrompt) {
+        alert('❌ Kein aktiver Prompt gefunden. Bitte aktivieren Sie einen Prompt.')
+        return
+      }
+
+      // Bereite Produktinfo vor
+      const merkmaleText = artikel.merkmale?.map(m => `${m.name}: ${m.wert}`).join(' | ') || ''
+
+      const res = await fetch('/api/amazon/bulletpoints/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          artikelnummer: artikel.cArtNr,
+          artikelname: artikel.cName,
+          beschreibung: artikel.cBeschreibung || '',
+          kurzbeschreibung: artikel.cKurzBeschreibung || '',
+          merkmale: merkmaleText,
+          userPrompt: activePrompt.prompt
+        })
+      })
+
+      const data = await res.json()
+      if (data.ok) {
+        // Speichere in DB
+        await fetch(`/api/amazon/bulletpoints/artikel/${artikel.kArtikel}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bulletpoints: data.bulletpoints,
+            promptVersion: activePrompt.version
+          })
+        })
+
+        setArtikelBulletpoints(data.bulletpoints)
+        alert('✅ Bulletpoints erfolgreich generiert!')
+      } else {
+        alert('❌ Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('❌ Fehler: ' + e.message)
+    } finally {
+      setGeneratingBulletpoints(false)
+    }
+  }
+
+  const loadBulletpointsForArtikel = async (kArtikel) => {
+    try {
+      const res = await fetch(`/api/amazon/bulletpoints/artikel/${kArtikel}`)
+      const data = await res.json()
+      if (data.ok && data.bulletpoints) {
+        setArtikelBulletpoints(data.bulletpoints)
+      } else {
+        setArtikelBulletpoints(null)
+      }
+    } catch (e) {
+      console.error('Error loading bulletpoints:', e)
+      setArtikelBulletpoints(null)
+    }
+  }
+
   // Status-Polling: Prüfe alle 3 Sekunden ob Import läuft
   useEffect(() => {
     const interval = setInterval(() => {
