@@ -656,6 +656,8 @@ export default function App() {
   const [artikelDetailTab, setArtikelDetailTab] = useState('jtl') // jtl | bulletpoints
   const [artikelBulletpoints, setArtikelBulletpoints] = useState(null)
   const [generatingBulletpoints, setGeneratingBulletpoints] = useState(false)
+  const [artikelDetails, setArtikelDetails] = useState(null)
+  const [loadingArtikelDetails, setLoadingArtikelDetails] = useState(false)
   
   // Preise
   const [preiseTab, setPreiseTab] = useState('alte_pb') // alte_pb | neue_2025
