@@ -1993,6 +1993,26 @@ export default function App() {
     }
   }
 
+  const loadArtikelDetails = async (kArtikel) => {
+    try {
+      setLoadingArtikelDetails(true)
+      const res = await fetch(`/api/jtl/articles/${kArtikel}/details`)
+      const data = await res.json()
+      if (data.ok) {
+        setArtikelDetails(data.artikel)
+        console.log('[Artikel Details]', `Loaded kArtikel=${kArtikel}, ${data.artikel.merkmale?.length || 0} merkmale`)
+      } else {
+        console.error('Error loading artikel details:', data.error)
+        setArtikelDetails(null)
+      }
+    } catch (e) {
+      console.error('Error loading artikel details:', e)
+      setArtikelDetails(null)
+    } finally {
+      setLoadingArtikelDetails(false)
+    }
+  }
+
   // Status-Polling: Prüfe alle 3 Sekunden ob Import läuft
   useEffect(() => {
     const interval = setInterval(() => {
