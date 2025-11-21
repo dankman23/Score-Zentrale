@@ -38,36 +38,25 @@ export async function GET(
 
     const pool = await getMssqlPool()
     
-    // 1. Basis-Artikeldaten - nur sichere Spalten
-    const artikelResult = await pool.request()
-      .input('kArtikel', kArtikel)
-      .query(`
-        SELECT 
-          a.kArtikel,
-          a.cArtNr,
-          a.cBarcode,
-          a.cHAN,
-          a.fVKNetto,
-          a.fEKNetto,
-          a.fUVP,
-          a.nLagerbestand,
-          a.fGewicht,
-          h.cName as cHerstellerName,
-          w.cName as cWarengruppenName
-        FROM tArtikel a
-        LEFT JOIN tHersteller h ON a.kHersteller = h.kHersteller
-        LEFT JOIN tWarengruppe w ON a.kWarengruppe = w.kWarengruppe
-        WHERE a.kArtikel = @kArtikel
-      `)
-    
-    if (artikelResult.recordset.length === 0) {
-      return NextResponse.json({
-        ok: false,
-        error: 'Artikel nicht gefunden'
-      }, { status: 404 })
+    // Nutze MongoDB-Daten als Basis
+    const artikel = {
+      kArtikel: mongoArtikel.kArtikel,
+      cArtNr: mongoArtikel.cArtNr,
+      cName: mongoArtikel.cName,
+      cKurzBeschreibung: mongoArtikel.cKurzBeschreibung || null,
+      cBeschreibung: null, // Wird gleich geladen
+      cBarcode: mongoArtikel.cBarcode,
+      cHAN: mongoArtikel.cHAN,
+      fVKNetto: mongoArtikel.fVKNetto,
+      fEKNetto: mongoArtikel.fEKNetto,
+      fUVP: mongoArtikel.fUVP,
+      nLagerbestand: mongoArtikel.nLagerbestand,
+      fGewicht: mongoArtikel.fGewicht,
+      cHerstellerName: mongoArtikel.cHerstellerName,
+      cWarengruppenName: mongoArtikel.cWarengruppenName,
+      merkmale: mongoArtikel.merkmale || [],
+      attribute: []
     }
-    
-    const artikel = artikelResult.recordset[0]
     
     // 2. Beschreibung aus tArtikelBeschreibung
     const beschreibungResult = await pool.request()
