@@ -53,9 +53,9 @@ async function callClaudeAPI(prompt) {
     })
     
     const options = {
-      hostname: 'llm.staging.emergent.tools',
+      hostname: 'llm.emergent.tools',
       port: 443,
-      path: '/api/v1/chat',
+      path: '/api/v1/chat/completions',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
