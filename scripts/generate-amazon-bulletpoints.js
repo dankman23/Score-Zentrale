@@ -38,24 +38,28 @@ function parseCSV(csvText) {
   return articles
 }
 
-async function callClaudeAPI(prompt) {
+async function callOpenAIAPI(prompt) {
   return new Promise((resolve, reject) => {
     const data = JSON.stringify({
-      model: 'claude-3-7-sonnet-20250219',
+      model: 'gpt-4o',
       messages: [
+        {
+          role: 'system',
+          content: 'Du bist ein Experte für Amazon-Produktbeschreibungen und SEO-optimierte Bulletpoints.'
+        },
         {
           role: 'user',
           content: prompt
         }
       ],
-      max_tokens: 4000,
+      max_tokens: 1500,
       temperature: 0.7
     })
     
     const options = {
-      hostname: 'llm.emergent.tools',
+      hostname: 'api.openai.com',
       port: 443,
-      path: '/api/v1/chat/completions',
+      path: '/v1/chat/completions',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
