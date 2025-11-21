@@ -51,13 +51,17 @@ ${merkmale || 'Keine Angabe'}
 Hier sind die Produktinformationen für EINEN Artikel:
 ${productInfo}
 
+WICHTIG: Die TECHNISCHEN MERKMALE oben enthalten ALLE relevanten Spezifikationen. 
+Bitte verwende ALLE diese technischen Daten in den Bulletpoints!
+
 Bitte erstelle GENAU 5 Bulletpoints für Amazon. Jeder Bulletpoint sollte:
 - Maximal 200-250 Zeichen lang sein (Amazon-Richtlinien)
 - Mit einem Großbuchstaben beginnen
 - Die wichtigsten Produktvorteile hervorheben
 - SEO-Keywords enthalten
-- Technische Details einbeziehen
-- Keine Informationen weglassen
+- ALLE technischen Details aus den TECHNISCHEN MERKMALEN einbeziehen
+- Keine Informationen weglassen - besonders nicht aus den technischen Merkmalen!
+- Maße, Körnung, Bindung, Härte, Typ, Schaftmaße etc. MÜSSEN erwähnt werden
 
 Format:
 • [Bulletpoint 1]
