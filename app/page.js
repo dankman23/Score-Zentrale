@@ -6682,7 +6682,15 @@ export default function App() {
             <div>
               <div className="card border-0 shadow-sm">
                 <div className="card-body">
-                  <h5 className="mb-3"><i className="bi bi-chat-left-text mr-2"/>Amazon Prompts</h5>
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h5 className="mb-0"><i className="bi bi-chat-left-text mr-2"/>Amazon Bulletpoint Prompts</h5>
+                    <button 
+                      className="btn btn-primary btn-sm"
+                      onClick={() => openPromptModal('create')}
+                    >
+                      <i className="bi bi-plus-circle mr-2"/>Neuer Prompt
+                    </button>
+                  </div>
                   
                   {loadingPrompts ? (
                     <div className="text-center py-5">
@@ -6695,34 +6703,226 @@ export default function App() {
                     <div className="text-center py-5">
                       <i className="bi bi-chat-left-text" style={{fontSize: '4rem', color: '#ccc'}}/>
                       <h4 className="mt-3 text-muted">Keine Prompts verfügbar</h4>
-                      <p className="text-muted">Es wurden noch keine Amazon-Prompts erstellt.</p>
+                      <p className="text-muted">Erstellen Sie Ihren ersten Amazon-Prompt.</p>
+                      <button 
+                        className="btn btn-primary mt-3"
+                        onClick={() => openPromptModal('create')}
+                      >
+                        <i className="bi bi-plus-circle mr-2"/>Ersten Prompt erstellen
+                      </button>
                     </div>
                   ) : (
-                    <div>
-                      <div className="row">
-                        {amazonPrompts.map((prompt, index) => (
-                          <div key={index} className="col-md-6 col-lg-4 mb-3">
-                            <div className="card h-100">
-                              <div className="card-body">
-                                <h6 className="card-title">{prompt.name}</h6>
-                                <p className="card-text text-muted small">{prompt.beschreibung}</p>
-                                <div className="mt-auto">
+                    <div className="table-responsive">
+                      <table className="table table-hover">
+                        <thead>
+                          <tr>
+                            <th>Version</th>
+                            <th>Name</th>
+                            <th>Beschreibung</th>
+                            <th>Status</th>
+                            <th>Aktionen</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {amazonPrompts.map((prompt) => (
+                            <tr key={prompt.version}>
+                              <td className="align-middle">
+                                <span className="badge badge-secondary">v{prompt.version}</span>
+                              </td>
+                              <td className="align-middle">
+                                <strong>{prompt.name}</strong>
+                              </td>
+                              <td className="align-middle">
+                                <small className="text-muted">{prompt.beschreibung}</small>
+                              </td>
+                              <td className="align-middle">
+                                {prompt.isActive ? (
+                                  <span className="badge badge-success">
+                                    <i className="bi bi-check-circle mr-1"/>Aktiv
+                                  </span>
+                                ) : (
+                                  <span className="badge badge-secondary">Inaktiv</span>
+                                )}
+                              </td>
+                              <td className="align-middle">
+                                <div className="btn-group btn-group-sm">
                                   <button 
-                                    className="btn btn-sm btn-outline-primary"
+                                    className="btn btn-outline-primary"
                                     onClick={() => setSelectedPrompt(prompt)}
+                                    title="Anzeigen"
                                   >
-                                    <i className="bi bi-eye mr-1"/>Anzeigen
+                                    <i className="bi bi-eye"/>
+                                  </button>
+                                  <button 
+                                    className="btn btn-outline-secondary"
+                                    onClick={() => openPromptModal('edit', prompt)}
+                                    title="Bearbeiten"
+                                  >
+                                    <i className="bi bi-pencil"/>
+                                  </button>
+                                  {!prompt.isActive && (
+                                    <button 
+                                      className="btn btn-outline-success"
+                                      onClick={() => activatePrompt(prompt.version)}
+                                      title="Aktivieren"
+                                    >
+                                      <i className="bi bi-check-circle"/>
+                                    </button>
+                                  )}
+                                  <button 
+                                    className="btn btn-outline-danger"
+                                    onClick={() => deletePrompt(prompt.version)}
+                                    title="Löschen"
+                                  >
+                                    <i className="bi bi-trash"/>
                                   </button>
                                 </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   )}
                 </div>
               </div>
+
+              {/* Prompt Detail Modal */}
+              {selectedPrompt && (
+                <div 
+                  className="modal d-block" 
+                  style={{backgroundColor: 'rgba(0,0,0,0.5)'}}
+                  onClick={() => setSelectedPrompt(null)}
+                >
+                  <div 
+                    className="modal-dialog modal-lg modal-dialog-scrollable"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h5 className="modal-title">
+                          <i className="bi bi-chat-left-text mr-2"/>
+                          {selectedPrompt.name} <span className="badge badge-secondary ml-2">v{selectedPrompt.version}</span>
+                        </h5>
+                        <button 
+                          className="close" 
+                          onClick={() => setSelectedPrompt(null)}
+                        >
+                          <span>&times;</span>
+                        </button>
+                      </div>
+                      <div className="modal-body">
+                        <div className="mb-3">
+                          <strong>Beschreibung:</strong>
+                          <p className="text-muted">{selectedPrompt.beschreibung}</p>
+                        </div>
+                        <div className="mb-3">
+                          <strong>Status:</strong>
+                          {selectedPrompt.isActive ? (
+                            <span className="badge badge-success ml-2">Aktiv</span>
+                          ) : (
+                            <span className="badge badge-secondary ml-2">Inaktiv</span>
+                          )}
+                        </div>
+                        <div>
+                          <strong>Prompt:</strong>
+                          <pre className="bg-light p-3 rounded mt-2" style={{maxHeight: '400px', overflow: 'auto', fontSize: '12px'}}>
+                            {selectedPrompt.prompt}
+                          </pre>
+                        </div>
+                      </div>
+                      <div className="modal-footer">
+                        <button 
+                          className="btn btn-secondary"
+                          onClick={() => setSelectedPrompt(null)}
+                        >
+                          Schließen
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Create/Edit Prompt Modal */}
+              {showPromptModal && (
+                <div 
+                  className="modal d-block" 
+                  style={{backgroundColor: 'rgba(0,0,0,0.5)'}}
+                  onClick={() => setShowPromptModal(false)}
+                >
+                  <div 
+                    className="modal-dialog modal-xl modal-dialog-scrollable"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h5 className="modal-title">
+                          <i className="bi bi-chat-left-text mr-2"/>
+                          {promptModalMode === 'edit' ? 'Prompt bearbeiten' : 'Neuer Prompt'}
+                        </h5>
+                        <button 
+                          className="close" 
+                          onClick={() => setShowPromptModal(false)}
+                        >
+                          <span>&times;</span>
+                        </button>
+                      </div>
+                      <div className="modal-body">
+                        <div className="form-group">
+                          <label>Name *</label>
+                          <input 
+                            type="text"
+                            className="form-control"
+                            value={newPromptData.name}
+                            onChange={(e) => setNewPromptData({...newPromptData, name: e.target.value})}
+                            placeholder="z.B. Premium Stil-Vorgabe"
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Beschreibung</label>
+                          <input 
+                            type="text"
+                            className="form-control"
+                            value={newPromptData.beschreibung}
+                            onChange={(e) => setNewPromptData({...newPromptData, beschreibung: e.target.value})}
+                            placeholder="Kurze Beschreibung des Prompts"
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Prompt *</label>
+                          <textarea 
+                            className="form-control font-monospace"
+                            rows="20"
+                            value={newPromptData.prompt}
+                            onChange={(e) => setNewPromptData({...newPromptData, prompt: e.target.value})}
+                            placeholder="Geben Sie hier den Prompt ein..."
+                            style={{fontSize: '12px'}}
+                          />
+                          <small className="form-text text-muted">
+                            Verwenden Sie {'{'}{'{'} PRODUKTINFO {'}'}{'}'}  als Platzhalter für die Produktinformationen
+                          </small>
+                        </div>
+                      </div>
+                      <div className="modal-footer">
+                        <button 
+                          className="btn btn-secondary"
+                          onClick={() => setShowPromptModal(false)}
+                        >
+                          Abbrechen
+                        </button>
+                        <button 
+                          className="btn btn-primary"
+                          onClick={savePrompt}
+                        >
+                          <i className="bi bi-save mr-2"/>
+                          {promptModalMode === 'edit' ? 'Aktualisieren' : 'Erstellen'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
