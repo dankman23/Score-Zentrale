@@ -26,7 +26,7 @@ export async function GET(
 
     // Lade aus MongoDB (hat bereits importierte Basis-Daten)
     const db = await getDb()
-    const collection = db.collection('jtl_artikel')
+    const collection = db.collection('articles')
     const mongoArtikel = await collection.findOne({ kArtikel })
     
     if (!mongoArtikel) {
