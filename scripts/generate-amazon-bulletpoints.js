@@ -10,7 +10,7 @@ const https = require('https')
 
 // Emergent LLM Key
 const API_KEY = 'sk-emergent-a5626Df00550106A36'
-const API_URL = 'https://llm.staging.emergent.tools/api/v1/chat'
+const API_URL = 'https://llm.emergent.tools/api/v1/chat/completions'
 
 // CSV Datei laden
 const csvFilePath = '/tmp/tyrolit-bps_test.csv'
