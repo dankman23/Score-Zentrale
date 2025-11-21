@@ -6458,72 +6458,106 @@ export default function App() {
                                         {/* JTL-Daten Tab */}
                                         {artikelDetailTab === 'jtl' && (
                                           <div className="py-2 px-3">
-                                            <h6 className="mb-3"><i className="bi bi-database mr-2"/>JTL-Daten & Merkmale</h6>
-                                            <div className="row">
-                                              <div className="col-md-6">
-                                                <table className="table table-sm table-bordered">
-                                                  <tbody>
-                                                    <tr>
-                                                      <td><strong>Artikel-Nr:</strong></td>
-                                                      <td>{artikel.cArtNr}</td>
-                                                    </tr>
-                                                    <tr>
-                                                      <td><strong>Name:</strong></td>
-                                                      <td>{artikel.cName}</td>
-                                                    </tr>
-                                                    <tr>
-                                                      <td><strong>Barcode/EAN:</strong></td>
-                                                      <td>{artikel.cBarcode || '-'}</td>
-                                                    </tr>
-                                                    <tr>
-                                                      <td><strong>HAN:</strong></td>
-                                                      <td>{artikel.cHAN || '-'}</td>
-                                                    </tr>
-                                                    <tr>
-                                                      <td><strong>Lagerbestand:</strong></td>
-                                                      <td>{artikel.nLagerbestand}</td>
-                                                    </tr>
-                                                    <tr>
-                                                      <td><strong>Gewicht (kg):</strong></td>
-                                                      <td>{artikel.fGewicht || '-'}</td>
-                                                    </tr>
-                                                    <tr>
-                                                      <td><strong>VK Preis:</strong></td>
-                                                      <td>{artikel.fVKNetto?.toFixed(2)}€</td>
-                                                    </tr>
-                                                    <tr>
-                                                      <td><strong>EK Preis:</strong></td>
-                                                      <td>{artikel.fEKNetto?.toFixed(2)}€</td>
-                                                    </tr>
-                                                    <tr>
-                                                      <td><strong>Marge:</strong></td>
-                                                      <td>{artikel.margin_percent?.toFixed(1)}%</td>
-                                                    </tr>
-                                                  </tbody>
-                                                </table>
+                                            {loadingArtikelDetails ? (
+                                              <div className="text-center py-3">
+                                                <span className="spinner-border spinner-border-sm mr-2"/>Lade Details...
                                               </div>
-                                              <div className="col-md-6">
-                                                <h6><i className="bi bi-tag mr-2"/>Merkmale</h6>
-                                                {artikel.merkmale && artikel.merkmale.length > 0 ? (
-                                                  <table className="table table-sm table-bordered">
-                                                    <tbody>
-                                                      {artikel.merkmale.map((m, idx) => (
-                                                        <tr key={idx}>
-                                                          <td><strong>{m.name}:</strong></td>
-                                                          <td>{m.wert}</td>
+                                            ) : artikelDetails ? (
+                                              <>
+                                                <h6 className="mb-3"><i className="bi bi-database mr-2"/>JTL-Daten & Merkmale</h6>
+                                                <div className="row">
+                                                  <div className="col-md-6">
+                                                    <table className="table table-sm table-bordered">
+                                                      <tbody>
+                                                        <tr>
+                                                          <td><strong>Artikel-Nr:</strong></td>
+                                                          <td>{artikelDetails.cArtNr}</td>
                                                         </tr>
-                                                      ))}
-                                                    </tbody>
-                                                  </table>
-                                                ) : (
-                                                  <p className="text-muted">Keine Merkmale vorhanden</p>
+                                                        <tr>
+                                                          <td><strong>Name:</strong></td>
+                                                          <td>{artikelDetails.cName}</td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td><strong>Barcode/EAN:</strong></td>
+                                                          <td>{artikelDetails.cBarcode || '-'}</td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td><strong>HAN:</strong></td>
+                                                          <td>{artikelDetails.cHAN || '-'}</td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td><strong>Lagerbestand:</strong></td>
+                                                          <td>{artikelDetails.nLagerbestand}</td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td><strong>Gewicht (kg):</strong></td>
+                                                          <td>{artikelDetails.fGewicht || '-'}</td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td><strong>VK Preis:</strong></td>
+                                                          <td>{artikelDetails.fVKNetto?.toFixed(2)}€</td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td><strong>EK Preis:</strong></td>
+                                                          <td>{artikelDetails.fEKNetto?.toFixed(2)}€</td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td><strong>Marge:</strong></td>
+                                                          <td>{artikelDetails.margin_percent}%</td>
+                                                        </tr>
+                                                      </tbody>
+                                                    </table>
+                                                  </div>
+                                                  <div className="col-md-6">
+                                                    <h6><i className="bi bi-tag mr-2"/>Merkmale</h6>
+                                                    {artikelDetails.merkmale && artikelDetails.merkmale.length > 0 ? (
+                                                      <table className="table table-sm table-bordered">
+                                                        <tbody>
+                                                          {artikelDetails.merkmale.map((m, idx) => (
+                                                            <tr key={idx}>
+                                                              <td><strong>{m.name}:</strong></td>
+                                                              <td>{m.wert}</td>
+                                                            </tr>
+                                                          ))}
+                                                        </tbody>
+                                                      </table>
+                                                    ) : (
+                                                      <p className="text-muted small">Keine Merkmale vorhanden</p>
+                                                    )}
+                                                    
+                                                    {artikelDetails.attribute && artikelDetails.attribute.length > 0 && (
+                                                      <>
+                                                        <h6 className="mt-3"><i className="bi bi-tag mr-2"/>Attribute</h6>
+                                                        <table className="table table-sm table-bordered">
+                                                          <tbody>
+                                                            {artikelDetails.attribute.map((a, idx) => (
+                                                              <tr key={idx}>
+                                                                <td><strong>{a.name}:</strong></td>
+                                                                <td>{a.wert}</td>
+                                                              </tr>
+                                                            ))}
+                                                          </tbody>
+                                                        </table>
+                                                      </>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                                {artikelDetails.cKurzBeschreibung && (
+                                                  <div className="mt-3">
+                                                    <h6><i className="bi bi-file-text mr-2"/>Kurzbeschreibung</h6>
+                                                    <p className="small">{artikelDetails.cKurzBeschreibung}</p>
+                                                  </div>
                                                 )}
-                                              </div>
-                                            </div>
-                                            {artikel.cKurzBeschreibung && (
-                                              <div className="mt-3">
-                                                <h6><i className="bi bi-file-text mr-2"/>Kurzbeschreibung</h6>
-                                                <p className="small">{artikel.cKurzBeschreibung}</p>
+                                                {artikelDetails.cBeschreibung && (
+                                                  <div className="mt-3">
+                                                    <h6><i className="bi bi-file-text mr-2"/>Beschreibung</h6>
+                                                    <div className="small" dangerouslySetInnerHTML={{ __html: artikelDetails.cBeschreibung }} />
+                                                  </div>
+                                                )}
+                                              </>
+                                            ) : (
+                                              <div className="alert alert-info">
+                                                Artikel-Details konnten nicht geladen werden.
                                               </div>
                                             )}
                                           </div>
