@@ -8,9 +8,9 @@
 const fs = require('fs')
 const https = require('https')
 
-// Emergent LLM Key
-const API_KEY = 'sk-emergent-a5626Df00550106A36'
-const API_URL = 'https://llm.emergent.tools/api/v1/chat/completions'
+// OpenAI API Key (aus .env)
+const API_KEY = process.env.OPENAI_API_KEY || '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'
+const API_URL = 'https://api.openai.com/v1/chat/completions'
 
 // CSV Datei laden
 const csvFilePath = '/tmp/tyrolit-bps_test.csv'
