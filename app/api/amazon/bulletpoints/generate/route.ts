@@ -46,31 +46,35 @@ TECHNISCHE MERKMALE:
 ${merkmale || 'Keine Angabe'}
 `
 
-    const fullPrompt = `${userPrompt ||'Erstelle 5 hochwertige Bulletpoints für Amazon'}
+    // PERFEKTER PROMPT basierend auf Kundenbeispiel
+    const fullPrompt = `Du bist ein Experte für Amazon-Produktbeschreibungen. Erstelle GENAU 5 Bulletpoints nach diesem EXAKTEN Format und Stil:
 
-Hier sind die Produktinformationen für EINEN Artikel:
+PRODUKTINFORMATIONEN:
 ${productInfo}
 
-WICHTIG: Die TECHNISCHEN MERKMALE oben enthalten ALLE relevanten Spezifikationen. 
-Bitte verwende ALLE diese technischen Daten in den Bulletpoints!
+BEISPIEL für korrekten Stil (Artikel 426625):
+Robuster keramischer Schleifstift (Industriequalität) für präzise Metallbearbeitung, selbst an schwer zugänglichen Stellen. Ideal zum Entgraten, Anfasen und Kantenbrechen an Stahloberflächen.;Langlebig und effizient: Keramische Bindung (V-Bindung) mit rosafarbenem Edelkorund (Aluminiumoxid 88A), Körnung 60 (mittelfein) – sorgt für hohe Abtragsleistung und hervorragende Standzeit.;Härtegrad P (universeller Einsatz) gewährleistet optimale Balance zwischen Materialabtrag und Oberflächenqualität.;Praktisches Format: Schleifkopf-Ø 20 x 63 mm, Schaft Ø 6 x 40 mm – passend für alle gängigen Geradschleifer.;Tyrolit Premium-Qualität: Hochleistungs-Schleifstift für Profis und anspruchsvolle Heimwerker. Entwickelt für maximale Effizienz und lange Standzeit bei intensiver Metallbearbeitung.
 
-Bitte erstelle GENAU 5 Bulletpoints für Amazon. Jeder Bulletpoint sollte:
-- Maximal 200-250 Zeichen lang sein (Amazon-Richtlinien)
-- Mit einem Großbuchstaben beginnen
-- Die wichtigsten Produktvorteile hervorheben
-- SEO-Keywords enthalten
-- ALLE technischen Details aus den TECHNISCHEN MERKMALEN einbeziehen
-- Keine Informationen weglassen - besonders nicht aus den technischen Merkmalen!
-- Maße, Körnung, Bindung, Härte, Typ, Schaftmaße etc. MÜSSEN erwähnt werden
+STRUKTUR (EXAKT einhalten!):
+1. BP1: Hauptvorteil + (Qualifikation in Klammern) + Anwendungsgebiet
+2. BP2: "Langlebig und effizient:" + technische Details (in Klammern) + Nutzen mit Bindestrich
+3. BP3: Technisches Merkmal + konkrete Vorteile ("gewährleistet", "sorgt für")
+4. BP4: "Praktisches Format:" + Maße mit Ø-Zeichen + "passend für..."
+5. BP5: "Tyrolit Premium-Qualität:" + Zielgruppe + Zusammenfassung
 
-Format:
-• [Bulletpoint 1]
-• [Bulletpoint 2]
-• [Bulletpoint 3]
-• [Bulletpoint 4]
-• [Bulletpoint 5]
+WICHTIGE REGELN:
+- ALLE technischen Merkmale verwenden (Maße, Körnung, Bindung, Härte, Material)
+- Klammern für Spezifikationen nutzen: (Industriequalität), (V-Bindung), (mittelfein)
+- Ø-Zeichen für Durchmesser verwenden
+- Doppelpunkte nach Einleitungen: "Langlebig und effizient:", "Praktisches Format:"
+- Aktive Verben: "gewährleistet", "sorgt für", "passend für", "entwickelt für"
+- Professioneller, technischer aber verständlicher Stil
+- Jeder Bulletpoint 150-250 Zeichen
+- SEMIKOLON als Trennzeichen zwischen Bulletpoints (NICHT Bullet-Zeichen!)
 
-Antworte NUR mit den 5 Bulletpoints, keine zusätzlichen Erklärungen.`
+AUSGABE: Gib NUR die 5 Bulletpoints mit Semikolon getrennt zurück, KEINE weiteren Erklärungen!
+
+Format: [BP1];[BP2];[BP3];[BP4];[BP5]`
 
     console.log(`[Bulletpoints] Generating for: ${artikelname}`)
     
