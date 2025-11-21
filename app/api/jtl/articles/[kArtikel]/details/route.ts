@@ -3,10 +3,12 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getMssqlPool } from '@/lib/db/mssql'
+import { getDb } from '@/lib/db/mongodb'
 
 /**
  * GET /api/jtl/articles/[kArtikel]/details
  * Lädt vollständige Artikel-Details inkl. Merkmale, Attribute, Beschreibung
+ * Zuerst aus MongoDB (importierte Daten), dann enrichment aus MSSQL
  */
 export async function GET(
   request: NextRequest,
@@ -20,6 +22,18 @@ export async function GET(
         ok: false,
         error: 'Ungültige Artikel-ID'
       }, { status: 400 })
+    }
+
+    // Lade aus MongoDB (hat bereits importierte Basis-Daten)
+    const db = await getDb()
+    const collection = db.collection('jtl_artikel')
+    const mongoArtikel = await collection.findOne({ kArtikel })
+    
+    if (!mongoArtikel) {
+      return NextResponse.json({
+        ok: false,
+        error: 'Artikel nicht in MongoDB gefunden. Bitte Import durchführen.'
+      }, { status: 404 })
     }
 
     const pool = await getMssqlPool()
