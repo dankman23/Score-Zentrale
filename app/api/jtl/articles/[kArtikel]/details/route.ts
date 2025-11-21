@@ -58,19 +58,24 @@ export async function GET(
       attribute: []
     }
     
-    // 2. Beschreibung aus tArtikelBeschreibung
-    const beschreibungResult = await pool.request()
-      .input('kArtikel', kArtikel)
-      .query(`
-        SELECT TOP 1 cBeschreibung
-        FROM tArtikelBeschreibung
-        WHERE kArtikel = @kArtikel
-        AND kSprache = 1
-      `)
-    
-    artikel.cBeschreibung = beschreibungResult.recordset.length > 0 
-      ? beschreibungResult.recordset[0].cBeschreibung 
-      : null
+    // 2. Beschreibung aus tArtikelBeschreibung (Langtext)
+    try {
+      const beschreibungResult = await pool.request()
+        .input('kArtikel', kArtikel)
+        .query(`
+          SELECT TOP 1 cBeschreibung
+          FROM tArtikelBeschreibung
+          WHERE kArtikel = @kArtikel
+          AND kSprache = 1
+        `)
+      
+      artikel.cBeschreibung = beschreibungResult.recordset.length > 0 
+        ? beschreibungResult.recordset[0].cBeschreibung 
+        : null
+    } catch (e) {
+      console.log('[Artikel Details] Beschreibung konnte nicht geladen werden:', e.message)
+      artikel.cBeschreibung = null
+    }
     
     // 3. Merkmale
     const merkmaleResult = await pool.request()
