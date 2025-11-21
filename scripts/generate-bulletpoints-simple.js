@@ -92,8 +92,8 @@ async function main() {
   
   const results = []
   
-  // Nur erste 3 Artikel für Testlauf
-  const testArticles = articles.slice(0, 3)
+  // ALLE Artikel verarbeiten (nicht nur 3)
+  const testArticles = articles // Alle Artikel!
   
   for (let i = 0; i < testArticles.length; i++) {
     const article = testArticles[i]
