@@ -5824,6 +5824,12 @@ export default function App() {
             >
               <i className="bi bi-grid mr-2"/>Artikel-Browser
             </button>
+            <button 
+              className={`btn ${produkteTab === 'prompts' ? 'btn-primary' : 'btn-outline-secondary'}`}
+              onClick={() => { setProdukteTab('prompts'); loadAmazonPrompts(); }}
+            >
+              <i className="bi bi-chat-left-text mr-2"/>Prompts
+            </button>
           </div>
 
           {/* Import Tab */}
