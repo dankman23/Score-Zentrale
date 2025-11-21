@@ -6429,7 +6429,12 @@ export default function App() {
                                         <div className="btn-group btn-group-sm mb-3">
                                           <button 
                                             className={`btn ${artikelDetailTab === 'jtl' ? 'btn-primary' : 'btn-outline-secondary'}`}
-                                            onClick={() => setArtikelDetailTab('jtl')}
+                                            onClick={() => {
+                                              setArtikelDetailTab('jtl')
+                                              if (!artikelDetails || artikelDetails.kArtikel !== artikel.kArtikel) {
+                                                loadArtikelDetails(artikel.kArtikel)
+                                              }
+                                            }}
                                           >
                                             <i className="bi bi-database mr-1"/>JTL-Daten
                                           </button>
