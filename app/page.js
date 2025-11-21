@@ -1783,6 +1783,27 @@ export default function App() {
     }
   }
 
+  // Lade Artikel für Browser
+  const loadArtikelBrowser = async () => {
+    try {
+      setArtikelListLoading(true)
+      const res = await fetch(`/api/jtl/articles/list?page=${artikelPage}&limit=${artikelPageSize}&search=${artikelSearch}&sortBy=${artikelSortBy}&sortOrder=${artikelSortOrder}`)
+      const data = await res.json()
+      if (data.ok) {
+        setArtikelList(data.articles || [])
+        setArtikelTotal(data.pagination?.total || 0)
+        setArtikelTotalPages(data.pagination?.totalPages || 0)
+        console.log('[Artikel Browser]', `Loaded ${data.articles?.length || 0} articles, page ${artikelPage}`)
+      } else {
+        console.error('Error loading articles:', data.error)
+      }
+    } catch (e) {
+      console.error('Error loading articles:', e)
+    } finally {
+      setArtikelListLoading(false)
+    }
+  }
+
   const loadAmazonPrompts = async () => {
     try {
       setLoadingPrompts(true)
