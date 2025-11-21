@@ -6515,6 +6515,54 @@ export default function App() {
               )}
             </div>
           )}
+          {/* Prompts Tab */}
+          {produkteTab === 'prompts' && (
+            <div>
+              <div className="card border-0 shadow-sm">
+                <div className="card-body">
+                  <h5 className="mb-3"><i className="bi bi-chat-left-text mr-2"/>Amazon Prompts</h5>
+                  
+                  {loadingPrompts ? (
+                    <div className="text-center py-5">
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="sr-only">Laden...</span>
+                      </div>
+                      <p className="mt-3 text-muted">Prompts werden geladen...</p>
+                    </div>
+                  ) : amazonPrompts.length === 0 ? (
+                    <div className="text-center py-5">
+                      <i className="bi bi-chat-left-text" style={{fontSize: '4rem', color: '#ccc'}}/>
+                      <h4 className="mt-3 text-muted">Keine Prompts verfügbar</h4>
+                      <p className="text-muted">Es wurden noch keine Amazon-Prompts erstellt.</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="row">
+                        {amazonPrompts.map((prompt, index) => (
+                          <div key={index} className="col-md-6 col-lg-4 mb-3">
+                            <div className="card h-100">
+                              <div className="card-body">
+                                <h6 className="card-title">{prompt.name}</h6>
+                                <p className="card-text text-muted small">{prompt.beschreibung}</p>
+                                <div className="mt-auto">
+                                  <button 
+                                    className="btn btn-sm btn-outline-primary"
+                                    onClick={() => setSelectedPrompt(prompt)}
+                                  >
+                                    <i className="bi bi-eye mr-1"/>Anzeigen
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
