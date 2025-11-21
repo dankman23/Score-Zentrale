@@ -1938,18 +1938,32 @@ export default function App() {
         return
       }
 
-      // Bereite Produktinfo vor
-      const merkmaleText = artikel.merkmale?.map(m => `${m.name}: ${m.wert}`).join(' | ') || ''
+      // Lade Details falls nicht vorhanden
+      let details = artikelDetails
+      if (!details || details.kArtikel !== artikel.kArtikel) {
+        const detailRes = await fetch(`/api/jtl/articles/${artikel.kArtikel}/details`)
+        const detailData = await detailRes.json()
+        if (detailData.ok) {
+          details = detailData.artikel
+          setArtikelDetails(details)
+        } else {
+          details = artikel // Fallback
+        }
+      }
+
+      // Bereite Produktinfo vor (mit ALLEN Details)
+      const merkmaleText = details.merkmale?.map(m => `${m.name}: ${m.wert}`).join(' | ') || ''
+      const attributeText = details.attribute?.map(a => `${a.name}: ${a.wert}`).join(' | ') || ''
 
       const res = await fetch('/api/amazon/bulletpoints/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          artikelnummer: artikel.cArtNr,
-          artikelname: artikel.cName,
-          beschreibung: artikel.cBeschreibung || '',
-          kurzbeschreibung: artikel.cKurzBeschreibung || '',
-          merkmale: merkmaleText,
+          artikelnummer: details.cArtNr,
+          artikelname: details.cName,
+          beschreibung: details.cBeschreibung || '',
+          kurzbeschreibung: details.cKurzBeschreibung || '',
+          merkmale: merkmaleText + (attributeText ? ' | ' + attributeText : ''),
           userPrompt: activePrompt.prompt
         })
       })
