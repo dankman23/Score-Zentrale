@@ -78,12 +78,17 @@ async function callOpenAIAPI(prompt) {
       res.on('end', () => {
         try {
           const response = JSON.parse(body)
+          console.log(`   [DEBUG] API Response: ${JSON.stringify(response).substring(0, 200)}...`)
           if (response.choices && response.choices[0]) {
             resolve(response.choices[0].message.content)
+          } else if (response.error) {
+            reject(new Error(`API Error: ${response.error.message || JSON.stringify(response.error)}`))
           } else {
+            console.log(`   [DEBUG] Full Response: ${JSON.stringify(response)}`)
             reject(new Error('Unexpected API response format'))
           }
         } catch (error) {
+          console.log(`   [DEBUG] Parse error. Body: ${body.substring(0, 500)}`)
           reject(error)
         }
       })
