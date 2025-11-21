@@ -127,10 +127,49 @@ async function main() {
   console.log(`\n\n✅ TESTLAUF ABGESCHLOSSEN!`)
   console.log(`   ${results.length} von ${testArticles.length} Artikel erfolgreich verarbeitet\n`)
   
-  // Speichere Ergebnisse
-  const outputPath = '/tmp/bulletpoints_results.json'
-  fs.writeFileSync(outputPath, JSON.stringify(results, null, 2), 'utf-8')
-  console.log(`💾 Ergebnisse gespeichert: ${outputPath}\n`)
+  // Speichere Ergebnisse als JSON
+  const outputJsonPath = '/tmp/bulletpoints_results.json'
+  fs.writeFileSync(outputJsonPath, JSON.stringify(results, null, 2), 'utf-8')
+  console.log(`💾 JSON gespeichert: ${outputJsonPath}`)
+  
+  // Erstelle CSV mit Semikolon-getrennten Bulletpoints
+  const csvLines = ['Artikelnummer;Artikelname;Bulletpoint1;Bulletpoint2;Bulletpoint3;Bulletpoint4;Bulletpoint5']
+  
+  results.forEach(result => {
+    // Splitte Bulletpoints am Semikolon
+    const bps = result.bulletpoints.split(';').map(bp => bp.trim())
+    
+    // Füge leere Bulletpoints hinzu falls weniger als 5
+    while (bps.length < 5) {
+      bps.push('')
+    }
+    
+    // Escape Semikolons und Anführungszeichen in den Daten
+    const escapeCsv = (text) => {
+      if (!text) return ''
+      // Wenn Semikolon oder Anführungszeichen enthalten, in Anführungszeichen setzen
+      if (text.includes(';') || text.includes('"') || text.includes('\n')) {
+        return `"${text.replace(/"/g, '""')}"`
+      }
+      return text
+    }
+    
+    const line = [
+      result.artikelnummer,
+      escapeCsv(result.artikelname),
+      escapeCsv(bps[0]),
+      escapeCsv(bps[1]),
+      escapeCsv(bps[2]),
+      escapeCsv(bps[3]),
+      escapeCsv(bps[4])
+    ].join(';')
+    
+    csvLines.push(line)
+  })
+  
+  const outputCsvPath = '/tmp/bulletpoints_results.csv'
+  fs.writeFileSync(outputCsvPath, csvLines.join('\n'), 'utf-8')
+  console.log(`💾 CSV gespeichert: ${outputCsvPath}\n`)
   
   // Zeige Zusammenfassung
   console.log('\n📊 ZUSAMMENFASSUNG:')
@@ -138,6 +177,9 @@ async function main() {
     console.log(`\n${idx + 1}. ${result.artikelnummer} - ${result.artikelname}`)
     console.log(result.bulletpoints)
   })
+  
+  console.log('\n\n✅ CSV-Datei bereit zum Download!')
+  console.log(`   Pfad: ${outputCsvPath}`)
 }
 
 main().catch(console.error)
