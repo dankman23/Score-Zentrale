@@ -641,7 +641,21 @@ export default function App() {
   const [glossarSearch, setGlossarSearch] = useState('')
   
   // Produkte (Artikel-Import)
-  const [produkteTab, setProdukteTab] = useState('import') // import | browser
+  const [produkteTab, setProdukteTab] = useState('import') // import | browser | prompts
+  
+  // Amazon Bulletpoints
+  const [amazonPrompts, setAmazonPrompts] = useState([])
+  const [selectedPrompt, setSelectedPrompt] = useState(null)
+  const [loadingPrompts, setLoadingPrompts] = useState(false)
+  const [showPromptModal, setShowPromptModal] = useState(false)
+  const [promptModalMode, setPromptModalMode] = useState('create') // create | edit
+  const [editingPrompt, setEditingPrompt] = useState(null)
+  const [newPromptData, setNewPromptData] = useState({ name: '', beschreibung: '', prompt: '' })
+  
+  // Artikel Detail Tabs
+  const [artikelDetailTab, setArtikelDetailTab] = useState('jtl') // jtl | bulletpoints
+  const [artikelBulletpoints, setArtikelBulletpoints] = useState(null)
+  const [generatingBulletpoints, setGeneratingBulletpoints] = useState(false)
   
   // Preise
   const [preiseTab, setPreiseTab] = useState('alte_pb') // alte_pb | neue_2025
