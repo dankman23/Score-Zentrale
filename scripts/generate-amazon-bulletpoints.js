@@ -136,7 +136,7 @@ Format:
 Antworte NUR mit den 5 Bulletpoints, keine zusätzlichen Erklärungen.`
 
   try {
-    const response = await callClaudeAPI(fullPrompt)
+    const response = await callOpenAIAPI(fullPrompt)
     return response
   } catch (error) {
     console.error(`❌ Fehler bei Artikel ${article.artikelnummer}:`, error.message)
