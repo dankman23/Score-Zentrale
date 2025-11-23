@@ -7299,6 +7299,152 @@ export default function App() {
                   </div>
                 </div>
               )}
+
+              {/* Batch Generation Modal */}
+              {showBatchModal && (
+                <div 
+                  className="modal d-block" 
+                  style={{backgroundColor: 'rgba(0,0,0,0.5)'}}
+                >
+                  <div 
+                    className="modal-dialog modal-lg modal-dialog-scrollable"
+                  >
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h5 className="modal-title">
+                          <i className="bi bi-stars mr-2"/>
+                          Batch-Generierung Amazon Bulletpoints
+                        </h5>
+                        {!batchGenerating && (
+                          <button 
+                            className="close" 
+                            onClick={() => setShowBatchModal(false)}
+                          >
+                            <span>&times;</span>
+                          </button>
+                        )}
+                      </div>
+                      <div className="modal-body">
+                        {batchGenerating ? (
+                          <div className="text-center py-5">
+                            <div className="spinner-border text-primary mb-3" style={{width: '3rem', height: '3rem'}}>
+                              <span className="sr-only">Verarbeitet...</span>
+                            </div>
+                            <h5>Bulletpoints werden generiert...</h5>
+                            <p className="text-muted">Dies kann einige Minuten dauern. Bitte warten...</p>
+                            <div className="progress" style={{height: '25px'}}>
+                              <div 
+                                className="progress-bar progress-bar-striped progress-bar-animated" 
+                                style={{width: `${batchProgress.total > 0 ? (batchProgress.processed / batchProgress.total * 100) : 0}%`}}
+                              >
+                                {batchProgress.processed} / {batchProgress.total}
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="alert alert-success">
+                              <h5 className="alert-heading">
+                                <i className="bi bi-check-circle mr-2"/>
+                                Batch-Generierung abgeschlossen!
+                              </h5>
+                              <hr/>
+                              <div className="row">
+                                <div className="col-md-4">
+                                  <div className="text-center">
+                                    <h2 className="text-success">{batchProgress.succeeded}</h2>
+                                    <small>Erfolgreich</small>
+                                  </div>
+                                </div>
+                                <div className="col-md-4">
+                                  <div className="text-center">
+                                    <h2 className="text-danger">{batchProgress.failed}</h2>
+                                    <small>Fehlgeschlagen</small>
+                                  </div>
+                                </div>
+                                <div className="col-md-4">
+                                  <div className="text-center">
+                                    <h2 className="text-primary">{batchProgress.processed}</h2>
+                                    <small>Gesamt</small>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {batchResults.length > 0 && (
+                              <div>
+                                <h6 className="mb-3">Ergebnisse (erste 20):</h6>
+                                <div className="table-responsive" style={{maxHeight: '400px'}}>
+                                  <table className="table table-sm table-hover">
+                                    <thead className="thead-light">
+                                      <tr>
+                                        <th>Status</th>
+                                        <th>Art.-Nr.</th>
+                                        <th>Name</th>
+                                        <th>Bulletpoints</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {batchResults.slice(0, 20).map((result, idx) => (
+                                        <tr key={idx}>
+                                          <td>
+                                            {result.success ? (
+                                              <span className="badge badge-success">✓ OK</span>
+                                            ) : (
+                                              <span className="badge badge-danger">✗ Error</span>
+                                            )}
+                                          </td>
+                                          <td><code>{result.cArtNr}</code></td>
+                                          <td>
+                                            <small className="text-truncate d-block" style={{maxWidth: '200px'}}>
+                                              {result.cName || '-'}
+                                            </small>
+                                          </td>
+                                          <td>
+                                            {result.success ? (
+                                              <small className="text-muted">{result.bullets?.length || 0} Bulletpoints</small>
+                                            ) : (
+                                              <small className="text-danger">{result.error}</small>
+                                            )}
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                                {batchResults.length > 20 && (
+                                  <p className="text-muted text-center">
+                                    ... und {batchResults.length - 20} weitere
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <div className="modal-footer">
+                        {!batchGenerating && (
+                          <>
+                            <button 
+                              className="btn btn-success"
+                              onClick={downloadBatchCSV}
+                            >
+                              <i className="bi bi-download mr-2"/>
+                              CSV Download
+                            </button>
+                            <button 
+                              className="btn btn-secondary"
+                              onClick={() => setShowBatchModal(false)}
+                            >
+                              Schließen
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
