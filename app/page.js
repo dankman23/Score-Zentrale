@@ -2033,6 +2033,76 @@ export default function App() {
     }
   }
 
+  // Batch Bulletpoint Generation
+  const startBatchGeneration = async () => {
+    if (!confirm(`Bulletpoints für ${artikelTotal.toLocaleString()} gefilterte Artikel generieren?\n\n⚠️ Dies kann einige Minuten dauern.\n\nFortfahren?`)) {
+      return
+    }
+
+    try {
+      setBatchGenerating(true)
+      setShowBatchModal(true)
+      setBatchProgress({ processed: 0, succeeded: 0, failed: 0, total: artikelTotal })
+      setBatchResults([])
+
+      console.log('[Batch Generation] Starte mit Filter:', artikelFilter)
+
+      const res = await fetch('/api/amazon/bulletpoints/batch/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filter: artikelFilter,
+          limit: artikelTotal > 1000 ? 1000 : artikelTotal // Limit auf 1000 für Performance
+        })
+      })
+
+      const data = await res.json()
+      if (data.ok) {
+        setBatchProgress({
+          processed: data.processed,
+          succeeded: data.succeeded,
+          failed: data.failed,
+          total: data.processed
+        })
+        setBatchResults(data.results || [])
+        
+        alert(`✅ Batch-Generierung abgeschlossen!\n\n${data.succeeded} erfolgreich\n${data.failed} fehlgeschlagen\nDauer: ${data.duration}`)
+      } else {
+        alert('❌ Fehler: ' + data.error)
+      }
+    } catch (e) {
+      alert('❌ Fehler: ' + e.message)
+    } finally {
+      setBatchGenerating(false)
+    }
+  }
+
+  const downloadBatchCSV = async () => {
+    try {
+      // Lade CSV mit allen generierten Bulletpoints
+      const res = await fetch('/api/amazon/bulletpoints/batch/download')
+      
+      if (!res.ok) {
+        alert('❌ Keine generierten Bulletpoints gefunden')
+        return
+      }
+
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `amazon_bulletpoints_${new Date().toISOString().split('T')[0]}.csv`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      
+      console.log('[Batch CSV] Download gestartet')
+    } catch (e) {
+      alert('❌ Fehler beim Download: ' + e.message)
+    }
+  }
+
   // Status-Polling: Prüfe alle 3 Sekunden ob Import läuft
   useEffect(() => {
     const interval = setInterval(() => {
