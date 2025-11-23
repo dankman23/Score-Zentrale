@@ -665,7 +665,7 @@ export default function App() {
   const [showBatchModal, setShowBatchModal] = useState(false)
   const [batchResults, setBatchResults] = useState([])
   const [selectedArtikel, setSelectedArtikel] = useState([])
-  const [selectedPromptId, setSelectedPromptId] = useState('amazon-bp-standard-v1')
+  const [selectedPromptId, setSelectedPromptId] = useState(2) // Version 2 ist Standard
   
   // Preise
   const [preiseTab, setPreiseTab] = useState('alte_pb') // alte_pb | neue_2025
