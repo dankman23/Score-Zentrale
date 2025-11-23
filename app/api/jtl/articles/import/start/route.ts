@@ -162,6 +162,10 @@ export async function POST(request: NextRequest) {
             cBarcode: article.cBarcode || '',
             cHAN: article.cHAN || '',
             
+            // Merkmale & Attribute (immer aktualisieren)
+            merkmale: merkmaleByArtikel[article.kArtikel] || [],
+            attribute: attributeByArtikel[article.kArtikel] || [],
+            
             // Preise (immer aktualisieren)
             fVKNetto: parseFloat(article.fVKNetto) || 0,
             fEKNetto: parseFloat(article.fEKNetto) || 0,
