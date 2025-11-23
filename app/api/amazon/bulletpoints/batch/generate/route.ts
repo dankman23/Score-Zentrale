@@ -179,7 +179,9 @@ ${merkmaleText || 'Keine Angabe'}
               bulletpoints: bulletpointsRaw,
               bullets: bullets,
               generatedAt: new Date(),
-              prompt_version: 1
+              promptId: selectedPrompt._id,
+              promptName: selectedPrompt.name,
+              promptVersion: selectedPrompt.version
             }
           },
           { upsert: true }
