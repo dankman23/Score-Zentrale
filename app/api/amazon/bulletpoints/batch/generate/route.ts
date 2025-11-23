@@ -23,6 +23,19 @@ export async function POST(request: NextRequest) {
     const db = await getDb()
     const articlesCollection = db.collection('articles')
     const bulletpointsCollection = db.collection('amazon_bulletpoints_generated')
+    const promptsCollection = db.collection('amazon_prompts')
+    
+    // Lade ausgewählten Prompt
+    const selectedPrompt = await promptsCollection.findOne({ _id: promptId || 'amazon-bp-standard-v1' })
+    
+    if (!selectedPrompt) {
+      return NextResponse.json({
+        ok: false,
+        error: 'Prompt nicht gefunden'
+      }, { status: 400 })
+    }
+    
+    console.log(`[Batch Generate] Verwende Prompt: ${selectedPrompt.name}`)
     
     let artikelIds: number[] = []
     
