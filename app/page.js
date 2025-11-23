@@ -6485,12 +6485,35 @@ export default function App() {
                                   <small className="text-muted ml-2">
                                     ({artikelTotal.toLocaleString()} Artikel {artikelFilter.search || artikelFilter.hersteller || artikelFilter.warengruppe ? 'gefiltert' : 'gesamt'})
                                   </small>
+                                  {selectedArtikel.length > 0 && (
+                                    <span className="badge badge-primary ml-2">
+                                      {selectedArtikel.length} ausgewählt
+                                    </span>
+                                  )}
                                 </div>
                                 <div>
+                                  {selectedArtikel.length > 0 ? (
+                                    <button 
+                                      className="btn btn-sm btn-outline-secondary mr-2"
+                                      onClick={deselectAllArtikel}
+                                    >
+                                      <i className="bi bi-x-circle mr-1"/>
+                                      Auswahl aufheben
+                                    </button>
+                                  ) : (
+                                    <button 
+                                      className="btn btn-sm btn-outline-secondary mr-2"
+                                      onClick={selectAllArtikel}
+                                      disabled={artikelList.length === 0}
+                                    >
+                                      <i className="bi bi-check-square mr-1"/>
+                                      Alle auswählen
+                                    </button>
+                                  )}
                                   <button 
                                     className="btn btn-sm btn-success mr-2"
                                     onClick={startBatchGeneration}
-                                    disabled={batchGenerating || artikelTotal === 0}
+                                    disabled={batchGenerating || (selectedArtikel.length === 0 && artikelTotal === 0)}
                                   >
                                     {batchGenerating ? (
                                       <>
@@ -6500,7 +6523,10 @@ export default function App() {
                                     ) : (
                                       <>
                                         <i className="bi bi-play-fill mr-1"/>
-                                        Alle generieren
+                                        {selectedArtikel.length > 0 
+                                          ? `${selectedArtikel.length} generieren`
+                                          : 'Alle generieren'
+                                        }
                                       </>
                                     )}
                                   </button>
