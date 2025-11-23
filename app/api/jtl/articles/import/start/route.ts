@@ -89,10 +89,43 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // TODO: Merkmale & Attribute werden aktuell NICHT importiert
-    // Diese werden on-demand in der Batch-API geladen
-    console.log(`[Articles Import] Merkmale & Attribute werden on-demand geladen`)
-    const merkmaleByArtikel = {}
+    // Lade ALLE Merkmale für diesen Batch (effizient)
+    console.log(`[Articles Import] Loading Merkmale for ${articles.length} articles...`)
+    const kArtikelList = articles.map(a => a.kArtikel).join(',')
+    
+    let merkmaleByArtikel = {}
+    
+    try {
+      const merkmaleResult = await pool.request().query(`
+        SELECT 
+          am.kArtikel,
+          m.cName as name,
+          mw.cWert as wert
+        FROM tArtikelMerkmal am
+        INNER JOIN tMerkmal m ON am.kMerkmal = m.kMerkmal
+        LEFT JOIN tMerkmalWert mw ON am.kMerkmalWert = mw.kMerkmalWert
+        WHERE am.kArtikel IN (${kArtikelList})
+        ORDER BY am.kArtikel, m.nSort, m.cName
+      `)
+
+      // Gruppiere Merkmale nach kArtikel
+      for (const m of merkmaleResult.recordset) {
+        if (!merkmaleByArtikel[m.kArtikel]) {
+          merkmaleByArtikel[m.kArtikel] = []
+        }
+        merkmaleByArtikel[m.kArtikel].push({
+          name: m.name,
+          wert: m.wert || ''
+        })
+      }
+      
+      console.log(`[Articles Import] Loaded ${merkmaleResult.recordset.length} Merkmale`)
+    } catch (e: any) {
+      console.log(`[Articles Import] Konnte Merkmale nicht laden:`, e.message)
+      console.log(`[Articles Import] Merkmale werden on-demand geladen`)
+    }
+    
+    // Attribute überspringen (optional, werden bei Bedarf on-demand geladen)
     const attributeByArtikel = {}
 
     // Artikel in MongoDB speichern mit Upsert
