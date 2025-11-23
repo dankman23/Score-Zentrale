@@ -7446,14 +7446,30 @@ export default function App() {
                           />
                         </div>
                         <div className="form-group">
+                          <label>AI-Modell</label>
+                          <select 
+                            className="form-control"
+                            value={newPromptData.model || 'claude-sonnet-4-20250514'}
+                            onChange={(e) => setNewPromptData({...newPromptData, model: e.target.value})}
+                          >
+                            <option value="claude-sonnet-4-20250514">Claude Sonnet 4 (neueste Version)</option>
+                            <option value="claude-3-7-sonnet-20250219">Claude 3.7 Sonnet</option>
+                            <option value="gpt-4o">GPT-4o</option>
+                            <option value="gpt-4">GPT-4</option>
+                          </select>
+                          <small className="form-text text-muted">
+                            Wählen Sie das AI-Modell für diesen Prompt
+                          </small>
+                        </div>
+                        <div className="form-group">
                           <label>Prompt *</label>
                           <textarea 
-                            className="form-control font-monospace"
+                            className="form-control"
                             rows="20"
                             value={newPromptData.prompt}
                             onChange={(e) => setNewPromptData({...newPromptData, prompt: e.target.value})}
                             placeholder="Geben Sie hier den Prompt ein..."
-                            style={{fontSize: '12px'}}
+                            style={{fontSize: '13px', backgroundColor: 'white', color: 'black', fontFamily: 'monospace'}}
                           />
                           <small className="form-text text-muted">
                             Verwenden Sie {'{'}{'{'} PRODUKTINFO {'}'}{'}'}  als Platzhalter für die Produktinformationen
