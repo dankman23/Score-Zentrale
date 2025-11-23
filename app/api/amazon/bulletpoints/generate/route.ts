@@ -3,11 +3,7 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
 import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from 'openai'
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-})
+import { ClaudeClient } from '../../../lib/claude-client'
 
 /**
  * POST /api/amazon/bulletpoints/generate
