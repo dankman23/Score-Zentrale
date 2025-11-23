@@ -127,18 +127,19 @@ export async function POST(request: NextRequest) {
         if (merkmale.length === 0 && mssqlPool) {
           console.log(`[Batch] Lade Merkmale für kArtikel=${kArtikel} aus MSSQL...`)
           try {
-            const merkmaleResult = await mssqlPool.request()
+            const pool = mssqlPool
+            const merkmaleResult = await pool.request()
               .input('kArtikel', kArtikel)
               .query(`
-                SELECT 
-                  m.cName as name,
-                  mw.cWert as wert
-                FROM tArtikelMerkmal am
-                INNER JOIN tMerkmal m ON am.kMerkmal = m.kMerkmal
-                LEFT JOIN tMerkmalWert mw ON am.kMerkmalWert = mw.kMerkmalWert
-                WHERE am.kArtikel = @kArtikel
-                ORDER BY m.nSort, m.cName
-              `)
+            SELECT 
+              m.cName as name,
+              mw.cWert as wert
+            FROM tArtikelMerkmal am
+            INNER JOIN tMerkmal m ON am.kMerkmal = m.kMerkmal
+            LEFT JOIN tMerkmalWert mw ON am.kMerkmalWert = mw.kMerkmalWert
+            WHERE am.kArtikel = @kArtikel
+            ORDER BY m.nSort, m.cName
+          `)
             
             merkmale = merkmaleResult.recordset.map((m: any) => ({
               name: m.name,
