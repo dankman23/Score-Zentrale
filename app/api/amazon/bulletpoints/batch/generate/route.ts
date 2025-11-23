@@ -23,10 +23,11 @@ export async function POST(request: NextRequest) {
     const db = await getDb()
     const articlesCollection = db.collection('articles')
     const bulletpointsCollection = db.collection('amazon_bulletpoints_generated')
-    const promptsCollection = db.collection('amazon_prompts')
+    const promptsCollection = db.collection('amazon_bulletpoint_prompts')
     
-    // Lade ausgewählten Prompt
-    const selectedPrompt = await promptsCollection.findOne({ _id: promptId || 'amazon-bp-standard-v1' })
+    // Lade ausgewählten Prompt (by version number from promptId)
+    const promptVersion = parseInt(promptId) || 2
+    const selectedPrompt = await promptsCollection.findOne({ version: promptVersion, isActive: true })
     
     if (!selectedPrompt) {
       return NextResponse.json({
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
     
-    console.log(`[Batch Generate] Verwende Prompt: ${selectedPrompt.name}`)
+    console.log(`[Batch Generate] Verwende Prompt v${selectedPrompt.version}: ${selectedPrompt.name}`)
     
     let artikelIds: number[] = []
     
