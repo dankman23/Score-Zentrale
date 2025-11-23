@@ -89,66 +89,11 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Lade ALLE Merkmale für diesen Batch auf einmal (effizient)
-    console.log(`[Articles Import] Loading Merkmale for ${articles.length} articles...`)
-    const kArtikelList = articles.map(a => a.kArtikel).join(',')
-    
-    const merkmaleResult = await pool.request().query(`
-      SELECT 
-        am.kArtikel,
-        COALESCE(m.cName, '') as name,
-        COALESCE(mw.cWert, '') as wert
-      FROM tArtikelMerkmal am
-      INNER JOIN tMerkmal m ON am.kMerkmal = m.kMerkmal
-      LEFT JOIN tMerkmalWert mw ON am.kMerkmalWert = mw.kMerkmalWert
-      WHERE am.kArtikel IN (${kArtikelList})
-      ORDER BY am.kArtikel, COALESCE(m.nSort, 999), m.cName
-    `)
-
-    // Gruppiere Merkmale nach kArtikel
+    // TODO: Merkmale & Attribute werden aktuell NICHT importiert
+    // Diese werden on-demand in der Batch-API geladen
+    console.log(`[Articles Import] Merkmale & Attribute werden on-demand geladen`)
     const merkmaleByArtikel = {}
-    for (const m of merkmaleResult.recordset) {
-      if (!merkmaleByArtikel[m.kArtikel]) {
-        merkmaleByArtikel[m.kArtikel] = []
-      }
-      merkmaleByArtikel[m.kArtikel].push({
-        name: m.name,
-        wert: m.wert || ''
-      })
-    }
-
-    // Lade ALLE Attribute für diesen Batch auf einmal
-    console.log(`[Articles Import] Loading Attribute for ${articles.length} articles...`)
-    let attributeByArtikel = {}
-    
-    try {
-      const attributeResult = await pool.request().query(`
-        SELECT 
-          aa.kArtikel,
-          a.cName as name,
-          aa.cWert as wert
-        FROM tArtikelAttribut aa
-        INNER JOIN tAttribut a ON aa.kAttribut = a.kAttribut
-        WHERE aa.kArtikel IN (${kArtikelList})
-        ORDER BY aa.kArtikel, a.nSort, a.cName
-      `)
-
-      // Gruppiere Attribute nach kArtikel
-      for (const attr of attributeResult.recordset) {
-        if (!attributeByArtikel[attr.kArtikel]) {
-          attributeByArtikel[attr.kArtikel] = []
-        }
-        attributeByArtikel[attr.kArtikel].push({
-          name: attr.name,
-          wert: attr.wert || ''
-        })
-      }
-      
-      console.log(`[Articles Import] Loaded ${merkmaleResult.recordset.length} Merkmale and ${attributeResult.recordset.length} Attribute`)
-    } catch (e: any) {
-      console.log(`[Articles Import] Konnte Attribute nicht laden (überspringen):`, e.message)
-      console.log(`[Articles Import] Loaded ${merkmaleResult.recordset.length} Merkmale (Attribute übersprungen)`)
-    }
+    const attributeByArtikel = {}
 
     // Artikel in MongoDB speichern mit Upsert
     // $set: Felder, die bei jedem Update überschrieben werden (JTL-Daten)
