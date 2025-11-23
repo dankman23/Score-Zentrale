@@ -1,6 +1,9 @@
 /**
  * Claude Sonnet 4 Client mit Emergent LLM Key
+ * Verwendet OpenAI-kompatibles Format für Emergent Universal Key
  */
+
+import OpenAI from 'openai'
 
 export interface ClaudeMessage {
   role: 'user' | 'assistant'
@@ -20,15 +23,20 @@ export interface ClaudeResponse {
 }
 
 export class ClaudeClient {
-  private apiKey: string
+  private client: OpenAI
   private model: string = 'claude-sonnet-4-20250514'
-  private baseUrl: string = 'https://api.anthropic.com/v1'
 
   constructor() {
-    this.apiKey = process.env.EMERGENT_LLM_KEY || ''
-    if (!this.apiKey) {
+    const apiKey = process.env.EMERGENT_LLM_KEY || ''
+    if (!apiKey) {
       throw new Error('EMERGENT_LLM_KEY nicht gefunden')
     }
+
+    // Emergent LLM Key verwendet OpenAI-kompatibles Format
+    this.client = new OpenAI({
+      apiKey: apiKey,
+      baseURL: 'https://api.emergent.ai/v1' // Emergent Proxy für Universal Key
+    })
   }
 
   async createMessage(
@@ -37,27 +45,33 @@ export class ClaudeClient {
     maxTokens: number = 2000
   ): Promise<ClaudeResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/messages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': this.apiKey,
-          'anthropic-version': '2023-06-01'
-        },
-        body: JSON.stringify({
-          model: this.model,
-          max_tokens: maxTokens,
-          system: systemPrompt,
-          messages: messages
-        })
+      // Konvertiere zu OpenAI-Format
+      const openaiMessages = [
+        { role: 'system' as const, content: systemPrompt },
+        ...messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content }))
+      ]
+
+      const response = await this.client.chat.completions.create({
+        model: this.model,
+        messages: openaiMessages,
+        max_tokens: maxTokens,
+        temperature: 0.7
       })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(`Claude API Error: ${errorData.error?.message || response.statusText}`)
+      // Konvertiere Antwort zu Claude-Format für Kompatibilität
+      const content = response.choices[0]?.message?.content || ''
+      
+      return {
+        id: response.id,
+        model: response.model,
+        role: 'assistant',
+        content: [{ type: 'text', text: content }],
+        stop_reason: 'end_turn',
+        usage: {
+          input_tokens: response.usage?.prompt_tokens || 0,
+          output_tokens: response.usage?.completion_tokens || 0
+        }
       }
-
-      return await response.json()
     } catch (error: any) {
       console.error('[Claude Client] Error:', error)
       throw error
