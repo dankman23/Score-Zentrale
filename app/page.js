@@ -2020,12 +2020,20 @@ export default function App() {
   }
 
   const loadArtikelDetails = async (kArtikel) => {
+    // Prüfe Cache zuerst
+    if (artikelDetailsCache[kArtikel]) {
+      setArtikelDetails(artikelDetailsCache[kArtikel])
+      console.log('[Cache] Artikel-Details verwendet für kArtikel:', kArtikel)
+      return
+    }
+    
     try {
       setLoadingArtikelDetails(true)
       const res = await fetch(`/api/jtl/articles/${kArtikel}/details`)
       const data = await res.json()
       if (data.ok) {
         setArtikelDetails(data.artikel)
+        setArtikelDetailsCache(prev => ({ ...prev, [kArtikel]: data.artikel }))
         console.log('[Artikel Details]', `Loaded kArtikel=${kArtikel}, ${data.artikel.merkmale?.length || 0} merkmale`)
       } else {
         console.error('Error loading artikel details:', data.error)
