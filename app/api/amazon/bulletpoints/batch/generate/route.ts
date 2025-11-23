@@ -5,11 +5,7 @@ export const maxDuration = 300
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '../../../../../lib/db/mongodb'
 import { getMssqlPool } from '@/lib/db/mssql'
-import OpenAI from 'openai'
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-})
+import { ClaudeClient } from '@/lib/claude-client'
 
 /**
  * POST /api/amazon/bulletpoints/batch/generate
