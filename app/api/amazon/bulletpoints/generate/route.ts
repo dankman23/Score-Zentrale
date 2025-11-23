@@ -74,31 +74,31 @@ Format: [BP1];[BP2];[BP3];[BP4];[BP5]`
 
     console.log(`[Bulletpoints] Generating for: ${artikelname}`)
     
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: 'Du bist ein Experte für Amazon-Produktbeschreibungen und SEO-optimierte Bulletpoints.'
-        },
+    // Claude Sonnet 4 API Call
+    const claude = new ClaudeClient()
+    const response = await claude.createMessage(
+      [
         {
           role: 'user',
           content: fullPrompt
         }
       ],
-      max_tokens: 1500,
-      temperature: 0.7
-    })
+      'Du bist ein Experte für Amazon-Produktbeschreibungen und SEO-optimierte Bulletpoints.',
+      2000
+    )
     
-    const bulletpoints = completion.choices[0]?.message?.content || ''
+    const bulletpoints = response.content[0]?.text || ''
     
-    console.log(`[Bulletpoints] Generated ${bulletpoints.length} characters`)
+    console.log(`[Bulletpoints] Generated ${bulletpoints.length} characters (${response.usage.input_tokens} input, ${response.usage.output_tokens} output tokens)`)
     
     return NextResponse.json({
       ok: true,
       artikelnummer,
       bulletpoints,
-      usage: completion.usage
+      usage: {
+        input_tokens: response.usage.input_tokens,
+        output_tokens: response.usage.output_tokens
+      }
     })
     
   } catch (error: any) {
