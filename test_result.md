@@ -6,12 +6,21 @@
 ## Collections vereinheitlicht, BCC erweitert, Frontend-Statusanzeige verbessert
 
 user_problem_statement: |
-  AUTOPILOT-ÜBERARBEITUNG für Kaltakquise-Modul:
-  1. Collections-Chaos behoben: Alle APIs nutzen jetzt 'prospects' (vorher: cold_prospects, coldleads_prospects, prospects)
-  2. BCC erweitert: Mails gehen jetzt an leismann@score-schleifwerkzeuge.de UND danki.leismann@gmx.de
-  3. Autopilot-Statusanzeige verbessert: Live-Phase-Indicator mit Icons (🔍 Suche, 🧠 Analyse, 📧 Email)
-  4. Gesendete Mails sichtbar: Neue Spalte "Gesendet am" im "Kontaktiert"-Tab mit Follow-up-Status
-  5. Postausgang: Details-Accordion für kontaktierte Prospects mit Email-Historie
+  AMAZON BULLETPOINTS BATCH-VERARBEITUNG:
+  1. Backend API für Batch-Generierung erstellt (/api/amazon/bulletpoints/batch/generate)
+     - Akzeptiert Array von kArtikel IDs oder Filter-Parameter
+     - Verarbeitet mehrere Artikel sequenziell mit GPT-4o
+     - Robuste Fehlerbehandlung (einzelne Fehler stoppen nicht den ganzen Batch)
+     - Speichert Ergebnisse in MongoDB Collection 'amazon_bulletpoints_generated'
+  2. CSV-Download API erstellt (/api/amazon/bulletpoints/batch/download)
+     - Generiert CSV mit Spalten: kArtikel, cArtNr, cName, Bulletpoint 1-5, Generiert am
+     - UTF-8 BOM für Excel-Kompatibilität
+  3. Frontend UI Integration in Artikel-Browser (app/page.js)
+     - "Alle generieren" Button in Batch Actions Card
+     - CSV Download Button
+     - Progress Modal mit Live-Status während Generierung
+     - Ergebnis-Übersicht nach Abschluss (Erfolg/Fehler/Gesamt)
+     - Detaillierte Ergebnis-Tabelle der ersten 20 Artikel
 
 backend:
   - task: "Autopilot: Collections vereinheitlichen (alle → prospects)"
