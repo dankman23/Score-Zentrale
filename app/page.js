@@ -6479,7 +6479,7 @@ export default function App() {
                         <div className="col-md-12">
                           <div className="card bg-light">
                             <div className="card-body py-2">
-                              <div className="d-flex justify-content-between align-items-center">
+                              <div className="d-flex justify-content-between align-items-center mb-2">
                                 <div className="flex-grow-1">
                                   <div className="d-flex align-items-center">
                                     <div>
