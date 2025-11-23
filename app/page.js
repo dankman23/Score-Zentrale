@@ -6806,7 +6806,7 @@ export default function App() {
                                               <button 
                                                 className="btn btn-primary btn-sm"
                                                 onClick={() => generateBulletpointsForArtikel(artikel)}
-                                                disabled={generatingBulletpoints}
+                                                disabled={generatingBulletpoints || !artikelDetails}
                                               >
                                                 {generatingBulletpoints ? (
                                                   <>
@@ -6822,10 +6822,53 @@ export default function App() {
                                               </button>
                                             </div>
                                             
+                                            {/* Vorschau der Daten die Claude verwenden wird */}
+                                            {artikelDetails && (
+                                              <div className="card bg-light mb-3">
+                                                <div className="card-header py-2">
+                                                  <small className="text-muted">
+                                                    <i className="bi bi-database mr-2"/>JTL-Daten für Bulletpoint-Generierung
+                                                  </small>
+                                                </div>
+                                                <div className="card-body p-2">
+                                                  <div className="row">
+                                                    <div className="col-md-6">
+                                                      <small><strong>Artikel:</strong> {artikelDetails.cArtNr} - {artikelDetails.cName}</small>
+                                                      {artikelDetails.cKurzBeschreibung && (
+                                                        <div className="mt-2">
+                                                          <small><strong>Kurzbeschreibung:</strong></small>
+                                                          <div className="small text-muted">{artikelDetails.cKurzBeschreibung.substring(0, 150)}...</div>
+                                                        </div>
+                                                      )}
+                                                    </div>
+                                                    <div className="col-md-6">
+                                                      {artikelDetails.merkmale && artikelDetails.merkmale.length > 0 ? (
+                                                        <>
+                                                          <small><strong>Merkmale ({artikelDetails.merkmale.length}):</strong></small>
+                                                          <div className="small text-muted">
+                                                            {artikelDetails.merkmale.slice(0, 3).map((m, idx) => (
+                                                              <div key={idx}>• {m.name}: {m.wert}</div>
+                                                            ))}
+                                                            {artikelDetails.merkmale.length > 3 && (
+                                                              <div className="text-primary">+ {artikelDetails.merkmale.length - 3} weitere...</div>
+                                                            )}
+                                                          </div>
+                                                        </>
+                                                      ) : (
+                                                        <div className="alert alert-warning py-1 px-2 mb-0">
+                                                          <small><i className="bi bi-exclamation-triangle mr-1"/>Keine Merkmale vorhanden - Bulletpoints werden weniger detailliert sein!</small>
+                                                        </div>
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            )}
+                                            
                                             {artikelBulletpoints ? (
                                               <div>
                                                 <div className="alert alert-success">
-                                                  <i className="bi bi-check-circle mr-2"/>Bulletpoints wurden generiert
+                                                  <i className="bi bi-check-circle mr-2"/>Bulletpoints wurden mit Claude Sonnet 4 generiert
                                                 </div>
                                                 <div className="bg-white p-3 rounded border">
                                                   {artikelBulletpoints.split(';').map((bp, idx) => (
@@ -6840,7 +6883,11 @@ export default function App() {
                                               <div className="alert alert-info">
                                                 <i className="bi bi-info-circle mr-2"/>
                                                 Für diesen Artikel wurden noch keine Bulletpoints generiert.
-                                                Klicken Sie auf "Bulletpoints generieren" um welche zu erstellen.
+                                                {artikelDetails ? (
+                                                  <span> Klicken Sie auf "Bulletpoints generieren" um welche mit Claude Sonnet 4 zu erstellen.</span>
+                                                ) : (
+                                                  <span> Wechseln Sie zum "JTL-Daten" Tab um die Artikel-Details zu laden.</span>
+                                                )}
                                               </div>
                                             )}
                                           </div>
