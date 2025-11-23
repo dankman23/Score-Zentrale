@@ -147,37 +147,10 @@ TECHNISCHE MERKMALE:
 ${merkmaleText || 'Keine Angabe'}
 `
 
-        // 5. Generiere Bulletpoints mit GPT-4o
-        const fullPrompt = `Du bist ein Experte für Amazon-Produktbeschreibungen. Erstelle GENAU 5 Bulletpoints nach diesem EXAKTEN Format und Stil:
+        // 5. Bereite Prompt vor (Template mit Produktdaten befüllen)
+        const fullPrompt = selectedPrompt.userPromptTemplate.replace('{{PRODUCT_DATA}}', productInfo)
 
-PRODUKTINFORMATIONEN:
-${productInfo}
-
-BEISPIEL für korrekten Stil (Artikel 426625):
-Robuster keramischer Schleifstift (Industriequalität) für präzise Metallbearbeitung, selbst an schwer zugänglichen Stellen. Ideal zum Entgraten, Anfasen und Kantenbrechen an Stahloberflächen.;Langlebig und effizient: Keramische Bindung (V-Bindung) mit rosafarbenem Edelkorund (Aluminiumoxid 88A), Körnung 60 (mittelfein) – sorgt für hohe Abtragsleistung und hervorragende Standzeit.;Härtegrad P (universeller Einsatz) gewährleistet optimale Balance zwischen Materialabtrag und Oberflächenqualität.;Praktisches Format: Schleifkopf-Ø 20 x 63 mm, Schaft Ø 6 x 40 mm – passend für alle gängigen Geradschleifer.;Tyrolit Premium-Qualität: Hochleistungs-Schleifstift für Profis und anspruchsvolle Heimwerker. Entwickelt für maximale Effizienz und lange Standzeit bei intensiver Metallbearbeitung.
-
-STRUKTUR (EXAKT einhalten!):
-1. BP1: Hauptvorteil + (Qualifikation in Klammern) + Anwendungsgebiet
-2. BP2: "Langlebig und effizient:" + technische Details (in Klammern) + Nutzen mit Bindestrich
-3. BP3: Technisches Merkmal + konkrete Vorteile ("gewährleistet", "sorgt für")
-4. BP4: "Praktisches Format:" + Maße mit Ø-Zeichen + "passend für..."
-5. BP5: "Tyrolit Premium-Qualität:" + Zielgruppe + Zusammenfassung
-
-WICHTIGE REGELN:
-- ALLE technischen Merkmale verwenden (Maße, Körnung, Bindung, Härte, Material)
-- Klammern für Spezifikationen nutzen: (Industriequalität), (V-Bindung), (mittelfein)
-- Ø-Zeichen für Durchmesser verwenden
-- Doppelpunkte nach Einleitungen: "Langlebig und effizient:", "Praktisches Format:"
-- Aktive Verben: "gewährleistet", "sorgt für", "passend für", "entwickelt für"
-- Professioneller, technischer aber verständlicher Stil
-- Jeder Bulletpoint 150-250 Zeichen
-- SEMIKOLON als Trennzeichen zwischen Bulletpoints (NICHT Bullet-Zeichen!)
-
-AUSGABE: Gib NUR die 5 Bulletpoints mit Semikolon getrennt zurück, KEINE weiteren Erklärungen!
-
-Format: [BP1];[BP2];[BP3];[BP4];[BP5]`
-
-        // Claude Sonnet 4 API Call
+        // 6. Generiere Bulletpoints mit Claude Sonnet 4
         const claude = new ClaudeClient()
         const response = await claude.createMessage(
           [
@@ -186,7 +159,7 @@ Format: [BP1];[BP2];[BP3];[BP4];[BP5]`
               content: fullPrompt
             }
           ],
-          'Du bist ein Experte für Amazon-Produktbeschreibungen und SEO-optimierte Bulletpoints.',
+          selectedPrompt.systemPrompt,
           2000
         )
         
