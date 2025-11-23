@@ -121,11 +121,36 @@ export async function POST(request: NextRequest) {
           continue
         }
         
-        // 2. Lade Merkmale (sollten bereits in MongoDB sein)
-        const merkmale = artikel.merkmale || []
+        // 2. Lade Merkmale (aus MongoDB oder MSSQL nachladen)
+        let merkmale = artikel.merkmale || []
         
-        if (merkmale.length === 0) {
-          console.log(`[Batch] WARNUNG: kArtikel=${kArtikel} hat keine Merkmale in MongoDB - bitte Artikel neu importieren`)
+        if (merkmale.length === 0 && mssqlPool) {
+          console.log(`[Batch] Lade Merkmale für kArtikel=${kArtikel} aus MSSQL...`)
+          try {
+            const merkmaleResult = await mssqlPool.request()
+              .input('kArtikel', kArtikel)
+              .query(`
+                SELECT 
+                  m.cName as name,
+                  mw.cWert as wert
+                FROM tArtikelMerkmal am
+                INNER JOIN tMerkmal m ON am.kMerkmal = m.kMerkmal
+                LEFT JOIN tMerkmalWert mw ON am.kMerkmalWert = mw.kMerkmalWert
+                WHERE am.kArtikel = @kArtikel
+                ORDER BY m.nSort, m.cName
+              `)
+            
+            merkmale = merkmaleResult.recordset.map((m: any) => ({
+              name: m.name,
+              wert: m.wert || ''
+            }))
+            
+            console.log(`[Batch] Geladen: ${merkmale.length} Merkmale für kArtikel=${kArtikel}`)
+          } catch (e: any) {
+            console.log(`[Batch] Konnte Merkmale nicht laden für kArtikel=${kArtikel}:`, e.message)
+          }
+        } else if (merkmale.length === 0) {
+          console.log(`[Batch] WARNUNG: kArtikel=${kArtikel} hat keine Merkmale und MSSQL nicht verfügbar`)
         }
         
         // 3. Formatiere Merkmale-Text
