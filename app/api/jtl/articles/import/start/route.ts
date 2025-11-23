@@ -122,12 +122,12 @@ export async function POST(request: NextRequest) {
     const attributeResult = await pool.request().query(`
       SELECT 
         aa.kArtikel,
-        COALESCE(tas.cName, '') as name,
-        COALESCE(aa.cStringWert, '') as wert
+        COALESCE(a.cName, '') as name,
+        COALESCE(aa.cWert, '') as wert
       FROM tArtikelAttribut aa
-      INNER JOIN tAttribut tas ON aa.kAttribut = tas.kAttribut
+      INNER JOIN tAttribut a ON aa.kAttribut = a.kAttribut
       WHERE aa.kArtikel IN (${kArtikelList})
-      ORDER BY aa.kArtikel, COALESCE(tas.nSort, 999), tas.cName
+      ORDER BY aa.kArtikel, COALESCE(a.nSort, 999), a.cName
     `)
 
     // Gruppiere Attribute nach kArtikel
