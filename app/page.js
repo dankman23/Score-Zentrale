@@ -2034,10 +2034,30 @@ export default function App() {
     }
   }
 
+  // Artikel Auswahl für Batch
+  const toggleArtikelSelection = (kArtikel) => {
+    if (selectedArtikel.includes(kArtikel)) {
+      setSelectedArtikel(selectedArtikel.filter(id => id !== kArtikel))
+    } else {
+      setSelectedArtikel([...selectedArtikel, kArtikel])
+    }
+  }
+
+  const selectAllArtikel = () => {
+    const allIds = artikelList.map(a => a.kArtikel)
+    setSelectedArtikel(allIds)
+  }
+
+  const deselectAllArtikel = () => {
+    setSelectedArtikel([])
+  }
+
   // Batch Bulletpoint Generation
   const startBatchGeneration = async () => {
     try {
-      const count = artikelTotal > 1000 ? 1000 : artikelTotal
+      // Verwende entweder ausgewählte Artikel oder alle gefilterten
+      const useSelection = selectedArtikel.length > 0
+      const count = useSelection ? selectedArtikel.length : (artikelTotal > 1000 ? 1000 : artikelTotal)
       
       // 1. Lade Kosten-Schätzung
       const estimateRes = await fetch(`/api/amazon/bulletpoints/batch/estimate?count=${count}`)
