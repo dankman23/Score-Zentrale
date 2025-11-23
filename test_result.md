@@ -23,6 +23,31 @@ user_problem_statement: |
      - Detaillierte Ergebnis-Tabelle der ersten 20 Artikel
 
 backend:
+  - task: "Amazon Bulletpoints: POST /api/amazon/bulletpoints/batch/generate (Batch-Verarbeitung)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/amazon/bulletpoints/batch/generate/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEUE API: Batch-Verarbeitung für Amazon Bulletpoint-Generierung. Akzeptiert { kArtikel: number[] } oder { filter: {...}, limit?: number }. Verarbeitet Artikel sequenziell: (1) Lädt Details aus MongoDB, (2) Lädt Merkmale aus MSSQL falls nötig, (3) Generiert Bulletpoints mit GPT-4o, (4) Speichert in Collection 'amazon_bulletpoints_generated'. Robuste Fehlerbehandlung - einzelne Fehler stoppen nicht den ganzen Batch. Returnt { ok, processed, succeeded, failed, duration, results[] }. maxDuration: 300s für große Batches."
+
+  - task: "Amazon Bulletpoints: GET /api/amazon/bulletpoints/batch/download (CSV Export)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/amazon/bulletpoints/batch/download/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEUE API: CSV-Download aller generierten Bulletpoints. Query-Parameter: ?kArtikel=123,456 (optional). CSV-Format: kArtikel;cArtNr;cName;Bulletpoint 1-5;Generiert am. UTF-8 BOM für Excel-Kompatibilität. Semikolon-Trennung, deutsche Formatierung. Proper CSV-Escaping für Semikolon und Quotes in Texten."
+
+backend:
   - task: "Autopilot: Collections vereinheitlichen (alle → prospects)"
     implemented: true
     working: true
