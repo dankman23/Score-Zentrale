@@ -6508,12 +6508,12 @@ export default function App() {
                                     <select 
                                       className="form-control form-control-sm"
                                       value={selectedPromptId}
-                                      onChange={(e) => setSelectedPromptId(e.target.value)}
+                                      onChange={(e) => setSelectedPromptId(parseInt(e.target.value))}
                                       style={{minWidth: '250px'}}
                                     >
                                       {amazonPrompts.map(p => (
-                                        <option key={p._id} value={p._id}>
-                                          {p.name}
+                                        <option key={p.version} value={p.version}>
+                                          v{p.version}: {p.name}
                                         </option>
                                       ))}
                                     </select>
