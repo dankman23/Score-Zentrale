@@ -659,6 +659,10 @@ export default function App() {
   const [artikelDetails, setArtikelDetails] = useState(null)
   const [loadingArtikelDetails, setLoadingArtikelDetails] = useState(false)
   
+  // Cache für Artikel-Daten (per kArtikel)
+  const [artikelDetailsCache, setArtikelDetailsCache] = useState({})
+  const [artikelBulletpointsCache, setArtikelBulletpointsCache] = useState({})
+  
   // Batch Bulletpoint Generation
   const [batchGenerating, setBatchGenerating] = useState(false)
   const [batchProgress, setBatchProgress] = useState({ processed: 0, succeeded: 0, failed: 0, total: 0 })
