@@ -177,8 +177,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Amazon Bulletpoints Batch Generate API testen (POST /api/amazon/bulletpoints/batch/generate)"
-    - "Amazon Bulletpoints CSV Download API testen (GET /api/amazon/bulletpoints/batch/download)"
+    - "COMPLETED: Amazon Bulletpoints Batch Generate API ✅ (POST /api/amazon/bulletpoints/batch/generate)"
+    - "COMPLETED: Amazon Bulletpoints CSV Download API ✅ (GET /api/amazon/bulletpoints/batch/download)"
   stuck_tasks: []
   test_priority: "high_first"
   test_all: false
