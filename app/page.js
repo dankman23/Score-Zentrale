@@ -6479,17 +6479,27 @@ export default function App() {
                           <div className="card bg-light">
                             <div className="card-body py-2">
                               <div className="d-flex justify-content-between align-items-center">
-                                <div>
-                                  <i className="bi bi-stars mr-2 text-primary"/>
-                                  <strong>Amazon Bulletpoints Batch-Generierung</strong>
-                                  <small className="text-muted ml-2">
-                                    ({artikelTotal.toLocaleString()} Artikel {artikelFilter.search || artikelFilter.hersteller || artikelFilter.warengruppe ? 'gefiltert' : 'gesamt'})
-                                  </small>
-                                  {selectedArtikel.length > 0 && (
-                                    <span className="badge badge-primary ml-2">
-                                      {selectedArtikel.length} ausgewählt
-                                    </span>
-                                  )}
+                                <div className="flex-grow-1">
+                                  <div className="d-flex align-items-center">
+                                    <div>
+                                      <i className="bi bi-stars mr-2 text-primary"/>
+                                      <strong>Amazon Bulletpoints Batch-Generierung</strong>
+                                      <small className="text-muted ml-2">
+                                        ({artikelTotal.toLocaleString()} Artikel {artikelFilter.search || artikelFilter.hersteller || artikelFilter.warengruppe ? 'gefiltert' : 'gesamt'})
+                                      </small>
+                                      {selectedArtikel.length > 0 && (
+                                        <span className="badge badge-primary ml-2">
+                                          {selectedArtikel.length} ausgewählt
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="ml-3">
+                                      <small className="text-info">
+                                        <i className="bi bi-info-circle mr-1"/>
+                                        Artikel-Details (Merkmale & Beschreibung) werden automatisch aus JTL geladen
+                                      </small>
+                                    </div>
+                                  </div>
                                 </div>
                                 <div>
                                   {selectedArtikel.length > 0 ? (
