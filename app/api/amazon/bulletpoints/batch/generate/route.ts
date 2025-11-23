@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   
   try {
     const body = await request.json()
-    const { kArtikel: kArtikelList, filter, limit } = body
+    const { kArtikel: kArtikelList, filter, limit, promptId } = body
     
     const db = await getDb()
     const articlesCollection = db.collection('articles')
