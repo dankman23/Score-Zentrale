@@ -664,6 +664,7 @@ export default function App() {
   const [batchProgress, setBatchProgress] = useState({ processed: 0, succeeded: 0, failed: 0, total: 0 })
   const [showBatchModal, setShowBatchModal] = useState(false)
   const [batchResults, setBatchResults] = useState([])
+  const [selectedArtikel, setSelectedArtikel] = useState([])
   
   // Preise
   const [preiseTab, setPreiseTab] = useState('alte_pb') // alte_pb | neue_2025
