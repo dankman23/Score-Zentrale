@@ -96,13 +96,13 @@ export async function POST(request: NextRequest) {
     const merkmaleResult = await pool.request().query(`
       SELECT 
         am.kArtikel,
-        m.cName as name,
-        mw.cWert as wert
+        COALESCE(m.cName, '') as name,
+        COALESCE(mw.cWert, '') as wert
       FROM tArtikelMerkmal am
       INNER JOIN tMerkmal m ON am.kMerkmal = m.kMerkmal
       LEFT JOIN tMerkmalWert mw ON am.kMerkmalWert = mw.kMerkmalWert
       WHERE am.kArtikel IN (${kArtikelList})
-      ORDER BY am.kArtikel, m.nSort, m.cName
+      ORDER BY am.kArtikel, COALESCE(m.nSort, 999), m.cName
     `)
 
     // Gruppiere Merkmale nach kArtikel
