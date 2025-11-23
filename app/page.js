@@ -6504,15 +6504,15 @@ export default function App() {
                                 </div>
                                 <div className="d-flex align-items-center">
                                   <div className="mr-3">
-                                    <small className="text-muted d-block mb-1">Prompt:</small>
+                                    <small className="d-block mb-1" style={{color: '#6c757d'}}>Prompt auswählen:</small>
                                     <select 
                                       className="form-control form-control-sm"
                                       value={selectedPromptId}
                                       onChange={(e) => setSelectedPromptId(parseInt(e.target.value))}
-                                      style={{minWidth: '250px'}}
+                                      style={{minWidth: '300px', backgroundColor: 'white', color: 'black'}}
                                     >
                                       {amazonPrompts.map(p => (
-                                        <option key={p.version} value={p.version}>
+                                        <option key={p.version} value={p.version} style={{backgroundColor: 'white', color: 'black'}}>
                                           v{p.version}: {p.name}
                                         </option>
                                       ))}
