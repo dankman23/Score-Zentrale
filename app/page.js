@@ -2262,12 +2262,28 @@ export default function App() {
     if (expandedArtikel === kArtikel) {
       setExpandedArtikel(null)
       setArtikelPresence(null)
+      setArtikelDetails(null)
+      setArtikelBulletpoints(null)
       return
     }
 
     setExpandedArtikel(kArtikel)
     setLoadingPresence(true)
     setArtikelPresence(null)
+    
+    // Lade Daten aus Cache oder fresh
+    if (artikelDetailsCache[kArtikel]) {
+      setArtikelDetails(artikelDetailsCache[kArtikel])
+      console.log('[Cache] Artikel-Details geladen für kArtikel:', kArtikel)
+    }
+    
+    if (artikelBulletpointsCache[kArtikel]) {
+      setArtikelBulletpoints(artikelBulletpointsCache[kArtikel])
+      console.log('[Cache] Bulletpoints geladen für kArtikel:', kArtikel)
+    } else {
+      // Versuche Bulletpoints aus MongoDB zu laden (falls bereits generiert)
+      loadExistingBulletpoints(kArtikel)
+    }
 
     try {
       const res = await fetch(`/api/jtl/articles/presence/${kArtikel}`)
@@ -2279,6 +2295,20 @@ export default function App() {
       console.error('Fehler beim Laden der Präsenz:', e)
     }
     setLoadingPresence(false)
+  }
+  
+  const loadExistingBulletpoints = async (kArtikel) => {
+    try {
+      const res = await fetch(`/api/amazon/bulletpoints/artikel/${kArtikel}`)
+      const data = await res.json()
+      if (data.ok && data.bulletpoints) {
+        setArtikelBulletpoints(data.bulletpoints.bulletpoints)
+        setArtikelBulletpointsCache(prev => ({ ...prev, [kArtikel]: data.bulletpoints.bulletpoints }))
+        console.log('[MongoDB] Existierende Bulletpoints geladen für kArtikel:', kArtikel)
+      }
+    } catch (e) {
+      console.log('[MongoDB] Keine existierenden Bulletpoints für kArtikel:', kArtikel)
+    }
   }
 
   const startArtikelImport = async () => {
