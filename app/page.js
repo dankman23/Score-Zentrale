@@ -6958,7 +6958,10 @@ export default function App() {
                                                   <i className="bi bi-check-circle mr-2"/>Bulletpoints wurden mit Claude Sonnet 4 generiert
                                                 </div>
                                                 <div className="bg-white p-3 rounded border">
-                                                  {artikelBulletpoints.split(';').map((bp, idx) => (
+                                                  {(typeof artikelBulletpoints === 'string' 
+                                                    ? artikelBulletpoints.split(';') 
+                                                    : artikelBulletpoints.split ? artikelBulletpoints.split(';') : []
+                                                  ).map((bp, idx) => (
                                                     <div key={idx} className="mb-2">
                                                       <strong>Bulletpoint {idx + 1}:</strong>
                                                       <p className="mb-0 ml-3">{bp.trim()}</p>
