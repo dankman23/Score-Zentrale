@@ -103,6 +103,7 @@ export async function POST(request: NextRequest) {
             cArtNr: article.cArtNr || '',
             cName: article.cName || article.cArtNr || 'Unbenannt',
             cKurzBeschreibung: article.cKurzBeschreibung || '',
+            cBeschreibung: article.cBeschreibung || '',
             cBarcode: article.cBarcode || '',
             cHAN: article.cHAN || '',
             
