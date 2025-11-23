@@ -1993,6 +1993,8 @@ export default function App() {
         })
 
         setArtikelBulletpoints(data.bulletpoints)
+        setArtikelBulletpointsCache(prev => ({ ...prev, [artikel.kArtikel]: data.bulletpoints }))
+        console.log('[Bulletpoints] Generiert und im Cache gespeichert für kArtikel:', artikel.kArtikel)
         alert('✅ Bulletpoints erfolgreich generiert!')
       } else {
         alert('❌ Fehler: ' + data.error)
