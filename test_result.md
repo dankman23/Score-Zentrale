@@ -165,18 +165,21 @@ frontend:
 
 metadata:
   created_by: "main_agent"
-  version: "2.0"
-  test_sequence: 1
+  version: "3.0"
+  test_sequence: 2
   run_ui: false
 
 test_plan:
   current_focus:
-    - "COMPLETED: Auto-Match API Import-Fehler behoben ✅"
-    - "COMPLETED: Zahlungen API buchung-Feld Integration ✅"
-    - "COMPLETED: Buchungslogik MwSt-Berechnung verifiziert ✅"
+    - "Amazon Bulletpoints Batch Generate API testen (POST /api/amazon/bulletpoints/batch/generate)"
+    - "Amazon Bulletpoints CSV Download API testen (GET /api/amazon/bulletpoints/batch/download)"
   stuck_tasks: []
   test_priority: "high_first"
   test_all: false
+
+agent_communication:
+  - agent: "main"
+    message: "🚀 AMAZON BULLETPOINTS BATCH-VERARBEITUNG IMPLEMENTIERT! Neue Features: (1) Backend API für Batch-Generierung - verarbeitet mehrere Artikel sequenziell mit GPT-4o, speichert in MongoDB 'amazon_bulletpoints_generated' Collection. (2) CSV-Download API mit Excel-kompatiblem UTF-8 BOM. (3) Frontend UI im Artikel-Browser mit 'Alle generieren' Button, Progress Modal und Ergebnis-Übersicht. BITTE TESTEN: (a) POST /api/amazon/bulletpoints/batch/generate mit kleinem Test-Batch (3-5 Artikel), (b) GET /api/amazon/bulletpoints/batch/download zum CSV-Export. WICHTIG: Für Tests werden Artikel aus MongoDB benötigt - falls nicht importiert, Mock-Daten verwenden oder Import durchführen."
 
 #====================================================================================================
 # START - Testing Protocol - DO NOT EDIT OR REMOVE THIS SECTION
