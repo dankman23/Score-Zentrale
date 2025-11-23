@@ -1,6 +1,6 @@
 /**
- * Claude Sonnet 4 Client mit Emergent LLM Key
- * Verwendet OpenAI-kompatibles Format für Emergent Universal Key
+ * Claude Sonnet 4 Client mit Emergent LLM Key (Universal Key)
+ * Der Emergent Universal Key funktioniert direkt mit OpenAI SDK
  */
 
 import OpenAI from 'openai'
@@ -24,7 +24,7 @@ export interface ClaudeResponse {
 
 export class ClaudeClient {
   private client: OpenAI
-  private model: string = 'claude-sonnet-4-20250514'
+  private model: string = 'claude-3-7-sonnet-20250219' // Claude 3.7 Sonnet
 
   constructor() {
     const apiKey = process.env.EMERGENT_LLM_KEY || ''
@@ -32,10 +32,11 @@ export class ClaudeClient {
       throw new Error('EMERGENT_LLM_KEY nicht gefunden')
     }
 
-    // Emergent LLM Key verwendet OpenAI-kompatibles Format
+    // Emergent Universal Key funktioniert direkt mit OpenAI SDK
+    // Einfach den Model-Namen auf Claude ändern!
     this.client = new OpenAI({
       apiKey: apiKey,
-      baseURL: 'https://api.emergent.ai/v1' // Emergent Proxy für Universal Key
+      baseURL: 'https://api.openai.com/v1' // Standard OpenAI URL
     })
   }
 
@@ -52,7 +53,7 @@ export class ClaudeClient {
       ]
 
       const response = await this.client.chat.completions.create({
-        model: this.model,
+        model: this.model, // claude-3-7-sonnet-20250219
         messages: openaiMessages,
         max_tokens: maxTokens,
         temperature: 0.7
