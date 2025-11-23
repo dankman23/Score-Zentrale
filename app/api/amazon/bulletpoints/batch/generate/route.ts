@@ -180,9 +180,8 @@ ${merkmaleText || 'Keine Angabe'}
               bulletpoints: bulletpointsRaw,
               bullets: bullets,
               generatedAt: new Date(),
-              promptId: selectedPrompt._id,
-              promptName: selectedPrompt.name,
-              promptVersion: selectedPrompt.version
+              promptVersion: selectedPrompt.version,
+              promptName: selectedPrompt.name
             }
           },
           { upsert: true }
