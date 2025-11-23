@@ -6,21 +6,28 @@
 ## Collections vereinheitlicht, BCC erweitert, Frontend-Statusanzeige verbessert
 
 user_problem_statement: |
-  AMAZON BULLETPOINTS BATCH-VERARBEITUNG:
+  AMAZON BULLETPOINTS BATCH-VERARBEITUNG MIT CLAUDE SONNET 4:
   1. Backend API für Batch-Generierung erstellt (/api/amazon/bulletpoints/batch/generate)
-     - Akzeptiert Array von kArtikel IDs oder Filter-Parameter
-     - Verarbeitet mehrere Artikel sequenziell mit GPT-4o
+     - Verarbeitet mehrere Artikel sequenziell mit Claude Sonnet 4 (claude-sonnet-4-20250514)
+     - Verwendet Emergent LLM Key (Universal Key)
      - Robuste Fehlerbehandlung (einzelne Fehler stoppen nicht den ganzen Batch)
      - Speichert Ergebnisse in MongoDB Collection 'amazon_bulletpoints_generated'
   2. CSV-Download API erstellt (/api/amazon/bulletpoints/batch/download)
      - Generiert CSV mit Spalten: kArtikel, cArtNr, cName, Bulletpoint 1-5, Generiert am
      - UTF-8 BOM für Excel-Kompatibilität
-  3. Frontend UI Integration in Artikel-Browser (app/page.js)
-     - "Alle generieren" Button in Batch Actions Card
+  3. Kosten-Schätzungs API erstellt (/api/amazon/bulletpoints/batch/estimate)
+     - Berechnet geschätzte Token (Input/Output) und Kosten in USD/EUR
+     - Basierend auf Claude Sonnet 4 Pricing ($3/1M input, $15/1M output)
+  4. Frontend UI Integration in Artikel-Browser (app/page.js)
+     - "Alle generieren" Button mit Kosten-Bestätigung VOR Start
+     - Kosten-Dialog zeigt: Artikel-Anzahl, Token, USD/EUR Kosten, geschätzte Dauer
      - CSV Download Button
      - Progress Modal mit Live-Status während Generierung
      - Ergebnis-Übersicht nach Abschluss (Erfolg/Fehler/Gesamt)
-     - Detaillierte Ergebnis-Tabelle der ersten 20 Artikel
+  5. Claude Client Library erstellt (/app/app/lib/claude-client.ts)
+     - TypeScript Client für Claude Sonnet 4 API
+     - Kosten-Kalkulation Utility
+     - Emergent LLM Key Integration
 
 backend:
   - task: "Amazon Bulletpoints: POST /api/amazon/bulletpoints/batch/generate (Batch-Verarbeitung)"
