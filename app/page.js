@@ -659,6 +659,12 @@ export default function App() {
   const [artikelDetails, setArtikelDetails] = useState(null)
   const [loadingArtikelDetails, setLoadingArtikelDetails] = useState(false)
   
+  // Batch Bulletpoint Generation
+  const [batchGenerating, setBatchGenerating] = useState(false)
+  const [batchProgress, setBatchProgress] = useState({ processed: 0, succeeded: 0, failed: 0, total: 0 })
+  const [showBatchModal, setShowBatchModal] = useState(false)
+  const [batchResults, setBatchResults] = useState([])
+  
   // Preise
   const [preiseTab, setPreiseTab] = useState('alte_pb') // alte_pb | neue_2025
   const [preiseSheet, setPreiseSheet] = useState('lagerware')
