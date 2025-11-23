@@ -16,9 +16,16 @@ export async function GET(
     const kArtikel = parseInt(params.kArtikel)
     
     const db = await getDb()
-    const collection = db.collection('amazon_bulletpoints')
     
-    const doc = await collection.findOne({ kArtikel })
+    // Versuche zuerst die Batch-Collection (neuer Ort)
+    let collection = db.collection('amazon_bulletpoints_generated')
+    let doc = await collection.findOne({ kArtikel })
+    
+    // Fallback auf alte Collection
+    if (!doc) {
+      collection = db.collection('amazon_bulletpoints')
+      doc = await collection.findOne({ kArtikel })
+    }
     
     if (!doc) {
       return NextResponse.json({
@@ -29,9 +36,12 @@ export async function GET(
     
     return NextResponse.json({
       ok: true,
-      bulletpoints: doc.bulletpoints,
-      promptVersion: doc.promptVersion,
-      generatedAt: doc.generatedAt
+      bulletpoints: {
+        bulletpoints: doc.bulletpoints,
+        bullets: doc.bullets,
+        promptVersion: doc.promptVersion || doc.promptName,
+        generatedAt: doc.generatedAt
+      }
     })
     
   } catch (error: any) {
