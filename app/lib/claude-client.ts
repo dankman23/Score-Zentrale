@@ -1,6 +1,6 @@
 /**
  * Claude Sonnet 4 Client mit Emergent LLM Key (Universal Key)
- * Der Emergent Universal Key funktioniert direkt mit OpenAI SDK
+ * Verwendet Emergent Integrations Endpoint
  */
 
 import OpenAI from 'openai'
@@ -24,7 +24,7 @@ export interface ClaudeResponse {
 
 export class ClaudeClient {
   private client: OpenAI
-  private model: string = 'claude-3-7-sonnet-20250219' // Claude 3.7 Sonnet
+  private model: string = 'anthropic/claude-3-7-sonnet-20250219' // Claude 3.7 Sonnet
 
   constructor() {
     const apiKey = process.env.EMERGENT_LLM_KEY || ''
@@ -32,11 +32,10 @@ export class ClaudeClient {
       throw new Error('EMERGENT_LLM_KEY nicht gefunden')
     }
 
-    // Emergent Universal Key funktioniert direkt mit OpenAI SDK
-    // Einfach den Model-Namen auf Claude ändern!
+    // Emergent Universal Key über Emergent Integrations Endpoint
     this.client = new OpenAI({
       apiKey: apiKey,
-      baseURL: 'https://api.openai.com/v1' // Standard OpenAI URL
+      baseURL: 'https://integrations.emergentagent.com/llm' // Emergent Integrations Endpoint
     })
   }
 
@@ -46,14 +45,14 @@ export class ClaudeClient {
     maxTokens: number = 2000
   ): Promise<ClaudeResponse> {
     try {
-      // Konvertiere zu OpenAI-Format
+      // Konvertiere zu OpenAI-Format (kompatibel mit Emergent Endpoint)
       const openaiMessages = [
         { role: 'system' as const, content: systemPrompt },
         ...messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content }))
       ]
 
       const response = await this.client.chat.completions.create({
-        model: this.model, // claude-3-7-sonnet-20250219
+        model: this.model, // anthropic/claude-3-7-sonnet-20250219
         messages: openaiMessages,
         max_tokens: maxTokens,
         temperature: 0.7
