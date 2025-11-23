@@ -184,23 +184,20 @@ AUSGABE: Gib NUR die 5 Bulletpoints mit Semikolon getrennt zurück, KEINE weiter
 
 Format: [BP1];[BP2];[BP3];[BP4];[BP5]`
 
-        const completion = await openai.chat.completions.create({
-          model: 'gpt-4o',
-          messages: [
-            {
-              role: 'system',
-              content: 'Du bist ein Experte für Amazon-Produktbeschreibungen und SEO-optimierte Bulletpoints.'
-            },
+        // Claude Sonnet 4 API Call
+        const claude = new ClaudeClient()
+        const response = await claude.createMessage(
+          [
             {
               role: 'user',
               content: fullPrompt
             }
           ],
-          max_tokens: 1500,
-          temperature: 0.7
-        })
+          'Du bist ein Experte für Amazon-Produktbeschreibungen und SEO-optimierte Bulletpoints.',
+          2000
+        )
         
-        const bulletpointsRaw = completion.choices[0]?.message?.content || ''
+        const bulletpointsRaw = response.content[0]?.text || ''
         const bullets = bulletpointsRaw.split(';').map(b => b.trim()).filter(b => b.length > 0)
         
         console.log(`[Batch] kArtikel=${kArtikel} - Generiert: ${bullets.length} Bulletpoints`)
