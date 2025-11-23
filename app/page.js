@@ -6502,7 +6502,22 @@ export default function App() {
                                     </div>
                                   </div>
                                 </div>
-                                <div>
+                                <div className="d-flex align-items-center">
+                                  <div className="mr-3">
+                                    <small className="text-muted d-block mb-1">Prompt:</small>
+                                    <select 
+                                      className="form-control form-control-sm"
+                                      value={selectedPromptId}
+                                      onChange={(e) => setSelectedPromptId(e.target.value)}
+                                      style={{minWidth: '250px'}}
+                                    >
+                                      {amazonPrompts.map(p => (
+                                        <option key={p._id} value={p._id}>
+                                          {p.name}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
                                   {selectedArtikel.length > 0 ? (
                                     <button 
                                       className="btn btn-sm btn-outline-secondary mr-2"
