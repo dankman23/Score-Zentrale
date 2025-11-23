@@ -30,20 +30,35 @@ user_problem_statement: |
      - Emergent LLM Key Integration
 
 backend:
-  - task: "Amazon Bulletpoints: POST /api/amazon/bulletpoints/batch/generate (Batch-Verarbeitung)"
+  - task: "Amazon Bulletpoints: POST /api/amazon/bulletpoints/batch/generate (Batch mit Claude Sonnet 4)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/amazon/bulletpoints/batch/generate/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "UPDATED: Von GPT-4o auf Claude Sonnet 4 (claude-sonnet-4-20250514) umgestellt. Verwendet Emergent LLM Key. Akzeptiert { kArtikel: number[] } oder { filter: {...}, limit?: number }. Verarbeitet Artikel sequenziell: (1) Lädt Details aus MongoDB, (2) Lädt Merkmale aus MSSQL falls nötig, (3) Generiert Bulletpoints mit Claude Sonnet 4, (4) Speichert in Collection 'amazon_bulletpoints_generated'. Robuste Fehlerbehandlung - einzelne Fehler stoppen nicht den ganzen Batch. Returnt { ok, processed, succeeded, failed, duration, results[] }. maxDuration: 300s."
+      - working: true
+        agent: "testing"
+        comment: "✅ PREVIOUS TEST with GPT-4o: Batch generation with 3 articles successful - processed: 3, succeeded: 3, failed: 0. NEEDS RE-TESTING with Claude Sonnet 4."
+
+  - task: "Amazon Bulletpoints: GET /api/amazon/bulletpoints/batch/estimate (Kosten-Schätzung)"
     implemented: true
     working: true
-    file: "/app/app/api/amazon/bulletpoints/batch/generate/route.ts"
+    file: "/app/app/api/amazon/bulletpoints/batch/estimate/route.ts"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "NEUE API: Batch-Verarbeitung für Amazon Bulletpoint-Generierung. Akzeptiert { kArtikel: number[] } oder { filter: {...}, limit?: number }. Verarbeitet Artikel sequenziell: (1) Lädt Details aus MongoDB, (2) Lädt Merkmale aus MSSQL falls nötig, (3) Generiert Bulletpoints mit GPT-4o, (4) Speichert in Collection 'amazon_bulletpoints_generated'. Robuste Fehlerbehandlung - einzelne Fehler stoppen nicht den ganzen Batch. Returnt { ok, processed, succeeded, failed, duration, results[] }. maxDuration: 300s für große Batches."
+        comment: "NEUE API: Kosten-Schätzung für Batch-Generierung. Query-Parameter: ?count=N. Berechnet geschätzte Token (Input: ~1500, Output: ~500 pro Artikel) und Kosten basierend auf Claude Sonnet 4 Pricing ($3/1M input, $15/1M output). Returnt { ok, count, model, estimate: { inputTokens, outputTokens, totalTokens, costs: { inputUSD, outputUSD, totalUSD, totalEUR } } }. Umrechnung USD->EUR mit Faktor 0.92."
       - working: true
-        agent: "testing"
-        comment: "✅ AMAZON BULLETPOINTS BATCH GENERATE API WORKING PERFECTLY! Comprehensive testing completed: (1) ✅ Batch generation with 3 articles successful - processed: 3, succeeded: 3, failed: 0, duration: 9.7s. GPT-4o integration working correctly, generating high-quality German bulletpoints following Amazon format. (2) ✅ Error handling for empty list working - returns HTTP 400 with proper error message 'Keine Artikel gefunden'. (3) ✅ Invalid article IDs handled gracefully - processed: 2, succeeded: 0, failed: 2 (expected behavior). (4) ✅ MongoDB collection 'amazon_bulletpoints_generated' correctly populated with bulletpoints, cArtNr, cName, generatedAt timestamp. (5) ✅ Response structure validated - all required fields present: ok, processed, succeeded, failed, duration, results[]. API ready for production use!"
+        agent: "main"
+        comment: "✅ Manuell getestet: GET /api/amazon/bulletpoints/batch/estimate?count=10 returns 200 OK mit korrekten Kosten-Berechnungen: Input $0.0450, Output $0.0750, Total $0.12 (€0.11)."
 
   - task: "Amazon Bulletpoints: GET /api/amazon/bulletpoints/batch/download (CSV Export)"
     implemented: true
