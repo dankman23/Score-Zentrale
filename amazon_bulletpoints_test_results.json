@@ -1,0 +1,40 @@
+{
+  "test1_batch_generate": {
+    "status": "PASSED",
+    "processed": 3,
+    "succeeded": 3,
+    "failed": 0,
+    "duration": "9.7s",
+    "results_count": 3
+  },
+  "test2_empty_list": {
+    "status": "PASSED",
+    "error_message": "Keine Artikel gefunden"
+  },
+  "test3_invalid_ids": {
+    "status": "PASSED",
+    "processed": 2,
+    "succeeded": 0,
+    "failed": 2
+  },
+  "test1_csv_download": {
+    "status": "PASSED",
+    "has_bom": true,
+    "total_rows": 3,
+    "columns": 9,
+    "sample_filename": "attachment; filename=\"amazon_bulletpoints_2025-11-23.csv\""
+  },
+  "test2_csv_filter": {
+    "status": "PASSED",
+    "content_type": "text/csv; charset=utf-8"
+  },
+  "status": "CHECKED_VIA_API",
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "errors": 0,
+    "expected_empty": 0,
+    "skipped": 0,
+    "total_tests": 5
+  }
+}
