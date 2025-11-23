@@ -166,9 +166,9 @@ ${merkmaleText || 'Keine Angabe'}
         const bulletpointsRaw = response.content[0]?.text || ''
         const bullets = bulletpointsRaw.split(';').map(b => b.trim()).filter(b => b.length > 0)
         
-        console.log(`[Batch] kArtikel=${kArtikel} - Generiert: ${bullets.length} Bulletpoints`)
+        console.log(`[Batch] kArtikel=${kArtikel} - Generiert: ${bullets.length} Bulletpoints mit Prompt: ${selectedPrompt.name}`)
         
-        // 6. Speichere in Datenbank
+        // 7. Speichere in Datenbank
         await bulletpointsCollection.updateOne(
           { kArtikel },
           {
