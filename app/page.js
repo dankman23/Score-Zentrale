@@ -2105,8 +2105,8 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(
           useSelection 
-            ? { kArtikel: selectedArtikel }
-            : { filter: artikelFilter, limit: count }
+            ? { kArtikel: selectedArtikel, promptId: selectedPromptId }
+            : { filter: artikelFilter, limit: count, promptId: selectedPromptId }
         )
       })
 
