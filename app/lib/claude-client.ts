@@ -24,7 +24,7 @@ export interface ClaudeResponse {
 
 export class ClaudeClient {
   private client: OpenAI
-  private model: string = 'claude-3-7-sonnet-20250219' // Claude 3.7 Sonnet (ohne anthropic/ prefix)
+  private model: string = 'claude-sonnet-4-20250514' // Claude Sonnet 4
 
   constructor() {
     const apiKey = process.env.EMERGENT_LLM_KEY || ''
