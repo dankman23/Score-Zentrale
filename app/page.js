@@ -2102,10 +2102,11 @@ export default function App() {
       const res = await fetch('/api/amazon/bulletpoints/batch/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          filter: artikelFilter,
-          limit: count
-        })
+        body: JSON.stringify(
+          useSelection 
+            ? { kArtikel: selectedArtikel }
+            : { filter: artikelFilter, limit: count }
+        )
       })
 
       const data = await res.json()
