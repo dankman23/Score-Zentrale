@@ -6612,7 +6612,14 @@ export default function App() {
                                           <i className={`bi bi-${expandedArtikel === artikel.kArtikel ? 'chevron-up' : 'chevron-down'}`}/>
                                         </button>
                                       </td>
-                                      <td className="font-weight-bold text-primary">{artikel.cArtNr}</td>
+                                      <td>
+                                        <div className="font-weight-bold text-primary">{artikel.cArtNr}</div>
+                                        {(!artikel.cKurzBeschreibung && !artikel.cBeschreibung) && (
+                                          <small className="text-warning">
+                                            <i className="bi bi-exclamation-triangle" title="Keine Beschreibung vorhanden"/>
+                                          </small>
+                                        )}
+                                      </td>
                                     <td>
                                       <div className="text-truncate font-weight-bold" style={{maxWidth: '350px'}} title={artikel.cName || artikel.cKurzBeschreibung}>
                                         {artikel.cName || artikel.cKurzBeschreibung || 'Kein Name'}
