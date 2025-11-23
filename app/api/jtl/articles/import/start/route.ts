@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
         -- Artikelname aus tArtikelBeschreibung
         ab.cName,
         ab.cKurzBeschreibung,
+        ab.cBeschreibung,
         
         -- Hersteller-Name
         h.cName as cHerstellerName,
