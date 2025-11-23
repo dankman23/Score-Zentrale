@@ -2035,14 +2035,45 @@ export default function App() {
 
   // Batch Bulletpoint Generation
   const startBatchGeneration = async () => {
-    if (!confirm(`Bulletpoints für ${artikelTotal.toLocaleString()} gefilterte Artikel generieren?\n\n⚠️ Dies kann einige Minuten dauern.\n\nFortfahren?`)) {
-      return
-    }
-
     try {
+      const count = artikelTotal > 1000 ? 1000 : artikelTotal
+      
+      // 1. Lade Kosten-Schätzung
+      const estimateRes = await fetch(`/api/amazon/bulletpoints/batch/estimate?count=${count}`)
+      const estimateData = await estimateRes.json()
+      
+      if (!estimateData.ok) {
+        alert('❌ Fehler beim Laden der Kosten-Schätzung: ' + estimateData.error)
+        return
+      }
+      
+      const { estimate } = estimateData
+      
+      // 2. Zeige Kosten-Bestätigung
+      const confirmed = confirm(
+        `🤖 Amazon Bulletpoints Batch-Generierung\n\n` +
+        `Artikel: ${count.toLocaleString()}\n` +
+        `Modell: Claude Sonnet 4\n\n` +
+        `📊 Geschätzte Token:\n` +
+        `  • Input: ${estimate.inputTokens}\n` +
+        `  • Output: ${estimate.outputTokens}\n` +
+        `  • Gesamt: ${estimate.totalTokens}\n\n` +
+        `💰 Geschätzte Kosten:\n` +
+        `  • Input: $${estimate.costs.inputUSD}\n` +
+        `  • Output: $${estimate.costs.outputUSD}\n` +
+        `  • GESAMT: $${estimate.costs.totalUSD} (≈ €${estimate.costs.totalEUR})\n\n` +
+        `⏱️ Geschätzte Dauer: ${Math.ceil(count * 3 / 60)} Minuten\n\n` +
+        `Fortfahren?`
+      )
+      
+      if (!confirmed) {
+        return
+      }
+
+      // 3. Starte Batch-Generierung
       setBatchGenerating(true)
       setShowBatchModal(true)
-      setBatchProgress({ processed: 0, succeeded: 0, failed: 0, total: artikelTotal })
+      setBatchProgress({ processed: 0, succeeded: 0, failed: 0, total: count })
       setBatchResults([])
 
       console.log('[Batch Generation] Starte mit Filter:', artikelFilter)
@@ -2052,7 +2083,7 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           filter: artikelFilter,
-          limit: artikelTotal > 1000 ? 1000 : artikelTotal // Limit auf 1000 für Performance
+          limit: count
         })
       })
 
