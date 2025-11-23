@@ -149,7 +149,7 @@ ${merkmaleText || 'Keine Angabe'}
 `
 
         // 5. Bereite Prompt vor (Template mit Produktdaten befüllen)
-        const fullPrompt = selectedPrompt.userPromptTemplate.replace('{{PRODUCT_DATA}}', productInfo)
+        const fullPrompt = selectedPrompt.prompt.replace('{{PRODUKTINFO}}', productInfo)
 
         // 6. Generiere Bulletpoints mit Claude Sonnet 4
         const claude = new ClaudeClient()
@@ -160,7 +160,7 @@ ${merkmaleText || 'Keine Angabe'}
               content: fullPrompt
             }
           ],
-          selectedPrompt.systemPrompt,
+          'Du bist ein Experte für Amazon-Produktbeschreibungen und SEO-optimierte Bulletpoints.',
           2000
         )
         
