@@ -6420,6 +6420,51 @@ export default function App() {
                         </div>
                       </div>
 
+                      {/* Batch Actions */}
+                      <div className="row mb-3">
+                        <div className="col-md-12">
+                          <div className="card bg-light">
+                            <div className="card-body py-2">
+                              <div className="d-flex justify-content-between align-items-center">
+                                <div>
+                                  <i className="bi bi-stars mr-2 text-primary"/>
+                                  <strong>Amazon Bulletpoints Batch-Generierung</strong>
+                                  <small className="text-muted ml-2">
+                                    ({artikelTotal.toLocaleString()} Artikel {artikelFilter.search || artikelFilter.hersteller || artikelFilter.warengruppe ? 'gefiltert' : 'gesamt'})
+                                  </small>
+                                </div>
+                                <div>
+                                  <button 
+                                    className="btn btn-sm btn-success mr-2"
+                                    onClick={startBatchGeneration}
+                                    disabled={batchGenerating || artikelTotal === 0}
+                                  >
+                                    {batchGenerating ? (
+                                      <>
+                                        <span className="spinner-border spinner-border-sm mr-2"/>
+                                        Verarbeite...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <i className="bi bi-play-fill mr-1"/>
+                                        Alle generieren
+                                      </>
+                                    )}
+                                  </button>
+                                  <button 
+                                    className="btn btn-sm btn-outline-primary"
+                                    onClick={downloadBatchCSV}
+                                  >
+                                    <i className="bi bi-download mr-1"/>
+                                    CSV Download
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
                       {/* Artikel-Tabelle */}
                       {artikelLoading ? (
                         <div className="text-center py-5">
