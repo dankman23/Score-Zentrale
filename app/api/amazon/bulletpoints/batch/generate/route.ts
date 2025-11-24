@@ -128,25 +128,32 @@ export async function POST(request: NextRequest) {
           console.log(`[Batch] Lade Merkmale für kArtikel=${kArtikel} aus MSSQL...`)
           try {
             const pool = mssqlPool
+            // Erste Query: Hole alle Spalten um die richtigen Namen zu finden
             const merkmaleResult = await pool.request()
               .input('kArtikel', kArtikel)
               .query(`
-            SELECT 
-              m.cName as name,
-              mw.cWert as wert
+            SELECT TOP 5 *
             FROM tArtikelMerkmal am
             INNER JOIN tMerkmal m ON am.kMerkmal = m.kMerkmal
             LEFT JOIN tMerkmalWert mw ON am.kMerkmalWert = mw.kMerkmalWert
             WHERE am.kArtikel = @kArtikel
-            ORDER BY m.nSort, m.cName
           `)
             
-            merkmale = merkmaleResult.recordset.map((m: any) => ({
-              name: m.name,
-              wert: m.wert || ''
-            }))
-            
-            console.log(`[Batch] Geladen: ${merkmale.length} Merkmale für kArtikel=${kArtikel}`)
+            if (merkmaleResult.recordset.length > 0) {
+              console.log(`[Batch] Merkmale Spalten für kArtikel=${kArtikel}:`, Object.keys(merkmaleResult.recordset[0]))
+              
+              // Versuche verschiedene mögliche Spalten-Kombinationen
+              const firstRow = merkmaleResult.recordset[0]
+              merkmale = merkmaleResult.recordset.map((m: any) => ({
+                name: m.cName || m.MerkmalName || m.name || m.cMerkmalName || 'Unbekannt',
+                wert: m.cWert || m.Wert || m.wert || m.cWertName || m.value || ''
+              }))
+              
+              console.log(`[Batch] Geladen: ${merkmale.length} Merkmale für kArtikel=${kArtikel}`)
+              console.log(`[Batch] Erstes Merkmal:`, merkmale[0])
+            } else {
+              console.log(`[Batch] Keine Merkmale gefunden für kArtikel=${kArtikel}`)
+            }
           } catch (e: any) {
             console.log(`[Batch] Konnte Merkmale nicht laden für kArtikel=${kArtikel}:`, e.message)
           }
