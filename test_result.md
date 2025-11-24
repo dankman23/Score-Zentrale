@@ -237,9 +237,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "CRITICAL: Test Merkmale-Loading Fix - POST /api/amazon/bulletpoints/batch/generate mit Artikeln die Merkmale haben"
-    - "CRITICAL: Test Merkmale-Loading Fix - GET /api/jtl/articles/[kArtikel]/details für Artikel mit Merkmalen"
-    - "Verify: Merkmale erscheinen im generierten Prompt und beeinflussen Bulletpoint-Qualität"
+    - "COMPLETED: ✅ Merkmale-Loading Fix erfolgreich getestet - beide APIs funktionieren"
+    - "COMPLETED: ✅ SQL-Query-Fix verifiziert - tMerkmalSprache statt tMerkmal verwendet"
+    - "COMPLETED: ✅ Technische Merkmale werden korrekt geladen und in Bulletpoints integriert"
   stuck_tasks: []
   test_priority: "high_first"
   test_all: false
