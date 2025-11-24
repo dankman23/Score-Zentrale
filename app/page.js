@@ -1024,7 +1024,7 @@ export default function App() {
     if (activeTab === 'produkte' && produkteTab === 'browser' && artikelImportProgress.imported > 0) {
       loadArtikelList()
     }
-  }, [activeTab, produkteTab, artikelPage, artikelPerPage, artikelFilter.search, artikelFilter.hersteller, artikelFilter.warengruppe, artikelSortBy, artikelSortOrder])
+  }, [activeTab, produkteTab, artikelPage, artikelPerPage, artikelFilter.search, artikelFilter.hersteller, artikelFilter.warengruppe, artikelFilter.abp, artikelSortBy, artikelSortOrder])
 
   const renderCharts = () => {
     if (!window.Chart) return
