@@ -6251,6 +6251,207 @@ export default function App() {
         <FibuModule />
       )}
 
+      {/* Orga Tab */}
+      {activeTab==='orga' && (
+        <div>
+          <div className="d-flex align-items-center justify-content-between mb-4">
+            <div>
+              <h2 className="mb-1"><i className="bi bi-calendar-check mr-2"/>Organisation</h2>
+              <p className="text-muted small mb-0">Schichtplan & Team-Kommunikation</p>
+            </div>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="btn-group mb-4">
+            <button 
+              className={`btn ${orgaTab === 'schichtplan' ? 'btn-primary' : 'btn-outline-secondary'}`}
+              onClick={() => setOrgaTab('schichtplan')}
+            >
+              <i className="bi bi-calendar3 mr-2"/>Schichtplan
+            </button>
+            <button 
+              className={`btn ${orgaTab === 'telegram' ? 'btn-primary' : 'btn-outline-secondary'}`}
+              onClick={() => setOrgaTab('telegram')}
+            >
+              <i className="bi bi-telegram mr-2"/>Telegram
+            </button>
+          </div>
+
+          {/* Schichtplan Tab */}
+          {orgaTab === 'schichtplan' && (
+            <div className="card border-0 shadow-sm">
+              <div className="card-body p-0">
+                <div style={{height: '80vh', width: '100%'}}>
+                  <iframe 
+                    src="https://docs.google.com/spreadsheets/d/1UOG9J6kHP2MqeDuNgMARFWLqKWNrZ4iTf77NxoAwrRo/edit?rm=minimal"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      border: 'none'
+                    }}
+                    title="Schichtplan"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Telegram Tab */}
+          {orgaTab === 'telegram' && (
+            <div>
+              <div className="row">
+                <div className="col-md-8">
+                  <div className="card border-0 shadow-sm mb-4">
+                    <div className="card-header bg-primary text-white">
+                      <h5 className="mb-0"><i className="bi bi-telegram mr-2"/>Telegram Bot Setup</h5>
+                    </div>
+                    <div className="card-body">
+                      <div className="alert alert-info">
+                        <h6 className="alert-heading"><i className="bi bi-info-circle mr-2"/>So erstellen Sie einen Telegram Bot:</h6>
+                        <ol className="mb-0 small">
+                          <li>Öffnen Sie Telegram und suchen Sie nach <strong>@BotFather</strong></li>
+                          <li>Senden Sie den Befehl <code>/newbot</code></li>
+                          <li>Folgen Sie den Anweisungen und wählen Sie einen Namen und Username</li>
+                          <li>Sie erhalten einen <strong>Bot Token</strong> - kopieren Sie diesen</li>
+                          <li>Fügen Sie den Bot zu Ihrer Telegram-Gruppe hinzu</li>
+                          <li>Um die <strong>Chat ID</strong> zu erhalten:
+                            <ul>
+                              <li>Senden Sie eine Nachricht in die Gruppe</li>
+                              <li>Öffnen Sie: <code>https://api.telegram.org/bot&lt;IHR_BOT_TOKEN&gt;/getUpdates</code></li>
+                              <li>Suchen Sie nach "chat":{"id": hier steht die Chat ID</li>
+                            </ul>
+                          </li>
+                        </ol>
+                      </div>
+
+                      <div className="form-group">
+                        <label>Bot Token</label>
+                        <input 
+                          type="text"
+                          className="form-control"
+                          placeholder="z.B. 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
+                          value={telegramBotToken}
+                          onChange={(e) => setTelegramBotToken(e.target.value)}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label>Chat ID (Gruppe)</label>
+                        <input 
+                          type="text"
+                          className="form-control"
+                          placeholder="z.B. -1001234567890"
+                          value={telegramChatId}
+                          onChange={(e) => setTelegramChatId(e.target.value)}
+                        />
+                        <small className="text-muted">Gruppen-IDs beginnen meist mit einem Minus</small>
+                      </div>
+
+                      <div className="form-group">
+                        <label>Nachricht</label>
+                        <textarea 
+                          className="form-control"
+                          rows="4"
+                          placeholder="Ihre Nachricht an die Gruppe..."
+                          value={telegramMessage}
+                          onChange={(e) => setTelegramMessage(e.target.value)}
+                        />
+                      </div>
+
+                      <button 
+                        className="btn btn-primary btn-block"
+                        onClick={async () => {
+                          if (!telegramBotToken || !telegramChatId || !telegramMessage) {
+                            alert('Bitte füllen Sie alle Felder aus!')
+                            return
+                          }
+
+                          setSendingTelegram(true)
+                          try {
+                            const res = await fetch('/api/telegram/send', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                botToken: telegramBotToken,
+                                chatId: telegramChatId,
+                                message: telegramMessage
+                              })
+                            })
+
+                            const data = await res.json()
+                            if (data.ok) {
+                              alert('✅ Nachricht erfolgreich gesendet!')
+                              setTelegramHistory([
+                                { 
+                                  timestamp: new Date().toLocaleString('de-DE'), 
+                                  message: telegramMessage,
+                                  status: 'success'
+                                },
+                                ...telegramHistory
+                              ])
+                              setTelegramMessage('')
+                            } else {
+                              alert('❌ Fehler: ' + data.error)
+                            }
+                          } catch (e) {
+                            alert('❌ Fehler: ' + e.message)
+                          } finally {
+                            setSendingTelegram(false)
+                          }
+                        }}
+                        disabled={sendingTelegram || !telegramBotToken || !telegramChatId || !telegramMessage}
+                      >
+                        {sendingTelegram ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm mr-2"/>
+                            Sende...
+                          </>
+                        ) : (
+                          <>
+                            <i className="bi bi-send mr-2"/>
+                            Nachricht senden
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-4">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header">
+                      <h6 className="mb-0"><i className="bi bi-clock-history mr-2"/>Nachrichtenhistorie</h6>
+                    </div>
+                    <div className="card-body" style={{maxHeight: '500px', overflowY: 'auto'}}>
+                      {telegramHistory.length === 0 ? (
+                        <div className="text-center text-muted py-4">
+                          <i className="bi bi-inbox" style={{fontSize: '2rem'}}/>
+                          <p className="small mb-0 mt-2">Noch keine Nachrichten gesendet</p>
+                        </div>
+                      ) : (
+                        <div>
+                          {telegramHistory.map((item, idx) => (
+                            <div key={idx} className="mb-3 pb-3 border-bottom">
+                              <div className="d-flex justify-content-between align-items-start mb-1">
+                                <small className="text-muted">{item.timestamp}</small>
+                                <span className={`badge badge-${item.status === 'success' ? 'success' : 'danger'}`}>
+                                  {item.status === 'success' ? '✓' : '✗'}
+                                </span>
+                              </div>
+                              <p className="small mb-0">{item.message}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Produkte (Artikel-Import & Browser) */}
       {activeTab==='produkte' && (
         <div>
