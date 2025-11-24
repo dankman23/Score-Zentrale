@@ -1,15 +1,30 @@
 {
   "test1_artikel_details": {
-    "status": "NO_MERKMALE",
+    "status": "PASSED",
     "kArtikel": 1,
-    "note": "Article has no Merkmale in MSSQL database"
+    "merkmale_count": 4,
+    "merkmale_sample": [
+      {
+        "name": "Bindung",
+        "wert": "Kunstharz"
+      },
+      {
+        "name": "Schleifkorn",
+        "wert": "AlO Aluminiumkorund"
+      },
+      {
+        "name": "Streuung",
+        "wert": "dicht"
+      }
+    ],
+    "has_technical_features": false
   },
   "test2_batch_generation": {
     "status": "PASSED",
     "processed": 3,
     "succeeded": 3,
     "failed": 0,
-    "duration": "20.9s",
+    "duration": "19.9s",
     "merkmale_integration": true,
     "total_results": 3
   },
@@ -19,15 +34,15 @@
   },
   "backend_logs": {
     "status": "FOUND",
-    "merkmale_log_entries": 19,
+    "merkmale_log_entries": 38,
     "sample_logs": [
       "[Batch] kArtikel=11 - Generiert: 5 Bulletpoints mit Prompt: Premium mit Stil-Vorgabe",
-      "[Batch Generate] Abgeschlossen in 20.9s: 3 erfolgreich, 0 fehlgeschlagen",
-      "POST /api/amazon/bulletpoints/batch/generate 200 in 21555ms"
+      "[Batch Generate] Abgeschlossen in 19.9s: 3 erfolgreich, 0 fehlgeschlagen",
+      "POST /api/amazon/bulletpoints/batch/generate 200 in 20130ms"
     ]
   },
   "summary": {
-    "passed": 1,
+    "passed": 2,
     "failed": 0,
     "errors": 1,
     "total_tests": 4,
