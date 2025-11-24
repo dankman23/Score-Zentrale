@@ -46,11 +46,11 @@ user_problem_statement: |
 backend:
   - task: "Amazon Bulletpoints: POST /api/amazon/bulletpoints/batch/generate (Batch mit Claude Sonnet 4)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/amazon/bulletpoints/batch/generate/route.ts"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -61,6 +61,9 @@ backend:
       - working: "NA"
         agent: "main"
         comment: "🔧 KRITISCHER BUGFIX: SQL-Query für Merkmale korrigiert! Vorher: Join auf nicht-existente Tabelle 'tMerkmalWert'. Jetzt: Korrekte Query mit tMerkmalWertSprache (Zeilen 127-181). JOIN-Struktur: tArtikelMerkmal → tMerkmal (Namen) → tMerkmalWertSprache (Werte, kSprache=1 für Deutsch). Merkmale werden jetzt korrekt aus JTL MSSQL geladen und in MongoDB gecacht. MUSS NEU GETESTET WERDEN: (1) Batch-Generierung mit Artikeln die Merkmale haben, (2) Überprüfen ob Merkmale im Prompt sichtbar sind, (3) Verifizieren dass generierte Bulletpoints die Merkmale berücksichtigen."
+      - working: true
+        agent: "testing"
+        comment: "✅ KRITISCHER BUGFIX ERFOLGREICH GETESTET! SQL-Query-Fix funktioniert perfekt: (1) ✅ Batch-Generierung mit 3 Artikeln erfolgreich (processed: 3, succeeded: 3, failed: 0, duration: 19.9s), (2) ✅ Merkmale werden korrekt aus MSSQL geladen - Backend-Logs zeigen 'Erfolgreich 6 Merkmale für kArtikel=11 geladen', (3) ✅ Technische Merkmale sind sichtbar: 'Außendurchmesser in mm: 115', 'Max RPM: 13300', 'Bohrungsdurchmesser in mm: 22,23', (4) ✅ Generierte Bulletpoints enthalten technische Features aus Merkmalen. PROBLEM BEHOBEN: SQL-Query verwendet jetzt korrekte Tabelle tMerkmalSprache statt tMerkmal für Merkmal-Namen. JOIN-Struktur: tArtikelMerkmal → tMerkmalSprache (Namen) → tMerkmalWertSprache (Werte). Qualität der Amazon Bulletpoints deutlich verbessert durch technische Produktdetails!"
 
   - task: "Amazon Bulletpoints: GET /api/amazon/bulletpoints/batch/estimate (Kosten-Schätzung)"
     implemented: true
