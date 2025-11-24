@@ -231,8 +231,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "COMPLETED: Amazon Bulletpoints Batch Generate API ✅ (POST /api/amazon/bulletpoints/batch/generate)"
-    - "COMPLETED: Amazon Bulletpoints CSV Download API ✅ (GET /api/amazon/bulletpoints/batch/download)"
+    - "CRITICAL: Test Merkmale-Loading Fix - POST /api/amazon/bulletpoints/batch/generate mit Artikeln die Merkmale haben"
+    - "CRITICAL: Test Merkmale-Loading Fix - GET /api/jtl/articles/[kArtikel]/details für Artikel mit Merkmalen"
+    - "Verify: Merkmale erscheinen im generierten Prompt und beeinflussen Bulletpoint-Qualität"
   stuck_tasks: []
   test_priority: "high_first"
   test_all: false
