@@ -6703,7 +6703,7 @@ export default function App() {
                             <tbody>
                               {artikelList.length === 0 ? (
                                 <tr>
-                                  <td colSpan="11" className="text-center text-muted py-4">
+                                  <td colSpan="12" className="text-center text-muted py-4">
                                     <i className="bi bi-inbox mr-2" style={{fontSize: '2rem'}}/>
                                     <div>Keine Artikel gefunden</div>
                                     <small>Versuchen Sie andere Filter</small>
