@@ -82,11 +82,11 @@ backend:
 
   - task: "JTL Articles: GET /api/jtl/articles/[kArtikel]/details (Artikel-Details mit Merkmalen)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/jtl/articles/[kArtikel]/details/route.ts"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "user"
@@ -94,6 +94,9 @@ backend:
       - working: "NA"
         agent: "main"
         comment: "🔧 KRITISCHER BUGFIX: SQL-Query korrigiert von tMerkmalWert auf tMerkmalWertSprache (Zeilen 47-58). LEFT JOIN auf tMerkmalWertSprache mit kSprache=1 OR kSprache IS NULL Bedingung. Merkmale sollten jetzt korrekt geladen werden. MUSS GETESTET WERDEN: GET /api/jtl/articles/{kArtikel}/details für einen Artikel mit bekannten Merkmalen."
+      - working: true
+        agent: "testing"
+        comment: "✅ KRITISCHER BUGFIX ERFOLGREICH GETESTET! Artikel-Details API lädt jetzt korrekt Merkmale aus JTL MSSQL: (1) ✅ GET /api/jtl/articles/1/details returnt 4 Merkmale: 'Bindung: Kunstharz', 'Schleifkorn: AlO Aluminiumkorund', 'Streuung: dicht', 'Unterlage: flexibles J-Gewebe', (2) ✅ GET /api/jtl/articles/10/details returnt 7 Merkmale inkl. technische Spezifikationen: 'Außendurchmesser in mm: 115', 'Max RPM: 13300', 'Bohrungsdurchmesser in mm: 22,23', (3) ✅ SQL-Query-Fix funktioniert: Verwendet jetzt tMerkmalSprache für Merkmal-Namen statt nicht-existente tMerkmal.cName. PROBLEM BEHOBEN: Korrekte JOIN-Struktur tArtikelMerkmal → tMerkmalSprache (Namen, kSprache=1) → tMerkmalWertSprache (Werte). Merkmale werden erfolgreich aus JTL-Datenbank geladen und für Amazon Bulletpoint-Generierung verfügbar gemacht!"
 
   - task: "Amazon Bulletpoints: GET /api/amazon/bulletpoints/batch/download (CSV Export)"
     implemented: true
