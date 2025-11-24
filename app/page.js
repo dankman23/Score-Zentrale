@@ -6496,7 +6496,7 @@ export default function App() {
                       </div>
 
                       <div className="row mb-3">
-                        <div className="col-md-4">
+                        <div className="col-md-3">
                           <input 
                             type="text"
                             className="form-control"
@@ -6505,7 +6505,7 @@ export default function App() {
                             onChange={(e) => { setArtikelFilter({...artikelFilter, search: e.target.value}); setArtikelPage(1); }}
                           />
                         </div>
-                        <div className="col-md-3">
+                        <div className="col-md-2">
                           <select 
                             className="form-control"
                             value={artikelFilter.hersteller}
@@ -6519,7 +6519,7 @@ export default function App() {
                             ))}
                           </select>
                         </div>
-                        <div className="col-md-3">
+                        <div className="col-md-2">
                           <select 
                             className="form-control"
                             value={artikelFilter.warengruppe}
@@ -6534,10 +6534,21 @@ export default function App() {
                           </select>
                         </div>
                         <div className="col-md-2">
+                          <select 
+                            className="form-control"
+                            value={artikelFilter.abp}
+                            onChange={(e) => { setArtikelFilter({...artikelFilter, abp: e.target.value}); setArtikelPage(1); }}
+                          >
+                            <option value="all">Alle ABP</option>
+                            <option value="generated">✓ Mit Bulletpoints</option>
+                            <option value="missing">✗ Ohne Bulletpoints</option>
+                          </select>
+                        </div>
+                        <div className="col-md-3">
                           <button 
                             className="btn btn-outline-secondary btn-block" 
                             onClick={() => {
-                              setArtikelFilter({ search: '', hersteller: '', warengruppe: '' })
+                              setArtikelFilter({ search: '', hersteller: '', warengruppe: '', abp: 'all' })
                               setArtikelPage(1)
                             }}
                           >
