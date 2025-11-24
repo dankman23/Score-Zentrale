@@ -129,47 +129,37 @@ export async function POST(request: NextRequest) {
           try {
             const pool = mssqlPool
             
-            // Strategie: Lade zuerst die IDs, dann hole Namen und Werte separat
-            const artikelMerkmaleResult = await pool.request()
+            // Korrekte Query mit tMerkmalWertSprache (nicht tMerkmalWert!)
+            const merkmalResult = await pool.request()
               .input('kArtikel', kArtikel)
               .query(`
-                SELECT am.kMerkmal, am.kMerkmalWert
-                FROM tArtikelMerkmal am
-                WHERE am.kArtikel = @kArtikel
+                SELECT 
+                  m.cName AS MerkmalName,
+                  mws.cWert AS MerkmalWert
+                FROM 
+                  tArtikelMerkmal am
+                JOIN 
+                  tMerkmal m ON am.kMerkmal = m.kMerkmal
+                JOIN 
+                  tMerkmalWertSprache mws ON am.kMerkmalWert = mws.kMerkmalWert
+                WHERE 
+                  am.kArtikel = @kArtikel
+                  AND mws.kSprache = 1
               `)
             
-            if (artikelMerkmaleResult.recordset.length > 0) {
-              console.log(`[Batch] Gefunden: ${artikelMerkmaleResult.recordset.length} Merkmal-Zuordnungen für kArtikel=${kArtikel}`)
+            if (merkmalResult.recordset.length > 0) {
+              merkmale = merkmalResult.recordset.map(row => ({
+                name: row.MerkmalName,
+                wert: row.MerkmalWert
+              }))
               
-              // Sammle alle kMerkmal und kMerkmalWert IDs
-              const merkmalIds = artikelMerkmaleResult.recordset.map(m => m.kMerkmal).join(',')
-              const merkmalWertIds = artikelMerkmaleResult.recordset.filter(m => m.kMerkmalWert).map(m => m.kMerkmalWert).join(',')
+              console.log(`[Batch] Erfolgreich ${merkmale.length} Merkmale für kArtikel=${kArtikel} geladen:`, merkmale)
               
-              // Hole Merkmal-Namen
-              const merkmalNamenResult = await pool.request().query(`
-                SELECT TOP 1 * FROM tMerkmal WHERE kMerkmal IN (${merkmalIds})
-              `)
-              
-              if (merkmalNamenResult.recordset.length > 0) {
-                console.log(`[Batch] tMerkmal Spalten:`, Object.keys(merkmalNamenResult.recordset[0]))
-              }
-              
-              // Hole Merkmal-Werte (falls vorhanden)
-              if (merkmalWertIds) {
-                const merkmalWerteResult = await pool.request().query(`
-                  SELECT TOP 1 * FROM tMerkmalWert WHERE kMerkmalWert IN (${merkmalWertIds})
-                `)
-                
-                if (merkmalWerteResult.recordset.length > 0) {
-                  console.log(`[Batch] tMerkmalWert Spalten:`, Object.keys(merkmalWerteResult.recordset[0]))
-                }
-              }
-              
-              // Jetzt baue die richtige Query basierend auf gefundenen Spalten
-              // Vorläufig: Leere Merkmale
-              merkmale = []
-              console.log(`[Batch] Debug-Info gesammelt, Merkmale werden im nächsten Durchlauf korrekt geladen`)
-              
+              // Optional: In MongoDB cachen
+              await articlesCollection.updateOne(
+                { kArtikel },
+                { $set: { merkmale } }
+              )
             } else {
               console.log(`[Batch] Keine Merkmale gefunden für kArtikel=${kArtikel}`)
             }
