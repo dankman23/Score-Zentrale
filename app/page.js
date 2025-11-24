@@ -6750,22 +6750,22 @@ export default function App() {
                                         )}
                                       </td>
                                     <td>
-                                      <div className="text-truncate font-weight-bold" style={{maxWidth: '350px'}} title={artikel.cName || artikel.cKurzBeschreibung}>
+                                      <div className="text-truncate font-weight-bold text-white" style={{maxWidth: '250px'}} title={artikel.cName || artikel.cKurzBeschreibung}>
                                         {artikel.cName || artikel.cKurzBeschreibung || 'Kein Name'}
                                       </div>
                                       {artikel.cKurzBeschreibung && artikel.cName !== artikel.cKurzBeschreibung && (
-                                        <small className="text-muted text-truncate d-block" style={{maxWidth: '350px'}}>
-                                          {artikel.cKurzBeschreibung.substring(0, 100)}...
+                                        <small className="text-muted text-truncate d-block" style={{maxWidth: '250px'}}>
+                                          {artikel.cKurzBeschreibung.substring(0, 60)}...
                                         </small>
                                       )}
                                     </td>
                                     <td>
-                                      <span className="badge badge-light">{artikel.cHerstellerName || '-'}</span>
+                                      <span className="badge badge-light" style={{fontSize: '0.75rem'}}>{artikel.cHerstellerName || '-'}</span>
                                     </td>
                                     <td>
-                                      <span className="badge badge-secondary">{artikel.cWarengruppenName || '-'}</span>
+                                      <span className="badge badge-secondary" style={{fontSize: '0.75rem'}}>{artikel.cWarengruppenName || '-'}</span>
                                     </td>
-                                    <td className="text-right font-weight-bold">
+                                    <td className="text-right font-weight-bold text-white">
                                       {parseFloat(artikel.fVKNetto || 0).toFixed(2)} €
                                     </td>
                                     <td className="text-right text-muted">
