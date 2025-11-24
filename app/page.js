@@ -1833,6 +1833,13 @@ export default function App() {
       if (data.ok) {
         setAmazonPrompts(data.prompts || [])
         console.log('[Amazon Prompts]', `Loaded ${data.prompts?.length || 0} prompts`)
+        
+        // Setze aktiven Prompt als ausgewählt, falls vorhanden
+        const activePrompt = (data.prompts || []).find(p => p.isActive)
+        if (activePrompt && activePrompt.version !== selectedPromptId) {
+          setSelectedPromptId(activePrompt.version)
+          console.log('[Amazon Prompts]', `Auto-selected active prompt: v${activePrompt.version}`)
+        }
       } else {
         console.error('Error loading Amazon prompts:', data.error)
       }
