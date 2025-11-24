@@ -6945,76 +6945,28 @@ export default function App() {
                                               </button>
                                             </div>
                                             
-                                            {/* Vorschau der Daten die Claude verwenden wird */}
-                                            {artikelDetails && (
-                                              <div className="card bg-light mb-3">
-                                                <div className="card-header py-2">
-                                                  <small className="text-muted">
-                                                    <i className="bi bi-database mr-2"/>JTL-Daten für Bulletpoint-Generierung
-                                                  </small>
-                                                </div>
-                                                <div className="card-body p-2">
-                                                  <div className="row">
-                                                    <div className="col-md-6">
-                                                      <small><strong>Artikel:</strong> {artikelDetails.cArtNr} - {artikelDetails.cName}</small>
-                                                      {artikelDetails.cKurzBeschreibung && (
-                                                        <div className="mt-2">
-                                                          <small><strong>Kurzbeschreibung:</strong></small>
-                                                          <div className="small text-muted">{artikelDetails.cKurzBeschreibung.substring(0, 150)}{artikelDetails.cKurzBeschreibung.length > 150 ? '...' : ''}</div>
-                                                        </div>
-                                                      )}
-                                                      {artikelDetails.cBeschreibung && (
-                                                        <div className="mt-2">
-                                                          <small><strong>Produktbeschreibung:</strong></small>
-                                                          <div 
-                                                            className="small text-muted" 
-                                                            style={{maxHeight: '100px', overflow: 'auto'}}
-                                                            dangerouslySetInnerHTML={{ 
-                                                              __html: artikelDetails.cBeschreibung.substring(0, 300) + (artikelDetails.cBeschreibung.length > 300 ? '...' : '')
-                                                            }} 
-                                                          />
-                                                        </div>
-                                                      )}
-                                                    </div>
-                                                    <div className="col-md-6">
-                                                      {artikelDetails.merkmale && artikelDetails.merkmale.length > 0 ? (
-                                                        <>
-                                                          <small><strong>Merkmale ({artikelDetails.merkmale.length}):</strong></small>
-                                                          <div className="small text-muted">
-                                                            {artikelDetails.merkmale.slice(0, 3).map((m, idx) => (
-                                                              <div key={idx}>• {m.name}: {m.wert}</div>
-                                                            ))}
-                                                            {artikelDetails.merkmale.length > 3 && (
-                                                              <div className="text-primary">+ {artikelDetails.merkmale.length - 3} weitere...</div>
-                                                            )}
-                                                          </div>
-                                                        </>
-                                                      ) : (
-                                                        <div className="alert alert-warning py-1 px-2 mb-0">
-                                                          <small><i className="bi bi-exclamation-triangle mr-1"/>Keine Merkmale vorhanden - Bulletpoints werden weniger detailliert sein!</small>
-                                                        </div>
-                                                      )}
-                                                    </div>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            )}
-                                            
                                             {artikelBulletpoints ? (
                                               <div>
-                                                <div className="alert alert-success">
+                                                <div className="alert alert-success mb-3">
                                                   <i className="bi bi-check-circle mr-2"/>Bulletpoints wurden mit Claude Sonnet 4 generiert
                                                 </div>
-                                                <div className="bg-white p-3 rounded border">
-                                                  {(typeof artikelBulletpoints === 'string' 
-                                                    ? artikelBulletpoints.split(';') 
-                                                    : artikelBulletpoints.split ? artikelBulletpoints.split(';') : []
-                                                  ).map((bp, idx) => (
-                                                    <div key={idx} className="mb-2">
-                                                      <strong>Bulletpoint {idx + 1}:</strong>
-                                                      <p className="mb-0 ml-3">{bp.trim()}</p>
-                                                    </div>
-                                                  ))}
+                                                <div className="card border-primary">
+                                                  <div className="card-header bg-primary text-white py-2">
+                                                    <i className="bi bi-list-stars mr-2"/>Generierte Bulletpoints
+                                                  </div>
+                                                  <div className="card-body bg-white">
+                                                    {(typeof artikelBulletpoints === 'string' 
+                                                      ? artikelBulletpoints.split(';') 
+                                                      : artikelBulletpoints.split ? artikelBulletpoints.split(';') : []
+                                                    ).map((bp, idx) => (
+                                                      <div key={idx} className="mb-3 pb-3 border-bottom">
+                                                        <div className="d-flex align-items-start">
+                                                          <span className="badge badge-primary mr-2" style={{fontSize: '0.9rem'}}>{idx + 1}</span>
+                                                          <p className="mb-0">{bp.trim()}</p>
+                                                        </div>
+                                                      </div>
+                                                    ))}
+                                                  </div>
                                                 </div>
                                               </div>
                                             ) : (
