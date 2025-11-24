@@ -6318,7 +6318,7 @@ export default function App() {
                             <ul>
                               <li>Senden Sie eine Nachricht in die Gruppe</li>
                               <li>Öffnen Sie: <code>https://api.telegram.org/bot&lt;IHR_BOT_TOKEN&gt;/getUpdates</code></li>
-                              <li>Suchen Sie nach "chat":{"id": hier steht die Chat ID</li>
+                              <li>Suchen Sie nach "chat":{'{'}"{"}id"{'"}'}: hier steht die Chat ID</li>
                             </ul>
                           </li>
                         </ol>
