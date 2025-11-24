@@ -77,6 +77,21 @@ backend:
         agent: "main"
         comment: "✅ Manuell getestet: GET /api/amazon/bulletpoints/batch/estimate?count=10 returns 200 OK mit korrekten Kosten-Berechnungen: Input $0.0450, Output $0.0750, Total $0.12 (€0.11)."
 
+  - task: "JTL Articles: GET /api/jtl/articles/[kArtikel]/details (Artikel-Details mit Merkmalen)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/jtl/articles/[kArtikel]/details/route.ts"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "Merkmale werden nicht aus der JTL-Datenbank geladen. Query funktioniert nicht korrekt."
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 KRITISCHER BUGFIX: SQL-Query korrigiert von tMerkmalWert auf tMerkmalWertSprache (Zeilen 47-58). LEFT JOIN auf tMerkmalWertSprache mit kSprache=1 OR kSprache IS NULL Bedingung. Merkmale sollten jetzt korrekt geladen werden. MUSS GETESTET WERDEN: GET /api/jtl/articles/{kArtikel}/details für einen Artikel mit bekannten Merkmalen."
+
   - task: "Amazon Bulletpoints: GET /api/amazon/bulletpoints/batch/download (CSV Export)"
     implemented: true
     working: true
