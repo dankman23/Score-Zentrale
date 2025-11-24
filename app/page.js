@@ -2118,19 +2118,26 @@ export default function App() {
       const { estimate } = estimateData
       
       // 2. Zeige Kosten-Bestätigung
+      const modeText = useSelection 
+        ? `${count} ausgewählte Artikel` 
+        : (artikelTotal > 1000 
+          ? `${count} Artikel (von ${artikelTotal.toLocaleString()} gefilterten - Limit 1000)`
+          : `${count} gefilterte Artikel`)
+      
       const confirmed = confirm(
         `🤖 Amazon Bulletpoints Batch-Generierung\n\n` +
-        `Artikel: ${count.toLocaleString()}\n` +
-        `Modell: Claude Sonnet 4\n\n` +
+        `📦 Artikel: ${modeText}\n` +
+        `🤖 Modell: Claude Sonnet 4\n\n` +
         `📊 Geschätzte Token:\n` +
-        `  • Input: ${estimate.inputTokens}\n` +
-        `  • Output: ${estimate.outputTokens}\n` +
-        `  • Gesamt: ${estimate.totalTokens}\n\n` +
+        `  • Input: ${estimate.inputTokens.toLocaleString()}\n` +
+        `  • Output: ${estimate.outputTokens.toLocaleString()}\n` +
+        `  • Gesamt: ${estimate.totalTokens.toLocaleString()}\n\n` +
         `💰 Geschätzte Kosten:\n` +
         `  • Input: $${estimate.costs.inputUSD}\n` +
         `  • Output: $${estimate.costs.outputUSD}\n` +
         `  • GESAMT: $${estimate.costs.totalUSD} (≈ €${estimate.costs.totalEUR})\n\n` +
         `⏱️ Geschätzte Dauer: ${Math.ceil(count * 3 / 60)} Minuten\n\n` +
+        `ℹ️ HINWEIS: Es werden nur die aktuell ${useSelection ? 'ausgewählten' : 'gefilterten'} Artikel generiert!\n\n` +
         `Fortfahren?`
       )
       
