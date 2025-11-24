@@ -6933,7 +6933,7 @@ export default function App() {
                                         {artikelDetailTab === 'bulletpoints' && (
                                           <div className="py-2 px-3">
                                             <div className="d-flex justify-content-between align-items-center mb-3">
-                                              <h6 className="mb-0"><i className="bi bi-chat-left-text mr-2"/>Amazon Bulletpoints</h6>
+                                              <h6 className="mb-0 text-white"><i className="bi bi-chat-left-text mr-2"/>Amazon Bulletpoints</h6>
                                               <button 
                                                 className="btn btn-primary btn-sm"
                                                 onClick={() => generateBulletpointsForArtikel(artikel)}
@@ -6962,18 +6962,35 @@ export default function App() {
                                                   <div className="card-header bg-primary text-white py-2">
                                                     <i className="bi bi-list-stars mr-2"/>Generierte Bulletpoints
                                                   </div>
-                                                  <div className="card-body bg-white">
-                                                    {(typeof artikelBulletpoints === 'string' 
-                                                      ? artikelBulletpoints.split(';') 
-                                                      : artikelBulletpoints.split ? artikelBulletpoints.split(';') : []
-                                                    ).map((bp, idx) => (
-                                                      <div key={idx} className="mb-3 pb-3 border-bottom">
-                                                        <div className="d-flex align-items-start">
-                                                          <span className="badge badge-primary mr-2" style={{fontSize: '0.9rem'}}>{idx + 1}</span>
-                                                          <p className="mb-0">{bp.trim()}</p>
+                                                  <div className="card-body bg-white" style={{color: '#000'}}>
+                                                    {(() => {
+                                                      let bulletpointList = [];
+                                                      if (Array.isArray(artikelBulletpoints)) {
+                                                        bulletpointList = artikelBulletpoints;
+                                                      } else if (typeof artikelBulletpoints === 'string') {
+                                                        bulletpointList = artikelBulletpoints.split(';').filter(bp => bp.trim());
+                                                      } else if (artikelBulletpoints.bulletpoints) {
+                                                        bulletpointList = Array.isArray(artikelBulletpoints.bulletpoints) 
+                                                          ? artikelBulletpoints.bulletpoints 
+                                                          : artikelBulletpoints.bulletpoints.split(';').filter(bp => bp.trim());
+                                                      }
+                                                      
+                                                      return bulletpointList.length > 0 ? (
+                                                        bulletpointList.map((bp, idx) => (
+                                                          <div key={idx} className="mb-3 pb-3 border-bottom">
+                                                            <div className="d-flex align-items-start">
+                                                              <span className="badge badge-primary mr-2" style={{fontSize: '0.9rem'}}>{idx + 1}</span>
+                                                              <p className="mb-0 text-dark">{typeof bp === 'string' ? bp.trim() : bp}</p>
+                                                            </div>
+                                                          </div>
+                                                        ))
+                                                      ) : (
+                                                        <div className="alert alert-warning">
+                                                          <i className="bi bi-exclamation-triangle mr-2"/>
+                                                          Die Bulletpoints konnten nicht geladen werden. Bitte generieren Sie sie erneut.
                                                         </div>
-                                                      </div>
-                                                    ))}
+                                                      );
+                                                    })()}
                                                   </div>
                                                 </div>
                                               </div>
