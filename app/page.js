@@ -6790,7 +6790,7 @@ export default function App() {
                                   {/* Aufklappbare Präsenz-Details */}
                                   {expandedArtikel === artikel.kArtikel && (
                                     <tr>
-                                      <td colSpan="10" className="bg-light">
+                                      <td colSpan="11" className="bg-light">
                                         {/* Artikel Detail Tabs */}
                                         <div className="btn-group btn-group-sm mb-3">
                                           <button 
