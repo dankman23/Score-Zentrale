@@ -58,6 +58,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ PREVIOUS TEST with GPT-4o: Batch generation with 3 articles successful - processed: 3, succeeded: 3, failed: 0. NEEDS RE-TESTING with Claude Sonnet 4."
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 KRITISCHER BUGFIX: SQL-Query für Merkmale korrigiert! Vorher: Join auf nicht-existente Tabelle 'tMerkmalWert'. Jetzt: Korrekte Query mit tMerkmalWertSprache (Zeilen 127-181). JOIN-Struktur: tArtikelMerkmal → tMerkmal (Namen) → tMerkmalWertSprache (Werte, kSprache=1 für Deutsch). Merkmale werden jetzt korrekt aus JTL MSSQL geladen und in MongoDB gecacht. MUSS NEU GETESTET WERDEN: (1) Batch-Generierung mit Artikeln die Merkmale haben, (2) Überprüfen ob Merkmale im Prompt sichtbar sind, (3) Verifizieren dass generierte Bulletpoints die Merkmale berücksichtigen."
 
   - task: "Amazon Bulletpoints: GET /api/amazon/bulletpoints/batch/estimate (Kosten-Schätzung)"
     implemented: true
