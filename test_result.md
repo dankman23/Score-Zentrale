@@ -28,6 +28,20 @@ user_problem_statement: |
      - TypeScript Client für Claude Sonnet 4 API
      - Kosten-Kalkulation Utility
      - Emergent LLM Key Integration
+  
+  KRITISCHER BUGFIX - MERKMALE AUS JTL LADEN:
+  6. SQL-Query Korrektur für Artikel-Merkmale (HÖCHSTE PRIORITÄT)
+     - Problem identifiziert: Bisherige Queries verwendeten falsche Tabelle 'tMerkmalWert'
+     - Lösung: Korrekte Tabelle ist 'tMerkmalWertSprache' mit Spalten: kMerkmalWert, cWert, kSprache
+     - Korrekte JOIN-Struktur implementiert:
+       * tArtikelMerkmal → tMerkmal (für Merkmal-Namen)
+       * tArtikelMerkmal → tMerkmalWertSprache (für Merkmal-Werte)
+       * Filter auf kSprache = 1 (Deutsch)
+     - Dateien korrigiert:
+       * /api/amazon/bulletpoints/batch/generate/route.ts (Zeile 127-181)
+       * /api/jtl/articles/[kArtikel]/details/route.ts (Zeile 47-58)
+     - Merkmale werden jetzt korrekt geladen und in MongoDB gecacht
+     - Bullet Point Generator hat endlich Zugriff auf alle Produkt-Attribute
 
 backend:
   - task: "Amazon Bulletpoints: POST /api/amazon/bulletpoints/batch/generate (Batch mit Claude Sonnet 4)"
