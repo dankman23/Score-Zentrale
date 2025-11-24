@@ -6580,6 +6580,7 @@ export default function App() {
                                       className="form-control form-control-sm"
                                       value={selectedPromptId}
                                       onChange={(e) => setSelectedPromptId(parseInt(e.target.value))}
+                                      disabled={amazonPrompts.length === 0}
                                       style={{
                                         minWidth: '300px', 
                                         backgroundColor: '#2b3035', 
@@ -6587,18 +6588,24 @@ export default function App() {
                                         borderColor: '#495057'
                                       }}
                                     >
-                                      {amazonPrompts.map(p => (
-                                        <option 
-                                          key={p.version} 
-                                          value={p.version} 
-                                          style={{
-                                            backgroundColor: '#2b3035', 
-                                            color: '#ffffff'
-                                          }}
-                                        >
-                                          v{p.version}: {p.name}
+                                      {amazonPrompts.length === 0 ? (
+                                        <option style={{backgroundColor: '#2b3035', color: '#ffffff'}}>
+                                          Lade Prompts...
                                         </option>
-                                      ))}
+                                      ) : (
+                                        amazonPrompts.map(p => (
+                                          <option 
+                                            key={p.version} 
+                                            value={p.version} 
+                                            style={{
+                                              backgroundColor: '#2b3035', 
+                                              color: '#ffffff'
+                                            }}
+                                          >
+                                            v{p.version}: {p.name}
+                                          </option>
+                                        ))
+                                      )}
                                     </select>
                                   </div>
                                   {selectedArtikel.length > 0 ? (
