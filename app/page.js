@@ -6936,7 +6936,19 @@ export default function App() {
                                                       {artikelDetails.cKurzBeschreibung && (
                                                         <div className="mt-2">
                                                           <small><strong>Kurzbeschreibung:</strong></small>
-                                                          <div className="small text-muted">{artikelDetails.cKurzBeschreibung.substring(0, 150)}...</div>
+                                                          <div className="small text-muted">{artikelDetails.cKurzBeschreibung.substring(0, 150)}{artikelDetails.cKurzBeschreibung.length > 150 ? '...' : ''}</div>
+                                                        </div>
+                                                      )}
+                                                      {artikelDetails.cBeschreibung && (
+                                                        <div className="mt-2">
+                                                          <small><strong>Produktbeschreibung:</strong></small>
+                                                          <div 
+                                                            className="small text-muted" 
+                                                            style={{maxHeight: '100px', overflow: 'auto'}}
+                                                            dangerouslySetInnerHTML={{ 
+                                                              __html: artikelDetails.cBeschreibung.substring(0, 300) + (artikelDetails.cBeschreibung.length > 300 ? '...' : '')
+                                                            }} 
+                                                          />
                                                         </div>
                                                       )}
                                                     </div>
