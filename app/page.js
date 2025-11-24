@@ -698,6 +698,14 @@ export default function App() {
   const [availableHerstellerArtikel, setAvailableHerstellerArtikel] = useState([])
   const [availableWarengruppenArtikel, setAvailableWarengruppenArtikel] = useState([])
   const [artikelSortBy, setArtikelSortBy] = useState('cArtNr')
+  
+  // Orga Tab
+  const [orgaTab, setOrgaTab] = useState('schichtplan') // schichtplan | telegram
+  const [telegramBotToken, setTelegramBotToken] = useState('')
+  const [telegramChatId, setTelegramChatId] = useState('')
+  const [telegramMessage, setTelegramMessage] = useState('')
+  const [sendingTelegram, setSendingTelegram] = useState(false)
+  const [telegramHistory, setTelegramHistory] = useState([])
   const [artikelSortOrder, setArtikelSortOrder] = useState('asc')
   
   // Analytics (GA4)
