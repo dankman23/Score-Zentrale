@@ -6770,6 +6770,13 @@ export default function App() {
                                       </span>
                                     </td>
                                     <td className="text-center">
+                                      {artikel.hasAmazonBulletpoints ? (
+                                        <i className="bi bi-check-circle-fill text-success" style={{fontSize: '1.2rem'}} title="Bulletpoints vorhanden"/>
+                                      ) : (
+                                        <i className="bi bi-x-circle text-muted" style={{fontSize: '1.2rem'}} title="Keine Bulletpoints"/>
+                                      )}
+                                    </td>
+                                    <td className="text-center">
                                       <button 
                                         className="btn btn-sm btn-info"
                                         onClick={() => startePreisvergleich(artikel)}
