@@ -6903,13 +6903,21 @@ export default function App() {
                                                 {artikelDetails.cKurzBeschreibung && (
                                                   <div className="mt-3">
                                                     <h6><i className="bi bi-file-text mr-2"/>Kurzbeschreibung</h6>
-                                                    <p className="small">{artikelDetails.cKurzBeschreibung}</p>
+                                                    <div className="card bg-light">
+                                                      <div className="card-body p-2">
+                                                        <p className="small mb-0">{artikelDetails.cKurzBeschreibung}</p>
+                                                      </div>
+                                                    </div>
                                                   </div>
                                                 )}
                                                 {artikelDetails.cBeschreibung && (
                                                   <div className="mt-3">
-                                                    <h6><i className="bi bi-file-text mr-2"/>Beschreibung</h6>
-                                                    <div className="small" dangerouslySetInnerHTML={{ __html: artikelDetails.cBeschreibung }} />
+                                                    <h6><i className="bi bi-file-text-fill mr-2"/>Vollständige Produktbeschreibung</h6>
+                                                    <div className="card bg-light">
+                                                      <div className="card-body p-2" style={{maxHeight: '400px', overflow: 'auto'}}>
+                                                        <div className="small" dangerouslySetInnerHTML={{ __html: artikelDetails.cBeschreibung }} />
+                                                      </div>
+                                                    </div>
                                                   </div>
                                                 )}
                                               </>
