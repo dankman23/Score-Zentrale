@@ -51,6 +51,23 @@ export async function GET(request: NextRequest) {
     // Pagination
     const skip = (page - 1) * limit
 
+    // ABP Filter: Hole alle kArtikel mit generierten Bulletpoints
+    let artikelMitBulletpoints: Set<number> | null = null
+    if (abpFilter !== 'all') {
+      const bulletpoints = await bulletpointsCollection
+        .find({}, { projection: { kArtikel: 1 } })
+        .toArray()
+      artikelMitBulletpoints = new Set(bulletpoints.map(bp => bp.kArtikel))
+      
+      if (abpFilter === 'generated') {
+        // Nur Artikel MIT Bulletpoints
+        query.kArtikel = { $in: Array.from(artikelMitBulletpoints) }
+      } else if (abpFilter === 'missing') {
+        // Nur Artikel OHNE Bulletpoints
+        query.kArtikel = { $nin: Array.from(artikelMitBulletpoints) }
+      }
+    }
+
     // Query ausführen
     const [articles, totalCount] = await Promise.all([
       articlesCollection
@@ -61,6 +78,13 @@ export async function GET(request: NextRequest) {
         .toArray(),
       articlesCollection.countDocuments(query)
     ])
+
+    // Hole Bulletpoint-Status für die aktuellen Artikel
+    const kArtikelList = articles.map(a => a.kArtikel)
+    const bulletpointsForArticles = await bulletpointsCollection
+      .find({ kArtikel: { $in: kArtikelList } })
+      .toArray()
+    const bulletpointsMap = new Map(bulletpointsForArticles.map(bp => [bp.kArtikel, true]))
 
     // Formatierte Artikel
     const formattedArticles = articles.map(a => ({
@@ -75,7 +99,8 @@ export async function GET(request: NextRequest) {
       nLagerbestand: a.nLagerbestand,
       cHerstellerName: a.cHerstellerName,
       cWarengruppenName: a.cWarengruppenName,
-      imported_at: a.imported_at
+      imported_at: a.imported_at,
+      hasAmazonBulletpoints: bulletpointsMap.has(a.kArtikel)
     }))
 
     return NextResponse.json({
