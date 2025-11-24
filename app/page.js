@@ -2443,6 +2443,7 @@ export default function App() {
       if (artikelFilter.search) params.append('search', artikelFilter.search)
       if (artikelFilter.hersteller) params.append('hersteller', artikelFilter.hersteller)
       if (artikelFilter.warengruppe) params.append('warengruppe', artikelFilter.warengruppe)
+      if (artikelFilter.abp && artikelFilter.abp !== 'all') params.append('abp', artikelFilter.abp)
 
       const res = await fetch('/api/jtl/articles/list?' + params.toString())
       const data = await res.json()
