@@ -48,14 +48,15 @@ export async function GET(
           .input('kArtikel', kArtikel)
           .query(`
             SELECT 
-              m.cName as name,
+              ms.cName as name,
               mws.cWert as wert
             FROM tArtikelMerkmal am
-            INNER JOIN tMerkmal m ON am.kMerkmal = m.kMerkmal
+            INNER JOIN tMerkmalSprache ms ON am.kMerkmal = ms.kMerkmal
             LEFT JOIN tMerkmalWertSprache mws ON am.kMerkmalWert = mws.kMerkmalWert
             WHERE am.kArtikel = @kArtikel
+              AND ms.kSprache = 1
               AND (mws.kSprache = 1 OR mws.kSprache IS NULL)
-            ORDER BY m.nSort, m.cName
+            ORDER BY ms.cName
           `)
         
         merkmale = merkmaleResult.recordset.map(m => ({
