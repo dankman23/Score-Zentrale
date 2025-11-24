@@ -1,0 +1,36 @@
+{
+  "test1_artikel_details": {
+    "status": "NO_MERKMALE",
+    "kArtikel": 1,
+    "note": "Article has no Merkmale in MSSQL database"
+  },
+  "test2_batch_generation": {
+    "status": "PASSED",
+    "processed": 3,
+    "succeeded": 3,
+    "failed": 0,
+    "duration": "20.9s",
+    "merkmale_integration": true,
+    "total_results": 3
+  },
+  "test3_mongodb_caching": {
+    "status": "ERROR",
+    "error": "Failed to parse $size. Expected a number in: $size: { $gt: 0 }, full error: {'ok': 0.0, 'errmsg': 'Failed to parse $size. Expected a number in: $size: { $gt: 0 }', 'code': 2, 'codeName': 'BadValue'}"
+  },
+  "backend_logs": {
+    "status": "FOUND",
+    "merkmale_log_entries": 19,
+    "sample_logs": [
+      "[Batch] kArtikel=11 - Generiert: 5 Bulletpoints mit Prompt: Premium mit Stil-Vorgabe",
+      "[Batch Generate] Abgeschlossen in 20.9s: 3 erfolgreich, 0 fehlgeschlagen",
+      "POST /api/amazon/bulletpoints/batch/generate 200 in 21555ms"
+    ]
+  },
+  "summary": {
+    "passed": 1,
+    "failed": 0,
+    "errors": 1,
+    "total_tests": 4,
+    "critical_fix_status": "SUCCESS"
+  }
+}
