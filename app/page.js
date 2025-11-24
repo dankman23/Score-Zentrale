@@ -6250,7 +6250,7 @@ export default function App() {
               className={`btn ${produkteTab === 'browser' ? 'btn-primary' : 'btn-outline-secondary'}`}
               onClick={() => { setProdukteTab('browser'); }}
             >
-              <i className="bi bi-grid mr-2"/>Artikel-Browser
+              <i className="bi bi-database mr-2"/>JTL-Daten
             </button>
             <button 
               className={`btn ${produkteTab === 'prompts' ? 'btn-primary' : 'btn-outline-secondary'}`}
