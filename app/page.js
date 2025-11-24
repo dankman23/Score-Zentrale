@@ -689,7 +689,7 @@ export default function App() {
   const [preisvergleichArtikel, setPreisvergleichArtikel] = useState(null)
   const [preisvergleichErgebnisse, setPreisvergleichErgebnisse] = useState([])
   const [preisvergleichLoading, setPreisvergleichLoading] = useState(false)
-  const [artikelFilter, setArtikelFilter] = useState({ search: '', hersteller: '', warengruppe: '' })
+  const [artikelFilter, setArtikelFilter] = useState({ search: '', hersteller: '', warengruppe: '', abp: 'all' })
   const [artikelPage, setArtikelPage] = useState(1)
   const [artikelPerPage, setArtikelPerPage] = useState(50)
   const [artikelTotal, setArtikelTotal] = useState(0)
