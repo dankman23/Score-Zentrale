@@ -6696,6 +6696,7 @@ export default function App() {
                                 <th className="text-right">EK Netto</th>
                                 <th className="text-right">Marge %</th>
                                 <th className="text-center">Bestand</th>
+                                <th className="text-center" title="Amazon Bulletpoints">ABP</th>
                                 <th className="text-center">Preisvergleich</th>
                               </tr>
                             </thead>
