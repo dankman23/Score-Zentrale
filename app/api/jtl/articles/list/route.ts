@@ -12,11 +12,13 @@ export async function GET(request: NextRequest) {
   try {
     const { db } = await connectToDatabase()
     const articlesCollection = db.collection('articles')
+    const bulletpointsCollection = db.collection('amazon_bulletpoints_generated')
 
     const searchParams = request.nextUrl.searchParams
     const search = searchParams.get('search') || ''
     const hersteller = searchParams.get('hersteller') || ''
     const warengruppe = searchParams.get('warengruppe') || ''
+    const abpFilter = searchParams.get('abp') || 'all' // 'all', 'generated', 'missing'
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '50')
     const sortBy = searchParams.get('sortBy') || 'cArtNr'
