@@ -129,21 +129,22 @@ export async function POST(request: NextRequest) {
           try {
             const pool = mssqlPool
             
-            // Korrekte Query mit tMerkmalWertSprache (nicht tMerkmalWert!)
+            // Korrekte Query mit tMerkmalSprache für Namen und tMerkmalWertSprache für Werte
             const merkmalResult = await pool.request()
               .input('kArtikel', kArtikel)
               .query(`
                 SELECT 
-                  m.cName AS MerkmalName,
+                  ms.cName AS MerkmalName,
                   mws.cWert AS MerkmalWert
                 FROM 
                   tArtikelMerkmal am
                 JOIN 
-                  tMerkmal m ON am.kMerkmal = m.kMerkmal
+                  tMerkmalSprache ms ON am.kMerkmal = ms.kMerkmal
                 JOIN 
                   tMerkmalWertSprache mws ON am.kMerkmalWert = mws.kMerkmalWert
                 WHERE 
                   am.kArtikel = @kArtikel
+                  AND ms.kSprache = 1
                   AND mws.kSprache = 1
               `)
             
