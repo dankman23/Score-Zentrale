@@ -6558,15 +6558,27 @@ export default function App() {
                                 </div>
                                 <div className="d-flex align-items-center">
                                   <div className="mr-3">
-                                    <small className="d-block mb-1" style={{color: '#6c757d'}}>Prompt auswählen:</small>
+                                    <small className="d-block mb-1" style={{color: '#adb5bd'}}>Prompt auswählen:</small>
                                     <select 
                                       className="form-control form-control-sm"
                                       value={selectedPromptId}
                                       onChange={(e) => setSelectedPromptId(parseInt(e.target.value))}
-                                      style={{minWidth: '300px', backgroundColor: 'white', color: 'black'}}
+                                      style={{
+                                        minWidth: '300px', 
+                                        backgroundColor: '#2b3035', 
+                                        color: '#ffffff',
+                                        borderColor: '#495057'
+                                      }}
                                     >
                                       {amazonPrompts.map(p => (
-                                        <option key={p.version} value={p.version} style={{backgroundColor: 'white', color: 'black'}}>
+                                        <option 
+                                          key={p.version} 
+                                          value={p.version} 
+                                          style={{
+                                            backgroundColor: '#2b3035', 
+                                            color: '#ffffff'
+                                          }}
+                                        >
                                           v{p.version}: {p.name}
                                         </option>
                                       ))}
