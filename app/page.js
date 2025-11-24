@@ -6681,9 +6681,9 @@ export default function App() {
                           <p className="text-muted mt-2">Artikel werden geladen...</p>
                         </div>
                       ) : (
-                        <div className="table-responsive">
+                        <div className="table-responsive" style={{maxHeight: '70vh', overflowY: 'auto'}}>
                           <table className="table table-hover table-sm">
-                            <thead className="thead-light">
+                            <thead className="thead-light" style={{position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#f8f9fa'}}>
                               <tr>
                                 <th style={{width: '30px'}}>
                                   <input 
@@ -6699,17 +6699,17 @@ export default function App() {
                                     title="Alle auswählen"
                                   />
                                 </th>
-                                <th></th>
-                                <th>Art.-Nr.</th>
-                                <th>Name</th>
-                                <th>Hersteller</th>
-                                <th>Warengruppe</th>
-                                <th className="text-right">VK Netto</th>
-                                <th className="text-right">EK Netto</th>
-                                <th className="text-right">Marge %</th>
-                                <th className="text-center">Bestand</th>
-                                <th className="text-center" title="Amazon Bulletpoints">ABP</th>
-                                <th className="text-center">Preisvergleich</th>
+                                <th style={{width: '40px'}}></th>
+                                <th style={{width: '90px'}}>Art.-Nr.</th>
+                                <th style={{width: '250px'}}>Name</th>
+                                <th style={{width: '120px'}}>Hersteller</th>
+                                <th style={{width: '130px'}}>Warengruppe</th>
+                                <th className="text-right" style={{width: '80px'}}>VK Netto</th>
+                                <th className="text-right" style={{width: '80px'}}>EK Netto</th>
+                                <th className="text-right" style={{width: '70px'}}>Marge %</th>
+                                <th className="text-center" style={{width: '70px'}}>Bestand</th>
+                                <th className="text-center" style={{width: '50px'}} title="Amazon Bulletpoints">ABP</th>
+                                <th className="text-center" style={{width: '90px'}}>Preisvgl.</th>
                               </tr>
                             </thead>
                             <tbody>
