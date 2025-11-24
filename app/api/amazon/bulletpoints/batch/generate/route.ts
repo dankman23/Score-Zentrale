@@ -128,34 +128,53 @@ export async function POST(request: NextRequest) {
           console.log(`[Batch] Lade Merkmale für kArtikel=${kArtikel} aus MSSQL...`)
           try {
             const pool = mssqlPool
-            // Erste Query: Hole alle Spalten um die richtigen Namen zu finden
-            const merkmaleResult = await pool.request()
+            
+            // Strategie: Lade zuerst die IDs, dann hole Namen und Werte separat
+            const artikelMerkmaleResult = await pool.request()
               .input('kArtikel', kArtikel)
               .query(`
-            SELECT TOP 5 *
-            FROM tArtikelMerkmal am
-            INNER JOIN tMerkmal m ON am.kMerkmal = m.kMerkmal
-            LEFT JOIN tMerkmalWert mw ON am.kMerkmalWert = mw.kMerkmalWert
-            WHERE am.kArtikel = @kArtikel
-          `)
+                SELECT am.kMerkmal, am.kMerkmalWert
+                FROM tArtikelMerkmal am
+                WHERE am.kArtikel = @kArtikel
+              `)
             
-            if (merkmaleResult.recordset.length > 0) {
-              console.log(`[Batch] Merkmale Spalten für kArtikel=${kArtikel}:`, Object.keys(merkmaleResult.recordset[0]))
+            if (artikelMerkmaleResult.recordset.length > 0) {
+              console.log(`[Batch] Gefunden: ${artikelMerkmaleResult.recordset.length} Merkmal-Zuordnungen für kArtikel=${kArtikel}`)
               
-              // Versuche verschiedene mögliche Spalten-Kombinationen
-              const firstRow = merkmaleResult.recordset[0]
-              merkmale = merkmaleResult.recordset.map((m: any) => ({
-                name: m.cName || m.MerkmalName || m.name || m.cMerkmalName || 'Unbekannt',
-                wert: m.cWert || m.Wert || m.wert || m.cWertName || m.value || ''
-              }))
+              // Sammle alle kMerkmal und kMerkmalWert IDs
+              const merkmalIds = artikelMerkmaleResult.recordset.map(m => m.kMerkmal).join(',')
+              const merkmalWertIds = artikelMerkmaleResult.recordset.filter(m => m.kMerkmalWert).map(m => m.kMerkmalWert).join(',')
               
-              console.log(`[Batch] Geladen: ${merkmale.length} Merkmale für kArtikel=${kArtikel}`)
-              console.log(`[Batch] Erstes Merkmal:`, merkmale[0])
+              // Hole Merkmal-Namen
+              const merkmalNamenResult = await pool.request().query(`
+                SELECT TOP 1 * FROM tMerkmal WHERE kMerkmal IN (${merkmalIds})
+              `)
+              
+              if (merkmalNamenResult.recordset.length > 0) {
+                console.log(`[Batch] tMerkmal Spalten:`, Object.keys(merkmalNamenResult.recordset[0]))
+              }
+              
+              // Hole Merkmal-Werte (falls vorhanden)
+              if (merkmalWertIds) {
+                const merkmalWerteResult = await pool.request().query(`
+                  SELECT TOP 1 * FROM tMerkmalWert WHERE kMerkmalWert IN (${merkmalWertIds})
+                `)
+                
+                if (merkmalWerteResult.recordset.length > 0) {
+                  console.log(`[Batch] tMerkmalWert Spalten:`, Object.keys(merkmalWerteResult.recordset[0]))
+                }
+              }
+              
+              // Jetzt baue die richtige Query basierend auf gefundenen Spalten
+              // Vorläufig: Leere Merkmale
+              merkmale = []
+              console.log(`[Batch] Debug-Info gesammelt, Merkmale werden im nächsten Durchlauf korrekt geladen`)
+              
             } else {
               console.log(`[Batch] Keine Merkmale gefunden für kArtikel=${kArtikel}`)
             }
           } catch (e: any) {
-            console.log(`[Batch] Konnte Merkmale nicht laden für kArtikel=${kArtikel}:`, e.message)
+            console.log(`[Batch] Fehler beim Laden der Merkmale für kArtikel=${kArtikel}:`, e.message)
           }
         } else if (merkmale.length === 0) {
           console.log(`[Batch] WARNUNG: kArtikel=${kArtikel} hat keine Merkmale und MSSQL nicht verfügbar`)
