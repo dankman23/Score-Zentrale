@@ -6248,7 +6248,10 @@ export default function App() {
             </button>
             <button 
               className={`btn ${produkteTab === 'browser' ? 'btn-primary' : 'btn-outline-secondary'}`}
-              onClick={() => { setProdukteTab('browser'); }}
+              onClick={() => { 
+                setProdukteTab('browser'); 
+                if (amazonPrompts.length === 0) loadAmazonPrompts();
+              }}
             >
               <i className="bi bi-database mr-2"/>JTL-Daten
             </button>
