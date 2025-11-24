@@ -8,7 +8,7 @@ import requests
 import json
 import time
 
-BASE_URL = "https://ecommerce-hub-247.preview.emergentagent.com/api"
+BASE_URL = "https://bullet-gen.preview.emergentagent.com/api"
 
 def print_section(title):
     print(f"\n{'='*80}")
