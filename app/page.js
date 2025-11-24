@@ -1800,7 +1800,7 @@ export default function App() {
   // Lade Artikel für Browser
   const loadArtikelBrowser = async () => {
     try {
-      setArtikelListLoading(true)
+      setArtikelLoading(true)
       const res = await fetch(`/api/jtl/articles/list?page=${artikelPage}&limit=${artikelPageSize}&search=${artikelSearch}&sortBy=${artikelSortBy}&sortOrder=${artikelSortOrder}`)
       const data = await res.json()
       if (data.ok) {
@@ -1814,7 +1814,7 @@ export default function App() {
     } catch (e) {
       console.error('Error loading articles:', e)
     } finally {
-      setArtikelListLoading(false)
+      setArtikelLoading(false)
     }
   }
 
