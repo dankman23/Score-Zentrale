@@ -36,13 +36,40 @@ export async function GET(
       }, { status: 404 })
     }
 
-    // Wenn Merkmale NICHT in MongoDB sind, hole sie aus MSSQL
+    // Wenn Merkmale NICHT in MongoDB sind oder cBeschreibung fehlt, hole sie aus MSSQL
     let merkmale = artikel.merkmale || []
     let attribute = artikel.attribute || []
+    let cBeschreibung = artikel.cBeschreibung || null
+    let cKurzBeschreibung = artikel.cKurzBeschreibung || null
     
-    if (merkmale.length === 0) {
+    if (merkmale.length === 0 || !cBeschreibung) {
       try {
         const pool = await getMssqlPool()
+        
+        // Lade Beschreibung aus MSSQL falls nicht vorhanden
+        if (!cBeschreibung || !cKurzBeschreibung) {
+          const beschreibungResult = await pool.request()
+            .input('kArtikel', kArtikel)
+            .query(`
+              SELECT 
+                cKurzBeschreibung,
+                cBeschreibung
+              FROM tArtikelBeschreibung
+              WHERE kArtikel = @kArtikel AND kSprache = 1
+            `)
+          
+          if (beschreibungResult.recordset.length > 0) {
+            cKurzBeschreibung = beschreibungResult.recordset[0].cKurzBeschreibung || cKurzBeschreibung
+            cBeschreibung = beschreibungResult.recordset[0].cBeschreibung || cBeschreibung
+            console.log(`[Artikel Details] Beschreibung aus MSSQL geladen für kArtikel=${kArtikel}`)
+            
+            // Update MongoDB mit der Beschreibung
+            await collection.updateOne(
+              { kArtikel },
+              { $set: { cKurzBeschreibung, cBeschreibung } }
+            )
+          }
+        }
         
         const merkmaleResult = await pool.request()
           .input('kArtikel', kArtikel)
