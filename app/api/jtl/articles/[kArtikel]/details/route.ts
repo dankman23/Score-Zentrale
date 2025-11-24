@@ -49,11 +49,12 @@ export async function GET(
           .query(`
             SELECT 
               m.cName as name,
-              mw.cWert as wert
+              mws.cWert as wert
             FROM tArtikelMerkmal am
             INNER JOIN tMerkmal m ON am.kMerkmal = m.kMerkmal
-            LEFT JOIN tMerkmalWert mw ON am.kMerkmalWert = mw.kMerkmalWert
+            LEFT JOIN tMerkmalWertSprache mws ON am.kMerkmalWert = mws.kMerkmalWert
             WHERE am.kArtikel = @kArtikel
+              AND (mws.kSprache = 1 OR mws.kSprache IS NULL)
             ORDER BY m.nSort, m.cName
           `)
         
