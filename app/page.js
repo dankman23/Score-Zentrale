@@ -1843,6 +1843,13 @@ export default function App() {
     }
   }
 
+  // Auto-load Amazon Prompts when Produkte section is active
+  useEffect(() => {
+    if (activeTab === 'produkte' && amazonPrompts.length === 0) {
+      loadAmazonPrompts()
+    }
+  }, [activeTab])
+
   const activatePrompt = async (version) => {
     try {
       const res = await fetch('/api/amazon/prompts', {
