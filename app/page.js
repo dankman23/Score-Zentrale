@@ -6435,7 +6435,7 @@ export default function App() {
             <div>
               <div className="card border-0 shadow-sm">
                 <div className="card-body">
-                  <h5 className="mb-3"><i className="bi bi-grid mr-2"/>Artikel-Browser</h5>
+                  <h5 className="mb-3"><i className="bi bi-database mr-2"/>JTL-Daten Browser</h5>
                   
                   {artikelImportProgress.imported === 0 ? (
                     <div className="text-center py-5">
