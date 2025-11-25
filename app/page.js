@@ -528,6 +528,47 @@ function KpiTile({ title, value, sub, demo }) {
 const fmtCurrency = (n) => new Intl.NumberFormat('de-DE', { style:'currency', currency:'EUR' }).format(Number(n||0))
 
 export default function App() {
+  const router = useRouter()
+  
+  // Auth State
+  const [authChecked, setAuthChecked] = useState(false)
+  const [currentUser, setCurrentUser] = useState(null)
+  
+  // Check authentication on mount
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token')
+    const userStr = localStorage.getItem('auth_user')
+    
+    if (!token || !userStr) {
+      router.push('/login')
+      return
+    }
+    
+    try {
+      const user = JSON.parse(userStr)
+      setCurrentUser(user)
+      setAuthChecked(true)
+    } catch (e) {
+      console.error('Auth error:', e)
+      router.push('/login')
+    }
+  }, [router])
+  
+  // Show nothing while checking auth
+  if (!authChecked) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#1a1d23'
+      }}>
+        <div className="spinner-border text-primary" style={{width: '3rem', height: '3rem'}}/>
+      </div>
+    )
+  }
+  
   const [activeTab, setActiveTab] = useState('dashboard')
   
   // JTL/Sales Filter
