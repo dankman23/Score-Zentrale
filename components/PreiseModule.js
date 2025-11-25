@@ -1355,7 +1355,7 @@ export default function PreiseModule() {
 
                 {/* Aktionen */}
                 <button 
-                  className="btn btn-primary btn-block mb-2"
+                  className="btn btn-primary btn-block btn-sm mb-1"
                   onClick={async () => {
                     setStaffelLoading(true)
                     try {
