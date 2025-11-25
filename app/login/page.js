@@ -89,13 +89,13 @@ export default function LoginPage() {
         {/* Error Message */}
         {error && (
           <div style={{
-            background: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            color: '#f87171',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            marginBottom: '24px',
-            fontSize: '14px'
+            background: '#fee',
+            border: '1px solid #fcc',
+            color: '#c33',
+            padding: '10px 12px',
+            borderRadius: '6px',
+            marginBottom: '18px',
+            fontSize: '13px'
           }}>
             <i className="bi bi-exclamation-triangle mr-2"/>
             {error}
@@ -104,13 +104,13 @@ export default function LoginPage() {
 
         {/* Login Form */}
         <form onSubmit={handleLogin}>
-          <div style={{ marginBottom: '24px' }}>
+          <div style={{ marginBottom: '18px' }}>
             <label style={{
               display: 'block',
-              color: '#d1d5db',
-              fontSize: '14px',
+              color: '#495057',
+              fontSize: '13px',
               fontWeight: '500',
-              marginBottom: '8px'
+              marginBottom: '6px'
             }}>
               Benutzername
             </label>
@@ -122,28 +122,28 @@ export default function LoginPage() {
               disabled={loading}
               style={{
                 width: '100%',
-                padding: '12px 16px',
-                background: '#1f2227',
-                border: '1px solid #3a3f47',
-                borderRadius: '8px',
-                color: '#fff',
-                fontSize: '16px',
+                padding: '10px 12px',
+                background: '#fff',
+                border: '1px solid #ced4da',
+                borderRadius: '6px',
+                color: '#212529',
+                fontSize: '14px',
                 outline: 'none',
                 transition: 'border-color 0.2s'
               }}
               onFocus={(e) => e.target.style.borderColor = '#667eea'}
-              onBlur={(e) => e.target.style.borderColor = '#3a3f47'}
-              placeholder="Benutzername eingeben"
+              onBlur={(e) => e.target.style.borderColor = '#ced4da'}
+              placeholder="Benutzername"
             />
           </div>
 
-          <div style={{ marginBottom: '32px' }}>
+          <div style={{ marginBottom: '22px' }}>
             <label style={{
               display: 'block',
-              color: '#d1d5db',
-              fontSize: '14px',
+              color: '#495057',
+              fontSize: '13px',
               fontWeight: '500',
-              marginBottom: '8px'
+              marginBottom: '6px'
             }}>
               Passwort
             </label>
@@ -155,18 +155,18 @@ export default function LoginPage() {
               disabled={loading}
               style={{
                 width: '100%',
-                padding: '12px 16px',
-                background: '#1f2227',
-                border: '1px solid #3a3f47',
-                borderRadius: '8px',
-                color: '#fff',
-                fontSize: '16px',
+                padding: '10px 12px',
+                background: '#fff',
+                border: '1px solid #ced4da',
+                borderRadius: '6px',
+                color: '#212529',
+                fontSize: '14px',
                 outline: 'none',
                 transition: 'border-color 0.2s'
               }}
               onFocus={(e) => e.target.style.borderColor = '#667eea'}
-              onBlur={(e) => e.target.style.borderColor = '#3a3f47'}
-              placeholder="Passwort eingeben"
+              onBlur={(e) => e.target.style.borderColor = '#ced4da'}
+              placeholder="Passwort"
             />
           </div>
 
@@ -175,18 +175,18 @@ export default function LoginPage() {
             disabled={loading}
             style={{
               width: '100%',
-              padding: '14px',
-              background: loading ? '#4b5563' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              padding: '11px',
+              background: loading ? '#6c757d' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               color: '#fff',
               border: 'none',
-              borderRadius: '8px',
-              fontSize: '16px',
+              borderRadius: '6px',
+              fontSize: '15px',
               fontWeight: '600',
               cursor: loading ? 'not-allowed' : 'pointer',
               transition: 'transform 0.1s, opacity 0.2s',
               opacity: loading ? 0.7 : 1
             }}
-            onMouseEnter={(e) => !loading && (e.target.style.transform = 'translateY(-2px)')}
+            onMouseEnter={(e) => !loading && (e.target.style.transform = 'translateY(-1px)')}
             onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
           >
             {loading ? (
@@ -206,9 +206,9 @@ export default function LoginPage() {
         {/* Footer */}
         <div style={{
           textAlign: 'center',
-          marginTop: '32px',
-          color: '#6b7280',
-          fontSize: '13px'
+          marginTop: '24px',
+          color: '#868e96',
+          fontSize: '12px'
         }}>
           © 2025 SCORE Schleifwerkzeuge
         </div>
