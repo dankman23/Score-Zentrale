@@ -27,7 +27,8 @@ export default function LoginPage() {
       if (data.ok) {
         localStorage.setItem('auth_token', data.token)
         localStorage.setItem('auth_user', JSON.stringify(data.user))
-        router.push('/')
+        // Full page reload to trigger auth check
+        window.location.href = '/'
       } else {
         setError(data.error || 'Login fehlgeschlagen')
       }
