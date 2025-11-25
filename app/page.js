@@ -757,31 +757,6 @@ export default function App() {
   const [googleAdsLoading, setGoogleAdsLoading] = useState(false)
 
   const isDegradedFlag = (process.env.NEXT_PUBLIC_DEGRADED === '1')
-
-  // Check authentication on mount
-  useEffect(() => {
-    const token = localStorage.getItem('auth_token')
-    const userStr = localStorage.getItem('auth_user')
-    
-    if (!token || !userStr) {
-      router.push('/login')
-      return
-    }
-    
-    try {
-      const user = JSON.parse(userStr)
-      setCurrentUser(user)
-      setAuthChecked(true)
-    } catch (e) {
-      console.error('Auth error:', e)
-      router.push('/login')
-    }
-  }, [router])
-  
-  // Debounce search
-  useEffect(() => { const t = setTimeout(()=>{ setQF(qTyping); setPageF(1) }, 300); return ()=>clearTimeout(t) }, [qTyping])
-
-  useEffect(() => { loadDateRangeAndAdjust(); fetchAll(); fetchSalesTables(); refreshProspects(); loadColdLeadStats() }, [])
   useEffect(() => { fetchAll(); fetchSalesTables() }, [from, to, limit])
   useEffect(() => { if (activeTab==='warmakquise') queryLeads() }, [activeTab, statusF, b2bF, minScoreF, qF, pageF, limitF, sortF, orderF])
   useEffect(() => { 
