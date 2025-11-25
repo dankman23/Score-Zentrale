@@ -1162,6 +1162,415 @@ export default function PreiseModule() {
             )}
           </div>
         )}
+
+        {/* Staffelgrenzen Tab */}
+        {tab === 'staffelgrenzen' && (
+          <div>
+            <div className="alert alert-info mb-3">
+              <small>
+                <i className="bi bi-info-circle mr-2"/>
+                Staffelgrenzen werden automatisch berechnet basierend auf VE, Mindestverkauf und definierten Schwellen.
+                Die Preise werden mit der g2-Logik berechnet.
+              </small>
+            </div>
+
+            <div className="row">
+              <div className="col-md-4">
+                {/* Basisparameter */}
+                <div className="card mb-3">
+                  <div className="card-header py-2">
+                    <strong>Basis parameter</strong>
+                  </div>
+                  <div className="card-body">
+                    <div className="form-group">
+                      <label className="small">Verpackungseinheit (VE) in Stück</label>
+                      <input 
+                        type="number"
+                        className="form-control form-control-sm"
+                        min="1"
+                        step="1"
+                        value={staffelVE}
+                        onChange={(e) => setStaffelVE(Math.max(1, parseInt(e.target.value) || 1))}
+                      />
+                      <small className="text-muted">Lagerartikel: VE=1, Fremdlager: VE=10,25,50...</small>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="small">Mindestverkauf-Typ</label>
+                      <select 
+                        className="form-control form-control-sm"
+                        value={staffelMindestTyp}
+                        onChange={(e) => setStaffelMindestTyp(e.target.value)}
+                      >
+                        <option value="ek">Mindestverkaufswert in EK (netto)</option>
+                        <option value="vk">Mindestverkaufswert in VK (netto)</option>
+                        <option value="stueck">Mindeststückzahl</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="small">
+                        {staffelMindestTyp === 'ek' ? 'EK-Wert (netto) je Position' :
+                         staffelMindestTyp === 'vk' ? 'VK-Wert (netto) je Position' :
+                         'Mindeststückzahl'}
+                      </label>
+                      <input 
+                        type="number"
+                        className="form-control form-control-sm"
+                        min="0"
+                        step="0.01"
+                        value={staffelMindestWert}
+                        onChange={(e) => setStaffelMindestWert(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="small">EK pro Stück (für Berechnung)</label>
+                      <input 
+                        type="number"
+                        className="form-control form-control-sm"
+                        min="0"
+                        step="0.01"
+                        value={staffelG2EK}
+                        onChange={(e) => setStaffelG2EK(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="small">Warengruppe</label>
+                      <select 
+                        className="form-control form-control-sm"
+                        value={staffelG2Warengruppe}
+                        onChange={(e) => setStaffelG2Warengruppe(e.target.value)}
+                      >
+                        {sheets.map(s => (
+                          <option key={s.id} value={s.id}>{s.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Staffel-Schwellen */}
+                <div className="card mb-3">
+                  <div className="card-header py-2">
+                    <strong>Staffel-Schwellen (max. 7)</strong>
+                  </div>
+                  <div className="card-body">
+                    {staffelSchwellen.map((schwelle, idx) => (
+                      <div key={idx} className="row mb-2">
+                        <div className="col-6">
+                          <select 
+                            className="form-control form-control-sm"
+                            value={schwelle.typ}
+                            onChange={(e) => {
+                              const neu = [...staffelSchwellen]
+                              neu[idx].typ = e.target.value
+                              setStaffelSchwellen(neu)
+                            }}
+                          >
+                            <option value="vk">VK-Warenwert (netto)</option>
+                            <option value="ek">EK-Warenwert</option>
+                            <option value="stueck">Menge (Stück)</option>
+                          </select>
+                        </div>
+                        <div className="col-6">
+                          <div className="input-group input-group-sm">
+                            <input 
+                              type="number"
+                              className="form-control form-control-sm"
+                              value={schwelle.wert}
+                              onChange={(e) => {
+                                const neu = [...staffelSchwellen]
+                                neu[idx].wert = e.target.value
+                                setStaffelSchwellen(neu)
+                              }}
+                            />
+                            <div className="input-group-append">
+                              <button 
+                                className="btn btn-sm btn-outline-danger"
+                                onClick={() => {
+                                  const neu = staffelSchwellen.filter((_, i) => i !== idx)
+                                  setStaffelSchwellen(neu)
+                                }}
+                                disabled={staffelSchwellen.length <= 1}
+                              >
+                                <i className="bi bi-x"/>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {staffelSchwellen.length < 7 && (
+                      <button 
+                        className="btn btn-sm btn-outline-primary btn-block"
+                        onClick={() => setStaffelSchwellen([...staffelSchwellen, { typ: 'vk', wert: '500' }])}
+                      >
+                        <i className="bi bi-plus mr-1"/>Schwelle hinzufügen
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Rundung */}
+                <div className="card mb-3">
+                  <div className="card-header py-2">
+                    <strong>Rundung</strong>
+                  </div>
+                  <div className="card-body">
+                    <div className="form-group mb-0">
+                      <label className="small">Schöne Zahlen (Stückzahlen)</label>
+                      <input 
+                        type="text"
+                        className="form-control form-control-sm"
+                        placeholder="z.B. 3,5,10,15,20,25,30,40,50,75,100,150,200,300"
+                        value={staffelRundung}
+                        onChange={(e) => setStaffelRundung(e.target.value)}
+                      />
+                      <small className="text-muted">Kommagetrennt. Leer = keine Rundung</small>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Aktionen */}
+                <button 
+                  className="btn btn-primary btn-block mb-2"
+                  onClick={async () => {
+                    setStaffelLoading(true)
+                    try {
+                      const ekWert = parseFloat(staffelG2EK) || 0
+                      const vkWert = ekWert * 2.5 // Vereinfachte g2-Berechnung als Beispiel
+                      
+                      // Mindestmenge berechnen
+                      const mindestWert = parseFloat(staffelMindestWert) || 0
+                      let qMinRaw = 0
+                      
+                      if (staffelMindestTyp === 'ek') {
+                        qMinRaw = mindestWert / ekWert
+                      } else if (staffelMindestTyp === 'vk') {
+                        qMinRaw = mindestWert / vkWert
+                      } else {
+                        qMinRaw = mindestWert
+                      }
+                      
+                      let qMin = Math.max(Math.ceil(qMinRaw), staffelVE)
+                      qMin = Math.ceil(qMin / staffelVE) * staffelVE
+                      
+                      // Rundungsliste parsen
+                      const rundungsliste = staffelRundung
+                        .split(',')
+                        .map(s => parseInt(s.trim()))
+                        .filter(n => !isNaN(n) && n > 0)
+                        .sort((a, b) => a - b)
+                      
+                      // Staffelgrenzen berechnen
+                      const grenzen = []
+                      
+                      for (const schwelle of staffelSchwellen) {
+                        const wert = parseFloat(schwelle.wert) || 0
+                        let qRaw = 0
+                        
+                        if (schwelle.typ === 'vk') {
+                          qRaw = wert / vkWert
+                        } else if (schwelle.typ === 'ek') {
+                          qRaw = wert / ekWert
+                        } else {
+                          qRaw = wert
+                        }
+                        
+                        let q = Math.max(Math.ceil(qRaw), qMin)
+                        q = Math.ceil(q / staffelVE) * staffelVE
+                        
+                        // Rundung anwenden
+                        if (rundungsliste.length > 0) {
+                          const gerundet = rundungsliste.find(r => r >= q)
+                          if (gerundet) {
+                            q = gerundet
+                            // VE-Check nach Rundung
+                            if (q % staffelVE !== 0) {
+                              q = Math.ceil(q / staffelVE) * staffelVE
+                            }
+                          }
+                        }
+                        
+                        grenzen.push(q)
+                      }
+                      
+                      // Deduplizieren, sortieren, filtern
+                      const eindeutig = [...new Set(grenzen)]
+                        .sort((a, b) => a - b)
+                        .filter(q => q >= qMin)
+                        .slice(0, 7)
+                      
+                      // Staffeltabelle mit Preisen erstellen
+                      const staffeltabelle = [
+                        {
+                          ab: qMin,
+                          preisProStueck: vkWert,
+                          preisProVE: vkWert * staffelVE,
+                          warenwert: qMin * vkWert,
+                          rabatt: 0
+                        }
+                      ]
+                      
+                      eindeutig.forEach((q, idx) => {
+                        const rabatt = (idx + 1) * 5 // 5%, 10%, 15% etc
+                        const preisProStueck = vkWert * (1 - rabatt / 100)
+                        staffeltabelle.push({
+                          ab: q,
+                          preisProStueck,
+                          preisProVE: preisProStueck * staffelVE,
+                          warenwert: q * preisProStueck,
+                          rabatt
+                        })
+                      })
+                      
+                      setStaffelGrenzen(staffeltabelle)
+                      setStaffelTestMenge(qMin)
+                      
+                    } catch (e) {
+                      alert('Fehler bei Berechnung: ' + e.message)
+                    } finally {
+                      setStaffelLoading(false)
+                    }
+                  }}
+                  disabled={staffelLoading}
+                >
+                  {staffelLoading ? (
+                    <><span className="spinner-border spinner-border-sm mr-2"/>Berechne...</>
+                  ) : (
+                    <><i className="bi bi-calculator mr-2"/>Staffelgrenzen berechnen</>
+                  )}
+                </button>
+
+                <button 
+                  className="btn btn-outline-secondary btn-block"
+                  onClick={() => {
+                    localStorage.setItem('staffelgrenzen_config', JSON.stringify({
+                      ve: staffelVE,
+                      mindestTyp: staffelMindestTyp,
+                      mindestWert: staffelMindestWert,
+                      schwellen: staffelSchwellen,
+                      rundung: staffelRundung,
+                      ek: staffelG2EK,
+                      warengruppe: staffelG2Warengruppe
+                    }))
+                    alert('✅ Einstellungen gespeichert!')
+                  }}
+                >
+                  <i className="bi bi-save mr-2"/>Einstellungen speichern
+                </button>
+              </div>
+
+              <div className="col-md-8">
+                {staffelGrenzen.length > 0 ? (
+                  <>
+                    {/* Staffelpreistabelle */}
+                    <div className="card mb-3">
+                      <div className="card-header py-2">
+                        <strong>Mengenstaffeln</strong>
+                      </div>
+                      <div className="card-body p-0">
+                        <table className="table table-sm table-hover mb-0">
+                          <thead>
+                            <tr>
+                              <th>Anzahl</th>
+                              <th className="text-right">Preis/Stück</th>
+                              <th className="text-right">Preis/VE</th>
+                              <th className="text-right">Warenwert</th>
+                              <th className="text-right">Rabatt</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {staffelGrenzen.map((staffel, idx) => {
+                              const isAktiv = staffelTestMenge >= staffel.ab && 
+                                (idx === staffelGrenzen.length - 1 || staffelTestMenge < staffelGrenzen[idx + 1]?.ab)
+                              
+                              return (
+                                <tr 
+                                  key={idx} 
+                                  className={isAktiv ? 'table-success font-weight-bold' : ''}
+                                >
+                                  <td>ab {staffel.ab} Stück</td>
+                                  <td className="text-right">{staffel.preisProStueck.toFixed(2)} €</td>
+                                  <td className="text-right">{staffel.preisProVE.toFixed(2)} €</td>
+                                  <td className="text-right">{staffel.warenwert.toFixed(2)} €</td>
+                                  <td className="text-right">{staffel.rabatt}%</td>
+                                </tr>
+                              )
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* Mengen-Simulation */}
+                    <div className="card">
+                      <div className="card-header py-2">
+                        <strong>Mengen-Simulation</strong>
+                      </div>
+                      <div className="card-body">
+                        <div className="form-group">
+                          <label>Menge (Stück) testen</label>
+                          <input 
+                            type="number"
+                            className="form-control"
+                            min={staffelGrenzen[0]?.ab || staffelVE}
+                            step={staffelVE}
+                            value={staffelTestMenge}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || staffelVE
+                              const min = staffelGrenzen[0]?.ab || staffelVE
+                              const rounded = Math.max(Math.ceil(val / staffelVE) * staffelVE, min)
+                              setStaffelTestMenge(rounded)
+                            }}
+                          />
+                          <small className="text-muted">Schrittweite: {staffelVE} (VE)</small>
+                        </div>
+
+                        {(() => {
+                          const aktiveStaffel = [...staffelGrenzen]
+                            .reverse()
+                            .find(s => staffelTestMenge >= s.ab) || staffelGrenzen[0]
+                          
+                          const warenwert = staffelTestMenge * aktiveStaffel.preisProStueck
+                          
+                          return (
+                            <div className="alert alert-success">
+                              <h6 className="alert-heading">Aktive Staffel: ab {aktiveStaffel.ab} Stück</h6>
+                              <hr/>
+                              <div className="row">
+                                <div className="col-md-6">
+                                  <strong>Preis pro Stück:</strong><br/>
+                                  {aktiveStaffel.preisProStueck.toFixed(2)} €
+                                </div>
+                                <div className="col-md-6">
+                                  <strong>Preis pro VE ({staffelVE} Stk):</strong><br/>
+                                  {aktiveStaffel.preisProVE.toFixed(2)} €
+                                </div>
+                              </div>
+                              <hr/>
+                              <div>
+                                <strong>Warenwert (netto) bei {staffelTestMenge} Stück:</strong><br/>
+                                <h4 className="mb-0">{warenwert.toFixed(2)} €</h4>
+                              </div>
+                            </div>
+                          )
+                        })()}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="alert alert-info">
+                    <i className="bi bi-info-circle mr-2"/>
+                    Klicken Sie auf "Staffelgrenzen berechnen" um die Mengenstaffeln zu generieren.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
