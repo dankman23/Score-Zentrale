@@ -48,35 +48,39 @@ export default function LoginPage() {
       padding: '20px'
     }}>
       <div style={{
-        background: '#252930',
-        borderRadius: '16px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-        padding: '48px',
-        maxWidth: '440px',
+        background: '#f8f9fa',
+        borderRadius: '12px',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+        padding: '32px',
+        maxWidth: '380px',
         width: '100%',
-        border: '1px solid #3a3f47'
+        border: '1px solid #dee2e6'
       }}>
         {/* SCORE Logo */}
         <div style={{
           textAlign: 'center',
-          marginBottom: '40px'
+          marginBottom: '28px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center'
         }}>
           <img 
             src="https://customer-assets.emergentagent.com/job_bullet-gen/artifacts/qsejfv1b_score-abrasives.png"
             alt="SCORE Logo"
             style={{
-              maxWidth: '280px',
+              maxWidth: '200px',
               width: '100%',
               height: 'auto',
-              marginBottom: '16px'
+              marginBottom: '12px',
+              display: 'block'
             }}
           />
           <div style={{
-            fontSize: '20px',
-            color: '#9ca3af',
+            fontSize: '16px',
+            color: '#6c757d',
             fontWeight: '300',
-            letterSpacing: '3px',
-            marginTop: '8px'
+            letterSpacing: '2px',
+            marginTop: '4px'
           }}>
             ZENTRALE
           </div>
