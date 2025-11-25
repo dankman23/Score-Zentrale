@@ -55,6 +55,19 @@ export default function RootLayout({ children }) {
               <li className="nav-item"><a className="nav-link" href="#orga"><i className="bi bi-calendar-check mr-1"/>Orga</a></li>
               <li className="nav-item"><a className="nav-link" href="#fibu"><i className="bi bi-receipt-cutoff mr-1"/>FIBU</a></li>
             </ul>
+            <div className="ml-auto">
+              <button 
+                className="btn btn-outline-light btn-sm"
+                onClick={() => {
+                  localStorage.removeItem('auth_token')
+                  localStorage.removeItem('auth_user')
+                  window.location.href = '/login'
+                }}
+                style={{fontSize: '0.85rem'}}
+              >
+                <i className="bi bi-box-arrow-right mr-1"/>Abmelden
+              </button>
+            </div>
           </div>
         </nav>
 
