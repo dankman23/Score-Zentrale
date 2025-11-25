@@ -1269,14 +1269,14 @@ export default function PreiseModule() {
                 </div>
 
                 {/* Staffel-Schwellen */}
-                <div className="card mb-3">
-                  <div className="card-header py-2">
-                    <strong>Staffel-Schwellen (max. 7)</strong>
+                <div className="card mb-2">
+                  <div className="card-header py-1">
+                    <strong className="small">Schwellen (max. 7)</strong>
                   </div>
-                  <div className="card-body">
+                  <div className="card-body p-2">
                     {staffelSchwellen.map((schwelle, idx) => (
-                      <div key={idx} className="row mb-2">
-                        <div className="col-6">
+                      <div key={idx} className="row mb-1">
+                        <div className="col-6 pr-1">
                           <select 
                             className="form-control form-control-sm"
                             value={schwelle.typ}
@@ -1285,13 +1285,14 @@ export default function PreiseModule() {
                               neu[idx].typ = e.target.value
                               setStaffelSchwellen(neu)
                             }}
+                            style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '0.75rem'}}
                           >
-                            <option value="vk">VK-Warenwert (netto)</option>
-                            <option value="ek">EK-Warenwert</option>
-                            <option value="stueck">Menge (Stück)</option>
+                            <option value="vk">VK €</option>
+                            <option value="ek">EK €</option>
+                            <option value="stueck">Stück</option>
                           </select>
                         </div>
-                        <div className="col-6">
+                        <div className="col-6 pl-1">
                           <div className="input-group input-group-sm">
                             <input 
                               type="number"
@@ -1302,6 +1303,7 @@ export default function PreiseModule() {
                                 neu[idx].wert = e.target.value
                                 setStaffelSchwellen(neu)
                               }}
+                              style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '0.75rem'}}
                             />
                             <div className="input-group-append">
                               <button 
@@ -1311,6 +1313,7 @@ export default function PreiseModule() {
                                   setStaffelSchwellen(neu)
                                 }}
                                 disabled={staffelSchwellen.length <= 1}
+                                style={{padding: '0.25rem 0.4rem', fontSize: '0.7rem'}}
                               >
                                 <i className="bi bi-x"/>
                               </button>
@@ -1321,31 +1324,31 @@ export default function PreiseModule() {
                     ))}
                     {staffelSchwellen.length < 7 && (
                       <button 
-                        className="btn btn-sm btn-outline-primary btn-block"
+                        className="btn btn-sm btn-outline-primary btn-block mt-1"
                         onClick={() => setStaffelSchwellen([...staffelSchwellen, { typ: 'vk', wert: '500' }])}
+                        style={{fontSize: '0.75rem', padding: '0.25rem'}}
                       >
-                        <i className="bi bi-plus mr-1"/>Schwelle hinzufügen
+                        <i className="bi bi-plus mr-1"/>Hinzufügen
                       </button>
                     )}
                   </div>
                 </div>
 
                 {/* Rundung */}
-                <div className="card mb-3">
-                  <div className="card-header py-2">
-                    <strong>Rundung</strong>
+                <div className="card mb-2">
+                  <div className="card-header py-1">
+                    <strong className="small">Rundung</strong>
                   </div>
-                  <div className="card-body">
+                  <div className="card-body p-2">
                     <div className="form-group mb-0">
-                      <label className="small">Schöne Zahlen (Stückzahlen)</label>
                       <input 
                         type="text"
                         className="form-control form-control-sm"
-                        placeholder="z.B. 3,5,10,15,20,25,30,40,50,75,100,150,200,300"
+                        placeholder="3,5,10,15,20,25,30,40,50,75,100"
                         value={staffelRundung}
                         onChange={(e) => setStaffelRundung(e.target.value)}
+                        style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '0.75rem'}}
                       />
-                      <small className="text-muted">Kommagetrennt. Leer = keine Rundung</small>
                     </div>
                   </div>
                 </div>
