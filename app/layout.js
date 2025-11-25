@@ -96,16 +96,7 @@ export default function RootLayout({ children }) {
                   <li className="nav-item"><a className="nav-link" href="#orga"><i className="bi bi-calendar-check"/>Orga</a></li>
                   <li className="nav-item"><a className="nav-link" href="#fibu"><i className="bi bi-receipt-cutoff"/>FIBU</a></li>
                   <li className="nav-item">
-                    <button 
-                      className="nav-link btn btn-link text-danger"
-                      onClick={() => {
-                        localStorage.removeItem('auth_token')
-                        localStorage.removeItem('auth_user')
-                        window.location.href = '/login'
-                      }}
-                    >
-                      <i className="bi bi-box-arrow-right"/>Abmelden
-                    </button>
+                    <LogoutButton mobile={true} />
                   </li>
                 </ul>
               </div>
