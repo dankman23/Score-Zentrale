@@ -1192,15 +1192,15 @@ export default function PreiseModule() {
             </div>
 
             <div className="row">
-              <div className="col-md-4">
+              <div className="col-md-3">
                 {/* Basisparameter */}
-                <div className="card mb-3">
-                  <div className="card-header py-2">
-                    <strong>Basis parameter</strong>
+                <div className="card mb-2">
+                  <div className="card-header py-1">
+                    <strong className="small">Basisparameter</strong>
                   </div>
-                  <div className="card-body">
-                    <div className="form-group">
-                      <label className="small">Verpackungseinheit (VE) in Stück</label>
+                  <div className="card-body p-2">
+                    <div className="form-group mb-2">
+                      <label className="small mb-1 text-white">VE (Stück)</label>
                       <input 
                         type="number"
                         className="form-control form-control-sm"
