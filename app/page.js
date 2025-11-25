@@ -757,15 +757,7 @@ export default function App() {
   const [googleAdsLoading, setGoogleAdsLoading] = useState(false)
 
   const isDegradedFlag = (process.env.NEXT_PUBLIC_DEGRADED === '1')
-  useEffect(() => { fetchAll(); fetchSalesTables() }, [from, to, limit])
-  useEffect(() => { if (activeTab==='warmakquise') queryLeads() }, [activeTab, statusF, b2bF, minScoreF, qF, pageF, limitF, sortF, orderF])
-  useEffect(() => { 
-    if (activeTab==='kaltakquise') {
-      loadColdProspects()
-      loadColdLeadStats()
-    }
-  }, [activeTab, coldStatusFilter])
-  
+
   // Lade Autopilot Status beim Start
   useEffect(() => {
     loadAutopilotStatus()
