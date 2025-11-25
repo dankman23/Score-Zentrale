@@ -759,6 +759,9 @@ export default function App() {
 
   const isDegradedFlag = (process.env.NEXT_PUBLIC_DEGRADED === '1')
   
+  // Auth-Check useEffect MUSS am Ende sein, nach allen Funktionsdefinitionen
+  // Wird später im Code nach den Funktionsdefinitionen eingefügt
+  
   // Show nothing while checking auth
   if (!authChecked) {
     return (
