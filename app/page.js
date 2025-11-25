@@ -1917,13 +1917,6 @@ export default function App() {
     }
   }
 
-  // Auto-load Artikel wenn Browser-Tab aktiv
-  useEffect(() => {
-    if (activeTab === 'produkte' && produkteTab === 'browser' && artikelList.length === 0) {
-      loadArtikelBrowser()
-    }
-  }, [activeTab, produkteTab])
-
   const loadAmazonPrompts = async () => {
     try {
       setLoadingPrompts(true)
