@@ -1275,48 +1275,52 @@ export default function PreiseModule() {
                   </div>
                   <div className="card-body p-2">
                     {staffelSchwellen.map((schwelle, idx) => (
-                      <div key={idx} className="row mb-1">
-                        <div className="col-6 pr-1">
-                          <select 
-                            className="form-control form-control-sm"
-                            value={schwelle.typ}
-                            onChange={(e) => {
-                              const neu = [...staffelSchwellen]
-                              neu[idx].typ = e.target.value
-                              setStaffelSchwellen(neu)
-                            }}
-                            style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '0.75rem'}}
-                          >
-                            <option value="vk">VK €</option>
-                            <option value="ek">EK €</option>
-                            <option value="stueck">Stück</option>
-                          </select>
-                        </div>
-                        <div className="col-6 pl-1">
-                          <div className="input-group input-group-sm">
-                            <input 
-                              type="number"
+                      <div key={idx} className="mb-2">
+                        <div className="row mb-1">
+                          <div className="col-12">
+                            <select 
                               className="form-control form-control-sm"
-                              value={schwelle.wert}
+                              value={schwelle.typ}
                               onChange={(e) => {
                                 const neu = [...staffelSchwellen]
-                                neu[idx].wert = e.target.value
+                                neu[idx].typ = e.target.value
                                 setStaffelSchwellen(neu)
                               }}
-                              style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '0.75rem'}}
-                            />
-                            <div className="input-group-append">
-                              <button 
-                                className="btn btn-sm btn-outline-danger"
-                                onClick={() => {
-                                  const neu = staffelSchwellen.filter((_, i) => i !== idx)
+                              style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '0.8rem'}}
+                            >
+                              <option value="vk">VK € (netto)</option>
+                              <option value="ek">EK € (netto)</option>
+                              <option value="stueck">Menge (Stück)</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="row">
+                          <div className="col-12">
+                            <div className="input-group input-group-sm">
+                              <input 
+                                type="number"
+                                className="form-control"
+                                value={schwelle.wert}
+                                onChange={(e) => {
+                                  const neu = [...staffelSchwellen]
+                                  neu[idx].wert = e.target.value
                                   setStaffelSchwellen(neu)
                                 }}
-                                disabled={staffelSchwellen.length <= 1}
-                                style={{padding: '0.25rem 0.4rem', fontSize: '0.7rem'}}
-                              >
-                                <i className="bi bi-x"/>
-                              </button>
+                                style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '0.85rem'}}
+                              />
+                              <div className="input-group-append">
+                                <button 
+                                  className="btn btn-outline-danger"
+                                  onClick={() => {
+                                    const neu = staffelSchwellen.filter((_, i) => i !== idx)
+                                    setStaffelSchwellen(neu)
+                                  }}
+                                  disabled={staffelSchwellen.length <= 1}
+                                  style={{padding: '0.375rem 0.5rem'}}
+                                >
+                                  <i className="bi bi-x"/>
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1324,11 +1328,11 @@ export default function PreiseModule() {
                     ))}
                     {staffelSchwellen.length < 7 && (
                       <button 
-                        className="btn btn-sm btn-outline-primary btn-block mt-1"
+                        className="btn btn-sm btn-outline-primary btn-block"
                         onClick={() => setStaffelSchwellen([...staffelSchwellen, { typ: 'vk', wert: '500' }])}
-                        style={{fontSize: '0.75rem', padding: '0.25rem'}}
+                        style={{fontSize: '0.8rem'}}
                       >
-                        <i className="bi bi-plus mr-1"/>Hinzufügen
+                        <i className="bi bi-plus mr-1"/>Schwelle hinzufügen
                       </button>
                     )}
                   </div>
@@ -1337,18 +1341,19 @@ export default function PreiseModule() {
                 {/* Rundung */}
                 <div className="card mb-2">
                   <div className="card-header py-1">
-                    <strong className="small">Rundung</strong>
+                    <strong className="small">Rundung (Schöne Zahlen)</strong>
                   </div>
                   <div className="card-body p-2">
                     <div className="form-group mb-0">
-                      <input 
-                        type="text"
+                      <textarea 
                         className="form-control form-control-sm"
-                        placeholder="3,5,10,15,20,25,30,40,50,75,100"
+                        rows="2"
+                        placeholder="3,5,10,15,20,25,30,40,50,75,100,150,200,300"
                         value={staffelRundung}
                         onChange={(e) => setStaffelRundung(e.target.value)}
-                        style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '0.75rem'}}
+                        style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '0.8rem'}}
                       />
+                      <small className="text-muted" style={{fontSize: '0.65rem'}}>Kommagetrennt</small>
                     </div>
                   </div>
                 </div>
