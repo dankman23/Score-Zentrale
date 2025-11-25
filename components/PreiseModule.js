@@ -1494,14 +1494,14 @@ export default function PreiseModule() {
                             <strong style={{fontSize: '0.8rem'}}>Mengenstaffeln</strong>
                           </div>
                           <div className="card-body p-1">
-                            <table className="table table-sm table-hover mb-0" style={{fontSize: '0.75rem'}}>
-                              <thead style={{backgroundColor: '#f8f9fa'}}>
+                            <table className="table table-sm table-hover mb-0" style={{fontSize: '0.8rem'}}>
+                              <thead style={{backgroundColor: '#495057', color: '#fff'}}>
                                 <tr>
-                                  <th className="py-1 px-2" style={{fontSize: '0.7rem'}}>Anzahl</th>
-                                  <th className="text-right py-1 px-2" style={{fontSize: '0.7rem'}}>€/Stk</th>
-                                  <th className="text-right py-1 px-2" style={{fontSize: '0.7rem'}}>€/VE</th>
-                                  <th className="text-right py-1 px-2" style={{fontSize: '0.7rem'}}>Warenwert</th>
-                                  <th className="text-right py-1 px-2" style={{fontSize: '0.7rem'}}>Rabatt</th>
+                                  <th className="py-1 px-2" style={{fontSize: '0.75rem', color: '#fff'}}>Anzahl</th>
+                                  <th className="text-right py-1 px-2" style={{fontSize: '0.75rem', color: '#fff'}}>€/Stk</th>
+                                  <th className="text-right py-1 px-2" style={{fontSize: '0.75rem', color: '#fff'}}>€/VE</th>
+                                  <th className="text-right py-1 px-2" style={{fontSize: '0.75rem', color: '#fff'}}>Warenwert</th>
+                                  <th className="text-right py-1 px-2" style={{fontSize: '0.75rem', color: '#fff'}}>Rabatt</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -1514,6 +1514,7 @@ export default function PreiseModule() {
                                       key={idx} 
                                       id={`staffel-${idx}`}
                                       className={isAktiv ? 'table-success font-weight-bold' : ''}
+                                      style={{color: isAktiv ? '#000' : '#fff'}}
                                     >
                                       <td className="py-1 px-2">ab {staffel.ab}</td>
                                       <td className="text-right py-1 px-2">{staffel.preisProStueck.toFixed(2)}</td>
