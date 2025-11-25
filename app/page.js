@@ -759,56 +759,6 @@ export default function App() {
 
   const isDegradedFlag = (process.env.NEXT_PUBLIC_DEGRADED === '1')
 
-  // Lade Autopilot Status beim Start
-  useEffect(() => {
-    loadAutopilotStatus()
-    
-    // Cleanup: Stoppe Polling beim Unmount
-    return () => {
-      stopAutopilotPolling()
-    }
-  }, [])
-  // Autopilot Status regelmäßig laden
-  useEffect(() => {
-    if (activeTab === 'kaltakquise') {
-      loadAutopilotStatus()
-      const interval = setInterval(loadAutopilotStatus, 5000)
-      return () => clearInterval(interval)
-    }
-  }, [activeTab])
-
-  // Lade Postausgang/Posteingang wenn Ansicht wechselt
-  useEffect(() => {
-    if (mailView === 'outbox') {
-      loadOutbox()
-    } else if (mailView === 'inbox') {
-      loadInbox()
-    }
-  }, [mailView])
-  
-  // Starte/Stoppe Polling basierend auf Autopilot State
-  useEffect(() => {
-    if (autopilotState.running && !autopilotIntervalRef.current) {
-      startAutopilotPolling()
-    } else if (!autopilotState.running && autopilotIntervalRef.current) {
-      stopAutopilotPolling()
-    }
-  }, [autopilotState.running])
-  useEffect(() => { 
-    if (activeTab==='marketing' && marketingSub==='analytics') {
-      console.log('[Analytics] Loading...', {analyticsDateRange})
-      loadAnalytics() 
-    }
-  }, [activeTab, marketingSub, analyticsDateRange])
-  useEffect(() => { if (activeTab==='marketing' && marketingSub==='googleads') loadGoogleAds() }, [activeTab, marketingSub])
-  
-  // Load filter options when Sales tab is active
-  useEffect(() => {
-    if (activeTab === 'sales') {
-      loadFilterOptions()
-    }
-  }, [activeTab])
-
   useEffect(() => {
     const applyHash = () => { const h=(window.location.hash||'#dashboard').replace('#',''); if (['dashboard','sales','marketing','glossar','kaltakquise','warmakquise','outbound','produkte','preise','fibu'].includes(h)) setActiveTab(h) }
     applyHash(); window.addEventListener('hashchange', applyHash)
