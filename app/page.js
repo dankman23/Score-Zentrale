@@ -2287,17 +2287,6 @@ export default function App() {
     }
   }
 
-  // Status-Polling: Prüfe alle 3 Sekunden ob Import läuft
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (activeTab === 'produkte') {
-        loadArtikelStatus()
-      }
-    }, 3000)
-    
-    return () => clearInterval(interval)
-  }, [activeTab])
-
   const checkOrphanedArticles = async () => {
     if (checkingOrphans) return
     
