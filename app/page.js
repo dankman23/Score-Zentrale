@@ -758,6 +758,41 @@ export default function App() {
 
   const isDegradedFlag = (process.env.NEXT_PUBLIC_DEGRADED === '1')
 
+  // Check authentication on mount
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token')
+    const userStr = localStorage.getItem('auth_user')
+    
+    if (!token || !userStr) {
+      router.push('/login')
+      return
+    }
+    
+    try {
+      const user = JSON.parse(userStr)
+      setCurrentUser(user)
+      setAuthChecked(true)
+    } catch (e) {
+      console.error('Auth error:', e)
+      router.push('/login')
+    }
+  }, [router])
+  
+  // Show nothing while checking auth
+  if (!authChecked) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#1a1d23'
+      }}>
+        <div className="spinner-border text-primary" style={{width: '3rem', height: '3rem'}}/>
+      </div>
+    )
+  }
+
   const pushLog = (entry) => {
     setNetlog(l => [{ ...entry, at: new Date().toLocaleTimeString() }, ...l.slice(0,9)])
   }
