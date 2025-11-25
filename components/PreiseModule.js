@@ -1483,7 +1483,7 @@ export default function PreiseModule() {
                 </button>
               </div>
 
-              <div className="col-md-9">
+              <div className="col-md-10">
                 {staffelGrenzen.length > 0 ? (
                   <>
                     <div className="row">
