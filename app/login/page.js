@@ -56,55 +56,29 @@ export default function LoginPage() {
         width: '100%',
         border: '1px solid #3a3f47'
       }}>
-        {/* Logo & Header Bild */}
+        {/* SCORE Logo */}
         <div style={{
           textAlign: 'center',
-          marginBottom: '32px'
+          marginBottom: '40px'
         }}>
+          <img 
+            src="https://customer-assets.emergentagent.com/job_bullet-gen/artifacts/qsejfv1b_score-abrasives.png"
+            alt="SCORE Logo"
+            style={{
+              maxWidth: '280px',
+              width: '100%',
+              height: 'auto',
+              marginBottom: '16px'
+            }}
+          />
           <div style={{
-            width: '100%',
-            height: '120px',
-            backgroundImage: "url('https://customer-assets.emergentagent.com/job_score-zentrale/artifacts/g4o0uovx_Header.JPG')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            borderRadius: '12px',
-            marginBottom: '16px',
-            position: 'relative',
-            overflow: 'hidden'
+            fontSize: '20px',
+            color: '#9ca3af',
+            fontWeight: '300',
+            letterSpacing: '3px',
+            marginTop: '8px'
           }}>
-            {/* Overlay für bessere Lesbarkeit */}
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.85) 0%, rgba(118, 75, 162, 0.85) 100%)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <div style={{
-                fontSize: '42px',
-                fontWeight: 'bold',
-                color: '#fff',
-                marginBottom: '4px',
-                letterSpacing: '-1px',
-                textShadow: '0 2px 8px rgba(0,0,0,0.3)'
-              }}>
-                SCORE
-              </div>
-              <div style={{
-                fontSize: '20px',
-                color: '#f3f4f6',
-                fontWeight: '300',
-                letterSpacing: '4px',
-                textShadow: '0 1px 4px rgba(0,0,0,0.3)'
-              }}>
-                ZENTRALE
-              </div>
-            </div>
+            ZENTRALE
           </div>
         </div>
 
