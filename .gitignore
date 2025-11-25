@@ -79,75 +79,10 @@ agenthub/agents/youtube/db
 android-sdk/ node_modules/@next/swc-linux-arm64-gnu/next-swc.linux-arm64-gnu.node
 node_modules/@next/swc-linux-arm64-musl/next-swc.linux-arm64-musl.node
 node_modules/@next/swc-linux-arm64-gnu/next-swc.linux-arm64-gnu.node
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
 .next/cache/webpack/server-production/0.pack
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+
+# IMPORTANT: .env files are NOT ignored for Emergent deployment
+# Environment files must be tracked in the repository
 -e 
 # Environment files
 *.env
