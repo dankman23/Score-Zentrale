@@ -874,6 +874,55 @@ export default function App() {
       loadArtikelList()
     }
   }, [activeTab, produkteTab, artikelPage, artikelPerPage, artikelFilter.search, artikelFilter.hersteller, artikelFilter.warengruppe, artikelFilter.abp, artikelSortBy, artikelSortOrder])
+
+  // Auto-load Artikel wenn Browser-Tab aktiv
+  useEffect(() => {
+    if (activeTab === 'produkte' && produkteTab === 'browser' && artikelList.length === 0) {
+      loadArtikelBrowser()
+    }
+  }, [activeTab, produkteTab])
+
+  // Auto-load Amazon Prompts when Produkte section is active
+  useEffect(() => {
+    if (activeTab === 'produkte' && amazonPrompts.length === 0) {
+      loadAmazonPrompts()
+    }
+  }, [activeTab])
+
+  // Auto-Load Artikel-Details wenn Tab geöffnet wird
+  useEffect(() => {
+    if (expandedArtikel && artikelDetailTab === 'bulletpoints') {
+      // Wenn Bulletpoints-Tab geöffnet wird, lade Details falls nicht vorhanden
+      if (!artikelDetails || artikelDetails.kArtikel !== expandedArtikel) {
+        loadArtikelDetails(expandedArtikel)
+      }
+    }
+  }, [expandedArtikel, artikelDetailTab])
+
+  // Status-Polling: Prüfe alle 3 Sekunden ob Import läuft
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (activeTab === 'produkte') {
+        loadArtikelStatus()
+      }
+    }, 3000)
+    
+    return () => clearInterval(interval)
+  }, [activeTab])
+
+  // Hash-basierte Navigation synchronisieren
+  useEffect(() => {
+    const syncHash = () => {
+      const hash = (window.location.hash || '#dashboard').slice(1)
+      if (hash !== activeTab) {
+        setActiveTab(hash)
+      }
+    }
+    
+    syncHash()
+    window.addEventListener('hashchange', syncHash)
+    return () => window.removeEventListener('hashchange', syncHash)
+  }, [activeTab])
   
   // Show nothing while checking auth
   if (!authChecked) {
