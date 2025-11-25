@@ -2576,20 +2576,6 @@ export default function App() {
   }
   const B2BBadge = ({b}) => (<span className={`badge badge-${b?'warning':'secondary'}`}>{b?'B2B':'B2C'}</span>)
 
-  // Hash-basierte Navigation synchronisieren
-  useEffect(() => {
-    const syncHash = () => {
-      const hash = (window.location.hash || '#dashboard').slice(1)
-      if (hash !== activeTab) {
-        setActiveTab(hash)
-      }
-    }
-    
-    syncHash()
-    window.addEventListener('hashchange', syncHash)
-    return () => window.removeEventListener('hashchange', syncHash)
-  }, [])
-
   return (
     <div>
       {/* Date Range - nur bei Dashboard, Sales, Marketing */}
