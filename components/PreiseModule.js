@@ -1208,29 +1208,26 @@ export default function PreiseModule() {
                         step="1"
                         value={staffelVE}
                         onChange={(e) => setStaffelVE(Math.max(1, parseInt(e.target.value) || 1))}
+                        style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057'}}
                       />
-                      <small className="text-muted">Lagerartikel: VE=1, Fremdlager: VE=10,25,50...</small>
                     </div>
 
-                    <div className="form-group">
-                      <label className="small">Mindestverkauf-Typ</label>
+                    <div className="form-group mb-2">
+                      <label className="small mb-1 text-white">Mindestverkauf</label>
                       <select 
                         className="form-control form-control-sm"
                         value={staffelMindestTyp}
                         onChange={(e) => setStaffelMindestTyp(e.target.value)}
+                        style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057'}}
                       >
-                        <option value="ek">Mindestverkaufswert in EK (netto)</option>
-                        <option value="vk">Mindestverkaufswert in VK (netto)</option>
-                        <option value="stueck">Mindeststückzahl</option>
+                        <option value="ek">EK (netto)</option>
+                        <option value="vk">VK (netto)</option>
+                        <option value="stueck">Stückzahl</option>
                       </select>
                     </div>
 
-                    <div className="form-group">
-                      <label className="small">
-                        {staffelMindestTyp === 'ek' ? 'EK-Wert (netto) je Position' :
-                         staffelMindestTyp === 'vk' ? 'VK-Wert (netto) je Position' :
-                         'Mindeststückzahl'}
-                      </label>
+                    <div className="form-group mb-2">
+                      <label className="small mb-1 text-white">Wert</label>
                       <input 
                         type="number"
                         className="form-control form-control-sm"
@@ -1238,11 +1235,12 @@ export default function PreiseModule() {
                         step="0.01"
                         value={staffelMindestWert}
                         onChange={(e) => setStaffelMindestWert(e.target.value)}
+                        style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057'}}
                       />
                     </div>
 
-                    <div className="form-group">
-                      <label className="small">EK pro Stück (für Berechnung)</label>
+                    <div className="form-group mb-2">
+                      <label className="small mb-1 text-white">EK/Stück</label>
                       <input 
                         type="number"
                         className="form-control form-control-sm"
@@ -1250,15 +1248,17 @@ export default function PreiseModule() {
                         step="0.01"
                         value={staffelG2EK}
                         onChange={(e) => setStaffelG2EK(e.target.value)}
+                        style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057'}}
                       />
                     </div>
 
-                    <div className="form-group">
-                      <label className="small">Warengruppe</label>
+                    <div className="form-group mb-0">
+                      <label className="small mb-1 text-white">Warengruppe</label>
                       <select 
                         className="form-control form-control-sm"
                         value={staffelG2Warengruppe}
                         onChange={(e) => setStaffelG2Warengruppe(e.target.value)}
+                        style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057'}}
                       >
                         {sheets.map(s => (
                           <option key={s.id} value={s.id}>{s.name}</option>
