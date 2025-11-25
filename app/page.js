@@ -51,10 +51,6 @@ function MailPromptsView() {
     }
   }
   
-  useEffect(() => {
-    loadPrompts()
-  }, [])
-  
   // Auth-Check - WICHTIG: Session validieren
   useEffect(() => {
     // Small delay to ensure localStorage is ready after login redirect
