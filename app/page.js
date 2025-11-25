@@ -55,6 +55,26 @@ function MailPromptsView() {
     loadPrompts()
   }, [])
   
+  // Auth-Check - WICHTIG: Session validieren
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token')
+    const userStr = localStorage.getItem('auth_user')
+    
+    if (!token || !userStr) {
+      router.push('/login')
+      return
+    }
+    
+    try {
+      const user = JSON.parse(userStr)
+      setCurrentUser(user)
+      setAuthChecked(true)
+    } catch (e) {
+      console.error('Auth error:', e)
+      router.push('/login')
+    }
+  }, [router])
+  
   async function activatePrompt(version) {
     try {
       await fetch('/api/coldleads/prompts', {
