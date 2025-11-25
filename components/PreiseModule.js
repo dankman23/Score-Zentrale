@@ -33,6 +33,23 @@ export default function PreiseModule() {
   const [vergleichLoading, setVergleichLoading] = useState(false)
   const [vergleichUploadedData, setVergleichUploadedData] = useState(null)
 
+  // Staffelgrenzen-Tab
+  const [staffelVE, setStaffelVE] = useState(1)
+  const [staffelMindestTyp, setStaffelMindestTyp] = useState('ek') // 'ek' | 'vk' | 'stueck'
+  const [staffelMindestWert, setStaffelMindestWert] = useState('50')
+  const [staffelSchwellen, setStaffelSchwellen] = useState([
+    { typ: 'vk', wert: '100' },
+    { typ: 'vk', wert: '250' },
+    { typ: 'vk', wert: '500' },
+    { typ: 'vk', wert: '1000' }
+  ])
+  const [staffelRundung, setStaffelRundung] = useState('3,5,10,15,20,25,30,40,50,75,100,150,200,300')
+  const [staffelGrenzen, setStaffelGrenzen] = useState([])
+  const [staffelTestMenge, setStaffelTestMenge] = useState(10)
+  const [staffelLoading, setStaffelLoading] = useState(false)
+  const [staffelG2EK, setStaffelG2EK] = useState('5')
+  const [staffelG2Warengruppe, setStaffelG2Warengruppe] = useState('lagerware')
+
   const sheets = [
     { id: 'lagerware', name: 'Lagerware' },
     { id: 'klingspor_fremdlager', name: 'Klingspor Fremdlager' },
