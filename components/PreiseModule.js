@@ -1487,60 +1487,57 @@ export default function PreiseModule() {
                 {staffelGrenzen.length > 0 ? (
                   <>
                     <div className="row">
-                      <div className="col-md-7">
-                        {/* Staffelpreistabelle */}
+                      <div className="col-md-8">
+                        {/* Staffelpreistabelle - ALLE sichtbar ohne Scroll */}
                         <div className="card mb-2">
-                          <div className="card-header py-1">
-                            <strong className="small">Mengenstaffeln</strong>
+                          <div className="card-header py-1 px-2">
+                            <strong style={{fontSize: '0.8rem'}}>Mengenstaffeln</strong>
                           </div>
-                          <div className="card-body p-0">
-                            <div style={{maxHeight: '400px', overflowY: 'auto'}} id="staffelTabelle">
-                              <table className="table table-sm table-hover mb-0" style={{fontSize: '0.85rem'}}>
-                                <thead style={{position: 'sticky', top: 0, backgroundColor: '#f8f9fa', zIndex: 1}}>
-                                  <tr>
-                                    <th className="py-1">Anzahl</th>
-                                    <th className="text-right py-1">€/Stk</th>
-                                    <th className="text-right py-1">€/VE</th>
-                                    <th className="text-right py-1">Wert</th>
-                                    <th className="text-right py-1">Rabatt</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {staffelGrenzen.map((staffel, idx) => {
-                                    const isAktiv = staffelTestMenge >= staffel.ab && 
-                                      (idx === staffelGrenzen.length - 1 || staffelTestMenge < staffelGrenzen[idx + 1]?.ab)
-                                    
-                                    return (
-                                      <tr 
-                                        key={idx} 
-                                        id={`staffel-${idx}`}
-                                        className={isAktiv ? 'table-success font-weight-bold' : ''}
-                                        style={{fontSize: '0.8rem'}}
-                                      >
-                                        <td className="py-1">ab {staffel.ab}</td>
-                                        <td className="text-right py-1">{staffel.preisProStueck.toFixed(2)}</td>
-                                        <td className="text-right py-1">{staffel.preisProVE.toFixed(2)}</td>
-                                        <td className="text-right py-1">{staffel.warenwert.toFixed(2)}</td>
-                                        <td className="text-right py-1">{staffel.rabatt}%</td>
-                                      </tr>
-                                    )
-                                  })}
-                                </tbody>
-                              </table>
-                            </div>
+                          <div className="card-body p-1">
+                            <table className="table table-sm table-hover mb-0" style={{fontSize: '0.75rem'}}>
+                              <thead style={{backgroundColor: '#f8f9fa'}}>
+                                <tr>
+                                  <th className="py-1 px-2" style={{fontSize: '0.7rem'}}>Anzahl</th>
+                                  <th className="text-right py-1 px-2" style={{fontSize: '0.7rem'}}>€/Stk</th>
+                                  <th className="text-right py-1 px-2" style={{fontSize: '0.7rem'}}>€/VE</th>
+                                  <th className="text-right py-1 px-2" style={{fontSize: '0.7rem'}}>Warenwert</th>
+                                  <th className="text-right py-1 px-2" style={{fontSize: '0.7rem'}}>Rabatt</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {staffelGrenzen.map((staffel, idx) => {
+                                  const isAktiv = staffelTestMenge >= staffel.ab && 
+                                    (idx === staffelGrenzen.length - 1 || staffelTestMenge < staffelGrenzen[idx + 1]?.ab)
+                                  
+                                  return (
+                                    <tr 
+                                      key={idx} 
+                                      id={`staffel-${idx}`}
+                                      className={isAktiv ? 'table-success font-weight-bold' : ''}
+                                    >
+                                      <td className="py-1 px-2">ab {staffel.ab}</td>
+                                      <td className="text-right py-1 px-2">{staffel.preisProStueck.toFixed(2)}</td>
+                                      <td className="text-right py-1 px-2">{staffel.preisProVE.toFixed(2)}</td>
+                                      <td className="text-right py-1 px-2">{staffel.warenwert.toFixed(2)}</td>
+                                      <td className="text-right py-1 px-2">{staffel.rabatt}%</td>
+                                    </tr>
+                                  )
+                                })}
+                              </tbody>
+                            </table>
                           </div>
                         </div>
                       </div>
 
-                      <div className="col-md-5">
+                      <div className="col-md-4">
                         {/* Mengen-Simulation */}
                         <div className="card mb-2">
-                          <div className="card-header py-1">
-                            <strong className="small">Mengen-Simulation</strong>
+                          <div className="card-header py-1 px-2">
+                            <strong style={{fontSize: '0.8rem'}}>Simulation</strong>
                           </div>
                           <div className="card-body p-2">
                             <div className="form-group mb-2">
-                              <label className="small mb-1 text-white">Menge (Stück)</label>
+                              <label className="mb-1 text-white" style={{fontSize: '0.75rem'}}>Menge (Stück)</label>
                               <input 
                                 type="number"
                                 className="form-control form-control-sm"
@@ -1552,23 +1549,10 @@ export default function PreiseModule() {
                                   const min = staffelGrenzen[0]?.ab || staffelVE
                                   const rounded = Math.max(Math.ceil(val / staffelVE) * staffelVE, min)
                                   setStaffelTestMenge(rounded)
-                                  
-                                  // Auto-scroll zu aktiver Staffel
-                                  setTimeout(() => {
-                                    const aktivIdx = staffelGrenzen.findIndex((s, idx) => 
-                                      rounded >= s.ab && (idx === staffelGrenzen.length - 1 || rounded < staffelGrenzen[idx + 1]?.ab)
-                                    )
-                                    if (aktivIdx >= 0) {
-                                      const row = document.getElementById(`staffel-${aktivIdx}`)
-                                      if (row) {
-                                        row.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                                      }
-                                    }
-                                  }, 100)
                                 }}
-                                style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057'}}
+                                style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '0.85rem'}}
                               />
-                              <small className="text-muted" style={{fontSize: '0.7rem'}}>Schrittweite: {staffelVE}</small>
+                              <small className="text-muted" style={{fontSize: '0.65rem'}}>Schrittweite: {staffelVE}</small>
                             </div>
 
                             {(() => {
@@ -1579,18 +1563,18 @@ export default function PreiseModule() {
                               const warenwert = staffelTestMenge * aktiveStaffel.preisProStueck
                               
                               return (
-                                <div className="alert alert-success mb-0 p-2">
-                                  <div className="small mb-1"><strong>Aktiv: ab {aktiveStaffel.ab} Stk</strong></div>
-                                  <div className="small mb-1">
+                                <div className="alert alert-success mb-0 p-2" style={{fontSize: '0.75rem'}}>
+                                  <div className="mb-1"><strong>Aktiv: ab {aktiveStaffel.ab} Stk</strong></div>
+                                  <div className="mb-1">
                                     <strong>€/Stk:</strong> {aktiveStaffel.preisProStueck.toFixed(2)} €
                                   </div>
-                                  <div className="small mb-1">
+                                  <div className="mb-1">
                                     <strong>€/VE:</strong> {aktiveStaffel.preisProVE.toFixed(2)} €
                                   </div>
                                   <hr className="my-1"/>
-                                  <div className="small">
+                                  <div>
                                     <strong>Wert bei {staffelTestMenge} Stk:</strong><br/>
-                                    <h5 className="mb-0 mt-1">{warenwert.toFixed(2)} €</h5>
+                                    <h6 className="mb-0 mt-1">{warenwert.toFixed(2)} €</h6>
                                   </div>
                                 </div>
                               )
