@@ -1192,7 +1192,7 @@ export default function PreiseModule() {
             </div>
 
             <div className="row">
-              <div className="col-md-3">
+              <div className="col-md-2">
                 {/* Basisparameter */}
                 <div className="card mb-2">
                   <div className="card-header py-1">
