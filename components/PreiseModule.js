@@ -1465,7 +1465,7 @@ export default function PreiseModule() {
                 </button>
 
                 <button 
-                  className="btn btn-outline-secondary btn-block"
+                  className="btn btn-outline-secondary btn-block btn-sm"
                   onClick={() => {
                     localStorage.setItem('staffelgrenzen_config', JSON.stringify({
                       ve: staffelVE,
@@ -1476,14 +1476,14 @@ export default function PreiseModule() {
                       ek: staffelG2EK,
                       warengruppe: staffelG2Warengruppe
                     }))
-                    alert('✅ Einstellungen gespeichert!')
+                    alert('✅ Gespeichert!')
                   }}
                 >
-                  <i className="bi bi-save mr-2"/>Einstellungen speichern
+                  <i className="bi bi-save mr-1"/>Speichern
                 </button>
               </div>
 
-              <div className="col-md-8">
+              <div className="col-md-9">
                 {staffelGrenzen.length > 0 ? (
                   <>
                     {/* Staffelpreistabelle */}
