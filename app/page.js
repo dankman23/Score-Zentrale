@@ -39,10 +39,7 @@ function MailPromptsView() {
     prompt: ''
   })
   
-  useEffect(() => {
-    loadPrompts()
-  }, [])
-  
+  // Prompts laden - Funktion MUSS VOR useEffect definiert sein
   async function loadPrompts() {
     try {
       const data = await getJson('/api/coldleads/prompts')
@@ -53,6 +50,10 @@ function MailPromptsView() {
       setLoading(false)
     }
   }
+  
+  useEffect(() => {
+    loadPrompts()
+  }, [])
   
   async function activatePrompt(version) {
     try {
