@@ -2166,16 +2166,6 @@ export default function App() {
     setSelectedArtikel([])
   }
 
-  // Auto-Load Artikel-Details wenn Tab geöffnet wird
-  useEffect(() => {
-    if (expandedArtikel && artikelDetailTab === 'bulletpoints') {
-      // Wenn Bulletpoints-Tab geöffnet wird, lade Details falls nicht vorhanden
-      if (!artikelDetails || artikelDetails.kArtikel !== expandedArtikel) {
-        loadArtikelDetails(expandedArtikel)
-      }
-    }
-  }, [expandedArtikel, artikelDetailTab])
-
   // Batch Bulletpoint Generation
   const startBatchGeneration = async () => {
     try {
