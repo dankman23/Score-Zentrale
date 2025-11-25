@@ -63,6 +63,23 @@ export default function PreiseModule() {
   // Formeln beim ersten Laden abrufen
   useEffect(() => {
     loadFormeln()
+    
+    // Staffelgrenzen-Config laden
+    const savedConfig = localStorage.getItem('staffelgrenzen_config')
+    if (savedConfig) {
+      try {
+        const config = JSON.parse(savedConfig)
+        setStaffelVE(config.ve || 1)
+        setStaffelMindestTyp(config.mindestTyp || 'ek')
+        setStaffelMindestWert(config.mindestWert || '50')
+        setStaffelSchwellen(config.schwellen || [])
+        setStaffelRundung(config.rundung || '')
+        setStaffelG2EK(config.ek || '5')
+        setStaffelG2Warengruppe(config.warengruppe || 'lagerware')
+      } catch (e) {
+        console.error('Fehler beim Laden der Staffelgrenzen-Config:', e)
+      }
+    }
   }, [])
 
   useEffect(() => {
