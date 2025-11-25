@@ -1486,98 +1486,117 @@ export default function PreiseModule() {
               <div className="col-md-9">
                 {staffelGrenzen.length > 0 ? (
                   <>
-                    {/* Staffelpreistabelle */}
-                    <div className="card mb-3">
-                      <div className="card-header py-2">
-                        <strong>Mengenstaffeln</strong>
+                    <div className="row">
+                      <div className="col-md-7">
+                        {/* Staffelpreistabelle */}
+                        <div className="card mb-2">
+                          <div className="card-header py-1">
+                            <strong className="small">Mengenstaffeln</strong>
+                          </div>
+                          <div className="card-body p-0">
+                            <div style={{maxHeight: '400px', overflowY: 'auto'}} id="staffelTabelle">
+                              <table className="table table-sm table-hover mb-0" style={{fontSize: '0.85rem'}}>
+                                <thead style={{position: 'sticky', top: 0, backgroundColor: '#f8f9fa', zIndex: 1}}>
+                                  <tr>
+                                    <th className="py-1">Anzahl</th>
+                                    <th className="text-right py-1">€/Stk</th>
+                                    <th className="text-right py-1">€/VE</th>
+                                    <th className="text-right py-1">Wert</th>
+                                    <th className="text-right py-1">Rabatt</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {staffelGrenzen.map((staffel, idx) => {
+                                    const isAktiv = staffelTestMenge >= staffel.ab && 
+                                      (idx === staffelGrenzen.length - 1 || staffelTestMenge < staffelGrenzen[idx + 1]?.ab)
+                                    
+                                    return (
+                                      <tr 
+                                        key={idx} 
+                                        id={`staffel-${idx}`}
+                                        className={isAktiv ? 'table-success font-weight-bold' : ''}
+                                        style={{fontSize: '0.8rem'}}
+                                      >
+                                        <td className="py-1">ab {staffel.ab}</td>
+                                        <td className="text-right py-1">{staffel.preisProStueck.toFixed(2)}</td>
+                                        <td className="text-right py-1">{staffel.preisProVE.toFixed(2)}</td>
+                                        <td className="text-right py-1">{staffel.warenwert.toFixed(2)}</td>
+                                        <td className="text-right py-1">{staffel.rabatt}%</td>
+                                      </tr>
+                                    )
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="card-body p-0">
-                        <table className="table table-sm table-hover mb-0">
-                          <thead>
-                            <tr>
-                              <th>Anzahl</th>
-                              <th className="text-right">Preis/Stück</th>
-                              <th className="text-right">Preis/VE</th>
-                              <th className="text-right">Warenwert</th>
-                              <th className="text-right">Rabatt</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {staffelGrenzen.map((staffel, idx) => {
-                              const isAktiv = staffelTestMenge >= staffel.ab && 
-                                (idx === staffelGrenzen.length - 1 || staffelTestMenge < staffelGrenzen[idx + 1]?.ab)
+
+                      <div className="col-md-5">
+                        {/* Mengen-Simulation */}
+                        <div className="card mb-2">
+                          <div className="card-header py-1">
+                            <strong className="small">Mengen-Simulation</strong>
+                          </div>
+                          <div className="card-body p-2">
+                            <div className="form-group mb-2">
+                              <label className="small mb-1 text-white">Menge (Stück)</label>
+                              <input 
+                                type="number"
+                                className="form-control form-control-sm"
+                                min={staffelGrenzen[0]?.ab || staffelVE}
+                                step={staffelVE}
+                                value={staffelTestMenge}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value) || staffelVE
+                                  const min = staffelGrenzen[0]?.ab || staffelVE
+                                  const rounded = Math.max(Math.ceil(val / staffelVE) * staffelVE, min)
+                                  setStaffelTestMenge(rounded)
+                                  
+                                  // Auto-scroll zu aktiver Staffel
+                                  setTimeout(() => {
+                                    const aktivIdx = staffelGrenzen.findIndex((s, idx) => 
+                                      rounded >= s.ab && (idx === staffelGrenzen.length - 1 || rounded < staffelGrenzen[idx + 1]?.ab)
+                                    )
+                                    if (aktivIdx >= 0) {
+                                      const row = document.getElementById(`staffel-${aktivIdx}`)
+                                      if (row) {
+                                        row.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                                      }
+                                    }
+                                  }, 100)
+                                }}
+                                style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057'}}
+                              />
+                              <small className="text-muted" style={{fontSize: '0.7rem'}}>Schrittweite: {staffelVE}</small>
+                            </div>
+
+                            {(() => {
+                              const aktiveStaffel = [...staffelGrenzen]
+                                .reverse()
+                                .find(s => staffelTestMenge >= s.ab) || staffelGrenzen[0]
+                              
+                              const warenwert = staffelTestMenge * aktiveStaffel.preisProStueck
                               
                               return (
-                                <tr 
-                                  key={idx} 
-                                  className={isAktiv ? 'table-success font-weight-bold' : ''}
-                                >
-                                  <td>ab {staffel.ab} Stück</td>
-                                  <td className="text-right">{staffel.preisProStueck.toFixed(2)} €</td>
-                                  <td className="text-right">{staffel.preisProVE.toFixed(2)} €</td>
-                                  <td className="text-right">{staffel.warenwert.toFixed(2)} €</td>
-                                  <td className="text-right">{staffel.rabatt}%</td>
-                                </tr>
+                                <div className="alert alert-success mb-0 p-2">
+                                  <div className="small mb-1"><strong>Aktiv: ab {aktiveStaffel.ab} Stk</strong></div>
+                                  <div className="small mb-1">
+                                    <strong>€/Stk:</strong> {aktiveStaffel.preisProStueck.toFixed(2)} €
+                                  </div>
+                                  <div className="small mb-1">
+                                    <strong>€/VE:</strong> {aktiveStaffel.preisProVE.toFixed(2)} €
+                                  </div>
+                                  <hr className="my-1"/>
+                                  <div className="small">
+                                    <strong>Wert bei {staffelTestMenge} Stk:</strong><br/>
+                                    <h5 className="mb-0 mt-1">{warenwert.toFixed(2)} €</h5>
+                                  </div>
+                                </div>
                               )
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-
-                    {/* Mengen-Simulation */}
-                    <div className="card">
-                      <div className="card-header py-2">
-                        <strong>Mengen-Simulation</strong>
-                      </div>
-                      <div className="card-body">
-                        <div className="form-group">
-                          <label>Menge (Stück) testen</label>
-                          <input 
-                            type="number"
-                            className="form-control"
-                            min={staffelGrenzen[0]?.ab || staffelVE}
-                            step={staffelVE}
-                            value={staffelTestMenge}
-                            onChange={(e) => {
-                              const val = parseInt(e.target.value) || staffelVE
-                              const min = staffelGrenzen[0]?.ab || staffelVE
-                              const rounded = Math.max(Math.ceil(val / staffelVE) * staffelVE, min)
-                              setStaffelTestMenge(rounded)
-                            }}
-                          />
-                          <small className="text-muted">Schrittweite: {staffelVE} (VE)</small>
+                            })()}
+                          </div>
                         </div>
-
-                        {(() => {
-                          const aktiveStaffel = [...staffelGrenzen]
-                            .reverse()
-                            .find(s => staffelTestMenge >= s.ab) || staffelGrenzen[0]
-                          
-                          const warenwert = staffelTestMenge * aktiveStaffel.preisProStueck
-                          
-                          return (
-                            <div className="alert alert-success">
-                              <h6 className="alert-heading">Aktive Staffel: ab {aktiveStaffel.ab} Stück</h6>
-                              <hr/>
-                              <div className="row">
-                                <div className="col-md-6">
-                                  <strong>Preis pro Stück:</strong><br/>
-                                  {aktiveStaffel.preisProStueck.toFixed(2)} €
-                                </div>
-                                <div className="col-md-6">
-                                  <strong>Preis pro VE ({staffelVE} Stk):</strong><br/>
-                                  {aktiveStaffel.preisProVE.toFixed(2)} €
-                                </div>
-                              </div>
-                              <hr/>
-                              <div>
-                                <strong>Warenwert (netto) bei {staffelTestMenge} Stück:</strong><br/>
-                                <h4 className="mb-0">{warenwert.toFixed(2)} €</h4>
-                              </div>
-                            </div>
-                          )
-                        })()}
                       </div>
                     </div>
                   </>
