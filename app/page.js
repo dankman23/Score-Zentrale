@@ -57,22 +57,32 @@ function MailPromptsView() {
   
   // Auth-Check - WICHTIG: Session validieren
   useEffect(() => {
-    const token = localStorage.getItem('auth_token')
-    const userStr = localStorage.getItem('auth_user')
-    
-    if (!token || !userStr) {
-      router.push('/login')
-      return
+    // Small delay to ensure localStorage is ready after login redirect
+    const checkAuth = () => {
+      const token = localStorage.getItem('auth_token')
+      const userStr = localStorage.getItem('auth_user')
+      
+      console.log('[Auth] Checking:', { hasToken: !!token, hasUser: !!userStr })
+      
+      if (!token || !userStr) {
+        console.log('[Auth] No credentials, redirecting to login')
+        router.push('/login')
+        return
+      }
+      
+      try {
+        const user = JSON.parse(userStr)
+        console.log('[Auth] User authenticated:', user.username)
+        setCurrentUser(user)
+        setAuthChecked(true)
+      } catch (e) {
+        console.error('[Auth] Parse error:', e)
+        router.push('/login')
+      }
     }
     
-    try {
-      const user = JSON.parse(userStr)
-      setCurrentUser(user)
-      setAuthChecked(true)
-    } catch (e) {
-      console.error('Auth error:', e)
-      router.push('/login')
-    }
+    // Run immediately
+    checkAuth()
   }, [router])
   
   async function activatePrompt(version) {
