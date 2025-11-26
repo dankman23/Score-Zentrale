@@ -17,6 +17,44 @@ export default function RootLayout({ children }) {
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
         {/* SCORE Theme (nach Bootstrap) */}
         <link rel="stylesheet" href="/styles/score-theme.css?v=2" />
+        {/* CRITICAL: Force Dark Mode - Inline styles always loaded */}
+        <style dangerouslySetInnerHTML={{__html: `
+          :root {
+            --app-bg: #111418;
+            --surf: #171b21;
+            --card: #1d232b;
+            --line: #2b3340;
+            --txt: #e7ecf2;
+            --muted: #a3afc1;
+            --accent: #F6B10A;
+          }
+          html, body {
+            background: var(--app-bg) !important;
+            color: var(--txt) !important;
+            min-height: 100vh;
+          }
+          .navbar {
+            background: rgba(17, 20, 24, 0.92) !important;
+            border-bottom: 1px solid var(--line);
+          }
+          .card {
+            background: var(--card) !important;
+            border: 1px solid var(--line);
+          }
+          .form-control, .form-select {
+            background: #141a20 !important;
+            border-color: #2a3340 !important;
+            color: var(--txt) !important;
+          }
+          .text-muted {
+            color: var(--muted) !important;
+          }
+          .btn-primary {
+            background: var(--accent) !important;
+            border-color: #e6a908 !important;
+            color: #111 !important;
+          }
+        `}} />
         {/* Chart.js */}
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
         {/* Chart.js Dark Defaults auf Basis CSS-Variablen */}
