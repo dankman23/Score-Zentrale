@@ -108,9 +108,9 @@ export async function GET(request: NextRequest) {
       
       return {
         kExternerBeleg: r.kExternerBeleg,
-        rechnungsNr: mongoData.cRechnungsNr || r.cBelegnr || 'N/A',
+        rechnungsNr: (mongoData as any).cRechnungsNr || r.cBelegnr || 'N/A',
         datum: r.dBelegdatumUtc,
-        kunde: mongoData.cKundenName || r.cRAName || 'Unbekannt',
+        kunde: (mongoData as any).cKundenName || r.cRAName || 'Unbekannt',
         kundenLand: r.cRALandISO || 'DE',
         kundenUstId: r.cKaeuferUstId || '',
         kKunde: r.kKunde,
