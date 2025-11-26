@@ -36,6 +36,12 @@ export default function RootLayout({ children }) {
           .navbar {
             background: rgba(17, 20, 24, 0.92) !important;
             border-bottom: 1px solid var(--line);
+            padding: 0.5rem 1rem !important;
+            min-height: 50px;
+          }
+          .navbar .nav-link {
+            padding: 0.4rem 0.8rem !important;
+            font-size: 0.9rem;
           }
           .card {
             background: var(--card) !important;
