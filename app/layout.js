@@ -103,14 +103,14 @@ export default function RootLayout({ children }) {
           </div>
         </nav>
 
-        {/* Hero + Subnav Icons – Bild abgeschwächt, Inhalte unterlegt */}
-        <div className="hero-band">
-          <div className="hero-bg d-flex align-items-end" style={{backgroundImage:"url('https://customer-assets.emergentagent.com/job_score-zentrale/artifacts/g4o0uovx_Header.JPG')", backgroundSize:'cover', backgroundPosition:'center'}}>
+        {/* Kompakte KPI-Zeile mit dünnem Hintergrundbild */}
+        <div className="hero-band" style={{minHeight: '60px'}}>
+          <div className="hero-bg d-flex align-items-center" style={{backgroundImage:"url('https://customer-assets.emergentagent.com/job_score-zentrale/artifacts/g4o0uovx_Header.JPG')", backgroundSize:'cover', backgroundPosition:'center', minHeight: '60px', maxHeight: '60px'}}>
             <div className="container py-2">
-              <div className="hero-shield mb-2">
+              <div className="hero-shield" style={{padding: '8px 16px', marginBottom: 0}}>
                 <div className="d-flex align-items-center justify-content-between">
-                  <div className="small text-muted">SCORE Schleifwerkzeuge • Zentrale KPIs und Outbound-Tools</div>
-                  <div className="small text-muted">Dark-Mode aktiv</div>
+                  <div className="small text-muted" style={{fontSize: '0.85rem'}}>SCORE Schleifwerkzeuge • Zentrale KPIs und Outbound-Tools</div>
+                  <div className="small text-muted" style={{fontSize: '0.85rem'}}>Dark-Mode aktiv</div>
                 </div>
               </div>
               <div className="hero-shield p-0">
