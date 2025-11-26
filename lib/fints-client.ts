@@ -165,8 +165,8 @@ export class FinTSBankClient {
       const balance = await this.client.balance(account)
       
       return {
-        amount: balance.value,
-        currency: balance.currency || 'EUR',
+        amount: (balance as any).value,
+        currency: (balance as any).currency || 'EUR',
         date: new Date(),
       }
     } catch (error) {
