@@ -119,8 +119,8 @@ export class FinTSBankClient {
         if (statement.transactions && Array.isArray(statement.transactions)) {
           for (const txn of statement.transactions) {
             transactions.push({
-              date: txn.entryDate || txn.valueDate,
-              valueDate: txn.valueDate,
+              date: (txn.entryDate || txn.valueDate) as any,
+              valueDate: txn.valueDate as any,
               amount: txn.amount,
               currency: txn.currency || 'EUR',
               purpose: this.cleanPurpose(txn.purpose || txn.description || ''),
