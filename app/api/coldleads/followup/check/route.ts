@@ -99,7 +99,7 @@ export async function POST() {
                   body: followupEmail.body.substring(0, 500)
                 }
               }
-            }
+            } as any
           )
           
           results.push({
