@@ -252,5 +252,5 @@ export function getProductRecommendations(mapped: ReturnType<typeof mapToGlossar
     recommendations.push('Schleifbänder inkl. Sondermaße')
   }
 
-  return [...new Set(recommendations)].slice(0, 5)
+  return Array.from(new Set(recommendations)).slice(0, 5)
 }
