@@ -14,7 +14,7 @@ async function connectToMongo() {
     if (!uri) throw new Error('MONGO_URL is not set')
     client = new MongoClient(uri)
     await client.connect()
-    db = client.db()
+    db = client.db(process.env.DB_NAME || 'score_zentrale')
   }
   return db
 }
