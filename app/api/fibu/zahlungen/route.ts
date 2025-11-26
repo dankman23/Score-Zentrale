@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     
     // Lade alle Rechnungen mit cBestellNr für schnelles Lookup
     const rechnungenDocs = await vkRechnungen.find({
-      cBestellNr: { $exists: true, $ne: null, $ne: '' }
+      cBestellNr: { $exists: true, $nin: [null, ''] }
     }, {
       projection: { cBestellNr: 1, cRechnungsNr: 1, brutto: 1 }
     }).toArray()
