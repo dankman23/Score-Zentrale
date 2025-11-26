@@ -2,8 +2,7 @@
 
 export default function LogoutButton({ className, style, mobile = false }) {
   const handleLogout = () => {
-    localStorage.removeItem('auth_token')
-    localStorage.removeItem('auth_user')
+    localStorage.removeItem('score_auth')
     window.location.href = '/login'
   }
 
