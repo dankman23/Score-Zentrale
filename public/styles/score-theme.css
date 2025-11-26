@@ -4,7 +4,7 @@ html,body{background:var(--app-bg);color:var(--txt);}
 .navbar .nav-link{color:#ffffff;font-weight:500;text-shadow:0 1px 3px rgba(0,0,0,0.5);} 
 .navbar .nav-link.active,.navbar .nav-link:hover{color:var(--accent);text-shadow:0 1px 4px rgba(246,177,10,0.4);} 
 .navbar .navbar-brand{color:#ffffff!important;font-weight:800;text-shadow:0 2px 6px rgba(0,0,0,0.6);}
-.brand-logo{height:42px}
+.brand-logo{height:32px;max-height:32px;width:auto;}
 .hero-band{position:relative;border-bottom:1px solid var(--line);} 
 /* Bild etwas weniger kräftig */
 .hero-bg{position:relative;min-height:170px;background:url('https://customer-assets.emergentagent.com/job_score-zentrale/artifacts/g4o0uovx_Header.JPG') center/cover no-repeat;filter:saturate(.9) contrast(1.0) brightness(.85);} 
