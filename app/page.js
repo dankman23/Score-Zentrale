@@ -2376,7 +2376,7 @@ export default function App() {
         alert('✅ Email erfolgreich versendet!')
         setGeneratedEmail(null)
         // Prospects neu laden um Status zu aktualisieren
-        await fetchColdProspects()
+        await loadColdProspects()
       } else {
         alert('Fehler: ' + data.error)
       }
