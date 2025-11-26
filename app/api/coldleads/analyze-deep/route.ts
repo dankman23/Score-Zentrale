@@ -121,7 +121,7 @@ export async function GET(req: NextRequest) {
     const db = await getDb()
     const collection = db.collection('prospects')
     
-    const prospect = await collection.findOne({ _id: prospectId })
+    const prospect = await collection.findOne({ _id: new ObjectId(prospectId) })
     
     if (!prospect || !prospect.analysis) {
       return NextResponse.json(
