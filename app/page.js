@@ -2409,6 +2409,45 @@ export default function App() {
     }
   }, [router])
 
+  // 1b. HASH-CHANGE LISTENER für Navigation
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1) // Remove '#'
+      if (hash) {
+        // Map hash to activeTab values
+        const hashToTab = {
+          'dashboard': 'dashboard',
+          'sales': 'sales',
+          'marketing': 'marketing',
+          'glossar': 'glossar',
+          'kaltakquise': 'kaltakquise',
+          'warmakquise': 'marketing', // warmakquise is a sub of marketing
+          'produkte': 'produkte',
+          'preise': 'preise',
+          'orga': 'orga',
+          'fibu': 'fibu'
+        }
+        
+        const newTab = hashToTab[hash]
+        if (newTab && newTab !== activeTab) {
+          setActiveTab(newTab)
+        }
+      }
+    }
+    
+    // Handle initial hash
+    handleHashChange()
+    
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange)
+    
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange)
+    }
+  }, [activeTab])
+
   // 2. DASHBOARD-DATEN laden (wenn authentifiziert und Dashboard aktiv)
   useEffect(() => {
     if (!authChecked || activeTab !== 'dashboard') return
