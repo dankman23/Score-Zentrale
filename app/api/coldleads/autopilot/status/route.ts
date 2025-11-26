@@ -17,7 +17,7 @@ export async function GET() {
     
     // Initialisiere State falls nicht vorhanden
     if (!state) {
-      state = {
+      const newState = {
         id: 'kaltakquise',
         running: false,
         dailyLimit: 50,
@@ -28,7 +28,8 @@ export async function GET() {
         currentPhase: null,
         errors: []
       }
-      await collection.insertOne(state)
+      await collection.insertOne(newState)
+      state = await collection.findOne({ id: 'kaltakquise' })
     }
     
     // Session-basiert: Kein automatischer Reset mehr
