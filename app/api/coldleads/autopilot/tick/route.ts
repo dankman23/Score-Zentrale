@@ -295,9 +295,9 @@ export async function POST() {
             errors: { 
               $each: [{ message: error.message, timestamp: new Date().toISOString() }],
               $slice: -10 // Behalte nur letzte 10 Fehler
-            } as any
+            }
           }
-        }
+        } as any
       )
     } catch (e) {
       console.error('[Autopilot Tick] Failed to log error:', e)
