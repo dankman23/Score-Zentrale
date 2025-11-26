@@ -121,7 +121,7 @@ export default function PreiseG2Module({ formeln }) {
     }
     
     // Entferne Duplikate und sortiere
-    staffeln = [...new Set(staffeln)].sort((a, b) => a - b)
+    staffeln = Array.from(new Set(staffeln)).sort((a, b) => a - b)
     
     // Begrenze auf max. 8 Staffeln
     if (staffeln.length > 8) {
