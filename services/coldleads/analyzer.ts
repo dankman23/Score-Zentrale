@@ -515,7 +515,7 @@ function extractContacts(html: string) {
 
   // Filtere generische Emails aus (info@, kontakt@, etc.)
   const genericPrefixes = ['info', 'kontakt', 'contact', 'mail', 'office', 'service', 'support']
-  const qualityEmails = emails.filter(email => {
+  const qualityEmails = emails.filter((email: string) => {
     const prefix = email.split('@')[0].toLowerCase()
     return !genericPrefixes.includes(prefix)
   })
