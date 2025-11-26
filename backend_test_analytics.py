@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Base URL from environment
-BASE_URL = "https://bullet-gen.preview.emergentagent.com"
+BASE_URL = "https://bulletpoint-hub.preview.emergentagent.com"
 
 def print_test_header(test_name):
     """Print a formatted test header"""
