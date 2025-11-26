@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
               $set: { 
                 status: 'processed',
                 processedAt: new Date(),
-                rechnungId: rechnung._id
+                rechnungId: (rechnung as any)._id
               }
             }
           )
