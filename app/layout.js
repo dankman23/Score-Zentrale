@@ -42,6 +42,16 @@ export default function RootLayout({ children }) {
           .navbar .nav-link {
             padding: 0.4rem 0.8rem !important;
             font-size: 0.9rem;
+            color: #ffffff !important;
+          }
+          .subnav-icons .nav-link {
+            color: #ffffff !important;
+            font-weight: 500;
+          }
+          .subnav-icons .nav-link.active,
+          .subnav-icons .nav-link:hover {
+            color: #F6B10A !important;
+            background: rgba(246, 177, 10, 0.15) !important;
           }
           .card {
             background: var(--card) !important;
