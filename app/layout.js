@@ -109,15 +109,31 @@ export default function RootLayout({ children }) {
           </div>
         </nav>
 
-        {/* Kompakte KPI-Zeile mit dünnem Hintergrundbild */}
-        <div className="hero-band" style={{minHeight: '60px'}}>
-          <div className="hero-bg d-flex align-items-center" style={{backgroundImage:"url('https://customer-assets.emergentagent.com/job_score-zentrale/artifacts/g4o0uovx_Header.JPG')", backgroundSize:'cover', backgroundPosition:'center', minHeight: '60px', maxHeight: '60px'}}>
-            <div className="container py-2">
-              <div className="hero-shield" style={{padding: '8px 16px', marginBottom: 0}}>
-                <div className="d-flex align-items-center justify-content-between">
-                  <div className="small text-muted" style={{fontSize: '0.85rem'}}>SCORE Schleifwerkzeuge • Zentrale KPIs und Outbound-Tools</div>
-                  <div className="small text-muted" style={{fontSize: '0.85rem'}}>Dark-Mode aktiv</div>
-                </div>
+        {/* Kompakte Navigation mit dünnem Hintergrundbild */}
+        <div className="hero-band" style={{minHeight: '50px'}}>
+          <div className="hero-bg d-flex align-items-center" style={{backgroundImage:"url('https://customer-assets.emergentagent.com/job_score-zentrale/artifacts/g4o0uovx_Header.JPG')", backgroundSize:'cover', backgroundPosition:'center', minHeight: '50px', maxHeight: '50px'}}>
+            <div className="container">
+              <div className="hero-shield p-0">
+                <ul className="nav nav-pills subnav-icons" style={{margin: 0, padding: '5px 0', flexWrap: 'nowrap', gap: '4px'}}>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#dashboard" style={{fontSize: '0.85rem'}}><i className="bi bi-speedometer2 mr-1"/>Dashboard</a></li>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#sales" style={{fontSize: '0.85rem'}}><i className="bi bi-bar-chart mr-1"/>Sales</a></li>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#marketing" style={{fontSize: '0.85rem'}}><i className="bi bi-bullseye mr-1"/>Marketing</a></li>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#glossar" style={{fontSize: '0.85rem'}}><i className="bi bi-book mr-1"/>Glossar</a></li>
+                  <li className="nav-item dropdown">
+                    <a className="nav-link dropdown-toggle py-1 px-2" href="#outbound" role="button" data-toggle="dropdown" style={{fontSize: '0.85rem'}}>
+                      <i className="bi bi-send mr-1"/>Outbound
+                    </a>
+                    <div className="dropdown-menu">
+                      <a className="dropdown-item" href="#outbound">Prospect Management</a>
+                      <a className="dropdown-item" href="#kaltakquise">Kaltakquise</a>
+                      <a className="dropdown-item" href="#warmakquise">Warmakquise</a>
+                    </div>
+                  </li>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#produkte" style={{fontSize: '0.85rem'}}><i className="bi bi-box-seam mr-1"/>Produkte</a></li>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#preise" style={{fontSize: '0.85rem'}}><i className="bi bi-calculator mr-1"/>Preise</a></li>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#orga" style={{fontSize: '0.85rem'}}><i className="bi bi-calendar-check mr-1"/>Orga</a></li>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#fibu" style={{fontSize: '0.85rem'}}><i className="bi bi-receipt-cutoff mr-1"/>FIBU</a></li>
+                </ul>
               </div>
             </div>
           </div>
