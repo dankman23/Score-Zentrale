@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       const prospectData = {
         company_name: r.company_name,
         website: r.website,
-        description: r.description || '',
+        description: (r as any).description || '',
         industry: industry,
         region: region,
         status: 'new',
