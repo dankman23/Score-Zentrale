@@ -11,7 +11,7 @@
  * 6. Potenzielle SCORE-Produkte
  */
 
-import { chatCompletion } from '@/lib/openai-client'
+import { emergentChatCompletion } from '@/lib/emergent-llm'
 
 // SCORE Produktkategorien
 const SCORE_PRODUCTS = [
