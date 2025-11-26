@@ -10,8 +10,8 @@ const { simpleParser } = require('mailparser')
  * GET /api/fibu/email-inbox/test-fetch
  * Test-Endpunkt zum direkten Email-Abruf und Speichern
  */
-export async function GET(request: NextRequest) {
-  return new Promise((resolve) => {
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  return new Promise<NextResponse>((resolve) => {
     const config = {
       user: process.env.FIBU_IMAP_USER!,
       password: process.env.FIBU_IMAP_PASSWORD!,
