@@ -14,7 +14,7 @@ import sys
 from datetime import datetime, timedelta
 
 # Base URL from environment
-BASE_URL = "https://bulletpoint-hub.preview.emergentagent.com/api"
+BASE_URL = "https://biz-insights-14.preview.emergentagent.com/api"
 
 # Color codes for output
 GREEN = '\033[92m'
