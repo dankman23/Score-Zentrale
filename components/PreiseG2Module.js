@@ -149,7 +149,7 @@ export default function PreiseG2Module({ formeln }) {
       })
       
       // Entferne Duplikate und begrenze auf 8
-      const unique = [...new Set(gerundet)].sort((a, b) => a - b).slice(0, 8)
+      const unique = Array.from(new Set(gerundet)).sort((a, b) => a - b).slice(0, 8)
       return unique
     }
     
