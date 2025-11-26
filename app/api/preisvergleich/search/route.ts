@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
                   url: productUrl,
                   preis: parseFloat(preis),
                   ve: ve || 1,
-                  preis_pro_stueck: ve > 1 ? parseFloat((preis / ve).toFixed(2)) : preis,
+                  preis_pro_stueck: ve > 1 ? parseFloat((parseFloat(preis) / ve).toFixed(2)) : parseFloat(preis),
                   title: item.title,
                   snippet: item.snippet
                 })
