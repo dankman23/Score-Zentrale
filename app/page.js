@@ -51,29 +51,12 @@ function MailPromptsView() {
     }
   }
   
-  // Auth-Check - WICHTIG: Session validieren
+  // EINFACHER AUTH-CHECK
   useEffect(() => {
-    const token = localStorage.getItem('auth_token')
-    const userStr = localStorage.getItem('auth_user')
-    
-    console.log('[Auth] Checking:', { hasToken: !!token, hasUser: !!userStr })
-    
-    if (!token || !userStr) {
-      console.log('[Auth] No credentials, redirecting to login')
-      window.location.href = '/login'
-      return
-    }
-    
-    try {
-      const user = JSON.parse(userStr)
-      console.log('[Auth] User authenticated:', user.username)
-      setCurrentUser(user)
-      setAuthChecked(true)
-    } catch (e) {
-      console.error('[Auth] Parse error:', e)
+    if (!localStorage.getItem('score_auth')) {
       window.location.href = '/login'
     }
-  }, []) // Empty dependency array - run once on mount
+  }, [])
   
   async function activatePrompt(version) {
     try {
