@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     console.log(`[Email Generator] Start für Prospect: ${prospectId}`)
     
     // Lade Prospect aus DB
-    const db = await connectToDb()
+    const db = await getDb()
     const collection = db.collection('prospects')
     
     const prospect = await collection.findOne({ _id: prospectId })
