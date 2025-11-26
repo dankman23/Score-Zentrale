@@ -240,7 +240,7 @@ function identifyBusinessType(text: string, fullText: string) {
   const foundProducts = new Set<string>()
   
   productPatterns.forEach(pattern => {
-    const matches = fullText.matchAll(pattern)
+    const matches = Array.from(fullText.matchAll(pattern))
     for (const match of matches) {
       if (match[1]) {
         let cleaned = match[1].trim()
