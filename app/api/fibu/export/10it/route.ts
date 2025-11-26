@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
     console.log(`  - Gesamt Buchungen: ${buchungen.length}`)
     
     if (validationErrors.length > 0) {
-      console.warn(`[10it Export] ⚠️ ${validationErrors.length} Validierungsfehler:`))
+      console.warn(`[10it Export] ⚠️ ${validationErrors.length} Validierungsfehler:`)
       validationErrors.forEach(err => console.warn(`  - ${err}`))
     }
     
