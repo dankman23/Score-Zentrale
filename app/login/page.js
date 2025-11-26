@@ -93,39 +93,6 @@ export default function LoginPage() {
 
         {/* Login Form */}
         <form onSubmit={handleLogin}>
-          <div style={{ marginBottom: '18px' }}>
-            <label style={{
-              display: 'block',
-              color: '#495057',
-              fontSize: '13px',
-              fontWeight: '500',
-              marginBottom: '6px'
-            }}>
-              Benutzername
-            </label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              disabled={loading}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                background: '#fff',
-                border: '1px solid #ced4da',
-                borderRadius: '6px',
-                color: '#212529',
-                fontSize: '14px',
-                outline: 'none',
-                transition: 'border-color 0.2s'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#667eea'}
-              onBlur={(e) => e.target.style.borderColor = '#ced4da'}
-              placeholder="Benutzername"
-            />
-          </div>
-
           <div style={{ marginBottom: '22px' }}>
             <label style={{
               display: 'block',
