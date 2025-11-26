@@ -2393,6 +2393,120 @@ export default function App() {
   }
   const B2BBadge = ({b}) => (<span className={`badge badge-${b?'warning':'secondary'}`}>{b?'B2B':'B2C'}</span>)
 
+  // ========================================
+  // ALLE useEffects - WIEDERHERGESTELLT
+  // ========================================
+  
+  // 1. AUTH-CHECK (MUSS ZUERST LAUFEN)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const auth = localStorage.getItem('score_auth')
+      if (!auth) {
+        router.push('/login')
+      } else {
+        setAuthChecked(true)
+      }
+    }
+  }, [router])
+
+  // 2. DASHBOARD-DATEN laden (wenn authentifiziert und Dashboard aktiv)
+  useEffect(() => {
+    if (!authChecked || activeTab !== 'dashboard') return
+    loadDateRangeAndAdjust()
+    fetchAll()
+    fetchSalesTables()
+  }, [authChecked, activeTab, from, to, limit])
+
+  // 3. KALTAKQUISE-DATEN laden
+  useEffect(() => {
+    if (!authChecked || activeTab !== 'kaltakquise') return
+    loadColdProspects()
+    loadColdLeadStats()
+  }, [authChecked, activeTab, coldStatusFilter])
+
+  // 4. DACH CRAWLER Stats
+  useEffect(() => {
+    if (!authChecked || activeTab !== 'kaltakquise' || coldLeadsTab !== 'dach') return
+    loadDachStats()
+    loadDachProgress()
+  }, [authChecked, activeTab, coldLeadsTab])
+
+  // 5. AUTOPILOT Status Polling
+  useEffect(() => {
+    if (!authChecked || activeTab !== 'kaltakquise') return
+    
+    loadAutopilotStatus()
+    
+    // Polling alle 5 Sekunden wenn Autopilot läuft
+    if (autopilotState.running) {
+      autopilotIntervalRef.current = setInterval(() => {
+        loadAutopilotStatus()
+      }, 5000)
+    }
+    
+    return () => {
+      if (autopilotIntervalRef.current) {
+        clearInterval(autopilotIntervalRef.current)
+        autopilotIntervalRef.current = null
+      }
+    }
+  }, [authChecked, activeTab, autopilotState.running])
+
+  // 6. ARTIKEL-BROWSER laden
+  useEffect(() => {
+    if (!authChecked || activeTab !== 'produkte' || produkteTab !== 'browser') return
+    loadArtikelList()
+  }, [authChecked, activeTab, produkteTab, artikelPage, artikelPerPage, artikelFilter, artikelSortBy, artikelSortOrder])
+
+  // 7. ARTIKEL-FILTER laden
+  useEffect(() => {
+    if (!authChecked || activeTab !== 'produkte' || produkteTab !== 'browser') return
+    loadArtikelFilters()
+  }, [authChecked, activeTab, produkteTab])
+
+  // 8. ARTIKEL IMPORT Status
+  useEffect(() => {
+    if (!authChecked || activeTab !== 'produkte' || produkteTab !== 'import') return
+    loadArtikelStatus()
+  }, [authChecked, activeTab, produkteTab])
+
+  // 9. AMAZON PROMPTS laden
+  useEffect(() => {
+    if (!authChecked || activeTab !== 'produkte' || produkteTab !== 'prompts') return
+    loadAmazonPrompts()
+  }, [authChecked, activeTab, produkteTab])
+
+  // 10. WARMAQUISE Leads laden
+  useEffect(() => {
+    if (!authChecked || activeTab !== 'marketing' || marketingSub !== 'warmaquise') return
+    queryLeads()
+  }, [authChecked, activeTab, marketingSub, pageF, limitF, sortF, orderF, statusF, b2bF, minScoreF, qF])
+
+  // 11. ANALYTICS laden
+  useEffect(() => {
+    if (!authChecked || activeTab !== 'marketing' || marketingSub !== 'analytics') return
+    loadAnalytics()
+  }, [authChecked, activeTab, marketingSub, analyticsDateRange, from, to])
+
+  // 12. GOOGLE ADS laden
+  useEffect(() => {
+    if (!authChecked || activeTab !== 'marketing' || marketingSub !== 'googleads') return
+    loadGoogleAds()
+  }, [authChecked, activeTab, marketingSub, from, to])
+
+  // 13. GLOSSAR laden
+  useEffect(() => {
+    if (!authChecked || activeTab !== 'marketing' || marketingSub !== 'glossar') return
+    loadGlossary()
+  }, [authChecked, activeTab, marketingSub, glossarSub, glossarSearch])
+
+  // 14. INBOX/OUTBOX laden
+  useEffect(() => {
+    if (!authChecked || activeTab !== 'kaltakquise' || coldLeadsTab !== 'mail') return
+    if (mailView === 'inbox') loadInbox()
+    if (mailView === 'outbox') loadOutbox()
+  }, [authChecked, activeTab, coldLeadsTab, mailView])
+
   return (
     <div>
       {/* Date Range - nur bei Dashboard, Sales, Marketing */}
