@@ -260,7 +260,7 @@ function extractBestContact(content: any, llmAnalysis: any): {
   const phones = searchText.match(phoneRegex) || []
   
   // Filtere generische Emails
-  const priorityEmails = emails.filter(email => 
+  const priorityEmails = emails.filter((email: string) => 
     !email.includes('info@') && 
     !email.includes('mail@') && 
     !email.includes('kontakt@') &&
