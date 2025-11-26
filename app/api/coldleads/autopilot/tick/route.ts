@@ -295,7 +295,7 @@ export async function POST() {
             errors: { 
               $each: [{ message: error.message, timestamp: new Date().toISOString() }],
               $slice: -10 // Behalte nur letzte 10 Fehler
-            }
+            } as any
           }
         }
       )
