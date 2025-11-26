@@ -9,7 +9,7 @@ const fs = require('fs')
 const https = require('https')
 
 // OpenAI API Key (aus .env)
-const API_KEY = process.env.OPENAI_API_KEY || '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'
+const API_KEY = process.env.OPENAI_API_KEY
 const API_URL = 'https://api.openai.com/v1/chat/completions'
 
 // CSV Datei laden
