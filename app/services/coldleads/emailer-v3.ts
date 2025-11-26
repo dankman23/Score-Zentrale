@@ -124,7 +124,7 @@ async function generateMail1(
   
   // Extrahiere Daten aus Analyse
   const werkstoffe = analysis.materials.map(m => m.term).slice(0, 3)
-  const werkstucke = analysis.workpieces?.map(w => w.term).slice(0, 3) || []
+  const werkstucke = (analysis as any).workpieces?.map((w: any) => w.term).slice(0, 3) || []
   const anwendungen = analysis.applications.map(a => a.term).slice(0, 3)
   
   // Baue Kontext für ChatGPT
