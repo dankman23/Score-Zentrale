@@ -127,10 +127,10 @@ export class FinTSBankClient {
               counterpartyName: (txn as any).remittanceName || (txn as any).applicantName || null,
               counterpartyIban: (txn as any).remittanceIban || (txn as any).applicantIban || null,
               counterpartyBic: (txn as any).remittanceBic || (txn as any).applicantBic || null,
-              bookingText: txn.bookingText || null,
-              bookingKey: txn.bookingKey || null,
-              primanotaNumber: txn.primanotaNumber || null,
-              externalId: this.generateExternalId(txn),
+              bookingText: (txn as any).bookingText || null,
+              bookingKey: (txn as any).bookingKey || null,
+              primanotaNumber: (txn as any).primanotaNumber || null,
+              externalId: this.generateExternalId(txn as any),
             })
           }
         }
