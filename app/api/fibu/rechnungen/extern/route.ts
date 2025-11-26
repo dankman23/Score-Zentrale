@@ -118,11 +118,11 @@ export async function GET(request: NextRequest) {
         waehrung: r.cWaehrungISO || 'EUR',
         brutto: rechnungsBetrag,
         betrag: rechnungsBetrag,
-        netto: parseFloat(r.fVkNetto || 0),
-        steuer: parseFloat((r.fVkBrutto || 0) - (r.fVkNetto || 0)),
+        netto: parseFloat(String(r.fVkNetto || 0)),
+        steuer: parseFloat(String((r.fVkBrutto || 0) - (r.fVkNetto || 0))),
         mwstSatz: r.fVkNetto > 0 ? parseFloat(((r.fVkBrutto - r.fVkNetto) / r.fVkNetto * 100).toFixed(2)) : 0,
-        debitorKonto: mongoData.debitorKonto || null,
-        sachkonto: mongoData.sachkonto || '8400',
+        debitorKonto: (mongoData as any).debitorKonto || null,
+        sachkonto: (mongoData as any).sachkonto || '8400',
         status: status,  // IMMER "Bezahlt"
         quelle: 'Amazon/Extern',
         
