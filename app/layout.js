@@ -16,7 +16,7 @@ export default function RootLayout({ children }) {
         {/* Bootstrap Icons */}
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
         {/* SCORE Theme (nach Bootstrap) */}
-        <link rel="stylesheet" href="/styles/score-theme.css" />
+        <link rel="stylesheet" href="/styles/score-theme.css?v=2" />
         {/* Chart.js */}
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
         {/* Chart.js Dark Defaults auf Basis CSS-Variablen */}
