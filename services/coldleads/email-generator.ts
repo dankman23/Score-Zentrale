@@ -108,7 +108,7 @@ NUR JSON, kein zusätzlicher Text!`
       max_tokens: 800
     })
     
-    const responseText = llmResponse.choices[0].message.content.trim()
+    const responseText = (llmResponse as any).choices[0].message.content.trim()
     
     // Extrahiere JSON
     let jsonText = responseText
