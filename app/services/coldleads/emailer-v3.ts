@@ -255,10 +255,11 @@ Schreibe jetzt NUR die E-Mail-Text (120-180 Wörter):`
 
   try {
     // Rufe ChatGPT auf mit dem konfigurierten Modell
-    const aiResponse = await emergentChatCompletion([
-      { role: 'system', content: 'Du bist ein Experte für natürliche, menschliche B2B-Kommunikation. Du schreibst kurze, direkte E-Mails ohne Marketing-Floskeln.' },
-      { role: 'user', content: prompt }
-    ], {
+    const aiResponse = await emergentChatCompletion({
+      messages: [
+        { role: 'system', content: 'Du bist ein Experte für natürliche, menschliche B2B-Kommunikation. Du schreibst kurze, direkte E-Mails ohne Marketing-Floskeln.' },
+        { role: 'user', content: prompt }
+      ],
       model: promptModel,
       temperature: 0.9, // Höher für mehr Variation
       max_tokens: 500
