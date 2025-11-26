@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
       const collection = db.collection(source.collection)
       
       // Erweitere Filter für Mollie: nur erfolgreiche Transaktionen
-      let query = { ...dateFilter }
+      let query: any = { ...dateFilter }
       if (source.name === 'Mollie') {
         query = {
           ...dateFilter,
