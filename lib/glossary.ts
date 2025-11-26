@@ -201,10 +201,10 @@ export function mapToGlossary(text: string): {
   }
 
   // Deduplizieren
-  result.applications = [...new Set(result.applications)]
-  result.categories = [...new Set(result.categories)]
-  result.materials = [...new Set(result.materials)]
-  result.machines = [...new Set(result.machines)]
+  result.applications = Array.from(new Set(result.applications))
+  result.categories = Array.from(new Set(result.categories))
+  result.materials = Array.from(new Set(result.materials))
+  result.machines = Array.from(new Set(result.machines))
 
   return result
 }
