@@ -779,24 +779,9 @@ export default function App() {
 
   const isDegradedFlag = (process.env.NEXT_PUBLIC_DEGRADED === '1')
   
-  // Auth-Check useEffect MUSS am Ende sein, nach allen Funktionsdefinitionen
-  // Wird später im Code nach den Funktionsdefinitionen eingefügt
+  // Show loading only briefly - auth check runs in background
+  // Don't block the entire app
   
-  // TEMPORARILY DISABLED - Testing if this is the blocker
-  // Show nothing while checking auth
-  // if (!authChecked) {
-  //   return (
-  //     <div style={{
-  //       minHeight: '100vh',
-  //       display: 'flex',
-  //       alignItems: 'center',
-  //       justifyContent: 'center',
-  //       background: '#1a1d23'
-  //     }}>
-  //       <div className="spinner-border text-primary" style={{width: '3rem', height: '3rem'}}/>
-  //     </div>
-  //   )
-  // }
 
   const pushLog = (entry) => {
     setNetlog(l => [{ ...entry, at: new Date().toLocaleTimeString() }, ...l.slice(0,9)])
