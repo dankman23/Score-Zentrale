@@ -48,7 +48,7 @@ export async function PUT(request: NextRequest) {
             note: body.note || `Status geändert zu ${status}`
           }
         }
-      }
+      } as any
     )
     
     if (result.matchedCount === 0) {
