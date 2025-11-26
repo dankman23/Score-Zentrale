@@ -1423,7 +1423,7 @@ export default function PreiseModule() {
                       }
                       
                       // Deduplizieren, sortieren, filtern
-                      const eindeutig = [...new Set(grenzen)]
+                      const eindeutig = Array.from(new Set(grenzen))
                         .sort((a, b) => a - b)
                         .filter(q => q >= qMin)
                         .slice(0, 7)
