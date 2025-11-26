@@ -42,14 +42,14 @@ export async function GET(request: NextRequest) {
 }
 
 // POST - Führe Fuzzy Matching aus
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const body = await request.json()
     const action = body.action
     
     if (action === 'run') {
       // Führe Fuzzy Matching Script aus
-      return new Promise((resolve) => {
+      return new Promise<NextResponse>((resolve) => {
         const scriptPath = '/app/scripts/fuzzy-match-zahlungen.js'
         const process = spawn('node', [scriptPath])
         
