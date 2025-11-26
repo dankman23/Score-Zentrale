@@ -143,7 +143,7 @@ export async function GET(request: NextRequest) {
       byAnbieter[anbieter].betrag += z.betrag
     })
     
-    zahlungStats.byAnbieter = byAnbieter
+    ;(zahlungStats as any).byAnbieter = byAnbieter
     
     // ========================================
     // 5. GUTSCHRIFTEN - verwende API
