@@ -15,26 +15,14 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
 
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      })
-
-      const data = await res.json()
-
-      if (data.ok) {
-        localStorage.setItem('auth_token', data.token)
-        localStorage.setItem('auth_user', JSON.stringify(data.user))
-        // Full page reload to trigger auth check
-        window.location.href = '/'
-      } else {
-        setError(data.error || 'Login fehlgeschlagen')
-      }
-    } catch (err) {
-      setError('Verbindungsfehler. Bitte versuchen Sie es erneut.')
-    } finally {
+    // EINFACHER SCHUTZ: Nur Passwort prüfen
+    const MASTER_PASSWORD = 'Score2025!'
+    
+    if (password === MASTER_PASSWORD) {
+      localStorage.setItem('score_auth', 'authenticated')
+      window.location.href = '/'
+    } else {
+      setError('Falsches Passwort')
       setLoading(false)
     }
   }
