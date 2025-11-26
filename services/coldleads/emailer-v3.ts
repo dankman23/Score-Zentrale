@@ -306,7 +306,7 @@ Dr. Alexander Biehl`
     // Subject basierend auf Werkstoff
     let subject = `Schleifwerkzeuge für ${analysis.company}`
     if (werkstoffe.length > 0) {
-      const werkstoffName = typeof werkstoffe[0] === 'string' ? werkstoffe[0] : werkstoffe[0].term
+      const werkstoffName = typeof werkstoffe[0] === 'string' ? werkstoffe[0] : (werkstoffe[0] as any).term
       subject = `Schleifwerkzeuge für ${werkstoffName} – ${analysis.company}`
     }
     
