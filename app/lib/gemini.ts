@@ -144,3 +144,61 @@ export async function extractInvoiceData(
     throw new Error(`Failed to extract invoice data: ${(error as Error).message}`)
   }
 }
+
+/**
+ * Parse invoice with Gemini - simplified version for EK-Rechnung processing
+ */
+export async function parseInvoiceWithGemini(pdfText: string, kreditorNameHint?: string) {
+  try {
+    const model = getGeminiModel()
+    
+    const prompt = `Extrahiere die folgenden Informationen aus dieser deutschen Lieferantenrechnung:
+    
+${pdfText}
+
+${kreditorNameHint ? `HINWEIS: Der Lieferant ist wahrscheinlich: ${kreditorNameHint}` : ''}
+
+Formatiere die Antwort als JSON mit folgenden Feldern:
+{
+  "lieferantName": "string",
+  "rechnungsNummer": "string",
+  "rechnungsDatum": "YYYY-MM-DD",
+  "betrag": number,
+  "nettoBetrag": number,
+  "steuersatz": number
+}
+
+Gib nur das JSON zurück, keine zusätzlichen Erklärungen.`
+    
+    const result = await model.generateContent(prompt)
+    const response = await result.response
+    const text = response.text()
+    
+    // Parse JSON
+    let cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+    const jsonMatch = cleanText.match(/\{[\s\S]*\}/)
+    
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0])
+    }
+    
+    return {
+      lieferantName: kreditorNameHint || 'Unbekannt',
+      rechnungsNummer: '',
+      rechnungsDatum: '',
+      betrag: 0,
+      nettoBetrag: 0,
+      steuersatz: 19
+    }
+  } catch (error) {
+    console.error('Error parsing invoice with Gemini:', error)
+    return {
+      lieferantName: kreditorNameHint || 'Unbekannt',
+      rechnungsNummer: '',
+      rechnungsDatum: '',
+      betrag: 0,
+      nettoBetrag: 0,
+      steuersatz: 19
+    }
+  }
+}
