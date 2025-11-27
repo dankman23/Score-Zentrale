@@ -142,9 +142,23 @@ export async function GET(
     
   } catch (error: any) {
     console.error('[Artikel Details] Error:', error)
+    
+    // Detaillierte Error Message für besseres Debugging
+    let errorMessage = error.message || 'Unbekannter Fehler'
+    
+    // Spezifische Error-Typen
+    if (error.message?.includes('not authorized')) {
+      errorMessage = 'MongoDB Zugriffsfehler: Keine Berechtigung für die Datenbank. Bitte prüfen Sie die MongoDB-Konfiguration.'
+    } else if (error.message?.includes('MONGO_URL')) {
+      errorMessage = 'MongoDB nicht konfiguriert: MONGO_URL fehlt in den Environment Variables.'
+    } else if (error.message?.includes('MSSQL') || error.message?.includes('SQL')) {
+      errorMessage = 'JTL-Datenbank (MSSQL) nicht erreichbar. Artikel-Details können nur teilweise geladen werden.'
+    }
+    
     return NextResponse.json({
       ok: false,
-      error: error.message
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
     }, { status: 500 })
   }
 }
