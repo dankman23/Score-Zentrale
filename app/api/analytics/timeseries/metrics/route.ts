@@ -15,9 +15,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(timeSeries)
   } catch (error: any) {
     console.error('Error in metrics timeseries API route:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch metrics time series' },
-      { status: 500 }
-    )
+    // Return empty array instead of crashing
+    return NextResponse.json({
+      data: [],
+      error: error.message || 'Failed to fetch metrics time series'
+    })
   }
 }
