@@ -46,10 +46,22 @@ export async function GET(
     
   } catch (error: any) {
     console.error('[Bulletpoints Artikel] Error:', error)
+    
+    // Detaillierte Error Message
+    let errorMessage = error.message || 'Unbekannter Fehler'
+    
+    if (error.message?.includes('not authorized')) {
+      errorMessage = 'MongoDB Zugriffsfehler: Keine Berechtigung. Bitte MongoDB-Konfiguration prüfen.'
+    } else if (error.message?.includes('MONGO_URL')) {
+      errorMessage = 'MongoDB nicht konfiguriert.'
+    }
+    
     return NextResponse.json({
       ok: false,
-      error: error.message
-    }, { status: 500 })
+      bulletpoints: null,
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    })
   }
 }
 
@@ -94,9 +106,21 @@ export async function POST(
     
   } catch (error: any) {
     console.error('[Bulletpoints Artikel] Error:', error)
+    
+    // Detaillierte Error Message
+    let errorMessage = error.message || 'Unbekannter Fehler'
+    
+    if (error.message?.includes('not authorized')) {
+      errorMessage = 'MongoDB Zugriffsfehler: Keine Berechtigung. Bitte MongoDB-Konfiguration prüfen.'
+    } else if (error.message?.includes('MONGO_URL')) {
+      errorMessage = 'MongoDB nicht konfiguriert.'
+    }
+    
     return NextResponse.json({
       ok: false,
-      error: error.message
-    }, { status: 500 })
+      bulletpoints: null,
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    })
   }
 }
