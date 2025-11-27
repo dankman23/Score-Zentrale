@@ -15,9 +15,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(metrics)
   } catch (error: any) {
     console.error('Error in metrics API route:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch analytics metrics' },
-      { status: 500 }
-    )
+    
+    // Return empty/default metrics instead of crashing
+    return NextResponse.json({
+      sessions: 0,
+      users: 0,
+      pageViews: 0,
+      avgSessionDuration: 0,
+      bounceRate: 0,
+      conversions: 0,
+      revenue: 0,
+      error: error.message || 'Failed to fetch analytics metrics'
+    })
   }
 }
