@@ -50,21 +50,44 @@ export function getAnalyticsClient(): BetaAnalyticsDataClient {
   try {
     const credentialsJson = process.env.GA4_SERVICE_ACCOUNT_JSON;
     if (!credentialsJson) {
+      console.error('GA4_SERVICE_ACCOUNT_JSON environment variable is not set');
       throw new Error('GA4_SERVICE_ACCOUNT_JSON environment variable is not set');
     }
 
-    const credentials = JSON.parse(credentialsJson);
+    // Parse the credentials
+    let credentials;
+    try {
+      credentials = JSON.parse(credentialsJson);
+    } catch (parseError) {
+      console.error('Failed to parse GA4_SERVICE_ACCOUNT_JSON:', parseError);
+      throw new Error('Invalid GA4_SERVICE_ACCOUNT_JSON format');
+    }
+
+    // Validate required fields
+    if (!credentials.client_email || !credentials.private_key) {
+      console.error('Missing required fields in GA4 credentials:', {
+        hasClientEmail: !!credentials.client_email,
+        hasPrivateKey: !!credentials.private_key
+      });
+      throw new Error('GA4 credentials missing client_email or private_key');
+    }
+
+    // Ensure private_key has correct newlines
+    const privateKey = credentials.private_key.replace(/\\n/g, '\n');
+
     analyticsClient = new BetaAnalyticsDataClient({
       credentials: {
         client_email: credentials.client_email,
-        private_key: credentials.private_key,
+        private_key: privateKey,
       },
+      projectId: credentials.project_id,
     });
 
+    console.log('GA4 client initialized successfully');
     return analyticsClient;
   } catch (error) {
     console.error('Failed to initialize GA4 client:', error);
-    throw new Error('Failed to initialize GA4 client');
+    throw error;
   }
 }
 
