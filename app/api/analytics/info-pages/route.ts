@@ -15,9 +15,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(infoPages);
   } catch (error: any) {
     console.error('Info pages API error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch info pages' },
-      { status: 500 }
-    );
+    // Return empty array instead of crashing
+    return NextResponse.json({
+      pages: [],
+      error: error.message || 'Failed to fetch info pages'
+    });
   }
 }
