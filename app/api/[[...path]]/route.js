@@ -8,13 +8,50 @@ import sql from 'mssql'
 
 let client
 let db
+
+/**
+ * Extract database name from MongoDB connection string
+ */
+function extractDbNameFromUri(uri) {
+  try {
+    const match = uri.match(/\/([^/?]+)(\?|$)/)
+    return match && match[1] && match[1] !== 'admin' ? match[1] : null
+  } catch {
+    return null
+  }
+}
+
 async function connectToMongo() {
   if (!client) {
     const uri = process.env.MONGO_URL
     if (!uri) throw new Error('MONGO_URL is not set')
+    
+    // Try to get DB name from: 1) env var, 2) connection string, 3) fallback
+    let dbName = process.env.MONGO_DB || process.env.DB_NAME
+    
+    if (!dbName) {
+      // Try to extract from connection string
+      dbName = extractDbNameFromUri(uri)
+    }
+    
+    // Final fallback (but log warning)
+    if (!dbName) {
+      dbName = 'score_zentrale'
+      console.warn('⚠️ [[...path]] route: No database name found. Using fallback:', dbName)
+    }
+    
+    // Validate we're not connecting to 'test' in production
+    if (dbName === 'test' && process.env.NODE_ENV === 'production') {
+      throw new Error('❌ FATAL: Refusing to connect to "test" database in production')
+    }
+    
+    console.log('[[...path]] route: MongoDB connecting to database:', dbName)
+    
     client = new MongoClient(uri)
     await client.connect()
-    db = client.db(process.env.DB_NAME || 'score_zentrale')
+    db = client.db(dbName)
+    
+    console.log('✅ [[...path]] route: MongoDB connected to', dbName)
   }
   return db
 }
