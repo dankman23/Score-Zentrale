@@ -57,10 +57,20 @@ export default function RootLayout({ children }) {
             background: var(--card) !important;
             border: 1px solid var(--line);
           }
-          .form-control, .form-select {
+          .form-control, .form-select, textarea, input[type="text"], input[type="email"], input[type="number"] {
             background: #141a20 !important;
             border-color: #2a3340 !important;
-            color: var(--txt) !important;
+            color: #e7ecf2 !important;
+            border-radius: 10px;
+          }
+          textarea {
+            color: #e7ecf2 !important;
+            background: #141a20 !important;
+          }
+          .modal-body textarea,
+          .modal-body input {
+            color: #e7ecf2 !important;
+            background: #141a20 !important;
           }
           .text-muted {
             color: var(--muted) !important;
