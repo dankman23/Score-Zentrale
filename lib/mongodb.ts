@@ -53,11 +53,13 @@ export async function connectToMongoDB(): Promise<Db> {
     const clientOptions: any = {}
     
     if (isAtlas) {
-      // Atlas-specific options
+      // Atlas-specific options - allow invalid certificates for container environments
       clientOptions.tls = true
-      clientOptions.tlsAllowInvalidCertificates = false
+      clientOptions.tlsAllowInvalidCertificates = true
+      clientOptions.tlsInsecure = true
       clientOptions.retryWrites = true
       clientOptions.w = 'majority'
+      clientOptions.serverSelectionTimeoutMS = 5000
     }
     
     cachedClient = new MongoClient(uri, clientOptions)
