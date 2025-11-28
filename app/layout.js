@@ -202,9 +202,10 @@ export default function RootLayout({ children }) {
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
         
-        {/* Logout Button Handler */}
+        {/* Logout Button Handler + Textfeld Dark Mode Fix */}
         <script dangerouslySetInnerHTML={{__html: `
           document.addEventListener('DOMContentLoaded', function() {
+            // Logout Button Handler
             const logoutBtns = document.querySelectorAll('.logout-btn, .logout-btn-hero');
             logoutBtns.forEach(function(btn) {
               btn.addEventListener('click', function(e) {
@@ -213,6 +214,25 @@ export default function RootLayout({ children }) {
                 window.location.href = '/login';
               });
             });
+            
+            // Force Dark Mode Styles auf ALLE Textfelder
+            function applyDarkModeToInputs() {
+              const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="number"], textarea, .form-control');
+              inputs.forEach(function(input) {
+                input.style.backgroundColor = '#141a20';
+                input.style.color = '#e7ecf2';
+                input.style.borderColor = '#2a3340';
+              });
+            }
+            
+            // Initial anwenden
+            applyDarkModeToInputs();
+            
+            // Bei jeder DOM-Änderung erneut anwenden (für dynamisch geladene Modals)
+            const observer = new MutationObserver(function() {
+              applyDarkModeToInputs();
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
           });
         `}} />
       </body>
