@@ -10,7 +10,7 @@ const SOURCE_URI = 'mongodb://localhost:27017';
 const SOURCE_DB = 'score_zentrale';
 
 // Target: MongoDB Atlas
-const TARGET_URI = 'mongodb+srv://scoreablqge_db_user:zo1l76ayASCYguLi@scorez.t4otq4g.mongodb.net/score_zentrale?appName=ScoreZ';
+const TARGET_URI = 'mongodb+srv://scoreablage_db_user:zoTl76ayASCYguLi@scorez.t4otq4g.mongodb.net/score_zentrale?appName=ScoreZ';
 const TARGET_DB = 'score_zentrale';
 
 async function migrateData() {
