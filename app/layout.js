@@ -70,6 +70,15 @@ export default function RootLayout({ children }) {
             border-color: #e6a908 !important;
             color: #111 !important;
           }
+          /* Datum-Picker Icon weiß machen */
+          input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+          }
+          input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+          }
         `}} />
         {/* Chart.js */}
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
