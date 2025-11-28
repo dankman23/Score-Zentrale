@@ -186,14 +186,14 @@ export default function RootLayout({ children }) {
         {/* Logout Button Handler */}
         <script dangerouslySetInnerHTML={{__html: `
           document.addEventListener('DOMContentLoaded', function() {
-            const logoutBtn = document.querySelector('.logout-btn');
-            if (logoutBtn) {
-              logoutBtn.addEventListener('click', function(e) {
+            const logoutBtns = document.querySelectorAll('.logout-btn, .logout-btn-hero');
+            logoutBtns.forEach(function(btn) {
+              btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 localStorage.removeItem('score_auth');
                 window.location.href = '/login';
               });
-            }
+            });
           });
         `}} />
       </body>
