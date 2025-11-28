@@ -47,9 +47,22 @@ export async function connectToMongoDB(): Promise<Db> {
   console.log('MongoDB connecting to database:', dbName)
 
   if (!cachedClient) {
-    cachedClient = new MongoClient(uri)
+    // MongoDB Atlas requires specific SSL/TLS configuration
+    const isAtlas = uri.includes('mongodb+srv://') || uri.includes('.mongodb.net')
+    
+    const clientOptions: any = {}
+    
+    if (isAtlas) {
+      // Atlas-specific options
+      clientOptions.tls = true
+      clientOptions.tlsAllowInvalidCertificates = false
+      clientOptions.retryWrites = true
+      clientOptions.w = 'majority'
+    }
+    
+    cachedClient = new MongoClient(uri, clientOptions)
     await cachedClient.connect()
-    console.log('✅ MongoDB connected successfully')
+    console.log('✅ MongoDB connected successfully to:', isAtlas ? 'Atlas' : 'Local')
   }
 
   cachedDb = cachedClient.db(dbName)
