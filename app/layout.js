@@ -217,23 +217,28 @@ export default function RootLayout({ children }) {
               });
             });
             
-            // Force Dark Mode Styles auf ALLE Textfelder
-            function applyDarkModeToInputs() {
-              const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="number"], textarea, .form-control');
-              inputs.forEach(function(input) {
-                input.style.backgroundColor = '#141a20';
-                input.style.color = '#e7ecf2';
-                input.style.borderColor = '#2a3340';
+            // AGGRESSIVE Dark Mode Fixer - setzt Styles permanent
+            function forceInputDarkMode() {
+              const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="number"], input[type="url"], input[type="tel"], textarea, select, .form-control, .form-select');
+              inputs.forEach(function(el) {
+                // Nur wenn nicht schon gesetzt
+                if (!el.dataset.darkModeApplied) {
+                  el.style.setProperty('background-color', '#141a20', 'important');
+                  el.style.setProperty('color', '#e7ecf2', 'important');
+                  el.style.setProperty('border-color', '#2a3340', 'important');
+                  el.dataset.darkModeApplied = 'true';
+                }
               });
             }
             
             // Initial anwenden
-            applyDarkModeToInputs();
+            forceInputDarkMode();
             
-            // Bei jeder DOM-Änderung erneut anwenden (für dynamisch geladene Modals)
-            const observer = new MutationObserver(function() {
-              applyDarkModeToInputs();
-            });
+            // Permanent alle 500ms prüfen und anwenden
+            setInterval(forceInputDarkMode, 500);
+            
+            // PLUS MutationObserver für sofortige Reaktion
+            const observer = new MutationObserver(forceInputDarkMode);
             observer.observe(document.body, { childList: true, subtree: true });
           });
         `}} />
