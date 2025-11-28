@@ -57,29 +57,31 @@ export default function RootLayout({ children }) {
             background: var(--card) !important;
             border: 1px solid var(--line);
           }
-          .form-control, .form-select, textarea, input[type="text"], input[type="email"], input[type="number"] {
+          /* CRITICAL: Force alle Input-Felder hell im Dark Mode */
+          input, textarea, select, .form-control, .form-select {
+            background-color: #141a20 !important;
             background: #141a20 !important;
             border-color: #2a3340 !important;
             color: #e7ecf2 !important;
+            -webkit-text-fill-color: #e7ecf2 !important;
             border-radius: 10px;
           }
-          textarea, textarea.form-control {
+          input::placeholder, textarea::placeholder {
+            color: #888 !important;
+            opacity: 1 !important;
+          }
+          /* Spezifisch für Modals */
+          .modal input, .modal textarea, .modal select,
+          .modal-body input, .modal-body textarea, .modal-body select {
+            background-color: #141a20 !important;
             color: #e7ecf2 !important;
-            background: #141a20 !important;
             -webkit-text-fill-color: #e7ecf2 !important;
           }
-          input, input.form-control {
+          /* Override Bootstrap defaults */
+          .form-control:focus, textarea:focus, input:focus {
+            background-color: #141a20 !important;
             color: #e7ecf2 !important;
-            background: #141a20 !important;
-            -webkit-text-fill-color: #e7ecf2 !important;
-          }
-          .modal-body textarea,
-          .modal-body input,
-          div textarea,
-          div input[type="text"] {
-            color: #e7ecf2 !important;
-            background: #141a20 !important;
-            -webkit-text-fill-color: #e7ecf2 !important;
+            border-color: var(--accent) !important;
           }
           .text-muted {
             color: var(--muted) !important;
