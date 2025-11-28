@@ -119,16 +119,20 @@ export default function RootLayout({ children }) {
               <li className="nav-item"><a className="nav-link" href="#orga"><i className="bi bi-calendar-check mr-1"/>Orga</a></li>
               <li className="nav-item"><a className="nav-link" href="#fibu"><i className="bi bi-receipt-cutoff mr-1"/>FIBU</a></li>
               <li className="nav-item">
-                <button 
-                  className="btn btn-outline-light btn-sm nav-link"
-                  style={{fontSize: '0.85rem', padding: '0.4rem 0.8rem', border: 'none'}}
-                  onClick={() => {
-                    localStorage.removeItem('score_auth');
-                    window.location.href = '/login';
+                <a 
+                  className="nav-link" 
+                  href="/login"
+                  style={{cursor: 'pointer'}}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (typeof window !== 'undefined') {
+                      localStorage.removeItem('score_auth');
+                      window.location.href = '/login';
+                    }
                   }}
                 >
                   <i className="bi bi-box-arrow-right mr-1"/>Abmelden
-                </button>
+                </a>
               </li>
             </ul>
           </div>
