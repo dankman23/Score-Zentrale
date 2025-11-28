@@ -181,6 +181,20 @@ export default function RootLayout({ children }) {
         {/* Bootstrap 4.6 JS (am Ende Body) */}
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+        
+        {/* Logout Button Handler */}
+        <script dangerouslySetInnerHTML={{__html: `
+          document.addEventListener('DOMContentLoaded', function() {
+            const logoutBtn = document.querySelector('.logout-btn');
+            if (logoutBtn) {
+              logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.removeItem('score_auth');
+                window.location.href = '/login';
+              });
+            }
+          });
+        `}} />
       </body>
     </html>
   )
