@@ -1246,6 +1246,12 @@ export default function App() {
       if (data.ok) {
         setAutopilotState(data.state)
         setAutopilotLimit(data.state.dailyLimit)
+        
+        // Wenn Autopilot läuft aber Polling nicht aktiv ist, starte es
+        if (data.state.running && !autopilotIntervalRef.current) {
+          console.log('[Autopilot] Auto-starting tick polling')
+          startAutopilotPolling()
+        }
       }
     } catch (e) {
       console.error('Load autopilot status failed:', e)
