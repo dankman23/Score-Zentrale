@@ -2476,13 +2476,6 @@ export default function App() {
     
     loadAutopilotStatus()
     
-    // Polling alle 5 Sekunden wenn Autopilot läuft
-    if (autopilotState.running) {
-      autopilotIntervalRef.current = setInterval(() => {
-        loadAutopilotStatus()
-      }, 5000)
-    }
-    
     return () => {
       if (autopilotIntervalRef.current) {
         clearInterval(autopilotIntervalRef.current)
