@@ -120,16 +120,9 @@ export default function RootLayout({ children }) {
               <li className="nav-item"><a className="nav-link" href="#fibu"><i className="bi bi-receipt-cutoff mr-1"/>FIBU</a></li>
               <li className="nav-item">
                 <a 
-                  className="nav-link" 
+                  className="nav-link logout-btn" 
                   href="/login"
                   style={{cursor: 'pointer'}}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (typeof window !== 'undefined') {
-                      localStorage.removeItem('score_auth');
-                      window.location.href = '/login';
-                    }
-                  }}
                 >
                   <i className="bi bi-box-arrow-right mr-1"/>Abmelden
                 </a>
