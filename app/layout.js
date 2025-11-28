@@ -63,14 +63,23 @@ export default function RootLayout({ children }) {
             color: #e7ecf2 !important;
             border-radius: 10px;
           }
-          textarea {
+          textarea, textarea.form-control {
             color: #e7ecf2 !important;
             background: #141a20 !important;
+            -webkit-text-fill-color: #e7ecf2 !important;
+          }
+          input, input.form-control {
+            color: #e7ecf2 !important;
+            background: #141a20 !important;
+            -webkit-text-fill-color: #e7ecf2 !important;
           }
           .modal-body textarea,
-          .modal-body input {
+          .modal-body input,
+          div textarea,
+          div input[type="text"] {
             color: #e7ecf2 !important;
             background: #141a20 !important;
+            -webkit-text-fill-color: #e7ecf2 !important;
           }
           .text-muted {
             color: var(--muted) !important;
