@@ -417,36 +417,123 @@ export default function FibuCompleteDashboard() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        {activeTab === 'overview' && (
+        {/* 1. Übersicht */}
+        {activeTab === 'uebersicht' && (
           <FibuMonatsUebersicht selectedPeriod={selectedPeriod} summaryData={summary} />
         )}
 
-        {activeTab === 'ek' && (
-          <EKRechnungenView zeitraum={selectedPeriod} initialFilter={tabFilters['ek']} />
+        {/* 2. EK-Belege (EK-Rechnungen + Kreditor-Zuordnung zusammengeführt) */}
+        {activeTab === 'ek-belege' && (
+          <div>
+            <EKRechnungenView zeitraum={selectedPeriod} initialFilter={tabFilters['ek-belege']} />
+          </div>
         )}
 
+        {/* 3. VK-Belege */}
+        {activeTab === 'vk-belege' && (
+          <VKRechnungenView zeitraum={selectedPeriod} initialFilter={tabFilters['vk-belege']} />
+        )}
+
+        {/* 4. Umsätze (ehemals Zahlungen) */}
+        {activeTab === 'umsaetze' && (
+          <ZahlungenView zeitraum={selectedPeriod} initialFilter={tabFilters['umsaetze']} />
+        )}
+
+        {/* 5. Einstellungen (Bank-Import, Kontenplan, Fuzzy-Matching) */}
+        {activeTab === 'einstellungen' && (
+          <div>
+            {/* Sub-Tab Navigation */}
+            <div className="flex gap-2 mb-6 border-b border-gray-200">
+              <button
+                onClick={() => setEinstellungenSubTab('bank-import')}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
+                  einstellungenSubTab === 'bank-import'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                🏦 Bank-Import
+              </button>
+              <button
+                onClick={() => setEinstellungenSubTab('kontenplan')}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
+                  einstellungenSubTab === 'kontenplan'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                📋 Kontenplan
+              </button>
+              <button
+                onClick={() => setEinstellungenSubTab('auto-zuordnung')}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
+                  einstellungenSubTab === 'auto-zuordnung'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                🔍 Auto-Zuordnung
+              </button>
+              <button
+                onClick={() => setEinstellungenSubTab('kreditoren')}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
+                  einstellungenSubTab === 'kreditoren'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                🏢 Kreditoren
+              </button>
+              <button
+                onClick={() => setEinstellungenSubTab('export')}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
+                  einstellungenSubTab === 'export'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                📤 10it Export
+              </button>
+            </div>
+
+            {/* Sub-Tab Content */}
+            {einstellungenSubTab === 'bank-import' && <BankImport />}
+            {einstellungenSubTab === 'kontenplan' && <KontenplanView />}
+            {einstellungenSubTab === 'auto-zuordnung' && <FuzzyMatchingView zeitraum={selectedPeriod} />}
+            {einstellungenSubTab === 'kreditoren' && <KreditorenManagement />}
+            {einstellungenSubTab === 'export' && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h3 className="text-lg font-semibold mb-4">10it / DATEV Export</h3>
+                <button
+                  onClick={() => setShowExportDialog(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  📥 Export starten
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 6. Zuordnung (Unzugeordnete Items auf einen Blick) */}
         {activeTab === 'zuordnung' && (
-          <KreditorZuordnung zeitraum={selectedPeriod} />
-        )}
-
-        {activeTab === 'vk' && (
-          <VKRechnungenView zeitraum={selectedPeriod} initialFilter={tabFilters['vk']} />
-        )}
-
-        {activeTab === 'zahlungen' && (
-          <ZahlungenView zeitraum={selectedPeriod} initialFilter={tabFilters['zahlungen']} />
-        )}
-
-        {activeTab === 'bank-import' && (
-          <BankImport />
-        )}
-
-        {activeTab === 'kontenplan' && (
-          <KontenplanView />
-        )}
-
-        {activeTab === 'fuzzy-matching' && (
-          <FuzzyMatchingView zeitraum={selectedPeriod} />
+          <div>
+            <h2 className="text-2xl font-bold mb-6">🔗 Zuordnung - Unzugeordnete Items</h2>
+            <p className="text-gray-600 mb-4">
+              Hier sehen Sie alle Transaktionen und Belege, die noch nicht zugeordnet sind, 
+              inklusive automatischer Vorschläge vom Dual-Matcher.
+            </p>
+            
+            {/* Verwende bestehende Kreditor-Zuordnung Component */}
+            <KreditorZuordnung zeitraum={selectedPeriod} />
+            
+            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-800">
+                <strong>💡 Tipp:</strong> Nutzen Sie die Auto-Zuordnung in den Einstellungen, 
+                um automatisch passende Rechnungen und Konten für Zahlungen zu finden.
+              </p>
+            </div>
+          </div>
         )}
       </div>
 
