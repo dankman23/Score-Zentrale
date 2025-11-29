@@ -338,12 +338,12 @@ export default function FibuCompleteDashboard() {
             </p>
           </div>
 
-          {/* Tabs */}
+          {/* Tabs - Neue 6-Tab-Struktur */}
           <div className="flex gap-6 border-t border-gray-100">
             <button
-              onClick={() => setActiveTab('overview')}
+              onClick={() => setActiveTab('uebersicht')}
               className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
-                activeTab === 'overview'
+                activeTab === 'uebersicht'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
@@ -351,14 +351,49 @@ export default function FibuCompleteDashboard() {
               📊 Übersicht
             </button>
             <button
-              onClick={() => setActiveTab('ek')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
-                activeTab === 'ek'
+              onClick={() => setActiveTab('ek-belege')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition relative ${
+                activeTab === 'ek-belege'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
-              📥 EK-Rechnungen
+              📥 EK-Belege
+              {issues?.ekOhneKreditor > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {issues.ekOhneKreditor}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab('vk-belege')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
+                activeTab === 'vk-belege'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              📤 VK-Belege
+            </button>
+            <button
+              onClick={() => setActiveTab('umsaetze')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
+                activeTab === 'umsaetze'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              💰 Umsätze
+            </button>
+            <button
+              onClick={() => setActiveTab('einstellungen')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
+                activeTab === 'einstellungen'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              ⚙️ Einstellungen
             </button>
             <button
               onClick={() => setActiveTab('zuordnung')}
@@ -368,62 +403,12 @@ export default function FibuCompleteDashboard() {
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
-              🔗 Kreditor-Zuordnung
-              {issues?.ekOhneKreditor > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {issues.ekOhneKreditor}
+              🔗 Zuordnung
+              {(issues?.zahlungenOhneZuordnung > 0 || issues?.ekOhneKreditor > 0) && (
+                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {(issues?.zahlungenOhneZuordnung || 0) + (issues?.ekOhneKreditor || 0)}
                 </span>
               )}
-            </button>
-            <button
-              onClick={() => setActiveTab('vk')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
-                activeTab === 'vk'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              📤 VK-Rechnungen
-            </button>
-            <button
-              onClick={() => setActiveTab('zahlungen')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
-                activeTab === 'zahlungen'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              💳 Zahlungen
-            </button>
-            <button
-              onClick={() => setActiveTab('bank-import')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
-                activeTab === 'bank-import'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              🏦 Bank-Import
-            </button>
-            <button
-              onClick={() => setActiveTab('kontenplan')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
-                activeTab === 'kontenplan'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              📋 Kontenplan + Einstellungen
-            </button>
-            <button
-              onClick={() => setActiveTab('fuzzy-matching')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
-                activeTab === 'fuzzy-matching'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              🔍 Auto-Zuordnung
             </button>
           </div>
         </div>
