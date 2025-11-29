@@ -56,7 +56,39 @@ export async function classifyKonto(
     }
   }
   
-  // Wenn kein Text UND keine Kategorie → null
+  // Spezial-Logik für PayPal (BEVOR Text-Prüfung)
+  if (zahlung.anbieter?.toLowerCase().includes('paypal')) {
+    const verwendungszweck = zahlung.verwendungszweck || ''
+    
+    // AU-Nummer im verwendungszweck → Erlös
+    const auPattern = /AU[_-]\d+[_-]SW\d+/i
+    if (verwendungszweck.match(auPattern)) {
+      console.log(`[Konto Classifier] ✅ PayPal mit AU-Nummer → Erlös`)
+      return {
+        konto: '8400',
+        steuer: 19,
+        bezeichnung: 'Erlöse 19% USt (PayPal)',
+        confidence: 0.90,
+        method: 'category',
+        reason: 'PayPal Zahlung mit AU-Nummer → Erlös'
+      }
+    }
+    
+    // Negativer Betrag → Gebühr
+    if (zahlung.betrag < 0) {
+      console.log(`[Konto Classifier] ✅ PayPal Gebühr (negativ)`)
+      return {
+        konto: '4950',
+        steuer: 19,
+        bezeichnung: 'PayPal-Gebühren',
+        confidence: 0.85,
+        method: 'category',
+        reason: 'PayPal negativer Betrag → Gebühr'
+      }
+    }
+  }
+  
+  // Wenn kein Text UND keine Kategorie UND nicht PayPal → null
   if (!text) {
     console.log('[Konto Classifier] Keine Text-Informationen und keine Kategorie')
     return null
