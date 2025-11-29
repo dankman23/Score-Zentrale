@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Base URL from environment
-BASE_URL = "https://biz-insights-14.preview.emergentagent.com/api"
+BASE_URL = "https://atlas-migrator.preview.emergentagent.com/api"
 
 # Test date range
 START_DATE = "30daysAgo"

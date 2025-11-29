@@ -7,7 +7,7 @@ import requests
 import json
 import os
 
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://biz-insights-14.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://atlas-migrator.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def debug_prospects():
