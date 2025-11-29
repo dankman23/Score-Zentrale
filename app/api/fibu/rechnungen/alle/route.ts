@@ -132,7 +132,6 @@ export async function GET(request: NextRequest) {
         '' AS debitorKonto,
         '' AS sachkonto
       FROM dbo.tgutschrift g
-      LEFT JOIN dbo.tKunde k ON g.kKunde = k.kKunde
       WHERE g.dErstellt >= @from
         AND g.dErstellt < DATEADD(day, 1, @to)
       
