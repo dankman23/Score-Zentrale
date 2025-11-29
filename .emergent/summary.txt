@@ -1,85 +1,98 @@
 <analysis>
-My analysis of the trajectory reveals a multi-stage recovery and enhancement process for the Score-Zentrale application. The work began by addressing a critical bug introduced during a login feature implementation: the removal of all  hooks, which crippled the main dashboard by preventing data from loading. My predecessor successfully restored these data-fetching hooks in the monolithic  and fixed the broken tab navigation by implementing a  listener.
+The trajectory documents a multi-faceted development and debugging session on the Score-Zentrale Next.js application. The work commenced by addressing a critical bug where the Kaltakquise (cold acquisition) autopilot only functioned when a user was active on the webpage. This was resolved by replacing the frontend-based  polling with a robust, persistent backend worker using a Node.js script managed by Supervisor. This ensured the autopilot runs 24/7, independent of frontend activity.
 
-The subsequent phase was a grueling marathon of debugging to make the application deployable. This involved fixing over two dozen TypeScript errors, incorrect module import paths, and syntax errors scattered across numerous API routes and service files. A recurring issue was the  pattern, which breaks the Next.js build; these were all refactored to use .
+Following this, the engineer addressed several user-reported bugs, including an input field limitation and a hardcoded data-fetching limit that prevented all company records from being displayed.
 
-After a successful build, post-deployment runtime errors emerged. The production dashboard showed zero data, which was traced to missing Google API credentials in the production environment. Concurrently, a major security issue arose when OpenAI revoked an API key that had been committed to the Git history. I guided the user through rotating this key. The final challenge was resolving GitHub's Push Protection, which blocked pushes due to the history of committed secrets. The user had to iteratively allow each detected secret before the code could be saved to the repository. The user's last request was to prepare the project for forking.
+The primary focus then shifted to a major feature enhancement of the FIBU (financial accounting) module. Guided by extensive user input comparing the desired functionality to the Lexoffice software, the engineer began implementing a sophisticated auto-matching system. This involved creating a dual-matching engine to associate financial transactions with *both* a document (Beleg) and an account (Konto). A significant debugging effort was undertaken to create a data-mapping layer () to normalize transaction data from various sources (Amazon, PayPal, etc.) before processing.
+
+The final phase involved building the frontend UI for manual assignments while simultaneously debugging the backend matching logic. A critical issue was identified: document matching was failing because the source collection () was empty. The user's last request was to pause development and create comprehensive documentation to prepare the project for forking.
 
 All future communication should be in **German**.
 </analysis>
 
 <product_requirements>
-The project is to build and maintain Score-Zentrale, a comprehensive internal business intelligence and productivity dashboard.
+The primary goal is to build a comprehensive, automated financial accounting (FIBU) module within the Score-Zentrale application, inspired by the functionality of Lexoffice.
 
-**Core Problem Solved:** The application was non-functional after a previous developer's attempt to add a login system, which inadvertently removed all data-loading logic from the main page. The primary goal was to restore full functionality.
-
-**Implementation Summary:**
-1.  **Authentication Fixed:** A complex multi-user login was simplified to a single-password system. A bug preventing dashboard data from loading post-login was fixed by restoring numerous  hooks in . The logout functionality was also repaired.
-2.  **Navigation Fixed:** Broken tab navigation was repaired by adding a  event listener that updates the active UI tab based on the URL hash.
-3.  **Deployment Readiness:** The application underwent extensive debugging to resolve over 25 TypeScript build errors, fixing incorrect types, module import paths, and syntax issues. This made the application successfully build for production.
-4.  **Security Hardening:** A compromised OpenAI API key, exposed in the Git history, was successfully rotated. The user was guided through the process of bypassing GitHub's push protection to save the changes. The application is now fully functional in the preview environment.
+**Key Requirements:**
+1.  **Dual-Assignment:** Every financial transaction must be associated with both a corresponding document (Beleg), such as an invoice, and a financial account (Konto), such as revenue or fees.
+2.  **Automated Matching:** Implement a robust, learning-based system to automatically perform this dual-assignment. The system should use various strategies:
+    *   Matching invoice/order numbers from transaction descriptions.
+    *   Rule-based mapping for known fees (e.g., PayPal fees).
+    *   Learning from manual user assignments to improve future suggestions.
+3.  **Manual Override:** Provide a clear and intuitive frontend interface allowing users to manually assign or correct the automated assignments for both documents and accounts.
+4.  **Data Persistence:** All transactions, documents, and their associations must be stored permanently in the MongoDB database.
+5.  **Data Export:** Create an export function to generate a CSV file compatible with the 10it (Addison) accounting software, following the DATEV format.
+6.  **Reliable Autopilot:** Ensure the Kaltakquise autopilot runs continuously in the background, independent of user browser sessions.
 </product_requirements>
 
 <key_technical_concepts>
-- **Framework:** Next.js (App Router) with React.
-- **State Management:** Client-side state is handled with  and .
-- **Authentication:** A simple client-side system using a hardcoded password check that sets a flag () in .
-- **Databases:** Connects to an external MSSQL database for J-T-L ERP data and uses a local MongoDB for application data and caching.
-- **Deployment:** The process involves , dealing with TypeScript compilation errors, and handling environment variables for a Kubernetes-based deployment on Emergent.
+- **Framework:** Next.js (App Router)
+- **Database:** MongoDB
+- **Background Jobs:** Node.js script managed by autopilot-worker                 RUNNING   pid 27, uptime 0:00:02
+code-server                      STOPPED   Not started
+jtl-import                       STOPPED   Not started
+mongodb                          RUNNING   pid 28, uptime 0:00:02
+nextjs                           RUNNING   pid 30, uptime 0:00:02
+nginx-code-proxy                 STARTING  
+supervisor>  for persistent, asynchronous tasks (Autopilot Worker).
+- **Data Normalization:** A dedicated data-mapping layer () to create a consistent data structure from disparate sources (Amazon, PayPal, Bank CSVs) before processing.
+- **Accounting Logic:** Implementation of a dual-matching engine and a learning classifier for automated financial record-keeping.
+- **Styling & UI:** React components, , and existing shadcn/ui and Tailwind CSS.
 </key_technical_concepts>
 
 <code_architecture>
-The application is a large, monolithic Next.js project. The majority of the frontend logic is consolidated into a single large file, , with some functionality broken out into components.
+The application is a Next.js monolith. The recent work has focused on creating a robust background processing system and a modular, extensible architecture for the new FIBU (financial accounting) features.
+
+**Directory Structure:**
 
 
+**File Analysis:**
 
-- ****
-    - **Importance:** The heart of the application's frontend. It contains the state and rendering logic for nearly all tabs (Dashboard, Sales, Marketing, etc.). Its monolithic nature was the source of the original  bug.
-    - **Summary of Changes:** A large block of  hooks was added back to restore all data fetching for the dashboard KPIs and charts. A new  hook was added to listen for URL  events, fixing the broken tab navigation.
-
-- ****
-    - **Importance:** The application's entry point for authentication.
-    - **Summary of Changes:** The form was simplified to a single password input, removing the username field. The inline style for the logo was modified to reduce its size.
-
-- ****
-    - **Importance:** Handles the user logout process.
-    - **Summary of Changes:** The component was modified to remove the correct item () from , fixing the previously broken logout flow.
-
-- **** (Numerous files)
-    - **Importance:** These are the backend endpoints that fetch data and perform business logic. They were the primary source of build errors preventing deployment.
-    - **Summary of Changes:** A vast number of TypeScript errors were fixed across these files. Changes included: correcting import paths, replacing  with , fixing type mismatches for MongoDB operations (especially with ), casting types with  to satisfy the compiler, and adding missing functions.
-
-- ** & ** (Numerous files)
-    - **Importance:** Helper libraries and service logic used by the API routes. These also contained many build-breaking errors.
-    - **Summary of Changes:** Fixed multiple instances of the spread operator on  objects (), which is incompatible with the build target, by replacing them with . Corrected various other TypeScript type errors.
+- ** & **
+  - **Importance:** These files create a persistent background worker process that solves the critical bug of the autopilot only running when the user is on the website. The script continuously calls the  API, and the  file ensures Supervisor keeps it running.
+  - **Changes:** Both were created from scratch.
 
 - ****
-    - **Importance:** Stores all secrets and environment-specific configuration.
-    - **Summary of Changes:** The  was updated after the previous one was compromised and revoked.
+  - **Importance:** This is a crucial new utility for the FIBU module. It solves the core problem of inconsistent data formats by normalizing raw transaction data from various MongoDB collections (Amazon, PayPal, etc.) into a single, unified  object.
+  - **Changes:** Created from scratch to map fields like  and  to a common  and .
 
 - ****
-    - **Importance:** Prevents secrets and build artifacts from being committed to version control.
-    - **Summary of Changes:** The file was cleaned up to remove duplicate and invalid entries that were causing warnings.
+  - **Importance:** This is the heart of the new accounting logic. It orchestrates the process of finding both a  (document) and a  (account) for a given transaction, fulfilling the Dual-Assignment requirement.
+  - **Changes:** Created from scratch to replace the older, single-assignment logic.
+
+- ****
+  - **Importance:** The new API endpoint that exposes the 's functionality. This is used for the large-scale re-processing of all historical transactions.
+  - **Changes:** Created from scratch.
+
+- ****
+  - **Importance:** A new, enhanced UI component for manual transaction assignment. It's designed to allow the user to select both a document and an account in a single interface, directly supporting the core FIBU requirements.
+  - **Changes:** Created from scratch as a replacement for the older, simpler .
+
+- ****
+  - **Importance:** The main frontend page.
+  - **Changes:** The hardcoded  for fetching companies was removed. The  attribute on the autopilot limit input was removed to fix a UI bug. The original  logic for the autopilot is now obsolete but likely still present in the code.
 </code_architecture>
 
 <pending_tasks>
-- **Fix Production Data Loading:** The deployed application shows  because the Google API credentials (Analytics, Search) were not configured in the production environment. The user needs to create and add these secrets to the deployment environment.
-- **Fix Production Dark Mode:** The dark mode CSS styles are not being applied correctly in the deployed version, making the UI difficult to read. This needs to be investigated and fixed.
-- **Rotate Exposed Secrets:** As a security precaution, the user should be advised to rotate all other secrets (e.g., eBay, Google) that were exposed in the Git commit history.
+- **Fix Beleg Matching:** The root cause of document matching failure needs to be addressed. The  collection is empty, so the process of populating it with invoices from JTL or other sources must be found and fixed.
+- **Complete Frontend UI:** Fully integrate the  and  into the  and  to allow seamless manual assignment and correction.
+- **Implement 10it Export:** Begin Phase 3 of the FIBU plan, which involves creating the API and logic to export accounting data in the DATEV/10it-compatible CSV format.
 </pending_tasks>
 
 <current_work>
-The AI engineer's most recent work was a comprehensive effort to make the Score-Zentrale application fully functional and deployable. This concluded a long and complex session that covered three main areas:
+Immediately before the summary request, the work was split between two parallel tasks, prompted by the user's request to do both:
 
-1.  **Core Functionality Restoration:** The engineer successfully fixed the main dashboard, which was not loading data, by re-implementing all necessary  hooks in . They also repaired the broken tab navigation system by adding a  listener.
+1.  **Backend Re-Run & Debugging:** A large-scale re-run of the new dual-matching logic was executing in the background on all 8,541 transactions for October 2025. This successfully assigned accounts to over 97% of transactions. In parallel, the engineer was actively debugging why **zero** documents (Belege) were being matched. This led to the discovery that the source collection for documents, , is empty. The PayPal matching logic was also being refined to improve its success rate.
 
-2.  **Deployment & Build Error Resolution:** A marathon debugging session was undertaken to fix over two dozen TypeScript errors, incorrect import paths, and syntax issues that were causing the production build () to fail. This involved systematically correcting type-casting issues for MongoDB operations and refactoring code incompatible with the build environment (e.g., replacing  with ).
+2.  **Frontend Development:** The engineer was building out the user interface for manual assignments to fulfill the user's request for clear menus and linking capabilities. This involved creating new React components:  for document details and  to display a list of documents. The next step was to integrate these new components and the previously created  into the main FIBU dashboard.
 
-3.  **Security & Configuration Management:** The engineer guided the user through a critical security incident where an OpenAI API key was compromised and had to be rotated. This was followed by a difficult process of resolving GitHub's Push Protection feature, which was blocking commits due to secrets in the repository's history. The user had to repeatedly allow detected secrets until the push was successful.
-
-Immediately before this summary, the user had confirmed that the final Git push worked and asked the engineer to prepare the project for forking.
+The final user message pivoted away from this work, explicitly requesting the creation of comprehensive documentation to prepare the project for forking.
 </current_work>
 
 <optional_next_step>
-Acknowledge the user's request and confirm that all recent fixes have been saved and the repository is in a clean, stable state, ready for them to fork.
+Create a comprehensive  file to document the project setup, architecture, and environment, as explicitly requested by the user to prepare the project for forking.
 </optional_next_step>
+
+<quotes>
+bitte ausführliche und gute übergBE ZUNM FORKING MIT DEN tXT DATEIN JETZT EBEN AUSFÜLLEN
+</quotes>
