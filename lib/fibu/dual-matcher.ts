@@ -199,6 +199,9 @@ export async function findDualMatch(
   
   // Wenn kein Konto über Rechnung gefunden → Klassifikator verwenden
   if (!result.konto.found) {
+    // Debug: Log Zahlung-Felder
+    console.log(`[Dual-Matcher] Klassifiziere Zahlung: betrag=${zahlung.betrag}, kategorie=${zahlung.kategorie}, verwendungszweck=${zahlung.verwendungszweck}`)
+    
     const suggestion = await classifyKonto(zahlung, db)
     
     if (suggestion) {
