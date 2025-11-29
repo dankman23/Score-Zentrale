@@ -173,23 +173,51 @@ export async function GET(request: NextRequest) {
       }
       })
       
-      // MongoDB speichern
+      // MongoDB speichern - SICHER!
+      // NUR neue Rechnungen einfügen, existierende NICHT überschreiben
       console.log('[Externe Rechnungen] Speichere', rechnungen.length, 'in MongoDB...')
       
+      let neuEingefuegt = 0
+      let bereitsVorhanden = 0
+      
       for (const rechnung of rechnungen) {
-        await externColl.updateOne(
-          { kExternerBeleg: rechnung.kExternerBeleg },
-          { 
-            $set: { 
-              ...rechnung,
-              belegdatum: new Date(rechnung.datum),
-              updated_at: new Date() 
-            },
-            $setOnInsert: { created_at: new Date() }
-          },
-          { upsert: true }
-        )
+        // Prüfen ob bereits vorhanden
+        const exists = await externColl.findOne({ kExternerBeleg: rechnung.kExternerBeleg })
+        
+        if (!exists) {
+          // NEU: Komplett einfügen
+          await externColl.insertOne({
+            ...rechnung,
+            belegdatum: new Date(rechnung.datum),
+            created_at: new Date(),
+            updated_at: new Date(),
+            // Verknüpfungs-Felder initialisieren
+            zugeordneteZahlung: null,
+            zugeordnetesKonto: null,
+            manuellZugeordnet: false
+          })
+          neuEingefuegt++
+        } else {
+          // EXISTIERT: Nur unkritische Felder aktualisieren
+          // NICHT: Verknüpfungen, debitorKonto, sachkonto überschreiben!
+          await externColl.updateOne(
+            { kExternerBeleg: rechnung.kExternerBeleg },
+            { 
+              $set: { 
+                // Nur Status und Beträge aktualisieren, falls sich geändert
+                brutto: rechnung.brutto,
+                netto: rechnung.netto,
+                steuer: rechnung.steuer,
+                updated_at: new Date()
+              }
+              // $set enthält KEINE Verknüpfungs-Felder!
+            }
+          )
+          bereitsVorhanden++
+        }
       }
+      
+      console.log(`[Externe Rechnungen] ✅ ${neuEingefuegt} neu eingefügt, ${bereitsVorhanden} bereits vorhanden (nicht überschrieben)`)
       
       console.log('[Externe Rechnungen] ✅ In MongoDB gespeichert')
       
