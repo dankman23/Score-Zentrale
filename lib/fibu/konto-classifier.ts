@@ -153,6 +153,33 @@ async function classifyByCategory(
     }
   }
   
+  // PayPal: Wenn AU-Nummer im verwendungszweck → Erlös
+  if (zahlung.anbieter?.toLowerCase().includes('paypal')) {
+    const auPattern = /AU_\d+_SW\d+/i
+    if (verwendungszweck.match(auPattern)) {
+      return {
+        konto: '8400',
+        steuer: 19,
+        bezeichnung: 'Erlöse 19% USt (PayPal)',
+        confidence: 0.90,
+        method: 'category',
+        reason: 'PayPal Zahlung mit AU-Nummer → Erlös'
+      }
+    }
+    
+    // Negativer Betrag → Gebühr
+    if (zahlung.betrag < 0) {
+      return {
+        konto: '4950',
+        steuer: 19,
+        bezeichnung: 'PayPal-Gebühren',
+        confidence: 0.85,
+        method: 'category',
+        reason: 'PayPal negativer Betrag → Gebühr'
+      }
+    }
+  }
+  
   return null
 }
 
