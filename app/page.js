@@ -1383,7 +1383,8 @@ export default function App() {
   const loadColdProspects = async (filterOverride = null) => {
     try {
       const filterToUse = filterOverride || coldStatusFilter
-      const res = await fetch(`/api/coldleads/search?status=${filterToUse}&limit=200`)
+      // Lade alle Prospects des gewählten Filters (limit=0 = kein Limit)
+      const res = await fetch(`/api/coldleads/search?status=${filterToUse}&limit=0`)
       const data = await res.json()
       if (data.ok) {
         setColdProspects(data.prospects)
