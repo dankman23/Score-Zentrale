@@ -140,7 +140,6 @@ export async function GET(request: NextRequest) {
         '' AS sachkonto
       FROM dbo.tgutschrift g
       LEFT JOIN dbo.tKunde k ON g.kKunde = k.kKunde
-      LEFT JOIN dbo.tLand la ON k.cLand = la.cISO
       WHERE g.dErstellt >= @from
         AND g.dErstellt < DATEADD(day, 1, @to)
       
