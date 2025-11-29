@@ -26,19 +26,20 @@ export function mapZahlung(rawDoc: any, anbieter: string): any {
   
   // PayPal
   if (anbieter === 'PayPal') {
+    // PayPal Transaktionen sind bereits durch /api/fibu/zahlungen gemapped
+    // verwendungszweck = AU-Nummer (z.B. "AU_12282_SW6")
+    // Wir müssen hier nur sicherstellen dass alle Felder vorhanden sind
     return {
       ...rawDoc,
       anbieter: 'PayPal',
-      betrag: rawDoc.amount_value || rawDoc.betrag || 0,
-      datum: rawDoc.transaction_info_transaction_initiation_date || rawDoc.datum,
-      datumDate: rawDoc.transaction_info_transaction_initiation_date 
-        ? new Date(rawDoc.transaction_info_transaction_initiation_date)
-        : (rawDoc.datumDate || rawDoc.datum),
-      verwendungszweck: rawDoc.transaction_info_transaction_subject || rawDoc.verwendungszweck || '',
-      beschreibung: rawDoc.transaction_info_transaction_note || rawDoc.beschreibung,
-      kategorie: rawDoc.transaction_info_transaction_event_code || rawDoc.kategorie,
-      referenz: rawDoc.transaction_info_paypal_reference_id || rawDoc.referenz,
-      gegenpartei: rawDoc.payer_info_payer_name_alternate_full_name || rawDoc.gegenpartei
+      betrag: rawDoc.betrag || 0,
+      datum: rawDoc.datum,
+      datumDate: rawDoc.datum ? new Date(rawDoc.datum) : null,
+      verwendungszweck: rawDoc.verwendungszweck || '',
+      beschreibung: rawDoc.betreff || rawDoc.beschreibung || '',
+      kategorie: rawDoc.kategorie || (rawDoc.betrag < 0 ? 'Fee' : 'Payment'),
+      referenz: rawDoc.referenz || rawDoc.transaktionsId || '',
+      gegenpartei: rawDoc.gegenkonto || rawDoc.kundenName || ''
     }
   }
   
