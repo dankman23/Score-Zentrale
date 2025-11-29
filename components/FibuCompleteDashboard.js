@@ -54,9 +54,14 @@ export default function FibuCompleteDashboard() {
   const [einstellungenSubTab, setEinstellungenSubTab] = useState('bank-import') // Sub-tab für Einstellungen
   const [showExportDialog, setShowExportDialog] = useState(false)
   const [tabFilters, setTabFilters] = useState({}) // Store filters per tab
-  const [quote] = useState(() => getRandomQuote())
+  const [quote, setQuote] = useState('') // Empty initially to avoid hydration mismatch
   const [showRefreshMenu, setShowRefreshMenu] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
+  
+  // Set quote after mount to avoid hydration mismatch
+  useEffect(() => {
+    setQuote(getRandomQuote())
+  }, [])
 
   // Parse URL parameters on mount and URL changes
   useEffect(() => {
