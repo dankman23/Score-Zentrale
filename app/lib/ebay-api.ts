@@ -114,7 +114,7 @@ export class EbayFinancesAPI {
 
     // Finances API: getTransactions
     // https://developer.ebay.com/api-docs/sell/finances/resources/transaction/methods/getTransactions
-    const url = new URL(`${this.baseUrl}/sell/finances/v1/transaction`)
+    const url = new URL(`${this.baseUrl}/sell/finances/v1/transaction_summary`)
     url.searchParams.append('filter', `transactionDate:[${fromDate}..${toDate}]`)
     url.searchParams.append('limit', limit.toString())
     url.searchParams.append('sort', 'transactionDate')
