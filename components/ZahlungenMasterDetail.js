@@ -25,7 +25,16 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
   const loadZahlungen = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/fibu/zahlungen?from=${zeitraum.from}&to=${zeitraum.to}`)
+      // Zeitraum kann String "YYYY-MM-DD_YYYY-MM-DD" oder Objekt {from, to} sein
+      let from, to
+      if (typeof zeitraum === 'string') {
+        [from, to] = zeitraum.split('_')
+      } else {
+        from = zeitraum.from
+        to = zeitraum.to
+      }
+      
+      const response = await fetch(`/api/fibu/zahlungen?from=${from}&to=${to}`)
       const data = await response.json()
       
       if (data.ok) {
