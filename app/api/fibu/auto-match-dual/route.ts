@@ -80,11 +80,13 @@ export async function POST(request: NextRequest) {
         query.status = { $in: ['paid', 'authorized'] }
       }
       
+      const findQuery = collection.find(query)
+      
       if (limit) {
-        query.$limit = limit
+        findQuery.limit(limit)
       }
       
-      const zahlungen = await collection.find(query).toArray()
+      const zahlungen = await findQuery.toArray()
       results.stats.totalZahlungen += zahlungen.length
       results.stats.byAnbieter[source.name] = {
         total: zahlungen.length,
