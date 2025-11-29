@@ -501,16 +501,6 @@ export default function FibuCompleteDashboard() {
                 📋 Kontenplan
               </button>
               <button
-                onClick={() => setEinstellungenSubTab('auto-zuordnung')}
-                className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
-                  einstellungenSubTab === 'auto-zuordnung'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                🔍 Auto-Zuordnung
-              </button>
-              <button
                 onClick={() => setEinstellungenSubTab('kreditoren')}
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
                   einstellungenSubTab === 'kreditoren'
@@ -535,11 +525,13 @@ export default function FibuCompleteDashboard() {
             {/* Sub-Tab Content */}
             {einstellungenSubTab === 'bank-import' && <BankImport />}
             {einstellungenSubTab === 'kontenplan' && <KontenplanView />}
-            {einstellungenSubTab === 'auto-zuordnung' && <FuzzyMatchingView zeitraum={selectedPeriod} />}
             {einstellungenSubTab === 'kreditoren' && <KreditorenManagement />}
             {einstellungenSubTab === 'export' && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h3 className="text-lg font-semibold mb-4">10it / DATEV Export</h3>
+                <p className="text-gray-600 mb-4">
+                  Exportieren Sie Ihre Buchhaltungsdaten im DATEV-Format für die Übergabe an Ihren Steuerberater oder Import in 10it (Addison).
+                </p>
                 <button
                   onClick={() => setShowExportDialog(true)}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
