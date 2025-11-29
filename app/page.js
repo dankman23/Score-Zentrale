@@ -619,13 +619,13 @@ export default function App() {
   // Autopilot
   const [autopilotState, setAutopilotState] = useState({ 
     running: false, 
-    dailyLimit: 50, 
+    dailyLimit: 500, 
     dailyCount: 0, 
-    remaining: 50,
+    remaining: 500,
     currentPhase: null,
     lastActivity: null
   })
-  const [autopilotLimit, setAutopilotLimit] = useState(50)
+  const [autopilotLimit, setAutopilotLimit] = useState(500)
   const autopilotIntervalRef = useRef(null)
 
   // Marketing → Warmaquise
