@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
           ELSE k.cVorname + ' ' + k.cNachname
         END AS kundenName,
         ISNULL(la.cISO, 'DE') AS kundenLand,
-        ISNULL(k.cUSTID, '') AS kundenUstId,
+        ISNULL(k.cUstId, '') AS kundenUstId,
         r.kZahlungsart,
         ISNULL(za.cName, 'Unbekannt') AS zahlungsart,
         CASE WHEN r.cStatus = 'Bezahlt' THEN 1 ELSE 0 END AS istBezahlt,
@@ -130,7 +130,7 @@ export async function GET(request: NextRequest) {
           ELSE k.cVorname + ' ' + k.cNachname
         END AS kundenName,
         ISNULL(la.cISO, 'DE') AS kundenLand,
-        ISNULL(k.cUSTID, '') AS kundenUstId,
+        ISNULL(k.cUstId, '') AS kundenUstId,
         NULL AS kZahlungsart,
         'Gutschrift' AS zahlungsart,
         0 AS istBezahlt,
