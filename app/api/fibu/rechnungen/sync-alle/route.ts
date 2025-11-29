@@ -47,34 +47,49 @@ export async function POST(request: NextRequest) {
     for (const r of vkRechnungen) {
       const uniqueId = `RECHNUNG_${r.kRechnung || r._id.toString()}`
       
-      await alleRechnungenColl.updateOne(
-        { uniqueId },
-        {
-          $set: {
-            uniqueId,
-            quelle: 'RECHNUNG',
-            belegId: r.kRechnung || r._id.toString(),
-            belegnummer: r.cRechnungsNr || r.rechnungsNr,
-            belegdatum: r.rechnungsdatum,
-            brutto: r.brutto || 0,
-            netto: r.netto || 0,
-            mwst: r.mwst || 0,
-            kundenName: r.kundenName || 'Unbekannt',
-            kundenLand: r.kundenLand || 'DE',
-            kundenUstId: r.kundenUstId || '',
-            zahlungsart: r.zahlungsart || 'Unbekannt',
-            status: r.status || 'Offen',
-            cBestellNr: r.cBestellNr || '',
-            kBestellung: r.kBestellung,
-            debitorKonto: r.debitorKonto,
-            sachkonto: r.sachkonto,
-            updated_at: new Date()
-          },
-          $setOnInsert: { created_at: new Date() }
-        },
-        { upsert: true }
-      )
-      stats.vkGespeichert++
+      // Prüfen ob bereits vorhanden
+      const exists = await alleRechnungenColl.findOne({ uniqueId })
+      
+      if (!exists) {
+        // NEU: Komplett einfügen
+        await alleRechnungenColl.insertOne({
+          uniqueId,
+          quelle: 'RECHNUNG',
+          belegId: r.kRechnung || r._id.toString(),
+          belegnummer: r.cRechnungsNr || r.rechnungsNr,
+          belegdatum: r.rechnungsdatum,
+          brutto: r.brutto || 0,
+          netto: r.netto || 0,
+          mwst: r.mwst || 0,
+          kundenName: r.kundenName || 'Unbekannt',
+          kundenLand: r.kundenLand || 'DE',
+          kundenUstId: r.kundenUstId || '',
+          zahlungsart: r.zahlungsart || 'Unbekannt',
+          status: r.status || 'Offen',
+          cBestellNr: r.cBestellNr || '',
+          kBestellung: r.kBestellung,
+          debitorKonto: r.debitorKonto,
+          sachkonto: r.sachkonto,
+          created_at: new Date(),
+          updated_at: new Date(),
+          // Verknüpfungs-Felder
+          zugeordneteZahlung: null,
+          zugeordnetesKonto: null,
+          manuellZugeordnet: false
+        })
+        stats.vkGespeichert++
+      } else {
+        // EXISTIERT: Nur Status aktualisieren, KEINE Verknüpfungen überschreiben!
+        await alleRechnungenColl.updateOne(
+          { uniqueId },
+          { 
+            $set: { 
+              status: r.status || 'Offen',
+              updated_at: new Date()
+            }
+          }
+        )
+      }
     }
     
     console.log(`[Sync] ✅ ${stats.vkGespeichert} VK-Rechnungen gespeichert`)
