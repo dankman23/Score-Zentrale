@@ -429,9 +429,9 @@ export default function FibuCompleteDashboard() {
           <FibuMonatsUebersicht selectedPeriod={selectedPeriod} summaryData={summary} />
         )}
 
-        {/* 2. EK-Belege */}
+        {/* 2. EK-Belege - Master-Detail-Layout */}
         {activeTab === 'ek-belege' && (
-          <EKRechnungenView zeitraum={selectedPeriod} initialFilter={tabFilters['ek']} />
+          <EKBelegeMasterDetail zeitraum={selectedPeriod} />
         )}
 
         {/* 3. VK-Belege */}
