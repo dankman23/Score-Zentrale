@@ -104,12 +104,23 @@ async function classifyByCategory(
   if (!zahlung.kategorie) return null
   
   const kategorie = zahlung.kategorie.trim()
+  const verwendungszweck = zahlung.verwendungszweck || ''
   
   // Amazon-Kategorien
   if (zahlung.anbieter?.toLowerCase().includes('amazon') || 
-      zahlung.verwendungszweck?.toLowerCase().includes('amazon')) {
+      verwendungszweck.toLowerCase().includes('amazon')) {
     
-    const mapping = AMAZON_MAPPINGS[kategorie]
+    // WICHTIG: Bei Amazon steht die echte Kategorie oft im verwendungszweck!
+    // z.B. kategorie="ItemPrice", verwendungszweck="Tax" oder "Shipping"
+    
+    // Prüfe erst verwendungszweck
+    let mapping = AMAZON_MAPPINGS[verwendungszweck]
+    
+    // Falls nicht gefunden, prüfe kategorie
+    if (!mapping) {
+      mapping = AMAZON_MAPPINGS[kategorie]
+    }
+    
     if (mapping) {
       return {
         konto: mapping.konto,
@@ -117,7 +128,7 @@ async function classifyByCategory(
         bezeichnung: mapping.bezeichnung,
         confidence: 0.95,
         method: 'category',
-        reason: `Amazon Kategorie "${kategorie}"`
+        reason: `Amazon Kategorie "${verwendungszweck || kategorie}"`
       }
     }
   }
