@@ -6,16 +6,20 @@
 export function mapZahlung(rawDoc: any, anbieter: string): any {
   // Amazon Settlements
   if (anbieter === 'Amazon') {
+    // Amazon Format: amountType z.B. "Order/ItemPrice/Principal"
+    const amountTypeKey = (rawDoc.amountType || '').split('/').pop() // "Principal"
+    
     return {
       ...rawDoc,
       anbieter: 'Amazon',
       betrag: rawDoc.amount || rawDoc.betrag || 0,
       datum: rawDoc.postedDate || rawDoc.datum,
       datumDate: rawDoc.postedDate ? new Date(rawDoc.postedDate) : (rawDoc.datumDate || rawDoc.datum),
-      verwendungszweck: rawDoc.amountType || rawDoc.verwendungszweck || '',
-      kategorie: rawDoc.type || rawDoc.kategorie || '',
-      beschreibung: rawDoc.description || rawDoc.beschreibung,
-      referenz: rawDoc.orderId || rawDoc.referenz,
+      verwendungszweck: amountTypeKey || rawDoc.verwendungszweck || '',  // z.B. "Principal", "Tax", "Shipping"
+      kategorie: rawDoc.amountType?.includes('ItemPrice') ? 'ItemPrice' : 
+                 (rawDoc.amountType?.includes('ItemFees') ? 'ItemFees' : amountTypeKey) || '',
+      beschreibung: rawDoc.amountDescription || rawDoc.beschreibung,
+      referenz: rawDoc.orderId || rawDoc.merchantOrderId || rawDoc.referenz,
       gegenpartei: null
     }
   }
