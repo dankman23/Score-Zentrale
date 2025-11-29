@@ -171,30 +171,73 @@ export async function GET(request: NextRequest) {
           kZahlungsart: r.kZahlungsart
         }
       }
-    })
-    
-    // MongoDB speichern (nutze mongoDb Variable von oben)
-    const collection = mongoDb.collection('fibu_externe_rechnungen')
-    
-    for (const rechnung of rechnungen) {
-      await collection.updateOne(
-        { kExternerBeleg: rechnung.kExternerBeleg },
-        { 
-          $set: { 
-            ...rechnung,
-            updated_at: new Date() 
+      })
+      
+      // MongoDB speichern
+      console.log('[Externe Rechnungen] Speichere', rechnungen.length, 'in MongoDB...')
+      
+      for (const rechnung of rechnungen) {
+        await externColl.updateOne(
+          { kExternerBeleg: rechnung.kExternerBeleg },
+          { 
+            $set: { 
+              ...rechnung,
+              belegdatum: new Date(rechnung.datum),
+              updated_at: new Date() 
+            },
+            $setOnInsert: { created_at: new Date() }
           },
-          $setOnInsert: { created_at: new Date() }
-        },
-        { upsert: true }
-      )
+          { upsert: true }
+        )
+      }
+      
+      console.log('[Externe Rechnungen] ✅ In MongoDB gespeichert')
+      
+      // Neu aus MongoDB laden
+      cached = await externColl.find({
+        belegdatum: {
+          $gte: startDate,
+          $lte: endDate
+        }
+      }).sort({ belegdatum: -1 }).toArray()
     }
+    
+    // 3. Aus MongoDB zurückgeben (schnell!)
+    const mapped = cached.map(r => ({
+      kExternerBeleg: r.kExternerBeleg,
+      rechnungsNr: r.rechnungsNr || r.cRechnungsNr || r._mongoOriginal?.belegnummer || 'N/A',
+      datum: r.datum || r.belegdatum,
+      kunde: r.kunde || 'Unbekannt',
+      kundenLand: r.kundenLand || 'DE',
+      kundenUstId: r.kundenUstId || '',
+      kKunde: r.kKunde,
+      zahlungsart: r.zahlungsart || 'Amazon Payment',
+      waehrung: r.waehrung || 'EUR',
+      brutto: r.brutto || r.betrag || 0,
+      betrag: r.betrag || r.brutto || 0,
+      netto: r.netto || 0,
+      steuer: r.steuer || r.mwst || 0,
+      mwstSatz: r.mwstSatz || 0,
+      debitorKonto: r.debitorKonto || null,
+      sachkonto: r.sachkonto || '8400',
+      status: r.status || 'Bezahlt',
+      quelle: r.quelle || 'Amazon/Extern',
+      zahlungId: r.zahlungId || null,
+      zahlungsdatum: r.zahlungsdatum,
+      zahlungsBetrag: r.zahlungsBetrag,
+      zahlungsHinweis: r.zahlungsHinweis || 'Amazon VCS-Lite',
+      bestellnummer: r.bestellnummer || '',
+      kBestellung: r.kBestellung,
+      betragDifferenz: r.betragDifferenz || 0,
+      vollstaendigBezahlt: r.vollstaendigBezahlt !== undefined ? r.vollstaendigBezahlt : true
+    }))
     
     return NextResponse.json({
       ok: true,
-      rechnungen,
-      total: rechnungen.length,
-      zeitraum: { from, to }
+      rechnungen: mapped,
+      total: mapped.length,
+      zeitraum: { from, to },
+      quelle: cached.length > 0 && !refresh ? 'MongoDB (gecacht)' : 'SQL → MongoDB'
     })
     
   } catch (error: any) {
