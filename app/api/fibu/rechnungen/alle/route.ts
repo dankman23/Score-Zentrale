@@ -44,10 +44,7 @@ export async function GET(request: NextRequest) {
         r.tBestellung_kBestellung AS kBestellung,
         b.cBestellNr,
         r.tKunde_kKunde AS kKunde,
-        CASE 
-          WHEN k.cFirma IS NOT NULL AND k.cFirma != '' THEN k.cFirma
-          ELSE k.cVorname + ' ' + k.cNachname
-        END AS kundenName,
+        ISNULL(k.cFirma, 'Unbekannt') AS kundenName,
         'DE' AS kundenLand,
         '' AS kundenUstId,
         r.kZahlungsart,
@@ -124,10 +121,7 @@ export async function GET(request: NextRequest) {
         NULL AS kBestellung,
         '' AS cBestellNr,
         g.kKunde,
-        CASE 
-          WHEN k.cFirma IS NOT NULL AND k.cFirma != '' THEN k.cFirma
-          ELSE k.cVorname + ' ' + k.cNachname
-        END AS kundenName,
+        ISNULL(k.cFirma, 'Unbekannt') AS kundenName,
         'DE' AS kundenLand,
         '' AS kundenUstId,
         NULL AS kZahlungsart,
