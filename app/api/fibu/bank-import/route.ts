@@ -182,24 +182,49 @@ export async function POST(request: NextRequest) {
     const collection = db.collection('fibu_bank_transaktionen')
     
     let imported = 0
+    let skipped = 0
+    
     for (const transaktion of transaktionen) {
       const uniqueKey = `${transaktion.quelle}_${transaktion.datum.toISOString()}_${transaktion.betrag}_${transaktion.verwendungszweck.substring(0, 50)}`
       
-      const result = await collection.updateOne(
-        { uniqueKey },
-        {
-          $set: {
-            ...transaktion,
-            uniqueKey,
-            updated_at: new Date()
-          },
-          $setOnInsert: { created_at: new Date() }
-        },
-        { upsert: true }
-      )
+      // Prüfen ob bereits vorhanden
+      const exists = await collection.findOne({ uniqueKey })
       
-      if (result.upsertedCount > 0) imported++
+      if (!exists) {
+        // NEU: Komplett einfügen mit Verknüpfungs-Feldern
+        await collection.insertOne({
+          ...transaktion,
+          uniqueKey,
+          created_at: new Date(),
+          updated_at: new Date(),
+          // Verknüpfungs-Felder initialisieren
+          istZugeordnet: false,
+          zugeordneteRechnung: null,
+          zugeordnetesKonto: null,
+          zuordnungsArt: null,
+          zuordnungsMethode: null
+        })
+        imported++
+      } else if (exists.istZugeordnet) {
+        // BEREITS ZUGEORDNET: Überhaupt nichts tun! ✅
+        skipped++
+        console.log(`[Bank-Import] ⚠️ Überspringe zugeordnete Transaktion: ${uniqueKey}`)
+      } else {
+        // EXISTIERT aber nicht zugeordnet: Nur Betrag/Datum aktualisieren (falls korrigiert)
+        await collection.updateOne(
+          { uniqueKey },
+          {
+            $set: {
+              betrag: transaktion.betrag,
+              datum: transaktion.datum,
+              updated_at: new Date()
+            }
+          }
+        )
+      }
     }
+    
+    console.log(`[Bank-Import] ✅ ${imported} neu, ${skipped} zugeordnete übersprungen`)
     
     return NextResponse.json({
       ok: true,
