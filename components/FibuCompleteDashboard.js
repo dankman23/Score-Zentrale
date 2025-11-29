@@ -338,11 +338,11 @@ export default function FibuCompleteDashboard() {
             </p>
           </div>
 
-          {/* Tabs - Neue 6-Tab-Struktur */}
-          <div className="flex gap-6 border-t border-gray-100">
+          {/* Tabs - Neue 7-Tab-Struktur */}
+          <div className="flex gap-6 border-t border-gray-100 overflow-x-auto">
             <button
               onClick={() => setActiveTab('uebersicht')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition whitespace-nowrap ${
                 activeTab === 'uebersicht'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -352,7 +352,7 @@ export default function FibuCompleteDashboard() {
             </button>
             <button
               onClick={() => setActiveTab('ek-belege')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition relative ${
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition relative whitespace-nowrap ${
                 activeTab === 'ek-belege'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -367,7 +367,7 @@ export default function FibuCompleteDashboard() {
             </button>
             <button
               onClick={() => setActiveTab('vk-belege')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition whitespace-nowrap ${
                 activeTab === 'vk-belege'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -377,7 +377,7 @@ export default function FibuCompleteDashboard() {
             </button>
             <button
               onClick={() => setActiveTab('umsaetze')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition whitespace-nowrap ${
                 activeTab === 'umsaetze'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -386,18 +386,18 @@ export default function FibuCompleteDashboard() {
               💰 Umsätze
             </button>
             <button
-              onClick={() => setActiveTab('einstellungen')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
-                activeTab === 'einstellungen'
+              onClick={() => setActiveTab('auto-zuordnung')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition whitespace-nowrap ${
+                activeTab === 'auto-zuordnung'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
-              ⚙️ Einstellungen
+              🔍 Auto-Zuordnung
             </button>
             <button
               onClick={() => setActiveTab('zuordnung')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition relative ${
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition relative whitespace-nowrap ${
                 activeTab === 'zuordnung'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -409,6 +409,16 @@ export default function FibuCompleteDashboard() {
                   {(issues?.zahlungenOhneZuordnung || 0) + (issues?.ekOhneKreditor || 0)}
                 </span>
               )}
+            </button>
+            <button
+              onClick={() => setActiveTab('einstellungen')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition whitespace-nowrap ${
+                activeTab === 'einstellungen'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              ⚙️ Einstellungen
             </button>
           </div>
         </div>
