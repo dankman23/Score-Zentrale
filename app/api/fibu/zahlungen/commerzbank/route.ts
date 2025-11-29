@@ -130,9 +130,28 @@ export async function GET(request: NextRequest) {
 
     console.log(`[Commerzbank] Saving ${formattedTransactions.length} transactions to MongoDB...`)
 
+    // WICHTIG: Zugeordnete Zahlungen (istZugeordnet=true) dürfen NICHT überschrieben werden!
+    const transactionIds = formattedTransactions.map(t => t.transactionId)
+    const zugeordnete = await collection
+      .find({
+        transactionId: { $in: transactionIds },
+        iban: accountIban,
+        istZugeordnet: true
+      })
+      .project({ transactionId: 1 })
+      .toArray()
+    
+    const zugeordneteIds = new Set(zugeordnete.map(z => z.transactionId))
+    
+    if (zugeordneteIds.size > 0) {
+      console.log(`[Commerzbank] ⚠️ ${zugeordneteIds.size} bereits zugeordnete Transaktionen werden geschützt`)
+    }
+
     // Upsert in MongoDB (basierend auf transactionId + IBAN)
     // WICHTIG: Bewahre User-Daten (Matching) mit $setOnInsert
-    const bulkOps = formattedTransactions.map(t => ({
+    const bulkOps = formattedTransactions
+      .filter(t => !zugeordneteIds.has(t.transactionId)) // Überspringe zugeordnete! ✅
+      .map(t => ({
       updateOne: {
         filter: { 
           transactionId: t.transactionId,
