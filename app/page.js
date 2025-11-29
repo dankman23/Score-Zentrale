@@ -1389,8 +1389,8 @@ export default function App() {
         setColdProspects(data.prospects)
         console.log(`Loaded ${data.prospects.length} prospects with status: ${filterToUse}`)
         
-        // Statistiken berechnen - lade alle Prospects für korrekte Zählung
-        const allRes = await fetch(`/api/coldleads/search?status=all&limit=1000`)
+        // Statistiken berechnen - lade ALLE Prospects für korrekte Zählung (KEIN LIMIT)
+        const allRes = await fetch(`/api/coldleads/search?status=all&limit=0`)
         const allData = await allRes.json()
         if (allData.ok) {
           const all = allData.prospects
