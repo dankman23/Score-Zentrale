@@ -47,21 +47,24 @@ export async function classifyKonto(
     .join(' ')
     .trim()
   
+  // Kategorie hat Priorität (auch ohne Text)
+  if (zahlung.kategorie) {
+    const categoryMatch = await classifyByCategory(zahlung, db)
+    if (categoryMatch) {
+      console.log(`[Konto Classifier] ✅ Kategorie-Match: ${categoryMatch.konto} (${zahlung.kategorie})`)
+      return categoryMatch
+    }
+  }
+  
+  // Wenn kein Text UND keine Kategorie → null
   if (!text) {
-    console.log('[Konto Classifier] Keine Text-Informationen vorhanden')
+    console.log('[Konto Classifier] Keine Text-Informationen und keine Kategorie')
     return null
   }
   
   console.log(`[Konto Classifier] Klassifiziere: "${text.substring(0, 80)}"`)
   
-  // Stufe 1: Kategorie-basiert (Amazon, PayPal, etc.)
-  if (zahlung.kategorie) {
-    const categoryMatch = await classifyByCategory(zahlung, db)
-    if (categoryMatch) {
-      console.log(`[Konto Classifier] ✅ Kategorie-Match: ${categoryMatch.konto}`)
-      return categoryMatch
-    }
-  }
+  // Stufe 1: Kategorie-basiert wurde bereits oben geprüft
   
   // Stufe 2: Statische Mappings (Text-basiert)
   const staticMatch = await classifyByStaticMapping(text)
