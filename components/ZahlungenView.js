@@ -614,37 +614,18 @@ export default function ZahlungenView({ zeitraum, initialFilter }) {
         )}
       </div>
 
-      {/* Zuordnungs-Modal */}
+      {/* Modal für Zuordnung - NEUES verbessertes Modal */}
       {showZuordnungModal && selectedZahlung && (
-        <ZuordnungsModal
+        <ZahlungDetailModal
           zahlung={selectedZahlung}
           onClose={() => {
             setShowZuordnungModal(false)
             setSelectedZahlung(null)
           }}
-          onZuordnen={async (zuordnungData) => {
-            try {
-              const res = await fetch('/api/fibu/zahlungen/zuordnen', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(zuordnungData)
-              })
-              
-              const data = await res.json()
-              
-              if (data.ok) {
-                alert(`✅ Zuordnung erfolgreich!\n${data.updated} Zahlung(en) zugeordnet`)
-                setShowZuordnungModal(false)
-                setSelectedZahlung(null)
-                // Reload data
-                loadZahlungen()
-              } else {
-                alert(`❌ Fehler: ${data.error}`)
-              }
-            } catch (error) {
-              console.error('Zuordnungs-Fehler:', error)
-              alert(`❌ Fehler beim Zuordnen: ${error.message}`)
-            }
+          onSave={() => {
+            setShowZuordnungModal(false)
+            setSelectedZahlung(null)
+            loadZahlungen()
           }}
         />
       )}
