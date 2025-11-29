@@ -272,7 +272,16 @@ function ZahlungDetailPanel({ zahlung, onUpdate, zeitraum }) {
 
   const loadRechnungen = async () => {
     try {
-      const response = await fetch(`/api/fibu/rechnungen/alle?from=${zeitraum.from}&to=${zeitraum.to}&limit=1000`)
+      // Zeitraum kann String oder Objekt sein
+      let from, to
+      if (typeof zeitraum === 'string') {
+        [from, to] = zeitraum.split('_')
+      } else {
+        from = zeitraum.from
+        to = zeitraum.to
+      }
+      
+      const response = await fetch(`/api/fibu/rechnungen/alle?from=${from}&to=${to}&limit=1000`)
       const data = await response.json()
       if (data.ok) {
         setRechnungen(data.rechnungen || [])
