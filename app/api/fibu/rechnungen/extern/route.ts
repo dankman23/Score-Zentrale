@@ -6,8 +6,13 @@ import { getMssqlPool } from '@/lib/db/mssql'
 import { getDb } from '@/lib/db/mongodb'
 
 /**
- * Externe Rechnungen aus Rechnung.tExternerBeleg laden
+ * Externe Rechnungen aus MongoDB laden (gecacht)
  * Dies sind Amazon VCS-Lite Rechnungen (XRE-XXXXX)
+ * 
+ * WICHTIG:
+ * - Lädt ZUERST aus MongoDB (schnell!)
+ * - Nur bei refresh=true wird aus SQL nachgeladen
+ * - Rechnungen bleiben PERMANENT in MongoDB
  */
 export async function GET(request: NextRequest) {
   try {
@@ -15,38 +20,61 @@ export async function GET(request: NextRequest) {
     const from = searchParams.get('from') || new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().split('T')[0]
     const to = searchParams.get('to') || new Date().toISOString().split('T')[0]
     const limit = parseInt(searchParams.get('limit') || '10000', 10)
+    const refresh = searchParams.get('refresh') === 'true'
     
-    const pool = await getMssqlPool()
+    console.log('[Externe Rechnungen] Lade Zeitraum:', from, 'bis', to, refresh ? '(mit SQL-Refresh)' : '(aus MongoDB)')
     
-    const query = `
-      SELECT TOP ${limit}
-        eb.kExternerBeleg,
-        eb.cBelegnr,
-        eb.dBelegdatumUtc,
-        eb.nBelegtyp,
-        eb.cHerkunft,
-        eb.kKunde,
-        eb.cRAName,
-        eb.cRALandISO,
-        eb.cKaeuferUstId,
-        eb.kZahlungsart,
-        eb.cWaehrungISO,
-        eck.fVkBrutto,
-        eck.fVkNetto,
-        za.cName AS zahlungsartName
-      FROM Rechnung.tExternerBeleg eb
-      LEFT JOIN Rechnung.tExternerBelegEckdaten eck ON eb.kExternerBeleg = eck.kExternerBeleg
-      LEFT JOIN dbo.tZahlungsart za ON eb.kZahlungsart = za.kZahlungsart
-      WHERE eb.dBelegdatumUtc >= @from
-        AND eb.dBelegdatumUtc < DATEADD(day, 1, @to)
-        AND eb.nBelegtyp = 0
-      ORDER BY eb.dBelegdatumUtc DESC
-    `
+    const db = await getDb()
+    const externColl = db.collection('fibu_externe_rechnungen')
     
-    const result = await pool.request()
-      .input('from', from)
-      .input('to', to)
-      .query(query)
+    // 1. Versuche aus MongoDB zu laden
+    const startDate = new Date(from)
+    const endDate = new Date(to + 'T23:59:59.999Z')
+    
+    let cached = await externColl.find({
+      belegdatum: {
+        $gte: startDate,
+        $lte: endDate
+      }
+    }).sort({ belegdatum: -1 }).toArray()
+    
+    console.log('[Externe Rechnungen] Aus MongoDB:', cached.length)
+    
+    // 2. Falls leer ODER refresh gewünscht: aus SQL laden
+    if (cached.length === 0 || refresh) {
+      console.log('[Externe Rechnungen] Lade aus SQL...')
+      
+      const pool = await getMssqlPool()
+      
+      const query = `
+        SELECT TOP ${limit}
+          eb.kExternerBeleg,
+          eb.cBelegnr,
+          eb.dBelegdatumUtc,
+          eb.nBelegtyp,
+          eb.cHerkunft,
+          eb.kKunde,
+          eb.cRAName,
+          eb.cRALandISO,
+          eb.cKaeuferUstId,
+          eb.kZahlungsart,
+          eb.cWaehrungISO,
+          eck.fVkBrutto,
+          eck.fVkNetto,
+          za.cName AS zahlungsartName
+        FROM Rechnung.tExternerBeleg eb
+        LEFT JOIN Rechnung.tExternerBelegEckdaten eck ON eb.kExternerBeleg = eck.kExternerBeleg
+        LEFT JOIN dbo.tZahlungsart za ON eb.kZahlungsart = za.kZahlungsart
+        WHERE eb.dBelegdatumUtc >= @from
+          AND eb.dBelegdatumUtc < DATEADD(day, 1, @to)
+          AND eb.nBelegtyp = 0
+        ORDER BY eb.dBelegdatumUtc DESC
+      `
+      
+      const result = await pool.request()
+        .input('from', from)
+        .input('to', to)
+        .query(query)
     
     // Hole Amazon Payments für Matching (Betrag + Datum)
     const zahlungenQuery = `
