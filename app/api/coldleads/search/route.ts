@@ -89,7 +89,9 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const status = searchParams.get('status') || 'all'
-    const limit = parseInt(searchParams.get('limit') || '50')
+    const limitParam = searchParams.get('limit')
+    // Wenn kein Limit angegeben oder 0, dann KEIN Limit (alle Dokumente)
+    const limit = limitParam ? parseInt(limitParam) : 0
 
     const { db } = await connectToDatabase()
     const collection = db.collection('prospects')
@@ -102,11 +104,11 @@ export async function GET(request: NextRequest) {
       filter = { status }
     }
     
-    const prospects = await collection
-      .find(filter)
-      .sort({ created_at: -1 })
-      .limit(limit)
-      .toArray()
+    // Wenn limit = 0, kein Limit setzen (alle Dokumente)
+    const query = collection.find(filter).sort({ created_at: -1 })
+    const prospects = limit > 0 
+      ? await query.limit(limit).toArray()
+      : await query.toArray()
 
     return NextResponse.json({
       ok: true,
