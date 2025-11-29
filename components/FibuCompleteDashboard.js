@@ -449,7 +449,33 @@ export default function FibuCompleteDashboard() {
           <ZahlungenView zeitraum={selectedPeriod} initialFilter={tabFilters['umsaetze']} />
         )}
 
-        {/* 5. Einstellungen (Bank-Import, Kontenplan, Fuzzy-Matching) */}
+        {/* 5. Auto-Zuordnung (ehemals unter Einstellungen) */}
+        {activeTab === 'auto-zuordnung' && (
+          <FuzzyMatchingView zeitraum={selectedPeriod} />
+        )}
+
+        {/* 6. Zuordnung (Unzugeordnete Items auf einen Blick) */}
+        {activeTab === 'zuordnung' && (
+          <div>
+            <h2 className="text-2xl font-bold mb-6">🔗 Zuordnung - Unzugeordnete Items</h2>
+            <p className="text-gray-600 mb-4">
+              Hier sehen Sie alle Transaktionen und Belege, die noch nicht zugeordnet sind, 
+              inklusive automatischer Vorschläge vom Dual-Matcher.
+            </p>
+            
+            {/* Verwende bestehende Kreditor-Zuordnung Component */}
+            <KreditorZuordnung zeitraum={selectedPeriod} />
+            
+            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-800">
+                <strong>💡 Tipp:</strong> Nutzen Sie die Auto-Zuordnung, 
+                um automatisch passende Rechnungen und Konten für Zahlungen zu finden.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* 7. Einstellungen (Bank-Import, Kontenplan) */}
         {activeTab === 'einstellungen' && (
           <div>
             {/* Sub-Tab Navigation */}
