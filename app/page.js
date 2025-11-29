@@ -4420,14 +4420,29 @@ export default function App() {
                         style={{width:'100px', color: '#000 !important', backgroundColor: '#fff !important'}}
                         value={autopilotLimit}
                         onChange={(e) => {
-                          const val = e.target.value === '' ? '' : parseInt(e.target.value)
-                          if (val === '' || (val >= 1 && val <= 500)) {
-                            setAutopilotLimit(val === '' ? 1 : val)
+                          const val = e.target.value
+                          // Erlaube leeres Feld für Bearbeitung
+                          if (val === '') {
+                            setAutopilotLimit('')
+                            return
+                          }
+                          // Parse und validiere
+                          const numVal = parseInt(val)
+                          if (!isNaN(numVal) && numVal >= 1 && numVal <= 9999) {
+                            setAutopilotLimit(numVal)
+                          }
+                        }}
+                        onBlur={(e) => {
+                          // Setze auf 1 wenn leer beim Verlassen
+                          if (autopilotLimit === '') {
+                            setAutopilotLimit(1)
                           }
                         }}
                         onFocus={(e) => e.target.select()}
                         min="1"
-                        max="500"
+                        max="9999"
+                        step="1"
+                        placeholder="1-9999"
                       />
                     </div>
                     <div className="mr-3 text-center">
