@@ -109,10 +109,12 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
       </div>
 
       {/* Master-Detail-Layout */}
-      <div className="flex gap-4 flex-1 overflow-hidden">
+      <div className="flex gap-4 flex-1 overflow-hidden relative">
         
-        {/* MASTER: Liste (links) */}
-        <div className="w-1/3 flex flex-col bg-white rounded-lg shadow-sm border border-gray-200">
+        {/* MASTER: Liste (breiter - fast Fullscreen) */}
+        <div className={`flex flex-col bg-white rounded-lg shadow-sm border border-gray-200 transition-all ${
+          selectedZahlung ? 'w-2/3' : 'w-full'
+        }`}>
           {/* Filter & Suche */}
           <div className="p-4 border-b border-gray-200 space-y-3">
             {/* Suche */}
