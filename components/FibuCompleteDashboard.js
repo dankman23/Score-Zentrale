@@ -49,7 +49,8 @@ export default function FibuCompleteDashboard() {
     // FIBU-Standard: Oktober 2025 (erste Daten im System)
     return '2025-10-01_2025-10-31'
   })
-  const [activeTab, setActiveTab] = useState('zahlungen') // Start with zahlungen tab instead of overview
+  const [activeTab, setActiveTab] = useState('uebersicht') // Start with overview
+  const [einstellungenSubTab, setEinstellungenSubTab] = useState('bank-import') // Sub-tab für Einstellungen
   const [showExportDialog, setShowExportDialog] = useState(false)
   const [tabFilters, setTabFilters] = useState({}) // Store filters per tab
   const [quote] = useState(() => getRandomQuote())
