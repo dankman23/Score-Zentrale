@@ -12,8 +12,10 @@ export interface KontoMapping {
 
 /**
  * Amazon-Kategorien Mapping
+ * WICHTIG: Amazon nutzt oft verwendungszweck für die echte Kategorie!
  */
 export const AMAZON_MAPPINGS: Record<string, KontoMapping> = {
+  // Provisionen & Gebühren
   'Commission': {
     konto: '4970',
     steuer: 19,
@@ -44,6 +46,46 @@ export const AMAZON_MAPPINGS: Record<string, KontoMapping> = {
     bezeichnung: 'FBA-Lagergebühren',
     beschreibung: 'Amazon Lagergebühren'
   },
+  
+  // Erlöse
+  'ItemPrice': {
+    konto: '8400',
+    steuer: 19,
+    bezeichnung: 'Erlöse 19% USt',
+    beschreibung: 'Amazon Artikelerlöse'
+  },
+  'Principal': {
+    konto: '8400',
+    steuer: 19,
+    bezeichnung: 'Erlöse 19% USt',
+    beschreibung: 'Amazon Haupterlöse'
+  },
+  'Shipping': {
+    konto: '8400',
+    steuer: 19,
+    bezeichnung: 'Versanderlöse',
+    beschreibung: 'Amazon Versanderlöse'
+  },
+  'ShippingHB': {
+    konto: '8400',
+    steuer: 19,
+    bezeichnung: 'Versanderlöse',
+    beschreibung: 'Amazon Versanderlöse'
+  },
+  'Tax': {
+    konto: '3806',
+    steuer: 0,
+    bezeichnung: 'Umsatzsteuer 19%',
+    beschreibung: 'Amazon ausgewiesene USt'
+  },
+  'ShippingTax': {
+    konto: '3806',
+    steuer: 0,
+    bezeichnung: 'Umsatzsteuer 19%',
+    beschreibung: 'Amazon Versand-USt'
+  },
+  
+  // Rückerstattungen
   'Refund': {
     konto: '8200',
     steuer: 19,
@@ -56,17 +98,19 @@ export const AMAZON_MAPPINGS: Record<string, KontoMapping> = {
     bezeichnung: 'Provisionserstattung',
     beschreibung: 'Rückerstattung von Provisionen bei Retouren'
   },
-  'ShippingHB': {
-    konto: '8400',
-    steuer: 19,
-    bezeichnung: 'Versanderlöse',
-    beschreibung: 'Amazon Versanderlöse'
-  },
+  
+  // Sonstiges
   'Subscription': {
     konto: '4950',
     steuer: 19,
     bezeichnung: 'Amazon Subscription',
     beschreibung: 'Amazon Professional Subscription'
+  },
+  'ServiceFee': {
+    konto: '4910',
+    steuer: 19,
+    bezeichnung: 'Servicegebühren',
+    beschreibung: 'Amazon Servicegebühren'
   }
 }
 
