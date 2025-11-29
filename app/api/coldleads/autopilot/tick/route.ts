@@ -182,7 +182,14 @@ export async function POST() {
             })
           })
           
-          const result = await analyzeResponse.json()
+          let result
+          try {
+            result = await analyzeResponse.json()
+          } catch (jsonError) {
+            console.error(`[Autopilot Tick] JSON parse error for ${prospect.company_name}`)
+            continue // Skip this prospect
+          }
+          
           console.log(`[Autopilot] ${prospect.company_name}: ${result.ok ? 'OK' : 'FAILED'}`)
           
         } catch (error) {
