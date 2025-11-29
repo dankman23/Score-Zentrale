@@ -103,40 +103,58 @@ export async function GET(request: NextRequest) {
 
     console.log(`[Mollie] Saving ${formattedTransactions.length} payments to MongoDB...`)
 
+    // WICHTIG: Zugeordnete Zahlungen (istZugeordnet=true) dürfen NICHT überschrieben werden!
+    const transactionIds = formattedTransactions.map(t => t.transactionId)
+    const zugeordnete = await collection
+      .find({
+        transactionId: { $in: transactionIds },
+        istZugeordnet: true
+      })
+      .project({ transactionId: 1 })
+      .toArray()
+    
+    const zugeordneteIds = new Set(zugeordnete.map(z => z.transactionId))
+    
+    if (zugeordneteIds.size > 0) {
+      console.log(`[Mollie] ⚠️ ${zugeordneteIds.size} bereits zugeordnete Transaktionen werden geschützt`)
+    }
+
     // Upsert in MongoDB (bewahre User-Daten)
-    const bulkOps = formattedTransactions.map(t => ({
-      updateOne: {
-        filter: { transactionId: t.transactionId },
-        update: {
-          $set: {
-            // Mollie-Original-Daten
-            datum: t.datum,
-            datumDate: t.datumDate,
-            betrag: t.betrag,
-            waehrung: t.waehrung,
-            status: t.status,
-            methode: t.methode,
-            beschreibung: t.beschreibung,
-            kundenName: t.kundenName,
-            kundenEmail: t.kundenEmail,
-            rechnungsNr: t.rechnungsNr,
-            quelle: t.quelle,
-            ursprungsdaten: t.ursprungsdaten,
-            updated_at: new Date()
+    const bulkOps = formattedTransactions
+      .filter(t => !zugeordneteIds.has(t.transactionId)) // Überspringe zugeordnete! ✅
+      .map(t => ({
+        updateOne: {
+          filter: { transactionId: t.transactionId },
+          update: {
+            $set: {
+              // Mollie-Original-Daten
+              datum: t.datum,
+              datumDate: t.datumDate,
+              betrag: t.betrag,
+              waehrung: t.waehrung,
+              status: t.status,
+              methode: t.methode,
+              beschreibung: t.beschreibung,
+              kundenName: t.kundenName,
+              kundenEmail: t.kundenEmail,
+              rechnungsNr: t.rechnungsNr,
+              quelle: t.quelle,
+              ursprungsdaten: t.ursprungsdaten,
+              updated_at: new Date()
+            },
+            $setOnInsert: {
+              // User-Daten (nur beim ersten Insert)
+              transactionId: t.transactionId,
+              istZugeordnet: false,
+              zugeordneteRechnung: null,
+              zugeordnetesKonto: null,
+              zuordnungsArt: null,
+              imported_at: new Date()
+            }
           },
-          $setOnInsert: {
-            // User-Daten (nur beim ersten Insert)
-            transactionId: t.transactionId,
-            istZugeordnet: false,
-            zugeordneteRechnung: null,
-            zugeordnetesKonto: null,
-            zuordnungsArt: null,
-            imported_at: new Date()
-          }
-        },
-        upsert: true
-      }
-    }))
+          upsert: true
+        }
+      }))
 
     if (bulkOps.length > 0) {
       const result = await collection.bulkWrite(bulkOps)
