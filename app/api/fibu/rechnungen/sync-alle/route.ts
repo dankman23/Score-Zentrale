@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         ISNULL(eb.cHerkunft, 'VCS-Lite') AS herkunft,
         eb.nBelegtyp,
         eb.kKunde,
-        eb.kBestellung,
+        NULL AS kBestellung,
         '' AS cBestellNr
       FROM Rechnung.tExternerBeleg eb
       LEFT JOIN dbo.tZahlungsart za ON eb.kZahlungsart = za.kZahlungsart
