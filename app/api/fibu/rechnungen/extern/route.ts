@@ -97,8 +97,8 @@ export async function GET(request: NextRequest) {
         .input('from', from)
         .input('to', to)
         .query(zahlungenQuery)
-    
-    const rechnungen = result.recordset.map((r: any) => {
+      
+      const rechnungen = result.recordset.map((r: any) => {
       const mongoData = mongoMap.get(r.kExternerBeleg) || {}
       const rechnungsBetrag = parseFloat(r.fVkBrutto || 0)
       const rechnungsDatum = new Date(r.dBelegdatumUtc)
