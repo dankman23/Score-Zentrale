@@ -101,13 +101,16 @@ export async function POST(request: NextRequest) {
       
       let processed = 0
       
-      for (const zahlung of zahlungen) {
+      for (const rawZahlung of zahlungen) {
         processed++
         
         // Log Fortschritt alle 100 Zahlungen
         if (processed % 100 === 0) {
           console.log(`[Dual-Match] ${source.name}: ${processed}/${zahlungen.length}`)
         }
+        
+        // Mappe Zahlung auf einheitliches Format
+        const zahlung = mapZahlung(rawZahlung, source.name)
         
         // Finde BELEG + KONTO
         const dualMatch = await findDualMatch(
