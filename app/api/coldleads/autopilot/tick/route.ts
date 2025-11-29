@@ -100,7 +100,31 @@ export async function POST() {
         })
       })
       
-      const searchResult = await searchResponse.json()
+      let searchResult
+      try {
+        searchResult = await searchResponse.json()
+      } catch (jsonError: any) {
+        const text = await searchResponse.text().catch(() => 'Unable to read response')
+        console.error('[Autopilot Tick] JSON parse error in search response:', text.substring(0, 200))
+        
+        await stateCollection.updateOne(
+          { id: 'kaltakquise' },
+          { 
+            $set: { 
+              lastSearchQuery: nextQuery,
+              currentPhase: 'idle',
+              lastActivity: new Date().toISOString()
+            } 
+          }
+        )
+        
+        return NextResponse.json({
+          ok: true,
+          action: 'search_parse_error',
+          error: jsonError.message,
+          query: nextQuery
+        })
+      }
       
       if (!searchResult.ok || searchResult.count === 0) {
         console.log('[Autopilot Tick] Search failed or no results')
