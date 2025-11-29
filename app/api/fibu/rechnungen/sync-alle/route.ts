@@ -90,21 +90,19 @@ export async function POST(request: NextRequest) {
         eb.dBelegdatumUtc AS datum,
         eb.cRAName AS kunde,
         ISNULL(eb.cRALandISO, 'DE') AS kundenLand,
-        eb.cKaeuferUstId AS kundenUstId,
+        ISNULL(eb.cKaeuferUstId, '') AS kundenUstId,
         eb.kZahlungsart,
         ISNULL(za.cName, 'Amazon Payment') AS zahlungsart,
-        ISNULL(eck.fBrutto, 0) AS brutto,
-        ISNULL(eck.fNetto, 0) AS netto,
-        (ISNULL(eck.fBrutto, 0) - ISNULL(eck.fNetto, 0)) AS mwst,
-        eb.cHerkunft AS herkunft,
+        0 AS brutto,
+        0 AS netto,
+        0 AS mwst,
+        ISNULL(eb.cHerkunft, 'VCS-Lite') AS herkunft,
         eb.nBelegtyp,
         eb.kKunde,
-        b.kBestellung,
-        b.cBestellNr
+        eb.kBestellung,
+        '' AS cBestellNr
       FROM Rechnung.tExternerBeleg eb
-      LEFT JOIN Rechnung.tExternerBelegEckdaten eck ON eb.kExternerBeleg = eck.kExternerBeleg
       LEFT JOIN dbo.tZahlungsart za ON eb.kZahlungsart = za.kZahlungsart
-      LEFT JOIN dbo.tBestellung b ON eb.kBestellung = b.kBestellung
       WHERE eb.dBelegdatumUtc >= @from
         AND eb.dBelegdatumUtc < DATEADD(day, 1, @to)
         AND eb.nBelegtyp = 0
