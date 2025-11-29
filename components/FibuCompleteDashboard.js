@@ -432,9 +432,9 @@ export default function FibuCompleteDashboard() {
           <VKRechnungenView zeitraum={selectedPeriod} initialFilter={tabFilters['vk']} />
         )}
 
-        {/* 4. Umsätze (Zahlungen) */}
+        {/* 4. Umsätze (Zahlungen) - Master-Detail-Layout */}
         {activeTab === 'zahlungen' && (
-          <ZahlungenView zeitraum={selectedPeriod} initialFilter={tabFilters['zahlungen']} />
+          <ZahlungenMasterDetail zeitraum={selectedPeriod} />
         )}
 
         {/* 5. Zuordnung (mit Auto-Zuordnung integriert) */}
