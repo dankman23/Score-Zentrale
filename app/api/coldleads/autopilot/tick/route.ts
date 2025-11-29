@@ -248,7 +248,37 @@ export async function POST() {
       })
     })
     
-    const emailResult = await emailResponse.json()
+    let emailResult
+    try {
+      emailResult = await emailResponse.json()
+    } catch (jsonError: any) {
+      const text = await emailResponse.text().catch(() => 'Unable to read response')
+      console.error('[Autopilot Tick] JSON parse error in email response:', text.substring(0, 200))
+      
+      // Markiere Prospect als fehlgeschlagen
+      await prospectsCollection.updateOne(
+        { $or: [
+          { id: nextProspect.id },
+          { _id: nextProspect._id }
+        ]},
+        { 
+          $set: { 
+            status: 'new',
+            email_error: 'JSON Parse Error: ' + jsonError.message,
+            email_error_at: new Date(),
+            autopilot_skip: true,
+            note: `Email-Versand fehlgeschlagen (JSON Parse Error)`
+          } 
+        }
+      )
+      
+      return NextResponse.json({
+        ok: true,
+        action: 'email_parse_error',
+        error: jsonError.message,
+        prospect: nextProspect.company_name
+      })
+    }
     
     if (!emailResult.ok) {
       console.error('[Autopilot Tick] Email failed:', emailResult.error)
