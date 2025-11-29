@@ -57,7 +57,6 @@ export async function GET(request: NextRequest) {
         '' AS sachkonto
       FROM dbo.tRechnung r
       LEFT JOIN dbo.tBestellung b ON r.tBestellung_kBestellung = b.kBestellung
-      LEFT JOIN dbo.tKunde k ON r.tKunde_kKunde = k.kKunde
       LEFT JOIN dbo.tZahlungsart za ON r.kZahlungsart = za.kZahlungsart
       LEFT JOIN Verkauf.lvRechnungsverwaltung rv ON r.kRechnung = rv.kRechnung
       WHERE r.dErstellt >= @from
