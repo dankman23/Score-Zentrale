@@ -135,35 +135,40 @@ export async function POST(request: NextRequest) {
     for (const r of externResult.recordset) {
       const uniqueId = `EXTERN_${r.kExternerBeleg}`
       
-      await alleRechnungenColl.updateOne(
-        { uniqueId },
-        {
-          $set: {
-            uniqueId,
-            quelle: 'EXTERN',
-            belegId: r.kExternerBeleg,
-            belegnummer: r.rechnungsNr,
-            belegdatum: r.datum,
-            brutto: parseFloat(r.brutto || 0),
-            netto: parseFloat(r.netto || 0),
-            mwst: parseFloat(r.mwst || 0),
-            kundenName: r.kunde || 'Unbekannt',
-            kundenLand: r.kundenLand,
-            kundenUstId: r.kundenUstId || '',
-            zahlungsart: r.zahlungsart,
-            status: 'Bezahlt',  // Externe Rechnungen sind meist bezahlt
-            cBestellNr: r.cBestellNr || '',
-            kBestellung: r.kBestellung,
-            debitorKonto: null,
-            sachkonto: '8400',  // Standard Erlöskonto
-            herkunft: r.herkunft,
-            updated_at: new Date()
-          },
-          $setOnInsert: { created_at: new Date() }
-        },
-        { upsert: true }
-      )
-      stats.externGespeichert++
+      // Prüfen ob bereits vorhanden
+      const exists = await alleRechnungenColl.findOne({ uniqueId })
+      
+      if (!exists) {
+        // NEU: Komplett einfügen
+        await alleRechnungenColl.insertOne({
+          uniqueId,
+          quelle: 'EXTERN',
+          belegId: r.kExternerBeleg,
+          belegnummer: r.rechnungsNr,
+          belegdatum: r.datum,
+          brutto: parseFloat(r.brutto || 0),
+          netto: parseFloat(r.netto || 0),
+          mwst: parseFloat(r.mwst || 0),
+          kundenName: r.kunde || 'Unbekannt',
+          kundenLand: r.kundenLand,
+          kundenUstId: r.kundenUstId || '',
+          zahlungsart: r.zahlungsart,
+          status: 'Bezahlt',
+          cBestellNr: r.cBestellNr || '',
+          kBestellung: r.kBestellung,
+          debitorKonto: null,
+          sachkonto: '8400',
+          herkunft: r.herkunft,
+          created_at: new Date(),
+          updated_at: new Date(),
+          // Verknüpfungs-Felder
+          zugeordneteZahlung: null,
+          zugeordnetesKonto: null,
+          manuellZugeordnet: false
+        })
+        stats.externGespeichert++
+      }
+      // EXISTIERT: Gar nichts tun - externe Rechnungen ändern sich nicht
     }
     
     console.log(`[Sync] ✅ ${stats.externGespeichert} externe Rechnungen gespeichert`)
