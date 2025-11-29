@@ -78,39 +78,19 @@ export class EbayFinancesAPI {
   }
 
   /**
-   * Generiert OAuth2 Access Token
-   * Dokumentation: https://developer.ebay.com/api-docs/static/oauth-credentials-grant-flow.html
+   * Gibt den Access Token zurück
+   * 
+   * WICHTIG: Der User Token aus der Developer Console IST bereits
+   * ein gültiger Access Token und kann direkt verwendet werden!
    */
   async getAccessToken(): Promise<string> {
-    // Für User Token nutzen wir den bereits generierten Token
-    // Alternativ: OAuth2 Client Credentials Flow für App-Token
-    
+    // User Token IST der Access Token - direkt verwenden
     if (this.config.userToken) {
+      console.log('[eBay API] Verwende User Token als Access Token')
       return this.config.userToken
     }
 
-    // Client Credentials Flow (falls kein User Token)
-    const credentials = Buffer.from(`${this.config.appId}:${this.config.certId}`).toString('base64')
-    
-    const response = await fetch(`${this.baseUrl}/identity/v1/oauth2/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${credentials}`
-      },
-      body: new URLSearchParams({
-        grant_type: 'client_credentials',
-        scope: 'https://api.ebay.com/oauth/api_scope/sell.finances'
-      })
-    })
-
-    if (!response.ok) {
-      const error = await response.text()
-      throw new Error(`eBay OAuth failed: ${error}`)
-    }
-
-    const data = await response.json()
-    return data.access_token
+    throw new Error('EBAY_USER_TOKEN fehlt. Bitte User Token in eBay Developer Console generieren.')
   }
 
   /**
