@@ -205,7 +205,8 @@ export async function GET(request: NextRequest) {
         kontonummer: k.kontonummer,
         bezeichnung: k.bezeichnung,
         klasse: k.klasse,
-        typ: k.typ
+        typ: k.typ,
+        belegpflicht: k.belegpflicht !== undefined ? k.belegpflicht : true
       })),
       grouped: Object.values(grouped),
       total: konten.length
