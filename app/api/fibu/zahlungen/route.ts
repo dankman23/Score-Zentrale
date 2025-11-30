@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '../../../lib/db/mongodb'
+import { Db } from 'mongodb'
 
 /**
  * NEUE Zahlungen API - holt NUR von echten Zahlungsquellen
@@ -15,6 +16,144 @@ import { getDb } from '../../../lib/db/mongodb'
  * 4. Mollie (fibu_mollie_transactions)
  * 5. Amazon Settlements (optional später)
  */
+
+// ========== MATCHING-PIPELINE: Inline-Funktionen ==========
+
+interface MatchResult {
+  vk_beleg_id?: string
+  vk_rechnung_nr?: string
+  konto_id?: string
+  konto_vorschlag_id?: string
+  match_source: 'import_vk' | 'auto_vk' | 'auto_konto' | 'manuell' | null
+  match_confidence?: number
+  match_details?: string
+}
+
+async function getImportMatch(zahlung: any, db: Db): Promise<MatchResult | null> {
+  if (zahlung.zugeordneteRechnung) {
+    const rechnung = await db.collection('fibu_vk_rechnungen').findOne({
+      cRechnungsNr: zahlung.zugeordneteRechnung
+    })
+    
+    if (rechnung) {
+      return {
+        vk_beleg_id: rechnung._id.toString(),
+        vk_rechnung_nr: rechnung.cRechnungsNr,
+        konto_id: rechnung.sachkonto || rechnung.debitorKonto,
+        match_source: 'import_vk',
+        match_confidence: 100,
+        match_details: 'JTL-Import-Match'
+      }
+    }
+  }
+  return null
+}
+
+async function getAutoVkMatch(zahlung: any, db: Db): Promise<MatchResult | null> {
+  if (zahlung.zugeordneteRechnung || zahlung.istZugeordnet) return null
+  
+  const vkRechnungen = db.collection('fibu_vk_rechnungen')
+  
+  // Match-Strategie 1: AU-Nummer
+  if (zahlung.referenz && zahlung.referenz.match(/^AU_\d+_SW\d+$/)) {
+    const rechnung = await vkRechnungen.findOne({ cBestellNr: zahlung.referenz })
+    
+    if (rechnung) {
+      const betragsDiff = Math.abs(rechnung.brutto - Math.abs(zahlung.betrag))
+      const toleranz = rechnung.brutto * 0.02
+      
+      if (betragsDiff <= toleranz) {
+        return {
+          vk_beleg_id: rechnung._id.toString(),
+          vk_rechnung_nr: rechnung.cRechnungsNr,
+          konto_id: rechnung.sachkonto || rechnung.debitorKonto,
+          match_source: 'auto_vk',
+          match_confidence: 95,
+          match_details: `AU-Match: ${zahlung.referenz}`
+        }
+      }
+    }
+  }
+  
+  return null
+}
+
+function getKontoVorschlag(zahlung: any): MatchResult {
+  let konto_vorschlag_id: string | undefined
+  let match_details = ''
+  
+  if (zahlung.anbieter === 'Amazon') {
+    const amountTypeKey = (zahlung.kategorie || '').split('/').pop()
+    
+    if (amountTypeKey === 'Principal') {
+      konto_vorschlag_id = '4340'
+      match_details = 'Amazon Principal → Erlöskonto'
+    } else if (amountTypeKey === 'Commission') {
+      konto_vorschlag_id = '6770'
+      match_details = 'Amazon Commission → Gebührenkonto'
+    } else if (amountTypeKey === 'Shipping') {
+      konto_vorschlag_id = '4800'
+      match_details = 'Amazon Shipping → Versandkonto'
+    } else {
+      konto_vorschlag_id = '1815'
+      match_details = 'Amazon sonstige → Settlement-Konto'
+    }
+  } else if (zahlung.anbieter === 'PayPal') {
+    konto_vorschlag_id = zahlung.betrag > 0 ? '69012' : '6855'
+    match_details = `PayPal ${zahlung.betrag > 0 ? 'Eingang' : 'Gebühr'}`
+  } else if (zahlung.anbieter === 'Commerzbank' || zahlung.anbieter === 'Postbank') {
+    konto_vorschlag_id = zahlung.betrag > 0 ? '69018' : '70000'
+    match_details = `Bank ${zahlung.betrag > 0 ? 'Eingang' : 'Ausgang'}`
+  }
+  
+  return {
+    konto_vorschlag_id,
+    match_source: 'auto_konto',
+    match_confidence: 70,
+    match_details
+  }
+}
+
+async function processZahlungMatching(zahlung: any, db: Db): Promise<MatchResult> {
+  const importMatch = await getImportMatch(zahlung, db)
+  if (importMatch) return importMatch
+  
+  const autoVkMatch = await getAutoVkMatch(zahlung, db)
+  if (autoVkMatch) return autoVkMatch
+  
+  const kontoVorschlag = getKontoVorschlag(zahlung)
+  
+  if (zahlung.istZugeordnet && zahlung.zugeordnetesKonto) {
+    return {
+      konto_id: zahlung.zugeordnetesKonto,
+      match_source: 'manuell',
+      match_confidence: 100,
+      match_details: 'Manuelle Zuordnung'
+    }
+  }
+  
+  return kontoVorschlag
+}
+
+async function berechneZuordnungsStatus(
+  zahlung: any,
+  matchResult: MatchResult,
+  db: Db
+): Promise<'offen' | 'beleg_fehlt' | 'zugeordnet'> {
+  const kontoNr = matchResult.konto_id || zahlung.zugeordnetesKonto
+  
+  if (!kontoNr) return 'offen'
+  
+  const konto = await db.collection('kontenplan').findOne({ kontonummer: kontoNr })
+  
+  if (!konto || konto.belegpflicht === false) return 'zugeordnet'
+  
+  const hatBeleg = matchResult.vk_beleg_id || zahlung.zugeordneteRechnung || zahlung.belegId
+  
+  return hatBeleg ? 'zugeordnet' : 'beleg_fehlt'
+}
+
+// ========== END MATCHING-PIPELINE ==========
 
 export async function GET(request: NextRequest) {
   try {
