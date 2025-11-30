@@ -53,6 +53,13 @@ async function migrate() {
     const db = client.db()
     const collection = db.collection('fibu_kontenplan')
     
+    // 0. RESET: Entferne alle belegpflicht-Felder für sauberen Neustart
+    await collection.updateMany(
+      {},
+      { $unset: { belegpflicht: "" } }
+    )
+    console.log('🔄 Alle belegpflicht-Felder zurückgesetzt')
+    
     // 1. Zähle alle Konten
     const totalCount = await collection.countDocuments({})
     console.log(`📊 Gefunden: ${totalCount} Konten im Kontenplan`)
