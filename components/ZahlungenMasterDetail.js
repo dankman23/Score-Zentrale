@@ -1,13 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Filter, RefreshCw, CheckCircle, Circle, DollarSign } from 'lucide-react'
+import { Search, Filter, RefreshCw, CheckCircle, Circle, DollarSign, X, FileText, Calendar } from 'lucide-react'
 
 /**
- * Master-Detail-Layout für Zahlungen/Umsätze (wie Lexoffice)
+ * Kompaktes Master-Detail-Layout für Zahlungen/Umsätze
  * 
- * Links: Master-Liste mit Filtern
- * Rechts: Detail-Panel mit Zuordnungs-UI
+ * Vollbreite Liste mit Slide-in Detail-Panel von rechts
  */
 export default function ZahlungenMasterDetail({ zeitraum }) {
   const [zahlungen, setZahlungen] = useState([])
@@ -25,7 +24,6 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
   const loadZahlungen = async () => {
     setLoading(true)
     try {
-      // Zeitraum kann String "YYYY-MM-DD_YYYY-MM-DD" oder Objekt {from, to} sein
       let from, to
       if (typeof zeitraum === 'string') {
         [from, to] = zeitraum.split('_')
@@ -39,10 +37,6 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
       
       if (data.ok) {
         setZahlungen(data.zahlungen || [])
-        // Erste Zahlung automatisch auswählen
-        if (data.zahlungen?.length > 0 && !selectedZahlung) {
-          setSelectedZahlung(data.zahlungen[0])
-        }
       }
     } catch (error) {
       console.error('Fehler beim Laden:', error)
@@ -53,14 +47,10 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
 
   // Gefilterte Zahlungen
   const filteredZahlungen = zahlungen.filter(z => {
-    // Filter nach Status
     if (filter === 'zugeordnet' && !z.istZugeordnet) return false
     if (filter === 'nicht-zugeordnet' && z.istZugeordnet) return false
-    
-    // Filter nach Quelle
     if (quelle !== 'alle' && z.quelle?.toLowerCase() !== quelle.toLowerCase()) return false
     
-    // Suche
     if (searchTerm) {
       const search = searchTerm.toLowerCase()
       const matches = 
@@ -82,191 +72,229 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-200px)]">
-      {/* Header mit Stats */}
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex gap-4">
-          <div className="text-sm">
-            <span className="font-semibold">{stats.gesamt}</span> Zahlungen gesamt
+    <div className="flex flex-col h-[calc(100vh-200px)] relative">
+      {/* Kompakte Header-Zeile mit Stats & Controls */}
+      <div className="mb-3 flex items-center justify-between bg-white px-4 py-2 rounded-lg border border-gray-200">
+        <div className="flex gap-4 text-xs">
+          <div className="flex items-center gap-1">
+            <span className="font-semibold text-gray-900">{stats.gesamt}</span>
+            <span className="text-gray-500">gesamt</span>
           </div>
-          <div className="text-sm text-green-600">
-            <CheckCircle className="inline w-4 h-4 mr-1" />
-            <span className="font-semibold">{stats.zugeordnet}</span> zugeordnet
+          <div className="flex items-center gap-1 text-green-600">
+            <CheckCircle className="w-3.5 h-3.5" />
+            <span className="font-semibold">{stats.zugeordnet}</span>
           </div>
-          <div className="text-sm text-orange-600">
-            <Circle className="inline w-4 h-4 mr-1" />
-            <span className="font-semibold">{stats.nichtZugeordnet}</span> offen
+          <div className="flex items-center gap-1 text-orange-600">
+            <Circle className="w-3.5 h-3.5" />
+            <span className="font-semibold">{stats.nichtZugeordnet}</span>
           </div>
         </div>
         
         <button
           onClick={loadZahlungen}
-          className="flex items-center gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="w-3.5 h-3.5" />
           Aktualisieren
         </button>
       </div>
 
-      {/* Master-Detail-Layout */}
-      <div className="flex gap-4 flex-1 overflow-hidden relative">
-        
-        {/* MASTER: Liste (breiter - fast Fullscreen) */}
-        <div className={`flex flex-col bg-white rounded-lg shadow-sm border border-gray-200 transition-all ${
-          selectedZahlung ? 'w-2/3' : 'w-full'
-        }`}>
-          {/* Filter & Suche */}
-          <div className="p-4 border-b border-gray-200 space-y-3">
-            {/* Suche */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Suchen..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Filter Status */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => setFilter('alle')}
-                className={`flex-1 px-3 py-2 text-xs rounded-lg transition ${
-                  filter === 'alle'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                Alle
-              </button>
-              <button
-                onClick={() => setFilter('zugeordnet')}
-                className={`flex-1 px-3 py-2 text-xs rounded-lg transition ${
-                  filter === 'zugeordnet'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                Zugeordnet
-              </button>
-              <button
-                onClick={() => setFilter('nicht-zugeordnet')}
-                className={`flex-1 px-3 py-2 text-xs rounded-lg transition ${
-                  filter === 'nicht-zugeordnet'
-                    ? 'bg-orange-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                Offen
-              </button>
-            </div>
-
-            {/* Filter Quelle */}
-            <select
-              value={quelle}
-              onChange={(e) => setQuelle(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="alle">Alle Quellen</option>
-              <option value="amazon">Amazon</option>
-              <option value="paypal">PayPal</option>
-              <option value="commerzbank">Commerzbank</option>
-              <option value="postbank">Postbank</option>
-              <option value="mollie">Mollie</option>
-            </select>
-          </div>
-
-          {/* Liste */}
-          <div className="flex-1 overflow-y-auto">
-            {loading ? (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-gray-500">Lädt...</div>
-              </div>
-            ) : filteredZahlungen.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                <Filter className="w-12 h-12 mb-2 text-gray-300" />
-                <p>Keine Zahlungen gefunden</p>
-              </div>
-            ) : (
-              filteredZahlungen.map((zahlung) => (
-                <div
-                  key={zahlung.transactionId || zahlung._id}
-                  onClick={() => setSelectedZahlung(zahlung)}
-                  className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition ${
-                    selectedZahlung?.transactionId === zahlung.transactionId
-                      ? 'bg-blue-50 border-l-4 border-l-blue-600'
-                      : ''
-                  }`}
-                >
-                  <div className="flex items-start justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      {zahlung.istZugeordnet ? (
-                        <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                      ) : (
-                        <Circle className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                      )}
-                      <span className="text-sm font-medium text-gray-900">
-                        {zahlung.betrag >= 0 ? '+' : ''}{zahlung.betrag?.toFixed(2)} {zahlung.waehrung || '€'}
-                      </span>
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      {new Date(zahlung.datum).toLocaleDateString('de-DE')}
-                    </span>
-                  </div>
-                  
-                  <div className="text-xs text-gray-600 mb-1 line-clamp-2">
-                    {zahlung.verwendungszweck || zahlung.beschreibung || 'Keine Beschreibung'}
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-700">
-                      {zahlung.quelle}
-                    </span>
-                    {zahlung.istZugeordnet && (
-                      <span className="text-xs text-green-600">
-                        ✓ {zahlung.zugeordnetesKonto || 'Zugeordnet'}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* DETAIL: Detail-Panel (rechts) */}
-        <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          {selectedZahlung ? (
-            <ZahlungDetailPanel 
-              zahlung={selectedZahlung} 
-              onUpdate={loadZahlungen}
-              zeitraum={zeitraum}
+      {/* Kompakte Filter-Leiste */}
+      <div className="mb-3 bg-white rounded-lg border border-gray-200 p-3">
+        <div className="flex gap-3 items-center">
+          {/* Suche */}
+          <div className="flex-1 relative">
+            <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Suchen..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-gray-500">
-              <DollarSign className="w-16 h-16 mb-4 text-gray-300" />
-              <p>Wählen Sie eine Zahlung aus</p>
-            </div>
-          )}
+          </div>
+
+          {/* Filter Status */}
+          <div className="flex gap-1.5">
+            <button
+              onClick={() => setFilter('alle')}
+              className={`px-3 py-1.5 text-xs rounded-md transition font-medium ${
+                filter === 'alle'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Alle
+            </button>
+            <button
+              onClick={() => setFilter('zugeordnet')}
+              className={`px-3 py-1.5 text-xs rounded-md transition font-medium ${
+                filter === 'zugeordnet'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Zugeordnet
+            </button>
+            <button
+              onClick={() => setFilter('nicht-zugeordnet')}
+              className={`px-3 py-1.5 text-xs rounded-md transition font-medium ${
+                filter === 'nicht-zugeordnet'
+                  ? 'bg-orange-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Offen
+            </button>
+          </div>
+
+          {/* Quelle Dropdown */}
+          <select
+            value={quelle}
+            onChange={(e) => setQuelle(e.target.value)}
+            className="px-3 py-1.5 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+          >
+            <option value="alle">Alle Quellen</option>
+            <option value="amazon">Amazon</option>
+            <option value="paypal">PayPal</option>
+            <option value="commerzbank">Commerzbank</option>
+            <option value="postbank">Postbank</option>
+            <option value="mollie">Mollie</option>
+          </select>
         </div>
       </div>
+
+      {/* Vollbreite Tabelle */}
+      <div className="flex-1 bg-white rounded-lg border border-gray-200 overflow-hidden">
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-gray-500 text-sm">Lädt...</div>
+          </div>
+        ) : filteredZahlungen.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-gray-500">
+            <Filter className="w-12 h-12 mb-2 text-gray-300" />
+            <p className="text-sm">Keine Zahlungen gefunden</p>
+          </div>
+        ) : (
+          <div className="overflow-y-auto h-full">
+            <table className="w-full text-xs">
+              <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
+                <tr>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-700 w-10"></th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-700">Datum</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-700">Beschreibung</th>
+                  <th className="px-3 py-2 text-right font-semibold text-gray-700">Betrag</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-700">Quelle</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-700">Zuordnung</th>
+                  <th className="px-3 py-2 text-center font-semibold text-gray-700 w-20">Aktion</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredZahlungen.map((zahlung) => (
+                  <tr
+                    key={zahlung.transactionId || zahlung._id}
+                    className={`hover:bg-gray-50 transition cursor-pointer ${
+                      selectedZahlung?.transactionId === zahlung.transactionId
+                        ? 'bg-blue-50'
+                        : ''
+                    }`}
+                    onClick={() => setSelectedZahlung(zahlung)}
+                  >
+                    <td className="px-3 py-2.5">
+                      {zahlung.istZugeordnet ? (
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Circle className="w-4 h-4 text-orange-500" />
+                      )}
+                    </td>
+                    <td className="px-3 py-2.5 text-gray-700 whitespace-nowrap">
+                      {new Date(zahlung.datum).toLocaleDateString('de-DE', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                      })}
+                    </td>
+                    <td className="px-3 py-2.5 text-gray-900">
+                      <div className="max-w-md truncate">
+                        {zahlung.verwendungszweck || zahlung.beschreibung || 'Keine Beschreibung'}
+                      </div>
+                      {zahlung.kundenName && (
+                        <div className="text-gray-500 text-xs mt-0.5">{zahlung.kundenName}</div>
+                      )}
+                    </td>
+                    <td className="px-3 py-2.5 text-right font-medium">
+                      <span className={zahlung.betrag >= 0 ? 'text-green-700' : 'text-red-700'}>
+                        {zahlung.betrag >= 0 ? '+' : ''}{zahlung.betrag?.toFixed(2)} €
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <span className="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700">
+                        {zahlung.quelle}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 text-gray-600">
+                      {zahlung.istZugeordnet ? (
+                        <span className="text-green-700 text-xs">✓ {zahlung.zugeordnetesKonto || 'Zugeordnet'}</span>
+                      ) : (
+                        <span className="text-gray-400 text-xs">-</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2.5 text-center">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setSelectedZahlung(zahlung)
+                        }}
+                        className="text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        Details
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* SLIDE-IN Detail-Panel von rechts */}
+      {selectedZahlung && (
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-black bg-opacity-30 z-40 transition-opacity"
+            onClick={() => setSelectedZahlung(null)}
+          />
+          
+          {/* Slide-in Panel */}
+          <div className="fixed right-0 top-0 h-full w-[600px] bg-white shadow-2xl z-50 animate-slide-in-right">
+            <ZahlungDetailPanel
+              zahlung={selectedZahlung}
+              onClose={() => setSelectedZahlung(null)}
+              onUpdate={() => {
+                loadZahlungen()
+                setSelectedZahlung(null)
+              }}
+              zeitraum={zeitraum}
+            />
+          </div>
+        </>
+      )}
     </div>
   )
 }
 
 /**
- * Detail-Panel für eine einzelne Zahlung
+ * Detail-Panel für eine einzelne Zahlung (Slide-in von rechts)
  */
-function ZahlungDetailPanel({ zahlung, onUpdate, zeitraum }) {
+function ZahlungDetailPanel({ zahlung, onClose, onUpdate, zeitraum }) {
   const [saving, setSaving] = useState(false)
   const [rechnungen, setRechnungen] = useState([])
   const [konten, setKonten] = useState([])
   const [selectedBeleg, setSelectedBeleg] = useState(zahlung.zugeordneteRechnung || '')
   const [selectedKonto, setSelectedKonto] = useState(zahlung.zugeordnetesKonto || '')
 
-  // Rechnungen und Konten laden
   useEffect(() => {
     loadRechnungen()
     loadKonten()
@@ -274,7 +302,6 @@ function ZahlungDetailPanel({ zahlung, onUpdate, zeitraum }) {
 
   const loadRechnungen = async () => {
     try {
-      // Zeitraum kann String oder Objekt sein
       let from, to
       if (typeof zeitraum === 'string') {
         [from, to] = zeitraum.split('_')
@@ -335,81 +362,89 @@ function ZahlungDetailPanel({ zahlung, onUpdate, zeitraum }) {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl font-bold text-gray-900">
-            {zahlung.betrag >= 0 ? '+' : ''}{zahlung.betrag?.toFixed(2)} {zahlung.waehrung || '€'}
+      {/* Kompakter Header mit Close-Button */}
+      <div className="px-5 py-3 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+        <div>
+          <h2 className="text-lg font-bold text-gray-900">
+            {zahlung.betrag >= 0 ? '+' : ''}{zahlung.betrag?.toFixed(2)} €
           </h2>
+          <div className="text-xs text-gray-500 mt-0.5">
+            {new Date(zahlung.datum).toLocaleDateString('de-DE', { 
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            })}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
           {zahlung.istZugeordnet ? (
-            <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full flex items-center gap-1">
-              <CheckCircle className="w-4 h-4" />
+            <span className="px-2.5 py-1 bg-green-100 text-green-800 text-xs rounded-full flex items-center gap-1">
+              <CheckCircle className="w-3.5 h-3.5" />
               Zugeordnet
             </span>
           ) : (
-            <span className="px-3 py-1 bg-orange-100 text-orange-800 text-sm rounded-full flex items-center gap-1">
-              <Circle className="w-4 h-4" />
-              Nicht zugeordnet
+            <span className="px-2.5 py-1 bg-orange-100 text-orange-800 text-xs rounded-full flex items-center gap-1">
+              <Circle className="w-3.5 h-3.5" />
+              Offen
             </span>
           )}
-        </div>
-        <div className="text-sm text-gray-600">
-          {new Date(zahlung.datum).toLocaleDateString('de-DE', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          })}
+          <button
+            onClick={onClose}
+            className="p-1.5 hover:bg-gray-200 rounded-md transition"
+            title="Schließen"
+          >
+            <X className="w-5 h-5 text-gray-600" />
+          </button>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        {/* Details */}
-        <div>
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">Details</h3>
-          <div className="space-y-2 text-sm">
+      {/* Content - scrollbar */}
+      <div className="flex-1 overflow-y-auto p-5 space-y-5">
+        {/* Details Sektion */}
+        <div className="bg-gray-50 rounded-lg p-4">
+          <h3 className="text-xs font-semibold text-gray-700 mb-3 uppercase tracking-wide">Details</h3>
+          <div className="space-y-2 text-xs">
             <div className="flex justify-between">
               <span className="text-gray-600">Quelle:</span>
-              <span className="font-medium">{zahlung.quelle}</span>
+              <span className="font-medium text-gray-900">{zahlung.quelle}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Transaktions-ID:</span>
-              <span className="font-mono text-xs">{zahlung.transactionId || zahlung._id}</span>
+              <span className="font-mono text-gray-900 text-[10px]">{zahlung.transactionId || zahlung._id}</span>
             </div>
             {zahlung.kundenName && (
               <div className="flex justify-between">
                 <span className="text-gray-600">Kunde:</span>
-                <span className="font-medium">{zahlung.kundenName}</span>
+                <span className="font-medium text-gray-900">{zahlung.kundenName}</span>
               </div>
             )}
             {zahlung.verwendungszweck && (
-              <div className="flex flex-col gap-1">
-                <span className="text-gray-600">Verwendungszweck:</span>
-                <span className="text-gray-900 bg-gray-50 p-2 rounded text-xs">
+              <div className="pt-2 border-t border-gray-200">
+                <span className="text-gray-600 block mb-1">Verwendungszweck:</span>
+                <div className="text-gray-900 bg-white p-2 rounded text-xs leading-relaxed">
                   {zahlung.verwendungszweck}
-                </span>
+                </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* Zuordnung */}
-        <div className="border-t border-gray-200 pt-6">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        {/* Zuordnung Sektion */}
+        <div className="border border-gray-200 rounded-lg p-4">
+          <h3 className="text-xs font-semibold text-gray-700 mb-3 uppercase tracking-wide flex items-center gap-1.5">
             🔗 Zuordnung
           </h3>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Beleg zuordnen */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-xs font-medium text-gray-700 mb-1.5">
                 Beleg (Rechnung)
               </label>
               <select
                 value={selectedBeleg}
                 onChange={(e) => setSelectedBeleg(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">-- Kein Beleg --</option>
                 {rechnungen.map(r => (
@@ -422,13 +457,13 @@ function ZahlungDetailPanel({ zahlung, onUpdate, zeitraum }) {
 
             {/* Konto zuordnen */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-xs font-medium text-gray-700 mb-1.5">
                 Konto (SKR03/04)
               </label>
               <select
                 value={selectedKonto}
                 onChange={(e) => setSelectedKonto(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">-- Kein Konto --</option>
                 {konten.map(k => (
@@ -440,15 +475,42 @@ function ZahlungDetailPanel({ zahlung, onUpdate, zeitraum }) {
             </div>
           </div>
         </div>
+
+        {/* Buchungsvorschlag (falls vorhanden) */}
+        {zahlung.buchung && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 className="text-xs font-semibold text-blue-900 mb-2 uppercase tracking-wide">💡 Buchungsvorschlag</h3>
+            <div className="space-y-1.5 text-xs text-blue-900">
+              <div className="flex justify-between">
+                <span>Soll:</span>
+                <span className="font-mono">{zahlung.buchung.sollKonto}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Haben:</span>
+                <span className="font-mono">{zahlung.buchung.habenKonto}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Netto:</span>
+                <span className="font-medium">{zahlung.buchung.nettoBetrag?.toFixed(2)} €</span>
+              </div>
+              {zahlung.buchung.mwstSatz && (
+                <div className="flex justify-between">
+                  <span>MwSt:</span>
+                  <span>{zahlung.buchung.mwstSatz}%</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer mit Buttons */}
-      <div className="p-6 border-t border-gray-200 bg-gray-50">
-        <div className="flex gap-3">
+      <div className="px-5 py-3 border-t border-gray-200 bg-gray-50">
+        <div className="flex gap-2">
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition"
+            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition text-sm font-medium"
           >
             {saving ? 'Speichert...' : 'Zuordnung speichern'}
           </button>
@@ -457,7 +519,7 @@ function ZahlungDetailPanel({ zahlung, onUpdate, zeitraum }) {
               setSelectedBeleg('')
               setSelectedKonto('')
             }}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition text-sm"
           >
             Zurücksetzen
           </button>

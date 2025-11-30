@@ -46,16 +46,15 @@ function getRandomQuote() {
 
 export default function FibuCompleteDashboard() {
   const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(false) // Changed to false - no initial load
+  const [loading, setLoading] = useState(false)
   const [selectedPeriod, setSelectedPeriod] = useState(() => {
-    // FIBU-Standard: Oktober 2025 (erste Daten im System)
     return '2025-10-01_2025-10-31'
   })
-  const [activeTab, setActiveTab] = useState('zahlungen') // Start with zahlungen tab
-  const [einstellungenSubTab, setEinstellungenSubTab] = useState('bank-import') // Sub-tab für Einstellungen
+  const [activeTab, setActiveTab] = useState('zahlungen')
+  const [einstellungenSubTab, setEinstellungenSubTab] = useState('bank-import')
   const [showExportDialog, setShowExportDialog] = useState(false)
-  const [tabFilters, setTabFilters] = useState({}) // Store filters per tab
-  const [quote, setQuote] = useState('') // Empty initially to avoid hydration mismatch
+  const [tabFilters, setTabFilters] = useState({})
+  const [quote, setQuote] = useState('')
   const [showRefreshMenu, setShowRefreshMenu] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   
@@ -85,10 +84,7 @@ export default function FibuCompleteDashboard() {
       }
     }
     
-    // Check on mount
     handleHashChange()
-    
-    // Listen for hash changes
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
@@ -98,78 +94,53 @@ export default function FibuCompleteDashboard() {
     if (activeTab === 'overview') {
       loadData()
     }
-  }, [selectedPeriod, activeTab])
+  }, [activeTab, selectedPeriod])
 
-  async function loadData(forceReload = false) {
+  const loadData = async (forceRefresh = false) => {
+    if (activeTab !== 'overview') return
+    
     setLoading(true)
     try {
       const [from, to] = selectedPeriod.split('_')
-      const forceParam = forceReload ? '&force=true' : ''
-      const res = await fetch(`/api/fibu/uebersicht/complete?from=${from}&to=${to}${forceParam}`)
-      const json = await res.json()
-      setData(json)
-      
-      if (json.cached) {
-        console.log(`✅ Daten aus Cache geladen (${json.cacheAge}s alt)`)
-      }
+      const url = `/api/fibu/dashboard?from=${from}&to=${to}${forceRefresh ? '&refresh=true' : ''}`
+      const response = await fetch(url)
+      const result = await response.json()
+      setData(result)
     } catch (error) {
       console.error('Fehler beim Laden:', error)
+      setData({ ok: false, error: error.message })
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
-  async function runAutoMatch() {
-    setShowRefreshMenu(false)
-    
-    if (!confirm('Auto-Zuordnung für den gewählten Zeitraum starten?\n\nDies ordnet Zahlungen automatisch Rechnungen und Konten zu.')) {
-      return
-    }
+  const runAutoMatch = async () => {
+    if (!confirm('Auto-Zuordnung starten? Dies kann einige Minuten dauern.')) return
     
     setRefreshing(true)
+    setShowRefreshMenu(false)
     
     try {
-      console.log('🤖 Starte Auto-Matching...')
-      
-      const res = await fetch('/api/fibu/auto-match', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          zeitraum: selectedPeriod,
-          dryRun: false 
-        })
+      const [from, to] = selectedPeriod.split('_')
+      const response = await fetch(`/api/fibu/auto-match?from=${from}&to=${to}`, {
+        method: 'POST'
       })
-      
-      const data = await res.json()
+      const data = await response.json()
       
       if (data.ok) {
-        const { matched, stats } = data
-        
-        alert(`✅ Auto-Zuordnung abgeschlossen!\n\n` +
-          `📊 Ergebnis:\n` +
-          `• ${stats.matched} von ${stats.totalZahlungen} Zahlungen zugeordnet\n\n` +
-          `📝 Details:\n` +
-          `• ${stats.byMethod.auNummer} über AU-Nummer\n` +
-          `• ${stats.byMethod.reNummer} über RE-Nummer\n` +
-          `• ${stats.byMethod.betragDatum} über Betrag+Datum\n` +
-          `• ${stats.byMethod.kategorie} über Kategorie (Gebühren)\n\n` +
-          `👉 ${stats.totalZahlungen - stats.matched} Zahlungen benötigen manuelle Zuordnung`
-        )
-        
-        // Reload data
+        alert(`✓ Auto-Zuordnung abgeschlossen!\n\nGematcht: ${data.matched || 0} Zahlungen`)
         await loadData(true)
       } else {
-        alert('❌ Fehler beim Auto-Matching:\n' + data.error)
+        alert('Fehler: ' + data.error)
       }
-      
     } catch (error) {
-      console.error('Fehler beim Auto-Matching:', error)
-      alert('❌ Fehler beim Auto-Matching:\n' + error.message)
+      alert('Fehler beim Auto-Match: ' + error.message)
     }
     
     setRefreshing(false)
   }
-  
-  async function refreshData(type = 'all') {
+
+  const refreshData = async (type) => {
     setRefreshing(true)
     setShowRefreshMenu(false)
     
@@ -177,27 +148,13 @@ export default function FibuCompleteDashboard() {
       const [from, to] = selectedPeriod.split('_')
       
       if (type === 'all' || type === 'zahlungen') {
-        console.log('🔄 Aktualisiere Zahlungen von allen Quellen...')
+        console.log('🔄 Aktualisiere Zahlungen...')
         
-        // PayPal (max 31 Tage, daher aufteilen wenn nötig)
-        const fromDate = new Date(from)
-        const toDate = new Date(to)
-        const daysDiff = Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24))
-        
-        if (daysDiff <= 31) {
-          await fetch(`/api/fibu/zahlungen/paypal?from=${from}&to=${to}&refresh=true`)
-        } else {
-          // Monat für Monat
-          let currentDate = new Date(fromDate)
-          while (currentDate <= toDate) {
-            const monthStart = currentDate.toISOString().split('T')[0]
-            const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).toISOString().split('T')[0]
-            const effectiveEnd = monthEnd < to ? monthEnd : to
-            
-            await fetch(`/api/fibu/zahlungen/paypal?from=${monthStart}&to=${effectiveEnd}&refresh=true`)
-            
-            currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
-          }
+        // PayPal
+        const paypalRes = await fetch(`/api/fibu/zahlungen/paypal?from=${from}&to=${to}&refresh=true`)
+        if (paypalRes.ok) {
+          const paypalData = await paypalRes.json()
+          console.log(`✓ PayPal: ${paypalData.count || 0} Transaktionen`)
         }
         
         // Commerzbank & Postbank
@@ -214,11 +171,9 @@ export default function FibuCompleteDashboard() {
       
       if (type === 'all' || type === 'vk') {
         console.log('🔄 Aktualisiere VK-Rechnungen...')
-        // VK-Rechnungen werden aus JTL geholt, kein spezifisches Refresh nötig
         console.log('✅ VK-Rechnungen aktualisiert')
       }
       
-      // Reload data
       await loadData(true)
       
     } catch (error) {
@@ -239,7 +194,6 @@ export default function FibuCompleteDashboard() {
     )
   }
 
-  // Only show error if we're on overview tab and data failed to load
   if (activeTab === 'overview' && (!data || !data.ok)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -258,80 +212,77 @@ export default function FibuCompleteDashboard() {
     )
   }
 
-  // Only destructure data if it exists (for overview tab)
   const summary = data?.summary || null
   const details = data?.details || null
   const issues = summary?.issues || null
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {/* Header - VOLLE BREITE */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-4">
-            <div className="flex items-center justify-between mb-2">
-              <h1 className="text-3xl font-bold text-gray-900">FIBU Dashboard</h1>
-              <div className="flex items-center gap-4">
+        <div className="px-6 lg:px-8">
+          <div className="py-3">
+            <div className="flex items-center justify-between mb-1">
+              <h1 className="text-2xl font-bold text-gray-900">FIBU Dashboard</h1>
+              <div className="flex items-center gap-3">
                 <DateRangeNavigator 
                   value={selectedPeriod}
                   onChange={setSelectedPeriod}
                 />
                 <button
                   onClick={() => setShowExportDialog(true)}
-                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium flex items-center gap-2"
+                  className="bg-green-600 text-white px-3 py-1.5 rounded-md hover:bg-green-700 text-xs font-medium flex items-center gap-1.5"
                 >
                   📥 Export
                 </button>
                 
-                {/* Refresh Dropdown */}
                 <div className="relative">
                   <button
                     onClick={() => setShowRefreshMenu(!showRefreshMenu)}
                     disabled={refreshing}
-                    className={`bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium flex items-center gap-2 ${refreshing ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    title="Daten aktualisieren"
+                    className={`bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 text-xs font-medium flex items-center gap-1.5 ${refreshing ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     {refreshing ? '⏳' : '🔄'} Aktualisieren
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
                   
                   {showRefreshMenu && !refreshing && (
-                    <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50 py-2 min-w-[220px]">
+                    <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-50 py-1.5 min-w-[200px]">
                       <button
                         onClick={() => refreshData('all')}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-gray-700"
+                        className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 text-gray-700"
                       >
                         🔄 Alles aktualisieren
                       </button>
                       <div className="border-t border-gray-200 my-1"></div>
                       <button
                         onClick={runAutoMatch}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-green-50 text-green-700 font-medium"
+                        className="w-full text-left px-3 py-1.5 text-xs hover:bg-green-50 text-green-700 font-medium"
                       >
                         🤖 Auto-Zuordnung starten
                       </button>
                       <div className="border-t border-gray-200 my-1"></div>
                       <button
                         onClick={() => refreshData('zahlungen')}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-gray-700"
+                        className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 text-gray-700"
                       >
                         💳 Zahlungen
                       </button>
                       <button
                         onClick={() => refreshData('vk')}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-gray-700"
+                        className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 text-gray-700"
                       >
                         📄 VK-Rechnungen
                       </button>
-                      <div className="border-t border-gray-200 my-2"></div>
+                      <div className="border-t border-gray-200 my-1"></div>
                       <button
                         onClick={() => {
                           setShowRefreshMenu(false)
                           loadData(true)
                         }}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-gray-500"
+                        className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 text-gray-500"
                       >
                         🗄️ Nur aus Cache neu laden
                       </button>
@@ -340,16 +291,16 @@ export default function FibuCompleteDashboard() {
                 </div>
               </div>
             </div>
-            <p className="text-sm text-gray-600 italic">
+            <p className="text-xs text-gray-600 italic">
               {quote}
             </p>
           </div>
 
-          {/* Tabs - 6-Tab-Struktur wie gewünscht */}
-          <div className="flex gap-6 border-t border-gray-100">
+          {/* Tabs - Kompakt */}
+          <div className="flex gap-4 border-t border-gray-100">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
+              className={`px-3 py-2.5 text-xs font-medium border-b-2 transition ${
                 activeTab === 'overview'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -359,7 +310,7 @@ export default function FibuCompleteDashboard() {
             </button>
             <button
               onClick={() => setActiveTab('ek-belege')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition relative ${
+              className={`px-3 py-2.5 text-xs font-medium border-b-2 transition relative ${
                 activeTab === 'ek-belege'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -367,14 +318,14 @@ export default function FibuCompleteDashboard() {
             >
               📥 EK-Belege
               {issues?.ekOhneKreditor > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center">
                   {issues.ekOhneKreditor}
                 </span>
               )}
             </button>
             <button
               onClick={() => setActiveTab('vk-belege')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
+              className={`px-3 py-2.5 text-xs font-medium border-b-2 transition ${
                 activeTab === 'vk-belege'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -384,7 +335,7 @@ export default function FibuCompleteDashboard() {
             </button>
             <button
               onClick={() => setActiveTab('zahlungen')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
+              className={`px-3 py-2.5 text-xs font-medium border-b-2 transition ${
                 activeTab === 'zahlungen'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -394,7 +345,7 @@ export default function FibuCompleteDashboard() {
             </button>
             <button
               onClick={() => setActiveTab('zuordnung')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition relative ${
+              className={`px-3 py-2.5 text-xs font-medium border-b-2 transition relative ${
                 activeTab === 'zuordnung'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -402,14 +353,14 @@ export default function FibuCompleteDashboard() {
             >
               🔗 Zuordnung
               {(issues?.zahlungenOhneZuordnung > 0 || issues?.ekOhneKreditor > 0) && (
-                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center">
                   {(issues?.zahlungenOhneZuordnung || 0) + (issues?.ekOhneKreditor || 0)}
                 </span>
               )}
             </button>
             <button
               onClick={() => setActiveTab('einstellungen')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition ${
+              className={`px-3 py-2.5 text-xs font-medium border-b-2 transition ${
                 activeTab === 'einstellungen'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -421,46 +372,42 @@ export default function FibuCompleteDashboard() {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Content - VOLLE BREITE */}
+      <div className="px-6 lg:px-8 py-6">
         
-        {/* 1. Übersicht */}
         {activeTab === 'overview' && (
           <FibuMonatsUebersicht selectedPeriod={selectedPeriod} summaryData={summary} />
         )}
 
-        {/* 2. EK-Belege - Master-Detail-Layout */}
         {activeTab === 'ek-belege' && (
           <EKBelegeMasterDetail zeitraum={selectedPeriod} />
         )}
 
-        {/* 3. VK-Belege */}
         {activeTab === 'vk-belege' && (
           <VKRechnungenView zeitraum={selectedPeriod} initialFilter={tabFilters['vk']} />
         )}
 
-        {/* 4. Umsätze (Zahlungen) - Master-Detail-Layout */}
         {activeTab === 'zahlungen' && (
           <ZahlungenMasterDetail zeitraum={selectedPeriod} />
         )}
 
-        {/* 5. Zuordnung (mit Auto-Zuordnung integriert) */}
         {activeTab === 'zuordnung' && (
           <div>
             <KreditorZuordnung zeitraum={selectedPeriod} />
+            <div className="mt-6">
+              <FuzzyMatchingView zeitraum={selectedPeriod} />
+            </div>
           </div>
         )}
 
-        {/* 6. Einstellungen */}
         {activeTab === 'einstellungen' && (
           <div>
-            {/* Sub-Tab Navigation */}
-            <div className="flex gap-2 mb-6 border-b border-gray-200">
+            <div className="mb-4 flex gap-2 border-b border-gray-200">
               <button
                 onClick={() => setEinstellungenSubTab('bank-import')}
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
                   einstellungenSubTab === 'bank-import'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -470,7 +417,7 @@ export default function FibuCompleteDashboard() {
                 onClick={() => setEinstellungenSubTab('kontenplan')}
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
                   einstellungenSubTab === 'kontenplan'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -480,39 +427,28 @@ export default function FibuCompleteDashboard() {
                 onClick={() => setEinstellungenSubTab('kreditoren')}
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
                   einstellungenSubTab === 'kreditoren'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
                 🏢 Kreditoren
               </button>
+              <button
+                onClick={() => setEinstellungenSubTab('zahlungen')}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
+                  einstellungenSubTab === 'zahlungen'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                💳 Zahlungen
+              </button>
             </div>
 
-            {/* Sub-Tab Content */}
             {einstellungenSubTab === 'bank-import' && <BankImport />}
             {einstellungenSubTab === 'kontenplan' && <KontenplanView />}
             {einstellungenSubTab === 'kreditoren' && <KreditorenManagement />}
-          </div>
-        )}
-
-        {/* 6. Zuordnung (Unzugeordnete Items auf einen Blick) */}
-        {activeTab === 'zuordnung' && (
-          <div>
-            <h2 className="text-2xl font-bold mb-6">🔗 Zuordnung - Unzugeordnete Items</h2>
-            <p className="text-gray-600 mb-4">
-              Hier sehen Sie alle Transaktionen und Belege, die noch nicht zugeordnet sind, 
-              inklusive automatischer Vorschläge vom Dual-Matcher.
-            </p>
-            
-            {/* Verwende bestehende Kreditor-Zuordnung Component */}
-            <KreditorZuordnung zeitraum={selectedPeriod} />
-            
-            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800">
-                <strong>💡 Tipp:</strong> Nutzen Sie die Auto-Zuordnung in den Einstellungen, 
-                um automatisch passende Rechnungen und Konten für Zahlungen zu finden.
-              </p>
-            </div>
+            {einstellungenSubTab === 'zahlungen' && <ZahlungsEinstellungen />}
           </div>
         )}
       </div>
@@ -520,8 +456,8 @@ export default function FibuCompleteDashboard() {
       {/* Export Dialog */}
       {showExportDialog && (
         <ExportDialog 
+          zeitraum={selectedPeriod}
           onClose={() => setShowExportDialog(false)}
-          selectedPeriod={selectedPeriod}
         />
       )}
     </div>
