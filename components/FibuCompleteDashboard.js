@@ -359,6 +359,16 @@ export default function FibuCompleteDashboard() {
               )}
             </button>
             <button
+              onClick={() => setActiveTab('kontenplan')}
+              className={`px-3 py-2.5 text-xs font-medium border-b-2 transition ${
+                activeTab === 'kontenplan'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              📋 Kontenplan
+            </button>
+            <button
               onClick={() => setActiveTab('einstellungen')}
               className={`px-3 py-2.5 text-xs font-medium border-b-2 transition ${
                 activeTab === 'einstellungen'
@@ -400,23 +410,14 @@ export default function FibuCompleteDashboard() {
           </div>
         )}
 
-        {activeTab === 'einstellungen' && (
+        {/* Kontenplan Tab mit Sub-Tabs */}
+        {activeTab === 'kontenplan' && (
           <div>
             <div className="mb-4 flex gap-2 border-b border-gray-200">
               <button
-                onClick={() => setEinstellungenSubTab('bank-import')}
+                onClick={() => setKontenplanSubTab('kontenplan')}
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
-                  einstellungenSubTab === 'bank-import'
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                🏦 Bank-Import
-              </button>
-              <button
-                onClick={() => setEinstellungenSubTab('kontenplan')}
-                className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
-                  einstellungenSubTab === 'kontenplan'
+                  kontenplanSubTab === 'kontenplan'
                     ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
@@ -424,9 +425,9 @@ export default function FibuCompleteDashboard() {
                 📋 Kontenplan
               </button>
               <button
-                onClick={() => setEinstellungenSubTab('kreditoren')}
+                onClick={() => setKontenplanSubTab('kreditoren')}
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
-                  einstellungenSubTab === 'kreditoren'
+                  kontenplanSubTab === 'kreditoren'
                     ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
@@ -434,22 +435,88 @@ export default function FibuCompleteDashboard() {
                 🏢 Kreditoren
               </button>
               <button
-                onClick={() => setEinstellungenSubTab('zahlungen')}
+                onClick={() => setKontenplanSubTab('debitoren')}
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
-                  einstellungenSubTab === 'zahlungen'
+                  kontenplanSubTab === 'debitoren'
                     ? 'border-blue-600 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                💳 Zahlungen
+                👥 Debitoren
               </button>
             </div>
 
-            {einstellungenSubTab === 'bank-import' && <BankImport />}
-            {einstellungenSubTab === 'kontenplan' && <KontenplanView />}
-            {einstellungenSubTab === 'kreditoren' && <KreditorenManagement />}
-            {einstellungenSubTab === 'zahlungen' && <ZahlungsEinstellungen />}
+            {kontenplanSubTab === 'kontenplan' && <KontenplanView />}
+            {kontenplanSubTab === 'kreditoren' && <KreditorenManagement />}
+            {kontenplanSubTab === 'debitoren' && (
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h2 className="text-xl font-bold mb-4">Debitoren (Sammeldebitoren)</h2>
+                <p className="text-sm text-gray-600 mb-4">
+                  Verwaltung der Sammeldebitoren-Konten für verschiedene Zahlungsarten
+                </p>
+                
+                <div className="space-y-4">
+                  <div className="border-b pb-4">
+                    <h3 className="font-semibold text-gray-900 mb-2">PayPal</h3>
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm text-gray-600">Sammelkonto:</span>
+                      <span className="font-mono text-blue-600">1201</span>
+                      <span className="text-sm text-gray-500">(Forderungen PayPal)</span>
+                    </div>
+                  </div>
+                  
+                  <div className="border-b pb-4">
+                    <h3 className="font-semibold text-gray-900 mb-2">Amazon</h3>
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm text-gray-600">Sammelkonto:</span>
+                      <span className="font-mono text-blue-600">1815</span>
+                      <span className="text-sm text-gray-500">(Amazon Settlement / Verrechnungskonto)</span>
+                    </div>
+                  </div>
+                  
+                  <div className="border-b pb-4">
+                    <h3 className="font-semibold text-gray-900 mb-2">eBay</h3>
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm text-gray-600">Sammelkonto:</span>
+                      <span className="font-mono text-blue-600">1202</span>
+                      <span className="text-sm text-gray-500">(Forderungen eBay)</span>
+                    </div>
+                  </div>
+                  
+                  <div className="border-b pb-4">
+                    <h3 className="font-semibold text-gray-900 mb-2">Mollie</h3>
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm text-gray-600">Sammelkonto:</span>
+                      <span className="font-mono text-blue-600">1203</span>
+                      <span className="text-sm text-gray-500">(Forderungen Mollie)</span>
+                    </div>
+                  </div>
+                  
+                  <div className="pb-4">
+                    <h3 className="font-semibold text-gray-900 mb-2">Sonstige Debitoren</h3>
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm text-gray-600">Sammelkonto:</span>
+                      <span className="font-mono text-blue-600">1200</span>
+                      <span className="text-sm text-gray-500">(Forderungen aus Lieferungen und Leistungen)</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-semibold text-blue-900 mb-2">ℹ️ Hinweis</h4>
+                  <p className="text-sm text-blue-800">
+                    Die Sammeldebitoren-Konten werden automatisch bei der Zuordnung von Zahlungen verwendet. 
+                    Diese Konten dienen als Verrechnungskonten zwischen Zahlungseingang und Rechnungsausgleich.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
+        )}
+
+        {/* Einstellungen Tab - nur Bank-Import */}
+        {activeTab === 'einstellungen' && (
+          <BankImport />
         )}
       </div>
 
