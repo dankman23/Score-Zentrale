@@ -209,17 +209,27 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              Zugeordnet
+              ✓ Zugeordnet
             </button>
             <button
-              onClick={() => setFilter('nicht-zugeordnet')}
+              onClick={() => setFilter('beleg_fehlt')}
               className={`px-3 py-1.5 text-xs rounded-md transition font-medium ${
-                filter === 'nicht-zugeordnet'
-                  ? 'bg-orange-600 text-white'
+                filter === 'beleg_fehlt'
+                  ? 'bg-yellow-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              Offen
+              ⚠ Beleg fehlt
+            </button>
+            <button
+              onClick={() => setFilter('offen')}
+              className={`px-3 py-1.5 text-xs rounded-md transition font-medium ${
+                filter === 'offen'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              ✗ Offen
             </button>
           </div>
 
