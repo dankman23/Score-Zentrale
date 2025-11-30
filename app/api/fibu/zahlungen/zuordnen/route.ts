@@ -90,17 +90,54 @@ export async function POST(request: NextRequest) {
           // Bestimme Zuordnungsart
           const zuordnungsArt = rechnungId ? 'rechnung' : (body.kontoNr ? 'konto' : null)
           
+          // Lade VK-Rechnung für vk_beleg_id, falls vorhanden
+          let vk_beleg_id = null
+          let konto_id = body.kontoNr || null
+          
+          if (rechnungId || rechnungsNr) {
+            const rechnung = await db.collection('fibu_vk_rechnungen').findOne({
+              $or: [
+                { _id: new ObjectId(rechnungId) },
+                { cRechnungsNr: rechnungsNr }
+              ]
+            })
+            
+            if (rechnung) {
+              vk_beleg_id = rechnung._id.toString()
+              // Wenn kein Konto vom User gesetzt: Konto aus Rechnung übernehmen
+              if (!konto_id) {
+                konto_id = rechnung.sachkonto || rechnung.debitorKonto
+              }
+            }
+          }
+          
+          // Berechne zuordnungs_status basierend auf Belegpflicht
+          const { berechneZuordnungsStatus } = await import('../../../../lib/fibu-matching-pipeline')
+          const matchResult = {
+            vk_beleg_id,
+            konto_id,
+            match_source: 'manuell' as const,
+            match_confidence: 100,
+            match_details: 'Manuelle Zuordnung durch Benutzer'
+          }
+          const zuordnungs_status = await berechneZuordnungsStatus(zahlung, matchResult, db)
+          
           // Update Zahlung
           const updateData: any = {
             istZugeordnet: true,
             zugeordneteRechnung: zuordnungsArt === 'rechnung' ? (rechnungsNr || rechnungId) : null,
-            zugeordnetesKonto: zuordnungsArt === 'konto' ? (body.kontoNr || null) : null,
+            zugeordnetesKonto: konto_id,
             zuordnungsArt,
             zuordnungsDatum: new Date(),
             zuordnungsMethode: 'manuell',
             abweichungsgrund: abweichungsgrund || null,
             abweichungsBetrag: abweichungsBetrag || null,
-            zuordnungsNotiz: notiz || null
+            zuordnungsNotiz: notiz || null,
+            // NEUE FELDER
+            vk_beleg_id,
+            match_source: 'manuell',
+            match_confidence: 100,
+            zuordnungs_status
           }
           
           await collection.updateOne(filter, { $set: updateData })
