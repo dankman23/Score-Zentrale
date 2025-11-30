@@ -449,57 +449,8 @@ export async function GET(request: NextRequest) {
           }
           transaktionsId = p.transactionId || p._id?.toString() || ''
           
-          // AUTO-ZUORDNUNG für Bank-Transaktionen
-          if (!p.istZugeordnet) {
-            if (referenz && referenz.match(/^AU_\d+_SW\d+$/)) {
-              // AU-Nummer gefunden - prüfe Rechnung
-              const rechnung = rechnungenMap.get(referenz)
-              
-              if (rechnung) {
-                autoZugeordnet = true
-                autoGegenkonto = '69012'  // Erlöskonto
-                autoZuordnungsArt = 'rechnung'
-                p.zugeordneteRechnung = rechnung.rechnungsNr
-              } else {
-                autoZugeordnet = true
-                autoGegenkonto = '69012'
-                autoZuordnungsArt = 'Bank Eingang (AU-Nummer, keine Rechnung)'
-              }
-            } else if (referenz && referenz.match(/^RE\d{4}-\d+$/)) {
-              // Rechnungsnummer direkt gefunden
-              // Prüfe ob diese Rechnung existiert
-              const rechnungExists = rechnungenDocs.find(r => r.cRechnungsNr === referenz)
-              if (rechnungExists) {
-                autoZugeordnet = true
-                autoGegenkonto = '69012'  // Erlöskonto
-                autoZuordnungsArt = 'rechnung'
-                p.zugeordneteRechnung = referenz
-              } else {
-                // Rechnung nicht gefunden, aber Format stimmt
-                autoZugeordnet = true
-                autoGegenkonto = '69012'
-                autoZuordnungsArt = 'Bank Eingang (Rechnung nicht gefunden)'
-              }
-            } else if (p.betrag < 0) {
-              // Negative Beträge: Wahrscheinlich Lieferantenrechnungen
-              // Prüfe ob Kreditor bekannt ist
-              const lieferant = p.gegenkonto || ''
-              if (lieferant && lieferant.length > 3) {
-                autoZugeordnet = true
-                autoGegenkonto = '70000'  // Kreditorenkonto (Wareneingang)
-                autoZuordnungsArt = 'Lieferantenrechnung (Kreditor: ' + lieferant + ')'
-              } else {
-                autoZugeordnet = true
-                autoGegenkonto = '6855'  // Sonstige Aufwendungen
-                autoZuordnungsArt = 'Bank Ausgang (Sonstige)'
-              }
-            } else if (p.betrag > 0 && !referenz) {
-              // Positive Beträge ohne Referenz
-              autoZugeordnet = true
-              autoGegenkonto = '69012'  // Erlöskonto
-              autoZuordnungsArt = 'Bank Eingang (ohne Referenz)'
-            }
-          }
+          // ALTE AUTO-ZUORDNUNG ENTFERNT - wird jetzt durch neue Matching-Pipeline ersetzt
+          // (siehe weiter unten: processZahlungMatching)
         }
         
         return {
