@@ -265,6 +265,7 @@ export async function POST(request: NextRequest) {
       steuersatz,
       vorsteuer,
       istAktiv,
+      belegpflicht: belegpflicht !== undefined ? belegpflicht : true,  // NEW: Belegpflicht
       istSystemkonto: false,
       updated_at: new Date()
     }
