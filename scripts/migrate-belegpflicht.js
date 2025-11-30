@@ -65,9 +65,10 @@ async function migrate() {
     console.log(`📊 Gefunden: ${totalCount} Konten im Kontenplan`)
     
     // 2. Setze belegpflicht = true für alle Konten der Klassen 4-8
+    // WICHTIG: klasse ist String, nicht Number!
     const resultTrue = await collection.updateMany(
       {
-        klasse: { $in: [4, 5, 6, 7, 8] },
+        klasse: { $in: ['4', '5', '6', '7', '8'] },
         belegpflicht: { $exists: false }
       },
       {
@@ -76,7 +77,7 @@ async function migrate() {
     )
     console.log(`✅ Belegpflicht = TRUE gesetzt für ${resultTrue.modifiedCount} Konten (Klassen 4-8)`)
     
-    // 2b. Stelle sicher, dass Aufwandskonten wie 6670 (Amazongebühren) belegpflichtig sind
+    // 2b. Stelle sicher, dass Aufwandskonten wie 6770 (Amazongebühren) belegpflichtig sind
     const resultAufwand = await collection.updateMany(
       {
         kontonummer: { $regex: /^(6[0-9]{3}|5[0-9]{3}|4[0-9]{3})$/ },
