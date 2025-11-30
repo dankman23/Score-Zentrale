@@ -590,6 +590,76 @@ function ZahlungDetailPanel({ zahlung, onClose, onUpdate, zeitraum }) {
           </div>
         </div>
 
+        {/* Match-Info Sektion (NEU) */}
+        {zahlung.match_result && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 className="text-xs font-semibold text-blue-800 mb-3 uppercase tracking-wide flex items-center gap-1.5">
+              🎯 Match-Informationen
+            </h3>
+            <div className="space-y-2 text-xs">
+              <div className="flex justify-between items-center">
+                <span className="text-blue-700 font-medium">Match-Quelle:</span>
+                <span className={`px-2 py-1 rounded font-semibold ${
+                  zahlung.match_source === 'import_vk' ? 'bg-green-100 text-green-700' :
+                  zahlung.match_source === 'auto_vk' ? 'bg-blue-100 text-blue-700' :
+                  zahlung.match_source === 'manuell' ? 'bg-purple-100 text-purple-700' :
+                  zahlung.match_source === 'auto_konto' ? 'bg-yellow-100 text-yellow-700' :
+                  'bg-gray-100 text-gray-600'
+                }`}>
+                  {zahlung.match_source === 'import_vk' ? '📦 JTL-Import' :
+                   zahlung.match_source === 'auto_vk' ? '🤖 Auto-Match' :
+                   zahlung.match_source === 'manuell' ? '👤 Manuell' :
+                   zahlung.match_source === 'auto_konto' ? '💡 Vorschlag' : zahlung.match_source}
+                </span>
+              </div>
+              
+              {zahlung.match_confidence !== undefined && (
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-700 font-medium">Konfidenz:</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full ${
+                          zahlung.match_confidence >= 95 ? 'bg-green-500' :
+                          zahlung.match_confidence >= 80 ? 'bg-blue-500' :
+                          zahlung.match_confidence >= 60 ? 'bg-yellow-500' :
+                          'bg-red-500'
+                        }`}
+                        style={{ width: `${zahlung.match_confidence}%` }}
+                      />
+                    </div>
+                    <span className={`font-bold ${
+                      zahlung.match_confidence < 100 ? 'text-orange-600' : 'text-green-700'
+                    }`}>
+                      {zahlung.match_confidence}%
+                    </span>
+                  </div>
+                </div>
+              )}
+              
+              {zahlung.match_result.match_details && (
+                <div className="pt-2 border-t border-blue-200">
+                  <span className="text-blue-700 font-medium block mb-1">Details:</span>
+                  <div className="text-blue-900 bg-white p-2 rounded text-xs">
+                    {zahlung.match_result.match_details}
+                  </div>
+                </div>
+              )}
+              
+              {zahlung.match_result.konto_vorschlag_id && !zahlung.zugeordnetesKonto && (
+                <div className="pt-2 border-t border-blue-200">
+                  <div className="flex items-center gap-2">
+                    <span className="text-blue-700 font-medium">💡 Konto-Vorschlag:</span>
+                    <span className="font-mono font-bold text-blue-900">
+                      {zahlung.match_result.konto_vorschlag_id}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Zuordnung Sektion */}
         <div className="border border-gray-200 rounded-lg p-4">
           <h3 className="text-xs font-semibold text-gray-700 mb-3 uppercase tracking-wide flex items-center gap-1.5">
