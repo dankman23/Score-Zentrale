@@ -369,11 +369,11 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
                             </span>
                             {zahlung.match_source && (
                               <span className={`px-1.5 py-0.5 rounded text-[8px] font-semibold ${
-                                zahlung.match_source === 'auto_konto' ? 'bg-yellow-100 text-yellow-700' :
+                                zahlung.match_source === 'auto_bank' ? 'bg-blue-100 text-blue-700' :
                                 zahlung.match_source === 'manuell' ? 'bg-purple-100 text-purple-700' :
                                 'bg-gray-100 text-gray-600'
                               }`}>
-                                {zahlung.match_source === 'auto_konto' ? 'Vorschlag' :
+                                {zahlung.match_source === 'auto_bank' ? 'Auto' :
                                  zahlung.match_source === 'manuell' ? 'Manuell' : ''}
                               </span>
                             )}
