@@ -12,34 +12,35 @@ const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/score_zent
 
 // Konten OHNE Belegpflicht (belegpflicht = false)
 const KEINE_BELEGPFLICHT = [
-  // Geldtransit / Durchlaufende Posten
-  '1360', '1369', '1370',
+  // === 1. Bank- und Zahlungsdienstleisterkonten ===
+  '1200', '1210', '1224', // Bankkonten
+  '1800', '1810', '1815', '1820', // Zahlungsdienstleister (PayPal, Amazon, etc.)
+  '1000', // Kasse
   
-  // Bankgebühren / Zinsen (Kontoauszug reicht)
-  '4970', '4830', '4831', '4832', '4833', '4834', '4835',
+  // === 2. Durchlaufende Posten / Geldtransit / Verrechnungskonten ===
+  '1360', '1369', '1370', '1371', '1372', '1373', '1374',
+  '1600', '1610', // Interne Verrechnungen
   
-  // Steuerkonten (automatische Buchungen)
-  '1780', '1790', '1570', '1576', '1776',
+  // === 3. Steuer-Zahllast-Konten ===
+  '1780', '1790', // USt-Zahllast
+  '1570', '1576', '1776', // Vorsteuer-Konten
+  '1740', '1750', '1760', // Körperschaftsteuer, Gewerbesteuer
+  '3730', '3740', '3750', // Steuerschulden
   
-  // Gehaltskonto (Lohnbuchung läuft separat)
-  '6200',
+  // === 4. Lohn-/Gehaltskonto (Beleg = Lohnjournal) ===
+  '6200', '4130', '4140', // Löhne/Gehälter, Sozialabgaben
   
-  // Sammeldebitoren (69xxx) - keine Belege nötig
+  // === 5. Sammeldebitoren (69xxx) ===
   '69001', '69002', '69003', '69004', '69005', '69006', '69007', '69008',
   '69010', '69011', '69012', '69013', '69014', '69015', '69016', '69017',
   '69018', '69019', '69020',
   
-  // Bankkonten
-  '1200', '1800', '1810', '1815', '1820',
+  // === 6. Privatentnahmen/-einlagen ===
+  '1890', '2100',
   
-  // Amazon Settlement
-  '1815',
-  
-  // Interne Umbuchungen
-  '1600', '1610',
-  
-  // Privatentnahmen/-einlagen
-  '1890', '2100'
+  // === 7. Bankgebühren / Zinsen (Kontoauszug reicht) ===
+  '4970', '4830', '4831', '4832', '4833', '4834', '4835',
+  '2120', '2130' // Zinsen
 ]
 
 async function migrate() {
