@@ -76,8 +76,10 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
 
   // Gefilterte Zahlungen
   const filteredZahlungen = zahlungen.filter(z => {
-    if (filter === 'zugeordnet' && !z.istZugeordnet) return false
-    if (filter === 'nicht-zugeordnet' && z.istZugeordnet) return false
+    // Status-Filter (3-stufig)
+    if (filter === 'zugeordnet' && z.zuordnungs_status !== 'zugeordnet') return false
+    if (filter === 'beleg_fehlt' && z.zuordnungs_status !== 'beleg_fehlt') return false
+    if (filter === 'offen' && z.zuordnungs_status !== 'offen') return false
     
     // Quelle-Filter mit normalisiertem Vergleich
     if (quelle !== 'alle') {
