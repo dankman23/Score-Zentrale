@@ -77,7 +77,10 @@ async function fixBelegpflicht() {
     console.log('✅ MongoDB verbunden')
     
     const db = client.db()
-    const collection = db.collection('fibu_kontenplan')
+    
+    // WICHTIG: Es gibt ZWEI Kontenplan-Collections!
+    const collections = ['fibu_kontenplan', 'kontenplan']
+    console.log('📋 Arbeite mit Collections:', collections.join(', '))
     
     // 1. PRÜFE & LEGE FEHLENDE KONTEN AN
     console.log('\n📋 SCHRITT 1: Prüfe Systemkonten...')
