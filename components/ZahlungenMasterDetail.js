@@ -12,7 +12,7 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
   const [zahlungen, setZahlungen] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedZahlung, setSelectedZahlung] = useState(null)
-  const [filter, setFilter] = useState('alle') // alle, zugeordnet, nicht-zugeordnet
+  const [filter, setFilter] = useState('alle') // alle, zugeordnet, beleg_fehlt, offen
   const [searchTerm, setSearchTerm] = useState('')
   const [quelle, setQuelle] = useState('alle') // alle, amazon, paypal, bank, etc.
   
