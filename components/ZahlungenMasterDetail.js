@@ -603,14 +603,14 @@ function ZahlungDetailPanel({ zahlung, onClose, onUpdate, zeitraum }) {
                 <span className={`px-2 py-1 rounded font-semibold ${
                   zahlung.match_source === 'import_vk' ? 'bg-green-100 text-green-700' :
                   zahlung.match_source === 'auto_vk' ? 'bg-blue-100 text-blue-700' :
+                  zahlung.match_source === 'auto_bank' ? 'bg-blue-100 text-blue-700' :
                   zahlung.match_source === 'manuell' ? 'bg-purple-100 text-purple-700' :
-                  zahlung.match_source === 'auto_konto' ? 'bg-yellow-100 text-yellow-700' :
                   'bg-gray-100 text-gray-600'
                 }`}>
                   {zahlung.match_source === 'import_vk' ? '📦 JTL-Import' :
-                   zahlung.match_source === 'auto_vk' ? '🤖 Auto-Match' :
-                   zahlung.match_source === 'manuell' ? '👤 Manuell' :
-                   zahlung.match_source === 'auto_konto' ? '💡 Vorschlag' : zahlung.match_source}
+                   zahlung.match_source === 'auto_vk' ? '🤖 Auto-Match (Beleg)' :
+                   zahlung.match_source === 'auto_bank' ? '🏦 Auto-Match (Bank)' :
+                   zahlung.match_source === 'manuell' ? '👤 Manuell' : zahlung.match_source}
                 </span>
               </div>
               
