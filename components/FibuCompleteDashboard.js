@@ -51,7 +51,7 @@ export default function FibuCompleteDashboard() {
     return '2025-10-01_2025-10-31'
   })
   const [activeTab, setActiveTab] = useState('zahlungen')
-  const [einstellungenSubTab, setEinstellungenSubTab] = useState('bank-import')
+  const [kontenplanSubTab, setKontenplanSubTab] = useState('kontenplan')
   const [showExportDialog, setShowExportDialog] = useState(false)
   const [tabFilters, setTabFilters] = useState({})
   const [quote, setQuote] = useState('')
