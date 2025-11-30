@@ -141,11 +141,6 @@ export async function GET(request: NextRequest) {
         .toArray()
 
       console.log(`[Zahlungen] ${source.name}: ${payments.length} Transaktionen`)
-      
-      // DEBUG: Zeige erste Transaktion zum Prüfen der Datum-Felder
-      if (payments.length > 0 && source.name === 'Amazon') {
-        console.log(`[DEBUG] Erste Amazon-Zahlung - datum: ${payments[0].datum}, datumDate: ${payments[0].datumDate}`)
-      }
 
       // Formatiere einheitlich mit Fokus auf Zuordnung
       const formatted = payments.map(p => {
