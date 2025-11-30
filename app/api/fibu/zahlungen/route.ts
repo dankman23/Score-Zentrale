@@ -469,6 +469,10 @@ export async function GET(request: NextRequest) {
     stats.zuordnung = {
       zugeordnet: zugeordnetCount,
       zugeordnetProzent: totalCount > 0 ? Math.round((zugeordnetCount / totalCount) * 100) : 0,
+      belegFehlt: belegFehltCount,
+      belegFehltProzent: totalCount > 0 ? Math.round((belegFehltCount / totalCount) * 100) : 0,
+      offen: offenCount,
+      offenProzent: totalCount > 0 ? Math.round((offenCount / totalCount) * 100) : 0,
       nichtZugeordnet: nichtZugeordnetCount,
       nichtZugeordnetProzent: totalCount > 0 ? Math.round((nichtZugeordnetCount / totalCount) * 100) : 0
     }
