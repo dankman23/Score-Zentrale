@@ -49,14 +49,12 @@ async function getImportMatch(zahlung: any, db: Db): Promise<MatchResult | null>
   return null
 }
 
-async function getAutoVkMatch(zahlung: any, db: Db): Promise<MatchResult | null> {
+async function getAutoVkMatch(zahlung: any, rechnungenCache: Map<string, any>): Promise<MatchResult | null> {
   if (zahlung.zugeordneteRechnung || zahlung.istZugeordnet) return null
   
-  const vkRechnungen = db.collection('fibu_vk_rechnungen')
-  
-  // Match-Strategie 1: AU-Nummer
+  // Match-Strategie 1: AU-Nummer (über Cache)
   if (zahlung.referenz && zahlung.referenz.match(/^AU_\d+_SW\d+$/)) {
-    const rechnung = await vkRechnungen.findOne({ cBestellNr: zahlung.referenz })
+    const rechnung = rechnungenCache.get(zahlung.referenz)
     
     if (rechnung) {
       const betragsDiff = Math.abs(rechnung.brutto - Math.abs(zahlung.betrag))
