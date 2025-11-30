@@ -267,7 +267,12 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
                       </td>
                       <td className="px-2 py-2.5">
                         {zahlung.zugeordneteRechnung ? (
-                          <span className="text-green-700 text-[10px] font-medium">📄 {zahlung.zugeordneteRechnung}</span>
+                          <div>
+                            <span className="text-green-700 text-[10px] font-bold block">📄 {zahlung.zugeordneteRechnung}</span>
+                            {zahlung.referenz && zahlung.referenz.match(/^AU_\d+_SW\d+$/) && (
+                              <span className="text-gray-500 text-[9px]">{zahlung.referenz}</span>
+                            )}
+                          </div>
                         ) : zahlung.zugeordnetesKonto ? (
                           <span className="text-blue-700 text-[10px]">🏦 {zahlung.zugeordnetesKonto}</span>
                         ) : (
