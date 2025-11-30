@@ -573,9 +573,9 @@ export async function GET(request: NextRequest) {
     })
     
     // Lade alle VK-Rechnungen für Auto-Matching (Cache für Performance)
-    const vkRechnungen = await db.collection('fibu_vk_rechnungen').find({}).toArray()
+    const vkRechnungenForCache = await db.collection('fibu_vk_rechnungen').find({}).toArray()
     const rechnungenCache = new Map()
-    vkRechnungen.forEach(r => {
+    vkRechnungenForCache.forEach(r => {
       if (r.cBestellNr) {
         rechnungenCache.set(r.cBestellNr, r)
       }
