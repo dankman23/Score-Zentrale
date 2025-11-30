@@ -582,10 +582,67 @@ export async function GET(request: NextRequest) {
     })
     console.log(`[Zahlungen] Rechnungen-Cache erstellt: ${rechnungenCache.size} Einträge`)
     
-    // Verarbeite jede Zahlung durch die Pipeline
+    // OPTIMIERUNG: Cache auch VK-Rechnungen nach cRechnungsNr für Import-Match
+    const rechnungenByNr = new Map()
+    vkRechnungenForCache.forEach(r => {
+      if (r.cRechnungsNr) {
+        rechnungenByNr.set(r.cRechnungsNr, r)
+      }
+    })
+    
+    // Verarbeite jede Zahlung durch die Pipeline (OHNE DB-Queries in der Schleife!)
     for (const zahlung of allPayments) {
-      // Matching-Pipeline durchlaufen
-      const matchResult = await processZahlungMatching(zahlung, db, rechnungenCache)
+      let matchResult: MatchResult = { match_source: null }
+      
+      // 1. Import-Match (über Cache statt DB)
+      if (zahlung.zugeordneteRechnung) {
+        const rechnung = rechnungenByNr.get(zahlung.zugeordneteRechnung)
+        if (rechnung) {
+          matchResult = {
+            vk_beleg_id: rechnung._id.toString(),
+            vk_rechnung_nr: rechnung.cRechnungsNr,
+            konto_id: rechnung.sachkonto || rechnung.debitorKonto,
+            match_source: 'import_vk',
+            match_confidence: 100,
+            match_details: 'JTL-Import-Match'
+          }
+        }
+      }
+      
+      // 2. Auto-VK-Match (nur wenn kein Import-Match)
+      if (!matchResult.match_source && zahlung.referenz && zahlung.referenz.match(/^AU_\d+_SW\d+$/)) {
+        const rechnung = rechnungenCache.get(zahlung.referenz)
+        if (rechnung) {
+          const betragsDiff = Math.abs(rechnung.brutto - Math.abs(zahlung.betrag))
+          const toleranz = rechnung.brutto * 0.02
+          
+          if (betragsDiff <= toleranz) {
+            matchResult = {
+              vk_beleg_id: rechnung._id.toString(),
+              vk_rechnung_nr: rechnung.cRechnungsNr,
+              konto_id: rechnung.sachkonto || rechnung.debitorKonto,
+              match_source: 'auto_vk',
+              match_confidence: 95,
+              match_details: `AU-Match: ${zahlung.referenz}`
+            }
+          }
+        }
+      }
+      
+      // 3. Konto-Vorschlag (nur wenn noch kein Match)
+      if (!matchResult.match_source) {
+        matchResult = getKontoVorschlag(zahlung)
+      }
+      
+      // 4. Manuell (überschreibt alles)
+      if (zahlung.istZugeordnet && zahlung.zugeordnetesKonto && !matchResult.vk_beleg_id) {
+        matchResult = {
+          konto_id: zahlung.zugeordnetesKonto,
+          match_source: 'manuell',
+          match_confidence: 100,
+          match_details: 'Manuelle Zuordnung'
+        }
+      }
       
       // Erweitere Zahlung mit Match-Ergebnis
       zahlung.match_result = matchResult
@@ -602,8 +659,21 @@ export async function GET(request: NextRequest) {
         zahlung.konto_vorschlag_id = matchResult.konto_vorschlag_id
       }
       
-      // Status berechnen
-      zahlung.zuordnungs_status = await berechneZuordnungsStatus(zahlung, matchResult, db)
+      // Status berechnen (OHNE DB-Query - über kontenMap Cache)
+      const kontoNr = matchResult.konto_id || zahlung.zugeordnetesKonto
+      
+      if (!kontoNr) {
+        zahlung.zuordnungs_status = 'offen'
+      } else {
+        const konto = kontenMap.get(kontoNr)
+        
+        if (!konto || konto.belegpflicht === false) {
+          zahlung.zuordnungs_status = 'zugeordnet'
+        } else {
+          const hatBeleg = matchResult.vk_beleg_id || zahlung.zugeordneteRechnung || zahlung.belegId
+          zahlung.zuordnungs_status = hatBeleg ? 'zugeordnet' : 'beleg_fehlt'
+        }
+      }
     }
 
     // Berechne Gesamt-Stats VOR Pagination (mit neuen Status-Werten)
