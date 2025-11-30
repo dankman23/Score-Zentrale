@@ -205,7 +205,7 @@ export default function KontenplanView() {
                           <th className="px-4 py-3 text-left font-semibold text-gray-700">Kontonummer</th>
                           <th className="px-4 py-3 text-left font-semibold text-gray-700">Bezeichnung</th>
                           <th className="px-4 py-3 text-left font-semibold text-gray-700">Klasse</th>
-                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Gruppe</th>
+                          <th className="px-4 py-3 text-center font-semibold text-gray-700">Belegpflicht</th>
                           <th className="px-4 py-3 text-center font-semibold text-gray-700">Aktionen</th>
                         </tr>
                       </thead>
@@ -217,7 +217,36 @@ export default function KontenplanView() {
                             </td>
                             <td className="px-4 py-3 text-gray-900">{konto.bezeichnung}</td>
                             <td className="px-4 py-3 text-gray-600">{konto.klasse}</td>
-                            <td className="px-4 py-3 text-gray-600">{konto.gruppe}</td>
+                            <td className="px-4 py-3 text-center">
+                              <button
+                                onClick={async () => {
+                                  const newValue = !konto.belegpflicht
+                                  try {
+                                    const res = await fetch('/api/fibu/kontenplan', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({
+                                        ...konto,
+                                        belegpflicht: newValue
+                                      })
+                                    })
+                                    if (res.ok) {
+                                      await loadKontenplan()
+                                    }
+                                  } catch (error) {
+                                    console.error('Fehler beim Toggle:', error)
+                                  }
+                                }}
+                                className={`px-3 py-1 rounded-full text-xs font-medium transition ${
+                                  konto.belegpflicht
+                                    ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                                title={konto.belegpflicht ? 'Beleg erforderlich' : 'Kein Beleg nötig'}
+                              >
+                                {konto.belegpflicht ? '✓ Ja' : '✗ Nein'}
+                              </button>
+                            </td>
                             <td className="px-4 py-3 text-center">
                               <button
                                 onClick={() => setEditingKonto(konto)}
