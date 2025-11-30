@@ -21,7 +21,7 @@ const OHNE_BELEGPFLICHT = [
 ]
 
 async function fixBelegpflicht() {
-  const client = new MongoClient(process.env.MONGO_URL)
+  const client = new MongoClient(MONGO_URL)
   
   try {
     await client.connect()
