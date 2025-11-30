@@ -55,6 +55,11 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
     }
   }
 
+  // Filter-Änderung: Setze Seite zurück auf 1
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filter, searchTerm, quelle])
+
   // Hilfsfunktion: Normalisiere Quellen-String für Vergleich
   const normalizeQuelle = (quelle) => {
     if (!quelle) return ''
