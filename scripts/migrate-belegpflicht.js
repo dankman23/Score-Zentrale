@@ -49,62 +49,19 @@ async function migrate() {
     const totalCount = await collection.countDocuments({})
     console.log(`📊 Gefunden: ${totalCount} Konten im Kontenplan`)
     
-    // 2. Setze belegpflicht = true für alle Konten der Klassen 4-8
-    // WICHTIG: klasse ist String, nicht Number!
-    const resultTrue = await collection.updateMany(
-      {
-        klasse: { $in: ['4', '5', '6', '7', '8'] },
-        belegpflicht: { $exists: false }
-      },
-      {
-        $set: { belegpflicht: true }
-      }
-    )
-    console.log(`✅ Belegpflicht = TRUE gesetzt für ${resultTrue.modifiedCount} Konten (Klassen 4-8)`)
-    
-    // 2b. Stelle sicher, dass Aufwandskonten wie 6770 (Amazongebühren) belegpflichtig sind
-    const resultAufwand = await collection.updateMany(
-      {
-        kontonummer: { $regex: /^(6[0-9]{3}|5[0-9]{3}|4[0-9]{3})$/ },
-        kontonummer: { $nin: KEINE_BELEGPFLICHT }
-      },
-      {
-        $set: { belegpflicht: true }
-      }
-    )
-    console.log(`✅ Belegpflicht = TRUE forciert für ${resultAufwand.modifiedCount} Aufwandskonten`)
-    
-    // 3. Setze belegpflicht = false für spezielle Konten
-    const resultFalse = await collection.updateMany(
-      {
-        kontonummer: { $in: KEINE_BELEGPFLICHT },
-        belegpflicht: { $exists: false }
-      },
-      {
-        $set: { belegpflicht: false }
-      }
-    )
-    console.log(`✅ Belegpflicht = FALSE gesetzt für ${resultFalse.modifiedCount} Konten (Ausnahmen)`)
-    
-    // 4. Setze belegpflicht = false für alle übrigen Konten (Klassen 0-3, 9)
-    // WICHTIG: klasse ist String!
-    const resultOther = await collection.updateMany(
-      {
-        klasse: { $in: ['0', '1', '2', '3', '9'] },
-        belegpflicht: { $exists: false }
-      },
-      {
-        $set: { belegpflicht: false }
-      }
-    )
-    console.log(`✅ Belegpflicht = FALSE gesetzt für ${resultOther.modifiedCount} Konten (Klassen 0-3, 9)`)
-    
-    // 5. Fallback: Alle übrigen Konten ohne belegpflicht
-    const resultFallback = await collection.updateMany(
+    // 2. DEFINITIVE REGEL: Setze ALLE auf true (Default)
+    const resultDefault = await collection.updateMany(
       { belegpflicht: { $exists: false } },
       { $set: { belegpflicht: true } }
     )
-    console.log(`✅ Belegpflicht = TRUE (Fallback) für ${resultFallback.modifiedCount} übrige Konten`)
+    console.log(`✅ Belegpflicht = TRUE (Default) für ${resultDefault.modifiedCount} Konten`)
+    
+    // 3. EXAKTE AUSNAHMEN: Setze spezifische Konten auf false
+    const resultFalse = await collection.updateMany(
+      { kontonummer: { $in: KEINE_BELEGPFLICHT } },
+      { $set: { belegpflicht: false } }
+    )
+    console.log(`✅ Belegpflicht = FALSE gesetzt für ${resultFalse.modifiedCount} technische Konten`)
     
     // 6. Statistik
     const mitBelegpflicht = await collection.countDocuments({ belegpflicht: true })
