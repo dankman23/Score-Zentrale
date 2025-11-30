@@ -325,7 +325,7 @@ export async function PUT(request: NextRequest) {
     }
     
     const db = await getDb()
-    const collection = db.collection('fibu_kontenplan')
+    const collection = db.collection('kontenplan') // FIXED: Use same collection as GET
     
     // Wenn Kontonummer geändert wird, neu analysieren
     if (updates.kontonummer && updates.kontonummer !== kontonummer) {
