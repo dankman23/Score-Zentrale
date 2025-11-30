@@ -447,6 +447,12 @@ function ZahlungDetailPanel({ zahlung, onClose, onUpdate, zeitraum }) {
                 <span className="font-medium text-gray-900">{zahlung.kundenName}</span>
               </div>
             )}
+            {zahlung.steuerschluessel && (
+              <div className="flex justify-between">
+                <span className="text-gray-600">Steuerschlüssel:</span>
+                <span className="font-mono font-bold text-green-700">{zahlung.steuerschluessel}</span>
+              </div>
+            )}
             {zahlung.verwendungszweck && (
               <div className="pt-2 border-t border-gray-200">
                 <span className="text-gray-600 block mb-1">Verwendungszweck:</span>
