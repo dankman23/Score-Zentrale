@@ -48,7 +48,13 @@ export default function FibuCompleteDashboard() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [selectedPeriod, setSelectedPeriod] = useState(() => {
-    return '2025-10-01_2025-10-31'
+    // Default: Letzte 7 Tage (Performance-Optimierung)
+    const today = new Date()
+    const sevenDaysAgo = new Date(today)
+    sevenDaysAgo.setDate(today.getDate() - 7)
+    
+    const formatDate = (d) => d.toISOString().split('T')[0]
+    return `${formatDate(sevenDaysAgo)}_${formatDate(today)}`
   })
   const [activeTab, setActiveTab] = useState('zahlungen')
   const [kontenplanSubTab, setKontenplanSubTab] = useState('kontenplan')
