@@ -252,7 +252,7 @@ export async function POST(request: NextRequest) {
     }
     
     const db = await getDb()
-    const collection = db.collection('fibu_kontenplan')
+    const collection = db.collection('kontenplan') // FIXED: Use same collection as GET
     
     // Analysiere Kontonummer
     const analysis = analyzeKontonummer(kontonummer)
