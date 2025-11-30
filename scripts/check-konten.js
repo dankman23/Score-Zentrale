@@ -1,7 +1,9 @@
-require('dotenv').config({ path: '/app/.env' })
 const { MongoClient } = require('mongodb')
+const fs = require('fs')
 
-const MONGO_URL = process.env.MONGO_URL
+// Parse .env manually
+const envContent = fs.readFileSync('/app/.env', 'utf8')
+const MONGO_URL = envContent.split('\n').find(line => line.startsWith('MONGO_URL=')).split('=')[1].trim()
 
 async function check() {
   const client = new MongoClient(MONGO_URL)
