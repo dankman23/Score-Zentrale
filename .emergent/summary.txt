@@ -1,98 +1,92 @@
 <analysis>
-The trajectory documents a multi-faceted development and debugging session on the Score-Zentrale Next.js application. The work commenced by addressing a critical bug where the Kaltakquise (cold acquisition) autopilot only functioned when a user was active on the webpage. This was resolved by replacing the frontend-based  polling with a robust, persistent backend worker using a Node.js script managed by Supervisor. This ensured the autopilot runs 24/7, independent of frontend activity.
+The trajectory chronicles the evolution of the Score-Zentrale application's financial accounting (FIBU) module. The work began with a user request to model the FIBU section after the Lexoffice software, leading to a multi-phase development plan.
 
-Following this, the engineer addressed several user-reported bugs, including an input field limitation and a hardcoded data-fetching limit that prevented all company records from being displayed.
+A significant portion of the work involved deep backend debugging and architectural refactoring. An initial problem of missing invoice data ( collection being empty) was traced to SQL errors in the JTL integration API. This was resolved by creating a robust sync mechanism that populates the MongoDB collection from various sources, which also drastically improved performance by introducing a caching layer.
 
-The primary focus then shifted to a major feature enhancement of the FIBU (financial accounting) module. Guided by extensive user input comparing the desired functionality to the Lexoffice software, the engineer began implementing a sophisticated auto-matching system. This involved creating a dual-matching engine to associate financial transactions with *both* a document (Beleg) and an account (Konto). A significant debugging effort was undertaken to create a data-mapping layer () to normalize transaction data from various sources (Amazon, PayPal, etc.) before processing.
+A critical turning point was the user's concern about data integrity. This led to a major refactoring of several data import APIs (for external invoices, bank transactions, etc.). The engineer replaced unsafe  operations using  (which overwrote manual user assignments) with a secure pattern using  or conditional updates that explicitly protect linkage fields. This established data persistence and safety as a core architectural principle.
 
-The final phase involved building the frontend UI for manual assignments while simultaneously debugging the backend matching logic. A critical issue was identified: document matching was failing because the source collection () was empty. The user's last request was to pause development and create comprehensive documentation to prepare the project for forking.
+The focus then shifted to the frontend, where the existing tab structure was consolidated into a more logical 6-tab layout. Extensive debugging was also performed on the eBay payment integration, revealing issues with disabled production keys and incorrect credential types (Auth'n'Auth vs. OAuth 2.0). The integration was ultimately paused.
 
-All future communication should be in **German**.
+Finally, development began on a Master-Detail UI for the Umsätze (Transactions) and EK-Belege (Incoming Documents) tabs. The work was paused by the user's explicit request to create this comprehensive summary to prepare the project for forking.
+
+The user communicates in **German**, and all future interactions should be in German.
 </analysis>
 
 <product_requirements>
-The primary goal is to build a comprehensive, automated financial accounting (FIBU) module within the Score-Zentrale application, inspired by the functionality of Lexoffice.
+The goal is to build a comprehensive, automated financial accounting (FIBU) module inspired by Lexoffice functionality.
 
-**Key Requirements:**
-1.  **Dual-Assignment:** Every financial transaction must be associated with both a corresponding document (Beleg), such as an invoice, and a financial account (Konto), such as revenue or fees.
-2.  **Automated Matching:** Implement a robust, learning-based system to automatically perform this dual-assignment. The system should use various strategies:
-    *   Matching invoice/order numbers from transaction descriptions.
-    *   Rule-based mapping for known fees (e.g., PayPal fees).
-    *   Learning from manual user assignments to improve future suggestions.
-3.  **Manual Override:** Provide a clear and intuitive frontend interface allowing users to manually assign or correct the automated assignments for both documents and accounts.
-4.  **Data Persistence:** All transactions, documents, and their associations must be stored permanently in the MongoDB database.
-5.  **Data Export:** Create an export function to generate a CSV file compatible with the 10it (Addison) accounting software, following the DATEV format.
-6.  **Reliable Autopilot:** Ensure the Kaltakquise autopilot runs continuously in the background, independent of user browser sessions.
+**Core Features:**
+1.  **UI/UX Overhaul:** Refactor the existing FIBU interface into a new 6-tab structure: Übersicht (Overview), EK-Belege (Incoming Invoices), VK-Belege (Outgoing Invoices), Umsätze (Transactions), Zuordnung (Assignment), and Einstellungen (Settings).
+2.  **Master-Detail Layout:** Implement a two-panel layout for the Belege and Umsätze tabs, showing a list of items on the left and a detailed view/editor on the right.
+3.  **Data Integrity and Persistence:** This is a critical, non-negotiable requirement. Data, once imported into MongoDB from sources like JTL (SQL), must be treated as permanent. Manual associations between transactions and documents must never be lost or overwritten by subsequent data syncs.
+4.  **Performance:** The application must be fast. Data should be cached in MongoDB to avoid slow, repetitive calls to external sources like the JTL SQL database.
+5.  **Data Import:** The system must handle importing data from various sources:
+    *   VK-Belege (Outgoing Invoices) from JTL.
+    *   EK-Belege (Incoming Invoices) via email/manual upload.
+    *   Transactions from PayPal, Amazon, Mollie, Commerzbank, and eBay.
+6.  **DATEV Export:** Implement a feature to export financial data into a CSV format compatible with 10it/Addison software.
 </product_requirements>
 
 <key_technical_concepts>
-- **Framework:** Next.js (App Router)
+- **Framework:** Next.js (App Router), React
 - **Database:** MongoDB
-- **Background Jobs:** Node.js script managed by autopilot-worker                 RUNNING   pid 27, uptime 0:00:02
-code-server                      STOPPED   Not started
-jtl-import                       STOPPED   Not started
-mongodb                          RUNNING   pid 28, uptime 0:00:02
-nextjs                           RUNNING   pid 30, uptime 0:00:02
-nginx-code-proxy                 STARTING  
-supervisor>  for persistent, asynchronous tasks (Autopilot Worker).
-- **Data Normalization:** A dedicated data-mapping layer () to create a consistent data structure from disparate sources (Amazon, PayPal, Bank CSVs) before processing.
-- **Accounting Logic:** Implementation of a dual-matching engine and a learning classifier for automated financial record-keeping.
-- **Styling & UI:** React components, , and existing shadcn/ui and Tailwind CSS.
+- **Data Persistence Strategy:** A cache-and-protect pattern. Data is fetched once from a primary source (e.g., JTL SQL) and stored in MongoDB. Subsequent updates are designed to be non-destructive, using  or conditional updates to protect user-generated data like manual transaction-document links.
+- **UI Architecture:** Master-Detail view pattern for data presentation and editing.
+- **External API Integration:** Connecting to JTL (MSSQL), eBay, and Mollie REST APIs.
 </key_technical_concepts>
 
 <code_architecture>
-The application is a Next.js monolith. The recent work has focused on creating a robust background processing system and a modular, extensible architecture for the new FIBU (financial accounting) features.
+The application is a Next.js monolith with a backend API layer and a React-based frontend. The architecture has been refactored to prioritize performance and data safety through a MongoDB caching layer.
 
-**Directory Structure:**
+**Directory Structure (Relevant Files):**
 
 
 **File Analysis:**
 
-- ** & **
-  - **Importance:** These files create a persistent background worker process that solves the critical bug of the autopilot only running when the user is on the website. The script continuously calls the  API, and the  file ensures Supervisor keeps it running.
-  - **Changes:** Both were created from scratch.
+-   ****
+    -   **Importance:** This is the main frontend component for the entire FIBU module. It manages the tab navigation and renders the corresponding view for each section.
+    -   **Changes:** Heavily refactored multiple times to consolidate the original 8+ tabs into the user-specified 6-tab structure (Übersicht, EK-Belege, VK-Belege, Umsätze, Zuordnung, Einstellungen). It now renders the new Master-Detail components. A React hydration error caused by random quote generation on the server was also fixed here.
 
-- ****
-  - **Importance:** This is a crucial new utility for the FIBU module. It solves the core problem of inconsistent data formats by normalizing raw transaction data from various MongoDB collections (Amazon, PayPal, etc.) into a single, unified  object.
-  - **Changes:** Created from scratch to map fields like  and  to a common  and .
+-   ** & **
+    -   **Importance:** These APIs handle importing data from external sources. They were identified as a major risk to data integrity.
+    -   **Changes:** The core logic was changed from a dangerous  which overwrote all data, to a safe pattern. Now, the code checks if a document/transaction exists. If it doesn't, it's inserted. If it does, only non-critical fields are updated, and any records with existing manual assignments are skipped entirely, thus preserving user work.
 
-- ****
-  - **Importance:** This is the heart of the new accounting logic. It orchestrates the process of finding both a  (document) and a  (account) for a given transaction, fulfilling the Dual-Assignment requirement.
-  - **Changes:** Created from scratch to replace the older, single-assignment logic.
+-   ****
+    -   **Importance:** A new API created to solve the problem of empty invoice collections. It acts as a central aggregator.
+    -   **Changes:** Created from scratch. It fetches data from various sources (like  and the JTL  API) and consolidates them into the  collection, which is used by the matching engine. This also now uses the safe update pattern.
 
-- ****
-  - **Importance:** The new API endpoint that exposes the 's functionality. This is used for the large-scale re-processing of all historical transactions.
-  - **Changes:** Created from scratch.
+-   ** & **
+    -   **Importance:** These are new, central components for the revamped UI, implementing the Lexoffice-style Master-Detail layout.
+    -   **Changes:** Created from scratch. They provide a two-panel view with a filterable list on the left and a details/assignment panel on the right. This represents the beginning of the final UI vision.
 
-- ****
-  - **Importance:** A new, enhanced UI component for manual transaction assignment. It's designed to allow the user to select both a document and an account in a single interface, directly supporting the core FIBU requirements.
-  - **Changes:** Created from scratch as a replacement for the older, simpler .
-
-- ****
-  - **Importance:** The main frontend page.
-  - **Changes:** The hardcoded  for fetching companies was removed. The  attribute on the autopilot limit input was removed to fix a UI bug. The original  logic for the autopilot is now obsolete but likely still present in the code.
+-   ** & **
+    -   **Importance:** These files manage the eBay integration.
+    -   **Changes:** The  file was repeatedly updated with new eBay tokens and switched from  to . The  was modified to fix the API endpoint URL and the authentication method. Despite these efforts, the integration remains non-functional due to a persistent 404 error, likely related to incorrect token type (Auth'n'Auth vs. OAuth 2.0).
 </code_architecture>
 
 <pending_tasks>
-- **Fix Beleg Matching:** The root cause of document matching failure needs to be addressed. The  collection is empty, so the process of populating it with invoices from JTL or other sources must be found and fixed.
-- **Complete Frontend UI:** Fully integrate the  and  into the  and  to allow seamless manual assignment and correction.
-- **Implement 10it Export:** Begin Phase 3 of the FIBU plan, which involves creating the API and logic to export accounting data in the DATEV/10it-compatible CSV format.
+- **Finalize Master-Detail Layouts:**
+  - Implement the Master-Detail view for the VK-Belege tab.
+  - Adjust the Umsätze (Zahlungen) layout to have a wider list and a slide-in detail panel, per the user's latest feedback.
+- **Implement 10it/DATEV Export:** Create the API and frontend button for CSV data export.
+- **Fix eBay Integration:** The integration is paused. It requires generating a proper OAuth 2.0 user token and potentially further debugging with eBay support.
+- **Create Project Documentation:** Fulfill the user's final request to create a  file summarizing the project for forking.
 </pending_tasks>
 
 <current_work>
-Immediately before the summary request, the work was split between two parallel tasks, prompted by the user's request to do both:
+The most recent work focused on a major frontend overhaul to implement a Master-Detail UI, mirroring the Lexoffice software.
 
-1.  **Backend Re-Run & Debugging:** A large-scale re-run of the new dual-matching logic was executing in the background on all 8,541 transactions for October 2025. This successfully assigned accounts to over 97% of transactions. In parallel, the engineer was actively debugging why **zero** documents (Belege) were being matched. This led to the discovery that the source collection for documents, , is empty. The PayPal matching logic was also being refined to improve its success rate.
+1.  **Hydration Error Fix:** A blocking React hydration error, caused by server-side random quote generation in , was identified and resolved by moving the quote generation to a  hook, ensuring it only runs on the client.
 
-2.  **Frontend Development:** The engineer was building out the user interface for manual assignments to fulfill the user's request for clear menus and linking capabilities. This involved creating new React components:  for document details and  to display a list of documents. The next step was to integrate these new components and the previously created  into the main FIBU dashboard.
+2.  **Umsätze (Transactions) View:** The  component was created and integrated. After initial debugging to fix data loading, it successfully displayed a list of transactions on the left and a detail/assignment panel on the right, proving the concept.
 
-The final user message pivoted away from this work, explicitly requesting the creation of comprehensive documentation to prepare the project for forking.
+3.  **EK-Belege (Incoming Invoices) View:** Following the success with transactions, the  component was created and integrated, establishing the same UI pattern for incoming invoices.
+
+4.  **New User Feedback & Pivot:** Immediately after the EK-Belege view was implemented, the user provided new visual feedback indicating that the layout for Umsätze should be different: a wider, almost full-screen list with a detail panel that slides in from the right upon clicking an item, rather than being permanently visible.
+
+5.  **Final Request:** Before development on the layout adjustment could begin, the user's very next message was **bitte ordentlich zusammenfassen fürs forken** (please summarize properly for forking), which initiated the creation of this summary document.
 </current_work>
 
 <optional_next_step>
-Create a comprehensive  file to document the project setup, architecture, and environment, as explicitly requested by the user to prepare the project for forking.
+Adjust the  component to match the user's latest feedback: change the layout to a wider list and make the detail panel a slide-in element that appears on click.
 </optional_next_step>
-
-<quotes>
-bitte ausführliche und gute übergBE ZUNM FORKING MIT DEN tXT DATEIN JETZT EBEN AUSFÜLLEN
-</quotes>
