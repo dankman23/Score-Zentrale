@@ -184,6 +184,14 @@ export async function GET(request: NextRequest) {
       .sort({ kontonummer: 1 })
       .toArray()
     
+    // DEBUG: Log first few accounts
+    if (konten.length > 0) {
+      console.log('[Kontenplan API] Sample accounts from DB:')
+      konten.slice(0, 3).forEach((k: any) => {
+        console.log(`  ${k.kontonummer}: belegpflicht=${k.belegpflicht} (type: ${typeof k.belegpflicht})`)
+      })
+    }
+    
     // Transformiere Konten zuerst (mit belegpflicht)
     const transformedKonten = konten.map((k: any) => ({
       kontonummer: k.kontonummer,
