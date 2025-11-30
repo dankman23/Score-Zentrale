@@ -561,7 +561,7 @@ export async function GET(request: NextRequest) {
     allPayments.sort((a, b) => new Date(b.datum).getTime() - new Date(a.datum).getTime())
 
     // ===== NEUE MATCHING-PIPELINE: Erweitere Zuordnungen =====
-    const { processZahlungMatching, berechneZuordnungsStatus } = await import('../../lib/fibu-matching-pipeline')
+    // (Funktionen sind oben in der Datei definiert)
     
     // Lade alle Konten mit Belegpflicht-Info (KORRIGIERT: kontenplan statt fibu_kontenplan!)
     const kontenplanCollection = db.collection('kontenplan')
