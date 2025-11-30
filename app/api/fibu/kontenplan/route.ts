@@ -230,7 +230,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { kontonummer, bezeichnung, beschreibung, steuersatz, vorsteuer, istAktiv = true } = body
+    const { kontonummer, bezeichnung, beschreibung, steuersatz, vorsteuer, istAktiv = true, belegpflicht } = body
     
     if (!kontonummer || !bezeichnung) {
       return NextResponse.json(
