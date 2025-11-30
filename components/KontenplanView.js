@@ -55,7 +55,7 @@ export default function KontenplanView() {
   
   useEffect(() => {
     loadKontenplan()
-  }, [loadKontenplan])
+  }, [])
   
   async function saveKonto(konto) {
     try {
