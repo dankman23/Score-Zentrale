@@ -112,11 +112,11 @@ function getKontoVorschlag(zahlung: any): MatchResult {
   }
 }
 
-async function processZahlungMatching(zahlung: any, db: Db): Promise<MatchResult> {
+async function processZahlungMatching(zahlung: any, db: Db, rechnungenCache: Map<string, any>): Promise<MatchResult> {
   const importMatch = await getImportMatch(zahlung, db)
   if (importMatch) return importMatch
   
-  const autoVkMatch = await getAutoVkMatch(zahlung, db)
+  const autoVkMatch = await getAutoVkMatch(zahlung, rechnungenCache)
   if (autoVkMatch) return autoVkMatch
   
   const kontoVorschlag = getKontoVorschlag(zahlung)
