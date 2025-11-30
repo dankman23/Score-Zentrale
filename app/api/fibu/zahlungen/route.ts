@@ -113,6 +113,7 @@ function getKontoVorschlag(zahlung: any): MatchResult {
   }
   
   return {
+    konto_id: konto_vorschlag_id,  // Verwende Vorschlag direkt als Konto
     konto_vorschlag_id,
     match_source: 'auto_konto',
     match_confidence: 70,
