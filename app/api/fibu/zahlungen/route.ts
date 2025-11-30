@@ -76,48 +76,50 @@ async function getAutoVkMatch(zahlung: any, rechnungenCache: Map<string, any>): 
   return null
 }
 
-function getKontoVorschlag(zahlung: any): MatchResult {
-  let konto_vorschlag_id: string | undefined
+function getBankKontoAutoMatch(zahlung: any): MatchResult {
+  let bank_konto_id: string | undefined
   let match_details = ''
   
-  // KORRIGIERT: Bank-Konten verwenden, NICHT Debitoren!
+  // EINDEUTIGE BANK-ZUORDNUNGEN = 100% Auto-Match (nicht "Vorschlag"!)
   
   if (zahlung.anbieter === 'Amazon') {
-    // Amazon-Zahlungen → Amazon-Konto 1825
-    konto_vorschlag_id = '1825'
-    match_details = 'Amazon-Zahlung → Bank-Konto 1825'
+    bank_konto_id = '1825'
+    match_details = 'Amazon-Zahlung → Bank-Konto 1825 (Amazon-Konto)'
   } else if (zahlung.anbieter === 'eBay') {
-    // eBay-Zahlungen → eBay-Konto 1810
-    konto_vorschlag_id = '1810'
-    match_details = 'eBay-Zahlung → Bank-Konto 1810'
+    bank_konto_id = '1810'
+    match_details = 'eBay-Zahlung → Bank-Konto 1810 (eBay-Konto)'
   } else if (zahlung.anbieter === 'PayPal') {
-    // PayPal-Zahlungen → PayPal SCORE 1801
-    konto_vorschlag_id = '1801'
+    bank_konto_id = '1801'
     match_details = 'PayPal-Zahlung → Bank-Konto 1801 (PayPal SCORE)'
   } else if (zahlung.anbieter === 'Commerzbank') {
-    // Commerzbank → Commerzbank Girokonto 1802
-    konto_vorschlag_id = '1802'
-    match_details = 'Commerzbank → Bank-Konto 1802'
+    bank_konto_id = '1802'
+    match_details = 'Commerzbank → Bank-Konto 1802 (Commerzbank Girokonto)'
   } else if (zahlung.anbieter === 'Postbank') {
-    // Postbank → Postbank 1701
-    konto_vorschlag_id = '1701'
-    match_details = 'Postbank → Bank-Konto 1701'
+    bank_konto_id = '1701'
+    match_details = 'Postbank → Bank-Konto 1701 (Postbank)'
   } else if (zahlung.anbieter === 'Mollie') {
-    // Mollie → Mollie-Konto 1830
-    konto_vorschlag_id = '1830'
-    match_details = 'Mollie-Zahlung → Bank-Konto 1830'
+    bank_konto_id = '1830'
+    match_details = 'Mollie-Zahlung → Bank-Konto 1830 (Mollie-Konto)'
   } else if (zahlung.quelle === 'Kasse' || zahlung.verwendungszweck?.toLowerCase().includes('bar')) {
-    // Bar → Kasse 1600
-    konto_vorschlag_id = '1600'
-    match_details = 'Bar-Zahlung → Kasse 1600'
+    bank_konto_id = '1600'
+    match_details = 'Bar-Zahlung → Bank-Konto 1600 (Kasse)'
   }
   
+  // Eindeutige Bank-Zuordnung = 100% Confidence, Auto-Match!
+  if (bank_konto_id) {
+    return {
+      konto_id: bank_konto_id,
+      match_source: 'auto_bank',  // Neuer Typ: automatisches Bank-Matching
+      match_confidence: 100,
+      match_details
+    }
+  }
+  
+  // Fallback: Kein Match
   return {
-    konto_id: konto_vorschlag_id,  // Verwende Vorschlag direkt als Konto
-    konto_vorschlag_id,
-    match_source: 'auto_konto',
-    match_confidence: 70,
-    match_details
+    match_source: null,
+    match_confidence: 0,
+    match_details: 'Keine automatische Zuordnung möglich'
   }
 }
 
