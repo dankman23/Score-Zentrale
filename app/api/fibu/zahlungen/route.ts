@@ -426,10 +426,42 @@ export async function GET(request: NextRequest) {
     // Sortiere nach Datum
     allPayments.sort((a, b) => new Date(b.datum).getTime() - new Date(a.datum).getTime())
 
-    // Berechne Gesamt-Stats VOR Pagination
+    // ===== STATUS-LOGIK: Berechne zuordnungs_status für alle Zahlungen =====
+    // Lade alle Konten mit Belegpflicht-Info
+    const kontenplanCollection = db.collection('fibu_kontenplan')
+    const alleKonten = await kontenplanCollection.find({}).toArray()
+    const kontenMap = new Map()
+    alleKonten.forEach(k => {
+      kontenMap.set(k.kontonummer, {
+        belegpflicht: k.belegpflicht !== undefined ? k.belegpflicht : true,
+        bezeichnung: k.bezeichnung
+      })
+    })
+    
+    // Berechne Status für jede Zahlung
+    allPayments.forEach(zahlung => {
+      if (!zahlung.zugeordnetesKonto) {
+        zahlung.zuordnungs_status = 'offen'
+      } else {
+        const konto = kontenMap.get(zahlung.zugeordnetesKonto)
+        
+        if (!konto || !konto.belegpflicht) {
+          // Konto hat keine Belegpflicht oder existiert nicht
+          zahlung.zuordnungs_status = 'zugeordnet'
+        } else {
+          // Konto hat Belegpflicht = true
+          const hatBeleg = zahlung.zugeordneteRechnung || zahlung.belegId || zahlung.beleglink
+          zahlung.zuordnungs_status = hatBeleg ? 'zugeordnet' : 'beleg_fehlt'
+        }
+      }
+    })
+
+    // Berechne Gesamt-Stats VOR Pagination (mit neuen Status-Werten)
     const totalCount = allPayments.length
     const totalSum = allPayments.reduce((sum, p) => sum + p.betrag, 0)
-    const zugeordnetCount = allPayments.filter(p => p.istZugeordnet).length
+    const zugeordnetCount = allPayments.filter(p => p.zuordnungs_status === 'zugeordnet').length
+    const belegFehltCount = allPayments.filter(p => p.zuordnungs_status === 'beleg_fehlt').length
+    const offenCount = allPayments.filter(p => p.zuordnungs_status === 'offen').length
     const nichtZugeordnetCount = totalCount - zugeordnetCount
     
     stats.gesamt = totalCount
