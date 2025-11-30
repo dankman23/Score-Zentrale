@@ -351,13 +351,14 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
                               <span className={`px-1.5 py-0.5 rounded text-[8px] font-semibold ${
                                 zahlung.match_source === 'import_vk' ? 'bg-green-100 text-green-700' :
                                 zahlung.match_source === 'auto_vk' ? 'bg-blue-100 text-blue-700' :
+                                zahlung.match_source === 'auto_bank' ? 'bg-blue-100 text-blue-700' :
                                 zahlung.match_source === 'manuell' ? 'bg-purple-100 text-purple-700' :
                                 'bg-gray-100 text-gray-600'
                               }`}>
                                 {zahlung.match_source === 'import_vk' ? 'JTL' :
                                  zahlung.match_source === 'auto_vk' ? 'Auto' :
-                                 zahlung.match_source === 'manuell' ? 'Manuell' :
-                                 zahlung.match_source === 'auto_konto' ? 'Vorschlag' : ''}
+                                 zahlung.match_source === 'auto_bank' ? 'Auto' :
+                                 zahlung.match_source === 'manuell' ? 'Manuell' : ''}
                               </span>
                             )}
                           </div>
