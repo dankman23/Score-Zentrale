@@ -54,7 +54,7 @@ export default function KontenplanView() {
   }, [searchTerm, selectedKlasse])
   
   useEffect(() => {
-    loadKontenplan()
+    loadKontenplan() // eslint-disable-line react-hooks/exhaustive-deps
   }, [])
   
   async function saveKonto(konto) {
