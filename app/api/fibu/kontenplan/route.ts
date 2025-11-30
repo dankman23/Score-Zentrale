@@ -378,7 +378,7 @@ export async function DELETE(request: NextRequest) {
     }
     
     const db = await getDb()
-    const collection = db.collection('fibu_kontenplan')
+    const collection = db.collection('kontenplan') // FIXED: Use same collection as GET
     
     // Prüfe ob Systemkonto
     const konto = await collection.findOne({ kontonummer })
