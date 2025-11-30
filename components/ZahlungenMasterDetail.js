@@ -337,15 +337,46 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
                         </span>
                       </td>
                       <td className="px-2 py-2.5">
-                        {zahlung.zugeordneteRechnung ? (
-                          <div>
-                            <span className="text-green-700 text-[10px] font-bold block">📄 {zahlung.zugeordneteRechnung}</span>
-                            {zahlung.referenz && zahlung.referenz.match(/^AU_\d+_SW\d+$/) && (
-                              <span className="text-gray-500 text-[9px]">{zahlung.referenz}</span>
+                        {zahlung.zugeordneteRechnung || zahlung.match_result?.vk_rechnung_nr ? (
+                          <div className="flex items-center gap-1">
+                            <div>
+                              <span className="text-green-700 text-[10px] font-bold block">
+                                📄 {zahlung.zugeordneteRechnung || zahlung.match_result?.vk_rechnung_nr}
+                              </span>
+                              {zahlung.referenz && zahlung.referenz.match(/^AU_\d+_SW\d+$/) && (
+                                <span className="text-gray-500 text-[9px]">{zahlung.referenz}</span>
+                              )}
+                            </div>
+                            {zahlung.match_source && (
+                              <span className={`px-1.5 py-0.5 rounded text-[8px] font-semibold ${
+                                zahlung.match_source === 'import_vk' ? 'bg-green-100 text-green-700' :
+                                zahlung.match_source === 'auto_vk' ? 'bg-blue-100 text-blue-700' :
+                                zahlung.match_source === 'manuell' ? 'bg-purple-100 text-purple-700' :
+                                'bg-gray-100 text-gray-600'
+                              }`}>
+                                {zahlung.match_source === 'import_vk' ? 'JTL' :
+                                 zahlung.match_source === 'auto_vk' ? 'Auto' :
+                                 zahlung.match_source === 'manuell' ? 'Manuell' :
+                                 zahlung.match_source === 'auto_konto' ? 'Vorschlag' : ''}
+                              </span>
                             )}
                           </div>
-                        ) : zahlung.zugeordnetesKonto ? (
-                          <span className="text-blue-700 text-[10px]">🏦 {zahlung.zugeordnetesKonto}</span>
+                        ) : zahlung.zugeordnetesKonto || zahlung.match_result?.konto_id ? (
+                          <div className="flex items-center gap-1">
+                            <span className="text-blue-700 text-[10px]">
+                              🏦 {zahlung.zugeordnetesKonto || zahlung.match_result?.konto_id}
+                            </span>
+                            {zahlung.match_source && (
+                              <span className={`px-1.5 py-0.5 rounded text-[8px] font-semibold ${
+                                zahlung.match_source === 'auto_konto' ? 'bg-yellow-100 text-yellow-700' :
+                                zahlung.match_source === 'manuell' ? 'bg-purple-100 text-purple-700' :
+                                'bg-gray-100 text-gray-600'
+                              }`}>
+                                {zahlung.match_source === 'auto_konto' ? 'Vorschlag' :
+                                 zahlung.match_source === 'manuell' ? 'Manuell' : ''}
+                              </span>
+                            )}
+                          </div>
                         ) : (
                           <span className="text-gray-400 text-[10px]">-</span>
                         )}
