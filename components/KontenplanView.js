@@ -381,6 +381,18 @@ function KontoForm({ konto, onSave, onCancel }) {
         />
       </div>
       
+      <div>
+        <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+          <input
+            type="checkbox"
+            checked={formData.belegpflicht}
+            onChange={(e) => setFormData({ ...formData, belegpflicht: e.target.checked })}
+            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          Belegpflicht (Beleg erforderlich für Buchungen)
+        </label>
+      </div>
+      
       <div className="flex gap-3 justify-end pt-4 border-t">
         <button
           type="button"
