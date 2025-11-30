@@ -30,10 +30,6 @@ export default function KontenplanView() {
     9: 'Vortragskonten'
   }
   
-  useEffect(() => {
-    loadKontenplan()
-  }, [])
-  
   async function loadKontenplan() {
     try {
       const params = new URLSearchParams()
@@ -56,6 +52,10 @@ export default function KontenplanView() {
     }
     setLoading(false)
   }
+  
+  useEffect(() => {
+    loadKontenplan()
+  }, [loadKontenplan])
   
   async function saveKonto(konto) {
     try {
