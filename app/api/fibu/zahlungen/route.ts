@@ -377,6 +377,7 @@ export async function GET(request: NextRequest) {
           
           // Buchungsinformationen
           buchung: p.buchung || null,
+          steuerschluessel: p.steuerschluessel || null,  // Steuerschlüssel (z.B. 401 für voller Vorsteuerabzug)
           
           // Zuordnung zu Rechnungen (mit Auto-Zuordnung)
           istZugeordnet: p.istZugeordnet || autoZugeordnet,
