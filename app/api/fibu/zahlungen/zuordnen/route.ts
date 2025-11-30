@@ -3,7 +3,26 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '../../../../lib/db/mongodb'
-import { ObjectId } from 'mongodb'
+import { ObjectId, Db } from 'mongodb'
+
+// Helper: Berechne zuordnungs_status basierend auf Konto + Belegpflicht
+async function berechneZuordnungsStatus(
+  zahlung: any,
+  matchResult: any,
+  db: Db
+): Promise<'offen' | 'beleg_fehlt' | 'zugeordnet'> {
+  const kontoNr = matchResult.konto_id || zahlung.zugeordnetesKonto
+  
+  if (!kontoNr) return 'offen'
+  
+  const konto = await db.collection('kontenplan').findOne({ kontonummer: kontoNr })
+  
+  if (!konto || konto.belegpflicht === false) return 'zugeordnet'
+  
+  const hatBeleg = matchResult.vk_beleg_id || zahlung.zugeordneteRechnung || zahlung.belegId
+  
+  return hatBeleg ? 'zugeordnet' : 'beleg_fehlt'
+}
 
 /**
  * POST /api/fibu/zahlungen/zuordnen
