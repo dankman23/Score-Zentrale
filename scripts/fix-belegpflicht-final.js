@@ -102,17 +102,25 @@ async function fixBelegpflicht() {
     }
     console.log(`✅ ${angelegtCount} Systemkonten angelegt`)
     
-    // 2. SETZE BELEGPFLICHT = FALSE (HART, überschreibt bestehende Werte)
+    // 2. SETZE BELEGPFLICHT = FALSE (HART, mit Einzelupdate für sichere Matches)
     console.log('\n🔧 SCHRITT 2: Setze belegpflicht = FALSE für Systemkonten...')
     
     const kontonummern = Object.keys(SYSTEMKONTEN_OHNE_BELEGPFLICHT)
-    const resultFalse = await collection.updateMany(
-      { kontonummer: { $in: kontonummern } },
-      { $set: { belegpflicht: false } }
-    )
-    console.log(`✅ ${resultFalse.modifiedCount} Konten auf belegpflicht = FALSE gesetzt`)
+    let falseCount = 0
     
-    // 3. SETZE ALLE ANDEREN AUF TRUE
+    for (const nr of kontonummern) {
+      const result = await collection.updateOne(
+        { kontonummer: nr.trim() },
+        { $set: { belegpflicht: false } }
+      )
+      if (result.modifiedCount > 0) {
+        falseCount++
+        console.log(`  ✓ ${nr} → belegpflicht = FALSE`)
+      }
+    }
+    console.log(`✅ ${falseCount} Systemkonten auf belegpflicht = FALSE gesetzt`)
+    
+    // 3. SETZE ALLE ANDEREN AUF TRUE (mit Whitespace-bereinigung)
     console.log('\n🔧 SCHRITT 3: Setze alle anderen Konten auf belegpflicht = TRUE...')
     
     const resultTrue = await collection.updateMany(
@@ -120,6 +128,13 @@ async function fixBelegpflicht() {
       { $set: { belegpflicht: true } }
     )
     console.log(`✅ ${resultTrue.modifiedCount} Konten auf belegpflicht = TRUE gesetzt`)
+    
+    // 3b. Stelle sicher, dass 6770 (Amazongebühren) TRUE hat
+    await collection.updateOne(
+      { kontonummer: '6770' },
+      { $set: { belegpflicht: true } }
+    )
+    console.log(`✅ Konto 6770 (Amazongebühren) explizit auf TRUE gesetzt`)
     
     // 4. STATISTIK
     console.log('\n📊 ERGEBNIS:')
