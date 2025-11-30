@@ -591,9 +591,9 @@ export async function GET(request: NextRequest) {
         }
       }
       
-      // 3. Konto-Vorschlag (nur wenn noch kein Match)
+      // 3. Bank-Konto Auto-Match (nur wenn noch kein VK-Match)
       if (!matchResult.match_source) {
-        matchResult = getKontoVorschlag(zahlung)
+        matchResult = getBankKontoAutoMatch(zahlung)
       }
       
       // 4. Manuell (überschreibt alles)
