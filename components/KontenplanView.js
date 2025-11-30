@@ -30,7 +30,7 @@ export default function KontenplanView() {
     9: 'Vortragskonten'
   }
   
-  async function loadKontenplan() {
+  const loadKontenplan = useCallback(async () => {
     try {
       const params = new URLSearchParams()
       if (searchTerm) params.append('search', searchTerm)
@@ -51,7 +51,7 @@ export default function KontenplanView() {
       console.error('Fehler beim Laden:', error)
     }
     setLoading(false)
-  }
+  }, [searchTerm, selectedKlasse])
   
   useEffect(() => {
     loadKontenplan()
