@@ -82,28 +82,34 @@ async function fixBelegpflicht() {
     const collections = ['fibu_kontenplan', 'kontenplan']
     console.log('📋 Arbeite mit Collections:', collections.join(', '))
     
-    // 1. PRÜFE & LEGE FEHLENDE KONTEN AN
-    console.log('\n📋 SCHRITT 1: Prüfe Systemkonten...')
-    
-    let angelegtCount = 0
-    for (const [kontonummer, info] of Object.entries(SYSTEMKONTEN_OHNE_BELEGPFLICHT)) {
-      const exists = await collection.findOne({ kontonummer })
+    // Durchlaufe BEIDE Collections
+    for (const collectionName of collections) {
+      const collection = db.collection(collectionName)
       
-      if (!exists) {
-        console.log(`  ➕ Lege an: ${kontonummer} - ${info.bezeichnung}`)
-        await collection.insertOne({
-          kontonummer,
-          bezeichnung: info.bezeichnung,
-          klasse: info.klasse,
-          belegpflicht: false,
-          istSystemkonto: true,
-          istAktiv: true,
-          created_at: new Date()
-        })
-        angelegtCount++
+      console.log(`\n=== Collection: ${collectionName} ===`)
+      
+      // 1. PRÜFE & LEGE FEHLENDE KONTEN AN
+      console.log('📋 SCHRITT 1: Prüfe Systemkonten...')
+      
+      let angelegtCount = 0
+      for (const [kontonummer, info] of Object.entries(SYSTEMKONTEN_OHNE_BELEGPFLICHT)) {
+        const exists = await collection.findOne({ kontonummer })
+        
+        if (!exists) {
+          console.log(`  ➕ Lege an: ${kontonummer} - ${info.bezeichnung}`)
+          await collection.insertOne({
+            kontonummer,
+            bezeichnung: info.bezeichnung,
+            klasse: info.klasse,
+            belegpflicht: false,
+            istSystemkonto: true,
+            istAktiv: true,
+            created_at: new Date()
+          })
+          angelegtCount++
+        }
       }
-    }
-    console.log(`✅ ${angelegtCount} Systemkonten angelegt`)
+      console.log(`✅ ${angelegtCount} Systemkonten angelegt`)
     
     // 2. SETZE BELEGPFLICHT = FALSE (HART, mit Einzelupdate für sichere Matches)
     console.log('\n🔧 SCHRITT 2: Setze belegpflicht = FALSE für Systemkonten...')
