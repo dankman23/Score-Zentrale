@@ -450,63 +450,223 @@ export default function FibuCompleteDashboard() {
             {kontenplanSubTab === 'kreditoren' && <KreditorenManagement />}
             {kontenplanSubTab === 'debitoren' && (
               <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h2 className="text-xl font-bold mb-4">Debitoren (Sammeldebitoren)</h2>
-                <p className="text-sm text-gray-600 mb-4">
-                  Verwaltung der Sammeldebitoren-Konten für verschiedene Zahlungsarten
+                <h2 className="text-xl font-bold mb-4">👥 Debitoren (Sammeldebitoren)</h2>
+                <p className="text-sm text-gray-600 mb-6">
+                  Verwaltung der Sammeldebitoren-Konten für verschiedene Zahlungsarten (SKR04)
                 </p>
                 
-                <div className="space-y-4">
-                  <div className="border-b pb-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">PayPal</h3>
+                <div className="space-y-3">
+                  {/* Amazon Payment */}
+                  <div className="border-b pb-3 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <span className="text-sm text-gray-600">Sammelkonto:</span>
-                      <span className="font-mono text-blue-600">1201</span>
-                      <span className="text-sm text-gray-500">(Forderungen PayPal)</span>
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69001</span>
+                      <span className="font-semibold text-gray-900">Amazon Payment</span>
                     </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 8</span>
                   </div>
                   
-                  <div className="border-b pb-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">Amazon</h3>
+                  {/* Bar */}
+                  <div className="border-b pb-3 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <span className="text-sm text-gray-600">Sammelkonto:</span>
-                      <span className="font-mono text-blue-600">1815</span>
-                      <span className="text-sm text-gray-500">(Amazon Settlement / Verrechnungskonto)</span>
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69002</span>
+                      <span className="font-semibold text-gray-900">Bar</span>
                     </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 1</span>
                   </div>
                   
-                  <div className="border-b pb-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">eBay</h3>
+                  {/* eBay Managed Payments */}
+                  <div className="border-b pb-3 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <span className="text-sm text-gray-600">Sammelkonto:</span>
-                      <span className="font-mono text-blue-600">1202</span>
-                      <span className="text-sm text-gray-500">(Forderungen eBay)</span>
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69003</span>
+                      <span className="font-semibold text-gray-900">eBay Managed Payments</span>
                     </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 7</span>
                   </div>
                   
-                  <div className="border-b pb-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">Mollie</h3>
+                  {/* eBay Rechnungskauf */}
+                  <div className="border-b pb-3 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <span className="text-sm text-gray-600">Sammelkonto:</span>
-                      <span className="font-mono text-blue-600">1203</span>
-                      <span className="text-sm text-gray-500">(Forderungen Mollie)</span>
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69004</span>
+                      <span className="font-semibold text-gray-900">eBay Rechnungskauf</span>
                     </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 5</span>
                   </div>
                   
-                  <div className="pb-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">Sonstige Debitoren</h3>
+                  {/* EPS */}
+                  <div className="border-b pb-3 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <span className="text-sm text-gray-600">Sammelkonto:</span>
-                      <span className="font-mono text-blue-600">1200</span>
-                      <span className="text-sm text-gray-500">(Forderungen aus Lieferungen und Leistungen)</span>
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69005</span>
+                      <span className="font-semibold text-gray-900">EPS</span>
                     </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 16</span>
+                  </div>
+                  
+                  {/* GiroPay */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69006</span>
+                      <span className="font-semibold text-gray-900">GiroPay</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 15</span>
+                  </div>
+                  
+                  {/* Kaufland.de */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69007</span>
+                      <span className="font-semibold text-gray-900">Kaufland.de</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 11</span>
+                  </div>
+                  
+                  {/* Kreditkarte */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69008</span>
+                      <span className="font-semibold text-gray-900">Kreditkarte</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 4</span>
+                  </div>
+                  
+                  {/* Nachnahme */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69010</span>
+                      <span className="font-semibold text-gray-900">Nachnahme</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 13</span>
+                  </div>
+                  
+                  {/* Otto.de */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69011</span>
+                      <span className="font-semibold text-gray-900">Otto.de</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 14</span>
+                  </div>
+                  
+                  {/* PayPal */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69012</span>
+                      <span className="font-semibold text-gray-900">PayPal</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 6</span>
+                  </div>
+                  
+                  {/* PayPal Express */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69013</span>
+                      <span className="font-semibold text-gray-900">PayPal Express</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 10</span>
+                  </div>
+                  
+                  {/* Ratepay */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69014</span>
+                      <span className="font-semibold text-gray-900">Ratepay</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 12</span>
+                  </div>
+                  
+                  {/* Rechnung */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69015</span>
+                      <span className="font-semibold text-gray-900">Rechnung</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 18</span>
+                  </div>
+                  
+                  {/* Rechnungskauf */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69016</span>
+                      <span className="font-semibold text-gray-900">Rechnungskauf</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 9</span>
+                  </div>
+                  
+                  {/* Scheck */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69017</span>
+                      <span className="font-semibold text-gray-900">Scheck</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 3</span>
+                  </div>
+                  
+                  {/* Überweisung / Vorkasse */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69018</span>
+                      <span className="font-semibold text-gray-900">Überweisung / Vorkasse</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 2</span>
+                  </div>
+                  
+                  {/* Überweisung / Vorkasse mit 2% Skonto */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69019</span>
+                      <span className="font-semibold text-gray-900">Überweisung / Vorkasse mit 2% Skonto</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 17</span>
+                  </div>
+                  
+                  {/* Mollie */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69020</span>
+                      <span className="font-semibold text-gray-900">Mollie</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 19</span>
+                  </div>
+                  
+                  {/* Vorkasse */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69018</span>
+                      <span className="font-semibold text-gray-900">Vorkasse</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 20</span>
+                  </div>
+                  
+                  {/* Apple Pay */}
+                  <div className="border-b pb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-blue-600 font-bold text-lg w-16">69002</span>
+                      <span className="font-semibold text-gray-900">Apple Pay</span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">ID: 22</span>
                   </div>
                 </div>
                 
+                {/* IGL Debitoren Info */}
+                <div className="mt-8 bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 className="font-semibold text-green-900 mb-2 flex items-center gap-2">
+                    🇪🇺 IGL Debitoren (Innergemeinschaftliche Lieferung)
+                  </h4>
+                  <p className="text-sm text-green-800 mb-2">
+                    EU-Kunden mit 0% MwSt und gültiger Ust-ID erhalten <strong>Einzeldebitorenkonten</strong>:
+                  </p>
+                  <ul className="text-sm text-green-800 list-disc list-inside space-y-1">
+                    <li>Kontenbereich: <span className="font-mono font-bold">ab 69500</span></li>
+                    <li>Beispiel: Kunde #1 → 69501, Kunde #2 → 69502, etc.</li>
+                    <li>Automatische Vergabe bei Neuanlage mit EU-Ust-ID</li>
+                  </ul>
+                </div>
+                
                 <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h4 className="font-semibold text-blue-900 mb-2">ℹ️ Hinweis</h4>
+                  <h4 className="font-semibold text-blue-900 mb-2">ℹ️ Hinweis zur Verwendung</h4>
                   <p className="text-sm text-blue-800">
-                    Die Sammeldebitoren-Konten werden automatisch bei der Zuordnung von Zahlungen verwendet. 
-                    Diese Konten dienen als Verrechnungskonten zwischen Zahlungseingang und Rechnungsausgleich.
+                    Die Sammeldebitoren-Konten (69001-69020) werden automatisch bei der Zuordnung von Zahlungen 
+                    nach Zahlungsart verwendet. Diese Konten dienen als Verrechnungskonten zwischen Zahlungseingang 
+                    und Rechnungsausgleich. Die Struktur entspricht dem <strong>SKR04</strong>-Standard.
                   </p>
                 </div>
               </div>
