@@ -111,66 +111,63 @@ async function fixBelegpflicht() {
       }
       console.log(`✅ ${angelegtCount} Systemkonten angelegt`)
     
-    // 2. SETZE BELEGPFLICHT = FALSE (HART, mit Einzelupdate für sichere Matches)
-    console.log('\n🔧 SCHRITT 2: Setze belegpflicht = FALSE für Systemkonten...')
-    
-    const kontonummern = Object.keys(SYSTEMKONTEN_OHNE_BELEGPFLICHT)
-    let falseCount = 0
-    
-    for (const nr of kontonummern) {
-      const result = await collection.updateOne(
-        { kontonummer: nr.trim() },
-        { $set: { belegpflicht: false } }
+      // 2. SETZE BELEGPFLICHT = FALSE (HART, mit Einzelupdate für sichere Matches)
+      console.log('🔧 SCHRITT 2: Setze belegpflicht = FALSE für Systemkonten...')
+      
+      const kontonummern = Object.keys(SYSTEMKONTEN_OHNE_BELEGPFLICHT)
+      let falseCount = 0
+      
+      for (const nr of kontonummern) {
+        const result = await collection.updateOne(
+          { kontonummer: nr.trim() },
+          { $set: { belegpflicht: false } }
+        )
+        if (result.modifiedCount > 0) {
+          falseCount++
+        }
+      }
+      console.log(`✅ ${falseCount} Systemkonten auf belegpflicht = FALSE gesetzt`)
+      
+      // 3. SETZE ALLE ANDEREN AUF TRUE
+      console.log('🔧 SCHRITT 3: Setze alle anderen Konten auf belegpflicht = TRUE...')
+      
+      const resultTrue = await collection.updateMany(
+        { kontonummer: { $nin: kontonummern } },
+        { $set: { belegpflicht: true } }
       )
-      if (result.modifiedCount > 0) {
-        falseCount++
-        console.log(`  ✓ ${nr} → belegpflicht = FALSE`)
+      console.log(`✅ ${resultTrue.modifiedCount} Konten auf belegpflicht = TRUE gesetzt`)
+      
+      // 3b. Stelle sicher, dass 6770 (Amazongebühren) TRUE hat
+      await collection.updateOne(
+        { kontonummer: '6770' },
+        { $set: { belegpflicht: true } }
+      )
+      console.log(`✅ Konto 6770 (Amazongebühren) explizit auf TRUE gesetzt`)
+      
+      // 4. STATISTIK
+      console.log('📊 ERGEBNIS:')
+      const totalCount = await collection.countDocuments({})
+      const mitBelegpflicht = await collection.countDocuments({ belegpflicht: true })
+      const ohneBelegpflicht = await collection.countDocuments({ belegpflicht: false })
+      
+      console.log(`  Gesamt: ${totalCount} Konten`)
+      console.log(`  MIT Belegpflicht: ${mitBelegpflicht}`)
+      console.log(`  OHNE Belegpflicht: ${ohneBelegpflicht}`)
+      
+      // 5. VERIFIZIERUNG
+      console.log('🔍 VERIFIZIERUNG:')
+      const testKonten = ['1800', '1810', '3720', '6020', '4120', '6770']
+      
+      for (const nr of testKonten) {
+        const konto = await collection.findOne({ kontonummer: nr })
+        if (konto) {
+          const status = konto.belegpflicht ? '✓ TRUE' : '✗ FALSE'
+          console.log(`  ${nr}: ${status}`)
+        }
       }
-    }
-    console.log(`✅ ${falseCount} Systemkonten auf belegpflicht = FALSE gesetzt`)
+    } // Ende Collection-Loop
     
-    // 3. SETZE ALLE ANDEREN AUF TRUE (mit Whitespace-bereinigung)
-    console.log('\n🔧 SCHRITT 3: Setze alle anderen Konten auf belegpflicht = TRUE...')
-    
-    const resultTrue = await collection.updateMany(
-      { kontonummer: { $nin: kontonummern } },
-      { $set: { belegpflicht: true } }
-    )
-    console.log(`✅ ${resultTrue.modifiedCount} Konten auf belegpflicht = TRUE gesetzt`)
-    
-    // 3b. Stelle sicher, dass 6770 (Amazongebühren) TRUE hat
-    await collection.updateOne(
-      { kontonummer: '6770' },
-      { $set: { belegpflicht: true } }
-    )
-    console.log(`✅ Konto 6770 (Amazongebühren) explizit auf TRUE gesetzt`)
-    
-    // 4. STATISTIK
-    console.log('\n📊 ERGEBNIS:')
-    const totalCount = await collection.countDocuments({})
-    const mitBelegpflicht = await collection.countDocuments({ belegpflicht: true })
-    const ohneBelegpflicht = await collection.countDocuments({ belegpflicht: false })
-    
-    console.log(`  Gesamt: ${totalCount} Konten`)
-    console.log(`  MIT Belegpflicht: ${mitBelegpflicht}`)
-    console.log(`  OHNE Belegpflicht: ${ohneBelegpflicht}`)
-    
-    // 5. VERIFIZIERUNG - Zeige konkrete Beispiele
-    console.log('\n🔍 VERIFIZIERUNG:')
-    
-    const testKonten = ['1800', '1810', '1815', '3720', '3806', '6020', '4120', '4400', '5200', '6770']
-    console.log('  Erwarte FALSE bei: 1800, 1810, 1815, 3720, 3806, 6020')
-    console.log('  Erwarte TRUE bei: 4120, 4400, 5200, 6770')
-    
-    for (const nr of testKonten) {
-      const konto = await collection.findOne({ kontonummer: nr })
-      if (konto) {
-        const status = konto.belegpflicht ? '✓ TRUE' : '✗ FALSE'
-        console.log(`  ${nr}: ${status}`)
-      } else {
-        console.log(`  ${nr}: ⚠️  NICHT GEFUNDEN`)
-      }
-    }
+    console.log('\n' + '='.repeat(60))
     
   } catch (error) {
     console.error('❌ Fehler:', error)
