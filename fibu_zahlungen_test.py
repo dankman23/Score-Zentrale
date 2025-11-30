@@ -23,7 +23,7 @@ import sys
 from datetime import datetime, timedelta
 
 # Get base URL from environment
-BASE_URL = "https://finanz-zentrale.preview.emergentagent.com"
+BASE_URL = "https://fibu-master.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 def test_main_zahlungen_api():
