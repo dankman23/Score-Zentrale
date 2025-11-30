@@ -80,28 +80,36 @@ function getKontoVorschlag(zahlung: any): MatchResult {
   let konto_vorschlag_id: string | undefined
   let match_details = ''
   
+  // KORRIGIERT: Bank-Konten verwenden, NICHT Debitoren!
+  
   if (zahlung.anbieter === 'Amazon') {
-    const amountTypeKey = (zahlung.kategorie || '').split('/').pop()
-    
-    if (amountTypeKey === 'Principal') {
-      konto_vorschlag_id = '4340'
-      match_details = 'Amazon Principal → Erlöskonto'
-    } else if (amountTypeKey === 'Commission') {
-      konto_vorschlag_id = '6770'
-      match_details = 'Amazon Commission → Gebührenkonto'
-    } else if (amountTypeKey === 'Shipping') {
-      konto_vorschlag_id = '4800'
-      match_details = 'Amazon Shipping → Versandkonto'
-    } else {
-      konto_vorschlag_id = '1815'
-      match_details = 'Amazon sonstige → Settlement-Konto'
-    }
+    // Amazon-Zahlungen → Amazon-Konto 1825
+    konto_vorschlag_id = '1825'
+    match_details = 'Amazon-Zahlung → Bank-Konto 1825'
+  } else if (zahlung.anbieter === 'eBay') {
+    // eBay-Zahlungen → eBay-Konto 1810
+    konto_vorschlag_id = '1810'
+    match_details = 'eBay-Zahlung → Bank-Konto 1810'
   } else if (zahlung.anbieter === 'PayPal') {
-    konto_vorschlag_id = zahlung.betrag > 0 ? '69012' : '6855'
-    match_details = `PayPal ${zahlung.betrag > 0 ? 'Eingang' : 'Gebühr'}`
-  } else if (zahlung.anbieter === 'Commerzbank' || zahlung.anbieter === 'Postbank') {
-    konto_vorschlag_id = zahlung.betrag > 0 ? '69018' : '70000'
-    match_details = `Bank ${zahlung.betrag > 0 ? 'Eingang' : 'Ausgang'}`
+    // PayPal-Zahlungen → PayPal SCORE 1801
+    konto_vorschlag_id = '1801'
+    match_details = 'PayPal-Zahlung → Bank-Konto 1801 (PayPal SCORE)'
+  } else if (zahlung.anbieter === 'Commerzbank') {
+    // Commerzbank → Commerzbank Girokonto 1802
+    konto_vorschlag_id = '1802'
+    match_details = 'Commerzbank → Bank-Konto 1802'
+  } else if (zahlung.anbieter === 'Postbank') {
+    // Postbank → Postbank 1701
+    konto_vorschlag_id = '1701'
+    match_details = 'Postbank → Bank-Konto 1701'
+  } else if (zahlung.anbieter === 'Mollie') {
+    // Mollie → Mollie-Konto 1830
+    konto_vorschlag_id = '1830'
+    match_details = 'Mollie-Zahlung → Bank-Konto 1830'
+  } else if (zahlung.quelle === 'Kasse' || zahlung.verwendungszweck?.toLowerCase().includes('bar')) {
+    // Bar → Kasse 1600
+    konto_vorschlag_id = '1600'
+    match_details = 'Bar-Zahlung → Kasse 1600'
   }
   
   return {
