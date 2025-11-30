@@ -242,9 +242,16 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
                         <div className="truncate">
                           {zahlung.verwendungszweck || zahlung.beschreibung || 'Keine Beschreibung'}
                         </div>
-                        {zahlung.kundenName && (
-                          <div className="text-gray-500 text-[10px] mt-0.5 truncate">
-                            {zahlung.kundenName}
+                        {/* Kundenname oder Gegenkonto */}
+                        {(zahlung.kundenName || zahlung.gegenkonto) && (
+                          <div className="text-gray-600 text-[10px] mt-0.5 truncate">
+                            👤 {zahlung.kundenName || zahlung.gegenkonto}
+                          </div>
+                        )}
+                        {/* Order ID / Referenz */}
+                        {zahlung.referenz && (
+                          <div className="text-blue-600 text-[10px] mt-0.5 truncate font-mono">
+                            📦 {zahlung.referenz}
                           </div>
                         )}
                       </td>
