@@ -131,7 +131,6 @@ export async function POST(request: NextRequest) {
           }
           
           // Berechne zuordnungs_status basierend auf Belegpflicht
-          const { berechneZuordnungsStatus } = await import('../../../../lib/fibu-matching-pipeline')
           const matchResult = {
             vk_beleg_id,
             konto_id,
