@@ -11,36 +11,21 @@ const { MongoClient } = require('mongodb')
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/score_zentrale'
 
 // Konten OHNE Belegpflicht (belegpflicht = false)
+// DEFINITIVE LISTE basierend auf fachlicher Vorgabe
 const KEINE_BELEGPFLICHT = [
-  // === 1. Bank- und Zahlungsdienstleisterkonten ===
-  '1200', '1210', '1224', // Bankkonten
-  '1800', '1810', '1815', '1820', // Zahlungsdienstleister (PayPal, Amazon, etc.)
-  '1000', // Kasse
+  // === Bank/Zahlung & Transit ===
+  '1370', '1460', '1600', '1701', '1800', '1801', '1802', '1810', '1811',
   
-  // === 2. Durchlaufende Posten / Geldtransit / Verrechnungskonten ===
-  '1360', '1369', '1370', '1371', '1372', '1373', '1374',
-  '1600', '1610', // Interne Verrechnungen
+  // === Lohn/Steuern/Verrechnung ===
+  '3720', '3730', '3740', '3790', '3804', '3806', '3817', '3820', '3837',
   
-  // === 3. Steuer-Zahllast-Konten ===
-  '1780', '1790', // USt-Zahllast
-  '1570', '1576', '1776', // Vorsteuer-Konten
-  '1740', '1750', '1760', // Körperschaftsteuer, Gewerbesteuer
-  '3730', '3740', '3750', // Steuerschulden
+  // === Löhne/Sozialaufwand ===
+  '6020', '6035', '6110',
   
-  // === 4. Lohn-/Gehaltskonto (Beleg = Lohnjournal) ===
-  '6200', // Nur Löhne/Gehälter (4130, 4140 sind Erlöskonten!)
-  
-  // === 5. Sammeldebitoren (69xxx) ===
+  // === Sammeldebitoren (69001-69020) ===
   '69001', '69002', '69003', '69004', '69005', '69006', '69007', '69008',
   '69010', '69011', '69012', '69013', '69014', '69015', '69016', '69017',
-  '69018', '69019', '69020',
-  
-  // === 6. Privatentnahmen/-einlagen ===
-  '1890', '2100',
-  
-  // === 7. Bankgebühren / Zinsen (Kontoauszug reicht) ===
-  '4970', '4830', '4831', '4832', '4833', '4834', '4835',
-  '2120', '2130' // Zinsen
+  '69018', '69019', '69020'
 ]
 
 async function migrate() {
