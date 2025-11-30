@@ -280,18 +280,26 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
                   return (
                     <tr
                       key={zahlung.transactionId || zahlung._id}
-                      className={`hover:bg-gray-50 transition cursor-pointer ${
+                      className={`transition cursor-pointer ${
                         selectedZahlung?.transactionId === zahlung.transactionId
                           ? 'bg-blue-50'
-                          : ''
+                          : zahlung.zuordnungs_status === 'offen'
+                          ? 'bg-red-50 hover:bg-red-100'
+                          : zahlung.zuordnungs_status === 'beleg_fehlt'
+                          ? 'bg-yellow-50 hover:bg-yellow-100'
+                          : 'hover:bg-gray-50'
                       }`}
                       onClick={() => setSelectedZahlung(zahlung)}
                     >
                       <td className="px-2 py-2.5">
-                        {zahlung.istZugeordnet ? (
+                        {zahlung.zuordnungs_status === 'zugeordnet' && (
                           <CheckCircle className="w-4 h-4 text-green-600" />
-                        ) : (
-                          <Circle className="w-4 h-4 text-orange-500" />
+                        )}
+                        {zahlung.zuordnungs_status === 'beleg_fehlt' && (
+                          <AlertCircle className="w-4 h-4 text-yellow-600" />
+                        )}
+                        {zahlung.zuordnungs_status === 'offen' && (
+                          <Circle className="w-4 h-4 text-red-600" />
                         )}
                       </td>
                       <td className="px-2 py-2.5 text-gray-700 whitespace-nowrap text-[11px]">
