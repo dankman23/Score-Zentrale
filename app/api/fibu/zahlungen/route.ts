@@ -421,9 +421,11 @@ export async function GET(request: NextRequest) {
     // Sortiere nach Datum
     allPayments.sort((a, b) => new Date(b.datum).getTime() - new Date(a.datum).getTime())
 
-    // ===== STATUS-LOGIK: Berechne zuordnungs_status für alle Zahlungen =====
-    // Lade alle Konten mit Belegpflicht-Info
-    const kontenplanCollection = db.collection('fibu_kontenplan')
+    // ===== NEUE MATCHING-PIPELINE: Erweitere Zuordnungen =====
+    const { processZahlungMatching, berechneZuordnungsStatus } = await import('../../../lib/fibu/matching-pipeline')
+    
+    // Lade alle Konten mit Belegpflicht-Info (KORRIGIERT: kontenplan statt fibu_kontenplan!)
+    const kontenplanCollection = db.collection('kontenplan')
     const alleKonten = await kontenplanCollection.find({}).toArray()
     const kontenMap = new Map()
     alleKonten.forEach(k => {
@@ -433,23 +435,29 @@ export async function GET(request: NextRequest) {
       })
     })
     
-    // Berechne Status für jede Zahlung
-    allPayments.forEach(zahlung => {
-      if (!zahlung.zugeordnetesKonto) {
-        zahlung.zuordnungs_status = 'offen'
-      } else {
-        const konto = kontenMap.get(zahlung.zugeordnetesKonto)
-        
-        if (!konto || !konto.belegpflicht) {
-          // Konto hat keine Belegpflicht oder existiert nicht
-          zahlung.zuordnungs_status = 'zugeordnet'
-        } else {
-          // Konto hat Belegpflicht = true
-          const hatBeleg = zahlung.zugeordneteRechnung || zahlung.belegId || zahlung.beleglink
-          zahlung.zuordnungs_status = hatBeleg ? 'zugeordnet' : 'beleg_fehlt'
-        }
+    // Verarbeite jede Zahlung durch die Pipeline
+    for (const zahlung of allPayments) {
+      // Matching-Pipeline durchlaufen
+      const matchResult = await processZahlungMatching(zahlung, db)
+      
+      // Erweitere Zahlung mit Match-Ergebnis
+      zahlung.match_result = matchResult
+      zahlung.match_source = matchResult.match_source
+      zahlung.match_confidence = matchResult.match_confidence
+      
+      // Wenn neues Match gefunden: aktualisiere Felder
+      if (matchResult.vk_beleg_id && !zahlung.zugeordneteRechnung) {
+        zahlung.vk_beleg_id = matchResult.vk_beleg_id
+        zahlung.zugeordneteRechnung = matchResult.vk_rechnung_nr
       }
-    })
+      
+      if (matchResult.konto_vorschlag_id && !zahlung.zugeordnetesKonto) {
+        zahlung.konto_vorschlag_id = matchResult.konto_vorschlag_id
+      }
+      
+      // Status berechnen
+      zahlung.zuordnungs_status = await berechneZuordnungsStatus(zahlung, matchResult, db)
+    }
 
     // Berechne Gesamt-Stats VOR Pagination (mit neuen Status-Werten)
     const totalCount = allPayments.length
