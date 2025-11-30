@@ -180,78 +180,92 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
             <table className="w-full text-xs">
               <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
                 <tr>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-700 w-10"></th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-700">Datum</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-700 w-8"></th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-700 w-24">Datum</th>
                   <th className="px-3 py-2 text-left font-semibold text-gray-700">Beschreibung</th>
-                  <th className="px-3 py-2 text-right font-semibold text-gray-700">Betrag</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-700">Quelle</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-700">Zuordnung</th>
+                  <th className="px-3 py-2 text-right font-semibold text-gray-700 w-28">Betrag</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-700 w-32">Quelle</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-700 w-40">Zuordnung</th>
                   <th className="px-3 py-2 text-center font-semibold text-gray-700 w-20">Aktion</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredZahlungen.map((zahlung) => (
-                  <tr
-                    key={zahlung.transactionId || zahlung._id}
-                    className={`hover:bg-gray-50 transition cursor-pointer ${
-                      selectedZahlung?.transactionId === zahlung.transactionId
-                        ? 'bg-blue-50'
-                        : ''
-                    }`}
-                    onClick={() => setSelectedZahlung(zahlung)}
-                  >
-                    <td className="px-3 py-2.5">
-                      {zahlung.istZugeordnet ? (
-                        <CheckCircle className="w-4 h-4 text-green-600" />
-                      ) : (
-                        <Circle className="w-4 h-4 text-orange-500" />
-                      )}
-                    </td>
-                    <td className="px-3 py-2.5 text-gray-700 whitespace-nowrap">
-                      {new Date(zahlung.datum).toLocaleDateString('de-DE', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric'
-                      })}
-                    </td>
-                    <td className="px-3 py-2.5 text-gray-900">
-                      <div className="max-w-md truncate">
-                        {zahlung.verwendungszweck || zahlung.beschreibung || 'Keine Beschreibung'}
-                      </div>
-                      {zahlung.kundenName && (
-                        <div className="text-gray-500 text-xs mt-0.5">{zahlung.kundenName}</div>
-                      )}
-                    </td>
-                    <td className="px-3 py-2.5 text-right font-medium">
-                      <span className={zahlung.betrag >= 0 ? 'text-green-700' : 'text-red-700'}>
-                        {zahlung.betrag >= 0 ? '+' : ''}{zahlung.betrag?.toFixed(2)} €
-                      </span>
-                    </td>
-                    <td className="px-3 py-2.5">
-                      <span className="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700">
-                        {zahlung.quelle}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2.5 text-gray-600">
-                      {zahlung.istZugeordnet ? (
-                        <span className="text-green-700 text-xs">✓ {zahlung.zugeordnetesKonto || 'Zugeordnet'}</span>
-                      ) : (
-                        <span className="text-gray-400 text-xs">-</span>
-                      )}
-                    </td>
-                    <td className="px-3 py-2.5 text-center">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setSelectedZahlung(zahlung)
-                        }}
-                        className="text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        Details
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {filteredZahlungen.map((zahlung) => {
+                  // Bestimme Zuordnungs-Text
+                  let zuordnungText = '-'
+                  if (zahlung.zugeordneteRechnung) {
+                    zuordnungText = `📄 ${zahlung.zugeordneteRechnung}`
+                  } else if (zahlung.zugeordnetesKonto) {
+                    zuordnungText = `🏦 ${zahlung.zugeordnetesKonto}`
+                  }
+                  
+                  return (
+                    <tr
+                      key={zahlung.transactionId || zahlung._id}
+                      className={`hover:bg-gray-50 transition cursor-pointer ${
+                        selectedZahlung?.transactionId === zahlung.transactionId
+                          ? 'bg-blue-50'
+                          : ''
+                      }`}
+                      onClick={() => setSelectedZahlung(zahlung)}
+                    >
+                      <td className="px-3 py-2.5">
+                        {zahlung.istZugeordnet ? (
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <Circle className="w-4 h-4 text-orange-500" />
+                        )}
+                      </td>
+                      <td className="px-3 py-2.5 text-gray-700 whitespace-nowrap">
+                        {new Date(zahlung.datum).toLocaleDateString('de-DE', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric'
+                        })}
+                      </td>
+                      <td className="px-3 py-2.5 text-gray-900">
+                        <div className="truncate" style={{ maxWidth: '600px' }}>
+                          {zahlung.verwendungszweck || zahlung.beschreibung || 'Keine Beschreibung'}
+                        </div>
+                        {zahlung.kundenName && (
+                          <div className="text-gray-500 text-xs mt-0.5 truncate" style={{ maxWidth: '600px' }}>
+                            {zahlung.kundenName}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-3 py-2.5 text-right font-medium">
+                        <span className={zahlung.betrag >= 0 ? 'text-green-700' : 'text-red-700'}>
+                          {zahlung.betrag >= 0 ? '+' : ''}{zahlung.betrag?.toFixed(2)} €
+                        </span>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <span className="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700">
+                          {zahlung.quelle}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        {zahlung.zugeordneteRechnung ? (
+                          <span className="text-green-700 text-xs font-medium">📄 {zahlung.zugeordneteRechnung}</span>
+                        ) : zahlung.zugeordnetesKonto ? (
+                          <span className="text-blue-700 text-xs">🏦 {zahlung.zugeordnetesKonto}</span>
+                        ) : (
+                          <span className="text-gray-400 text-xs">-</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-2.5 text-center">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedZahlung(zahlung)
+                          }}
+                          className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                          Details
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>

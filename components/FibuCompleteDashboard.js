@@ -218,9 +218,9 @@ export default function FibuCompleteDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header - VOLLE BREITE */}
+      {/* Header - MAXIMALE BREITE mit minimalem Padding */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="px-6 lg:px-8">
+        <div className="px-2">
           <div className="py-3">
             <div className="flex items-center justify-between mb-1">
               <h1 className="text-2xl font-bold text-gray-900">FIBU Dashboard</h1>
@@ -372,8 +372,8 @@ export default function FibuCompleteDashboard() {
         </div>
       </div>
 
-      {/* Content - VOLLE BREITE */}
-      <div className="px-6 lg:px-8 py-6">
+      {/* Content - MAXIMALE BREITE mit minimalem Padding */}
+      <div className="px-2 py-6">
         
         {activeTab === 'overview' && (
           <FibuMonatsUebersicht selectedPeriod={selectedPeriod} summaryData={summary} />
