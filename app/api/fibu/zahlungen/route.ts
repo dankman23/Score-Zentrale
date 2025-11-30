@@ -572,10 +572,20 @@ export async function GET(request: NextRequest) {
       })
     })
     
+    // Lade alle VK-Rechnungen für Auto-Matching (Cache für Performance)
+    const vkRechnungen = await db.collection('fibu_vk_rechnungen').find({}).toArray()
+    const rechnungenCache = new Map()
+    vkRechnungen.forEach(r => {
+      if (r.cBestellNr) {
+        rechnungenCache.set(r.cBestellNr, r)
+      }
+    })
+    console.log(`[Zahlungen] Rechnungen-Cache erstellt: ${rechnungenCache.size} Einträge`)
+    
     // Verarbeite jede Zahlung durch die Pipeline
     for (const zahlung of allPayments) {
       // Matching-Pipeline durchlaufen
-      const matchResult = await processZahlungMatching(zahlung, db)
+      const matchResult = await processZahlungMatching(zahlung, db, rechnungenCache)
       
       // Erweitere Zahlung mit Match-Ergebnis
       zahlung.match_result = matchResult
