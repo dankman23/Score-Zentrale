@@ -102,9 +102,10 @@ async function migrate() {
     console.log(`✅ Belegpflicht = FALSE gesetzt für ${resultFalse.modifiedCount} Konten (Ausnahmen)`)
     
     // 4. Setze belegpflicht = false für alle übrigen Konten (Klassen 0-3, 9)
+    // WICHTIG: klasse ist String!
     const resultOther = await collection.updateMany(
       {
-        klasse: { $in: [0, 1, 2, 3, 9] },
+        klasse: { $in: ['0', '1', '2', '3', '9'] },
         belegpflicht: { $exists: false }
       },
       {
