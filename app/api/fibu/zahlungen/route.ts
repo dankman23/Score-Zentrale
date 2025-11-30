@@ -403,6 +403,10 @@ export async function GET(request: NextRequest) {
           zuordnungsDatum: p.zuordnungsDatum || (autoZugeordnet ? new Date().toISOString() : null),
           zuordnungsMethode: p.zuordnungsMethode || (autoZugeordnet ? 'auto-amazon-type' : null),
           
+          // Beleg-Felder
+          belegId: p.belegId || null,
+          beleglink: p.beleglink || null,
+          
           // Abweichungen (für Teilzahlungen, Skonto, Währung)
           abweichungsgrund: p.abweichungsgrund || null,
           abweichungsBetrag: p.abweichungsBetrag || null,
