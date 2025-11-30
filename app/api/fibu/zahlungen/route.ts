@@ -84,11 +84,22 @@ export async function GET(request: NextRequest) {
     // Wenn Start vor Oktober, beginne bei Oktober
     const effectiveStartDate = startDateTime < minDate ? minDate : startDateTime
 
+    // Datum-Filter: Unterstützt sowohl 'datumDate' als auch 'datum' Felder
     const dateFilter = {
-      datumDate: {
-        $gte: effectiveStartDate,
-        $lte: endDateTime
-      }
+      $or: [
+        {
+          datumDate: {
+            $gte: effectiveStartDate,
+            $lte: endDateTime
+          }
+        },
+        {
+          datum: {
+            $gte: startDate,
+            $lte: endDate
+          }
+        }
+      ]
     }
 
     let allPayments: any[] = []
