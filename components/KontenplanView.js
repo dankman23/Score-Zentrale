@@ -303,7 +303,8 @@ function KontoForm({ konto, onSave, onCancel }) {
     klasse: konto?.klasse || 0,
     gruppe: konto?.gruppe || 0,
     untergruppe: konto?.untergruppe || '',
-    beschreibung: konto?.beschreibung || ''
+    beschreibung: konto?.beschreibung || '',
+    belegpflicht: konto?.belegpflicht || false
   })
   
   const handleSubmit = (e) => {
