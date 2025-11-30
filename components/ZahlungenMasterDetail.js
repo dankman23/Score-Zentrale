@@ -285,7 +285,8 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
                       <td className="px-2 py-2.5 text-gray-700 whitespace-nowrap text-[11px]">
                         {new Date(zahlung.datum).toLocaleDateString('de-DE', {
                           day: '2-digit',
-                          month: '2-digit'
+                          month: '2-digit',
+                          timeZone: 'UTC'
                         })}
                       </td>
                       <td className="px-2 py-2.5 text-gray-900">
