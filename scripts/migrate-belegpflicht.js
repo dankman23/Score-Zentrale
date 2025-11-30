@@ -49,19 +49,19 @@ async function migrate() {
     const totalCount = await collection.countDocuments({})
     console.log(`📊 Gefunden: ${totalCount} Konten im Kontenplan`)
     
-    // 2. DEFINITIVE REGEL: Setze ALLE auf true (Default)
-    const resultDefault = await collection.updateMany(
-      { belegpflicht: { $exists: false } },
-      { $set: { belegpflicht: true } }
-    )
-    console.log(`✅ Belegpflicht = TRUE (Default) für ${resultDefault.modifiedCount} Konten`)
-    
-    // 3. EXAKTE AUSNAHMEN: Setze spezifische Konten auf false
+    // 2. EXAKTE AUSNAHMEN ZUERST: Setze spezifische Konten auf false
     const resultFalse = await collection.updateMany(
       { kontonummer: { $in: KEINE_BELEGPFLICHT } },
       { $set: { belegpflicht: false } }
     )
     console.log(`✅ Belegpflicht = FALSE gesetzt für ${resultFalse.modifiedCount} technische Konten`)
+    
+    // 3. DANACH Default: Alle anderen auf true
+    const resultDefault = await collection.updateMany(
+      { belegpflicht: { $exists: false } },
+      { $set: { belegpflicht: true } }
+    )
+    console.log(`✅ Belegpflicht = TRUE (Default) für ${resultDefault.modifiedCount} Konten`)
     
     // 6. Statistik
     const mitBelegpflicht = await collection.countDocuments({ belegpflicht: true })
