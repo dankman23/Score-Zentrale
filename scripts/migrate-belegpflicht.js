@@ -28,7 +28,7 @@ const KEINE_BELEGPFLICHT = [
   '3730', '3740', '3750', // Steuerschulden
   
   // === 4. Lohn-/Gehaltskonto (Beleg = Lohnjournal) ===
-  '6200', '4130', '4140', // Löhne/Gehälter, Sozialabgaben
+  '6200', // Nur Löhne/Gehälter (4130, 4140 sind Erlöskonten!)
   
   // === 5. Sammeldebitoren (69xxx) ===
   '69001', '69002', '69003', '69004', '69005', '69006', '69007', '69008',
