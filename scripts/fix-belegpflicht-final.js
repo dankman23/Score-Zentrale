@@ -7,11 +7,8 @@
  */
 
 const { MongoClient } = require('mongodb')
-const fs = require('fs')
 
-// Parse .env
-const envContent = fs.readFileSync('/app/.env', 'utf8')
-const MONGO_URL = envContent.split('\n').find(line => line.startsWith('MONGO_URL=')).split('=')[1].trim()
+const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/score_zentrale'
 
 // DEFINITIVE Liste: Konten OHNE Belegpflicht
 const SYSTEMKONTEN_OHNE_BELEGPFLICHT = {
