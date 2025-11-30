@@ -33,8 +33,9 @@ export async function GET(request: NextRequest) {
     console.log(`[Zahlungen NEU] Loading from ${startDate} to ${endDate}, anbieter: ${anbieter || 'all'}`)
 
     const db = await getDb()
-    const startDateTime = new Date(startDate + 'T00:00:00Z')
-    const endDateTime = new Date(endDate + 'T23:59:59Z')
+    // WICHTIG: UTC-Datum ohne Timezone-Offset verwenden
+    const startDateTime = new Date(startDate + 'T00:00:00.000Z')
+    const endDateTime = new Date(endDate + 'T23:59:59.999Z')
     
     // FIBU-Modul: Nur Daten ab Oktober 2025
     const minDate = new Date('2025-10-01T00:00:00Z')
