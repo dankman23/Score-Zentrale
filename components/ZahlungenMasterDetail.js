@@ -32,10 +32,12 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
         to = zeitraum.to
       }
       
-      const response = await fetch(`/api/fibu/zahlungen?from=${from}&to=${to}`)
+      // WICHTIG: Kein Limit setzen, alle Zahlungen laden
+      const response = await fetch(`/api/fibu/zahlungen?from=${from}&to=${to}&pageSize=10000`)
       const data = await response.json()
       
       if (data.ok) {
+        console.log(`Zahlungen geladen: ${data.zahlungen?.length} von ${data.stats?.gesamt}`)
         setZahlungen(data.zahlungen || [])
       }
     } catch (error) {
@@ -45,11 +47,31 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
     }
   }
 
+  // Hilfsfunktion: Normalisiere Quellen-String für Vergleich
+  const normalizeQuelle = (quelle) => {
+    if (!quelle) return ''
+    const q = quelle.toLowerCase()
+    // Mappe Collection-Namen auf UI-Namen
+    if (q.includes('amazon')) return 'amazon'
+    if (q.includes('paypal')) return 'paypal'
+    if (q.includes('commerzbank')) return 'commerzbank'
+    if (q.includes('postbank')) return 'postbank'
+    if (q.includes('mollie')) return 'mollie'
+    if (q.includes('ebay')) return 'ebay'
+    return q
+  }
+
   // Gefilterte Zahlungen
   const filteredZahlungen = zahlungen.filter(z => {
     if (filter === 'zugeordnet' && !z.istZugeordnet) return false
     if (filter === 'nicht-zugeordnet' && z.istZugeordnet) return false
-    if (quelle !== 'alle' && z.quelle?.toLowerCase() !== quelle.toLowerCase()) return false
+    
+    // Quelle-Filter mit normalisiertem Vergleich
+    if (quelle !== 'alle') {
+      const normalizedZahlung = normalizeQuelle(z.quelle || z.anbieter)
+      const normalizedFilter = quelle.toLowerCase()
+      if (normalizedZahlung !== normalizedFilter) return false
+    }
     
     if (searchTerm) {
       const search = searchTerm.toLowerCase()
@@ -88,6 +110,7 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
             <Circle className="w-3.5 h-3.5" />
             <span className="font-semibold">{stats.nichtZugeordnet}</span>
           </div>
+          <div className="text-gray-500">({filteredZahlungen.length} angezeigt)</div>
         </div>
         
         <button
@@ -160,6 +183,7 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
             <option value="commerzbank">Commerzbank</option>
             <option value="postbank">Postbank</option>
             <option value="mollie">Mollie</option>
+            <option value="ebay">eBay</option>
           </select>
         </div>
       </div>
@@ -191,14 +215,6 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredZahlungen.map((zahlung) => {
-                  // Bestimme Zuordnungs-Text
-                  let zuordnungText = '-'
-                  if (zahlung.zugeordneteRechnung) {
-                    zuordnungText = `📄 ${zahlung.zugeordneteRechnung}`
-                  } else if (zahlung.zugeordnetesKonto) {
-                    zuordnungText = `🏦 ${zahlung.zugeordnetesKonto}`
-                  }
-                  
                   return (
                     <tr
                       key={zahlung.transactionId || zahlung._id}
@@ -239,7 +255,7 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
                       </td>
                       <td className="px-2 py-2.5 text-[10px]">
                         <span className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-700">
-                          {zahlung.quelle}
+                          {zahlung.anbieter || normalizeQuelle(zahlung.quelle)}
                         </span>
                       </td>
                       <td className="px-2 py-2.5">
@@ -419,7 +435,7 @@ function ZahlungDetailPanel({ zahlung, onClose, onUpdate, zeitraum }) {
           <div className="space-y-2 text-xs">
             <div className="flex justify-between">
               <span className="text-gray-600">Quelle:</span>
-              <span className="font-medium text-gray-900">{zahlung.quelle}</span>
+              <span className="font-medium text-gray-900">{zahlung.anbieter || zahlung.quelle}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Transaktions-ID:</span>
