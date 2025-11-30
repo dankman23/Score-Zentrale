@@ -209,56 +209,55 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
                       }`}
                       onClick={() => setSelectedZahlung(zahlung)}
                     >
-                      <td className="px-3 py-2.5">
+                      <td className="px-2 py-2.5">
                         {zahlung.istZugeordnet ? (
                           <CheckCircle className="w-4 h-4 text-green-600" />
                         ) : (
                           <Circle className="w-4 h-4 text-orange-500" />
                         )}
                       </td>
-                      <td className="px-3 py-2.5 text-gray-700 whitespace-nowrap">
+                      <td className="px-2 py-2.5 text-gray-700 whitespace-nowrap text-[11px]">
                         {new Date(zahlung.datum).toLocaleDateString('de-DE', {
                           day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric'
+                          month: '2-digit'
                         })}
                       </td>
-                      <td className="px-3 py-2.5 text-gray-900">
-                        <div className="truncate" style={{ maxWidth: '600px' }}>
+                      <td className="px-2 py-2.5 text-gray-900">
+                        <div className="truncate">
                           {zahlung.verwendungszweck || zahlung.beschreibung || 'Keine Beschreibung'}
                         </div>
                         {zahlung.kundenName && (
-                          <div className="text-gray-500 text-xs mt-0.5 truncate" style={{ maxWidth: '600px' }}>
+                          <div className="text-gray-500 text-[10px] mt-0.5 truncate">
                             {zahlung.kundenName}
                           </div>
                         )}
                       </td>
-                      <td className="px-3 py-2.5 text-right font-medium">
+                      <td className="px-2 py-2.5 text-right font-medium">
                         <span className={zahlung.betrag >= 0 ? 'text-green-700' : 'text-red-700'}>
-                          {zahlung.betrag >= 0 ? '+' : ''}{zahlung.betrag?.toFixed(2)} €
+                          {zahlung.betrag >= 0 ? '+' : ''}{zahlung.betrag?.toFixed(2)}
                         </span>
                       </td>
-                      <td className="px-3 py-2.5">
-                        <span className="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700">
+                      <td className="px-2 py-2.5 text-[10px]">
+                        <span className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-700">
                           {zahlung.quelle}
                         </span>
                       </td>
-                      <td className="px-3 py-2.5">
+                      <td className="px-2 py-2.5">
                         {zahlung.zugeordneteRechnung ? (
-                          <span className="text-green-700 text-xs font-medium">📄 {zahlung.zugeordneteRechnung}</span>
+                          <span className="text-green-700 text-[10px] font-medium">📄 {zahlung.zugeordneteRechnung}</span>
                         ) : zahlung.zugeordnetesKonto ? (
-                          <span className="text-blue-700 text-xs">🏦 {zahlung.zugeordnetesKonto}</span>
+                          <span className="text-blue-700 text-[10px]">🏦 {zahlung.zugeordnetesKonto}</span>
                         ) : (
-                          <span className="text-gray-400 text-xs">-</span>
+                          <span className="text-gray-400 text-[10px]">-</span>
                         )}
                       </td>
-                      <td className="px-3 py-2.5 text-center">
+                      <td className="px-2 py-2.5 text-center">
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
                             setSelectedZahlung(zahlung)
                           }}
-                          className="text-blue-600 hover:text-blue-800 font-medium"
+                          className="text-blue-600 hover:text-blue-800 font-medium text-[10px]"
                         >
                           Details
                         </button>
