@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Filter, RefreshCw, CheckCircle, Circle, DollarSign, X, FileText, Calendar } from 'lucide-react'
+import { Search, Filter, RefreshCw, CheckCircle, Circle, AlertCircle, DollarSign, X, FileText, Calendar } from 'lucide-react'
 
 /**
  * Kompaktes Master-Detail-Layout für Zahlungen/Umsätze
