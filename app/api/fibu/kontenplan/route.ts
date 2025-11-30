@@ -184,13 +184,23 @@ export async function GET(request: NextRequest) {
       .sort({ kontonummer: 1 })
       .toArray()
     
-    // Gruppiere nach Kontenklasse
-    const grouped = konten.reduce((acc: any, konto: any) => {
+    // Transformiere Konten zuerst (mit belegpflicht)
+    const transformedKonten = konten.map((k: any) => ({
+      kontonummer: k.kontonummer,
+      bezeichnung: k.bezeichnung,
+      klasse: k.klasse,
+      typ: k.typ,
+      gruppe: k.gruppe,
+      belegpflicht: k.belegpflicht !== undefined ? k.belegpflicht : true
+    }))
+    
+    // Group by klasse NACH der Transformation
+    const grouped = transformedKonten.reduce((acc: any, konto: any) => {
       const klasse = konto.klasse || 0
       if (!acc[klasse]) {
         acc[klasse] = {
           klasse: klasse,
-          bezeichnung: konto.kontenklasseBezeichnung || '',
+          bezeichnung: `Klasse ${klasse}`,
           typ: konto.typ,
           konten: []
         }
@@ -201,13 +211,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       ok: true,
-      konten: konten.map((k: any) => ({
-        kontonummer: k.kontonummer,
-        bezeichnung: k.bezeichnung,
-        klasse: k.klasse,
-        typ: k.typ,
-        belegpflicht: k.belegpflicht !== undefined ? k.belegpflicht : true
-      })),
+      konten: transformedKonten,
       grouped: Object.values(grouped),
       total: konten.length
     })
