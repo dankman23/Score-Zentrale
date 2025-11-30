@@ -15,11 +15,17 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
   const [filter, setFilter] = useState('alle') // alle, zugeordnet, nicht-zugeordnet
   const [searchTerm, setSearchTerm] = useState('')
   const [quelle, setQuelle] = useState('alle') // alle, amazon, paypal, bank, etc.
+  
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const pageSize = 50 // Nur 50 Zahlungen pro Seite
 
   // Zahlungen laden
   useEffect(() => {
     loadZahlungen()
-  }, [zeitraum])
+  }, [zeitraum, currentPage])
 
   const loadZahlungen = async () => {
     setLoading(true)
@@ -32,13 +38,15 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
         to = zeitraum.to
       }
       
-      // WICHTIG: Kein Limit setzen, alle Zahlungen laden
-      const response = await fetch(`/api/fibu/zahlungen?from=${from}&to=${to}&pageSize=10000`)
+      // Pagination: Nur 50 pro Seite laden
+      const response = await fetch(`/api/fibu/zahlungen?from=${from}&to=${to}&page=${currentPage}&pageSize=${pageSize}`)
       const data = await response.json()
       
       if (data.ok) {
-        console.log(`Zahlungen geladen: ${data.zahlungen?.length} von ${data.stats?.gesamt}`)
+        console.log(`Zahlungen geladen: Seite ${currentPage}/${data.pagination?.totalPages || 1}`)
         setZahlungen(data.zahlungen || [])
+        setTotalPages(data.pagination?.totalPages || 1)
+        setTotalCount(data.pagination?.totalCount || 0)
       }
     } catch (error) {
       console.error('Fehler beim Laden:', error)
