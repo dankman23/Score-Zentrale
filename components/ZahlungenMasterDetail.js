@@ -177,16 +177,16 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
           </div>
         ) : (
           <div className="overflow-y-auto h-full">
-            <table className="w-full text-xs">
+            <table className="w-full text-xs table-fixed">
               <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
                 <tr>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-700 w-8"></th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-700 w-24">Datum</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-700">Beschreibung</th>
-                  <th className="px-3 py-2 text-right font-semibold text-gray-700 w-28">Betrag</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-700 w-32">Quelle</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-700 w-40">Zuordnung</th>
-                  <th className="px-3 py-2 text-center font-semibold text-gray-700 w-20">Aktion</th>
+                  <th className="px-2 py-2 text-left font-semibold text-gray-700 w-8"></th>
+                  <th className="px-2 py-2 text-left font-semibold text-gray-700 w-20">Datum</th>
+                  <th className="px-2 py-2 text-left font-semibold text-gray-700">Beschreibung</th>
+                  <th className="px-2 py-2 text-right font-semibold text-gray-700 w-24">Betrag</th>
+                  <th className="px-2 py-2 text-left font-semibold text-gray-700 w-28">Quelle</th>
+                  <th className="px-2 py-2 text-left font-semibold text-gray-700 w-44">Zuordnung</th>
+                  <th className="px-2 py-2 text-center font-semibold text-gray-700 w-16">Aktion</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
