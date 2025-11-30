@@ -105,29 +105,66 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
     <div className="flex flex-col h-[calc(100vh-200px)] relative">
       {/* Kompakte Header-Zeile mit Stats & Controls */}
       <div className="mb-3 flex items-center justify-between bg-white px-4 py-2 rounded-lg border border-gray-200">
-        <div className="flex gap-4 text-xs">
+        <div className="flex gap-4 text-xs items-center">
           <div className="flex items-center gap-1">
-            <span className="font-semibold text-gray-900">{stats.gesamt}</span>
+            <span className="font-semibold text-gray-900">{totalCount}</span>
             <span className="text-gray-500">gesamt</span>
           </div>
-          <div className="flex items-center gap-1 text-green-600">
-            <CheckCircle className="w-3.5 h-3.5" />
-            <span className="font-semibold">{stats.zugeordnet}</span>
+          <div className="text-gray-400">|</div>
+          <div className="flex items-center gap-1">
+            <span className="text-gray-600">Seite {currentPage} von {totalPages}</span>
           </div>
-          <div className="flex items-center gap-1 text-orange-600">
-            <Circle className="w-3.5 h-3.5" />
-            <span className="font-semibold">{stats.nichtZugeordnet}</span>
+          <div className="text-gray-400">|</div>
+          <div className="flex items-center gap-1">
+            <span className="text-gray-600">{filteredZahlungen.length} auf dieser Seite</span>
           </div>
-          <div className="text-gray-500">({filteredZahlungen.length} angezeigt)</div>
         </div>
         
-        <button
-          onClick={loadZahlungen}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-        >
-          <RefreshCw className="w-3.5 h-3.5" />
-          Aktualisieren
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Pagination Controls */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+              className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Erste Seite"
+            >
+              ««
+            </button>
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Vorherige Seite"
+            >
+              «
+            </button>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Nächste Seite"
+            >
+              »
+            </button>
+            <button
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+              className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Letzte Seite"
+            >
+              »»
+            </button>
+          </div>
+          
+          <button
+            onClick={loadZahlungen}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            Aktualisieren
+          </button>
+        </div>
       </div>
 
       {/* Kompakte Filter-Leiste */}
