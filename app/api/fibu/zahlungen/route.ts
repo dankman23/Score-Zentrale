@@ -179,6 +179,8 @@ export async function GET(request: NextRequest) {
               autoZugeordnet = true
               autoGegenkonto = '6770'  // Amazon Kommission
               autoZuordnungsArt = 'Amazon Gebühr (Kommission)'
+              // Steuerschlüssel 401: Voller Vorsteuerabzug
+              p.steuerschluessel = '401'
             } else if (amountTypeKey === 'Shipping' || p.amountType?.includes('Shipping')) {
               autoZugeordnet = true
               autoGegenkonto = '4800'  // Versanderlöse
@@ -195,6 +197,8 @@ export async function GET(request: NextRequest) {
               autoZugeordnet = true
               autoGegenkonto = '4950'  // FBA Gebühren
               autoZuordnungsArt = 'Amazon FBA Gebühr'
+              // Steuerschlüssel 401: Voller Vorsteuerabzug
+              p.steuerschluessel = '401'
             } else if (p.amountType?.includes('Refund')) {
               autoZugeordnet = true
               autoGegenkonto = '69001'  // Rückerstattungen gegen Erlöse
@@ -207,6 +211,8 @@ export async function GET(request: NextRequest) {
               autoZugeordnet = true
               autoGegenkonto = '6855'  // Sonstige Aufwendungen
               autoZuordnungsArt = 'Amazon Sonstige Transaktion'
+              // Steuerschlüssel 401: Voller Vorsteuerabzug
+              p.steuerschluessel = '401'
             } else {
               // Fallback: Unbekannte Amazon-Transaktionen werden auch zugeordnet
               autoZugeordnet = true
