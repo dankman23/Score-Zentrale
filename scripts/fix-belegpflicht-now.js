@@ -3,7 +3,11 @@
  */
 
 const { MongoClient } = require('mongodb')
-require('dotenv').config({ path: '/app/.env' })
+
+// Load environment variables manually
+const fs = require('fs')
+const envContent = fs.readFileSync('/app/.env', 'utf-8')
+const MONGO_URL = envContent.match(/MONGO_URL=(.+)/)?.[1] || 'mongodb://localhost:27017/score_zentrale'
 
 // Liste der Konten OHNE Belegpflicht (aus dem Original-Script)
 const OHNE_BELEGPFLICHT = [
