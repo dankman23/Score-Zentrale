@@ -24,7 +24,7 @@ interface MatchResult {
   vk_rechnung_nr?: string
   konto_id?: string
   konto_vorschlag_id?: string
-  match_source: 'import_vk' | 'auto_vk' | 'auto_konto' | 'manuell' | null
+  match_source: 'import_vk' | 'auto_vk' | 'auto_konto' | 'auto_bank' | 'manuell' | null
   match_confidence?: number
   match_details?: string
 }
