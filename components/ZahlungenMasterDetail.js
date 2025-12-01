@@ -25,7 +25,7 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
   // Zahlungen laden
   useEffect(() => {
     loadZahlungen()
-  }, [zeitraum, currentPage, filter])  // Filter hinzugefügt!
+  }, [zeitraum, currentPage, filter, quelle])  // Quelle hinzugefügt!
 
   const loadZahlungen = async () => {
     setLoading(true)
@@ -38,8 +38,11 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
         to = zeitraum.to
       }
       
+      // Quelle-Filter: Mappe UI-Namen auf API-Parameter
+      const anbieterParam = quelle === 'alle' ? 'all' : quelle
+      
       // Serverseitiger Filter + Pagination
-      const response = await fetch(`/api/fibu/zahlungen?from=${from}&to=${to}&page=${currentPage}&pageSize=${pageSize}&statusFilter=${filter}`)
+      const response = await fetch(`/api/fibu/zahlungen?from=${from}&to=${to}&page=${currentPage}&pageSize=${pageSize}&statusFilter=${filter}&anbieter=${anbieterParam}`)
       const data = await response.json()
       
       if (data.ok) {
