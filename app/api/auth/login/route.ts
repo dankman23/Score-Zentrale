@@ -3,12 +3,16 @@ export const runtime = 'nodejs'
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 
-// Hardcoded Admin-Accounts (für v1.02)
-const USERS = [
-  { username: 'Alex', password: 'Ali', role: 'admin', displayName: 'Alex' },
-  { username: 'David', password: 'Enste', role: 'admin', displayName: 'David' },
-  { username: 'Danki', password: 'lll', role: 'admin', displayName: 'Danki' }
-]
+// Admin accounts from environment variable (JSON format)
+// Example: ADMIN_USERS='[{"username":"Alex","password":"Ali","role":"admin","displayName":"Alex"}]'
+const USERS = process.env.ADMIN_USERS 
+  ? JSON.parse(process.env.ADMIN_USERS)
+  : [
+      // Fallback for development only
+      { username: 'Alex', password: 'Ali', role: 'admin', displayName: 'Alex' },
+      { username: 'David', password: 'Enste', role: 'admin', displayName: 'David' },
+      { username: 'Danki', password: 'lll', role: 'admin', displayName: 'Danki' }
+    ]
 
 export async function POST(request: NextRequest) {
   try {
