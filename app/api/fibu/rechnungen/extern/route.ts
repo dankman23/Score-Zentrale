@@ -98,6 +98,14 @@ export async function GET(request: NextRequest) {
         .input('to', to)
         .query(zahlungenQuery)
       
+      // Create map of cached MongoDB data for quick lookup
+      const mongoMap = new Map()
+      cached.forEach((doc: any) => {
+        if (doc.kExternerBeleg) {
+          mongoMap.set(doc.kExternerBeleg, doc)
+        }
+      })
+      
       const rechnungen = result.recordset.map((r: any) => {
       const mongoData = mongoMap.get(r.kExternerBeleg) || {}
       const rechnungsBetrag = parseFloat(r.fVkBrutto || 0)
