@@ -431,7 +431,10 @@ function ZahlungDetailPanel({ zahlung, onClose, onUpdate, zeitraum }) {
   const [rechnungen, setRechnungen] = useState([])
   const [konten, setKonten] = useState([])
   const [selectedBeleg, setSelectedBeleg] = useState(zahlung.zugeordneteRechnung || '')
-  const [selectedKonto, setSelectedKonto] = useState(zahlung.zugeordnetesKonto || '')
+  // FIX: Berücksichtige auch Auto-Zuordnung aus match_result
+  const [selectedKonto, setSelectedKonto] = useState(
+    zahlung.zugeordnetesKonto || zahlung.match_result?.konto_id || ''
+  )
 
   useEffect(() => {
     loadRechnungen()
