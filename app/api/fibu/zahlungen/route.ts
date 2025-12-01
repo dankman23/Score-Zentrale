@@ -456,11 +456,9 @@ export async function GET(request: NextRequest) {
           // NEUE FELDER: Klare Trennung Bankkonto / Gegenkonto
           bank_konto_nr: bankKontoInfo.konto,  // Zahlungskonto (aus Quelle, read-only)
           bank_konto_bezeichnung: bankKontoInfo.bezeichnung,
-          // KRITISCH: Wenn bereits manuell zugeordnet (istZugeordnet=true), DB-Wert verwenden
-          // Sonst: Auto-Zuordnung anwenden
-          gegenkonto_konto_nr: p.istZugeordnet 
-            ? (p.gegenkonto_konto_nr || p.zugeordnetesKonto)  // Manuelle Zuordnung beibehalten
-            : (autoGegenkonto || p.gegenkonto_konto_nr || p.zugeordnetesKonto || null),  // Auto-Zuordnung
+          // WICHTIG: Auto-Zuordnung hat VORRANG vor alten DB-Werten!
+          // Grund: Alte Daten können falsche Konten haben (z.B. 4910 statt 6770 für Commission)
+          gegenkonto_konto_nr: autoGegenkonto || p.gegenkonto_konto_nr || p.zugeordnetesKonto || null,
           
           // Beschreibung & Details
           verwendungszweck,
