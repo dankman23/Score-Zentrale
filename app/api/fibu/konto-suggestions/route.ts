@@ -70,8 +70,8 @@ export async function GET(request: NextRequest) {
         
         console.log(`[Konto Suggestions] ${source.name}: ${zahlungen.length} Zahlungen geladen`)
         
-        // Klassifiziere alle Zahlungen
-        const classified = await classifyKontoBulk(zahlungen, db, {
+        // Klassifiziere alle Zahlungen (mit Type-Assertion für MongoDB-Dokumente)
+        const classified = await classifyKontoBulk(zahlungen as any[], db, {
           minConfidence,
           parallel: true
         })
