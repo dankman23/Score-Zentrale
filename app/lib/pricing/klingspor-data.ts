@@ -163,3 +163,16 @@ export function getProductHierarchy(type: string): number | null {
   // Letzter Fallback: Standard PH für coat.abras.standard belts
   return 10200101
 }
+
+// Helper: Sales Org Multiplier (aus zms2.json)
+export function getSalesOrgMultiplier(salesOrg: string, ph: number, type: string): number {
+  // Match-Key: "DE10 10200101 CS 308 Y"
+  const key = `${salesOrg} ${ph} ${type}`
+  const entry = zms2Map[key]
+  
+  if (entry && entry.salesOrgMultiplier !== undefined) {
+    return entry.salesOrgMultiplier
+  }
+  
+  return 0
+}
