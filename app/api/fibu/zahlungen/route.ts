@@ -639,13 +639,34 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Berechne Gesamt-Stats VOR Pagination (mit neuen Status-Werten)
-    const totalCount = allPayments.length
-    const totalSum = allPayments.reduce((sum, p) => sum + p.betrag, 0)
-    const zugeordnetCount = allPayments.filter(p => p.zuordnungs_status === 'zugeordnet').length
-    const belegFehltCount = allPayments.filter(p => p.zuordnungs_status === 'beleg_fehlt').length
-    const offenCount = allPayments.filter(p => p.zuordnungs_status === 'offen').length
-    const nichtZugeordnetCount = totalCount - zugeordnetCount
+    // SERVERSEITIGER STATUS-FILTER anwenden (VOR Pagination!)
+    let filteredPayments = allPayments
+    
+    if (statusFilter && statusFilter !== 'alle') {
+      filteredPayments = allPayments.filter(p => {
+        if (statusFilter === 'zugeordnet') return p.zuordnungs_status === 'zugeordnet'
+        if (statusFilter === 'beleg_fehlt') return p.zuordnungs_status === 'beleg_fehlt'
+        if (statusFilter === 'offen') return p.zuordnungs_status === 'offen'
+        return true
+      })
+      console.log(`[Zahlungen] Filter '${statusFilter}': ${filteredPayments.length}/${allPayments.length} Zahlungen`)
+    }
+    
+    // Berechne Stats auf ALLE ungefilterten Zahlungen (für die Gesamt-Statistik)
+    const totalCountAll = allPayments.length
+    const totalSumAll = allPayments.reduce((sum, p) => sum + p.betrag, 0)
+    const zugeordnetCountAll = allPayments.filter(p => p.zuordnungs_status === 'zugeordnet').length
+    const belegFehltCountAll = allPayments.filter(p => p.zuordnungs_status === 'beleg_fehlt').length
+    const offenCountAll = allPayments.filter(p => p.zuordnungs_status === 'offen').length
+    const nichtZugeordnetCountAll = belegFehltCountAll + offenCountAll
+    
+    // Berechne Stats auf GEFILTERTE Zahlungen (für Pagination)
+    const totalCount = filteredPayments.length
+    const totalSum = filteredPayments.reduce((sum, p) => sum + p.betrag, 0)
+    const zugeordnetCount = filteredPayments.filter(p => p.zuordnungs_status === 'zugeordnet').length
+    const belegFehltCount = filteredPayments.filter(p => p.zuordnungs_status === 'beleg_fehlt').length
+    const offenCount = filteredPayments.filter(p => p.zuordnungs_status === 'offen').length
+    const nichtZugeordnetCount = belegFehltCount + offenCount
     
     stats.gesamt = totalCount
     stats.gesamtsumme = totalSum
