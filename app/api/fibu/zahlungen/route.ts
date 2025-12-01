@@ -306,15 +306,16 @@ export async function GET(request: NextRequest) {
           sku = p.sku || ''
           transaktionsId = p.transactionId || ''
           
-          // AUTO-ZUORDNUNG für Amazon basierend auf amountType
+          // AUTO-ZUORDNUNG für Amazon basierend auf amountType UND amountDescription
           // WICHTIG: IMMER ausführen, um alte falsche Zuordnungen zu korrigieren!
           const amountTypeKey = (p.amountType || '').split('/').pop() // z.B. "Order/ItemPrice/Principal" → "Principal"
+          const amountDesc = (p.amountDescription || '').toLowerCase()
           
           if (amountTypeKey === 'Principal' || p.amountType?.includes('ItemPrice')) {
             autoZugeordnet = true
             autoGegenkonto = '69001'  // Umsatzerlöse
             autoZuordnungsArt = 'Amazon Erlös (Principal)'
-          } else if (amountTypeKey === 'Commission' || p.amountType?.includes('ItemFees/Commission')) {
+          } else if (amountDesc.includes('commission') || p.amountType?.includes('ItemFees/Commission')) {
             autoZugeordnet = true
             autoGegenkonto = '6770'  // Amazon Kommission
             autoZuordnungsArt = 'Amazon Gebühr (Kommission)'
