@@ -110,11 +110,12 @@ export class PayPalClient {
     this.clientId = process.env.PAYPAL_CLIENT_ID || ''
     this.clientSecret = process.env.PAYPAL_CLIENT_SECRET || ''
     
-    // Bestimme die API URL basierend auf dem Modus
+    // Bestimme die API URL basierend auf dem Modus (configurable via env vars)
     const mode = process.env.PAYPAL_MODE || 'live'
-    this.baseUrl = mode === 'sandbox' 
+    const defaultUrl = mode === 'sandbox' 
       ? 'https://api-m.sandbox.paypal.com'
       : 'https://api-m.paypal.com'
+    this.baseUrl = process.env.PAYPAL_API_URL || defaultUrl
 
     if (!this.clientId || !this.clientSecret) {
       throw new Error('PayPal credentials not configured in environment variables')
