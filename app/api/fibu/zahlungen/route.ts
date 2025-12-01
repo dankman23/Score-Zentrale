@@ -668,17 +668,18 @@ export async function GET(request: NextRequest) {
     const offenCount = filteredPayments.filter(p => p.zuordnungs_status === 'offen').length
     const nichtZugeordnetCount = belegFehltCount + offenCount
     
-    stats.gesamt = totalCount
-    stats.gesamtsumme = totalSum
+    // Stats zeigen GESAMT-Zahlen (ungefiltert) für Übersicht
+    stats.gesamt = totalCountAll
+    stats.gesamtsumme = totalSumAll
     stats.zuordnung = {
-      zugeordnet: zugeordnetCount,
-      zugeordnetProzent: totalCount > 0 ? Math.round((zugeordnetCount / totalCount) * 100) : 0,
-      belegFehlt: belegFehltCount,
-      belegFehltProzent: totalCount > 0 ? Math.round((belegFehltCount / totalCount) * 100) : 0,
-      offen: offenCount,
-      offenProzent: totalCount > 0 ? Math.round((offenCount / totalCount) * 100) : 0,
-      nichtZugeordnet: nichtZugeordnetCount,
-      nichtZugeordnetProzent: totalCount > 0 ? Math.round((nichtZugeordnetCount / totalCount) * 100) : 0
+      zugeordnet: zugeordnetCountAll,
+      zugeordnetProzent: totalCountAll > 0 ? Math.round((zugeordnetCountAll / totalCountAll) * 100) : 0,
+      belegFehlt: belegFehltCountAll,
+      belegFehltProzent: totalCountAll > 0 ? Math.round((belegFehltCountAll / totalCountAll) * 100) : 0,
+      offen: offenCountAll,
+      offenProzent: totalCountAll > 0 ? Math.round((offenCountAll / totalCountAll) * 100) : 0,
+      nichtZugeordnet: nichtZugeordnetCountAll,
+      nichtZugeordnetProzent: totalCountAll > 0 ? Math.round((nichtZugeordnetCountAll / totalCountAll) * 100) : 0
     }
 
     // Pagination anwenden (auf GEFILTERTE Zahlungen!)
