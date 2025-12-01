@@ -638,22 +638,34 @@ export async function GET(request: NextRequest) {
         zahlung.zugeordneteRechnung = matchResult.vk_rechnung_nr
       }
       
-      if (matchResult.konto_vorschlag_id && !zahlung.zugeordnetesKonto) {
+      // Übernehme Gegenkonto aus matchResult (falls vorhanden)
+      if (matchResult.gegenkonto_id && !zahlung.gegenkonto_konto_nr) {
+        zahlung.gegenkonto_konto_nr = matchResult.gegenkonto_id
+      }
+      
+      if (matchResult.konto_vorschlag_id && !zahlung.gegenkonto_konto_nr) {
         zahlung.konto_vorschlag_id = matchResult.konto_vorschlag_id
       }
       
-      // Status berechnen (OHNE DB-Query - über kontenMap Cache)
-      const kontoNr = matchResult.konto_id || zahlung.zugeordnetesKonto
+      // ===== KORREKTE STATUS-BERECHNUNG =====
+      // Status hängt NUR vom GEGENKONTO ab, NICHT vom Bankkonto!
+      // Bankkonto ist immer gesetzt (aus Quelle) und zählt nicht für Zuordnung
       
-      if (!kontoNr) {
+      const gegenkontoNr = zahlung.gegenkonto_konto_nr
+      
+      if (!gegenkontoNr) {
+        // Kein Gegenkonto → OFFEN (Bankkonto allein reicht nicht!)
         zahlung.zuordnungs_status = 'offen'
       } else {
-        const konto = kontenMap.get(kontoNr)
+        // Gegenkonto ist gesetzt → prüfe Belegpflicht
+        const gegenkontoInfo = kontenMap.get(gegenkontoNr)
         
-        if (!konto || konto.belegpflicht === false) {
+        if (!gegenkontoInfo || gegenkontoInfo.belegpflicht === false) {
+          // Gegenkonto ohne Belegpflicht → ZUGEORDNET
           zahlung.zuordnungs_status = 'zugeordnet'
         } else {
-          const hatBeleg = matchResult.vk_beleg_id || zahlung.zugeordneteRechnung || zahlung.belegId
+          // Gegenkonto mit Belegpflicht → prüfe ob Beleg vorhanden
+          const hatBeleg = zahlung.vk_beleg_id || zahlung.ek_beleg_id || zahlung.belegId || zahlung.zugeordneteRechnung
           zahlung.zuordnungs_status = hatBeleg ? 'zugeordnet' : 'beleg_fehlt'
         }
       }
