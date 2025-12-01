@@ -277,7 +277,7 @@ export default function KlingsporKonfigurator() {
                     <thead>
                       <tr className="border-b">
                         <th className="text-left py-1 text-white font-semibold">VE</th>
-                        <th className="text-right py-1 text-yellow-400 font-semibold">Gesamt-EK</th>
+                        <th className="text-right py-1 text-white font-semibold bg-blue-900/30">Gesamt-EK</th>
                         <th className="text-right py-1 text-white font-semibold">VK/Stück netto</th>
                         <th className="text-right py-1 text-white font-semibold">VK Shop netto</th>
                         <th className="text-right py-1 text-white font-semibold">VK Shop brutto</th>
@@ -287,7 +287,7 @@ export default function KlingsporKonfigurator() {
                       {result.staffelPreise.map((staffel: any) => (
                         <tr key={staffel.ve} className="border-b border-gray-700">
                           <td className="py-1 text-white">{staffel.ve}</td>
-                          <td className="text-right text-yellow-400 font-semibold">{formatEuro(result.ekGesamtMbm * staffel.ve)}</td>
+                          <td className="text-right text-white font-bold bg-blue-900/20">{formatEuro(result.ekGesamtMbm * staffel.ve)}</td>
                           <td className="text-right text-white">{formatEuro(staffel.vk_stueck_netto)}</td>
                           <td className="text-right text-white">{formatEuro(staffel.vk_shop_netto)}</td>
                           <td className="text-right font-semibold text-green-400">{formatEuro(staffel.vk_shop_brutto)}</td>
