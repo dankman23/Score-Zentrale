@@ -17,12 +17,24 @@ import { Db } from 'mongodb'
  * 5. Amazon Settlements (optional später)
  */
 
+// ========== BANKKONTO-MAPPING (Quelle → Zahlungskonto) ==========
+// Diese Konten werden AUTOMATISCH bei Import gesetzt und haben KEINE Belegpflicht
+const BANK_KONTO_MAPPING: Record<string, { konto: string, bezeichnung: string }> = {
+  'Postbank': { konto: '1701', bezeichnung: 'Postbank' },
+  'Commerzbank': { konto: '1802', bezeichnung: 'Commerzbank' },
+  'PayPal': { konto: '1801', bezeichnung: 'PayPal' },
+  'Amazon': { konto: '1825', bezeichnung: 'Amazon Pay' },
+  'eBay': { konto: '1810', bezeichnung: 'eBay Managed Payments' },
+  'Mollie': { konto: '1830', bezeichnung: 'Mollie' },
+  'Bar': { konto: '1600', bezeichnung: 'Kasse' }
+}
+
 // ========== MATCHING-PIPELINE: Inline-Funktionen ==========
 
 interface MatchResult {
   vk_beleg_id?: string
   vk_rechnung_nr?: string
-  konto_id?: string
+  gegenkonto_id?: string  // GEÄNDERT: Das ist das GEGENKONTO (Aufwand/Erlös), NICHT das Bankkonto
   konto_vorschlag_id?: string
   match_source: 'import_vk' | 'auto_vk' | 'auto_konto' | 'auto_bank' | 'manuell' | null
   match_confidence?: number
