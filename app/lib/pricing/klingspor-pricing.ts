@@ -138,8 +138,8 @@ export function calculateKlingsporBeltPrice(
     m2Demand: parseFloat(m2.toFixed(6)),
     pricePer100m2: zpqg_price_per_100m2,
     basicPrice: parseFloat(basicPrice.toFixed(2)),
-    zpsdFactor,
-    zsc2Factor,
+    zpsdFactor: zpsd_factor,
+    zsc2Factor: zsc2_factor,
     glueSurcharge: parseFloat(glueSurcharge.toFixed(2)),
     totalProductSpecific: parseFloat(totalProductSpecific.toFixed(2)),
     salesOrgMultiplier
