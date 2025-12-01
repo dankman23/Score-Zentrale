@@ -104,9 +104,8 @@ export interface ExchangeRate {
 
 // Export data
 export const validEntries: ValidEntry[] = validEntriesData as ValidEntry[]
-export const availableGrits: AvailableGrit[] = availableGritsData as AvailableGrit[]
-export const definitionPh: DefinitionPH[] = definitionPhData as DefinitionPH[]
-export const backing: Backing[] = backingData as Backing[]
+export const backingMap: Record<string, {de: string, en: string}> = backingDataNew as Record<string, {de: string, en: string}>
+export const allTypes: string[] = typesData as string[]
 export const zpqg: ZPQG[] = zpqgData as ZPQG[]
 export const zpsd: ZPSD[] = zpsdData as ZPSD[]
 export const zsc2: ZSC2[] = zsc2Data as ZSC2[]
@@ -114,24 +113,34 @@ export const zsg1: ZSG1[] = zsg1Data as ZSG1[]
 export const zms2: ZMS2[] = zms2Data as ZMS2[]
 export const exchangeRates: ExchangeRate[] = exchangeRatesData as ExchangeRate[]
 
-// Helper: Typen Liste
+// Helper: Typen Liste (ALLE 55 Typen aus der neuen Excel)
 export function getAvailableTypes(): string[] {
-  return [...new Set(validEntries.map(e => e['SaU Type']))].sort()
+  return allTypes
 }
 
 // Helper: Körnungen für Typ
 export function getGritsForType(type: string): number[] {
-  return availableGrits
-    .filter(g => g['SaU Type'] === type)
-    .map(g => g.Korn)
+  const grits = validEntries
+    .filter(e => e['SaU Type'] === type)
+    .map(e => e.Korn)
+    .filter(k => k !== null && k !== undefined)
     .filter((v, i, a) => a.indexOf(v) === i)
     .sort((a, b) => a - b)
+  
+  return grits
 }
 
-// Helper: Backing-Typ
+// Helper: Backing-Typ (verwendet neue backing.json)
 export function getBackingType(type: string): string {
-  const entry = backing.find(b => b.Typ === type)
-  return entry ? entry.UNTERLAGENART : 'Unbekannt'
+  const backingInfo = backingMap[type]
+  if (backingInfo && backingInfo.de) {
+    return backingInfo.de
+  }
+  
+  // Fallback: Regel-basiert
+  if (type.startsWith('PS')) return 'Papier'
+  if (type.startsWith('NBS') || type.startsWith('NBF')) return 'Vlies'
+  return 'Gewebe'
 }
 
 // Helper: Product Hierarchy
