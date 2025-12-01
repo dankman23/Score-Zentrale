@@ -430,11 +430,36 @@ function ZahlungDetailPanel({ zahlung, onClose, onUpdate, zeitraum }) {
   const [saving, setSaving] = useState(false)
   const [rechnungen, setRechnungen] = useState([])
   const [konten, setKonten] = useState([])
-  const [selectedBeleg, setSelectedBeleg] = useState(zahlung.zugeordneteRechnung || '')
-  // FIX: Verwende GEGENKONTO (nicht Bankkonto!)
-  const [selectedKonto, setSelectedKonto] = useState(
-    zahlung.gegenkonto_konto_nr || zahlung.zugeordnetesKonto || zahlung.match_result?.gegenkonto_id || ''
-  )
+  
+  // BELEG: Verwende vk_beleg_id (ID) oder zugeordneteRechnung (Rechnungsnummer) oder match_result
+  const initialBeleg = zahlung.vk_beleg_id 
+    || zahlung.zugeordneteRechnung 
+    || zahlung.match_result?.vk_beleg_id 
+    || zahlung.match_result?.vk_rechnung_nr 
+    || ''
+  const [selectedBeleg, setSelectedBeleg] = useState(initialBeleg)
+  
+  // GEGENKONTO: Verwende gegenkonto_konto_nr (neues Feld) oder alte Felder
+  const initialKonto = zahlung.gegenkonto_konto_nr 
+    || zahlung.zugeordnetesKonto 
+    || zahlung.match_result?.gegenkonto_id 
+    || ''
+  const [selectedKonto, setSelectedKonto] = useState(initialKonto)
+
+  // Debugging: Zeige was gesetzt wurde
+  useEffect(() => {
+    console.log('[Detail Panel] Zahlung:', {
+      betrag: zahlung.betrag,
+      verwendungszweck: zahlung.verwendungszweck,
+      gegenkonto_konto_nr: zahlung.gegenkonto_konto_nr,
+      zugeordnetesKonto: zahlung.zugeordnetesKonto,
+      zugeordneteRechnung: zahlung.zugeordneteRechnung,
+      vk_beleg_id: zahlung.vk_beleg_id,
+      match_result: zahlung.match_result,
+      selectedKonto: initialKonto,
+      selectedBeleg: initialBeleg
+    })
+  }, [])
 
   useEffect(() => {
     loadRechnungen()
