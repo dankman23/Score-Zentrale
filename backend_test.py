@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 """
-Backend Testing Script for Amazon Bulletpoints Batch-Verarbeitung APIs
-Tests the newly implemented batch generation and CSV download APIs
+Klingspor Price Configurator Backend Testing
+Comprehensive test suite for POST /api/pricing/konfigurator
 """
 
 import requests
 import json
-import time
-import csv
-import io
-from typing import Dict, List, Any
+import sys
+from typing import Dict, Any, List
 
-# Configuration
+# Backend URL from environment
 BASE_URL = "https://klingspor-config.preview.emergentagent.com"
-API_BASE = f"{BASE_URL}/api"
+API_URL = f"{BASE_URL}/api/pricing/konfigurator"
 
-class AmazonBulletpointsAPITester:
+def test_api_call(payload: Dict[str, Any], test_name: str) -> Dict[str, Any]:
     def __init__(self):
         self.session = requests.Session()
         self.session.headers.update({
