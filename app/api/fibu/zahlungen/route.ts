@@ -170,6 +170,7 @@ export async function GET(request: NextRequest) {
     const from = searchParams.get('from')
     const to = searchParams.get('to')
     const anbieter = searchParams.get('anbieter') // z.B. 'paypal', 'commerzbank', 'all'
+    const statusFilter = searchParams.get('statusFilter') // 'alle' | 'zugeordnet' | 'beleg_fehlt' | 'offen'
     const page = parseInt(searchParams.get('page') || '1')
     const pageSize = parseInt(searchParams.get('pageSize') || '500')
     const limit = parseInt(searchParams.get('limit') || '0') // 0 = kein Limit (alle laden)
