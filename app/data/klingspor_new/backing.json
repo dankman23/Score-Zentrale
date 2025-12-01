@@ -1,0 +1,806 @@
+{
+  "CS 308 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 310 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 310 XF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 311 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 320 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 321 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 322 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 325 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 326 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 329 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 330 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 333 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 333 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 333 XF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 336 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 341 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 409 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 410 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 411 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 411 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 412 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 416 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 420 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 538 Z": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 631 XF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 710 XF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 729 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 811 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 920 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 922 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 931 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "GX 533 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "GX 712 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "GX 931 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "LS 309 J": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "LS 309 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "LS 309 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "LS 309 XH": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "LS 312 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "LS 313 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "LS 314 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "LS 318 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "PS 20 F": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 20 FW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 21 F": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 22 F": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 24 F": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 27 DW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 28 F": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 29 F": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 38 G": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 524 E": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 529 F": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 61 F": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 729 F": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "FP 73 W": {
+    "de": "Film",
+    "en": "Film"
+  },
+  "NBF 800": {
+    "de": "Vlies",
+    "en": "Non Woven"
+  },
+  "NBS 800": {
+    "de": "Vlies",
+    "en": "Non Woven"
+  },
+  "LS 912 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "PS 726 F": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "CS 911 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 913 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 310 XA": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 310 XS": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 311 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 323 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 326 YK": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 326 YY": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 327 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 329 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 330 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 333 J": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 355 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 377 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 395 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 396 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 411 XK": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 411 XS": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 411 YY": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 416 YY": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 417 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 448 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 450 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 451 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 455 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 461 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 480 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 520 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 538 ZZ": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 539 Z": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 555 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 757 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 905 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 910 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 912 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 920 YK": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 922 YY": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 950 Y": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "CS 959 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "FP 73 WK": {
+    "de": "Film",
+    "en": "Film"
+  },
+  "FP 77": {
+    "de": "Film",
+    "en": "Film"
+  },
+  "FP 77 K": {
+    "de": "Film",
+    "en": "Film"
+  },
+  "FP 77 S": {
+    "de": "Film",
+    "en": "Film"
+  },
+  "GX 514 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "KL 361 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "KL 371 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "KL 375 J": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "KL 381 J": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "KL 385 JF": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "LS 307 X": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "LS 309XHK": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "LS 314 J": {
+    "de": "Gewebe",
+    "en": "Cloth"
+  },
+  "PL 16 E": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PL 28 C": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PL 28 CK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PL 31 B": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PL 712 AW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PL 713 E": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 11 A": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 11 AK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 11 AW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 11 C": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 18": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 18 E": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 18 EK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 19 E": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 19 EK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 19 F": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 19 FK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 2000 F": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 21 FK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 22 E": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 22 K": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 22 N": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 26 F": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 28 FS": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 29 FS": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 30 D": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 30 DK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 32 B": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 33 B": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 33 BF": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 33 BK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 33 BS": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 33 BW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 33 BWC": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 33 BWK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 33 C": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 33 CC": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 33 CF": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 33 CK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 33 CS": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 33BWCK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 35 BW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 35 CW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 36 C": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 36 CK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 36 D": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 36 DK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 44 E": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 46 E": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 48 D": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 514 A": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 61 FK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 73 BW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 73 BWC": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 73 BWK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 73 BWS": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 73 CW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 73 CWK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 77 C": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 77 CK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 77 CS": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 8 A": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 8 AK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 8 C": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 86 C": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 86 CC": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "PS 9 C": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "VP 73 CW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "VP 73 CWK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 244 BW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 244 CW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 244BWK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 244CWK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 55 B": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 55 BK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 55 C": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 55 CK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 733 BW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 733 CW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 733BWK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 733CWK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 836 C": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 836 CK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 836 D": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 836 DK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 994 CW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 994 DW": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 994CWK": {
+    "de": "Papier",
+    "en": "Paper"
+  },
+  "WP 994DWK": {
+    "de": "Papier",
+    "en": "Paper"
+  }
+}
