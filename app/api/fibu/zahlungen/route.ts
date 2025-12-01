@@ -587,7 +587,7 @@ export async function GET(request: NextRequest) {
       // 4. Manuell (überschreibt alles)
       if (zahlung.istZugeordnet && zahlung.zugeordnetesKonto && !matchResult.vk_beleg_id) {
         matchResult = {
-          konto_id: zahlung.zugeordnetesKonto,
+          gegenkonto_id: zahlung.zugeordnetesKonto,  // GEGENKONTO
           match_source: 'manuell',
           match_confidence: 100,
           match_details: 'Manuelle Zuordnung'
