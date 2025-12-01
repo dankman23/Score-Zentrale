@@ -454,7 +454,8 @@ export async function GET(request: NextRequest) {
           // NEUE FELDER: Klare Trennung Bankkonto / Gegenkonto
           bank_konto_nr: bankKontoInfo.konto,  // Zahlungskonto (aus Quelle, read-only)
           bank_konto_bezeichnung: bankKontoInfo.bezeichnung,
-          gegenkonto_konto_nr: p.gegenkonto_konto_nr || autoGegenkonto || null,  // Das EIGENTLICHE Buchungskonto (editierbar)
+          // WICHTIG: Auto-Gegenkonto MUSS vor DB-Wert kommen, damit Auto-Zuordnung funktioniert!
+          gegenkonto_konto_nr: autoGegenkonto || p.gegenkonto_konto_nr || p.zugeordnetesKonto || null,  // Das EIGENTLICHE Buchungskonto (editierbar)
           
           // Beschreibung & Details
           verwendungszweck,
