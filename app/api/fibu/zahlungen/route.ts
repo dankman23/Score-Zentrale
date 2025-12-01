@@ -306,21 +306,21 @@ export async function GET(request: NextRequest) {
           sku = p.sku || ''
           transaktionsId = p.transactionId || ''
           
-          // AUTO-ZUORDNUNG für Amazon basierend auf amountType (nur wenn noch kein Gegenkonto manuell gesetzt)
-          if (!p.gegenkonto_konto_nr && !p.zugeordnetesKonto) {
-            const amountTypeKey = (p.amountType || '').split('/').pop() // z.B. "Order/ItemPrice/Principal" → "Principal"
-            
-            if (amountTypeKey === 'Principal' || p.amountType?.includes('ItemPrice')) {
-              autoZugeordnet = true
-              autoGegenkonto = '69001'  // Umsatzerlöse
-              autoZuordnungsArt = 'Amazon Erlös (Principal)'
-            } else if (amountTypeKey === 'Commission' || p.amountType?.includes('ItemFees/Commission')) {
-              autoZugeordnet = true
-              autoGegenkonto = '6770'  // Amazon Kommission
-              autoZuordnungsArt = 'Amazon Gebühr (Kommission)'
-              // Steuerschlüssel 401: Voller Vorsteuerabzug
-              p.steuerschluessel = '401'
-            } else if (amountTypeKey === 'Shipping' || p.amountType?.includes('Shipping')) {
+          // AUTO-ZUORDNUNG für Amazon basierend auf amountType
+          // WICHTIG: IMMER ausführen, um alte falsche Zuordnungen zu korrigieren!
+          const amountTypeKey = (p.amountType || '').split('/').pop() // z.B. "Order/ItemPrice/Principal" → "Principal"
+          
+          if (amountTypeKey === 'Principal' || p.amountType?.includes('ItemPrice')) {
+            autoZugeordnet = true
+            autoGegenkonto = '69001'  // Umsatzerlöse
+            autoZuordnungsArt = 'Amazon Erlös (Principal)'
+          } else if (amountTypeKey === 'Commission' || p.amountType?.includes('ItemFees/Commission')) {
+            autoZugeordnet = true
+            autoGegenkonto = '6770'  // Amazon Kommission
+            autoZuordnungsArt = 'Amazon Gebühr (Kommission)'
+            // Steuerschlüssel 401: Voller Vorsteuerabzug
+            p.steuerschluessel = '401'
+          } else if (amountTypeKey === 'Shipping' || p.amountType?.includes('Shipping')) {
               autoZugeordnet = true
               autoGegenkonto = '4800'  // Versanderlöse
               autoZuordnungsArt = 'Amazon Versand'
