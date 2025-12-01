@@ -76,15 +76,19 @@ export async function POST(request: NextRequest) {
     // 4. Gesamt-EK
     const ekGesamtMbm = stueckEk * mbm
 
-    // 5. Score-Preisformel anwenden
+    // 5. Score-Preisformel anwenden - WICHTIG: Mit Gesamt-EK für MBM, nicht pro Stück!
+    // Die "Alte PB → Alle Konfektionen" nimmt den Gesamt-EK als Input
     const priceFormulaResult = calculateScoreSellingPrices({
-      ek: stueckEk
-      // Verwendet Default-Regler für "Alte PB - Alle Konfektionen"
+      ek: ekGesamtMbm,  // 33,90 € (nicht 2,26 €!)
+      // Staffeln sind dann Vielfache der MBM: VE 1 = 1×MBM, VE 3 = 3×MBM, etc.
+      ve_staffeln: [1, 3, 5, 10, 25, 50, 100, 300]
     })
 
-    // 6. VK für MBM
-    const vkMbmNetto = priceFormulaResult.vkStueckNetto * mbm
-    const vkMbmBrutto = priceFormulaResult.vkStueckBrutto * mbm
+    // 6. VK pro Stück = Gesamt-VK / MBM
+    const vkStueckNetto = priceFormulaResult.vkStueckNetto / mbm
+    const vkStueckBrutto = priceFormulaResult.vkStueckBrutto / mbm
+    const vkMbmNetto = priceFormulaResult.vkStueckNetto
+    const vkMbmBrutto = priceFormulaResult.vkStueckBrutto
 
     const response: KonfiguratorResponse = {
       manufacturer: 'Klingspor',
