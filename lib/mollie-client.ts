@@ -27,8 +27,9 @@ export class MollieClient {
     // Token läuft in weniger als 5 Minuten ab
     if (Date.now() > this.tokenExpiry - 300000 && this.config.refreshToken) {
       try {
-        // Mollie OAuth2 Token Refresh
-        const response = await fetch('https://api.mollie.com/oauth2/tokens', {
+        // Mollie OAuth2 Token Refresh (configurable via env var)
+        const mollieTokenUrl = process.env.MOLLIE_TOKEN_URL || 'https://api.mollie.com/oauth2/tokens'
+        const response = await fetch(mollieTokenUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
