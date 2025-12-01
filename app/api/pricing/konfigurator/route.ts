@@ -108,7 +108,14 @@ export async function POST(request: NextRequest) {
       vkMbmNetto: parseFloat(vkMbmNetto.toFixed(2)),
       vkMbmBrutto: parseFloat(vkMbmBrutto.toFixed(2)),
 
-      staffelPreise: priceFormulaResult.staffelPreise,
+      // Staffelpreise: Umrechnen auf pro-Stück-Basis
+      staffelPreise: priceFormulaResult.staffelPreise.map(sp => ({
+        ve: sp.ve,
+        vk_stueck_netto: parseFloat((sp.vk_stueck_netto / mbm).toFixed(2)),
+        vk_plattform_netto: parseFloat((sp.vk_plattform_netto / mbm).toFixed(2)),
+        vk_shop_netto: parseFloat((sp.vk_shop_netto / mbm).toFixed(2)),
+        vk_shop_brutto: parseFloat((sp.vk_shop_brutto / mbm).toFixed(2))
+      })),
 
       debug: {
         klingsporCalculation: {
