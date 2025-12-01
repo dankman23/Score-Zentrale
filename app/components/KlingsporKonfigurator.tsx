@@ -276,21 +276,21 @@ export default function KlingsporKonfigurator() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-left py-2">VE</th>
-                        <th className="text-right py-2">VK/Stück netto</th>
-                        <th className="text-right py-2">VK Plattform</th>
-                        <th className="text-right py-2">VK Shop netto</th>
-                        <th className="text-right py-2">VK Shop brutto</th>
+                        <th className="text-left py-2 text-gray-300">VE</th>
+                        <th className="text-right py-2 text-gray-300">VK/Stück netto</th>
+                        <th className="text-right py-2 text-gray-300">VK Plattform</th>
+                        <th className="text-right py-2 text-gray-300">VK Shop netto</th>
+                        <th className="text-right py-2 text-gray-300">VK Shop brutto</th>
                       </tr>
                     </thead>
                     <tbody>
                       {result.staffelPreise.map((staffel: any) => (
                         <tr key={staffel.ve} className="border-b">
-                          <td className="py-2">{staffel.ve}</td>
-                          <td className="text-right">{formatEuro(staffel.vk_stueck_netto)}</td>
-                          <td className="text-right">{formatEuro(staffel.vk_plattform_netto)}</td>
-                          <td className="text-right">{formatEuro(staffel.vk_shop_netto)}</td>
-                          <td className="text-right font-semibold">{formatEuro(staffel.vk_shop_brutto)}</td>
+                          <td className="py-2 text-gray-300">{staffel.ve}</td>
+                          <td className="text-right text-gray-300">{formatEuro(staffel.vk_stueck_netto)}</td>
+                          <td className="text-right text-gray-300">{formatEuro(staffel.vk_plattform_netto)}</td>
+                          <td className="text-right text-gray-300">{formatEuro(staffel.vk_shop_netto)}</td>
+                          <td className="text-right font-semibold text-gray-100">{formatEuro(staffel.vk_shop_brutto)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -305,7 +305,7 @@ export default function KlingsporKonfigurator() {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm">🔍 Debug-Informationen</CardTitle>
+                  <CardTitle className="text-sm text-white">🔍 Debug-Informationen</CardTitle>
                   <Button
                     variant="ghost"
                     size="sm"
