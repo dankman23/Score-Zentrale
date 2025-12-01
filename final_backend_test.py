@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime
 
 # Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://fibu-master.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://klingspor-config.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def test_get_kpis():

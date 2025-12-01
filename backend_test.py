@@ -12,7 +12,7 @@ import io
 from typing import Dict, List, Any
 
 # Configuration
-BASE_URL = "https://fibu-master.preview.emergentagent.com"
+BASE_URL = "https://klingspor-config.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class AmazonBulletpointsAPITester:

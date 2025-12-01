@@ -1,92 +1,105 @@
 <analysis>
-My analysis of the trajectory reveals a complex, multi-phase development process for a Score-Zentrale financial accounting (FIBU) module. The project's goal is to emulate Lexoffice functionality, focusing on UI/UX, data integrity, and performance.
+The trajectory documents an extensive development process, starting with a critical bug fix in a financial accounting (FIBU) module and transitioning to a new, complex feature. The initial phase involved a deep-dive debugging of a Belegpflicht (document obligation) feature. The core issue was data inconsistency between two MongoDB collections ( and ) and missing fields in the database, which was resolved through multiple iterations of migration scripts and API logic corrections.
 
-The work began with UI refactoring, consolidating tabs and starting a Master-Detail layout. A significant portion of the effort was then spent on backend bug-fixing, including date/source filtering and performance optimization via pagination for transaction loading.
+Following the fix, the focus shifted to a major refactoring of the transaction assignment logic. The user mandated a sophisticated, backend-driven matching pipeline to replace simple frontend logic. This involved several iterations to enhance performance by caching data, correcting flawed business logic (distinguishing between bank and debtor accounts), and implementing server-side filtering for performance and correctness. The work was highly iterative, with the user providing detailed, precise feedback to correct business logic flaws.
 
-A major pivot occurred with the introduction of a sophisticated, account-based Belegpflicht (document obligation) system to determine a transaction's status (open, document missing, assigned). This required extensive changes to the data model, backend APIs, and frontend components.
+The final phase pivoted to a completely new feature: a Klingspor Price Configurator. This involved converting an Excel file to JSON data and scaffolding the necessary API routes and frontend components to build a tool that calculates purchase prices and reuses existing logic to determine selling prices. The work on this new feature is in its initial stages.
 
-The implementation of this feature was fraught with persistent and difficult-to-diagnose bugs. The root cause was eventually identified as the existence of two separate MongoDB collections ( and ), with the migration scripts updating one while the API was reading from the other. Although a final script was created to update both collections and the database state appears correct, the user's last message indicates the frontend UI is still displaying the incorrect  status for all accounts. This is the immediate problem to be solved.
-
-The user primarily communicates in **German**. All future responses should be in German.
+The user's primary language is **German**. All future interactions must be in German.
 </analysis>
 
 <product_requirements>
-The primary objective is to build a comprehensive, automated financial accounting (FIBU) module inspired by Lexoffice.
+The project involves two main components: a Financial Accounting (FIBU) module and a Price Configurator.
 
-**Core Features & Requirements:**
-1.  **UI/UX:** A 6-tab structure (Übersicht, EK-Belege, VK-Belege, Umsätze, Zuordnung, Einstellungen) with a full-width, Master-Detail layout for transactions and invoices.
-2.  **Account-Based Assignment Logic:** The system must move away from simple categories to a Belegpflicht (document obligation) model. This boolean flag, set per account in the chart of accounts (SKR04), determines a transaction's status:
-    *   ** (assigned):** If the linked account does not require a document, or if it does and one is attached.
-    *   ** (document missing):** If the linked account requires a document, but none is attached.
-    *   ** (open):** If no account is assigned.
-3.  **Data Integrity:** User-made assignments must be persistent and never overwritten by automated syncs.
-4.  **Performance:** The UI must be responsive, with slow operations like loading thousands of transactions optimized via backend pagination.
-5.  **Data Import:** The system handles data from JTL, email, and payment providers (PayPal, Amazon, etc.).
-6.  **DATEV Export:** A pending core requirement is to implement a CSV export compatible with 10it/Addison software.
+**1. FIBU Module (Inspired by Lexoffice):**
+The goal is to create a robust accounting module for managing financial transactions.
+- **Account-Based Assignment:** The core logic is Belegpflicht (document obligation), a boolean flag on each account in the chart of accounts. This flag, combined with the presence of a linked document (invoice), determines a transaction's status:  (assigned),  (document missing), or  (open).
+- **Backend-Driven Matching Pipeline:** All assignment logic must reside in the backend. It should prioritize pre-existing matches from the JTL ERP system (), perform automated matching based on rules (), and suggest accounts for unassigned transactions (). The UI is purely for display and manual overrides.
+- **Performance & Usability:** The application must handle thousands of transactions efficiently, using server-side pagination and filtering. The UI should provide clear status indicators and filtering options.
+
+**2. Price Configurator:**
+A new tool under the Preise section to calculate pricing for Klingspor abrasive belts.
+- **UI:** A Konfigurator tab with a form for , , , and .
+- **Backend Logic:** An API that takes the configuration, uses logic derived from a provided Excel sheet to calculate the purchase price (EK) and Minimum Order Quantity (MBM), and then reuses the application's existing price formula service to calculate the final selling prices (VK), including platform and tiered pricing.
 </product_requirements>
 
 <key_technical_concepts>
 - **Framework:** Next.js (App Router), React
-- **UI:** Shadcn/UI, Tailwind CSS, Master-Detail layout pattern.
-- **Database:** MongoDB. A critical issue was discovered involving two collections (, ) holding similar data, causing data inconsistency.
-- **Data Logic:**
-  - **Account-Based Belegpflicht:** The core business logic for transaction assignment status, managed via a boolean  field on each account.
-  - **Data Migration:** Node.js scripts were used to add and correct the  field across the chart of accounts.
+- **UI:** Shadcn/UI, Tailwind CSS, Master-Detail Layout
+- **Backend:** Next.js API Routes (TypeScript)
+- **Database:** MongoDB
+- **Core Business Logic (FIBU):**
+    - **Belegpflicht:** Account-level boolean flag controlling transaction status.
+    - **Matching Pipeline:** Multi-stage, backend-driven logic to automatically assign transactions (, , , ).
+- **Data Processing:**
+    - **Data Migration:** Node.js scripts for database schema updates and data correction.
+    - **Excel to JSON:** Python script used to parse an  file and convert sheets into JSON for the pricing calculator.
 </key_technical_concepts>
 
 <code_architecture>
-The application is a Next.js monolith. The architecture relies on a backend API layer to serve data from MongoDB to the React frontend. A significant architectural challenge was the discovery and remediation of a duplicate database collection.
+The application is a Next.js monolith with a server-side API layer communicating with a MongoDB database. The logic has been progressively moved from the frontend to backend services for correctness and performance.
 
-**Directory Structure:**
+**Directory Structure (Key Files):**
 
 
 **File Analysis:**
 
 -   ****
-    -   **Importance:** The central API for fetching and processing all financial transactions (Umsätze).
-    -   **Changes:** Heavily modified to implement pagination, fixing a major performance bottleneck. Implemented complex filtering logic for date ranges and payment sources. Crucially, it was updated to calculate the new  (offen, beleg_fehlt, zugeordnet) for each transaction based on the  of the assigned account.
+    -   **Importance:** The most critical backend endpoint. It fetches transactions, applies the complex multi-stage matching pipeline, calculates the  for each payment, and handles server-side filtering and pagination.
+    -   **Changes:** This file has been heavily refactored. Legacy logic was removed, and a new, optimized matching pipeline was added directly into the file to avoid import issues. It now caches chart of accounts and invoices to improve performance. Server-side filtering by status (, , etc.) was also implemented here.
 
 -   ****
-    -   **Importance:** Serves the chart of accounts (Kontenplan) to the frontend.
-    -   **Changes:** This file was the source of a major bug. It was hardcoded to read from the old  collection, while migration scripts were writing to . It was also updated to handle POST/PUT requests for updating the  toggle.
+    -   **Importance:** Handles manual transaction assignments from the UI.
+    -   **Changes:** Updated to set  and correctly update the  and  upon user save.
 
 -   ****
-    -   **Importance:** The main UI for viewing and managing transactions.
-    -   **Changes:** The layout was refactored to be full-width with a slide-in detail panel. Pagination controls were added. The transaction rows are now color-coded based on their , and the UI includes filters for this status.
+    -   **Importance:** The primary UI for viewing and interacting with transactions.
+    -   **Changes:** Modified to send the new  parameter to the backend API instead of filtering on the client. UI was enhanced to display  tags (e.g., JTL, Auto, Manuell) and a detailed Match-Informationen block in the detail panel.
 
 -   ****
-    -   **Importance:** Displays the chart of accounts and allows managing the  for each account.
-    -   **Changes:** A Belegpflicht column with a toggle switch was added. This component is at the center of the current unresolved issue, as it incorrectly displays all accounts as having , despite database and API corrections.
+    -   **Importance:** A critical migration script that corrected a major flaw in business logic.
+    -   **Changes:** It sets  for all debtor accounts (69xxx) and  for all bank/payment accounts (1xxx). This was crucial for the correct calculation of the .
 
--   ****
-    -   **Importance:** The definitive migration script created after a long debugging process.
-    -   **Changes:** This script contains the final business logic for . It ensures required system accounts exist and correctly sets the  flag to  or  in **both** the  and  collections, resolving the data inconsistency. It was renamed from .
+-   **** & ****
+    -   **Importance:** These are new files that build the frontend for the Price Configurator feature.
+    -   **Changes:** Created to provide a two-tab layout (Preisberechnung and Konfigurator).  contains the form for user inputs and the structure for displaying calculation results.
 
--   ** & **
-    -   **Importance:** Part of the code cleanup.
-    -   **Changes:** Old, obsolete migration scripts were moved to the archive, and a README was created for the final script. The old  collection was also renamed in the database to .
+-   **** & ****
+    -   **Importance:** The new backend for the price configurator.
+    -   **Changes:**  and  were created to encapsulate the logic from the user-provided Excel file.  was created to extract and reuse the existing selling price calculation logic. The  file orchestrates these services. The implementation is currently a scaffold and needs to be filled out.
 </code_architecture>
 
 <pending_tasks>
-- **10it/DATEV Export:** Implement the CSV export functionality for financial data.
-- **UI Consistency:** Implement the Master-Detail layout for the EK-Belege and VK-Belege tabs to match the Umsätze tab.
-- **eBay Integration:** The integration is non-functional and requires investigation (likely related to OAuth 2.0 token issues).
-- **Create Project Documentation:** The user's original request for a  to be created before forking is still pending.
+- **Complete Klingspor Price Configurator:** The main pending task is the full implementation of the API logic and connecting it to the frontend for the Klingspor configurator.
+- **Unit Tests:** Add unit tests for the Klingspor pricing logic to verify its correctness against the source Excel file.
+- **Older Pending Tasks:**
+    - Implement 10it/DATEV CSV export.
+    - Investigate and fix the non-functional eBay integration.
+    - Create general project documentation (README.md).
 </pending_tasks>
 
 <current_work>
-The most recent work was an intense and prolonged debugging effort to correctly implement the **account-based  (document obligation) feature**.
+The work has just pivoted from refining the FIBU module to starting a brand new **Klingspor Price Configurator** feature. The last actions taken were to set up the complete file structure for this new feature, based on a detailed user prompt.
 
-This involved multiple iterations of creating and running database migration scripts to add and set a  boolean flag on each account in the chart of accounts. The core problem was a series of cascading failures:
-1.  Initial migrations used incorrect data types (number vs. string) for account classes.
-2.  The frontend UI () failed to display the correct  status.
-3.  The root cause was discovered: the existence of two separate MongoDB collections,  (old, used by the API) and  (new, updated by scripts).
+**1. Data Conversion:** The AI engineer successfully converted the required sheets from the user-provided  file into JSON data, which was then used to create a TypeScript data file:
+    - ****: Contains the raw data (valid entries, grits, pricing factors) from the Excel file.
 
-A final, robust script () was created to ensure specific system accounts exist and to correctly set the  flag in **both** collections, effectively synchronizing them. The script's verification logs confirm the data in the database is now correct.
+**2. Backend Scaffolding:** The backend logic was broken down into services and an API route. The files were created but the logic within them is largely placeholder:
+    - ****: A service file intended to hold the core calculation logic that mimics the Excel sheet.
+    - ****: A new helper file created to extract the existing selling-price calculation logic from  so it can be reused.
+    - ****: The new API endpoint that will receive configurator inputs and orchestrate calls to the pricing services.
 
-However, despite these backend and data fixes, the very last user message and screenshot confirm that the frontend UI in  is **still incorrectly showing all accounts as having **. The work was paused at this exact point, with the immediate task being to resolve this final frontend display bug.
+**3. Frontend Scaffolding:** The UI was laid out with a new tabbed navigation and a dedicated component for the configurator:
+    - ****: The main page, updated to include a top-level tab component to switch between the existing Preisberechnung and the new Konfigurator.
+    - ****: A new component containing the form for user inputs (Type, Grit, Width, Length) and the result display area.
+
+The immediate work was paused just before the user asked to fork, with the next logical step being to populate these newly created files with their respective logic and connect the frontend to the backend API.
 </current_work>
 
 <optional_next_step>
-Investigate and fix the  component to correctly display the  status from the API, which is now believed to be serving the correct data from the  collection.
+Continue the implementation of the Klingspor Price Configurator by populating the API route () and the newly created service files in  with the complete business logic.
 </optional_next_step>
+
+<direct_quotes>
+User's last explicit instruction for the next step: Ja, bitte mach jetzt mit **API-Route und Frontend** weiter. Deine Phase-1-Basis ist perfekt, jetzt hätte ich gern die komplette Umsetzung wie besprochen.
+</direct_quotes>
