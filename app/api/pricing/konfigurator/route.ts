@@ -108,13 +108,16 @@ export async function POST(request: NextRequest) {
       vkMbmNetto: parseFloat(vkMbmNetto.toFixed(2)),
       vkMbmBrutto: parseFloat(vkMbmBrutto.toFixed(2)),
 
-      // Staffelpreise: Umrechnen auf pro-Stück-Basis
+      // Staffelpreise: Bereits pro-Stück-Basis (Formel berechnet mit EK × VE)
+      // vk_stueck_netto ist der Preis PRO VE, nicht pro Stück!
+      // Eine VE = 1 MBM = 15 Stück
+      // Für Anzeige: Preis pro Stück = vk_netto / (ve × mbm)
       staffelPreise: priceFormulaResult.staffelPreise.map(sp => ({
         ve: sp.ve,
-        vk_stueck_netto: parseFloat((sp.vk_stueck_netto / mbm).toFixed(2)),
-        vk_plattform_netto: parseFloat((sp.vk_plattform_netto / mbm).toFixed(2)),
-        vk_shop_netto: parseFloat((sp.vk_shop_netto / mbm).toFixed(2)),
-        vk_shop_brutto: parseFloat((sp.vk_shop_brutto / mbm).toFixed(2))
+        vk_stueck_netto: parseFloat((sp.vk_stueck_netto / (sp.ve * mbm)).toFixed(2)),
+        vk_plattform_netto: parseFloat((sp.vk_plattform_netto / (sp.ve * mbm)).toFixed(2)),
+        vk_shop_netto: parseFloat((sp.vk_shop_netto / (sp.ve * mbm)).toFixed(2)),
+        vk_shop_brutto: parseFloat((sp.vk_shop_brutto / (sp.ve * mbm)).toFixed(2))
       })),
 
       debug: {
