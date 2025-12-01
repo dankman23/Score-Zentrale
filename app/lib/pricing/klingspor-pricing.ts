@@ -110,13 +110,8 @@ export function calculateKlingsporBeltPrice(
     (rollWidthSurcharge * m2 / 100) +
     (glueSurcharge / 100)
   
-  // 11. ZMS2 - Sales Org Multiplikator (in Prozent) - Excel: C16 = VLOOKUP(...)/100
-  const zms2Entry = zms2.find(
-    z => z.Verkaufsorganisation === salesOrg && 
-         z.Produkthierarchie === ph &&
-         z['SaU Type'] === type
-  )
-  const salesOrgMultiplier = zms2Entry ? (zms2Entry.Konditionsbetrag / 100) : 0  // z.B. 2.94
+  // 11. ZMS2 - Sales Org Multiplikator - Excel: C16 = VLOOKUP(I2&" "&F2&" "&B2,ZMS2!$A:$I,9,FALSE)/100
+  const salesOrgMultiplier = getSalesOrgMultiplier(salesOrg, ph, type)  // z.B. 2.9403
   
   // 12. Listenpreis in EUR - Excel: C17 = (C16+1)*C15
   const listPrice = (salesOrgMultiplier + 1) * totalProductSpecific
