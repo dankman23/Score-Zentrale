@@ -4,8 +4,20 @@ let transporter: any = null
 
 export function getEmailTransporter() {
   // Nicht cachen - immer neu erstellen für korrekte Config
+  // SMTP Host jetzt ohne Fallback - muss als Umgebungsvariable gesetzt werden
+  const smtpHost = process.env.SMTP_HOST
+  
+  if (!smtpHost) {
+    console.warn('[Email] SMTP_HOST nicht gesetzt - Email-Versand deaktiviert')
+    // Erstelle einen "dummy" transporter der nicht sendet
+    return nodemailer.createTransport({
+      streamTransport: true,
+      newline: 'unix'
+    })
+  }
+  
   transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'mail.agenturserver.de',
+    host: smtpHost,
     port: parseInt(process.env.SMTP_PORT || '587'),
     secure: process.env.SMTP_SECURE === 'true', // false für Port 587
     auth: {
