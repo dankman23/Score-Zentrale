@@ -14,37 +14,37 @@ BASE_URL = "https://klingspor-config.preview.emergentagent.com"
 API_URL = f"{BASE_URL}/api/pricing/konfigurator"
 
 def test_api_call(payload: Dict[str, Any], test_name: str) -> Dict[str, Any]:
-    def __init__(self):
-        self.session = requests.Session()
-        self.session.headers.update({
-            'Content-Type': 'application/json',
-            'User-Agent': 'Backend-Tester/1.0'
-        })
+    """Make API call and return response"""
+    print(f"\n🧪 {test_name}")
+    print(f"📤 Request: {json.dumps(payload, indent=2)}")
+    
+    try:
+        response = requests.post(API_URL, json=payload, timeout=30)
+        print(f"📊 Status: {response.status_code}")
         
-    def log(self, message: str, level: str = "INFO"):
-        """Log messages with timestamp"""
-        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-        print(f"[{timestamp}] [{level}] {message}")
-        
-    def test_batch_generate_api(self) -> Dict[str, Any]:
-        """Test POST /api/amazon/bulletpoints/batch/generate"""
-        self.log("=== TESTING BATCH GENERATE API ===")
-        results = {}
-        
-        # Test 1: Batch mit kArtikel Array (3-5 Artikel)
-        self.log("Test 1: Batch mit kArtikel Array (3-5 Artikel)")
-        try:
-            # Get some article IDs first
-            articles_response = self.session.get(f"{API_BASE}/jtl/articles/list?limit=5")
-            if articles_response.status_code == 200:
-                articles_data = articles_response.json()
-                if articles_data.get('ok') and articles_data.get('articles'):
-                    artikel_ids = [article['kArtikel'] for article in articles_data['articles'][:3]]
-                    self.log(f"Using article IDs: {artikel_ids}")
-                    
-                    # Test batch generation
-                    payload = {"kArtikel": artikel_ids}
-                    response = self.session.post(f"{API_BASE}/amazon/bulletpoints/batch/generate", json=payload)
+        if response.headers.get('content-type', '').startswith('application/json'):
+            result = response.json()
+            print(f"📥 Response: {json.dumps(result, indent=2)}")
+            return {
+                'status_code': response.status_code,
+                'data': result,
+                'success': response.status_code == 200 and result.get('ok') == True
+            }
+        else:
+            print(f"❌ Non-JSON response: {response.text[:500]}")
+            return {
+                'status_code': response.status_code,
+                'data': {'error': 'Non-JSON response'},
+                'success': False
+            }
+            
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Request failed: {str(e)}")
+        return {
+            'status_code': 0,
+            'data': {'error': str(e)},
+            'success': False
+        }
                     
                     self.log(f"Response Status: {response.status_code}")
                     if response.status_code == 200:
