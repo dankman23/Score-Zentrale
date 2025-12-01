@@ -10,7 +10,7 @@ import sys
 from typing import Dict, Any, List
 
 # Backend URL from environment
-BASE_URL = "https://klingspor-config.preview.emergentagent.com"
+BASE_URL = "https://klingspor-pricing.preview.emergentagent.com"
 API_URL = f"{BASE_URL}/api/pricing/konfigurator"
 
 def test_api_call(payload: Dict[str, Any], test_name: str) -> Dict[str, Any]:

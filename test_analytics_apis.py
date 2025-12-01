@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Base URL from environment
-BASE_URL = "https://klingspor-config.preview.emergentagent.com/api"
+BASE_URL = "https://klingspor-pricing.preview.emergentagent.com/api"
 
 # Test date range
 START_DATE = "30daysAgo"
