@@ -147,8 +147,19 @@ export function getBackingType(type: string): string {
   return 'Gewebe'
 }
 
-// Helper: Product Hierarchy
+// Helper: Product Hierarchy (verwendet definition_ph.json mit Fallback)
 export function getProductHierarchy(type: string): number | null {
+  // Prüfe phMap zuerst (vollständige Abdeckung aller 55 Typen)
+  if (phMap[type]) {
+    return phMap[type]
+  }
+  
+  // Fallback: validEntries
   const entry = validEntries.find(e => e['SaU Type'] === type)
-  return entry ? entry.PH : null
+  if (entry && entry.PH) {
+    return entry.PH
+  }
+  
+  // Letzter Fallback: Standard PH für coat.abras.standard belts
+  return 10200101
 }
