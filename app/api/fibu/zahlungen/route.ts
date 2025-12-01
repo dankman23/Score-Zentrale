@@ -88,50 +88,16 @@ async function getAutoVkMatch(zahlung: any, rechnungenCache: Map<string, any>): 
   return null
 }
 
+// DEPRECATED: Bankkonto-Matching ist jetzt obsolet
+// Bankkonten werden direkt aus der Quelle (source.name) über BANK_KONTO_MAPPING gesetzt
+// Diese Funktion wird nicht mehr verwendet und gibt ein leeres Match zurück
 function getBankKontoAutoMatch(zahlung: any): MatchResult {
-  let bank_konto_id: string | undefined
-  let match_details = ''
-  
-  // EINDEUTIGE BANK-ZUORDNUNGEN = 100% Auto-Match (nicht "Vorschlag"!)
-  
-  if (zahlung.anbieter === 'Amazon') {
-    bank_konto_id = '1825'
-    match_details = 'Amazon-Zahlung → Bank-Konto 1825 (Amazon-Konto)'
-  } else if (zahlung.anbieter === 'eBay') {
-    bank_konto_id = '1810'
-    match_details = 'eBay-Zahlung → Bank-Konto 1810 (eBay-Konto)'
-  } else if (zahlung.anbieter === 'PayPal') {
-    bank_konto_id = '1801'
-    match_details = 'PayPal-Zahlung → Bank-Konto 1801 (PayPal SCORE)'
-  } else if (zahlung.anbieter === 'Commerzbank') {
-    bank_konto_id = '1802'
-    match_details = 'Commerzbank → Bank-Konto 1802 (Commerzbank Girokonto)'
-  } else if (zahlung.anbieter === 'Postbank') {
-    bank_konto_id = '1701'
-    match_details = 'Postbank → Bank-Konto 1701 (Postbank)'
-  } else if (zahlung.anbieter === 'Mollie') {
-    bank_konto_id = '1830'
-    match_details = 'Mollie-Zahlung → Bank-Konto 1830 (Mollie-Konto)'
-  } else if (zahlung.quelle === 'Kasse' || zahlung.verwendungszweck?.toLowerCase().includes('bar')) {
-    bank_konto_id = '1600'
-    match_details = 'Bar-Zahlung → Bank-Konto 1600 (Kasse)'
-  }
-  
-  // Eindeutige Bank-Zuordnung = 100% Confidence, Auto-Match!
-  if (bank_konto_id) {
-    return {
-      konto_id: bank_konto_id,
-      match_source: 'auto_bank',  // Neuer Typ: automatisches Bank-Matching
-      match_confidence: 100,
-      match_details
-    }
-  }
-  
-  // Fallback: Kein Match
+  // Bankkonten sind jetzt in bank_konto_nr Feld (aus Quelle)
+  // Match-Results betreffen nur noch GEGENKONTEN (Aufwand/Erlös)
   return {
     match_source: null,
     match_confidence: 0,
-    match_details: 'Keine automatische Zuordnung möglich'
+    match_details: 'Bankkonto aus Quelle gesetzt'
   }
 }
 
