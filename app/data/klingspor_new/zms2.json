@@ -1,0 +1,1606 @@
+{
+  "DE10 10200101 CP 540 Z": {
+    "salesOrgMultiplier": 3.82,
+    "konditionsbetrag_cent": 382
+  },
+  "DE10 10200101 CS 2000 Z": {
+    "salesOrgMultiplier": 3.1756,
+    "konditionsbetrag_cent": 317.56
+  },
+  "DE10 10200101 CS 308 Y": {
+    "salesOrgMultiplier": 2.9403,
+    "konditionsbetrag_cent": 294.03
+  },
+  "DE10 10200101 CS 310 X": {
+    "salesOrgMultiplier": 3.2463,
+    "konditionsbetrag_cent": 324.63
+  },
+  "DE10 10200101 CS 310 XA": {
+    "salesOrgMultiplier": 3.2084,
+    "konditionsbetrag_cent": 320.84
+  },
+  "DE10 10200101 CS 310 XF": {
+    "salesOrgMultiplier": 3.2543,
+    "konditionsbetrag_cent": 325.43
+  },
+  "DE10 10200101 CS 311 Y": {
+    "salesOrgMultiplier": 2.9837,
+    "konditionsbetrag_cent": 298.37
+  },
+  "DE10 10200101 CS 320 Y": {
+    "salesOrgMultiplier": 3.4729,
+    "konditionsbetrag_cent": 347.29
+  },
+  "DE10 10200101 CS 321 X": {
+    "salesOrgMultiplier": 3.7901,
+    "konditionsbetrag_cent": 379.01
+  },
+  "DE10 10200101 CS 322 X": {
+    "salesOrgMultiplier": 3.7901,
+    "konditionsbetrag_cent": 379.01
+  },
+  "DE10 10200101 CS 325 Y": {
+    "salesOrgMultiplier": 3.9444,
+    "konditionsbetrag_cent": 394.44
+  },
+  "DE10 10200101 CS 326 Y": {
+    "salesOrgMultiplier": 3.2619,
+    "konditionsbetrag_cent": 326.19
+  },
+  "DE10 10200101 CS 326 YY": {
+    "salesOrgMultiplier": 3.2583,
+    "konditionsbetrag_cent": 325.83
+  },
+  "DE10 10200101 CS 327 Y": {
+    "salesOrgMultiplier": 3.2483,
+    "konditionsbetrag_cent": 324.83
+  },
+  "DE10 10200101 CS 329 JF": {
+    "salesOrgMultiplier": 3.592,
+    "konditionsbetrag_cent": 359.2
+  },
+  "DE10 10200101 CS 329 Y": {
+    "salesOrgMultiplier": 3.2572,
+    "konditionsbetrag_cent": 325.72
+  },
+  "DE10 10200101 CS 330 X": {
+    "salesOrgMultiplier": 3.8225,
+    "konditionsbetrag_cent": 382.25
+  },
+  "DE10 10200101 CS 330 Y": {
+    "salesOrgMultiplier": 3.4681,
+    "konditionsbetrag_cent": 346.81
+  },
+  "DE10 10200101 CS 333 J": {
+    "salesOrgMultiplier": 3.9509,
+    "konditionsbetrag_cent": 395.09
+  },
+  "DE10 10200101 CS 333 JF": {
+    "salesOrgMultiplier": 3.9509,
+    "konditionsbetrag_cent": 395.09
+  },
+  "DE10 10200101 CS 333 X": {
+    "salesOrgMultiplier": 3.9509,
+    "konditionsbetrag_cent": 395.09
+  },
+  "DE10 10200101 CS 333 XF": {
+    "salesOrgMultiplier": 3.9509,
+    "konditionsbetrag_cent": 395.09
+  },
+  "DE10 10200101 CS 336 Y": {
+    "salesOrgMultiplier": 3.6135,
+    "konditionsbetrag_cent": 361.35
+  },
+  "DE10 10200101 CS 341 X": {
+    "salesOrgMultiplier": 3.1968,
+    "konditionsbetrag_cent": 319.68
+  },
+  "DE10 10200101 CS 409 Y": {
+    "salesOrgMultiplier": 3.2183,
+    "konditionsbetrag_cent": 321.83
+  },
+  "DE10 10200101 CS 410 X": {
+    "salesOrgMultiplier": 3.3152,
+    "konditionsbetrag_cent": 331.52
+  },
+  "DE10 10200101 CS 411 X": {
+    "salesOrgMultiplier": 3.4822,
+    "konditionsbetrag_cent": 348.22
+  },
+  "DE10 10200101 CS 411 XS": {
+    "salesOrgMultiplier": 3.4822,
+    "konditionsbetrag_cent": 348.22
+  },
+  "DE10 10200101 CS 411 Y": {
+    "salesOrgMultiplier": 3.2271,
+    "konditionsbetrag_cent": 322.71
+  },
+  "DE10 10200101 CS 412 Y": {
+    "salesOrgMultiplier": 2.9797,
+    "konditionsbetrag_cent": 297.97
+  },
+  "DE10 10200101 CS 416 Y": {
+    "salesOrgMultiplier": 3.0627,
+    "konditionsbetrag_cent": 306.27
+  },
+  "DE10 10200101 CS 416 YY": {
+    "salesOrgMultiplier": 3.0627,
+    "konditionsbetrag_cent": 306.27
+  },
+  "DE10 10200101 CS 420 Y": {
+    "salesOrgMultiplier": 3.415,
+    "konditionsbetrag_cent": 341.5
+  },
+  "DE10 10200101 CS 520 Y": {
+    "salesOrgMultiplier": 4.1431,
+    "konditionsbetrag_cent": 414.31
+  },
+  "DE10 10200101 CS 533 X": {
+    "salesOrgMultiplier": 3.2268,
+    "konditionsbetrag_cent": 322.68
+  },
+  "DE10 10200101 CS 533 XF": {
+    "salesOrgMultiplier": 3.2268,
+    "konditionsbetrag_cent": 322.68
+  },
+  "DE10 10200101 CS 538 Z": {
+    "salesOrgMultiplier": 3.8621,
+    "konditionsbetrag_cent": 386.21
+  },
+  "DE10 10200101 CS 538 ZZ": {
+    "salesOrgMultiplier": 3.8621,
+    "konditionsbetrag_cent": 386.21
+  },
+  "DE10 10200101 CS 555 Y": {
+    "salesOrgMultiplier": 3.9437,
+    "konditionsbetrag_cent": 394.37
+  },
+  "DE10 10200101 CS 612 Y": {
+    "salesOrgMultiplier": 3.2183,
+    "konditionsbetrag_cent": 321.83
+  },
+  "DE10 10200101 CS 631 JF": {
+    "salesOrgMultiplier": 3.5516,
+    "konditionsbetrag_cent": 355.16
+  },
+  "DE10 10200101 CS 631 XF": {
+    "salesOrgMultiplier": 3.584,
+    "konditionsbetrag_cent": 358.4
+  },
+  "DE10 10200101 CS 710 XF": {
+    "salesOrgMultiplier": 3.2457,
+    "konditionsbetrag_cent": 324.57
+  },
+  "DE10 10200101 CS 729 X": {
+    "salesOrgMultiplier": 3.2494,
+    "konditionsbetrag_cent": 324.94
+  },
+  "DE10 10200101 CS 757 JF": {
+    "salesOrgMultiplier": 3.584,
+    "konditionsbetrag_cent": 358.4
+  },
+  "DE10 10200101 CS 811 Y": {
+    "salesOrgMultiplier": 3.1562,
+    "konditionsbetrag_cent": 315.62
+  },
+  "DE10 10200101 CS 905 Y": {
+    "salesOrgMultiplier": 3.2183,
+    "konditionsbetrag_cent": 321.83
+  },
+  "DE10 10200101 CS 910 Y": {
+    "salesOrgMultiplier": 3.2589,
+    "konditionsbetrag_cent": 325.89
+  },
+  "DE10 10200101 CS 911 X": {
+    "salesOrgMultiplier": 3.2589,
+    "konditionsbetrag_cent": 325.89
+  },
+  "DE10 10200101 CS 912 Y": {
+    "salesOrgMultiplier": 3.2572,
+    "konditionsbetrag_cent": 325.72
+  },
+  "DE10 10200101 CS 913 X": {
+    "salesOrgMultiplier": 3.2183,
+    "konditionsbetrag_cent": 321.83
+  },
+  "DE10 10200101 CS 920 Y": {
+    "salesOrgMultiplier": 3.2572,
+    "konditionsbetrag_cent": 325.72
+  },
+  "DE10 10200101 CS 922 Y": {
+    "salesOrgMultiplier": 3.254,
+    "konditionsbetrag_cent": 325.4
+  },
+  "DE10 10200101 CS 922 YY": {
+    "salesOrgMultiplier": 3.2183,
+    "konditionsbetrag_cent": 321.83
+  },
+  "DE10 10200101 CS 931 JF": {
+    "salesOrgMultiplier": 3.5895,
+    "konditionsbetrag_cent": 358.95
+  },
+  "DE10 10200101 CS 950 Y": {
+    "salesOrgMultiplier": 3.2572,
+    "konditionsbetrag_cent": 325.72
+  },
+  "DE10 10200101 CS 959 JF": {
+    "salesOrgMultiplier": 3.6329,
+    "konditionsbetrag_cent": 363.29
+  },
+  "DE10 10200101 FP 73 W": {
+    "salesOrgMultiplier": 3.2629,
+    "konditionsbetrag_cent": 326.29
+  },
+  "DE10 10200101 FP 77": {
+    "salesOrgMultiplier": 3.2629,
+    "konditionsbetrag_cent": 326.29
+  },
+  "DE10 10200101 FP 77 K": {
+    "salesOrgMultiplier": 3.2691,
+    "konditionsbetrag_cent": 326.91
+  },
+  "DE10 10200101 GX 514 JF": {
+    "salesOrgMultiplier": 3.9141,
+    "konditionsbetrag_cent": 391.41
+  },
+  "DE10 10200101 GX 533 JF": {
+    "salesOrgMultiplier": 3.9451,
+    "konditionsbetrag_cent": 394.51
+  },
+  "DE10 10200101 GX 712 JF": {
+    "salesOrgMultiplier": 3.293,
+    "konditionsbetrag_cent": 329.3
+  },
+  "DE10 10200101 GX 729 JF": {
+    "salesOrgMultiplier": 3.5516,
+    "konditionsbetrag_cent": 355.16
+  },
+  "DE10 10200101 GX 931 JF": {
+    "salesOrgMultiplier": 3.587,
+    "konditionsbetrag_cent": 358.7
+  },
+  "DE10 10200101 KL 361 JF": {
+    "salesOrgMultiplier": 3.2897,
+    "konditionsbetrag_cent": 328.97
+  },
+  "DE10 10200101 LS 307 X": {
+    "salesOrgMultiplier": 3.293,
+    "konditionsbetrag_cent": 329.3
+  },
+  "DE10 10200101 LS 309 J": {
+    "salesOrgMultiplier": 3.2923,
+    "konditionsbetrag_cent": 329.23
+  },
+  "DE10 10200101 LS 309 JF": {
+    "salesOrgMultiplier": 3.2913,
+    "konditionsbetrag_cent": 329.13
+  },
+  "DE10 10200101 LS 309 JS": {
+    "salesOrgMultiplier": 3.258,
+    "konditionsbetrag_cent": 325.8
+  },
+  "DE10 10200101 LS 309 X": {
+    "salesOrgMultiplier": 3.293,
+    "konditionsbetrag_cent": 329.3
+  },
+  "DE10 10200101 LS 309 XH": {
+    "salesOrgMultiplier": 3.293,
+    "konditionsbetrag_cent": 329.3
+  },
+  "DE10 10200101 LS 312 JF": {
+    "salesOrgMultiplier": 3.2913,
+    "konditionsbetrag_cent": 329.13
+  },
+  "DE10 10200101 LS 313 JF": {
+    "salesOrgMultiplier": 3.3451,
+    "konditionsbetrag_cent": 334.51
+  },
+  "DE10 10200101 LS 314 J": {
+    "salesOrgMultiplier": 3.2704,
+    "konditionsbetrag_cent": 327.04
+  },
+  "DE10 10200101 LS 314 JF": {
+    "salesOrgMultiplier": 3.2776,
+    "konditionsbetrag_cent": 327.76
+  },
+  "DE10 10200101 LS 318 JF": {
+    "salesOrgMultiplier": 3.3415,
+    "konditionsbetrag_cent": 334.15
+  },
+  "DE10 10200101 LS 912 JF": {
+    "salesOrgMultiplier": 3.5914,
+    "konditionsbetrag_cent": 359.14
+  },
+  "DE10 10200101 PS 11 A": {
+    "salesOrgMultiplier": 3.8925,
+    "konditionsbetrag_cent": 389.25
+  },
+  "DE10 10200101 PS 11 AK": {
+    "salesOrgMultiplier": 3.8925,
+    "konditionsbetrag_cent": 389.25
+  },
+  "DE10 10200101 PS 11 AW": {
+    "salesOrgMultiplier": 3.8925,
+    "konditionsbetrag_cent": 389.25
+  },
+  "DE10 10200101 PS 11 C": {
+    "salesOrgMultiplier": 3.8925,
+    "konditionsbetrag_cent": 389.25
+  },
+  "DE10 10200101 PS 11 CW": {
+    "salesOrgMultiplier": 3.8925,
+    "konditionsbetrag_cent": 389.25
+  },
+  "DE10 10200101 PS 15 F": {
+    "salesOrgMultiplier": 3.4492,
+    "konditionsbetrag_cent": 344.92
+  },
+  "DE10 10200101 PS 18 E": {
+    "salesOrgMultiplier": 3.5369,
+    "konditionsbetrag_cent": 353.69
+  },
+  "DE10 10200101 PS 19 E": {
+    "salesOrgMultiplier": 3.9626,
+    "konditionsbetrag_cent": 396.26
+  },
+  "DE10 10200101 PS 19 F": {
+    "salesOrgMultiplier": 3.9626,
+    "konditionsbetrag_cent": 396.26
+  },
+  "DE10 10200101 PS 20 F": {
+    "salesOrgMultiplier": 3.5371,
+    "konditionsbetrag_cent": 353.71
+  },
+  "DE10 10200101 PS 20 FW": {
+    "salesOrgMultiplier": 3.2072,
+    "konditionsbetrag_cent": 320.72
+  },
+  "DE10 10200101 PS 21 F": {
+    "salesOrgMultiplier": 3.5354,
+    "konditionsbetrag_cent": 353.54
+  },
+  "DE10 10200101 PS 22 F": {
+    "salesOrgMultiplier": 3.5352,
+    "konditionsbetrag_cent": 353.52
+  },
+  "DE10 10200101 PS 23 F": {
+    "salesOrgMultiplier": 3.4492,
+    "konditionsbetrag_cent": 344.92
+  },
+  "DE10 10200101 PS 24 F": {
+    "salesOrgMultiplier": 4.0034,
+    "konditionsbetrag_cent": 400.34
+  },
+  "DE10 10200101 PS 26 F": {
+    "salesOrgMultiplier": 3.4957,
+    "konditionsbetrag_cent": 349.57
+  },
+  "DE10 10200101 PS 27 DW": {
+    "salesOrgMultiplier": 3.9988,
+    "konditionsbetrag_cent": 399.88
+  },
+  "DE10 10200101 PS 28 F": {
+    "salesOrgMultiplier": 2.8147,
+    "konditionsbetrag_cent": 281.47
+  },
+  "DE10 10200101 PS 29 F": {
+    "salesOrgMultiplier": 3.4879,
+    "konditionsbetrag_cent": 348.79
+  },
+  "DE10 10200101 PS 38 G": {
+    "salesOrgMultiplier": 3.9626,
+    "konditionsbetrag_cent": 396.26
+  },
+  "DE10 10200101 PS 524 E": {
+    "salesOrgMultiplier": 4.0019,
+    "konditionsbetrag_cent": 400.19
+  },
+  "DE10 10200101 PS 529 F": {
+    "salesOrgMultiplier": 4.0158,
+    "konditionsbetrag_cent": 401.58
+  },
+  "DE10 10200101 PS 61 F": {
+    "salesOrgMultiplier": 3.4728,
+    "konditionsbetrag_cent": 347.28
+  },
+  "DE10 10200101 PS 726 F": {
+    "salesOrgMultiplier": 3.4993,
+    "konditionsbetrag_cent": 349.93
+  },
+  "DE10 10200101 PS 729 F": {
+    "salesOrgMultiplier": 3.486,
+    "konditionsbetrag_cent": 348.6
+  },
+  "DE10 10200101 PS 73 BW": {
+    "salesOrgMultiplier": 3.5334,
+    "konditionsbetrag_cent": 353.34
+  },
+  "DE10 10200102 CP 540 Z": {
+    "salesOrgMultiplier": 3.82,
+    "konditionsbetrag_cent": 382
+  },
+  "DE10 10200102 CS 308 Y": {
+    "salesOrgMultiplier": 2.9308,
+    "konditionsbetrag_cent": 293.08
+  },
+  "DE10 10200102 CS 310 X": {
+    "salesOrgMultiplier": 3.1782,
+    "konditionsbetrag_cent": 317.82
+  },
+  "DE10 10200102 CS 310 XA": {
+    "salesOrgMultiplier": 3.2084,
+    "konditionsbetrag_cent": 320.84
+  },
+  "DE10 10200102 CS 310 XF": {
+    "salesOrgMultiplier": 3.1707,
+    "konditionsbetrag_cent": 317.07
+  },
+  "DE10 10200102 CS 311 Y": {
+    "salesOrgMultiplier": 2.9019,
+    "konditionsbetrag_cent": 290.19
+  },
+  "DE10 10200102 CS 320 Y": {
+    "salesOrgMultiplier": 3.4531,
+    "konditionsbetrag_cent": 345.31
+  },
+  "DE10 10200102 CS 321 X": {
+    "salesOrgMultiplier": 3.7536,
+    "konditionsbetrag_cent": 375.36
+  },
+  "DE10 10200102 CS 322 X": {
+    "salesOrgMultiplier": 3.7536,
+    "konditionsbetrag_cent": 375.36
+  },
+  "DE10 10200102 CS 325 Y": {
+    "salesOrgMultiplier": 3.9392,
+    "konditionsbetrag_cent": 393.92
+  },
+  "DE10 10200102 CS 326 Y": {
+    "salesOrgMultiplier": 3.0425,
+    "konditionsbetrag_cent": 304.25
+  },
+  "DE10 10200102 CS 327 Y": {
+    "salesOrgMultiplier": 3.2183,
+    "konditionsbetrag_cent": 321.83
+  },
+  "DE10 10200102 CS 329 JF": {
+    "salesOrgMultiplier": 3.5764,
+    "konditionsbetrag_cent": 357.64
+  },
+  "DE10 10200102 CS 329 Y": {
+    "salesOrgMultiplier": 3.2742,
+    "konditionsbetrag_cent": 327.42
+  },
+  "DE10 10200102 CS 330 X": {
+    "salesOrgMultiplier": 3.8225,
+    "konditionsbetrag_cent": 382.25
+  },
+  "DE10 10200102 CS 330 Y": {
+    "salesOrgMultiplier": 3.4335,
+    "konditionsbetrag_cent": 343.35
+  },
+  "DE10 10200102 CS 333 J": {
+    "salesOrgMultiplier": 3.9141,
+    "konditionsbetrag_cent": 391.41
+  },
+  "DE10 10200102 CS 333 JF": {
+    "salesOrgMultiplier": 3.8237,
+    "konditionsbetrag_cent": 382.37
+  },
+  "DE10 10200102 CS 333 X": {
+    "salesOrgMultiplier": 3.925,
+    "konditionsbetrag_cent": 392.5
+  },
+  "DE10 10200102 CS 333 XF": {
+    "salesOrgMultiplier": 3.9029,
+    "konditionsbetrag_cent": 390.29
+  },
+  "DE10 10200102 CS 336 Y": {
+    "salesOrgMultiplier": 3.5536,
+    "konditionsbetrag_cent": 355.36
+  },
+  "DE10 10200102 CS 341 X": {
+    "salesOrgMultiplier": 3.1523,
+    "konditionsbetrag_cent": 315.23
+  },
+  "DE10 10200102 CS 409 Y": {
+    "salesOrgMultiplier": 3.1836,
+    "konditionsbetrag_cent": 318.36
+  },
+  "DE10 10200102 CS 410 X": {
+    "salesOrgMultiplier": 3.2727,
+    "konditionsbetrag_cent": 327.27
+  },
+  "DE10 10200102 CS 411 X": {
+    "salesOrgMultiplier": 3.4467,
+    "konditionsbetrag_cent": 344.67
+  },
+  "DE10 10200102 CS 411 XS": {
+    "salesOrgMultiplier": 3.4467,
+    "konditionsbetrag_cent": 344.67
+  },
+  "DE10 10200102 CS 411 Y": {
+    "salesOrgMultiplier": 3.1836,
+    "konditionsbetrag_cent": 318.36
+  },
+  "DE10 10200102 CS 412 Y": {
+    "salesOrgMultiplier": 2.5501,
+    "konditionsbetrag_cent": 255.01
+  },
+  "DE10 10200102 CS 416 Y": {
+    "salesOrgMultiplier": 3.0377,
+    "konditionsbetrag_cent": 303.77
+  },
+  "DE10 10200102 CS 420 Y": {
+    "salesOrgMultiplier": 3.3723,
+    "konditionsbetrag_cent": 337.23
+  },
+  "DE10 10200102 CS 520 Y": {
+    "salesOrgMultiplier": 4.0831,
+    "konditionsbetrag_cent": 408.31
+  },
+  "DE10 10200102 CS 533 X": {
+    "salesOrgMultiplier": 3.2268,
+    "konditionsbetrag_cent": 322.68
+  },
+  "DE10 10200102 CS 533 XF": {
+    "salesOrgMultiplier": 3.2268,
+    "konditionsbetrag_cent": 322.68
+  },
+  "DE10 10200102 CS 538 Z": {
+    "salesOrgMultiplier": 3.82,
+    "konditionsbetrag_cent": 382
+  },
+  "DE10 10200102 CS 538 ZZ": {
+    "salesOrgMultiplier": 3.82,
+    "konditionsbetrag_cent": 382
+  },
+  "DE10 10200102 CS 555 Y": {
+    "salesOrgMultiplier": 3.9042,
+    "konditionsbetrag_cent": 390.42
+  },
+  "DE10 10200102 CS 612 Y": {
+    "salesOrgMultiplier": 3.2183,
+    "konditionsbetrag_cent": 321.83
+  },
+  "DE10 10200102 CS 631 JF": {
+    "salesOrgMultiplier": 3.5516,
+    "konditionsbetrag_cent": 355.16
+  },
+  "DE10 10200102 CS 631 XF": {
+    "salesOrgMultiplier": 3.584,
+    "konditionsbetrag_cent": 358.4
+  },
+  "DE10 10200102 CS 710 XF": {
+    "salesOrgMultiplier": 3.2183,
+    "konditionsbetrag_cent": 321.83
+  },
+  "DE10 10200102 CS 729 X": {
+    "salesOrgMultiplier": 3.2395,
+    "konditionsbetrag_cent": 323.95
+  },
+  "DE10 10200102 CS 757 JF": {
+    "salesOrgMultiplier": 3.584,
+    "konditionsbetrag_cent": 358.4
+  },
+  "DE10 10200102 CS 811 Y": {
+    "salesOrgMultiplier": 3.1156,
+    "konditionsbetrag_cent": 311.56
+  },
+  "DE10 10200102 CS 905 Y": {
+    "salesOrgMultiplier": 3.2183,
+    "konditionsbetrag_cent": 321.83
+  },
+  "DE10 10200102 CS 910 Y": {
+    "salesOrgMultiplier": 3.2498,
+    "konditionsbetrag_cent": 324.98
+  },
+  "DE10 10200102 CS 911 X": {
+    "salesOrgMultiplier": 3.2183,
+    "konditionsbetrag_cent": 321.83
+  },
+  "DE10 10200102 CS 912 Y": {
+    "salesOrgMultiplier": 3.2959,
+    "konditionsbetrag_cent": 329.59
+  },
+  "DE10 10200102 CS 913 X": {
+    "salesOrgMultiplier": 3.2183,
+    "konditionsbetrag_cent": 321.83
+  },
+  "DE10 10200102 CS 920 Y": {
+    "salesOrgMultiplier": 3.2498,
+    "konditionsbetrag_cent": 324.98
+  },
+  "DE10 10200102 CS 922 Y": {
+    "salesOrgMultiplier": 3.2395,
+    "konditionsbetrag_cent": 323.95
+  },
+  "DE10 10200102 CS 922 YY": {
+    "salesOrgMultiplier": 3.2183,
+    "konditionsbetrag_cent": 321.83
+  },
+  "DE10 10200102 CS 931 JF": {
+    "salesOrgMultiplier": 3.5791,
+    "konditionsbetrag_cent": 357.91
+  },
+  "DE10 10200102 CS 950 Y": {
+    "salesOrgMultiplier": 3.2498,
+    "konditionsbetrag_cent": 324.98
+  },
+  "DE10 10200102 CS 959 JF": {
+    "salesOrgMultiplier": 3.5516,
+    "konditionsbetrag_cent": 355.16
+  },
+  "DE10 10200102 FP 73 W": {
+    "salesOrgMultiplier": 3.1991,
+    "konditionsbetrag_cent": 319.91
+  },
+  "DE10 10200102 FP 77 K": {
+    "salesOrgMultiplier": 3.247,
+    "konditionsbetrag_cent": 324.7
+  },
+  "DE10 10200102 GX 514 JF": {
+    "salesOrgMultiplier": 3.9141,
+    "konditionsbetrag_cent": 391.41
+  },
+  "DE10 10200102 GX 533 JF": {
+    "salesOrgMultiplier": 3.8261,
+    "konditionsbetrag_cent": 382.61
+  },
+  "DE10 10200102 GX 712 JF": {
+    "salesOrgMultiplier": 3.3085,
+    "konditionsbetrag_cent": 330.85
+  },
+  "DE10 10200102 GX 729 JF": {
+    "salesOrgMultiplier": 3.5516,
+    "konditionsbetrag_cent": 355.16
+  },
+  "DE10 10200102 GX 931 JF": {
+    "salesOrgMultiplier": 3.5791,
+    "konditionsbetrag_cent": 357.91
+  },
+  "DE10 10200102 KL 361 JF": {
+    "salesOrgMultiplier": 3.2605,
+    "konditionsbetrag_cent": 326.05
+  },
+  "DE10 10200102 LS 307 X": {
+    "salesOrgMultiplier": 3.2646,
+    "konditionsbetrag_cent": 326.46
+  },
+  "DE10 10200102 LS 309 J": {
+    "salesOrgMultiplier": 3.2627,
+    "konditionsbetrag_cent": 326.27
+  },
+  "DE10 10200102 LS 309 JF": {
+    "salesOrgMultiplier": 3.1346,
+    "konditionsbetrag_cent": 313.46
+  },
+  "DE10 10200102 LS 309 JS": {
+    "salesOrgMultiplier": 3.258,
+    "konditionsbetrag_cent": 325.8
+  },
+  "DE10 10200102 LS 309 X": {
+    "salesOrgMultiplier": 3.2616,
+    "konditionsbetrag_cent": 326.16
+  },
+  "DE10 10200102 LS 309 XH": {
+    "salesOrgMultiplier": 3.2555,
+    "konditionsbetrag_cent": 325.55
+  },
+  "DE10 10200102 LS 312 JF": {
+    "salesOrgMultiplier": 3.2467,
+    "konditionsbetrag_cent": 324.67
+  },
+  "DE10 10200102 LS 313 JF": {
+    "salesOrgMultiplier": 3.3083,
+    "konditionsbetrag_cent": 330.83
+  },
+  "DE10 10200102 LS 314 J": {
+    "salesOrgMultiplier": 3.258,
+    "konditionsbetrag_cent": 325.8
+  },
+  "DE10 10200102 LS 314 JF": {
+    "salesOrgMultiplier": 3.3012,
+    "konditionsbetrag_cent": 330.12
+  },
+  "DE10 10200102 LS 318 JF": {
+    "salesOrgMultiplier": 3.3424,
+    "konditionsbetrag_cent": 334.24
+  },
+  "DE10 10200102 LS 912 JF": {
+    "salesOrgMultiplier": 3.6084,
+    "konditionsbetrag_cent": 360.84
+  },
+  "DE10 10200102 PS 11 A": {
+    "salesOrgMultiplier": 3.8925,
+    "konditionsbetrag_cent": 389.25
+  },
+  "DE10 10200102 PS 11 AK": {
+    "salesOrgMultiplier": 3.8925,
+    "konditionsbetrag_cent": 389.25
+  },
+  "DE10 10200102 PS 11 AW": {
+    "salesOrgMultiplier": 3.8925,
+    "konditionsbetrag_cent": 389.25
+  },
+  "DE10 10200102 PS 11 C": {
+    "salesOrgMultiplier": 3.8925,
+    "konditionsbetrag_cent": 389.25
+  },
+  "DE10 10200102 PS 11 CW": {
+    "salesOrgMultiplier": 3.8925,
+    "konditionsbetrag_cent": 389.25
+  },
+  "DE10 10200102 PS 15 F": {
+    "salesOrgMultiplier": 3.4492,
+    "konditionsbetrag_cent": 344.92
+  },
+  "DE10 10200102 PS 18 E": {
+    "salesOrgMultiplier": 3.4957,
+    "konditionsbetrag_cent": 349.57
+  },
+  "DE10 10200102 PS 19 E": {
+    "salesOrgMultiplier": 3.9626,
+    "konditionsbetrag_cent": 396.26
+  },
+  "DE10 10200102 PS 19 F": {
+    "salesOrgMultiplier": 3.9626,
+    "konditionsbetrag_cent": 396.26
+  },
+  "DE10 10200102 PS 20 F": {
+    "salesOrgMultiplier": 3.4957,
+    "konditionsbetrag_cent": 349.57
+  },
+  "DE10 10200102 PS 20 FW": {
+    "salesOrgMultiplier": 3.1672,
+    "konditionsbetrag_cent": 316.72
+  },
+  "DE10 10200102 PS 21 F": {
+    "salesOrgMultiplier": 3.459,
+    "konditionsbetrag_cent": 345.9
+  },
+  "DE10 10200102 PS 22 F": {
+    "salesOrgMultiplier": 3.4957,
+    "konditionsbetrag_cent": 349.57
+  },
+  "DE10 10200102 PS 23 F": {
+    "salesOrgMultiplier": 3.4492,
+    "konditionsbetrag_cent": 344.92
+  },
+  "DE10 10200102 PS 24 F": {
+    "salesOrgMultiplier": 3.9626,
+    "konditionsbetrag_cent": 396.26
+  },
+  "DE10 10200102 PS 26 F": {
+    "salesOrgMultiplier": 3.4957,
+    "konditionsbetrag_cent": 349.57
+  },
+  "DE10 10200102 PS 27 DW": {
+    "salesOrgMultiplier": 3.9626,
+    "konditionsbetrag_cent": 396.26
+  },
+  "DE10 10200102 PS 28 F": {
+    "salesOrgMultiplier": 2.7758,
+    "konditionsbetrag_cent": 277.58
+  },
+  "DE10 10200102 PS 29 F": {
+    "salesOrgMultiplier": 3.4326,
+    "konditionsbetrag_cent": 343.26
+  },
+  "DE10 10200102 PS 38 G": {
+    "salesOrgMultiplier": 3.9626,
+    "konditionsbetrag_cent": 396.26
+  },
+  "DE10 10200102 PS 524 E": {
+    "salesOrgMultiplier": 3.9626,
+    "konditionsbetrag_cent": 396.26
+  },
+  "DE10 10200102 PS 529 F": {
+    "salesOrgMultiplier": 3.9626,
+    "konditionsbetrag_cent": 396.26
+  },
+  "DE10 10200102 PS 61 F": {
+    "salesOrgMultiplier": 3.4284,
+    "konditionsbetrag_cent": 342.84
+  },
+  "DE10 10200102 PS 726 F": {
+    "salesOrgMultiplier": 3.4492,
+    "konditionsbetrag_cent": 344.92
+  },
+  "DE10 10200102 PS 729 F": {
+    "salesOrgMultiplier": 3.4492,
+    "konditionsbetrag_cent": 344.92
+  },
+  "DE10 10200102 PS 73 BW": {
+    "salesOrgMultiplier": 3.4957,
+    "konditionsbetrag_cent": 349.57
+  },
+  "DE10 10200201 CP 540 Z": {
+    "salesOrgMultiplier": 3.8598,
+    "konditionsbetrag_cent": 385.98
+  },
+  "DE10 10200201 CS 308 Y": {
+    "salesOrgMultiplier": 2.8886,
+    "konditionsbetrag_cent": 288.86
+  },
+  "DE10 10200201 CS 310 X": {
+    "salesOrgMultiplier": 3.2344,
+    "konditionsbetrag_cent": 323.44
+  },
+  "DE10 10200201 CS 310 XF": {
+    "salesOrgMultiplier": 3.3105,
+    "konditionsbetrag_cent": 331.05
+  },
+  "DE10 10200201 CS 311 Y": {
+    "salesOrgMultiplier": 2.9323,
+    "konditionsbetrag_cent": 293.23
+  },
+  "DE10 10200201 CS 320 Y": {
+    "salesOrgMultiplier": 3.4531,
+    "konditionsbetrag_cent": 345.31
+  },
+  "DE10 10200201 CS 321 X": {
+    "salesOrgMultiplier": 3.8043,
+    "konditionsbetrag_cent": 380.43
+  },
+  "DE10 10200201 CS 322 X": {
+    "salesOrgMultiplier": 3.8043,
+    "konditionsbetrag_cent": 380.43
+  },
+  "DE10 10200201 CS 325 Y": {
+    "salesOrgMultiplier": 3.955,
+    "konditionsbetrag_cent": 395.5
+  },
+  "DE10 10200201 CS 326 Y": {
+    "salesOrgMultiplier": 3.2619,
+    "konditionsbetrag_cent": 326.19
+  },
+  "DE10 10200201 CS 330 X": {
+    "salesOrgMultiplier": 3.8043,
+    "konditionsbetrag_cent": 380.43
+  },
+  "DE10 10200201 CS 333 J": {
+    "salesOrgMultiplier": 3.9537,
+    "konditionsbetrag_cent": 395.37
+  },
+  "DE10 10200201 CS 333 X": {
+    "salesOrgMultiplier": 3.9537,
+    "konditionsbetrag_cent": 395.37
+  },
+  "DE10 10200201 CS 333 XF": {
+    "salesOrgMultiplier": 3.9537,
+    "konditionsbetrag_cent": 395.37
+  },
+  "DE10 10200201 CS 336 Y": {
+    "salesOrgMultiplier": 3.5914,
+    "konditionsbetrag_cent": 359.14
+  },
+  "DE10 10200201 CS 409 Y": {
+    "salesOrgMultiplier": 3.1562,
+    "konditionsbetrag_cent": 315.62
+  },
+  "DE10 10200201 CS 410 X": {
+    "salesOrgMultiplier": 3.2609,
+    "konditionsbetrag_cent": 326.09
+  },
+  "DE10 10200201 CS 411 X": {
+    "salesOrgMultiplier": 3.4707,
+    "konditionsbetrag_cent": 347.07
+  },
+  "DE10 10200201 CS 411 XS": {
+    "salesOrgMultiplier": 3.4707,
+    "konditionsbetrag_cent": 347.07
+  },
+  "DE10 10200201 CS 411 Y": {
+    "salesOrgMultiplier": 3.2183,
+    "konditionsbetrag_cent": 321.83
+  },
+  "DE10 10200201 CS 412 Y": {
+    "salesOrgMultiplier": 2.9323,
+    "konditionsbetrag_cent": 293.23
+  },
+  "DE10 10200201 CS 416 Y": {
+    "salesOrgMultiplier": 3.1425,
+    "konditionsbetrag_cent": 314.25
+  },
+  "DE10 10200201 CS 538 Z": {
+    "salesOrgMultiplier": 3.8621,
+    "konditionsbetrag_cent": 386.21
+  },
+  "DE10 10200201 CS 538 ZZ": {
+    "salesOrgMultiplier": 3.8621,
+    "konditionsbetrag_cent": 386.21
+  },
+  "DE10 10200201 CS 555 Y": {
+    "salesOrgMultiplier": 3.955,
+    "konditionsbetrag_cent": 395.5
+  },
+  "DE10 10200201 CS 612 Y": {
+    "salesOrgMultiplier": 3.2483,
+    "konditionsbetrag_cent": 324.83
+  },
+  "DE10 10200201 CS 631 JF": {
+    "salesOrgMultiplier": 3.584,
+    "konditionsbetrag_cent": 358.4
+  },
+  "DE10 10200201 CS 631 XF": {
+    "salesOrgMultiplier": 3.584,
+    "konditionsbetrag_cent": 358.4
+  },
+  "DE10 10200201 CS 905 Y": {
+    "salesOrgMultiplier": 3.2498,
+    "konditionsbetrag_cent": 324.98
+  },
+  "DE10 10200201 CS 910 Y": {
+    "salesOrgMultiplier": 3.2498,
+    "konditionsbetrag_cent": 324.98
+  },
+  "DE10 10200201 CS 912 Y": {
+    "salesOrgMultiplier": 3.2483,
+    "konditionsbetrag_cent": 324.83
+  },
+  "DE10 10200201 CS 920 Y": {
+    "salesOrgMultiplier": 3.2483,
+    "konditionsbetrag_cent": 324.83
+  },
+  "DE10 10200201 CS 931 JF": {
+    "salesOrgMultiplier": 3.584,
+    "konditionsbetrag_cent": 358.4
+  },
+  "DE10 10200201 CS 950 Y": {
+    "salesOrgMultiplier": 3.2483,
+    "konditionsbetrag_cent": 324.83
+  },
+  "DE10 10200201 GX 712 JF": {
+    "salesOrgMultiplier": 3.293,
+    "konditionsbetrag_cent": 329.3
+  },
+  "DE10 10200201 GX 931 JF": {
+    "salesOrgMultiplier": 3.584,
+    "konditionsbetrag_cent": 358.4
+  },
+  "DE10 10200201 KL 361 JF": {
+    "salesOrgMultiplier": 3.293,
+    "konditionsbetrag_cent": 329.3
+  },
+  "DE10 10200201 LS 307 X": {
+    "salesOrgMultiplier": 2.5272,
+    "konditionsbetrag_cent": 252.72
+  },
+  "DE10 10200201 LS 309 J": {
+    "salesOrgMultiplier": 3.293,
+    "konditionsbetrag_cent": 329.3
+  },
+  "DE10 10200201 LS 309 JF": {
+    "salesOrgMultiplier": 3.293,
+    "konditionsbetrag_cent": 329.3
+  },
+  "DE10 10200201 LS 309 JS": {
+    "salesOrgMultiplier": 3.293,
+    "konditionsbetrag_cent": 329.3
+  },
+  "DE10 10200201 LS 309 X": {
+    "salesOrgMultiplier": 2.5159,
+    "konditionsbetrag_cent": 251.59
+  },
+  "DE10 10200201 LS 309 XH": {
+    "salesOrgMultiplier": 2.5159,
+    "konditionsbetrag_cent": 251.59
+  },
+  "DE10 10200201 LS 312 JF": {
+    "salesOrgMultiplier": 3.293,
+    "konditionsbetrag_cent": 329.3
+  },
+  "DE10 10200201 LS 313 JF": {
+    "salesOrgMultiplier": 3.3005,
+    "konditionsbetrag_cent": 330.05
+  },
+  "DE10 10200201 LS 318 JF": {
+    "salesOrgMultiplier": 3.293,
+    "konditionsbetrag_cent": 329.3
+  },
+  "DE10 10200301 CP 540 Z": {
+    "salesOrgMultiplier": 3.5115,
+    "konditionsbetrag_cent": 351.15
+  },
+  "DE10 10200301 CS 2000 Z": {
+    "salesOrgMultiplier": 2.9194,
+    "konditionsbetrag_cent": 291.94
+  },
+  "DE10 10200301 CS 308 Y": {
+    "salesOrgMultiplier": 2.6899,
+    "konditionsbetrag_cent": 268.99
+  },
+  "DE10 10200301 CS 310 X": {
+    "salesOrgMultiplier": 2.9797,
+    "konditionsbetrag_cent": 297.97
+  },
+  "DE10 10200301 CS 310 XF": {
+    "salesOrgMultiplier": 2.9797,
+    "konditionsbetrag_cent": 297.97
+  },
+  "DE10 10200301 CS 311 Y": {
+    "salesOrgMultiplier": 2.691,
+    "konditionsbetrag_cent": 269.1
+  },
+  "DE10 10200301 CS 320 Y": {
+    "salesOrgMultiplier": 3.3034,
+    "konditionsbetrag_cent": 330.34
+  },
+  "DE10 10200301 CS 321 X": {
+    "salesOrgMultiplier": 3.6406,
+    "konditionsbetrag_cent": 364.06
+  },
+  "DE10 10200301 CS 322 X": {
+    "salesOrgMultiplier": 3.6398,
+    "konditionsbetrag_cent": 363.98
+  },
+  "DE10 10200301 CS 325 Y": {
+    "salesOrgMultiplier": 3.7974,
+    "konditionsbetrag_cent": 379.74
+  },
+  "DE10 10200301 CS 326 Y": {
+    "salesOrgMultiplier": 3.1305,
+    "konditionsbetrag_cent": 313.05
+  },
+  "DE10 10200301 CS 326 YY": {
+    "salesOrgMultiplier": 3.1305,
+    "konditionsbetrag_cent": 313.05
+  },
+  "DE10 10200301 CS 329 JF": {
+    "salesOrgMultiplier": 3.4139,
+    "konditionsbetrag_cent": 341.39
+  },
+  "DE10 10200301 CS 329 Y": {
+    "salesOrgMultiplier": 3.1318,
+    "konditionsbetrag_cent": 313.18
+  },
+  "DE10 10200301 CS 330 X": {
+    "salesOrgMultiplier": 3.6384,
+    "konditionsbetrag_cent": 363.84
+  },
+  "DE10 10200301 CS 330 Y": {
+    "salesOrgMultiplier": 3.3026,
+    "konditionsbetrag_cent": 330.26
+  },
+  "DE10 10200301 CS 333 JF": {
+    "salesOrgMultiplier": 3.5987,
+    "konditionsbetrag_cent": 359.87
+  },
+  "DE10 10200301 CS 333 X": {
+    "salesOrgMultiplier": 3.6385,
+    "konditionsbetrag_cent": 363.85
+  },
+  "DE10 10200301 CS 333 XF": {
+    "salesOrgMultiplier": 3.5987,
+    "konditionsbetrag_cent": 359.87
+  },
+  "DE10 10200301 CS 336 Y": {
+    "salesOrgMultiplier": 3.3035,
+    "konditionsbetrag_cent": 330.35
+  },
+  "DE10 10200301 CS 341 X": {
+    "salesOrgMultiplier": 2.9956,
+    "konditionsbetrag_cent": 299.56
+  },
+  "DE10 10200301 CS 409 Y": {
+    "salesOrgMultiplier": 2.8232,
+    "konditionsbetrag_cent": 282.32
+  },
+  "DE10 10200301 CS 410 X": {
+    "salesOrgMultiplier": 2.9956,
+    "konditionsbetrag_cent": 299.56
+  },
+  "DE10 10200301 CS 411 X": {
+    "salesOrgMultiplier": 3.108,
+    "konditionsbetrag_cent": 310.8
+  },
+  "DE10 10200301 CS 411 XS": {
+    "salesOrgMultiplier": 3.0678,
+    "konditionsbetrag_cent": 306.78
+  },
+  "DE10 10200301 CS 411 Y": {
+    "salesOrgMultiplier": 2.872,
+    "konditionsbetrag_cent": 287.2
+  },
+  "DE10 10200301 CS 412 Y": {
+    "salesOrgMultiplier": 2.691,
+    "konditionsbetrag_cent": 269.1
+  },
+  "DE10 10200301 CS 416 Y": {
+    "salesOrgMultiplier": 2.8085,
+    "konditionsbetrag_cent": 280.85
+  },
+  "DE10 10200301 CS 416 YY": {
+    "salesOrgMultiplier": 2.8085,
+    "konditionsbetrag_cent": 280.85
+  },
+  "DE10 10200301 CS 417 Y": {
+    "salesOrgMultiplier": 2.9118,
+    "konditionsbetrag_cent": 291.18
+  },
+  "DE10 10200301 CS 420 Y": {
+    "salesOrgMultiplier": 3.2435,
+    "konditionsbetrag_cent": 324.35
+  },
+  "DE10 10200301 CS 520 Y": {
+    "salesOrgMultiplier": 4.1233,
+    "konditionsbetrag_cent": 412.33
+  },
+  "DE10 10200301 CS 533 X": {
+    "salesOrgMultiplier": 2.9554,
+    "konditionsbetrag_cent": 295.54
+  },
+  "DE10 10200301 CS 533 XF": {
+    "salesOrgMultiplier": 2.9554,
+    "konditionsbetrag_cent": 295.54
+  },
+  "DE10 10200301 CS 538 Z": {
+    "salesOrgMultiplier": 3.5524,
+    "konditionsbetrag_cent": 355.24
+  },
+  "DE10 10200301 CS 538 ZZ": {
+    "salesOrgMultiplier": 3.5524,
+    "konditionsbetrag_cent": 355.24
+  },
+  "DE10 10200301 CS 539 Z": {
+    "salesOrgMultiplier": 3.553,
+    "konditionsbetrag_cent": 355.3
+  },
+  "DE10 10200301 CS 555 Y": {
+    "salesOrgMultiplier": 3.756,
+    "konditionsbetrag_cent": 375.6
+  },
+  "DE10 10200301 CS 612 Y": {
+    "salesOrgMultiplier": 2.872,
+    "konditionsbetrag_cent": 287.2
+  },
+  "DE10 10200301 CS 631 JF": {
+    "salesOrgMultiplier": 3.1782,
+    "konditionsbetrag_cent": 317.82
+  },
+  "DE10 10200301 CS 631 XF": {
+    "salesOrgMultiplier": 3.1782,
+    "konditionsbetrag_cent": 317.82
+  },
+  "DE10 10200301 CS 710 XF": {
+    "salesOrgMultiplier": 2.9399,
+    "konditionsbetrag_cent": 293.99
+  },
+  "DE10 10200301 CS 729 X": {
+    "salesOrgMultiplier": 3.1318,
+    "konditionsbetrag_cent": 313.18
+  },
+  "DE10 10200301 CS 757 JF": {
+    "salesOrgMultiplier": 3.4139,
+    "konditionsbetrag_cent": 341.39
+  },
+  "DE10 10200301 CS 811 Y": {
+    "salesOrgMultiplier": 2.8085,
+    "konditionsbetrag_cent": 280.85
+  },
+  "DE10 10200301 CS 905 Y": {
+    "salesOrgMultiplier": 2.872,
+    "konditionsbetrag_cent": 287.2
+  },
+  "DE10 10200301 CS 910 Y": {
+    "salesOrgMultiplier": 2.872,
+    "konditionsbetrag_cent": 287.2
+  },
+  "DE10 10200301 CS 911 X": {
+    "salesOrgMultiplier": 3.2568,
+    "konditionsbetrag_cent": 325.68
+  },
+  "DE10 10200301 CS 912 Y": {
+    "salesOrgMultiplier": 2.9118,
+    "konditionsbetrag_cent": 291.18
+  },
+  "DE10 10200301 CS 913 X": {
+    "salesOrgMultiplier": 3.2183,
+    "konditionsbetrag_cent": 321.83
+  },
+  "DE10 10200301 CS 920 Y": {
+    "salesOrgMultiplier": 2.9118,
+    "konditionsbetrag_cent": 291.18
+  },
+  "DE10 10200301 CS 922 Y": {
+    "salesOrgMultiplier": 2.9118,
+    "konditionsbetrag_cent": 291.18
+  },
+  "DE10 10200301 CS 922 YY": {
+    "salesOrgMultiplier": 2.9118,
+    "konditionsbetrag_cent": 291.18
+  },
+  "DE10 10200301 CS 931 JF": {
+    "salesOrgMultiplier": 3.1782,
+    "konditionsbetrag_cent": 317.82
+  },
+  "DE10 10200301 CS 950 Y": {
+    "salesOrgMultiplier": 2.9118,
+    "konditionsbetrag_cent": 291.18
+  },
+  "DE10 10200301 CS 959 JF": {
+    "salesOrgMultiplier": 3.4139,
+    "konditionsbetrag_cent": 341.39
+  },
+  "DE10 10200301 GX 712 JF": {
+    "salesOrgMultiplier": 2.9399,
+    "konditionsbetrag_cent": 293.99
+  },
+  "DE10 10200301 GX 931 JF": {
+    "salesOrgMultiplier": 3.1782,
+    "konditionsbetrag_cent": 317.82
+  },
+  "DE10 10200301 LS 307 X": {
+    "salesOrgMultiplier": 2.9793,
+    "konditionsbetrag_cent": 297.93
+  },
+  "DE10 10200301 LS 309 J": {
+    "salesOrgMultiplier": 2.9399,
+    "konditionsbetrag_cent": 293.99
+  },
+  "DE10 10200301 LS 309 JF": {
+    "salesOrgMultiplier": 2.9399,
+    "konditionsbetrag_cent": 293.99
+  },
+  "DE10 10200301 LS 309 JS": {
+    "salesOrgMultiplier": 2.9399,
+    "konditionsbetrag_cent": 293.99
+  },
+  "DE10 10200301 LS 309 X": {
+    "salesOrgMultiplier": 2.9793,
+    "konditionsbetrag_cent": 297.93
+  },
+  "DE10 10200301 LS 309 XH": {
+    "salesOrgMultiplier": 2.9399,
+    "konditionsbetrag_cent": 293.99
+  },
+  "DE10 10200301 LS 312 JF": {
+    "salesOrgMultiplier": 2.9399,
+    "konditionsbetrag_cent": 293.99
+  },
+  "DE10 10200301 LS 313 JF": {
+    "salesOrgMultiplier": 2.9399,
+    "konditionsbetrag_cent": 293.99
+  },
+  "DE10 10200301 LS 318 JF": {
+    "salesOrgMultiplier": 2.9399,
+    "konditionsbetrag_cent": 293.99
+  },
+  "DE10 10200301 PL 713 E": {
+    "salesOrgMultiplier": 1.7048,
+    "konditionsbetrag_cent": 170.48
+  },
+  "DE10 10200301 PS 15 F": {
+    "salesOrgMultiplier": 2.189,
+    "konditionsbetrag_cent": 218.9
+  },
+  "DE10 10200301 PS 18 E": {
+    "salesOrgMultiplier": 2.23,
+    "konditionsbetrag_cent": 223
+  },
+  "DE10 10200301 PS 19 F": {
+    "salesOrgMultiplier": 2.5213,
+    "konditionsbetrag_cent": 252.13
+  },
+  "DE10 10200301 PS 20 F": {
+    "salesOrgMultiplier": 2.23,
+    "konditionsbetrag_cent": 223
+  },
+  "DE10 10200301 PS 20 FW": {
+    "salesOrgMultiplier": 2.3965,
+    "konditionsbetrag_cent": 239.65
+  },
+  "DE10 10200301 PS 2000 F": {
+    "salesOrgMultiplier": 0.9737,
+    "konditionsbetrag_cent": 97.37
+  },
+  "DE10 10200301 PS 21 F": {
+    "salesOrgMultiplier": 2.23,
+    "konditionsbetrag_cent": 223
+  },
+  "DE10 10200301 PS 22 F": {
+    "salesOrgMultiplier": 2.23,
+    "konditionsbetrag_cent": 223
+  },
+  "DE10 10200301 PS 22 N": {
+    "salesOrgMultiplier": 2.189,
+    "konditionsbetrag_cent": 218.9
+  },
+  "DE10 10200301 PS 23 F": {
+    "salesOrgMultiplier": 2.189,
+    "konditionsbetrag_cent": 218.9
+  },
+  "DE10 10200301 PS 24 F": {
+    "salesOrgMultiplier": 2.5644,
+    "konditionsbetrag_cent": 256.44
+  },
+  "DE10 10200301 PS 26 F": {
+    "salesOrgMultiplier": 2.189,
+    "konditionsbetrag_cent": 218.9
+  },
+  "DE10 10200301 PS 27 DW": {
+    "salesOrgMultiplier": 2.5644,
+    "konditionsbetrag_cent": 256.44
+  },
+  "DE10 10200301 PS 28 F": {
+    "salesOrgMultiplier": 1.7465,
+    "konditionsbetrag_cent": 174.65
+  },
+  "DE10 10200301 PS 29 F": {
+    "salesOrgMultiplier": 2.23,
+    "konditionsbetrag_cent": 223
+  },
+  "DE10 10200301 PS 38 G": {
+    "salesOrgMultiplier": 2.5644,
+    "konditionsbetrag_cent": 256.44
+  },
+  "DE10 10200301 PS 524 E": {
+    "salesOrgMultiplier": 2.5644,
+    "konditionsbetrag_cent": 256.44
+  },
+  "DE10 10200301 PS 529 F": {
+    "salesOrgMultiplier": 2.5644,
+    "konditionsbetrag_cent": 256.44
+  },
+  "DE10 10200301 PS 61 F": {
+    "salesOrgMultiplier": 2.23,
+    "konditionsbetrag_cent": 223
+  },
+  "DE10 10200301 PS 726 F": {
+    "salesOrgMultiplier": 2.189,
+    "konditionsbetrag_cent": 218.9
+  },
+  "DE10 10200301 PS 729 F": {
+    "salesOrgMultiplier": 2.23,
+    "konditionsbetrag_cent": 223
+  },
+  "DE10 10200401 CP 540 Z": {
+    "salesOrgMultiplier": 3.5526,
+    "konditionsbetrag_cent": 355.26
+  },
+  "DE10 10200401 CS 2000 Z": {
+    "salesOrgMultiplier": 2.9194,
+    "konditionsbetrag_cent": 291.94
+  },
+  "DE10 10200401 CS 310 X": {
+    "salesOrgMultiplier": 2.691,
+    "konditionsbetrag_cent": 269.1
+  },
+  "DE10 10200401 CS 311 Y": {
+    "salesOrgMultiplier": 2.691,
+    "konditionsbetrag_cent": 269.1
+  },
+  "DE10 10200401 CS 320 Y": {
+    "salesOrgMultiplier": 3.3034,
+    "konditionsbetrag_cent": 330.34
+  },
+  "DE10 10200401 CS 321 X": {
+    "salesOrgMultiplier": 3.6406,
+    "konditionsbetrag_cent": 364.06
+  },
+  "DE10 10200401 CS 322 X": {
+    "salesOrgMultiplier": 3.5987,
+    "konditionsbetrag_cent": 359.87
+  },
+  "DE10 10200401 CS 325 Y": {
+    "salesOrgMultiplier": 3.7974,
+    "konditionsbetrag_cent": 379.74
+  },
+  "DE10 10200401 CS 326 Y": {
+    "salesOrgMultiplier": 3.0907,
+    "konditionsbetrag_cent": 309.07
+  },
+  "DE10 10200401 CS 330 X": {
+    "salesOrgMultiplier": 3.5987,
+    "konditionsbetrag_cent": 359.87
+  },
+  "DE10 10200401 CS 341 X": {
+    "salesOrgMultiplier": 2.9956,
+    "konditionsbetrag_cent": 299.56
+  },
+  "DE10 10200401 CS 409 Y": {
+    "salesOrgMultiplier": 2.8232,
+    "konditionsbetrag_cent": 282.32
+  },
+  "DE10 10200401 CS 411 Y": {
+    "salesOrgMultiplier": 2.872,
+    "konditionsbetrag_cent": 287.2
+  },
+  "DE10 10200401 CS 412 Y": {
+    "salesOrgMultiplier": 2.6917,
+    "konditionsbetrag_cent": 269.17
+  },
+  "DE10 10200401 CS 416 Y": {
+    "salesOrgMultiplier": 2.8085,
+    "konditionsbetrag_cent": 280.85
+  },
+  "DE10 10200401 CS 416 YY": {
+    "salesOrgMultiplier": 2.8085,
+    "konditionsbetrag_cent": 280.85
+  },
+  "DE10 10200401 CS 538 Z": {
+    "salesOrgMultiplier": 3.5524,
+    "konditionsbetrag_cent": 355.24
+  },
+  "DE10 10200401 CS 538 ZZ": {
+    "salesOrgMultiplier": 3.5524,
+    "konditionsbetrag_cent": 355.24
+  },
+  "DE10 10200401 CS 539 Z": {
+    "salesOrgMultiplier": 3.5115,
+    "konditionsbetrag_cent": 351.15
+  },
+  "DE10 10200401 CS 555 Y": {
+    "salesOrgMultiplier": 3.756,
+    "konditionsbetrag_cent": 375.6
+  },
+  "DE10 10200401 CS 729 X": {
+    "salesOrgMultiplier": 3.1318,
+    "konditionsbetrag_cent": 313.18
+  },
+  "DE10 10200401 CS 811 Y": {
+    "salesOrgMultiplier": 2.8085,
+    "konditionsbetrag_cent": 280.85
+  },
+  "DE10 10200401 CS 905 Y": {
+    "salesOrgMultiplier": 2.872,
+    "konditionsbetrag_cent": 287.2
+  },
+  "DE10 10200401 CS 910 Y": {
+    "salesOrgMultiplier": 2.872,
+    "konditionsbetrag_cent": 287.2
+  },
+  "DE10 10200401 CS 912 Y": {
+    "salesOrgMultiplier": 2.9118,
+    "konditionsbetrag_cent": 291.18
+  },
+  "DE10 10200401 CS 920 Y": {
+    "salesOrgMultiplier": 2.9118,
+    "konditionsbetrag_cent": 291.18
+  },
+  "DE10 10200401 CS 922 Y": {
+    "salesOrgMultiplier": 2.9118,
+    "konditionsbetrag_cent": 291.18
+  },
+  "DE10 10200401 CS 922 YY": {
+    "salesOrgMultiplier": 2.872,
+    "konditionsbetrag_cent": 287.2
+  },
+  "DE10 10200401 CS 950 Y": {
+    "salesOrgMultiplier": 2.9118,
+    "konditionsbetrag_cent": 291.18
+  },
+  "DE10 10200401 PL 713 E": {
+    "salesOrgMultiplier": 1.7048,
+    "konditionsbetrag_cent": 170.48
+  },
+  "DE10 10200401 PS 18 E": {
+    "salesOrgMultiplier": 2.23,
+    "konditionsbetrag_cent": 223
+  },
+  "DE10 10200401 PS 19 F": {
+    "salesOrgMultiplier": 2.5213,
+    "konditionsbetrag_cent": 252.13
+  },
+  "DE10 10200401 PS 20 F": {
+    "salesOrgMultiplier": 2.23,
+    "konditionsbetrag_cent": 223
+  },
+  "DE10 10200401 PS 2000 F": {
+    "salesOrgMultiplier": 0.5875,
+    "konditionsbetrag_cent": 58.75
+  },
+  "DE10 10200401 PS 21 F": {
+    "salesOrgMultiplier": 2.23,
+    "konditionsbetrag_cent": 223
+  },
+  "DE10 10200401 PS 22 F": {
+    "salesOrgMultiplier": 2.23,
+    "konditionsbetrag_cent": 223
+  },
+  "DE10 10200401 PS 23 F": {
+    "salesOrgMultiplier": 2.189,
+    "konditionsbetrag_cent": 218.9
+  },
+  "DE10 10200401 PS 24 F": {
+    "salesOrgMultiplier": 2.5644,
+    "konditionsbetrag_cent": 256.44
+  },
+  "DE10 10200401 PS 27 DW": {
+    "salesOrgMultiplier": 2.5644,
+    "konditionsbetrag_cent": 256.44
+  },
+  "DE10 10200401 PS 28 F": {
+    "salesOrgMultiplier": 1.7452,
+    "konditionsbetrag_cent": 174.52
+  },
+  "DE10 10200401 PS 29 F": {
+    "salesOrgMultiplier": 2.23,
+    "konditionsbetrag_cent": 223
+  },
+  "DE10 10200401 PS 38 G": {
+    "salesOrgMultiplier": 2.5644,
+    "konditionsbetrag_cent": 256.44
+  },
+  "DE10 10200401 PS 524 E": {
+    "salesOrgMultiplier": 2.5644,
+    "konditionsbetrag_cent": 256.44
+  },
+  "DE10 10200401 PS 61 F": {
+    "salesOrgMultiplier": 2.23,
+    "konditionsbetrag_cent": 223
+  },
+  "DE10 10200401 PS 726 F": {
+    "salesOrgMultiplier": 2.189,
+    "konditionsbetrag_cent": 218.9
+  },
+  "DE10 10200401 PS 729 F": {
+    "salesOrgMultiplier": 2.189,
+    "konditionsbetrag_cent": 218.9
+  },
+  "DE10 10200501 NBF 800": {
+    "salesOrgMultiplier": 3.0347,
+    "konditionsbetrag_cent": 303.47
+  },
+  "DE10 10200501 NBF 820": {
+    "salesOrgMultiplier": 3.0347,
+    "konditionsbetrag_cent": 303.47
+  },
+  "DE10 10200501 NBS 800": {
+    "salesOrgMultiplier": 3.0748,
+    "konditionsbetrag_cent": 307.48
+  },
+  "DE10 10200501 NBS 850": {
+    "salesOrgMultiplier": 3.0631,
+    "konditionsbetrag_cent": 306.31
+  },
+  "DE10 10200502 NBF 800": {
+    "salesOrgMultiplier": 3.0646,
+    "konditionsbetrag_cent": 306.46
+  },
+  "DE10 10200502 NBF 820": {
+    "salesOrgMultiplier": 3.0646,
+    "konditionsbetrag_cent": 306.46
+  },
+  "DE10 10200502 NBS 800": {
+    "salesOrgMultiplier": 3.0347,
+    "konditionsbetrag_cent": 303.47
+  },
+  "DE10 10200502 NBS 850": {
+    "salesOrgMultiplier": 3.0347,
+    "konditionsbetrag_cent": 303.47
+  },
+  "DE10 10200503 NBF 800": {
+    "salesOrgMultiplier": 3.0347,
+    "konditionsbetrag_cent": 303.47
+  },
+  "DE10 10200503 NBF 820": {
+    "salesOrgMultiplier": 3.0347,
+    "konditionsbetrag_cent": 303.47
+  },
+  "DE10 10200503 NBS 800": {
+    "salesOrgMultiplier": 3.0748,
+    "konditionsbetrag_cent": 307.48
+  },
+  "DE10 10200503 NBS 850": {
+    "salesOrgMultiplier": 3.0631,
+    "konditionsbetrag_cent": 306.31
+  },
+  "DE10 10200504 NBF 800": {
+    "salesOrgMultiplier": 3.0347,
+    "konditionsbetrag_cent": 303.47
+  },
+  "DE10 10200504 NBF 820": {
+    "salesOrgMultiplier": 3.0347,
+    "konditionsbetrag_cent": 303.47
+  },
+  "DE10 10200504 NBS 800": {
+    "salesOrgMultiplier": 3.0748,
+    "konditionsbetrag_cent": 307.48
+  },
+  "DE10 10200504 NBS 850": {
+    "salesOrgMultiplier": 3.0631,
+    "konditionsbetrag_cent": 306.31
+  }
+}
