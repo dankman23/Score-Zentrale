@@ -237,9 +237,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "COMPLETED: ✅ Merkmale-Loading Fix erfolgreich getestet - beide APIs funktionieren"
-    - "COMPLETED: ✅ SQL-Query-Fix verifiziert - tMerkmalSprache statt tMerkmal verwendet"
-    - "COMPLETED: ✅ Technische Merkmale werden korrekt geladen und in Bulletpoints integriert"
+    - "COMPLETED: ✅ Klingspor Price Configurator umfassend getestet"
+    - "COMPLETED: ✅ CS 310 X Basis-Test mit korrekten Berechnungen"
+    - "COMPLETED: ✅ MBM-Berechnung nach Breite verifiziert"
+    - "COMPLETED: ✅ Fehlerbehandlung für ungültige Parameter getestet"
   stuck_tasks: []
   test_priority: "high_first"
   test_all: false
