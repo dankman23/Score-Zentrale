@@ -132,13 +132,13 @@ export default function KlingsporKonfigurator() {
           <div className="grid gap-6 md:grid-cols-2">
             {/* Hersteller */}
             <div className="space-y-2">
-              <Label>Hersteller</Label>
+              <Label className="text-white">Hersteller</Label>
               <Input value="Klingspor" disabled className="bg-muted" />
             </div>
 
             {/* Typ */}
             <div className="space-y-2">
-              <Label>Typ *</Label>
+              <Label className="text-white">Typ *</Label>
               <Select value={type} onValueChange={setType}>
                 <SelectTrigger>
                   <SelectValue placeholder="Typ wählen..." />
@@ -153,7 +153,7 @@ export default function KlingsporKonfigurator() {
 
             {/* Körnung */}
             <div className="space-y-2">
-              <Label>Körnung *</Label>
+              <Label className="text-white">Körnung *</Label>
               <Select value={grit} onValueChange={setGrit} disabled={!type}>
                 <SelectTrigger>
                   <SelectValue placeholder="Körnung wählen..." />
@@ -168,7 +168,7 @@ export default function KlingsporKonfigurator() {
 
             {/* Breite */}
             <div className="space-y-2">
-              <Label>Breite (mm) *</Label>
+              <Label className="text-white">Breite (mm) *</Label>
               <Input
                 type="number"
                 min={3}
@@ -180,7 +180,7 @@ export default function KlingsporKonfigurator() {
 
             {/* Länge */}
             <div className="space-y-2 md:col-span-2">
-              <Label>Länge (mm) *</Label>
+              <Label className="text-white">Länge (mm) *</Label>
               <Input
                 type="number"
                 min={100}
