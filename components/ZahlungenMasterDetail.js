@@ -665,10 +665,52 @@ function ZahlungDetailPanel({ zahlung, onClose, onUpdate, zeitraum }) {
           </h3>
 
           <div className="space-y-3">
+            {/* BANKKONTO (Read-Only, aus Quelle) */}
+            <div className="bg-gray-50 p-3 rounded border border-gray-200">
+              <label className="block text-xs font-medium text-gray-600 mb-1">
+                💳 Zahlungskonto (aus Quelle)
+              </label>
+              <div className="font-mono text-sm text-gray-800 font-semibold">
+                {zahlung.bank_konto_nr || '????'} – {zahlung.bank_konto_bezeichnung || zahlung.anbieter}
+              </div>
+              <div className="text-xs text-gray-500 mt-1">
+                Automatisch gesetzt, keine Belegpflicht
+              </div>
+            </div>
+
+            {/* GEGENKONTO (Editierbar - das eigentliche Buchungskonto) */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                📊 Gegenkonto (Aufwand/Erlös/Debitor) *
+              </label>
+              <select
+                value={selectedKonto}
+                onChange={(e) => setSelectedKonto(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">-- Kein Gegenkonto --</option>
+                {konten
+                  .filter(k => {
+                    // Filtere Bankkonten (1xxx) aus dem Dropdown
+                    const nr = parseInt(k.kontonummer)
+                    return nr < 1000 || nr >= 2000  // Nur 4xxx-7xxx, Debitoren, Kreditoren etc.
+                  })
+                  .map(k => (
+                    <option key={k.kontonummer} value={k.kontonummer}>
+                      {k.kontonummer} - {k.bezeichnung}
+                    </option>
+                  ))
+                }
+              </select>
+              <div className="text-xs text-gray-500 mt-1">
+                * Erforderlich für Zuordnung
+              </div>
+            </div>
+
             {/* Beleg zuordnen */}
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                Beleg (Rechnung)
+                📄 Beleg (Rechnung/Gutschrift)
               </label>
               <select
                 value={selectedBeleg}
@@ -682,25 +724,9 @@ function ZahlungDetailPanel({ zahlung, onClose, onUpdate, zeitraum }) {
                   </option>
                 ))}
               </select>
-            </div>
-
-            {/* Konto zuordnen */}
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                Konto (SKR03/04)
-              </label>
-              <select
-                value={selectedKonto}
-                onChange={(e) => setSelectedKonto(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">-- Kein Konto --</option>
-                {konten.map(k => (
-                  <option key={k.kontonummer} value={k.kontonummer}>
-                    {k.kontonummer} - {k.bezeichnung}
-                  </option>
-                ))}
-              </select>
+              <div className="text-xs text-gray-500 mt-1">
+                Erforderlich, falls Gegenkonto belegpflichtig
+              </div>
             </div>
           </div>
         </div>
