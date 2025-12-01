@@ -130,8 +130,6 @@ async function processZahlungMatching(zahlung: any, db: Db, rechnungenCache: Map
   const autoVkMatch = await getAutoVkMatch(zahlung, rechnungenCache)
   if (autoVkMatch) return autoVkMatch
   
-  const kontoVorschlag = getKontoVorschlag(zahlung)
-  
   if (zahlung.istZugeordnet && zahlung.zugeordnetesKonto) {
     return {
       konto_id: zahlung.zugeordnetesKonto,
@@ -141,7 +139,7 @@ async function processZahlungMatching(zahlung: any, db: Db, rechnungenCache: Map
     }
   }
   
-  return kontoVorschlag
+  return getBankKontoAutoMatch(zahlung)
 }
 
 async function berechneZuordnungsStatus(
