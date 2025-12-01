@@ -467,6 +467,9 @@ export async function GET(request: NextRequest) {
           // (siehe weiter unten: processZahlungMatching)
         }
         
+        // Bankkonto aus Quelle ableiten (IMMER gesetzt, keine Belegpflicht)
+        const bankKontoInfo = BANK_KONTO_MAPPING[source.name] || { konto: '1200', bezeichnung: 'Bank' }
+        
         return {
           _id: p._id?.toString(),
           
@@ -481,9 +484,14 @@ export async function GET(request: NextRequest) {
           anbieter: source.name,
           quelle: source.collection,
           
+          // NEUE FELDER: Klare Trennung Bankkonto / Gegenkonto
+          bank_konto_nr: bankKontoInfo.konto,  // Zahlungskonto (aus Quelle, read-only)
+          bank_konto_bezeichnung: bankKontoInfo.bezeichnung,
+          gegenkonto_konto_nr: p.gegenkonto_konto_nr || autoGegenkonto || null,  // Das EIGENTLICHE Buchungskonto (editierbar)
+          
           // Beschreibung & Details
           verwendungszweck,
-          gegenkonto,
+          gegenkonto,  // DEPRECATED: Name des Gegenkontos (z.B. Kundenname), nicht die Kontonummer
           gegenkontoIban: p.gegenkontoIban || null,
           kundenEmail: p.kundenEmail || null,
           
@@ -501,15 +509,17 @@ export async function GET(request: NextRequest) {
           steuerschluessel: p.steuerschluessel || null,  // Steuerschlüssel (z.B. 401 für voller Vorsteuerabzug)
           
           // Zuordnung zu Rechnungen (mit Auto-Zuordnung)
-          istZugeordnet: p.istZugeordnet || autoZugeordnet,
+          istZugeordnet: p.istZugeordnet || autoZugeordnet,  // DEPRECATED: Verwende zuordnungs_status
           zugeordneteRechnung: p.zugeordneteRechnung || null,
-          zugeordnetesKonto: p.zugeordnetesKonto || autoGegenkonto,
+          zugeordnetesKonto: p.zugeordnetesKonto || autoGegenkonto,  // DEPRECATED: Verwende gegenkonto_konto_nr
           zuordnungsArt: p.zuordnungsArt || autoZuordnungsArt,
           zuordnungsDatum: p.zuordnungsDatum || (autoZugeordnet ? new Date().toISOString() : null),
           zuordnungsMethode: p.zuordnungsMethode || (autoZugeordnet ? 'auto-amazon-type' : null),
           
           // Beleg-Felder
           belegId: p.belegId || null,
+          ek_beleg_id: p.ek_beleg_id || null,
+          vk_beleg_id: p.vk_beleg_id || null,
           beleglink: p.beleglink || null,
           
           // Abweichungen (für Teilzahlungen, Skonto, Währung)
