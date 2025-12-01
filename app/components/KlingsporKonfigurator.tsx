@@ -216,27 +216,27 @@ export default function KlingsporKonfigurator() {
           {/* Klingspor-Basisdaten */}
           <Card>
             <CardHeader>
-              <CardTitle>📊 Klingspor-Basisdaten</CardTitle>
+              <CardTitle className="text-white">📊 Klingspor-Basisdaten</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="border rounded-lg p-4">
-                  <div className="text-sm text-muted-foreground mb-1">Stück-EK (Score)</div>
-                  <div className="text-2xl font-bold">{formatEuro(result.stueckEk)}</div>
+                  <div className="text-sm text-gray-400 mb-1">Stück-EK (Score)</div>
+                  <div className="text-2xl font-bold text-white">{formatEuro(result.stueckEk)}</div>
                 </div>
                 <div className="border rounded-lg p-4">
-                  <div className="text-sm text-muted-foreground mb-1">MBM (Stück)</div>
-                  <div className="text-2xl font-bold">{result.minOrderQty}</div>
+                  <div className="text-sm text-gray-400 mb-1">MBM (Stück)</div>
+                  <div className="text-2xl font-bold text-white">{result.minOrderQty}</div>
                 </div>
                 <div className="border rounded-lg p-4">
-                  <div className="text-sm text-muted-foreground mb-1">Gesamt-EK für MBM</div>
-                  <div className="text-2xl font-bold">{formatEuro(result.ekGesamtMbm)}</div>
+                  <div className="text-sm text-gray-400 mb-1">Gesamt-EK für MBM</div>
+                  <div className="text-2xl font-bold text-white">{formatEuro(result.ekGesamtMbm)}</div>
                 </div>
               </div>
 
-              <div className="mt-4 text-sm text-muted-foreground border-t pt-4">
-                <p><strong>Typ:</strong> {result.type} | <strong>Körnung:</strong> {result.grit} | <strong>Unterlagenart:</strong> {result.backingType}</p>
-                <p><strong>Maße:</strong> {result.widthMm} mm × {result.lengthMm} mm | <strong>Listenpreis:</strong> {formatEuro(result.listPrice)}</p>
+              <div className="mt-4 text-sm text-gray-400 border-t pt-4">
+                <p className="text-gray-300"><strong>Typ:</strong> {result.type} | <strong>Körnung:</strong> {result.grit} | <strong>Unterlagenart:</strong> {result.backingType}</p>
+                <p className="text-gray-300"><strong>Maße:</strong> {result.widthMm} mm × {result.lengthMm} mm | <strong>Listenpreis:</strong> {formatEuro(result.listPrice)}</p>
               </div>
             </CardContent>
           </Card>
@@ -244,7 +244,7 @@ export default function KlingsporKonfigurator() {
           {/* Score-Preisformel-Ergebnis */}
           <Card>
             <CardHeader>
-              <CardTitle>💰 Score-Verkaufspreise</CardTitle>
+              <CardTitle className="text-white">💰 Score-Verkaufspreise</CardTitle>
               <CardDescription>
                 Berechnet mit Preisformel "Alte PB - Alle Konfektionen"
               </CardDescription>
@@ -252,26 +252,26 @@ export default function KlingsporKonfigurator() {
             <CardContent>
               <div className="grid gap-4 md:grid-cols-2 mb-6">
                 <div className="border rounded-lg p-4">
-                  <div className="text-sm text-muted-foreground mb-1">VK / Stück netto</div>
-                  <div className="text-2xl font-bold text-blue-600">{formatEuro(result.vkStueckNetto)}</div>
+                  <div className="text-sm text-gray-400 mb-1">VK / Stück netto</div>
+                  <div className="text-2xl font-bold text-blue-400">{formatEuro(result.vkStueckNetto)}</div>
                 </div>
                 <div className="border rounded-lg p-4">
-                  <div className="text-sm text-muted-foreground mb-1">VK / Stück brutto</div>
-                  <div className="text-2xl font-bold text-green-600">{formatEuro(result.vkStueckBrutto)}</div>
+                  <div className="text-sm text-gray-400 mb-1">VK / Stück brutto</div>
+                  <div className="text-2xl font-bold text-green-400">{formatEuro(result.vkStueckBrutto)}</div>
                 </div>
                 <div className="border rounded-lg p-4">
-                  <div className="text-sm text-muted-foreground mb-1">VK für MBM netto</div>
-                  <div className="text-xl font-bold text-blue-600">{formatEuro(result.vkMbmNetto)}</div>
+                  <div className="text-sm text-gray-400 mb-1">VK für MBM netto</div>
+                  <div className="text-xl font-bold text-blue-400">{formatEuro(result.vkMbmNetto)}</div>
                 </div>
                 <div className="border rounded-lg p-4">
-                  <div className="text-sm text-muted-foreground mb-1">VK für MBM brutto</div>
-                  <div className="text-xl font-bold text-green-600">{formatEuro(result.vkMbmBrutto)}</div>
+                  <div className="text-sm text-gray-400 mb-1">VK für MBM brutto</div>
+                  <div className="text-xl font-bold text-green-400">{formatEuro(result.vkMbmBrutto)}</div>
                 </div>
               </div>
 
               {/* Staffelpreise */}
               <div className="border-t pt-4">
-                <h3 className="font-semibold mb-3">Staffelpreise (Shop)</h3>
+                <h3 className="font-semibold mb-3 text-white">Staffelpreise (Shop)</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
