@@ -1,0 +1,2042 @@
+[
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 308 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1185,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 310 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1162,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 310 XF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1162,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 311 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1185,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 320 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1670,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 321 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1638,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 322 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 2884,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 325 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 2088,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 326 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1951,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 329 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 2049,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 330 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 4936,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 333 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1247,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 333 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1247,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 333 XF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1247,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 336 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1497,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 341 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1528,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 409 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1814,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 410 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1511,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 411 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1511,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 411 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1556,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 412 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1185,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 416 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1477,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 420 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 5520,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 631 XF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1742,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 729 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-01-24T00:00:00",
+    "Konditionsbetrag": 1756,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 811 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1689,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 920 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1905,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 922 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 1667,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 931 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1742,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "GX 533 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1247,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "GX 712 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1352,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "GX 931 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1568,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "LS 309 J",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1075,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "LS 309 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1075,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "LS 309 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1075,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "LS 312 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1176,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "LS 313 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1529,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "LS 314 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1290,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "LS 318 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1075,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "LS 912 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-01-04T00:00:00",
+    "Konditionsbetrag": 1394,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 20 F",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 373,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 21 F",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 411,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 22 F",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 391,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 24 F",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 416,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 27 DW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 541,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 28 F",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 336,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 29 F",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 373,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 529 F",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 937,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 61 F",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 575,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 729 F",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 858,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "NBF 800",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 8345,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "NBS 800",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 8345,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 20 FW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 529,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 726 F",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-05-09T00:00:00",
+    "Konditionsbetrag": 392,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CP 540 Z",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 2081,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 2000 Z",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1470,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 310 XA",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1243,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 310 XS",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1250,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 311 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1162,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 323 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1720,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 326 YK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 2259,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 326 YY",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-08-31T00:00:00",
+    "Konditionsbetrag": 1951,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 327 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1951,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 329 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 2049,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 330 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 4936,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 333 J",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1247,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 355 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1224,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 377 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-11-15T00:00:00",
+    "Konditionsbetrag": 1814,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 395 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 6500,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 396 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 8000,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 411 XK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1819,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 411 XS",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1547,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 411 YY",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-03-30T00:00:00",
+    "Konditionsbetrag": 1556,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 416 YY",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-03-30T00:00:00",
+    "Konditionsbetrag": 1477,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 417 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1185,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 448 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1209,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 450 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1511,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 451 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1889,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 455 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1587,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 461 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1590,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 480 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1587,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 520 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 5908,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 538 Z",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1982,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 538 ZZ",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2024-03-06T00:00:00",
+    "Konditionsbetrag": 2022,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 539 Z",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1982,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 555 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-08-02T00:00:00",
+    "Konditionsbetrag": 2401,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 710 XF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1353,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 757 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-01-24T00:00:00",
+    "Konditionsbetrag": 2356,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 905 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 2539,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 910 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 2539,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 911 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-03-06T00:00:00",
+    "Konditionsbetrag": 1151,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 912 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 2222,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 913 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-03-06T00:00:00",
+    "Konditionsbetrag": 1411,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 920 YK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-07-24T00:00:00",
+    "Konditionsbetrag": 2213,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 922 YY",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-09-28T00:00:00",
+    "Konditionsbetrag": 1934,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 950 Y",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2024-03-05T00:00:00",
+    "Konditionsbetrag": 1905,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "CS 959 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-01-26T00:00:00",
+    "Konditionsbetrag": 2458,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "FD 500",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 4000,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "FP 73 W",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 442,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "FP 73 WK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 710,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "FP 77",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 572,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "FP 77 K",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 840,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "FP 77 S",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-08-28T00:00:00",
+    "Konditionsbetrag": 840,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "GX 514 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1500,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "KL 361 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 740,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "KL 371 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 460,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "KL 375 J",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 400,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "KL 381 J",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 483,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "KL 385 JF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 511,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "LS 307 X",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 935,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "LS 309 XH",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 935,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "LS 309XHK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1243,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "LS 314 J",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 1290,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PL 16 E",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 142,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PL 28 C",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 102,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PL 28 CK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 370,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PL 31 B",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 156,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PL 712 AW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 285,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PL 713 E",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 300,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 11 A",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 276,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 11 AK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-06-26T00:00:00",
+    "Konditionsbetrag": 544,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 11 AW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 318,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 11 C",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 276,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 18",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 210,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 18 E",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 245,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 18 EK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 513,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 19 E",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 280,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 19 EK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 548,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 19 F",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 310,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 19 FK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-04-18T00:00:00",
+    "Konditionsbetrag": 578,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 2000 F",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 300,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 21 FK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 679,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 22 E",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-11-15T00:00:00",
+    "Konditionsbetrag": 391,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 22 K",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 641,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 22 N",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 359,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 26 F",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 429,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 28 FS",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 540,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 29 FS",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 577,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 30 D",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 146,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 30 DK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-01-20T00:00:00",
+    "Konditionsbetrag": 414,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 32 B",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-09-21T00:00:00",
+    "Konditionsbetrag": 195.5,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 33 B",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 230,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 33 BF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 620,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 33 BK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 498,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 33 BS",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 424,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 33 BW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 276,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 33 BWC",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2024-08-21T00:00:00",
+    "Konditionsbetrag": 276,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 33 BWK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 544,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 33 C",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 230,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 33 CC",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 230,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 33 CF",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 620,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 33 CK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 498,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 33 CS",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 424,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 33BWCK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2024-08-21T00:00:00",
+    "Konditionsbetrag": 544,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 35 BW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 290,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 35 CW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 290,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 36 C",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 243,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 36 CK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 511,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 36 D",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 243,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 36 DK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 511,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 38 G",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 644,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 44 E",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 146,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 46 E",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 146,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 48 D",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 146,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 514 A",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 307,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 524 E",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 360,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 61 FK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 843,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 73 BW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 285,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 73 BWC",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 285,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 73 BWK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 553,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 73 BWS",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 472,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 73 CW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 285,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 73 CWK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 553,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 77 C",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 392,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 77 CK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 660,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 77 CS",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2023-08-28T00:00:00",
+    "Konditionsbetrag": 660,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 8 A",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 240,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 8 AK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 508,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 8 C",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 240,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 86 C",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 243,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 86 CC",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 243,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "PS 9 C",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2024-08-07T00:00:00",
+    "Konditionsbetrag": 235,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "VP 73 CW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 332,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "VP 73 CWK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 600,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 244 BW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 265,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 244 CW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 265,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 244BWK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 573,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 244CWK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 573,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 55 B",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 253,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 55 BK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 548,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 55 C",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 253,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 55 CK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 548,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 733 BW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 276,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 733 CW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 276,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 733BWK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 598,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 733CWK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 598,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 836 C",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 253,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 836 CK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-06-15T00:00:00",
+    "Konditionsbetrag": 511,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 836 D",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 253,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 836 DK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 548,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 994 CW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 690,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 994 DW",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 690,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 994CWK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 1494,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  },
+  {
+    "Konditionsart": "ZPQG",
+    "SaU Type": "WP 994DWK",
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2022-12-13T00:00:00",
+    "Konditionsbetrag": 1494,
+    "Konditionswährung": "EUR",
+    "Preiseinheit": 100,
+    "Mengeneinheit": "M2"
+  }
+]

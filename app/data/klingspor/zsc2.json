@@ -1,0 +1,51 @@
+[
+  {
+    "Konditionsart": "ZSC2",
+    "Produkthierarchie": 10200101,
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2021-01-28T00:00:00",
+    "Betrag": 11.3
+  },
+  {
+    "Konditionsart": "ZSC2",
+    "Produkthierarchie": 10200102,
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2021-01-28T00:00:00",
+    "Betrag": 11.3
+  },
+  {
+    "Konditionsart": "ZSC2",
+    "Produkthierarchie": 10200201,
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2021-01-28T00:00:00",
+    "Betrag": 11.3
+  },
+  {
+    "Konditionsart": "ZSC2",
+    "Produkthierarchie": 10200301,
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2021-01-28T00:00:00",
+    "Betrag": 15.54
+  },
+  {
+    "Konditionsart": "ZSC2",
+    "Produkthierarchie": 10200401,
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2021-01-28T00:00:00",
+    "Betrag": 15.54
+  },
+  {
+    "Konditionsart": "ZSC2",
+    "Produkthierarchie": 10200501,
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2021-01-28T00:00:00",
+    "Betrag": 11.3
+  },
+  {
+    "Konditionsart": "ZSC2",
+    "Produkthierarchie": 10200502,
+    "Gültig bis": "9999-12-31T00:00:00",
+    "Gültig ab": "2021-01-28T00:00:00",
+    "Betrag": 11.3
+  }
+]
