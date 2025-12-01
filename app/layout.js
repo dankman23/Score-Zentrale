@@ -173,7 +173,7 @@ export default function RootLayout({ children }) {
                     </div>
                   </li>
                   <li className="nav-item"><a className="nav-link py-1 px-2" href="#produkte" style={{fontSize: '0.85rem'}}><i className="bi bi-box-seam mr-1"/>Produkte</a></li>
-                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#preise" style={{fontSize: '0.85rem'}}><i className="bi bi-calculator mr-1"/>Preise</a></li>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="/preise" style={{fontSize: '0.85rem'}}><i className="bi bi-calculator mr-1"/>Preise</a></li>
                   <li className="nav-item"><a className="nav-link py-1 px-2" href="#orga" style={{fontSize: '0.85rem'}}><i className="bi bi-calendar-check mr-1"/>Orga</a></li>
                   <li className="nav-item"><a className="nav-link py-1 px-2" href="#fibu" style={{fontSize: '0.85rem'}}><i className="bi bi-receipt-cutoff mr-1"/>FIBU</a></li>
                   <li className="nav-item"><a className="nav-link py-1 px-2 logout-btn-hero" href="/login" style={{fontSize: '0.85rem', color: '#ff6b6b !important'}}><i className="bi bi-box-arrow-right mr-1"/>Abmelden</a></li>
