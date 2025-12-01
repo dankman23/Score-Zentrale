@@ -5,9 +5,6 @@
 
 import {
   validEntries,
-  availableGrits,
-  definitionPh,
-  backing,
   zpqg,
   zpsd,
   zsc2,
