@@ -121,12 +121,14 @@ async function processZahlungMatching(zahlung: any, db: Db, rechnungenCache: Map
   return getBankKontoAutoMatch(zahlung)
 }
 
+// DEPRECATED: Diese Funktion wird nicht mehr verwendet
+// Status wird jetzt inline berechnet (siehe unten)
 async function berechneZuordnungsStatus(
   zahlung: any,
   matchResult: MatchResult,
   db: Db
 ): Promise<'offen' | 'beleg_fehlt' | 'zugeordnet'> {
-  const kontoNr = matchResult.konto_id || zahlung.zugeordnetesKonto
+  const kontoNr = matchResult.gegenkonto_id || zahlung.gegenkonto_konto_nr
   
   if (!kontoNr) return 'offen'
   
