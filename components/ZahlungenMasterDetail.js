@@ -743,11 +743,22 @@ function ZahlungDetailPanel({ zahlung, onClose, onUpdate, zeitraum }) {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">-- Kein Beleg --</option>
-                {rechnungen.map(r => (
-                  <option key={r._id || r.belegnummer} value={r._id || r.belegnummer}>
-                    {r.belegnummer} - {r.kundenName} ({r.brutto?.toFixed(2)}€)
-                  </option>
-                ))}
+                {rechnungen.map(r => {
+                  // Unterstütze sowohl ID als auch Rechnungsnummer als value
+                  const isSelectedById = selectedBeleg === (r._id || '').toString()
+                  const isSelectedByNummer = selectedBeleg === r.belegnummer || selectedBeleg === r.cRechnungsNr
+                  const isSelected = isSelectedById || isSelectedByNummer
+                  
+                  return (
+                    <option 
+                      key={r._id || r.belegnummer} 
+                      value={r._id || r.belegnummer}
+                      selected={isSelected}
+                    >
+                      {r.belegnummer || r.cRechnungsNr} - {r.kundenName} ({r.brutto?.toFixed(2)}€)
+                    </option>
+                  )
+                })}
               </select>
               <div className="text-xs text-gray-500 mt-1">
                 Erforderlich, falls Gegenkonto belegpflichtig
