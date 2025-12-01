@@ -1,0 +1,387 @@
+[
+  {
+    "SaU Type": "CS 308 Y",
+    "Korn": 12,
+    "PH": 10200101,
+    "Bezeichnung": "coat.abras.standard belts",
+    "Unterlagenart": "Cloth"
+  },
+  {
+    "SaU Type": "CS 310 X",
+    "Korn": 16,
+    "PH": 10200102,
+    "Bezeichnung": "coated abrasives file belts",
+    "Unterlagenart": "Paper"
+  },
+  {
+    "SaU Type": "CS 310 XF",
+    "Korn": 20,
+    "PH": 10200301,
+    "Bezeichnung": "coat.abras.wide belts",
+    "Unterlagenart": "Non Woven"
+  },
+  {
+    "SaU Type": "CS 311 Y",
+    "Korn": 24,
+    "PH": 10200501,
+    "Bezeichnung": "non-woven web belts",
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 320 Y",
+    "Korn": 30,
+    "PH": 10200502,
+    "Bezeichnung": "non-woven file belts",
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 321 X",
+    "Korn": 36,
+    "PH": 10200401,
+    "Bezeichnung": "coat.abras.wide belts,segmented",
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 322 X",
+    "Korn": 40,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 325 Y",
+    "Korn": 50,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 326 Y",
+    "Korn": 60,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 329 Y",
+    "Korn": 80,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 330 X",
+    "Korn": 100,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 333 JF",
+    "Korn": 120,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 333 X",
+    "Korn": 150,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 333 XF",
+    "Korn": 180,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 336 Y",
+    "Korn": 220,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 341 X",
+    "Korn": 240,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 409 Y",
+    "Korn": 280,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 410 X",
+    "Korn": 320,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 411 X",
+    "Korn": 360,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 411 Y",
+    "Korn": 400,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 412 Y",
+    "Korn": 500,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 416 Y",
+    "Korn": 600,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 420 Y",
+    "Korn": 800,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 631 XF",
+    "Korn": 1000,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 729 X",
+    "Korn": 1200,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 811 Y",
+    "Korn": 1500,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 920 Y",
+    "Korn": 2000,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 922 Y",
+    "Korn": 2500,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 931 JF",
+    "Korn": 3000,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "GX 533 JF",
+    "Korn": "CO",
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "GX 712 JF",
+    "Korn": "ME",
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "GX 931 JF",
+    "Korn": "VF",
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "LS 309 J",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "LS 309 JF",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "LS 309 X",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "LS 312 JF",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "LS 313 JF",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "LS 314 JF",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "LS 318 JF",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "NBF 800",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "NBS 800",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "PS 20 F",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "PS 21 F",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "PS 22 F",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "PS 24 F",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "PS 27 DW",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "PS 28 F",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "PS 29 F",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "PS 529 F",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "PS 61 F",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "PS 729 F",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "PS 20 FW",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 911 X",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "CS 913 X",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  },
+  {
+    "SaU Type": "PS 726 F",
+    "Korn": null,
+    "PH": null,
+    "Bezeichnung": null,
+    "Unterlagenart": null
+  }
+]
