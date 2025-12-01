@@ -51,7 +51,7 @@ async function getImportMatch(zahlung: any, db: Db): Promise<MatchResult | null>
       return {
         vk_beleg_id: rechnung._id.toString(),
         vk_rechnung_nr: rechnung.cRechnungsNr,
-        konto_id: rechnung.sachkonto || rechnung.debitorKonto,
+        gegenkonto_id: rechnung.sachkonto || rechnung.debitorKonto,  // GEGENKONTO, nicht Bankkonto!
         match_source: 'import_vk',
         match_confidence: 100,
         match_details: 'JTL-Import-Match'
