@@ -604,14 +604,17 @@ export async function GET(request: NextRequest) {
       zahlung.match_source = matchResult.match_source
       zahlung.match_confidence = matchResult.match_confidence
       
-      // Wenn neues Match gefunden: aktualisiere Felder
-      if (matchResult.vk_beleg_id && !zahlung.zugeordneteRechnung) {
+      // Übernehme VK-Beleg aus matchResult (IMMER, wenn Match gefunden)
+      if (matchResult.vk_beleg_id) {
         zahlung.vk_beleg_id = matchResult.vk_beleg_id
-        zahlung.zugeordneteRechnung = matchResult.vk_rechnung_nr
+        if (matchResult.vk_rechnung_nr) {
+          zahlung.zugeordneteRechnung = matchResult.vk_rechnung_nr
+        }
       }
       
-      // Übernehme Gegenkonto aus matchResult (falls vorhanden)
-      if (matchResult.gegenkonto_id && !zahlung.gegenkonto_konto_nr) {
+      // Übernehme Gegenkonto aus matchResult (IMMER, wenn Match gefunden)
+      // Wichtig: Match-Result hat Vorrang vor alten DB-Werten!
+      if (matchResult.gegenkonto_id) {
         zahlung.gegenkonto_konto_nr = matchResult.gegenkonto_id
       }
       
