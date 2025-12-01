@@ -25,7 +25,7 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
   // Zahlungen laden
   useEffect(() => {
     loadZahlungen()
-  }, [zeitraum, currentPage])
+  }, [zeitraum, currentPage, filter])  // Filter hinzugefügt!
 
   const loadZahlungen = async () => {
     setLoading(true)
@@ -38,8 +38,8 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
         to = zeitraum.to
       }
       
-      // Pagination: Nur 50 pro Seite laden
-      const response = await fetch(`/api/fibu/zahlungen?from=${from}&to=${to}&page=${currentPage}&pageSize=${pageSize}`)
+      // Serverseitiger Filter + Pagination
+      const response = await fetch(`/api/fibu/zahlungen?from=${from}&to=${to}&page=${currentPage}&pageSize=${pageSize}&statusFilter=${filter}`)
       const data = await response.json()
       
       if (data.ok) {
