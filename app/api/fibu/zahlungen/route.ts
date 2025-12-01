@@ -551,7 +551,7 @@ export async function GET(request: NextRequest) {
           matchResult = {
             vk_beleg_id: rechnung._id.toString(),
             vk_rechnung_nr: rechnung.cRechnungsNr,
-            konto_id: rechnung.sachkonto || rechnung.debitorKonto,
+            gegenkonto_id: rechnung.sachkonto || rechnung.debitorKonto,  // GEGENKONTO
             match_source: 'import_vk',
             match_confidence: 100,
             match_details: 'JTL-Import-Match'
@@ -570,7 +570,7 @@ export async function GET(request: NextRequest) {
             matchResult = {
               vk_beleg_id: rechnung._id.toString(),
               vk_rechnung_nr: rechnung.cRechnungsNr,
-              konto_id: rechnung.sachkonto || rechnung.debitorKonto,
+              gegenkonto_id: rechnung.sachkonto || rechnung.debitorKonto,  // GEGENKONTO
               match_source: 'auto_vk',
               match_confidence: 95,
               match_details: `AU-Match: ${zahlung.referenz}`
