@@ -477,12 +477,13 @@ export async function GET(request: NextRequest) {
           steuerschluessel: p.steuerschluessel || null,  // Steuerschlüssel (z.B. 401 für voller Vorsteuerabzug)
           
           // Zuordnung zu Rechnungen (mit Auto-Zuordnung)
-          istZugeordnet: p.istZugeordnet || autoZugeordnet,  // DEPRECATED: Verwende zuordnungs_status
+          // WICHTIG: istZugeordnet ist DEPRECATED - Status wird später über zuordnungs_status berechnet
+          istZugeordnet: p.istZugeordnet || false,  // DEPRECATED: Verwende zuordnungs_status
           zugeordneteRechnung: p.zugeordneteRechnung || null,
-          zugeordnetesKonto: p.zugeordnetesKonto || autoGegenkonto,  // DEPRECATED: Verwende gegenkonto_konto_nr
+          zugeordnetesKonto: autoGegenkonto || p.zugeordnetesKonto || null,  // DEPRECATED: Verwende gegenkonto_konto_nr
           zuordnungsArt: p.zuordnungsArt || autoZuordnungsArt,
-          zuordnungsDatum: p.zuordnungsDatum || (autoZugeordnet ? new Date().toISOString() : null),
-          zuordnungsMethode: p.zuordnungsMethode || (autoZugeordnet ? 'auto-amazon-type' : null),
+          zuordnungsDatum: p.zuordnungsDatum || (autoGegenkonto ? new Date().toISOString() : null),
+          zuordnungsMethode: p.zuordnungsMethode || (autoGegenkonto ? 'auto-amazon-type' : null),
           
           // Beleg-Felder
           belegId: p.belegId || null,
