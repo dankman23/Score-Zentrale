@@ -108,6 +108,7 @@ export interface ExchangeRate {
 export const validEntries: ValidEntry[] = validEntriesData as ValidEntry[]
 export const availableGrits: AvailableGrit[] = availableGritsData as AvailableGrit[]
 export const backingMap: Record<string, {de: string, en: string}> = backingDataNew as Record<string, {de: string, en: string}>
+export const phMap: Record<string, number> = definitionPhData as Record<string, number>
 export const allTypes: string[] = typesData as string[]
 export const zpqg: ZPQG[] = zpqgData as ZPQG[]
 export const zpsd: ZPSD[] = zpsdData as ZPSD[]
