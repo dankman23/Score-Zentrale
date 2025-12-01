@@ -4,6 +4,7 @@
  */
 
 import validEntriesData from '../../data/klingspor_new/valid_entries.json'
+import availableGritsData from '../../data/klingspor_new/available_grits.json'
 import backingDataNew from '../../data/klingspor_new/backing.json'
 import typesData from '../../data/klingspor_new/types.json'
 import zpqgData from '../../data/klingspor/zpqg.json'
