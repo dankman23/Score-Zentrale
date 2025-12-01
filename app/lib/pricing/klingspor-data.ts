@@ -104,15 +104,15 @@ export interface ExchangeRate {
   [key: string]: any
 }
 
-// Export data
-export const validEntries: ValidEntry[] = validEntriesData as ValidEntry[]
-export const availableGrits: AvailableGrit[] = availableGritsData as AvailableGrit[]
-export const backingMap: Record<string, {de: string, en: string}> = backingDataNew as Record<string, {de: string, en: string}>
-export const phMap: Record<string, number> = definitionPhData as Record<string, number>
-export const zms2Map: Record<string, {salesOrgMultiplier: number, konditionsbetrag_cent: number}> = zms2DataNew as Record<string, {salesOrgMultiplier: number, konditionsbetrag_cent: number}>
-export const allTypes: string[] = typesData as string[]
-export const zpqg: ZPQG[] = zpqgData as ZPQG[]
-export const zpsd: ZPSD[] = zpsdData as ZPSD[]
+// Export data (with type assertions to bypass strict type checking for JSON imports)
+export const validEntries: ValidEntry[] = validEntriesData as any
+export const availableGrits: AvailableGrit[] = availableGritsData as any
+export const backingMap: Record<string, {de: string, en: string}> = backingDataNew as any
+export const phMap: Record<string, number> = definitionPhData as any
+export const zms2Map: Record<string, {salesOrgMultiplier: number, konditionsbetrag_cent: number}> = zms2DataNew as any
+export const allTypes: string[] = typesData as any
+export const zpqg: ZPQG[] = zpqgData as any
+export const zpsd: ZPSD[] = zpsdData as any
 export const zsc2: ZSC2[] = zsc2Data as ZSC2[]
 export const zsg1: ZSG1[] = zsg1Data as ZSG1[]
 export const exchangeRates: ExchangeRate[] = exchangeRatesData as ExchangeRate[]
