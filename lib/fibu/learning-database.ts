@@ -203,7 +203,7 @@ export async function updateHistoryFeedback(
   const collection = db.collection<MatchingHistory>('fibu_matching_history')
   
   await collection.updateOne(
-    { _id: historyId },
+    { _id: historyId as any },
     {
       $set: {
         isCorrect,
@@ -215,7 +215,7 @@ export async function updateHistoryFeedback(
   
   // Wenn korrigiert wurde, erstelle neue Rule aus Korrektur
   if (!isCorrect && correctedKonto) {
-    const history = await collection.findOne({ _id: historyId })
+    const history = await collection.findOne({ _id: historyId as any })
     if (history) {
       // Extrahiere Pattern aus zahlungText
       const pattern = history.zahlungText.substring(0, 50).trim()
