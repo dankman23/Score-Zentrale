@@ -372,8 +372,8 @@ export async function GET(request: NextRequest) {
           gegenkonto = p.kundenName || ''  // Kundenname
           verwendungszweck = p.betreff || p.rechnungsNr || ''  // Betreff oder AU-Nummer als Fallback
           
-          // AUTO-ZUORDNUNG für PayPal über AU-Nummer (nur wenn noch nicht zugeordnet)
-          if (!p.istZugeordnet) {
+          // AUTO-ZUORDNUNG für PayPal über AU-Nummer (nur wenn noch kein Gegenkonto manuell gesetzt)
+          if (!p.gegenkonto_konto_nr && !p.zugeordnetesKonto) {
             if (referenz && referenz.match(/^AU_\d+_SW\d+$/)) {
               // Prüfe ob Rechnung mit dieser AU-Nummer existiert
               const rechnung = rechnungenMap.get(referenz)
