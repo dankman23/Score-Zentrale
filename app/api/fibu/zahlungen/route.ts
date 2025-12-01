@@ -358,7 +358,6 @@ export async function GET(request: NextRequest) {
               autoGegenkonto = '1815'  // Amazon Settlement-Konto (neutral)
               autoZuordnungsArt = 'Amazon (automatisch zugeordnet)'
             }
-          }
           
         } else if (source.name === 'Mollie') {
           // Mollie: AU-Nummer aus Verwendungszweck extrahieren
