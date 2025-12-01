@@ -304,8 +304,8 @@ export async function GET(request: NextRequest) {
           sku = p.sku || ''
           transaktionsId = p.transactionId || ''
           
-          // AUTO-ZUORDNUNG für Amazon basierend auf amountType (nur wenn noch NICHT zugeordnet)
-          if (!p.istZugeordnet) {
+          // AUTO-ZUORDNUNG für Amazon basierend auf amountType (nur wenn noch kein Gegenkonto manuell gesetzt)
+          if (!p.gegenkonto_konto_nr && !p.zugeordnetesKonto) {
             const amountTypeKey = (p.amountType || '').split('/').pop() // z.B. "Order/ItemPrice/Principal" → "Principal"
             
             if (amountTypeKey === 'Principal' || p.amountType?.includes('ItemPrice')) {
