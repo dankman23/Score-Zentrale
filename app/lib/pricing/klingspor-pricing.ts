@@ -135,7 +135,7 @@ export function calculateKlingsporBeltPrice(
     productHierarchy: ph,
     
     // Debug
-    m2Demand: parseFloat(m2Demand.toFixed(6)),
+    m2Demand: parseFloat(m2.toFixed(6)),
     pricePer100m2,
     basicPrice: parseFloat(basicPrice.toFixed(2)),
     zpsdFactor,
