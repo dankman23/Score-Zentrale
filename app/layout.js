@@ -136,7 +136,15 @@ export default function RootLayout({ children }) {
                 </div>
               </li>
               <li className="nav-item"><a className="nav-link" href="#produkte"><i className="bi bi-box-seam mr-1"/>Produkte</a></li>
-              <li className="nav-item"><a className="nav-link" href="/preise"><i className="bi bi-calculator mr-1"/>Preise</a></li>
+              <li className="nav-item dropdown">
+                <a className="nav-link dropdown-toggle" href="#preise" id="preiseDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i className="bi bi-calculator mr-1"/>Preise
+                </a>
+                <div className="dropdown-menu" aria-labelledby="preiseDropdown">
+                  <a className="dropdown-item" href="/preise/preisberechnung"><i className="bi bi-calculator-fill mr-2"/>Preisberechnung</a>
+                  <a className="dropdown-item" href="/preise/konfigurator"><i className="bi bi-gear-fill mr-2"/>Konfigurator</a>
+                </div>
+              </li>
               <li className="nav-item"><a className="nav-link" href="#orga"><i className="bi bi-calendar-check mr-1"/>Orga</a></li>
               <li className="nav-item"><a className="nav-link" href="#fibu"><i className="bi bi-receipt-cutoff mr-1"/>FIBU</a></li>
               <li className="nav-item">
