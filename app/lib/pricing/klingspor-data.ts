@@ -8,11 +8,11 @@ import availableGritsData from '../../data/klingspor_new/available_grits.json'
 import backingDataNew from '../../data/klingspor_new/backing.json'
 import typesData from '../../data/klingspor_new/types.json'
 import definitionPhData from '../../data/klingspor_new/definition_ph.json'
+import zms2DataNew from '../../data/klingspor_new/zms2.json'
 import zpqgData from '../../data/klingspor/zpqg.json'
 import zpsdData from '../../data/klingspor/zpsd.json'
 import zsc2Data from '../../data/klingspor/zsc2.json'
 import zsg1Data from '../../data/klingspor/zsg1.json'
-import zms2Data from '../../data/klingspor/zms2.json'
 import exchangeRatesData from '../../data/klingspor/exchange_rates.json'
 
 export interface ValidEntry {
