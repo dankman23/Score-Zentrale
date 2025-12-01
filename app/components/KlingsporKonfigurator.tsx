@@ -50,7 +50,8 @@ export default function KlingsporKonfigurator() {
     fetch('/data/klingspor/valid_entries.json')
       .then(res => res.json())
       .then(data => {
-        const types = [...new Set(data.map((e: any) => e['SaU Type']))].sort()
+        const uniqueTypes = new Set(data.map((e: any) => e['SaU Type']))
+        const types = Array.from(uniqueTypes).sort()
         setAvailableTypes(types as string[])
       })
       .catch(console.error)
