@@ -1,0 +1,74 @@
+[
+  {
+    "PH": 10200101,
+    "Bezeichnung": "coat.abras.standard belts",
+    "Backing": null,
+    "Type": null,
+    "Width": "3-399",
+    "Length": "100-27800"
+  },
+  {
+    "PH": 10200102,
+    "Bezeichnung": "coated abrasives file belts",
+    "Backing": null,
+    "Type": null,
+    "Width": "3-30",
+    "Length": 610
+  },
+  {
+    "PH": 10200201,
+    "Bezeichnung": "coat.abras.wood working belts",
+    "Backing": null,
+    "Type": "LS 309 XH",
+    "Width": null,
+    "Length": null
+  },
+  {
+    "PH": 10200301,
+    "Bezeichnung": "coat.abras.wide belts",
+    "Backing": null,
+    "Type": null,
+    "Width": "400-1650",
+    "Length": "1000-8000"
+  },
+  {
+    "PH": 10200401,
+    "Bezeichnung": "coat.abras.wide belts,segmented",
+    "Backing": null,
+    "Type": null,
+    "Width": "1300-3720",
+    "Length": "1900-4600"
+  },
+  {
+    "PH": 10200501,
+    "Bezeichnung": "non-woven web belts",
+    "Backing": "Non Woven",
+    "Type": null,
+    "Width": "6-1600",
+    "Length": "200-13800"
+  },
+  {
+    "PH": 10200502,
+    "Bezeichnung": "non-woven file belts",
+    "Backing": "Non Woven",
+    "Type": null,
+    "Width": "6-30",
+    "Length": "200-820"
+  },
+  {
+    "PH": 10200504,
+    "Bezeichnung": "non-woven wide belts",
+    "Backing": null,
+    "Type": null,
+    "Width": "400-1520",
+    "Length": "1000-8000"
+  },
+  {
+    "PH": 10200505,
+    "Bezeichnung": "non-woven seg. wide belts",
+    "Backing": null,
+    "Type": null,
+    "Width": "1300-3720",
+    "Length": "1900-4600"
+  }
+]

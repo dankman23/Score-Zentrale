@@ -1,0 +1,1007 @@
+[
+  {
+    "Typ": "CS 308 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 310 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 310 XF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 311 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 320 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 321 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 322 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 325 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 326 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 329 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 330 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 333 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 333 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 333 XF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 336 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 341 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 409 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 410 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 411 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 411 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 412 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 416 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 420 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 538 Z",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 631 XF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 710 XF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 729 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 811 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 920 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 922 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 931 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "GX 533 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "GX 712 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "GX 931 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "LS 309 J",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "LS 309 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "LS 309 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "LS 309 XH",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "LS 312 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "LS 313 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "LS 314 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "LS 318 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "PS 20 F",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 20 FW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 21 F",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 22 F",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 24 F",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 27 DW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 28 F",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 29 F",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 38 G",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 524 E",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 529 F",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 61 F",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 729 F",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "FP 73 W",
+    "UNTERLAGENART": "Film",
+    "UNTERLAGENART EN": "Film"
+  },
+  {
+    "Typ": "NBF 800",
+    "UNTERLAGENART": "Vlies",
+    "UNTERLAGENART EN": "Non Woven"
+  },
+  {
+    "Typ": "NBS 800",
+    "UNTERLAGENART": "Vlies",
+    "UNTERLAGENART EN": "Non Woven"
+  },
+  {
+    "Typ": "LS 912 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "PS 726 F",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "CS 911 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 913 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 310 XA",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 310 XS",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 311 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 323 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 326 YK",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 326 YY",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 327 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 329 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 330 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 333 J",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 355 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 377 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 395 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 396 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 411 XK",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 411 XS",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 411 YY",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 416 YY",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 417 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 448 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 450 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 451 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 455 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 461 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 480 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 520 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 538 ZZ",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 539 Z",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 555 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 757 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 905 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 910 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 912 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 920 YK",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 922 YY",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 950 Y",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "CS 959 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "FP 73 WK",
+    "UNTERLAGENART": "Film",
+    "UNTERLAGENART EN": "Film"
+  },
+  {
+    "Typ": "FP 77",
+    "UNTERLAGENART": "Film",
+    "UNTERLAGENART EN": "Film"
+  },
+  {
+    "Typ": "FP 77 K",
+    "UNTERLAGENART": "Film",
+    "UNTERLAGENART EN": "Film"
+  },
+  {
+    "Typ": "FP 77 S",
+    "UNTERLAGENART": "Film",
+    "UNTERLAGENART EN": "Film"
+  },
+  {
+    "Typ": "GX 514 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "KL 361 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "KL 371 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "KL 375 J",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "KL 381 J",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "KL 385 JF",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "LS 307 X",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "LS 309XHK",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "LS 314 J",
+    "UNTERLAGENART": "Gewebe",
+    "UNTERLAGENART EN": "Cloth"
+  },
+  {
+    "Typ": "PL 16 E",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PL 28 C",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PL 28 CK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PL 31 B",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PL 712 AW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PL 713 E",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 11 A",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 11 AK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 11 AW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 11 C",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 18",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 18 E",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 18 EK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 19 E",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 19 EK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 19 F",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 19 FK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 2000 F",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 21 FK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 22 E",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 22 K",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 22 N",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 26 F",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 28 FS",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 29 FS",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 30 D",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 30 DK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 32 B",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 33 B",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 33 BF",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 33 BK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 33 BS",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 33 BW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 33 BWC",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 33 BWK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 33 C",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 33 CC",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 33 CF",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 33 CK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 33 CS",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 33BWCK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 35 BW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 35 CW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 36 C",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 36 CK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 36 D",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 36 DK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 44 E",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 46 E",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 48 D",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 514 A",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 61 FK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 73 BW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 73 BWC",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 73 BWK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 73 BWS",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 73 CW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 73 CWK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 77 C",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 77 CK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 77 CS",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 8 A",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 8 AK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 8 C",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 86 C",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 86 CC",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "PS 9 C",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "VP 73 CW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "VP 73 CWK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 244 BW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 244 CW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 244BWK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 244CWK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 55 B",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 55 BK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 55 C",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 55 CK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 733 BW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 733 CW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 733BWK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 733CWK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 836 C",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 836 CK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 836 D",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 836 DK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 994 CW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 994 DW",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 994CWK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  },
+  {
+    "Typ": "WP 994DWK",
+    "UNTERLAGENART": "Papier",
+    "UNTERLAGENART EN": "Paper"
+  }
+]
