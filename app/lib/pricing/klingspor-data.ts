@@ -3,10 +3,9 @@
  * Lädt JSON-Daten aus /app/data/klingspor/
  */
 
-import validEntriesData from '../../data/klingspor/valid_entries.json'
-import availableGritsData from '../../data/klingspor/available_grits.json'
-import definitionPhData from '../../data/klingspor/definition_ph.json'
-import backingData from '../../data/klingspor/backing.json'
+import validEntriesData from '../../data/klingspor_new/valid_entries.json'
+import backingDataNew from '../../data/klingspor_new/backing.json'
+import typesData from '../../data/klingspor_new/types.json'
 import zpqgData from '../../data/klingspor/zpqg.json'
 import zpsdData from '../../data/klingspor/zpsd.json'
 import zsc2Data from '../../data/klingspor/zsc2.json'
