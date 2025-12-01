@@ -55,12 +55,19 @@ export async function sendEmail(to: string, subject: string, html: string, text?
   // TEST MODE: Wenn EMAIL_TEST_MODE aktiviert ist, sende ALLE Mails nur an BCC
   const testMode = process.env.EMAIL_TEST_MODE === 'true'
   
+  const emailFrom = process.env.EMAIL_FROM || 'noreply@example.com'
+  const emailBcc = process.env.EMAIL_BCC || ''
+  
   const mailOptions: any = {
-    from: `Score Schleifwerkzeuge <${process.env.EMAIL_FROM || 'vertrieb@score-schleifwerkzeuge.de'}>`,
-    bcc: 'leismann@score-schleifwerkzeuge.de', // BCC nur noch an leismann
+    from: `Score Schleifwerkzeuge <${emailFrom}>`,
     subject: testMode ? `[TEST] ${subject}` : subject,
     html: fullHTML,
     text: text || html.replace(/<[^>]*>/g, '')
+  }
+  
+  // Add BCC if configured
+  if (emailBcc) {
+    mailOptions.bcc = emailBcc
   }
   
   // Im Test-Modus: Sende NUR an BCC (kein TO)
@@ -71,7 +78,7 @@ export async function sendEmail(to: string, subject: string, html: string, text?
     console.log(`[Email] TEST MODE: Email würde an ${to} gesendet, geht nur an BCC`)
   } else {
     mailOptions.to = to
-    console.log(`[Email] LIVE MODE: Sende an ${to} mit BCC an leismann@score-schleifwerkzeuge.de`)
+    console.log(`[Email] LIVE MODE: Sende an ${to}${emailBcc ? ' mit BCC an ' + emailBcc : ''}`)
   }
 
   try {
