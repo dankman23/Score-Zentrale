@@ -10,10 +10,10 @@ import {
   zpsd,
   zsc2,
   zsg1,
-  zms2,
   getBackingType,
   getProductHierarchy,
-  getGritsForType
+  getGritsForType,
+  getSalesOrgMultiplier
 } from './klingspor-data'
 
 export interface KlingsporBeltPriceRequest {
