@@ -103,8 +103,8 @@ export async function POST(request: NextRequest) {
       minOrderQty: mbm,
       ekGesamtMbm,
 
-      vkStueckNetto: priceFormulaResult.vkStueckNetto,
-      vkStueckBrutto: priceFormulaResult.vkStueckBrutto,
+      vkStueckNetto: parseFloat(vkStueckNetto.toFixed(2)),
+      vkStueckBrutto: parseFloat(vkStueckBrutto.toFixed(2)),
       vkMbmNetto: parseFloat(vkMbmNetto.toFixed(2)),
       vkMbmBrutto: parseFloat(vkMbmBrutto.toFixed(2)),
 
