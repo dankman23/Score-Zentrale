@@ -109,12 +109,12 @@ export const validEntries: ValidEntry[] = validEntriesData as ValidEntry[]
 export const availableGrits: AvailableGrit[] = availableGritsData as AvailableGrit[]
 export const backingMap: Record<string, {de: string, en: string}> = backingDataNew as Record<string, {de: string, en: string}>
 export const phMap: Record<string, number> = definitionPhData as Record<string, number>
+export const zms2Map: Record<string, {salesOrgMultiplier: number, konditionsbetrag_cent: number}> = zms2DataNew as Record<string, {salesOrgMultiplier: number, konditionsbetrag_cent: number}>
 export const allTypes: string[] = typesData as string[]
 export const zpqg: ZPQG[] = zpqgData as ZPQG[]
 export const zpsd: ZPSD[] = zpsdData as ZPSD[]
 export const zsc2: ZSC2[] = zsc2Data as ZSC2[]
 export const zsg1: ZSG1[] = zsg1Data as ZSG1[]
-export const zms2: ZMS2[] = zms2Data as ZMS2[]
 export const exchangeRates: ExchangeRate[] = exchangeRatesData as ExchangeRate[]
 
 // Helper: Typen Liste (ALLE 55 Typen aus der neuen Excel)
