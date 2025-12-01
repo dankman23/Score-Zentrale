@@ -117,7 +117,8 @@ export const exchangeRates: ExchangeRate[] = exchangeRatesData as ExchangeRate[]
 
 // Helper: Typen Liste
 export function getAvailableTypes(): string[] {
-  return [...new Set(validEntries.map(e => e['SaU Type']))].sort()
+  const uniqueTypes = new Set(validEntries.map(e => e['SaU Type']))
+  return Array.from(uniqueTypes).sort()
 }
 
 // Helper: Körnungen für Typ
