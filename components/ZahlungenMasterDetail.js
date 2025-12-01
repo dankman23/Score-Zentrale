@@ -77,15 +77,11 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
     return q
   }
 
-  // Gefilterte Zahlungen (Status-Filter läuft jetzt serverseitig!)
+  // Gefilterte Zahlungen (Status-Filter UND Quelle-Filter laufen jetzt serverseitig!)
   const filteredZahlungen = zahlungen.filter(z => {
-    // Quelle-Filter mit normalisiertem Vergleich
-    if (quelle !== 'alle') {
-      const normalizedZahlung = normalizeQuelle(z.quelle || z.anbieter)
-      const normalizedFilter = quelle.toLowerCase()
-      if (normalizedZahlung !== normalizedFilter) return false
-    }
+    // Quelle-Filter läuft jetzt serverseitig, wird hier NICHT mehr gefiltert
     
+    // Nur noch Search-Filter im Frontend
     if (searchTerm) {
       const search = searchTerm.toLowerCase()
       const matches = 
