@@ -105,6 +105,7 @@ export interface ExchangeRate {
 
 // Export data
 export const validEntries: ValidEntry[] = validEntriesData as ValidEntry[]
+export const availableGrits: AvailableGrit[] = availableGritsData as AvailableGrit[]
 export const backingMap: Record<string, {de: string, en: string}> = backingDataNew as Record<string, {de: string, en: string}>
 export const allTypes: string[] = typesData as string[]
 export const zpqg: ZPQG[] = zpqgData as ZPQG[]
@@ -119,12 +120,12 @@ export function getAvailableTypes(): string[] {
   return allTypes
 }
 
-// Helper: Körnungen für Typ
+// Helper: Körnungen für Typ (aus available_grits)
 export function getGritsForType(type: string): number[] {
-  const grits = validEntries
-    .filter(e => e['SaU Type'] === type)
-    .map(e => e.Korn)
-    .filter(k => k !== null && k !== undefined)
+  const grits = availableGrits
+    .filter(g => g['SaU Type'] === type)
+    .map(g => g.Korn)
+    .filter(k => k !== null && k !== undefined && typeof k === 'number')
     .filter((v, i, a) => a.indexOf(v) === i)
     .sort((a, b) => a - b)
   
