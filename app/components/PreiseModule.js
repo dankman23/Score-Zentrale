@@ -323,7 +323,7 @@ export default function PreiseModule() {
     if (!file) return
     
     try {
-      const { parsePreisFile, intelligentSample } = await import('../app/lib/preis-utils')
+      const { parsePreisFile, intelligentSample } = await import('../lib/preis-utils')
       const preise = await parsePreisFile(file)
       
       // Filtere auf relevanten EK-Bereich (0-300€)
@@ -344,7 +344,7 @@ export default function PreiseModule() {
     if (!file) return
     
     try {
-      const { parsePreisFile, intelligentSample } = await import('../app/lib/preis-utils')
+      const { parsePreisFile, intelligentSample } = await import('../lib/preis-utils')
       const preise = await parsePreisFile(file)
       
       // Filtere auf relevanten EK-Bereich (0-300€)
