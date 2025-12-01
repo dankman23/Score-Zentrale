@@ -108,9 +108,10 @@ async function processZahlungMatching(zahlung: any, db: Db, rechnungenCache: Map
   const autoVkMatch = await getAutoVkMatch(zahlung, rechnungenCache)
   if (autoVkMatch) return autoVkMatch
   
+  // Manuelle Gegenkonto-Zuordnung
   if (zahlung.istZugeordnet && zahlung.zugeordnetesKonto) {
     return {
-      konto_id: zahlung.zugeordnetesKonto,
+      gegenkonto_id: zahlung.zugeordnetesKonto,  // GEGENKONTO
       match_source: 'manuell',
       match_confidence: 100,
       match_details: 'Manuelle Zuordnung'
