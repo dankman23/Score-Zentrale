@@ -431,9 +431,9 @@ function ZahlungDetailPanel({ zahlung, onClose, onUpdate, zeitraum }) {
   const [rechnungen, setRechnungen] = useState([])
   const [konten, setKonten] = useState([])
   const [selectedBeleg, setSelectedBeleg] = useState(zahlung.zugeordneteRechnung || '')
-  // FIX: Berücksichtige auch Auto-Zuordnung aus match_result
+  // FIX: Verwende GEGENKONTO (nicht Bankkonto!)
   const [selectedKonto, setSelectedKonto] = useState(
-    zahlung.zugeordnetesKonto || zahlung.match_result?.konto_id || ''
+    zahlung.gegenkonto_konto_nr || zahlung.zugeordnetesKonto || zahlung.match_result?.gegenkonto_id || ''
   )
 
   useEffect(() => {
