@@ -55,11 +55,11 @@ export function calculateKlingsporBeltPrice(
   const gritNum = typeof grit === 'string' ? parseInt(grit) : grit
   
   // 1. Validierung - prüfe ob Typ + Körnung existiert
-  const validEntry = validEntries.find(
-    e => e['SaU Type'] === type && e.Korn === gritNum
+  const availableGrit = availableGrits.find(
+    g => g['SaU Type'] === type && g.Korn === gritNum
   )
   
-  if (!validEntry) {
+  if (!availableGrit) {
     throw new Error(`Typ ${type} mit Körnung ${grit} nicht verfügbar`)
   }
   
