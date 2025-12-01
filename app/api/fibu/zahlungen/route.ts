@@ -681,12 +681,12 @@ export async function GET(request: NextRequest) {
       nichtZugeordnetProzent: totalCount > 0 ? Math.round((nichtZugeordnetCount / totalCount) * 100) : 0
     }
 
-    // Pagination anwenden
+    // Pagination anwenden (auf GEFILTERTE Zahlungen!)
     const startIndex = (page - 1) * pageSize
     const endIndex = startIndex + pageSize
     const paginatedPayments = limit > 0 
-      ? allPayments.slice(0, limit) 
-      : allPayments.slice(startIndex, endIndex)
+      ? filteredPayments.slice(0, limit) 
+      : filteredPayments.slice(startIndex, endIndex)
     
     const totalPages = limit > 0 
       ? 1 
