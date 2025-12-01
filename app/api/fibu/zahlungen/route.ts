@@ -321,43 +321,43 @@ export async function GET(request: NextRequest) {
             // Steuerschlüssel 401: Voller Vorsteuerabzug
             p.steuerschluessel = '401'
           } else if (amountTypeKey === 'Shipping' || p.amountType?.includes('Shipping')) {
-              autoZugeordnet = true
-              autoGegenkonto = '4800'  // Versanderlöse
-              autoZuordnungsArt = 'Amazon Versand'
-            } else if (p.amountType?.includes('Tax')) {
-              autoZugeordnet = true
-              autoGegenkonto = '1776'  // Umsatzsteuer
-              autoZuordnungsArt = 'Amazon Steuer'
-            } else if (p.amountType?.includes('MarketplaceFacilitatorVAT')) {
-              autoZugeordnet = true
-              autoGegenkonto = '1370'  // Abziehbare Vorsteuer
-              autoZuordnungsArt = 'Amazon MwSt (von Amazon abgeführt)'
-            } else if (p.amountType?.includes('FBA')) {
-              autoZugeordnet = true
-              autoGegenkonto = '4950'  // FBA Gebühren
-              autoZuordnungsArt = 'Amazon FBA Gebühr'
-              // Steuerschlüssel 401: Voller Vorsteuerabzug
-              p.steuerschluessel = '401'
-            } else if (p.amountType?.includes('Refund')) {
-              autoZugeordnet = true
-              autoGegenkonto = '69001'  // Rückerstattungen gegen Erlöse
-              autoZuordnungsArt = 'Amazon Rückerstattung'
-            } else if (p.amountType?.includes('Transfer')) {
-              autoZugeordnet = true
-              autoGegenkonto = '1200'  // Forderungen
-              autoZuordnungsArt = 'Amazon Transfer/Auszahlung'
-            } else if (p.transactionType === 'other-transaction') {
-              autoZugeordnet = true
-              autoGegenkonto = '6855'  // Sonstige Aufwendungen
-              autoZuordnungsArt = 'Amazon Sonstige Transaktion'
-              // Steuerschlüssel 401: Voller Vorsteuerabzug
-              p.steuerschluessel = '401'
-            } else {
-              // Fallback: Unbekannte Amazon-Transaktionen werden auch zugeordnet
-              autoZugeordnet = true
-              autoGegenkonto = '1815'  // Amazon Settlement-Konto (neutral)
-              autoZuordnungsArt = 'Amazon (automatisch zugeordnet)'
-            }
+            autoZugeordnet = true
+            autoGegenkonto = '4800'  // Versanderlöse
+            autoZuordnungsArt = 'Amazon Versand'
+          } else if (p.amountType?.includes('Tax')) {
+            autoZugeordnet = true
+            autoGegenkonto = '1776'  // Umsatzsteuer
+            autoZuordnungsArt = 'Amazon Steuer'
+          } else if (p.amountType?.includes('MarketplaceFacilitatorVAT')) {
+            autoZugeordnet = true
+            autoGegenkonto = '1370'  // Abziehbare Vorsteuer
+            autoZuordnungsArt = 'Amazon MwSt (von Amazon abgeführt)'
+          } else if (p.amountType?.includes('FBA')) {
+            autoZugeordnet = true
+            autoGegenkonto = '4950'  // FBA Gebühren
+            autoZuordnungsArt = 'Amazon FBA Gebühr'
+            // Steuerschlüssel 401: Voller Vorsteuerabzug
+            p.steuerschluessel = '401'
+          } else if (p.amountType?.includes('Refund')) {
+            autoZugeordnet = true
+            autoGegenkonto = '69001'  // Rückerstattungen gegen Erlöse
+            autoZuordnungsArt = 'Amazon Rückerstattung'
+          } else if (p.amountType?.includes('Transfer')) {
+            autoZugeordnet = true
+            autoGegenkonto = '1200'  // Forderungen
+            autoZuordnungsArt = 'Amazon Transfer/Auszahlung'
+          } else if (p.transactionType === 'other-transaction') {
+            autoZugeordnet = true
+            autoGegenkonto = '6855'  // Sonstige Aufwendungen
+            autoZuordnungsArt = 'Amazon Sonstige Transaktion'
+            // Steuerschlüssel 401: Voller Vorsteuerabzug
+            p.steuerschluessel = '401'
+          } else {
+            // Fallback: Unbekannte Amazon-Transaktionen werden auch zugeordnet
+            autoZugeordnet = true
+            autoGegenkonto = '1815'  // Amazon Settlement-Konto (neutral)
+            autoZuordnungsArt = 'Amazon (automatisch zugeordnet)'
+          }
           
         } else if (source.name === 'Mollie') {
           // Mollie: AU-Nummer aus Verwendungszweck extrahieren
