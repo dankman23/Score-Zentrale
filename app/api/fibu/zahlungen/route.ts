@@ -629,10 +629,16 @@ export async function GET(request: NextRequest) {
         // Kein Gegenkonto → OFFEN (Bankkonto allein reicht nicht!)
         zahlung.zuordnungs_status = 'offen'
       } else {
-        // Gegenkonto ist gesetzt → prüfe Belegpflicht
+        // Gegenkonto ist gesetzt → prüfe ob es im Kontenplan existiert
         const gegenkontoInfo = kontenMap.get(gegenkontoNr)
         
-        if (!gegenkontoInfo || gegenkontoInfo.belegpflicht === false) {
+        if (!gegenkontoInfo) {
+          // KRITISCH: Gegenkonto existiert nicht im Kontenplan!
+          // Das sollte nicht passieren, aber behandeln wir es als "beleg_fehlt" (gelb)
+          // damit der User es bemerkt und korrigieren kann
+          console.warn(`[Zahlungen] WARNUNG: Gegenkonto ${gegenkontoNr} existiert nicht im Kontenplan! Zahlung: ${zahlung._id}`)
+          zahlung.zuordnungs_status = 'beleg_fehlt'  // GELB statt GRÜN!
+        } else if (gegenkontoInfo.belegpflicht === false) {
           // Gegenkonto ohne Belegpflicht → ZUGEORDNET
           zahlung.zuordnungs_status = 'zugeordnet'
         } else {
