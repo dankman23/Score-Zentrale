@@ -97,12 +97,14 @@ export function calculateKlingsporBeltPrice(
   // Für jetzt: hardcoded 18.15 (typischer Wert), TODO: aus Tabelle laden
   const rollWidthSurcharge = 18.15
   
-  // 9. ZSG1 - Leimzuschlag (absolut in EUR) - Excel: C14 = VLOOKUP(...)
-  // Vereinfacht: Suche ZSG1-Eintrag für PH + backing + width
+  // 9. ZSG1 - Leimzuschlag (absolut in EUR) - Excel: C14 = VLOOKUP($F$2&" "&$C$11&" "&$C$12&" "&$C$13,ZSG1!$A:$G,7,FALSE)
+  // TODO: C11, C12, C13 sind komplexe Array-Formeln - vereinfachte Implementierung:
+  // Für jetzt: Durchschnittswert oder Schätzung basierend auf Breite
   const zsg1Entry = zsg1.find(
     z => z.Produkthierarchie === ph && z['ab Breite [mm]'] <= widthMm
   )
-  const glueSurcharge = zsg1Entry ? zsg1Entry.Konditionsbetrag : 0  // in Cent, z.B. 59
+  // Fallback: Schätzung basierend auf Breite (typisch 50-60 Cent für Standard-Breiten)
+  const glueSurcharge = zsg1Entry ? zsg1Entry.Konditionsbetrag : (widthMm >= 100 ? 59 : 30)  // in Cent
   
   // 10. Summe produktspezifisch - Excel: C15 = C7*(1+C8)*(1+C9)+(C10*C5/100)+(C14/100)
   const totalProductSpecific = 
