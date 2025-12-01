@@ -74,13 +74,8 @@ export default function ZahlungenMasterDetail({ zeitraum }) {
     return q
   }
 
-  // Gefilterte Zahlungen
+  // Gefilterte Zahlungen (Status-Filter läuft jetzt serverseitig!)
   const filteredZahlungen = zahlungen.filter(z => {
-    // Status-Filter (3-stufig)
-    if (filter === 'zugeordnet' && z.zuordnungs_status !== 'zugeordnet') return false
-    if (filter === 'beleg_fehlt' && z.zuordnungs_status !== 'beleg_fehlt') return false
-    if (filter === 'offen' && z.zuordnungs_status !== 'offen') return false
-    
     // Quelle-Filter mit normalisiertem Vergleich
     if (quelle !== 'alle') {
       const normalizedZahlung = normalizeQuelle(z.quelle || z.anbieter)
