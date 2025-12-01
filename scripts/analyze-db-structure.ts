@@ -62,7 +62,7 @@ async function analyze() {
   console.log(`   VK-Rechnungen gesamt: ${vkCount}`)
   
   const vkMitBestellung = await db.collection('fibu_vk_rechnungen').countDocuments({
-    cBestellNr: { $exists: true, $ne: null, $ne: '' }
+    cBestellNr: { $exists: true, $nin: [null, ''] }
   })
   console.log(`   VK-Rechnungen mit cBestellNr: ${vkMitBestellung}`)
   
