@@ -80,7 +80,7 @@ const ZAHLUNGSKONTEN = [
 async function setupZahlungskonten() {
   console.log('🚀 Setup Zahlungskonten gestartet...')
   
-  const { db } = await connectToDatabase()
+  const { db, client } = await connectToDatabase()
   const collection = db.collection('kontenplan')
   
   let created = 0
