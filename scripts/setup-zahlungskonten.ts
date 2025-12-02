@@ -136,6 +136,8 @@ async function setupZahlungskonten() {
   console.log(`  Aktualisiert: ${updated}`)
   console.log(`  Fehler: ${errors}`)
   console.log('\n✅ Setup Zahlungskonten abgeschlossen!')
+  
+  await client.close()
 }
 
 setupZahlungskonten()
