@@ -107,6 +107,17 @@ export function aggregateAmazonSettlements(
 ): AmazonBuchung[] {
   const buchungen: AmazonBuchung[] = []
   
+  const processedRows: Array<{
+    row: AmazonSettlementRaw
+    datum: string
+    gegenkonto: string
+    steuerschluessel: string | undefined
+    belegNr: string | null
+    auNummer: string
+    klassifizierung: string
+    verwendungszweck: string
+  }> = []
+  
   // SCHRITT 1: Verarbeite jede Roh-Zeile und bestimme Konten, Belege, Klassifizierung
   for (const row of rawData) {
     const datum = new Date(row.PostedDateTime).toISOString().split('T')[0]
