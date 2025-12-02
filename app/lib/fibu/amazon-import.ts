@@ -116,11 +116,11 @@ export function aggregateAmazonSettlements(
     belegNr: string | null
     auNummer: string
     klassifizierung: string
-    kundenName: string
+    verwendungszweck: string
   }> = []
   
   for (const row of rawData) {
-    const orderID = rows[0].OrderID
+    const orderID = row.OrderID
     const transactionType = rows[0].TransactionType
     const merchantOrderID = rows[0].MerchantOrderID
     const datum = new Date(rows[0].PostedDateTime).toISOString().split('T')[0]
