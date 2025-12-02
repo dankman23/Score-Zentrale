@@ -105,6 +105,8 @@ async function migrateZahlungskonten() {
   console.log(`Total verarbeitet: ${totalProcessed} Zahlungen`)
   console.log(`Total aktualisiert: ${totalUpdated} Zahlungen`)
   console.log('\n✅ Migration abgeschlossen!')
+  
+  await client.close()
 }
 
 migrateZahlungskonten()
