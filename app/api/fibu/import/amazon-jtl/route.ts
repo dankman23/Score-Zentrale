@@ -8,7 +8,7 @@ import {
   aggregateAmazonSettlements,
   berechneZuordnungsStatus,
   AmazonBuchung 
-} from '../../../../lib/fibu/amazon-import'
+} from '../../../../lib/fibu/amazon-import-v2'
 
 /**
  * Amazon-Import aus JTL-SQL
