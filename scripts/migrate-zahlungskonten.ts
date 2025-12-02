@@ -31,7 +31,7 @@ const BANK_KONTO_MAPPING: Record<string, string> = {
 async function migrateZahlungskonten() {
   console.log('🚀 Migration Zahlungskonten gestartet...\n')
   
-  const { db } = await connectToDatabase()
+  const { db, client } = await connectToDatabase()
   
   const collections = [
     'fibu_zahlungen_amazon',
