@@ -19,13 +19,15 @@ import { Db } from 'mongodb'
 
 // ========== BANKKONTO-MAPPING (Quelle → Zahlungskonto) ==========
 // Diese Konten werden AUTOMATISCH bei Import gesetzt und haben KEINE Belegpflicht
+// FIXE ZUORDNUNG - wird beim Import gesetzt und später NICHT überschrieben!
 const BANK_KONTO_MAPPING: Record<string, { konto: string, bezeichnung: string }> = {
-  'Postbank': { konto: '1701', bezeichnung: 'Postbank' },
-  'Commerzbank': { konto: '1802', bezeichnung: 'Commerzbank' },
-  'PayPal': { konto: '1801', bezeichnung: 'PayPal' },
-  'Amazon': { konto: '1825', bezeichnung: 'Amazon Pay' },
-  'eBay': { konto: '1810', bezeichnung: 'eBay Managed Payments' },
-  'Mollie': { konto: '1830', bezeichnung: 'Mollie' },
+  'Postbank': { konto: '1701', bezeichnung: 'Postbank (Zahlungskonto)' },
+  'Commerzbank': { konto: '1802', bezeichnung: 'Commerzbank (Zahlungskonto)' },
+  'PayPal': { konto: '1801', bezeichnung: 'PayPal (Zahlungskonto)' },
+  'Amazon': { konto: '1814', bezeichnung: 'Amazon (Zahlungskonto)' },
+  'eBay': { konto: '1810', bezeichnung: 'eBay (Zahlungskonto)' },
+  'Mollie': { konto: '1840', bezeichnung: 'Mollie (Zahlungskonto)' },
+  'Otto': { konto: '1820', bezeichnung: 'Otto (Zahlungskonto)' },
   'Bar': { konto: '1600', bezeichnung: 'Kasse' }
 }
 
