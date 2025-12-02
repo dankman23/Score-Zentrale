@@ -89,12 +89,17 @@ export async function fetchAmazonSettlementsFromJTL(
  * Aggregiert Amazon-Settlement-Daten nach Jera-Logik
  * 
  * EXAKTE Aggregationsregeln (wie in Excel "Amazon Oktober"):
- * 1. Pro Order-ID + TransactionType: 
- *    - EINE Zeile für alle POSITIVEN ItemPrice-Beträge (Principal + Tax + Shipping + ShippingTax)
- *    - EINE Zeile für alle NEGATIVEN ItemFees-Beträge (Commission + ShippingHB + Digital Service Fees)
- * 2. Refunds: Separate Zeilen mit XRK-Belegnummern
- * 3. Geldtransit: Separate Zeilen (1460), nicht mit Erlösen verrechnen
- * 4. Jede Zeile enthält: Datum, Konto, Gegenkonto, Betrag, BG-Text, Belegfelder, Order-ID, Klassifizierung
+ * Aggregation erfolgt nach ALLEN relevanten Feldern:
+ * - Datum
+ * - Konto (1814)
+ * - Gegenkonto (69001, 6770, 1460, etc.)
+ * - Steuerschlüssel (401, etc.)
+ * - Belegfeld 1 (XRE/XRK)
+ * - Belegfeld 2 (AU-Nummer)
+ * - Order ID
+ * - Klassifizierung (Order/ItemPrice/Principal, Order/ItemFees/Commission, etc.)
+ * 
+ * D.h. pro eindeutiger Kombination dieser Felder wird EINE Buchungszeile erstellt.
  */
 export function aggregateAmazonSettlements(
   rawData: AmazonSettlementRaw[],
@@ -102,19 +107,19 @@ export function aggregateAmazonSettlements(
 ): AmazonBuchung[] {
   const buchungen: AmazonBuchung[] = []
   
-  // Gruppiere nach OrderID + TransactionType
-  const grouped = new Map<string, AmazonSettlementRaw[]>()
+  // Verarbeite jede Roh-Zeile einzeln und ordne sie zu
+  const processedRows: Array<{
+    row: AmazonSettlementRaw
+    datum: string
+    gegenkonto: string
+    steuerschluessel: string | undefined
+    belegNr: string | null
+    auNummer: string
+    klassifizierung: string
+    kundenName: string
+  }> = []
   
   for (const row of rawData) {
-    const key = `${row.OrderID}_${row.TransactionType}`
-    if (!grouped.has(key)) {
-      grouped.set(key, [])
-    }
-    grouped.get(key)!.push(row)
-  }
-  
-  // Verarbeite jede Gruppe
-  for (const [key, rows] of grouped) {
     const orderID = rows[0].OrderID
     const transactionType = rows[0].TransactionType
     const merchantOrderID = rows[0].MerchantOrderID
