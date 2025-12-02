@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import { getMssqlPool } from '../app/lib/db/mssql'
 
 async function exploreJTLAmazonOktober() {
