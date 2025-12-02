@@ -6,7 +6,17 @@
  * 3. Setzt belegpflicht = false
  */
 
-import { connectToDatabase } from '../app/lib/db/mongodb'
+import { MongoClient } from 'mongodb'
+
+const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/score_zentrale'
+
+async function connectToDatabase() {
+  const client = new MongoClient(MONGO_URL)
+  await client.connect()
+  const dbName = process.env.MONGO_DB || process.env.DB_NAME || new URL(MONGO_URL).pathname.substring(1)
+  const db = client.db(dbName)
+  return { db, client }
+}
 
 const ZAHLUNGSKONTEN = [
   {
