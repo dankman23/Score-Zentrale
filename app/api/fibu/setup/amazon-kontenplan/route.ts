@@ -60,6 +60,14 @@ export async function POST(request: NextRequest) {
         art: 'Steuer',
         belegpflicht: false,
         beschreibung: 'Amazon Umsatzsteuer'
+      },
+      {
+        kontonummer: '6600',
+        bezeichnung: 'Kosten für Werbung',
+        art: 'Aufwand',
+        belegpflicht: true,
+        steuerschluessel: '401',
+        beschreibung: 'Amazon Werbekosten (ServiceFee, Cost of Advertising)'
       }
     ]
     
