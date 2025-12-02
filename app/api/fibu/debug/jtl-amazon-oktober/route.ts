@@ -67,61 +67,43 @@ export async function GET(request: NextRequest) {
       length: c.CHARACTER_MAXIMUM_LENGTH
     }))
     
-    // 5. Zähle Settlement-Positionen für Oktober
-    const oktoberCount = await pool.request().query(`
-      SELECT COUNT(*) as anzahl
-      FROM dbo.pf_amazon_settlementpos pos
-      INNER JOIN dbo.pf_amazon_settlement s ON pos.kSettlement = s.kSettlement
-      WHERE s.dSettlementStartDate >= '2025-10-01' AND s.dSettlementStartDate < '2025-11-01'
-    `)
-    results.oktober_settlementpos_anzahl = oktoberCount.recordset[0].anzahl
+    // 5. Prüfe Settlement-Tabelle (erst mal nur COUNT)
+    try {
+      const settlementCount = await pool.request().query(`
+        SELECT COUNT(*) as anzahl
+        FROM dbo.pf_amazon_settlement
+      `)
+      results.settlement_gesamt = settlementCount.recordset[0].anzahl
+      
+      // Beispiel Settlement
+      const settlementExample = await pool.request().query(`
+        SELECT TOP 3 *
+        FROM dbo.pf_amazon_settlement
+        ORDER BY kSettlement DESC
+      `)
+      results.settlement_beispiel = settlementExample.recordset
+    } catch (err: any) {
+      results.settlement_error = err.message
+    }
     
-    // 6. Beispiel Settlement-Positionen anzeigen
-    const examples = await pool.request().query(`
-      SELECT TOP 20
-        pos.kSettlementPos,
-        pos.cTransactionType,
-        pos.cAmountType,
-        pos.cAmountDescription,
-        pos.fAmount,
-        pos.cOrderId,
-        pos.cMerchantOrderId,
-        pos.cSKU,
-        s.dSettlementStartDate,
-        s.dSettlementEndDate
-      FROM dbo.pf_amazon_settlementpos pos
-      INNER JOIN dbo.pf_amazon_settlement s ON pos.kSettlement = s.kSettlement
-      WHERE s.dSettlementStartDate >= '2025-10-01' AND s.dSettlementStartDate < '2025-11-01'
-      ORDER BY s.dSettlementStartDate DESC, pos.cOrderId
-    `)
-    results.beispiel_settlementpos = examples.recordset
-    
-    // 7. Gruppiere nach cAmountType
-    const byAmountType = await pool.request().query(`
-      SELECT 
-        pos.cAmountType,
-        COUNT(*) as anzahl,
-        SUM(pos.fAmount) as summe
-      FROM dbo.pf_amazon_settlementpos pos
-      INNER JOIN dbo.pf_amazon_settlement s ON pos.kSettlement = s.kSettlement
-      WHERE s.dSettlementStartDate >= '2025-10-01' AND s.dSettlementStartDate < '2025-11-01'
-      GROUP BY pos.cAmountType
-      ORDER BY anzahl DESC
-    `)
-    results.nach_amount_type = byAmountType.recordset
-    
-    // 8. Gruppiere nach cTransactionType
-    const byTransactionType = await pool.request().query(`
-      SELECT 
-        pos.cTransactionType,
-        COUNT(*) as anzahl
-      FROM dbo.pf_amazon_settlementpos pos
-      INNER JOIN dbo.pf_amazon_settlement s ON pos.kSettlement = s.kSettlement
-      WHERE s.dSettlementStartDate >= '2025-10-01' AND s.dSettlementStartDate < '2025-11-01'
-      GROUP BY pos.cTransactionType
-      ORDER BY anzahl DESC
-    `)
-    results.nach_transaction_type = byTransactionType.recordset
+    // 6. Prüfe Settlement-Pos-Tabelle
+    try {
+      const settlementPosCount = await pool.request().query(`
+        SELECT COUNT(*) as anzahl
+        FROM dbo.pf_amazon_settlementpos
+      `)
+      results.settlementpos_gesamt = settlementPosCount.recordset[0].anzahl
+      
+      // Beispiel Settlement-Pos
+      const settlementPosExample = await pool.request().query(`
+        SELECT TOP 10 *
+        FROM dbo.pf_amazon_settlementpos
+        ORDER BY kSettlementPos DESC
+      `)
+      results.settlementpos_beispiel = settlementPosExample.recordset
+    } catch (err: any) {
+      results.settlementpos_error = err.message
+    }
     
     return NextResponse.json({
       ok: true,
