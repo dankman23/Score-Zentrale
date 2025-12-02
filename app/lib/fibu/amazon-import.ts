@@ -88,11 +88,13 @@ export async function fetchAmazonSettlementsFromJTL(
 /**
  * Aggregiert Amazon-Settlement-Daten nach Jera-Logik
  * 
- * Aggregationsregeln:
- * 1. Pro Order-ID + AmountType werden alle AmountDescriptions zu EINER Zeile aggregiert
- * 2. Positive Beträge (Principal, Tax, Shipping, ShippingTax) werden summiert → 1 Zeile
- * 3. Negative Beträge (Commission, ShippingHB) werden summiert → 1 Zeile
- * 4. Refunds werden separat behandelt (eigene XRK-Nummern)
+ * EXAKTE Aggregationsregeln (wie in Excel "Amazon Oktober"):
+ * 1. Pro Order-ID + TransactionType: 
+ *    - EINE Zeile für alle POSITIVEN ItemPrice-Beträge (Principal + Tax + Shipping + ShippingTax)
+ *    - EINE Zeile für alle NEGATIVEN ItemFees-Beträge (Commission + ShippingHB + Digital Service Fees)
+ * 2. Refunds: Separate Zeilen mit XRK-Belegnummern
+ * 3. Geldtransit: Separate Zeilen (1460), nicht mit Erlösen verrechnen
+ * 4. Jede Zeile enthält: Datum, Konto, Gegenkonto, Betrag, BG-Text, Belegfelder, Order-ID, Klassifizierung
  */
 export function aggregateAmazonSettlements(
   rawData: AmazonSettlementRaw[],
@@ -117,12 +119,18 @@ export function aggregateAmazonSettlements(
     const transactionType = rows[0].TransactionType
     const merchantOrderID = rows[0].MerchantOrderID
     const datum = new Date(rows[0].PostedDateTime).toISOString().split('T')[0]
+    const sku = rows[0].SKU
     
     // Extrahiere AU-Nummer aus MerchantOrderID (Format: "171-5939943-7771564_E_149")
-    let auNummer = merchantOrderID || orderID
-    const auMatch = auNummer.match(/_E_(\d+)/)
-    if (auMatch) {
-      auNummer = `AU2025-${auMatch[1]}`
+    let auNummer = ''
+    if (merchantOrderID) {
+      const auMatch = merchantOrderID.match(/_E_(\d+)/)
+      if (auMatch) {
+        auNummer = `AU2025-${auMatch[1]}`
+      }
+    }
+    if (!auNummer && orderID) {
+      auNummer = orderID  // Fallback: OrderID als AU-Nummer
     }
     
     // Finde zugeordnete Rechnung (über AU-Nummer oder Order-ID)
@@ -132,66 +140,40 @@ export function aggregateAmazonSettlements(
       rechnungsnummer = rechnung.cRechnungsNr
     }
     
-    // Gruppiere nach AmountType (ItemPrice, ItemFees, etc.)
-    const byAmountType = new Map<string, AmazonSettlementRaw[]>()
-    for (const row of rows) {
-      const amountType = row.AmountType
-      if (!byAmountType.has(amountType)) {
-        byAmountType.set(amountType, [])
-      }
-      byAmountType.get(amountType)!.push(row)
-    }
-    
-    // Erstelle Buchungen pro AmountType
-    for (const [amountType, typeRows] of byAmountType) {
-      const betrag = typeRows.reduce((sum, r) => sum + r.Amount, 0)
+    // === AGGREGATION: POSITIVE BETRÄGE (ItemPrice) ===
+    const itemPriceRows = rows.filter(r => r.AmountType === 'ItemPrice')
+    if (itemPriceRows.length > 0) {
+      const betragPositiv = itemPriceRows.reduce((sum, r) => sum + r.Amount, 0)
       
-      // Überspringe wenn Betrag = 0
-      if (Math.abs(betrag) < 0.01) continue
+      // Erstelle BG-Text aus allen AmountDescriptions
+      const kundenName = merchantOrderID ? merchantOrderID.split('_')[0] : ''
+      const beschreibungen = itemPriceRows.map(r => `${kundenName} ${r.AmountDescription} bezahlt`).join(' ')
       
-      // Bestimme Gegenkonto basierend auf AmountType und AmountDescription
-      let gegenkontoNr = '1815'  // Fallback: Amazon Settlement
+      // Bestimme Gegenkonto
+      let gegenkontoNr = '69001'  // Standard: Sammeldebitor Amazon
       let steuerschluessel: string | undefined
-      let bemerkung = ''
+      let belegNr = rechnungsnummer
       
-      // Sammle alle AmountDescriptions für Bemerkung
-      const descriptions = typeRows.map(r => r.AmountDescription).join(', ')
-      bemerkung = `${transactionType}/${amountType}/${descriptions}`
-      
-      // Konten-Mapping nach Jera-Logik
-      if (amountType === 'ItemPrice') {
-        if (transactionType === 'Refund') {
-          gegenkontoNr = '69001'  // Refund → Sammeldebitor
-          rechnungsnummer = rechnungsnummer ? `XRK-${rechnungsnummer.replace('XRE-', '')}` : null
-        } else if (descriptions.includes('Principal')) {
-          gegenkontoNr = '69001'  // Umsatzerlöse
-          rechnungsnummer = rechnungsnummer || `XRE-${auNummer.replace('AU2025-', '')}`
-        } else if (descriptions.includes('Tax')) {
-          gegenkontoNr = '1776'  // Umsatzsteuer
-        } else if (descriptions.includes('Shipping')) {
-          gegenkontoNr = '4800'  // Versanderlöse
+      // Refunds → XRK statt XRE
+      if (transactionType === 'Refund') {
+        if (belegNr && belegNr.startsWith('XRE-')) {
+          belegNr = `XRK-${belegNr.replace('XRE-', '')}`
+        } else if (auNummer) {
+          belegNr = `XRK-${auNummer.replace('AU2025-', '')}`
         }
-      } else if (amountType === 'ItemFees') {
-        if (descriptions.includes('Commission') || descriptions.includes('ShippingHB')) {
-          gegenkontoNr = '6770'  // Amazon-Gebühren
-          steuerschluessel = '401'  // 19% Vorsteuer
+      } else {
+        // Normale Orders → XRE
+        if (!belegNr && auNummer) {
+          belegNr = `XRE-${auNummer.replace('AU2025-', '')}`
         }
-      } else if (amountType === 'ItemWithheldTax') {
-        gegenkontoNr = '1370'  // Abziehbare Vorsteuer (Marketplace Facilitator VAT)
-      } else if (transactionType === 'Transfer') {
-        gegenkontoNr = '1460'  // Geldtransit
       }
       
-      // BG-Text erstellen (Verwendungszweck)
-      const kundenName = merchantOrderID ? merchantOrderID.split('_')[0] : orderID
-      let verwendungszweck = `${kundenName} ${descriptions}`
-      if (rechnungsnummer) {
-        verwendungszweck = `${rechnungsnummer} ${verwendungszweck}`
-      }
+      // Klassifizierung für Bemerkung (ursprüngliche Amazon Buchung)
+      const klassifizierung = `Order/ItemPrice/Principal`
       
       buchungen.push({
         datum,
-        betrag,
+        betrag: betragPositiv,
         waehrung: 'EUR',
         
         bank_konto_nr: '1814',
@@ -199,19 +181,140 @@ export function aggregateAmazonSettlements(
         
         order_id: orderID,
         au_nummer: auNummer,
-        rechnungsnummer,
+        rechnungsnummer: belegNr,
         transaktionsId: `${rows[0].kMessageId}`,
         
-        verwendungszweck,
-        bemerkung,
+        verwendungszweck: `${belegNr || ''} ${beschreibungen}`.trim(),
+        bemerkung: klassifizierung,
         
         anbieter: 'Amazon',
         quelle: 'jtl_amazon_settlement',
         transaction_type: transactionType,
-        amount_type: amountType,
-        amount_description: descriptions,
+        amount_type: 'ItemPrice',
+        amount_description: itemPriceRows.map(r => r.AmountDescription).join(', '),
         
         steuerschluessel
+      })
+    }
+    
+    // === AGGREGATION: NEGATIVE BETRÄGE (ItemFees) ===
+    const itemFeesRows = rows.filter(r => r.AmountType === 'ItemFees')
+    if (itemFeesRows.length > 0) {
+      const betragNegativ = itemFeesRows.reduce((sum, r) => sum + r.Amount, 0)
+      
+      // Erstelle BG-Text
+      const kundenName = merchantOrderID ? merchantOrderID.split('_')[0] : ''
+      const beschreibungen = itemFeesRows.map(r => `${kundenName} Amazon ${r.AmountDescription}`).join(' ')
+      
+      // Gegenkonto für Gebühren
+      let gegenkontoNr = '6770'  // Amazon-Gebühren
+      let steuerschluessel = '401'  // 19% Vorsteuer
+      let belegNr = rechnungsnummer
+      
+      // Refunds
+      if (transactionType === 'Refund') {
+        if (belegNr && belegNr.startsWith('XRE-')) {
+          belegNr = `XRK-${belegNr.replace('XRE-', '')}`
+        } else if (auNummer) {
+          belegNr = `XRK-${auNummer.replace('AU2025-', '')}`
+        }
+      } else {
+        if (!belegNr && auNummer) {
+          belegNr = `XRE-${auNummer.replace('AU2025-', '')}`
+        }
+      }
+      
+      // Klassifizierung
+      const klassifizierung = `Order/ItemFees/Commission`
+      
+      buchungen.push({
+        datum,
+        betrag: betragNegativ,
+        waehrung: 'EUR',
+        
+        bank_konto_nr: '1814',
+        gegenkonto_konto_nr: gegenkontoNr,
+        
+        order_id: orderID,
+        au_nummer: auNummer,
+        rechnungsnummer: belegNr,
+        transaktionsId: `${rows[0].kMessageId}_fees`,
+        
+        verwendungszweck: beschreibungen,
+        bemerkung: klassifizierung,
+        
+        anbieter: 'Amazon',
+        quelle: 'jtl_amazon_settlement',
+        transaction_type: transactionType,
+        amount_type: 'ItemFees',
+        amount_description: itemFeesRows.map(r => r.AmountDescription).join(', '),
+        
+        steuerschluessel
+      })
+    }
+    
+    // === GELDTRANSIT (Transfer-Transaktionen) ===
+    if (transactionType === 'Transfer') {
+      const transferRows = rows.filter(r => r.TransactionType === 'Transfer')
+      if (transferRows.length > 0) {
+        const betragTransfer = transferRows.reduce((sum, r) => sum + r.Amount, 0)
+        
+        buchungen.push({
+          datum,
+          betrag: betragTransfer,
+          waehrung: 'EUR',
+          
+          bank_konto_nr: '1814',
+          gegenkonto_konto_nr: '1460',  // Geldtransit
+          
+          order_id: orderID,
+          au_nummer: '',
+          rechnungsnummer: null,
+          transaktionsId: `${rows[0].kMessageId}_transfer`,
+          
+          verwendungszweck: 'Amazon Geldtransit',
+          bemerkung: '',
+          
+          anbieter: 'Amazon',
+          quelle: 'jtl_amazon_settlement',
+          transaction_type: 'Transfer',
+          amount_type: 'Transfer',
+          amount_description: 'Transfer',
+        })
+      }
+    }
+    
+    // === MARKETPLACE FACILITATOR VAT (ItemWithheldTax) ===
+    const withheldTaxRows = rows.filter(r => r.AmountType === 'ItemWithheldTax')
+    if (withheldTaxRows.length > 0) {
+      const betragTax = withheldTaxRows.reduce((sum, r) => sum + r.Amount, 0)
+      
+      const kundenName = merchantOrderID ? merchantOrderID.split('_')[0] : ''
+      const beschreibungen = withheldTaxRows.map(r => `${kundenName} ${r.AmountDescription}`).join(' ')
+      
+      let belegNr = rechnungsnummer || (auNummer ? `XRE-${auNummer.replace('AU2025-', '')}` : null)
+      
+      buchungen.push({
+        datum,
+        betrag: betragTax,
+        waehrung: 'EUR',
+        
+        bank_konto_nr: '1814',
+        gegenkonto_konto_nr: '1370',  // Abziehbare Vorsteuer
+        
+        order_id: orderID,
+        au_nummer: auNummer,
+        rechnungsnummer: belegNr,
+        transaktionsId: `${rows[0].kMessageId}_tax`,
+        
+        verwendungszweck: beschreibungen,
+        bemerkung: `Order/ItemWithheldTax/MarketplaceFacilitatorVAT`,
+        
+        anbieter: 'Amazon',
+        quelle: 'jtl_amazon_settlement',
+        transaction_type: transactionType,
+        amount_type: 'ItemWithheldTax',
+        amount_description: withheldTaxRows.map(r => r.AmountDescription).join(', '),
       })
     }
   }
