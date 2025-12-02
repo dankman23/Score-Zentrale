@@ -96,7 +96,10 @@ export async function POST(request: NextRequest) {
     
     // 6. Statistiken berechnen
     const stats = {
-      gesamt: buchungen.length,
+      gesamt_buchungen: buchungen.length,
+      gesamt_summe: 0,
+      positive_summe: 0,
+      negative_summe: 0,
       nach_konto: {} as Record<string, { anzahl: number, summe: number }>
     }
     
@@ -107,19 +110,40 @@ export async function POST(request: NextRequest) {
       }
       stats.nach_konto[konto].anzahl++
       stats.nach_konto[konto].summe += buchung.betrag
+      
+      stats.gesamt_summe += buchung.betrag
+      if (buchung.betrag > 0) {
+        stats.positive_summe += buchung.betrag
+      } else {
+        stats.negative_summe += buchung.betrag
+      }
+    }
+    
+    // Runde Summen auf 2 Dezimalstellen
+    stats.gesamt_summe = Math.round(stats.gesamt_summe * 100) / 100
+    stats.positive_summe = Math.round(stats.positive_summe * 100) / 100
+    stats.negative_summe = Math.round(stats.negative_summe * 100) / 100
+    
+    for (const konto in stats.nach_konto) {
+      stats.nach_konto[konto].summe = Math.round(stats.nach_konto[konto].summe * 100) / 100
     }
     
     console.log('[Amazon JTL Import] Import erfolgreich abgeschlossen')
     console.log(`  Roh-Daten: ${rawData.length}`)
-    console.log(`  Aggregiert: ${buchungen.length}`)
-    console.log(`  Konten:`, stats.nach_konto)
+    console.log(`  Aggregierte Buchungen: ${buchungen.length}`)
+    console.log(`  Gesamt-Summe: ${stats.gesamt_summe} EUR`)
+    console.log(`  Positive Summe: ${stats.positive_summe} EUR`)
+    console.log(`  Negative Summe: ${stats.negative_summe} EUR`)
+    console.log(`  Konten:`)
+    for (const konto in stats.nach_konto) {
+      console.log(`    ${konto}: ${stats.nach_konto[konto].anzahl} Buchungen, ${stats.nach_konto[konto].summe} EUR`)
+    }
     
     return NextResponse.json({
       ok: true,
       message: 'Amazon-Daten erfolgreich importiert',
       zeitraum: { from, to },
       roh_daten: rawData.length,
-      aggregierte_buchungen: buchungen.length,
       stats
     })
     
