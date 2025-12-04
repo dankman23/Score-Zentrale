@@ -1,95 +1,94 @@
 <analysis>
-The trajectory documents a complex, iterative development process focused on a financial accounting (FIBU) module. The work began with fixing a series of critical TypeScript build errors and deployment blockers, including type mismatches from MongoDB ( vs. ), hardcoded credentials, and incorrect dependency handling for UI components.
+The trajectory documents the iterative development of a complex Amazon transaction import and aggregation feature for a financial accounting (FIBU) module. The core task is to replicate the business logic of an existing Jera/ADDISON module, which generates 2,812 specific accounting records for October, using an Excel export as a reference.
 
-Following the initial fixes, the primary focus shifted to the FIBU module's core business logic. The user provided multiple, increasingly detailed requirements to correct fundamental accounting flaws. The engineer undertook a major refactoring to distinguish between a read-only Payment Account (e.g., Bank, PayPal) and an editable Contra Account (e.g., Expense, Revenue). This involved rewriting the status calculation logic (, , ) to depend solely on the contra account and its document requirements.
+The process began with a significant misunderstanding, where the AI engineer initially planned to import data directly from the provided Excel file. The user corrected this, clarifying that the Excel file is only a reference for validation and the true data source is an existing JTL-SQL database.
 
-The process was highly iterative, with the engineer implementing logic, the user testing and providing feedback with screenshots, and the engineer debugging and refining the implementation. Key challenges included handling stale data from the database that conflicted with new business rules and correctly initializing frontend state in React with asynchronously loaded data.
+The engineer then shifted focus to exploring the JTL database. After struggling with standalone scripts, a temporary debug API endpoint was successfully used to inspect the JTL SQL schema and identify the key table: .
 
-The final user request, which is the current task, is to replace the existing Amazon transaction import with a new, complex aggregation logic based on a provided Excel file (Amazon Oktober.xlsx) to generate 2,812 specific records. The user's primary language is **German**, and future communication must be in German.
+The main challenge became replicating the aggregation logic. The engineer went through multiple iterations:
+1.  A first attempt aggregated transactions too broadly, resulting in 2,192 records.
+2.  A second, more granular attempt produced 6,459 records (too many).
+3.  A third, highly specific logic was implemented in a new file () based on detailed rules from the user (e.g., one positive and one negative block per OrderID).
+
+However, a persistent Next.js caching issue repeatedly caused the old logic to execute. After successfully clearing the cache and re-running the import, the new logic still produced 2,192 records. The final analysis revealed that the new logic was indeed running correctly, but the initial premise was flawed: the 2,812 rows in the reference Excel are likely less aggregated than the newly implemented logic. The immediate next step is to re-evaluate the Excel file's structure.
+
+The user's primary language is **German**. All future communication must be in German.
 </analysis>
 
 <product_requirements>
-The primary goal is to build a robust financial accounting (FIBU) module that correctly processes and assigns bank transactions from multiple sources.
+The primary goal is to build a robust financial accounting (FIBU) import pipeline for Amazon transactions that replicates the logic of an existing Jera/ADDISON module.
 
-**Core Logic:**
-1.  **Account Separation:** A strict distinction must be maintained between a  (Payment Account) and a  (Contra Account).
-2.  **Fixed Payment Accounts:** Each payment source must be mapped to a fixed, unchangeable payment account (e.g., Amazon -> 1814, PayPal -> 1801). This account is for informational purposes only.
-3.  **Status Calculation:** The assignment status of a transaction (, , ) must depend *exclusively* on the  and its document requirement (), and whether a document is linked. The  must have no influence on this status.
-
-**Amazon October Import:**
-- Implement a new import pipeline that replicates the aggregation logic from the Amazon Oktober.xlsx file.
-- This pipeline must generate exactly 2,812 transaction records for the October period.
-- The logic must correctly handle positive amounts (revenues, mapped to debitors like 69001 or 30000+ for IGL), negative amounts (fees, mapped to 6770), refunds, and special cases like Geldtransit (mapped to 1460).
-- Specific fields from the Excel (Order ID, BG-Text, etc.) must be mapped to corresponding fields in the payment record.
+**Core Requirements:**
+1.  **Data Source:** The system must use the existing JTL-SQL database connection, specifically querying tables like . The provided Amazon Oktober.xlsx file is for validation and reference only, not for data import.
+2.  **Aggregation Logic:** The pipeline must aggregate raw settlement data to match the structure and financial totals of the reference Excel file, which contains 2,812 records for October.
+    *   For each  with , create two aggregated records:
+        *   A **positive block** (revenue) summing , , , etc., assigned to a Debitor account (e.g., ).
+        *   A **negative block** (fees) summing , , etc., assigned to an expense account (e.g., ).
+    *    must be handled separately and generate records with  numbers.
+    *    transactions must be mapped to account  and not aggregated by .
+3.  **Account Mapping:** A strict separation between a fixed, read-only Payment Account (e.g., Amazon -> ) and an editable Contra Account (e.g., , , ) must be enforced.
+4.  **Status Calculation:** A transaction's status (, , ) must depend exclusively on the Contra Account and its document requirements. The Payment Account must have no influence.
 </product_requirements>
 
 <key_technical_concepts>
-- **Framework:** Next.js (App Router), React
-- **Backend:** Next.js API Routes (TypeScript)
-- **Database:** MongoDB
-- **UI:** Shadcn/UI, Tailwind CSS
+- **Frameworks:** Next.js (App Router), React
+- **Backend:** Next.js API Routes, TypeScript
+- **Databases:** MongoDB (application data), MSSQL (for JTL-Wawi data source)
+- **UI:** shadcn/ui, Tailwind CSS
 - **Core Logic:**
-  - Deep refactoring of business logic in TypeScript.
-  - Strict data modeling to separate payment and contra accounts.
-  - Dynamic, rule-based calculation of transaction statuses.
+    - Complex SQL data aggregation and business rule implementation in TypeScript.
+    - Rule-based mapping of transaction types to specific general ledger accounts.
 - **Development Process:**
-  - Iterative debugging using  for API inspection and logs.
-  - Build-time error resolution ().
-  - Creation of database migration/setup scripts ( files executed with ).
+    - Iterative refinement of logic based on user feedback.
+    - Use of temporary API routes for database exploration and debugging.
+    - Management of server-side caching issues ( directory).
 </key_technical_concepts>
 
 <code_architecture>
-The application is a Next.js monolith. The work centered on the FIBU (financial accounting) feature, primarily within the API routes and corresponding frontend components.
+The application is a Next.js monolith. The work centered on the FIBU (financial accounting) feature, primarily within new and existing API routes and supporting library files.
 
 **Directory Structure:**
 
 
 - ****
-  - **Importance:** This is the most critical file, containing the entire business logic for fetching, processing, matching, and assigning payments.
-  - **Changes:** This file underwent a massive and iterative refactoring.
-    1.  A  was introduced to enforce fixed payment accounts.
-    2.  The main data processing loop was modified to add  and  to each payment object.
-    3.  The status calculation logic () was completely rewritten to depend only on the contra account and document status, ignoring the payment account.
-    4.  Auto-assignment logic for sources like Amazon was repeatedly fixed to correctly prioritize rules over incorrect stale data from the database.
-    5.  Matching functions were updated to use  instead of the generic .
+  - **Importance:** This new file contains the core, most up-to-date business logic for fetching raw Amazon settlement data from the JTL-SQL database and aggregating it according to the user's final, detailed specifications.
+  - **Summary of Changes:** Created from scratch to implement a precise aggregation strategy. It groups transactions by , separating them into positive (revenue), negative (fees), advertising, and tax blocks. It also handles special cases like 'Refund' and 'Transfer'. This file is intended to replace the previous, less accurate logic.
 
 - ****
-  - **Importance:** The frontend component displaying the payment list and the detail view for a selected payment. It contains all the UI for filtering and manual assignment.
-  - **Changes:**
-    1.  The  call was updated to send the source filter () to the backend.
-    2.  The detail panel was refactored to show the  as a read-only field.
-    3.  The state initialization ( and ) for the contra account and document dropdowns was repeatedly fixed to correctly handle asynchronously loaded data and reflect the backend's matching results.
+  - **Importance:** This is the new API endpoint created to trigger the import and aggregation process defined in .
+  - **Summary of Changes:** Created to provide a dedicated endpoint for the complex Amazon JTL import. It calls the  function, logs control sums for validation, and was the focus of extensive testing and debugging (including timeouts and caching issues).
 
 - ****
-  - **Importance:** Manages the Chart of Accounts (CoA).
-  - **Changes:** The  handler was used to add and update accounts, including the new fixed payment accounts and missing expense/revenue accounts identified during debugging.
+  - **Importance:** A one-time setup endpoint to ensure all necessary accounts (like 6600 for advertising, 6770 for fees) exist in the MongoDB  collection before the import runs.
+  - **Summary of Changes:** Created to programmatically add or update the chart of accounts required for the new Amazon logic, ensuring consistency. It was updated to include account .
 
 - ****
-  - **Importance:** One-off scripts created to manage database state.
-  - **Changes:** Scripts were created to initialize the new fixed payment accounts in the  and to attempt a (later deemed unnecessary) migration of existing payment records. They were adapted to run directly with  and a manual MongoDB connection.
+  - **Importance:** This file contains the configuration and connection logic for the JTL-SQL (MSSQL) database, which is the primary data source for the Amazon import.
+  - **Summary of Changes:** This file was read and analyzed to understand how the application connects to the JTL database. No edits were made.
+
+- ****
+  - **Importance:** This file contains the first, now-deprecated attempt at the aggregation logic.
+  - **Summary of Changes:** This file was created and modified during the initial, incorrect aggregation attempts. It is now superseded by  but was left in the codebase, causing caching issues until it was explicitly deleted from the cache.
 </code_architecture>
 
 <pending_tasks>
-- **Amazon October Import:** The primary and most complex pending task is to implement the new Amazon import and aggregation logic based on the Amazon Oktober.xlsx file. This involves building a new pipeline to generate 2,812 transaction records with the specified accounting rules for debitors, fees, and refunds.
-- **UI/UX Refinements:** The UI for the FIBU module may need further adjustments to fully align with the new Amazon import logic and display all required data fields (e.g., Bemerkung, BG-Text).
+- **Finalize Aggregation Logic:** The primary task is to resolve the discrepancy between the expected 2,812 records and the 2,192 records generated by the current logic. This involves re-analyzing the reference Excel file to understand its true granularity and adjusting the aggregation logic in  to match.
+- **Integrate into Main UI:** The new import logic must be fully integrated into the main FIBU dashboard's Update flow, replacing any old Amazon import mechanism.
+- **UI Enhancements:** The frontend detail view needs to be updated to display the new fields (, , etc.).
 </pending_tasks>
 
 <current_work>
-The engineer was at the very beginning of tackling a major new feature: **re-implementing the Amazon transaction import process for the FIBU module.**
+The engineer was in the final stages of debugging the new Amazon transaction import pipeline. The main goal is to process raw data from a JTL-SQL database to produce an output that matches a reference Excel file containing 2,812 records for October.
 
-This task was prompted by a detailed user request to replicate the logic from a specific Excel file, Amazon Oktober.xlsx, which contains 2,812 pre-aggregated transaction rows. The goal is for the application's import pipeline to produce the exact same 2,812 records, applying a complex set of business rules.
+A new, highly specific aggregation logic was implemented in , based on detailed user rules. This logic is triggered by a new API route: .
 
-**Key requirements for this new implementation include:**
-1.  **Aggregation:** Correctly aggregating raw Amazon data to match the structure in the provided Excel file.
-2.  **Account Mapping:**
-    -   Assigning the fixed payment account  to all Amazon transactions.
-    -   Assigning the correct contra account based on the transaction type:  for standard sales,  for IGL sales,  for fees, and  for money transfers.
-3.  **Data Mapping:** Populating specific fields like  (XRE-/XRK-), , , and  from the source data.
-4.  **Status Logic:** Ensuring the final  is calculated correctly based on the newly assigned contra account and its document requirements.
+A significant portion of the recent work involved troubleshooting a Next.js server-side cache issue, which was causing an older version of the import logic to run. After successfully clearing the cache by deleting the  folder and restarting the server, the engineer re-ran the import.
 
-The very last actions taken by the engineer were to analyze the provided Amazon Oktober.xlsx file to understand its structure and data. After an initial misunderstanding of the file's row count, the engineer received clarification from the user and was instructed to begin implementation immediately. The work on coding the new import pipeline itself has not yet started.
+The import, now using the correct  logic, consistently produced **2,192** records, not the expected **2,812**.
+
+The engineer's last action was to analyze this result. The conclusion was not that the code was failing, but that the premise was wrong. The engineer realized the new aggregation logic *was* running correctly, and the 2,192 result was the valid output of that logic (e.g., 1,093 orders creating one positive and one negative entry each). The discrepancy stems from an incorrect initial assumption that the 2,812 rows in the reference Excel file were already aggregated in the same way. The current work has pivoted from debugging the code's execution to questioning the fundamental aggregation target.
 </current_work>
 
 <optional_next_step>
-Begin implementing the new Amazon import logic by first adjusting the Kontenplan (Chart of Accounts) as per the user's detailed requirements (e.g., adding account 6770, correcting debitors).
+Re-examine the Amazon Oktober.xlsx file to confirm its level of aggregation and determine why it contains 2,812 rows, then adjust the logic in  accordingly.
 </optional_next_step>
