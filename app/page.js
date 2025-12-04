@@ -2087,11 +2087,72 @@ export default function App() {
 
   const downloadBatchCSV = async () => {
     try {
-      // Lade CSV mit allen generierten Bulletpoints
-      const res = await fetch('/api/amazon/bulletpoints/batch/download')
+      // Lade CSV mit den gefilterten Bulletpoints
+      // WICHTIG: Hole Liste der gefilterten Artikel und übergebe als Parameter
+      
+      // 1. Lade gefilterte Artikel-IDs
+      const query = {}
+      
+      if (artikelFilter.search) {
+        query.$or = [
+          { cArtNr: { $regex: artikelFilter.search, $options: 'i' } },
+          { cName: { $regex: artikelFilter.search, $options: 'i' } },
+          { cBarcode: { $regex: artikelFilter.search, $options: 'i' } },
+          { cHerstellerName: { $regex: artikelFilter.search, $options: 'i' } }
+        ]
+      }
+      
+      if (artikelFilter.hersteller && artikelFilter.hersteller !== 'all') {
+        query.cHerstellerName = artikelFilter.hersteller
+      }
+      
+      if (artikelFilter.warengruppe && artikelFilter.warengruppe !== 'all') {
+        query.cWarengruppenName = artikelFilter.warengruppe
+      }
+      
+      if (artikelFilter.abp === 'mit') {
+        query['bulletpoints'] = { $exists: true, $ne: null, $ne: '' }
+      } else if (artikelFilter.abp === 'ohne') {
+        query.$or = [
+          { bulletpoints: { $exists: false } },
+          { bulletpoints: null },
+          { bulletpoints: '' }
+        ]
+      }
+      
+      console.log('[CSV Download] Filter:', artikelFilter, 'Query:', query)
+      
+      // 2. Hole Artikel-IDs mit Filter
+      const artikelRes = await fetch('/api/jtl/articles/list', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filter: query,
+          limit: 10000, // Maximale Anzahl
+          page: 1
+        })
+      })
+      
+      if (!artikelRes.ok) {
+        alert('❌ Fehler beim Laden der Artikel')
+        return
+      }
+      
+      const artikelData = await artikelRes.json()
+      const kArtikelList = artikelData.articles.map(a => a.kArtikel)
+      
+      if (kArtikelList.length === 0) {
+        alert('❌ Keine Artikel mit diesem Filter gefunden')
+        return
+      }
+      
+      console.log(`[CSV Download] ${kArtikelList.length} Artikel gefunden`)
+      
+      // 3. Lade CSV mit den gefilterten Artikel-IDs
+      const res = await fetch(`/api/amazon/bulletpoints/batch/download?kArtikel=${kArtikelList.join(',')}`)
       
       if (!res.ok) {
-        alert('❌ Keine generierten Bulletpoints gefunden')
+        alert('❌ Keine generierten Bulletpoints für diese Artikel gefunden')
         return
       }
 
@@ -2105,9 +2166,10 @@ export default function App() {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
       
-      console.log('[Batch CSV] Download gestartet')
+      console.log('[Batch CSV] Download gestartet für', kArtikelList.length, 'Artikel')
     } catch (e) {
       alert('❌ Fehler beim Download: ' + e.message)
+      console.error('[CSV Download] Error:', e)
     }
   }
 
