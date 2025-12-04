@@ -194,7 +194,7 @@ export function aggregateAmazonSettlements(
   }
   
   // Verarbeite jede Gruppe (Order oder Refund)
-  for (const [key, rows] of grouped) {
+  for (const [key, rows] of Array.from(grouped.entries())) {
     const orderID = rows[0].OrderID
     const transactionType = rows[0].TransactionType
     const merchantOrderID = rows[0].MerchantOrderID
