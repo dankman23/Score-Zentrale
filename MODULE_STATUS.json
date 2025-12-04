@@ -1,0 +1,43 @@
+{
+  "amazon_import": {
+    "status": "production_ready",
+    "version": "2.0",
+    "last_updated": "2025-12-04",
+    "features": {
+      "settlement_import": true,
+      "payout_import": true,
+      "geldtransit_integration": true,
+      "aggregation": true,
+      "status_calculation": true
+    },
+    "data_sources": {
+      "pf_amazon_settlementpos": "active",
+      "pf_amazon_settlement": "active"
+    },
+    "api_endpoint": "/api/fibu/import/amazon-jtl",
+    "documentation": "/docs/amazon-import-abschlussbericht.md",
+    "known_limitations": [
+      "Bank-Konto-Mapping fest auf 1814 (sollte variabel sein)",
+      "Marketplace VAT leichte Abweichung zu Jera",
+      "Frontend-Integration unvollständig"
+    ],
+    "todos": [
+      "Bank-Konto-Mapping verfeinern (1811, 1813, 1814, 1815, 1816, 1819)",
+      "Frontend Detail-Ansicht erweitern",
+      "Automatisierung via Cron-Job",
+      "Umfangreiche Backend-Tests"
+    ],
+    "statistics_october_2025": {
+      "total_bookings": 2209,
+      "total_amount": -7230.38,
+      "accounts": {
+        "1460": { "bookings": 20, "amount": -62490.04, "description": "Geldtransit" },
+        "69001": { "bookings": 1064, "amount": 70085.96, "description": "Erlöse" },
+        "6770": { "bookings": 1087, "amount": -11354.68, "description": "Gebühren" },
+        "6600": { "bookings": 3, "amount": -640.23, "description": "Werbekosten" },
+        "1370": { "bookings": 6, "amount": -34.65, "description": "Marketplace VAT" },
+        "148328": { "bookings": 29, "amount": -2796.74, "description": "Refunds" }
+      }
+    }
+  }
+}
