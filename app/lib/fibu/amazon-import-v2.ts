@@ -154,7 +154,44 @@ export function aggregateAmazonSettlements(
       belegNr = createXREBeleg(rechnungsnummer, auNummer)
     }
     
-    // 1. POSITIVER UMSATZ-BLOCK (Principal + Tax + Shipping + ShippingTax)
+    // Für REFUNDS: Separate Behandlung - ALLE Beträge gehen zu Konto 148328
+    if (transactionType === 'Refund') {
+      // Sammle ALLE Beträge (ItemPrice + ItemFees)
+      const allRows = rows.filter(r => 
+        (r.AmountType === 'ItemPrice' || r.AmountType === 'ItemFees')
+      )
+      
+      if (allRows.length > 0) {
+        const betrag = allRows.reduce((sum, r) => sum + r.Amount, 0)
+        
+        if (Math.abs(betrag) >= 0.01) {
+          const kundenName = merchantOrderID ? merchantOrderID.split('_')[0] : orderID
+          const beschreibungen = allRows.map(r => r.AmountDescription).join(', ')
+          
+          buchungen.push({
+            datum,
+            betrag,
+            waehrung: 'EUR',
+            bank_konto_nr: transactionType === 'Refund' ? '1814' : '1814',  // Refunds können über 1813 oder 1814 laufen
+            gegenkonto_konto_nr: '148328',  // Rückerstattungen
+            order_id: orderID,
+            au_nummer: auNummer,
+            rechnungsnummer: belegNr,
+            transaktionsId: `${rows[0].kMessageId}_refund`,
+            verwendungszweck: `${belegNr} ${kundenName} Rückerstattung: ${beschreibungen}`,
+            bemerkung: `Refund/${beschreibungen}`,
+            anbieter: 'Amazon',
+            quelle: 'jtl_amazon_settlement',
+            transaction_type: transactionType,
+            amount_type: 'Refund',
+            amount_description: beschreibungen
+          })
+        }
+      }
+      continue  // Überspringen der weiteren Verarbeitung für Refunds
+    }
+    
+    // 1. POSITIVER UMSATZ-BLOCK (Principal + Tax + Shipping + ShippingTax) - NUR FÜR ORDERS
     const itemPriceRows = rows.filter(r => 
       r.AmountType === 'ItemPrice' && 
       ['Principal', 'Tax', 'Shipping', 'ShippingTax'].includes(r.AmountDescription)
