@@ -2064,7 +2064,23 @@ export default function App() {
         )
       })
 
-      const data = await res.json()
+      // Robustes JSON-Parsing mit Error-Handling
+      let data
+      try {
+        const responseText = await res.text()
+        console.log('[Batch Generate] Response:', responseText.substring(0, 500))
+        
+        if (!responseText || responseText.trim() === '') {
+          throw new Error('Leere Response vom Server')
+        }
+        
+        data = JSON.parse(responseText)
+      } catch (parseError) {
+        console.error('[Batch Generate] JSON Parse Error:', parseError)
+        console.error('[Batch Generate] Response Status:', res.status, res.statusText)
+        throw new Error(`Fehler beim Verarbeiten der Server-Antwort: ${parseError.message}`)
+      }
+      
       if (data.ok) {
         setBatchProgress({
           processed: data.processed,
@@ -2080,6 +2096,7 @@ export default function App() {
       }
     } catch (e) {
       alert('❌ Fehler: ' + e.message)
+      console.error('[Batch Generate] Error:', e)
     } finally {
       setBatchGenerating(false)
     }
