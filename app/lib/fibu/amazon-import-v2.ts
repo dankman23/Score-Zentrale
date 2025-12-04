@@ -63,6 +63,19 @@ export interface AmazonBuchung {
 /**
  * Holt Amazon-Settlement-Daten aus JTL-SQL für einen Zeitraum
  */
+/**
+ * Settlement-Daten (für Geldtransit/Auszahlungen)
+ */
+export interface AmazonSettlement {
+  kMessageId: number
+  SettlementID: string
+  SettlementStartDate: Date
+  SettlementEndDate: Date
+  DepositDate: Date
+  TotalAmount: number
+  Currency: string
+}
+
 export async function fetchAmazonSettlementsFromJTL(
   startDate: string,
   endDate: string
@@ -87,6 +100,35 @@ export async function fetchAmazonSettlementsFromJTL(
       AND PostedDateTime < '${endDate}'
     ORDER BY PostedDateTime, OrderID
   `)
+  
+  return result.recordset
+}
+
+/**
+ * Holt Amazon Settlement-Daten (Auszahlungen) für Geldtransit-Buchungen
+ */
+export async function fetchAmazonPayoutsFromJTL(
+  fromDate: string,
+  toDate: string
+): Promise<AmazonSettlement[]> {
+  const pool = await getJTLConnection()
+  
+  const result = await pool.request().query(`
+    SELECT 
+      kMessageId,
+      SettlementID,
+      SettlementStartDate,
+      SettlementEndDate,
+      DepositDate,
+      TotalAmount,
+      Currency
+    FROM dbo.pf_amazon_settlement
+    WHERE DepositDate >= '${fromDate}'
+      AND DepositDate < '${toDate}'
+    ORDER BY DepositDate
+  `)
+  
+  await pool.close()
   
   return result.recordset
 }
