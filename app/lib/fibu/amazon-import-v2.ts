@@ -104,10 +104,20 @@ export function aggregateAmazonSettlements(
   const grouped = new Map<string, AmazonSettlementRaw[]>()
   
   for (const row of rawData) {
-    // Geldtransit: NICHT aggregieren, jede Zeile einzeln
-    // Hinweis: Geldtransit kann TransactionType 'Transfer' ODER leer haben!
-    if (row.TransactionType === 'Transfer' || 
-        (row.AmountDescription && row.AmountDescription.includes('Transfer'))) {
+    // **WICHTIG**: Geldtransit-Transaktionen haben in JTL oft:
+    // - Leere oder spezielle OrderID
+    // - TransactionType könnte 'Transfer' sein ODER ein anderer Wert
+    // - AmountType/AmountDescription könnten leer oder spezielle Werte sein
+    
+    // Prüfe zuerst auf bekannte Transfer-Muster:
+    const isTransfer = row.TransactionType === 'Transfer' ||
+                      (row.AmountDescription && (
+                        row.AmountDescription.includes('Transfer') ||
+                        row.AmountDescription.includes('transfer')
+                      )) ||
+                      (row.AmountType && row.AmountType === 'Transfer')
+    
+    if (isTransfer) {
       buchungen.push(createGeldtransitBuchung(row, rechnungenMap))
       continue
     }
@@ -124,8 +134,10 @@ export function aggregateAmazonSettlements(
       continue
     }
     
-    // Wenn OrderID leer ist UND AmountDescription "Transfer" enthält = Geldtransit
-    if (!row.OrderID && row.AmountDescription && row.AmountDescription.toLowerCase().includes('transfer')) {
+    // Wenn OrderID leer/null ist, könnte es auch ein Transfer sein
+    // ABER nur wenn es kein ServiceFee oder other-transaction ist
+    if (!row.OrderID || row.OrderID.trim() === '') {
+      console.log(`⚠️ Zeile ohne OrderID gefunden: TransactionType=${row.TransactionType}, AmountType=${row.AmountType}, AmountDescription=${row.AmountDescription}, Amount=${row.Amount}`)
       buchungen.push(createGeldtransitBuchung(row, rechnungenMap))
       continue
     }
