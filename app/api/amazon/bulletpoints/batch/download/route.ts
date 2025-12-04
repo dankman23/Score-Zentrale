@@ -14,19 +14,74 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const kArtikelParam = searchParams.get('kArtikel')
+    const herstellerParam = searchParams.get('hersteller')
+    const warengruppeParam = searchParams.get('warengruppe')
+    const searchParam = searchParams.get('search')
+    const abpParam = searchParams.get('abp')
     
     const db = await getDb()
     const bulletpointsCollection = db.collection('amazon_bulletpoints_generated')
+    const articlesCollection = db.collection('articles')
     
-    // Filter: Spezifische Artikel oder alle
-    const query: any = {}
+    // Filter: Spezifische Artikel ODER Filter-basierte Suche
+    let kArtikelIds: number[] = []
     
     if (kArtikelParam) {
-      const ids = kArtikelParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id))
-      if (ids.length > 0) {
-        query.kArtikel = { $in: ids }
+      // Direkte Artikel-IDs
+      kArtikelIds = kArtikelParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id))
+    } else if (herstellerParam || warengruppeParam || searchParam || abpParam) {
+      // Filter-basierte Suche in articles
+      const articleQuery: any = {}
+      
+      if (herstellerParam) {
+        articleQuery.cHerstellerName = herstellerParam
       }
+      
+      if (warengruppeParam) {
+        articleQuery.cWarengruppenName = warengruppeParam
+      }
+      
+      if (searchParam) {
+        articleQuery.$or = [
+          { cArtNr: { $regex: searchParam, $options: 'i' } },
+          { cName: { $regex: searchParam, $options: 'i' } },
+          { cBarcode: { $regex: searchParam, $options: 'i' } },
+          { cHerstellerName: { $regex: searchParam, $options: 'i' } }
+        ]
+      }
+      
+      console.log(`[Batch Download] Filter-Query:`, articleQuery)
+      
+      // Hole Artikel-IDs
+      const articles = await articlesCollection
+        .find(articleQuery)
+        .project({ kArtikel: 1 })
+        .toArray()
+      
+      kArtikelIds = articles.map(a => a.kArtikel)
+      
+      console.log(`[Batch Download] ${kArtikelIds.length} Artikel gefunden mit Filter`)
     }
+    
+    // Query für Bulletpoints
+    const query: any = {}
+    
+    if (kArtikelIds.length > 0) {
+      query.kArtikel = { $in: kArtikelIds }
+    }
+    
+    // ABP-Filter (mit/ohne Bulletpoints)
+    if (abpParam === 'mit') {
+      query.bullets = { $exists: true, $ne: null, $ne: [] }
+    } else if (abpParam === 'ohne') {
+      query.$or = [
+        { bullets: { $exists: false } },
+        { bullets: null },
+        { bullets: [] }
+      ]
+    }
+    
+    console.log(`[Batch Download] Bulletpoints-Query:`, query)
     
     const bulletpoints = await bulletpointsCollection
       .find(query)
