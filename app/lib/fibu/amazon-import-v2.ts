@@ -429,6 +429,39 @@ function createXRKBeleg(rechnungsnummer: string | null, auNummer: string): strin
   return ''
 }
 
+/**
+ * Erstellt Geldtransit-Buchungen aus Settlement-Daten (Auszahlungen)
+ * Basierend auf pf_amazon_settlement.TotalAmount
+ */
+function createGeldtransitBuchungFromSettlement(
+  settlement: AmazonSettlement,
+  bankKonto: string = '1814' // Default, kann variieren (1811, 1813, 1814, 1815, 1816, 1819)
+): AmazonBuchung {
+  const datum = new Date(settlement.DepositDate).toISOString().split('T')[0]
+  
+  // Betrag ist NEGATIV in der Buchhaltung (Auszahlung vom Amazon-Konto)
+  const betrag = -Math.abs(settlement.TotalAmount)
+  
+  return {
+    datum,
+    betrag,
+    waehrung: settlement.Currency || 'EUR',
+    bank_konto_nr: bankKonto,
+    gegenkonto_konto_nr: '1460',  // Geldtransit
+    order_id: '',  // Keine OrderID bei Geldtransit
+    au_nummer: '',
+    rechnungsnummer: null,
+    transaktionsId: `settlement_${settlement.SettlementID}`,
+    verwendungszweck: 'Amazon Geldtransit',
+    bemerkung: `Geldtransit Settlement ${settlement.SettlementID}`,
+    anbieter: 'Amazon',
+    quelle: 'jtl_amazon_payout',
+    transaction_type: 'Geldtransit',
+    amount_type: 'Payout',
+    amount_description: 'Amazon Geldtransit'
+  }
+}
+
 function createGeldtransitBuchung(
   row: AmazonSettlementRaw,
   rechnungenMap: Map<string, any>
