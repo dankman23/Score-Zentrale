@@ -6,23 +6,77 @@ export const maxDuration = 180
 
 /**
  * Debug-Endpunkt: Exportiert JTL-Rohdaten zur Analyse
+ * Format: ?format=csv für CSV-Export, sonst JSON
  */
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const from = searchParams.get('from') || '2025-10-01'
     const to = searchParams.get('to') || '2025-10-31'
-    const limit = parseInt(searchParams.get('limit') || '100')
+    const format = searchParams.get('format') || 'json'
+    const limit = parseInt(searchParams.get('limit') || '0')
     
-    console.log(`[JTL Raw Export] Hole Daten von ${from} bis ${to}, max ${limit} Zeilen`)
+    console.log(`[JTL Raw Export] Hole Daten von ${from} bis ${to}, Format: ${format}`)
     
     // Hole Rohdaten
     const rawData = await fetchAmazonSettlementsFromJTL(from, to)
+    const dataToExport = limit > 0 ? rawData.slice(0, limit) : rawData
     
+    console.log(`[JTL Raw Export] ${rawData.length} Zeilen geladen, exportiere ${dataToExport.length}`)
+    
+    // CSV-Export
+    if (format === 'csv') {
+      const csvRows: string[] = []
+      
+      // Header
+      csvRows.push([
+        'kMessageId',
+        'PostedDateTime',
+        'TransactionType',
+        'OrderID',
+        'MerchantOrderID',
+        'AmountType',
+        'AmountDescription',
+        'Amount',
+        'QuantityPurchased',
+        'SellerSKU',
+        'MarketplaceName',
+        'SettlementID'
+      ].join(';'))
+      
+      // Daten
+      dataToExport.forEach(row => {
+        csvRows.push([
+          row.kMessageId || '',
+          row.PostedDateTime || '',
+          row.TransactionType || '',
+          row.OrderID || '',
+          row.MerchantOrderID || '',
+          row.AmountType || '',
+          row.AmountDescription || '',
+          row.Amount || 0,
+          row.QuantityPurchased || '',
+          row.SellerSKU || '',
+          row.MarketplaceName || '',
+          row.SettlementID || ''
+        ].join(';'))
+      })
+      
+      const csvContent = csvRows.join('\n')
+      
+      return new NextResponse(csvContent, {
+        headers: {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': `attachment; filename="jtl-amazon-raw-${from}_${to}.csv"`
+        }
+      })
+    }
+    
+    // JSON-Export (Default)
     // Gruppiere nach TransactionType
     const grouped = new Map<string, any[]>()
     
-    rawData.slice(0, limit).forEach(row => {
+    dataToExport.forEach(row => {
       const key = `${row.TransactionType || '(leer)'}_${row.AmountType || '(leer)'}`
       if (!grouped.has(key)) {
         grouped.set(key, [])
@@ -55,17 +109,19 @@ export async function GET(request: NextRequest) {
       ok: true,
       zeitraum: { from, to },
       gesamt_zeilen: rawData.length,
-      sample_size: Math.min(limit, rawData.length),
+      sample_size: dataToExport.length,
       einzigartige_kombinationen: Array.from(uniqueCombos).sort(),
       gruppiert_nach_type: summary,
-      rohdaten_sample: rawData.slice(0, 20).map(r => ({
+      rohdaten_sample: rawData.slice(0, 50).map(r => ({
+        kMessageId: r.kMessageId,
+        PostedDateTime: r.PostedDateTime,
         TransactionType: r.TransactionType || 'NULL',
         AmountType: r.AmountType || 'NULL',
         AmountDescription: r.AmountDescription || 'NULL',
         OrderID: r.OrderID || 'NULL',
         MerchantOrderID: r.MerchantOrderID || 'NULL',
         Amount: r.Amount,
-        PostedDateTime: r.PostedDateTime
+        SettlementID: r.SettlementID || 'NULL'
       }))
     })
     
