@@ -61,9 +61,6 @@ export interface AmazonBuchung {
 }
 
 /**
- * Holt Amazon-Settlement-Daten aus JTL-SQL für einen Zeitraum
- */
-/**
  * Settlement-Daten (für Geldtransit/Auszahlungen)
  */
 export interface AmazonSettlement {
@@ -75,6 +72,10 @@ export interface AmazonSettlement {
   TotalAmount: number
   Currency: string
 }
+
+/**
+ * Holt Amazon-Settlement-Daten aus JTL-SQL für einen Zeitraum
+ */
 
 export async function fetchAmazonSettlementsFromJTL(
   startDate: string,
