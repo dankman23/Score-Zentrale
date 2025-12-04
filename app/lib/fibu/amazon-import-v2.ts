@@ -355,6 +355,61 @@ function createGeldtransitBuchung(
   }
 }
 
+function createServiceFeeBuchung(
+  row: AmazonSettlementRaw,
+  rechnungenMap: Map<string, any>
+): AmazonBuchung {
+  const datum = new Date(row.PostedDateTime).toISOString().split('T')[0]
+  
+  return {
+    datum,
+    betrag: row.Amount,
+    waehrung: 'EUR',
+    bank_konto_nr: '1813',  // ServiceFee läuft über 1813 (aus Excel)
+    gegenkonto_konto_nr: '6600',  // Kosten für Werbung
+    order_id: row.OrderID || '',
+    au_nummer: '',
+    rechnungsnummer: null,
+    transaktionsId: `${row.kMessageId}_servicefee`,
+    verwendungszweck: `Kosten für Werbung`,
+    bemerkung: `ServiceFee/${row.AmountType}/${row.AmountDescription}`,
+    anbieter: 'Amazon',
+    quelle: 'jtl_amazon_settlement',
+    transaction_type: 'ServiceFee',
+    amount_type: row.AmountType,
+    amount_description: row.AmountDescription,
+    steuerschluessel: '401'  // 19% Vorsteuer
+  }
+}
+
+function createOtherTransactionBuchung(
+  row: AmazonSettlementRaw,
+  rechnungenMap: Map<string, any>
+): AmazonBuchung {
+  const datum = new Date(row.PostedDateTime).toISOString().split('T')[0]
+  
+  // other-transaction kann verschiedene Konten haben - hier nehmen wir 6770 für Gebühren
+  return {
+    datum,
+    betrag: row.Amount,
+    waehrung: 'EUR',
+    bank_konto_nr: '1814',
+    gegenkonto_konto_nr: '6770',  // Sonstige Gebühren
+    order_id: row.OrderID || '',
+    au_nummer: '',
+    rechnungsnummer: null,
+    transaktionsId: `${row.kMessageId}_other`,
+    verwendungszweck: row.AmountDescription || 'Sonstige Transaktion',
+    bemerkung: `other-transaction/${row.AmountType}/${row.AmountDescription}`,
+    anbieter: 'Amazon',
+    quelle: 'jtl_amazon_settlement',
+    transaction_type: 'other-transaction',
+    amount_type: row.AmountType,
+    amount_description: row.AmountDescription,
+    steuerschluessel: '401'
+  }
+}
+
 /**
  * Berechnet den Zuordnungsstatus basierend auf Gegenkonto + Belegpflicht
  */
