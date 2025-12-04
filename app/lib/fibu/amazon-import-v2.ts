@@ -564,3 +564,138 @@ export async function berechneZuordnungsStatus(
   
   return hatBeleg ? 'zugeordnet' : 'beleg_fehlt'
 }
+
+/**
+ * Berechnet den Buchungsstatus basierend auf Gegenkonto
+ */
+function calculateBuchungStatus(
+  buchung: AmazonBuchung,
+  kontenplanMap: Map<string, any>
+): 'offen' | 'beleg_fehlt' | 'zugeordnet' {
+  const konto = kontenplanMap.get(buchung.gegenkonto_konto_nr)
+  
+  if (!konto || konto.belegpflicht === false) {
+    return 'zugeordnet'
+  }
+  
+  const hatBeleg = !!buchung.rechnungsnummer
+  return hatBeleg ? 'zugeordnet' : 'beleg_fehlt'
+}
+
+/**
+ * Berechnet Statistiken für die importierten Buchungen
+ */
+function calculateStats(buchungen: AmazonBuchung[]): any {
+  const stats = {
+    total: buchungen.length,
+    byTransactionType: {} as Record<string, number>,
+    byStatus: {} as Record<string, number>,
+    totalAmount: 0
+  }
+  
+  buchungen.forEach(b => {
+    // Zähle nach TransactionType
+    stats.byTransactionType[b.transaction_type] = (stats.byTransactionType[b.transaction_type] || 0) + 1
+    
+    // Zähle nach Status
+    if (b.zuordnungs_status) {
+      stats.byStatus[b.zuordnungs_status] = (stats.byStatus[b.zuordnungs_status] || 0) + 1
+    }
+    
+    // Summiere Beträge
+    stats.totalAmount += b.betrag
+  })
+  
+  return stats
+}
+
+/**
+ * Hauptfunktion: Importiert und aggregiert Amazon-Daten aus JTL
+ */
+export async function importAndAggregateAmazonJtlData(
+  db: Db,
+  fromDate: string,
+  toDate: string
+): Promise<{ success: boolean; count: number; message: string; stats: any }> {
+  try {
+    console.log(`[Amazon JTL Import] Starte Import von ${fromDate} bis ${toDate}...`)
+    
+    // 1. Hole Rohdaten aus JTL (Settlement-Positionen)
+    const rawData = await fetchAmazonSettlementsFromJTL(fromDate, toDate)
+    console.log(`[Amazon JTL Import] ${rawData.length} Rohdaten-Zeilen geladen`)
+    
+    // 2. Hole Settlement-Daten (Auszahlungen/Geldtransit)
+    const payouts = await fetchAmazonPayoutsFromJTL(fromDate, toDate)
+    console.log(`[Amazon JTL Import] ${payouts.length} Auszahlungen (Geldtransit) geladen`)
+    
+    // 3. Hole Rechnungen für Zuordnung
+    const rechnungenCursor = await db.collection('rechnungen').find({}).toArray()
+    const rechnungenMap = new Map()
+    rechnungenCursor.forEach(r => {
+      if (r.au_nummer) rechnungenMap.set(r.au_nummer, r)
+    })
+    
+    // 4. Aggregiere Buchungen aus Settlement-Positionen
+    const buchungen = aggregateAmazonSettlements(rawData, rechnungenMap)
+    console.log(`[Amazon JTL Import] ${buchungen.length} aggregierte Buchungen erstellt`)
+    
+    // 5. Füge Geldtransit-Buchungen hinzu
+    for (const payout of payouts) {
+      // Bank-Konto ermitteln (Standard: 1814, kann aber variieren)
+      // TODO: Mapping von SettlementID zu Bank-Konto aus einer Konfigurations-Tabelle
+      const bankKonto = '1814' // Vorerst fest
+      
+      const geldtransitBuchung = createGeldtransitBuchungFromSettlement(payout, bankKonto)
+      buchungen.push(geldtransitBuchung)
+    }
+    console.log(`[Amazon JTL Import] ${payouts.length} Geldtransit-Buchungen hinzugefügt (Gesamt: ${buchungen.length})`)
+    
+    // 6. Berechne Status für jede Buchung
+    const kontenplanCursor = await db.collection('kontenplan').find({}).toArray()
+    const kontenplanMap = new Map()
+    kontenplanCursor.forEach(k => {
+      kontenplanMap.set(k.konto_nr, k)
+    })
+    
+    buchungen.forEach(b => {
+      b.status = calculateBuchungStatus(b, kontenplanMap)
+    })
+    
+    // 7. Speichere in MongoDB
+    console.log('[Amazon JTL Import] Speichere in MongoDB...')
+    const collection = db.collection('zahlungen')
+    
+    // Lösche alte Amazon-Buchungen für diesen Zeitraum
+    const deleteResult = await collection.deleteMany({
+      anbieter: 'Amazon',
+      datum: { $gte: fromDate, $lt: toDate }
+    })
+    console.log(`[Amazon JTL Import] ${deleteResult.deletedCount} alte Einträge gelöscht`)
+    
+    // Füge neue Buchungen ein
+    if (buchungen.length > 0) {
+      await collection.insertMany(buchungen)
+    }
+    
+    console.log('[Amazon JTL Import] Import erfolgreich abgeschlossen')
+    
+    // Statistiken
+    const stats = calculateStats(buchungen)
+    
+    return {
+      success: true,
+      count: buchungen.length,
+      message: `${buchungen.length} Amazon-Buchungen erfolgreich importiert (inkl. ${payouts.length} Geldtransit)`,
+      stats
+    }
+    
+  } catch (error: any) {
+    console.error('[Amazon JTL Import] Fehler:', error)
+    return {
+      success: false,
+      count: 0,
+      message: `Fehler beim Import: ${error.message}`,
+      stats: {}
+    }
+  }
+}
