@@ -105,7 +105,9 @@ export function aggregateAmazonSettlements(
   
   for (const row of rawData) {
     // Geldtransit: NICHT aggregieren, jede Zeile einzeln
-    if (row.TransactionType === 'Transfer') {
+    // Hinweis: Geldtransit kann TransactionType 'Transfer' ODER leer haben!
+    if (row.TransactionType === 'Transfer' || 
+        (row.AmountDescription && row.AmountDescription.includes('Transfer'))) {
       buchungen.push(createGeldtransitBuchung(row, rechnungenMap))
       continue
     }
@@ -119,6 +121,12 @@ export function aggregateAmazonSettlements(
     // other-transaction (z.B. Shipping label purchase): NICHT aggregieren
     if (row.TransactionType === 'other-transaction') {
       buchungen.push(createOtherTransactionBuchung(row, rechnungenMap))
+      continue
+    }
+    
+    // Wenn OrderID leer ist UND AmountDescription "Transfer" enthält = Geldtransit
+    if (!row.OrderID && row.AmountDescription && row.AmountDescription.toLowerCase().includes('transfer')) {
+      buchungen.push(createGeldtransitBuchung(row, rechnungenMap))
       continue
     }
     
