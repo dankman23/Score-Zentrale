@@ -110,6 +110,18 @@ export function aggregateAmazonSettlements(
       continue
     }
     
+    // ServiceFee (Werbekosten): NICHT aggregieren, jede Zeile einzeln
+    if (row.TransactionType === 'ServiceFee') {
+      buchungen.push(createServiceFeeBuchung(row, rechnungenMap))
+      continue
+    }
+    
+    // other-transaction (z.B. Shipping label purchase): NICHT aggregieren
+    if (row.TransactionType === 'other-transaction') {
+      buchungen.push(createOtherTransactionBuchung(row, rechnungenMap))
+      continue
+    }
+    
     const key = `${row.OrderID}_${row.TransactionType}`
     if (!grouped.has(key)) {
       grouped.set(key, [])
