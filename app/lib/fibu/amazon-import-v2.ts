@@ -57,6 +57,7 @@ export interface AmazonBuchung {
   amount_type: string
   amount_description: string
   zuordnungs_status?: 'offen' | 'beleg_fehlt' | 'zugeordnet'
+  status?: 'offen' | 'beleg_fehlt' | 'zugeordnet'
   steuerschluessel?: string
 }
 
