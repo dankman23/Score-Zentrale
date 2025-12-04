@@ -100,15 +100,6 @@ export async function POST(request: NextRequest) {
 
 // Alte Implementierung entfernt - verwende jetzt importAndAggregateAmazonJtlData()
     
-    if (rawData.length === 0) {
-      return NextResponse.json({
-        ok: true,
-        message: 'Keine Amazon-Daten im angegebenen Zeitraum gefunden',
-        imported: 0,
-        aggregated: 0
-      })
-    }
-    
     // 2. Lade VK-Rechnungen für Zuordnung
     console.log('[Amazon JTL Import] Lade VK-Rechnungen...')
     const vkRechnungen = await db.collection('fibu_vk_rechnungen').find({}).toArray()
