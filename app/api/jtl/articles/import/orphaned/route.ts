@@ -17,17 +17,18 @@ export async function GET() {
 
     console.log('[Orphaned Articles] Checking for articles no longer in JTL...')
 
-    // Alle aktiven kArtikel IDs aus JTL holen
+    // ALLE kArtikel IDs aus JTL holen (aktiv UND inaktiv!)
+    // Wichtig: Nur Artikel, die komplett aus JTL gelöscht wurden, sind "verwaist"
     const jtlResult = await pool.request().query(`
-      SELECT kArtikel
+      SELECT kArtikel, cAktiv
       FROM tArtikel
-      WHERE cAktiv = 'Y'
-        AND kStueckliste = 0
+      WHERE kStueckliste = 0
         AND (nIstVater = 1 OR kVaterArtikel = 0)
     `)
 
     const jtlArticleIds = new Set(jtlResult.recordset.map(r => r.kArtikel))
-    console.log(`[Orphaned Articles] JTL has ${jtlArticleIds.size} active articles`)
+    const activeCount = jtlResult.recordset.filter(r => r.cAktiv === 'Y').length
+    console.log(`[Orphaned Articles] JTL has ${jtlArticleIds.size} articles total (${activeCount} active, ${jtlArticleIds.size - activeCount} inactive)`)
 
     // Alle kArtikel aus MongoDB holen
     const mongoArticles = await articlesCollection.find({}, {
