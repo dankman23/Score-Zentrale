@@ -2088,85 +2088,49 @@ export default function App() {
   const downloadBatchCSV = async () => {
     try {
       // Lade CSV mit den gefilterten Bulletpoints
-      // WICHTIG: Hole Liste der gefilterten Artikel und übergebe als Parameter
+      // Übergebe Filter-Parameter an die Download-API
       
-      // 1. Lade gefilterte Artikel-IDs
-      const query = {}
-      
-      if (artikelFilter.search) {
-        query.$or = [
-          { cArtNr: { $regex: artikelFilter.search, $options: 'i' } },
-          { cName: { $regex: artikelFilter.search, $options: 'i' } },
-          { cBarcode: { $regex: artikelFilter.search, $options: 'i' } },
-          { cHerstellerName: { $regex: artikelFilter.search, $options: 'i' } }
-        ]
-      }
+      const params = new URLSearchParams()
       
       if (artikelFilter.hersteller && artikelFilter.hersteller !== 'all') {
-        query.cHerstellerName = artikelFilter.hersteller
+        params.append('hersteller', artikelFilter.hersteller)
       }
       
       if (artikelFilter.warengruppe && artikelFilter.warengruppe !== 'all') {
-        query.cWarengruppenName = artikelFilter.warengruppe
+        params.append('warengruppe', artikelFilter.warengruppe)
       }
       
-      if (artikelFilter.abp === 'mit') {
-        query['bulletpoints'] = { $exists: true, $ne: null, $ne: '' }
-      } else if (artikelFilter.abp === 'ohne') {
-        query.$or = [
-          { bulletpoints: { $exists: false } },
-          { bulletpoints: null },
-          { bulletpoints: '' }
-        ]
+      if (artikelFilter.search) {
+        params.append('search', artikelFilter.search)
       }
       
-      console.log('[CSV Download] Filter:', artikelFilter, 'Query:', query)
-      
-      // 2. Hole Artikel-IDs mit Filter
-      const artikelRes = await fetch('/api/jtl/articles/list', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          filter: query,
-          limit: 10000, // Maximale Anzahl
-          page: 1
-        })
-      })
-      
-      if (!artikelRes.ok) {
-        alert('❌ Fehler beim Laden der Artikel')
-        return
+      if (artikelFilter.abp && artikelFilter.abp !== 'all') {
+        params.append('abp', artikelFilter.abp)
       }
       
-      const artikelData = await artikelRes.json()
-      const kArtikelList = artikelData.articles.map(a => a.kArtikel)
+      const queryString = params.toString()
+      const url = `/api/amazon/bulletpoints/batch/download${queryString ? '?' + queryString : ''}`
       
-      if (kArtikelList.length === 0) {
-        alert('❌ Keine Artikel mit diesem Filter gefunden')
-        return
-      }
+      console.log('[CSV Download] Lade mit Filtern:', artikelFilter, 'URL:', url)
       
-      console.log(`[CSV Download] ${kArtikelList.length} Artikel gefunden`)
-      
-      // 3. Lade CSV mit den gefilterten Artikel-IDs
-      const res = await fetch(`/api/amazon/bulletpoints/batch/download?kArtikel=${kArtikelList.join(',')}`)
+      const res = await fetch(url)
       
       if (!res.ok) {
-        alert('❌ Keine generierten Bulletpoints für diese Artikel gefunden')
+        alert('❌ Keine generierten Bulletpoints gefunden')
         return
       }
 
       const blob = await res.blob()
-      const url = window.URL.createObjectURL(blob)
+      const downloadUrl = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
-      a.href = url
+      a.href = downloadUrl
       a.download = `amazon_bulletpoints_${new Date().toISOString().split('T')[0]}.csv`
       document.body.appendChild(a)
       a.click()
-      window.URL.revokeObjectURL(url)
+      window.URL.revokeObjectURL(downloadUrl)
       document.body.removeChild(a)
       
-      console.log('[Batch CSV] Download gestartet für', kArtikelList.length, 'Artikel')
+      console.log('[Batch CSV] Download gestartet')
     } catch (e) {
       alert('❌ Fehler beim Download: ' + e.message)
       console.error('[CSV Download] Error:', e)
