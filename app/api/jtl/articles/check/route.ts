@@ -24,15 +24,16 @@ export async function GET(request: NextRequest) {
     
     const result = await pool.request().query(`
       SELECT 
-        kArtikel, 
-        cArtNr, 
-        cName,
-        cAktiv,
-        kStueckliste,
-        nIstVater,
-        kVaterArtikel
-      FROM tArtikel 
-      WHERE kArtikel IN (${kArtikelParam})
+        a.kArtikel, 
+        a.cArtNr,
+        ab.cName,
+        a.cAktiv,
+        a.kStueckliste,
+        a.nIstVater,
+        a.kVaterArtikel
+      FROM tArtikel a
+      LEFT JOIN tArtikelBeschreibung ab ON a.kArtikel = ab.kArtikel AND ab.kSprache = 1
+      WHERE a.kArtikel IN (${kArtikelParam})
     `)
 
     return NextResponse.json({
