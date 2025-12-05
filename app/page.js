@@ -5049,6 +5049,32 @@ export default function App() {
                       >
                         <i className="bi bi-arrow-repeat mr-1"/>Follow-ups
                       </button>
+                      <button 
+                        className="btn btn-outline-info btn-sm mr-2 mb-2"
+                        onClick={async () => {
+                          if (!confirm('Alle JTL-Kunden in Datenbank importieren? Dies kann einige Minuten dauern.')) return
+                          setColdLoading(true)
+                          try {
+                            const res = await fetch('/api/coldleads/jtl-customers/import', { method: 'POST' })
+                            const data = await res.json()
+                            if (data.ok) {
+                              alert(`✅ Import erfolgreich!\n\nImportiert: ${data.imported}\nAktualisiert: ${data.updated}\nÜbersprungen: ${data.skipped}\n\nDauer: ${(data.duration/1000).toFixed(1)}s`)
+                              loadColdProspects()
+                              loadColdStats()
+                            } else {
+                              alert('❌ Import fehlgeschlagen: ' + data.error)
+                            }
+                          } catch (e) {
+                            alert('❌ Fehler: ' + e.message)
+                          } finally {
+                            setColdLoading(false)
+                          }
+                        }}
+                        disabled={coldLoading}
+                        title="Importiert alle Kunden aus JTL-Wawi"
+                      >
+                        <i className="bi bi-download mr-1"/>JTL-Kunden importieren
+                      </button>
                       <div className="btn-group btn-group-sm mb-2">
                         <button className={`btn ${coldStatusFilter==='all'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('all'); setShowColdProspectDetails(null)}}>
                           <i className="bi bi-list mr-1"/>Alle ({coldStats.total})
