@@ -5,6 +5,7 @@ import { ObjectId } from 'mongodb'
 import { connectToDatabase } from '../../../../../app/lib/api'
 import { sendEmail } from '../../../../../lib/email-client'
 import { SCORE_CONFIG } from '../../../../../lib/score-coldleads-config'
+import { buildProspectQuery } from '../../../../../lib/prospect-utils'
 
 /**
  * POST /api/coldleads/email-v3/send
