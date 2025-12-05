@@ -74,10 +74,27 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('[ColdLeads Search] Error:', error)
+    
+    // Spezifisches Error-Handling für verschiedene Fehlertypen
+    let errorMessage = error.message || 'Suche fehlgeschlagen'
+    let statusCode = 500
+    
+    if (error.name === 'MongoNetworkError') {
+      errorMessage = 'Datenbankverbindung fehlgeschlagen - bitte später versuchen'
+      statusCode = 503
+    } else if (error.message?.includes('ECONNREFUSED')) {
+      errorMessage = 'Google Search API nicht erreichbar'
+      statusCode = 503
+    } else if (error.message?.includes('timeout')) {
+      errorMessage = 'Zeitüberschreitung - bitte Limit reduzieren'
+      statusCode = 504
+    }
+    
     return NextResponse.json({
       ok: false,
-      error: error.message || 'Suche fehlgeschlagen'
-    }, { status: 500 })
+      error: errorMessage,
+      errorType: error.name || 'Error'
+    }, { status: statusCode })
   }
 }
 
