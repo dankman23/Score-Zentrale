@@ -53,13 +53,19 @@ export async function GET(request: NextRequest) {
       return acc
     }, {} as Record<string, number>)
 
+    // Zusätzliche Stats: JTL-Kunden vs. Neukunden
+    const jtlCustomersCount = await collection.countDocuments({ customer_source: 'jtl' })
+    const newCustomersCount = await collection.countDocuments({ customer_source: 'coldlead', status: 'customer' })
+
     return NextResponse.json({
       ok: true,
       unreadReplies,
       recentReplies,
       awaitingFollowup,
       byStatus: statusCounts,
-      total: byStatus.reduce((sum, item) => sum + item.count, 0)
+      total: byStatus.reduce((sum, item) => sum + item.count, 0),
+      jtl_customers: jtlCustomersCount,
+      new_customers: newCustomersCount
     })
   } catch (error: any) {
     console.error('[ColdLeads Stats] Error:', error)
