@@ -114,9 +114,15 @@ export async function GET(request: NextRequest) {
     const collection = db.collection('prospects')
 
     // Handle filter: "replied" means hasReply=true, otherwise filter by status
-    let filter = {}
+    let filter: any = {}
     if (status === 'replied') {
       filter = { hasReply: true }
+    } else if (status === 'jtl_customers') {
+      // Alle JTL-Kunden (importiert aus JTL-Wawi)
+      filter = { customer_source: 'jtl' }
+    } else if (status === 'new_customers') {
+      // Nur Neukunden (durch Kaltakquise gewonnen)
+      filter = { customer_source: 'coldlead', status: 'customer' }
     } else if (status !== 'all') {
       filter = { status }
     }
