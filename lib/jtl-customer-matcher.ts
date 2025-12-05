@@ -122,7 +122,7 @@ export async function checkJTLCustomerMatch(
   console.log(`[JTL-Matcher] Checking: ${companyName} (${website})`)
   
   try {
-    const pool = await connectToMSSQLRead()
+    const pool = await getMssqlPool()
     
     // Normalisierte Werte für Matching
     const normalizedName = normalizeFirmenname(companyName)
