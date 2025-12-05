@@ -26,24 +26,10 @@ export async function POST(request: Request) {
     const { db } = await connectToDatabase()
     const prospectsCollection = db.collection('prospects')
     
-    // Lade Prospect (prüfe sowohl id als auch _id mit ObjectId-Konvertierung)
+    // Lade Prospect mit vereinheitlichter Query-Logik
     console.log(`[EmailV3] Looking for prospect with ID: ${prospect_id}, type: ${typeof prospect_id}`)
     
-    // Baue Query basierend auf ID-Format
-    let query
-    try {
-      // Versuche als ObjectId
-      query = { 
-        $or: [
-          { _id: new ObjectId(prospect_id) },
-          { id: prospect_id }
-        ]
-      }
-    } catch (e) {
-      // Falls keine gültige ObjectId, nur nach String-ID suchen
-      query = { id: prospect_id }
-    }
-    
+    const query = buildProspectQuery(prospect_id)
     const prospect = await prospectsCollection.findOne(query)
     
     if (!prospect) {
