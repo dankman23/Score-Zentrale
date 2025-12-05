@@ -5069,6 +5069,14 @@ export default function App() {
                           <i className="bi bi-envelope-check mr-1"/>Antworten ({coldStats.replied || 0})
                           {coldLeadStats.unreadReplies > 0 && <span className="badge badge-danger ml-1">{coldLeadStats.unreadReplies}</span>}
                         </button>
+                      </div>
+                      <div className="btn-group btn-group-sm mb-2">
+                        <button className={`btn ${coldStatusFilter==='new_customers'?'btn-success':'btn-outline-success'}`} onClick={()=>{setColdStatusFilter('new_customers'); setShowColdProspectDetails(null)}}>
+                          <i className="bi bi-star-fill mr-1"/>Neukunden ({coldLeadStats.new_customers || 0})
+                        </button>
+                        <button className={`btn ${coldStatusFilter==='jtl_customers'?'btn-info':'btn-outline-info'}`} onClick={()=>{setColdStatusFilter('jtl_customers'); setShowColdProspectDetails(null)}}>
+                          <i className="bi bi-building mr-1"/>JTL-Kunden ({coldLeadStats.jtl_customers || 0})
+                        </button>
                         <button className={`btn ${coldStatusFilter==='prompts'?'btn-dark':'btn-outline-dark'}`} onClick={()=>{setColdStatusFilter('prompts'); setShowColdProspectDetails(null)}}>
                           <i className="bi bi-gear mr-1"/>Mail Prompts
                         </button>
