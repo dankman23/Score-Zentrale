@@ -9,9 +9,16 @@ import { connectToDatabase } from '../../../lib/api'
 
 /**
  * POST /api/coldleads/analyze
- * Analysiert eine Firma (Website-Crawling + AI + JTL-Matching)
+ * ⚠️ DEPRECATED: Use /api/coldleads/analyze-v3 instead
+ * 
+ * Legacy-Analyzer für Rückwärtskompatibilität
  */
 export async function POST(request: NextRequest) {
+  return NextResponse.json({
+    ok: false,
+    error: 'DEPRECATED: Use /api/coldleads/analyze-v3 instead',
+    deprecated: true
+  }, { status: 410 })
   try {
     const body = await request.json()
     const { website, industry, force = false } = body
