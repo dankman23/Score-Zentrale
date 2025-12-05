@@ -8,7 +8,7 @@
  * 3. Domain-Matching (Email-Domain vs. Website)
  */
 
-import { connectToMSSQLRead } from './mssql'
+import { connectToMSSQLRead } from '../app/lib/db/mssql'
 
 export interface JTLCustomerMatch {
   matched: boolean
