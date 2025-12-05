@@ -2526,13 +2526,20 @@ export default function App() {
     
     loadAutopilotStatus()
     
+    // Status alle 10 Sekunden aktualisieren
+    const statusInterval = setInterval(() => {
+      loadAutopilotStatus()
+      loadColdLeadsStats() // Stats auch refreshen
+    }, 10000)
+    
     return () => {
+      clearInterval(statusInterval)
       if (autopilotIntervalRef.current) {
         clearInterval(autopilotIntervalRef.current)
         autopilotIntervalRef.current = null
       }
     }
-  }, [authChecked, activeTab, autopilotState.running])
+  }, [authChecked, activeTab])
 
   // 6. ARTIKEL-BROWSER laden
   useEffect(() => {
