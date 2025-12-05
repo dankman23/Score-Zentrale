@@ -5216,8 +5216,19 @@ export default function App() {
                               </td>
                             )}
                             <td className="align-middle">
-                              <div className="text-white font-weight-bold text-truncate" style={{maxWidth:'170px'}} title={p.company_name}>
-                                {p.company_name || 'Unbekannt'}
+                              <div className="d-flex align-items-center">
+                                <div className="text-white font-weight-bold text-truncate" style={{maxWidth:'170px'}} title={p.company_name}>
+                                  {p.company_name || 'Unbekannt'}
+                                </div>
+                                {p.jtl_customer_match?.matched && (
+                                  <span 
+                                    className="badge badge-warning ml-2" 
+                                    style={{fontSize:'0.7rem', cursor:'help'}}
+                                    title={`⚠️ Bereits JTL-Kunde: ${p.jtl_customer_match.jtlCustomer?.cFirma} (${p.jtl_customer_match.confidence}% Match)`}
+                                  >
+                                    <i className="bi bi-exclamation-triangle"/> JTL-Kunde
+                                  </span>
+                                )}
                               </div>
                             </td>
                             <td className="align-middle">
