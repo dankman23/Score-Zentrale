@@ -32,13 +32,28 @@ export async function PUT(request: NextRequest) {
     const db = await connectToMongoDB()
     const collection = db.collection('prospects')
     
+    // Bei Status "customer": Prüfe ob von Cold-Lead oder JTL
+    const updateData: any = { 
+      status,
+      updated_at: new Date()
+    }
+    
+    // Wenn zu "customer" gewechselt wird und noch kein customer_source gesetzt
+    if (status === 'customer') {
+      const prospect = await collection.findOne({ _id: new ObjectId(id) })
+      
+      // Falls noch kein customer_source: Setze auf 'coldlead' (neue Akquise)
+      if (!prospect?.customer_source) {
+        updateData.customer_source = 'coldlead'
+        updateData.converted_at = new Date() // Conversion-Timestamp
+        console.log(`[Status Change] Marking as NEW CUSTOMER from cold lead`)
+      }
+    }
+    
     const result = await collection.updateOne(
       { _id: new ObjectId(id) },
       { 
-        $set: { 
-          status,
-          updated_at: new Date()
-        },
+        $set: updateData,
         $push: {
           history: {
             type: 'status_changed',
