@@ -5075,6 +5075,18 @@ export default function App() {
                       >
                         <i className="bi bi-download mr-1"/>JTL-Kunden importieren
                       </button>
+                      <button 
+                        className="btn btn-outline-success btn-sm mr-2 mb-2"
+                        onClick={() => {
+                          const includeAnalysis = confirm('📊 Analyse-Daten im Export inkludieren?\n\n✅ JA = Vollständiger Export mit Materialien, Anwendungen, etc.\n❌ NEIN = Nur Basisdaten')
+                          const url = `/api/coldleads/export/csv?status=${coldStatusFilter}&includeAnalysis=${includeAnalysis}`
+                          window.open(url, '_blank')
+                        }}
+                        disabled={coldLoading || coldProspects.length === 0}
+                        title="Exportiert aktuelle Ansicht als CSV"
+                      >
+                        <i className="bi bi-file-earmark-spreadsheet mr-1"/>CSV Export ({coldProspects.length})
+                      </button>
                       <div className="btn-group btn-group-sm mb-2">
                         <button className={`btn ${coldStatusFilter==='all'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('all'); setShowColdProspectDetails(null)}}>
                           <i className="bi bi-list mr-1"/>Alle ({coldStats.total})
