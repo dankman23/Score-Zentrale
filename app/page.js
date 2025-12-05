@@ -4555,7 +4555,7 @@ export default function App() {
           </div>
 
           {/* DACH Crawler - Direkt anzeigen (Google-Suche entfernt) */}
-          {coldStatusFilter === 'all' && false && (
+          {coldStatusFilter === 'all' && (
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-body">
                 <div className="d-flex align-items-center mb-3">
