@@ -2472,8 +2472,9 @@ export default function App() {
           'sales': 'sales',
           'marketing': 'marketing',
           'glossar': 'glossar',
+          'kunden': 'kunden',
+          'warmakquise': 'warmakquise',
           'kaltakquise': 'kaltakquise',
-          'warmakquise': 'marketing', // warmakquise is a sub of marketing
           'produkte': 'produkte',
           'preise': 'preise',
           'orga': 'orga',
