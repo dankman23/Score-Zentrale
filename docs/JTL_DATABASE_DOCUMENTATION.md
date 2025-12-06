@@ -445,9 +445,9 @@ ORDER BY o.dErstellt DESC
 ```
 tKunde (kKunde)
   ↓
-tBestellung (kKunde → kKunde)
+Verkauf.tAuftrag (kKunde → kKunde)  ✅ AKTUELL
   ↓
-tBestellpos (kBestellung → kBestellung)
+Verkauf.tAuftragPosition (kAuftrag → kAuftrag)  ✅ AKTUELL
   ↓
 tArtikel (kArtikel → kArtikel)
   ↓
