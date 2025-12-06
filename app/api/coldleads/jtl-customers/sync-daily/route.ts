@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       LEFT JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
         AND op.kArtikel > 0
       WHERE 
-        k.nRegistriert = 1
+        1=1  -- Alle Kunden
       GROUP BY 
         k.kKunde, f.cName, f.cStrasse, f.cPLZ, f.cOrt, f.cLand, 
         f.cTel, f.cFax, f.cEMail, f.cWWW, k.dErstellt
