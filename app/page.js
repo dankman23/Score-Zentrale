@@ -4410,7 +4410,95 @@ export default function App() {
         </div>
       )}
 
-      {/* Kaltakquise */}
+      {/* Kunden-Tab (NEU) */}
+      {activeTab==='kunden' && (
+        <div>
+          <div className="d-flex align-items-center justify-content-between mb-4">
+            <div>
+              <h2 className="mb-1"><i className="bi bi-building mr-2"/>Kunden-Übersicht</h2>
+              <p className="text-muted small mb-0">Zentrale Kundendatenbank mit B2B-Klassifizierung & Kanal-Analyse</p>
+            </div>
+            <button 
+              className="btn btn-primary"
+              onClick={async () => {
+                if (!confirm('JTL-Kunden synchronisieren?\n\nDies lädt alle Kunden aus JTL-Wawi und analysiert B2B-Status, Kanäle und Statistiken.')) return
+                try {
+                  const res = await fetch('/api/coldleads/jtl-customers/sync-daily', { method: 'POST' })
+                  const data = await res.json()
+                  if (data.ok) {
+                    alert(`✅ Sync erfolgreich!\n\nNeu: ${data.new_customers}\nAktualisiert: ${data.updated}\nUnverändert: ${data.unchanged}`)
+                  } else {
+                    alert('❌ Sync fehlgeschlagen: ' + data.error)
+                  }
+                } catch (e) {
+                  alert('❌ Fehler: ' + e.message)
+                }
+              }}
+            >
+              <i className="bi bi-arrow-repeat mr-1"/>JTL-Sync
+            </button>
+          </div>
+          
+          <div className="card border-0 shadow-sm">
+            <div className="card-body">
+              <div className="text-center py-5">
+                <i className="bi bi-building" style={{fontSize:'3rem', color:'#ccc'}}/>
+                <h4 className="mt-3">Kunden-Tab in Entwicklung</h4>
+                <p className="text-muted">
+                  Hier werden alle Kunden mit B2B-Status, Kanal-Zuordnung und Statistiken angezeigt.
+                </p>
+                <p className="text-muted small">
+                  <strong>Features:</strong> B2B/B2C-Filter, Kanal-Filter, Umsatz-Sortierung, Detail-Ansicht
+                </p>
+                <button 
+                  className="btn btn-outline-primary mt-3"
+                  onClick={async () => {
+                    try {
+                      const res = await fetch('/api/customers/list?limit=5')
+                      const data = await res.json()
+                      console.log('Kunden-API Test:', data)
+                      alert(`✅ API funktioniert!\n\n${data.customers?.length || 0} Kunden geladen.\nB2B: ${data.filters?.b2b || 0}\nB2C: ${data.filters?.b2c || 0}`)
+                    } catch (e) {
+                      alert('❌ API-Fehler: ' + e.message)
+                    }
+                  }}
+                >
+                  <i className="bi bi-bug mr-1"/>API testen
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Warmakquise-Tab (NEU) */}
+      {activeTab==='warmakquise' && (
+        <div>
+          <div className="d-flex align-items-center justify-content-between mb-4">
+            <div>
+              <h2 className="mb-1"><i className="bi bi-fire mr-2"/>Warmakquise</h2>
+              <p className="text-muted small mb-0">Bestehende Kunden reaktivieren & Cross-Selling</p>
+            </div>
+          </div>
+          
+          <div className="card border-0 shadow-sm">
+            <div className="card-body">
+              <div className="text-center py-5">
+                <i className="bi bi-fire" style={{fontSize:'3rem', color:'#ff6b6b'}}/>
+                <h4 className="mt-3">Warmakquise-Tab in Entwicklung</h4>
+                <p className="text-muted">
+                  Hier werden Kunden mit Reaktivierungs-Potenzial angezeigt.
+                </p>
+                <p className="text-muted small">
+                  <strong>Features:</strong> Warmakquise-Score, Letzte-Bestellung-Filter, Cross-Selling-Vorschläge
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Kaltakquise (UNVERÄNDERT!) */}
       {activeTab==='kaltakquise' && (
         <div>
           <div className="d-flex align-items-center justify-content-between mb-4">
