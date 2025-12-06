@@ -31,13 +31,23 @@ export async function POST(request: NextRequest) {
     const result = await pool.request().query(`
       SELECT 
         k.kKunde,
-        k.cFirma,
+        f.cName as cFirma,
+        f.cStrasse,
+        f.cPLZ,
+        f.cOrt,
+        f.cLand,
+        f.cTel,
+        f.cFax,
+        f.cEMail,
+        f.cWWW,
+        k.dErstellt,
         -- Umsatz über Auftragspositionen (NETTO)
         ISNULL(SUM(op.fAnzahl * op.fVKNetto), 0) as nUmsatzGesamt,
         COUNT(DISTINCT o.kAuftrag) as nAnzahlBestellungen,
         MAX(o.dErstellt) as dLetzteBestellung,
         MIN(o.dErstellt) as dErsteBestellung
       FROM tKunde k
+      LEFT JOIN tFirma f ON f.kFirma = k.kFirma
       LEFT JOIN Verkauf.tAuftrag o ON o.kKunde = k.kKunde 
         AND (o.nStorno IS NULL OR o.nStorno = 0)
         AND o.cAuftragsNr LIKE 'AU%'
@@ -46,7 +56,8 @@ export async function POST(request: NextRequest) {
       WHERE 
         k.nRegistriert = 1
       GROUP BY 
-        k.kKunde, k.cFirma
+        k.kKunde, f.cName, f.cStrasse, f.cPLZ, f.cOrt, f.cLand, 
+        f.cTel, f.cFax, f.cEMail, f.cWWW, k.dErstellt
       ORDER BY nUmsatzGesamt DESC
     `)
     
