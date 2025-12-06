@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
         k.cUSTID,
         k.dErstellt,
         k.nIstFirma,
-        ISNULL(SUM(a.fGesamtsummeNetto), 0) as nUmsatzGesamt,
+        ISNULL(SUM(a.fGesamtsumme), 0) as nUmsatzGesamt,
         COUNT(DISTINCT a.kBestellung) as nAnzahlBestellungen,
         MAX(a.dErstellt) as dLetzteBestellung,
         MIN(a.dErstellt) as dErsteBestellung
