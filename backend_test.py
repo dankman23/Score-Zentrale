@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """
-Klingspor Price Configurator Backend Testing
-Comprehensive test suite for POST /api/pricing/konfigurator
+JTL Customer Import Backend Testing
+Tests the JTL customer import functionality comprehensively
 """
 
 import requests
 import json
+import time
 import sys
-from typing import Dict, Any, List
+from datetime import datetime
 
-# Backend URL from environment
+# Configuration
 BASE_URL = "https://customer-hub-78.preview.emergentagent.com"
-API_URL = f"{BASE_URL}/api/pricing/konfigurator"
+TIMEOUT = 300  # 5 minutes for import
 
 def test_api_call(payload: Dict[str, Any], test_name: str) -> Dict[str, Any]:
     """Make API call and return response"""
