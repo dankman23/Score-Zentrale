@@ -347,22 +347,23 @@ ORDER BY GesamtUmsatzNetto DESC
 
 ---
 
-### **Q2: Top-Produkte eines Kunden**
+### **Q2: Top-Produkte eines Kunden (AKTUALISIERT für Verkauf.tAuftrag)**
 ```sql
 SELECT TOP 10
   a.cName,
   a.cArtNr,
-  SUM(bp.fAnzahl) as Menge,
-  SUM(bp.fAnzahl * bp.fVKNetto) as Umsatz,
+  SUM(op.fAnzahl) as Menge,
+  SUM(op.fAnzahl * op.fVKNetto) as Umsatz,
   aa.cWert as Produktkategorie
-FROM tBestellung b
-INNER JOIN tBestellpos bp ON bp.kBestellung = b.kBestellung
-INNER JOIN tArtikel a ON a.kArtikel = bp.kArtikel
+FROM Verkauf.tAuftrag o
+INNER JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
+INNER JOIN tArtikel a ON a.kArtikel = op.kArtikel
 LEFT JOIN tArtikelAttribut aa ON aa.kArtikel = a.kArtikel 
   AND aa.cName = 'attr_produktkategorie'
-WHERE b.kKunde = @kKunde
-  AND b.cStatus NOT IN ('storno', 'gelöscht')
-  AND bp.nTyp = 0
+WHERE o.kKunde = @kKunde
+  AND (o.nStorno IS NULL OR o.nStorno = 0)
+  AND o.cAuftragsNr LIKE 'AU%'
+  AND op.kArtikel > 0
 GROUP BY a.cName, a.cArtNr, aa.cWert
 ORDER BY Umsatz DESC
 ```
