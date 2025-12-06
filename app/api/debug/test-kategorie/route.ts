@@ -19,13 +19,9 @@ export async function GET(request: NextRequest) {
     const result = await pool.request()
       .input('kKunde', kKunde)
       .query(`
-        WITH Kategorien AS (
+        WITH Produktnamen AS (
           SELECT 
-            CASE 
-              WHEN CHARINDEX(' ', ab.cName) > 0 
-              THEN LEFT(ab.cName, CHARINDEX(' ', ab.cName) - 1)
-              ELSE ab.cName
-            END as kategorie,
+            ab.cName as produktname,
             SUM(op.fAnzahl * op.fVKNetto) as umsatz
           FROM Verkauf.tAuftrag o
           INNER JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
@@ -36,18 +32,37 @@ export async function GET(request: NextRequest) {
             AND (o.nStorno IS NULL OR o.nStorno = 0)
             AND o.cAuftragsNr LIKE 'AU%'
             AND op.kArtikel > 0
-          GROUP BY 
+            AND ab.cName IS NOT NULL
+          GROUP BY ab.cName
+        ),
+        KategorienMatch AS (
+          SELECT 
             CASE 
-              WHEN CHARINDEX(' ', ab.cName) > 0 
-              THEN LEFT(ab.cName, CHARINDEX(' ', ab.cName) - 1)
-              ELSE ab.cName
-            END
+              WHEN produktname LIKE '%Schleifscheibe%' THEN 'Schleifscheibe'
+              WHEN produktname LIKE '%Fächerscheibe%' THEN 'Fächerscheibe'
+              WHEN produktname LIKE '%Trennscheibe%' THEN 'Trennscheibe'
+              WHEN produktname LIKE '%Schleifband%' THEN 'Schleifband'
+              WHEN produktname LIKE '%Schleifbänder%' THEN 'Schleifband'
+              WHEN produktname LIKE '%Fräser%' THEN 'Fräser'
+              WHEN produktname LIKE '%Bohrer%' THEN 'Bohrer'
+              WHEN produktname LIKE '%Schleifpapier%' THEN 'Schleifpapier'
+              WHEN produktname LIKE '%Vlies%' THEN 'Vlies'
+              WHEN produktname LIKE '%Polierscheibe%' THEN 'Polierscheibe'
+              WHEN produktname LIKE '%Fächerschleifscheibe%' THEN 'Fächerscheibe'
+              WHEN produktname LIKE '%Fiberscheibe%' THEN 'Fiberscheibe'
+              WHEN produktname LIKE '%Schruppscheibe%' THEN 'Schruppscheibe'
+              WHEN produktname LIKE '%Lamellenscheibe%' THEN 'Lamellenscheibe'
+              ELSE NULL
+            END as kategorie,
+            produktname,
+            umsatz
+          FROM Produktnamen
         )
-        SELECT TOP 10 kategorie, umsatz
-        FROM Kategorien
-        WHERE kategorie NOT IN ('Kord', 'und', 'der', 'die', 'das')
-          AND LEN(kategorie) > 2
-        ORDER BY umsatz DESC
+        SELECT TOP 10 kategorie, SUM(umsatz) as total_umsatz
+        FROM KategorienMatch
+        WHERE kategorie IS NOT NULL
+        GROUP BY kategorie
+        ORDER BY total_umsatz DESC
       `)
     
     return NextResponse.json({
