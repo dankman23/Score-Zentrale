@@ -127,32 +127,30 @@ export async function POST(request: NextRequest) {
             )
           }
           
-          // Hauptartikel bestimmen (meist gekaufte Produktkategorie nach Umsatz)
+          // Hauptartikel bestimmen (meist gekaufter Artikel nach Umsatz)
           try {
             const produkteResult = await pool.request()
               .input('kKunde', customer.kKunde)
               .query(`
                 SELECT TOP 1
-                  ISNULL(a.cName, 'Sonstige') as hauptkategorie,
+                  art.cName as hauptartikel,
                   SUM(op.fAnzahl * op.fVKNetto) as umsatz
                 FROM Verkauf.tAuftrag o
                 INNER JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
                 INNER JOIN tArtikel art ON art.kArtikel = op.kArtikel
-                LEFT JOIN tArtikelAttribut aa ON aa.kArtikel = art.kArtikel AND aa.cName = 'Produktkategorie'
-                LEFT JOIN tArtikelAttribut a ON a.kArtikel = art.kArtikel AND a.cName = 'attr_produktkategorie'
                 WHERE o.kKunde = @kKunde
                   AND (o.nStorno IS NULL OR o.nStorno = 0)
                   AND o.cAuftragsNr LIKE 'AU%'
                   AND op.kArtikel > 0
-                GROUP BY ISNULL(a.cName, 'Sonstige')
+                GROUP BY art.cName
                 ORDER BY umsatz DESC
               `)
             
             if (produkteResult.recordset.length > 0) {
-              hauptartikel = produkteResult.recordset[0].hauptkategorie
+              hauptartikel = produkteResult.recordset[0].hauptartikel
             }
           } catch (produktError) {
-            console.error(`[JTL-Sync] Fehler beim Laden der Produktkategorien:`, produktError.message)
+            console.error(`[JTL-Sync] Fehler beim Laden des Hauptartikels:`, produktError.message)
           }
         }
       } catch (orderError) {
