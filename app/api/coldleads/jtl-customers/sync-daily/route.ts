@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
         AND op.kArtikel > 0
       WHERE 
         1=1  -- Alle Kunden
+        -- Uncomment für schnelleren Test: AND k.kKunde < 101000
       GROUP BY 
         k.kKunde, f.cName, f.cStrasse, f.cPLZ, f.cOrt, f.cLand, 
         f.cTel, f.cFax, f.cEMail, f.cWWW, k.dErstellt
