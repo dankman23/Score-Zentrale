@@ -1,90 +1,82 @@
 <analysis>
-The trajectory documents two primary development phases. The first, and most extensive, was the creation of a complex financial accounting (FIBU) import module for Amazon transactions. The core objective was to replicate the financial sums of a Jera/ADDISON accounting export by fetching and aggregating data from an external JTL (MSSQL) database. This phase involved significant iterative development, starting with a misunderstanding of the requirements (matching row counts vs. matching account sums), overcoming server-side caching issues, and a deep-dive investigation to locate the correct data tables. A major breakthrough was identifying that Geldtransit (money transfer) transactions were not in the primary  table but in , which was crucial for reconciling the accounts. The module was successfully completed and documented.
+The trajectory outlines a comprehensive development process for a Score-Zentrale application, focusing on its outbound module. The initial phase involved a thorough, read-only analysis of the existing Kaltakquise (cold acquisition) module, culminating in a detailed report on its architecture, workflows, and identified issues, along with a strategic roadmap.
 
-The second phase involved bug fixing in an existing Produkte (Products) menu. The user reported three issues: a failing orphaned articles check, an incorrect CSV export filter, and a crashing bulk bullet-point generation feature. The engineer successfully identified and fixed all three issues by correcting an SQL query, passing filter parameters from the frontend to the backend for the export, and adding robust error handling for a fragile API response. A final deployment health check was performed, flagging non-critical but important issues like hardcoded credentials and an unoptimized query for future attention.
+The second phase was reactive, addressing critical user-reported bugs. This involved debugging a stalled Autopilot worker, which was caused by a state desynchronization between the frontend and the database, and fixing a misconfigured email BCC functionality by correcting mismatched environment variable names in the email service code.
 
-Based on the user's messages, the primary language is **German**. All future responses must be in German.
+The third and most extensive phase involved a major feature overhaul based on new user requirements. The goal was to build a central customer management system. This necessitated creating new UI tabs (Kunden, Warmakquise) and backend infrastructure in parallel with the existing Kaltakquise module to avoid disruption. Development involved creating new API endpoints for importing and enriching customer data from an external JTL (MSSQL) database, updating the data model to include metrics like total revenue and order count, and building a new frontend component to display this data. The most recent task is debugging a persistent SQL error within the JTL customer import logic, where the AI is struggling to identify the correct column names for order data, blocking the completion of the import feature.
+
+Based on the trajectory, the user's primary language is **German**. All future responses should be in German.
 </analysis>
 
 <product_requirements>
-The project encompasses two main feature sets for a comprehensive financial and product management application.
+The application, Score-Zentrale, is a business intelligence suite. The current focus is on the Outbound module, which is being restructured into three distinct functional tabs:
 
-**1. Amazon FIBU (Financial Accounting) Import Module (Completed):**
-The primary goal was to build a system that imports Amazon transaction data from an external JTL-Wawi (MSSQL) database and aggregates it to match the account sums of a reference Jera/Addison export CSV. This was an ETL (Extract, Transform, Load) task. The system must correctly process various transaction types (, , , ) and map them to the correct general ledger accounts (e.g., 69001 for revenue, 6770 for fees, 6600 for advertising). A key requirement was to identify and process Geldtransit (money transfer) transactions, which were found in a separate  table and mapped to account 1460. The final implementation successfully reconciles the account totals with the reference export.
+1.  **Kaltakquise (Cold Acquisition - Mostly Complete & Stable):** An automated system for finding, analyzing, and contacting new leads. It includes a DACH-region web crawler, an LLM-based website analyzer, a multi-stage email sequence generator, and an Autopilot worker to orchestrate the process. The core functionality is stable after several critical bug fixes.
 
-**2. Product Database Maintenance & Tooling (Fixes Implemented):**
-This involves maintaining and enhancing a product management interface. The specific requirements were to fix existing broken functionality:
-- **Orphaned Article Check:** The Verwaiste Artikel prüfen function must correctly identify articles that exist in the application's MongoDB but are no longer present (neither active nor inactive) in the source JTL-Wawi database. Importantly, updates must not delete and recreate articles, to preserve custom data like AI-generated bullet points.
-- **Filtered CSV Export:** The CSV export functionality must respect the filters applied in the UI, such as filtering by manufacturer (e.g., Tyrolit).
-- **Bulk Generation Stability:** The tool for bulk-generating bullet points must be robust and not crash on receiving unexpected API responses (like non-JSON data).
+2.  **Kunden (Customers - In Development):** A new, central customer relationship management hub. The core requirement is to perform a one-time and subsequent nightly import of all customers from an external JTL-Wawi (MSSQL) database into the application's MongoDB. This import must enrich the customer data by calculating total revenue, order count, B2B status, last order date, sales channel, and the most purchased product category. The system must use an upsert logic to update existing records without deleting custom data (like warm-acquisition scores).
+
+3.  **Warmakquise (Warm Acquisition - Planned):** A tab intended for re-engaging existing customers. The data for this, particularly a warm_aquise_score, was lost and needs to be preserved by the new customer import logic.
 </product_requirements>
 
 <key_technical_concepts>
 - **Frameworks:** Next.js (App Router), React
-- **Backend:** Next.js API Routes, TypeScript
+- **Backend:** Next.js API Routes, TypeScript, Node.js
 - **Databases:**
-  - MongoDB: Primary application database for storing products, generated content, and imported accounting records.
-  - Microsoft SQL Server (MSSQL): External data source for the JTL-Wawi ERP system.
-- **Core Logic:**
-  - Complex SQL-to-NoSQL data transformation and aggregation.
-  - Rule-based mapping of transaction types to general ledger accounts.
-  - CSV generation and parsing for data analysis and export.
-- **Development/Debugging:**
-  - Management of Next.js server-side caching ( directory).
-  - Creation of temporary debug API routes for database exploration.
+    - MongoDB: Primary application database.
+    - Microsoft SQL Server (MSSQL): External JTL-Wawi ERP data source.
+- **Key Logic:**
+    - ETL Process: Extracting from MSSQL, transforming/enriching data (e.g., calculating revenue, B2B status), and loading/upserting into MongoDB.
+    - Background Worker: A -managed Node.js script for the Autopilot feature, which runs periodic tasks.
+    - Third-Party APIs: Google Custom Search, Jina.ai (for web crawling), and GPT models (for analysis).
 </key_technical_concepts>
 
 <code_architecture>
-The application is a Next.js monolith with a frontend and backend API, connecting to both a MongoDB and an external MSSQL database.
+The application is a Next.js monolith. The frontend is a large single-page application () with tab-based navigation. The backend consists of API routes for different modules.
 
-**Directory Structure (Relevant Files):**
+**Directory Structure (Key Files):**
 
 
-- ****
-    - **Importance:** Contains the complete, final business logic for the Amazon FIBU import. It fetches data from both  (for orders, fees, refunds) and  (for money transfers) and aggregates them.
-    - **Summary of Changes:** Heavily iterated upon. The final version includes functions to fetch and process , , , , and  transactions, mapping them to the correct accounts to match the Jera/Addison export sums.
+-   ** & **
+    -   **Importance:** These are the core frontend files.  contains the UI logic for all tabs, including state management for the Kaltakquise and the new Kunden/Warmakquise tabs.  contains the main navigation structure.
+    -   **Changes:** Heavily modified to add new navigation items and tabs for Kunden and Warmakquise. A periodic polling mechanism was added to sync the Autopilot status. UI elements for JTL import and CSV export were added. A major bug involving a duplicate, overlapping navigation menu was fixed.
 
-- ****
-    - **Importance:** The main API endpoint that triggers the entire Amazon import process by calling the logic in .
-    - **Summary of Changes:** Was completely rewritten to remove old, incorrect logic and exclusively use the final  function, returning clean statistics.
+-   ****
+    -   **Importance:** This is the central API for the new customer management feature. It contains the complex logic to fetch all customers and their orders from the JTL MSSQL database, perform data enrichment (B2B/channel detection, revenue calculation), and upsert the results into MongoDB.
+    -   **Changes:** Newly created and iteratively developed. Currently blocked by SQL errors as it contains incorrect column names for the  table (e.g., ).
 
-- ****
-    - **Importance:** Backend for the orphaned articles check.
-    - **Summary of Changes:** The SQL query was corrected. Instead of only fetching active articles (), it now fetches ALL  from JTL to correctly compare against the MongoDB collection and find articles that are truly non-existent in the source.
+-   ****
+    -   **Importance:** Handles all outgoing SMTP emails.
+    -   **Changes:** Corrected to use the proper environment variables (, ) instead of misnamed ones, fixing a critical bug where BCC emails were not being sent correctly.
 
-- ****
-    - **Importance:** Handles the CSV export of products with generated bullet points.
-    - **Summary of Changes:** Modified to accept a  (manufacturer) query parameter. This parameter is now used to filter the MongoDB query, ensuring the exported CSV matches the user's filter criteria.
+-   ****
+    -   **Importance:** A new React component created to encapsulate the entire UI for the Kunden tab, including the customer list, statistics, and import button.
+    -   **Changes:** Newly created to separate concerns from the massive  file. It fetches data from the  endpoint and displays it in a table with the user-requested columns.
 
-- ****
-    - **Importance:** The main (and apparently only) frontend page, containing the UI and client-side logic for the product menu.
-    - **Summary of Changes:**
-        - The  function was updated to pass the  as a query parameter to the download API.
-        - The  function was enhanced with a  block around the  call to prevent the application from crashing if the API returns a non-JSON response.
-
-- ****
-    - **Importance:** Final documentation and handoff report for the completed Amazon FIBU import module.
-    - **Summary of Changes:** This file was newly created to summarize the module's logic, data sources, and key outcomes as requested by the user.
+-   ** & **
+    -   **Importance:** Created to solve the recurring issue of not knowing the correct JTL database schema. The goal is to create a central, reliable source of truth for JTL table and column names that future agents can reference and update.
+    -   **Changes:** Newly created in response to repeated SQL failures.
 </code_architecture>
 
 <pending_tasks>
-- **Address Deployment Health Check Issues:** The deployment agent identified two non-critical but important issues that should be addressed:
-  - Remove hardcoded admin credentials in .
-  - Optimize the database query in  to prevent fetching all records at once.
+- **Fix JTL Customer Import:** Resolve the SQL errors in  to make the customer import functional.
+- **Implement Customer Detail View:** The user requested a detail view showing all of a customer's orders, email, and address. This has not been implemented.
+- **Implement Nightly Sync:** The daily sync is currently triggered by a button press. A cron job or scheduled task needs to be set up to run it automatically at night.
+- **Complete Original Roadmap:** Many items from the initial analysis are still open, including full ID standardization, a UI for email prompt management, and batch operations for analysis.
 </pending_tasks>
 
 <current_work>
-The most recent work focused on fixing two bugs and one stability issue within the Produkte (Products) menu, as reported by the user with screenshots.
+The immediate focus is on debugging the critical JTL customer import feature, which is the cornerstone of the new Kunden tab. The user reported that clicking the JTL-Sync button fails and no customers are imported.
 
-1.  **Incorrect CSV Export Filter:** The user filtered for products from Tyrolit but the exported CSV contained products from other manufacturers.
-    - **Action:** The engineer identified that the backend download API () was not receiving or applying the filter. The fix involved modifying the frontend () to send the manufacturer filter as a query parameter and updating the backend API to use this parameter in its MongoDB query. This was successfully tested.
+The investigation traced the issue to the backend API endpoint at . This endpoint is throwing a 500 server error due to an invalid SQL query. Specifically, the query attempts to select columns like  and  from the JTL database tables (, ), but these column names are incorrect, resulting in an Invalid column name error from the MSSQL driver.
 
-2.  **Crashing Bullet Point Generation:** The bulk generation feature for bullet points would crash with a JSON parsing error.
-    - **Action:** The engineer diagnosed this as a fragile frontend response handler. The fix was to wrap the  call within the  function in  inside a  block. This ensures that if the API returns non-JSON data (like an HTML error), the application handles it gracefully instead of crashing.
+The previous engineer's last actions were attempts to find the correct column names. This involved:
+1.  Trying to fix typos ( -> ), which also failed.
+2.  Trying to access the provided JTL database documentation URL, which was a dead link (404).
+3.  Crawling the main JTL database documentation website. This returned a massive list of all tables, which was not immediately helpful.
 
-Immediately after implementing these fixes, a deployment health check was initiated. The check reported several issues, most notably the use of a non-supported MSSQL database (assessed as a non-issue since it's external), hardcoded admin credentials, and an unoptimized database query. The current state is that the user-reported bugs are fixed and tested, and a report on system readiness for deployment has been generated.
+The work is currently stalled at this point: the import is completely broken, and the correct database schema for order information is still unknown. The last action was to search for the  table within the huge amount of crawled text from the JTL documentation website to pinpoint the correct column names for total order value and item quantity.
 </current_work>
 
 <optional_next_step>
-Report the findings from the deployment health check to the user and ask if they would like to address the high-priority security and performance issues (hardcoded credentials and the unoptimized query) before moving on.
+Continue the debugging process by thoroughly searching the crawled JTL documentation for the  and  table schemas to find the correct column names for order total and quantity.
 </optional_next_step>

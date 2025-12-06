@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Base URL from environment
-BASE_URL = "https://amazon-fibu-import.preview.emergentagent.com/api"
+BASE_URL = "https://customer-hub-78.preview.emergentagent.com/api"
 
 # Test date range
 START_DATE = "30daysAgo"
