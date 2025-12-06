@@ -370,19 +370,20 @@ ORDER BY Umsatz DESC
 
 ---
 
-### **Q3: Meist gekaufte Produktkategorie**
+### **Q3: Meist gekaufte Produktkategorie (AKTUALISIERT für Verkauf.tAuftrag)**
 ```sql
 SELECT TOP 1
   ISNULL(aa.cWert, 'Sonstige') as Hauptkategorie,
-  SUM(bp.fAnzahl * bp.fVKNetto) as Umsatz
-FROM tBestellung b
-INNER JOIN tBestellpos bp ON bp.kBestellung = b.kBestellung
-INNER JOIN tArtikel a ON a.kArtikel = bp.kArtikel
+  SUM(op.fAnzahl * op.fVKNetto) as Umsatz
+FROM Verkauf.tAuftrag o
+INNER JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
+INNER JOIN tArtikel a ON a.kArtikel = op.kArtikel
 LEFT JOIN tArtikelAttribut aa ON aa.kArtikel = a.kArtikel 
   AND aa.cName = 'attr_produktkategorie'
-WHERE b.kKunde = @kKunde
-  AND b.cStatus NOT IN ('storno', 'gelöscht')
-  AND bp.nTyp = 0
+WHERE o.kKunde = @kKunde
+  AND (o.nStorno IS NULL OR o.nStorno = 0)
+  AND o.cAuftragsNr LIKE 'AU%'
+  AND op.kArtikel > 0
 GROUP BY ISNULL(aa.cWert, 'Sonstige')
 ORDER BY Umsatz DESC
 ```
