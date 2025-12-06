@@ -1,23 +1,259 @@
 #!/usr/bin/env python3
 """
-JTL Customer Import Backend Testing
-Tests the JTL customer import functionality comprehensively
+Backend Testing für verbesserte Hauptkategorie-Logik
+Test der neuen Produktkategorien-Erkennung die echte Produktnamen erkennt
 """
 
 import requests
 import json
 import time
 import sys
-from datetime import datetime
+from typing import Dict, List, Any
 
 # Configuration
 BASE_URL = "https://customer-hub-78.preview.emergentagent.com"
-TIMEOUT = 300  # 5 minutes for import
+API_BASE = f"{BASE_URL}/api"
 
-def log(message):
-    """Log with timestamp"""
-    timestamp = datetime.now().strftime("%H:%M:%S")
-    print(f"[{timestamp}] {message}")
+def test_debug_kategorie_endpoint():
+    """
+    Test 1: Debug-Endpoint /api/debug/test-kategorie?kKunde=100000 (GET)
+    Sollte jetzt echte Produktkategorien zurückgeben, keine Zahlen oder "x-Set"
+    """
+    print("\n" + "="*80)
+    print("TEST 1: Debug-Endpoint Produktkategorien-Erkennung")
+    print("="*80)
+    
+    try:
+        # Test mit verschiedenen Kunden-IDs
+        test_customers = [100000, 100001, 100002, 100003, 100004]
+        
+        for kKunde in test_customers:
+            print(f"\n🔍 Testing kKunde={kKunde}...")
+            
+            response = requests.get(f"{API_BASE}/debug/test-kategorie", 
+                                  params={"kKunde": kKunde}, 
+                                  timeout=30)
+            
+            print(f"Status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                print(f"✅ Response OK: {data.get('ok', False)}")
+                
+                kategorien = data.get('kategorien', [])
+                print(f"📊 Kategorien gefunden: {len(kategorien)}")
+                
+                if kategorien:
+                    print("\n📋 Erkannte Kategorien:")
+                    expected_categories = [
+                        'Schleifscheibe', 'Fächerscheibe', 'Trennscheibe', 
+                        'Schleifband', 'Fräser', 'Bohrer', 'Schleifpapier', 
+                        'Vlies', 'Polierscheibe', 'Fiberscheibe', 
+                        'Schruppscheibe', 'Lamellenscheibe'
+                    ]
+                    
+                    valid_categories = []
+                    invalid_categories = []
+                    
+                    for kat in kategorien:
+                        kategorie = kat.get('kategorie', '')
+                        umsatz = kat.get('total_umsatz', 0)
+                        print(f"  - {kategorie}: {umsatz:.2f} EUR")
+                        
+                        # Prüfe ob es eine echte Produktkategorie ist
+                        if kategorie in expected_categories:
+                            valid_categories.append(kategorie)
+                        else:
+                            # Prüfe auf unerwünschte Muster (Zahlen, Sets)
+                            if (kategorie.endswith('er') and any(c.isdigit() for c in kategorie)) or \
+                               'Set' in kategorie or \
+                               kategorie.isdigit() or \
+                               len(kategorie) <= 3:
+                                invalid_categories.append(kategorie)
+                            else:
+                                valid_categories.append(kategorie)
+                    
+                    print(f"\n✅ Gültige Produktkategorien: {len(valid_categories)}")
+                    print(f"❌ Ungültige Kategorien (Zahlen/Sets): {len(invalid_categories)}")
+                    
+                    if invalid_categories:
+                        print(f"⚠️  Problematische Kategorien: {invalid_categories}")
+                        return False
+                    
+                    if valid_categories:
+                        print(f"🎯 Erkannte echte Produktkategorien: {valid_categories}")
+                        return True
+                    else:
+                        print("⚠️  Keine gültigen Produktkategorien gefunden")
+                        
+                else:
+                    print("ℹ️  Keine Kategorien für diesen Kunden")
+                    
+            else:
+                print(f"❌ Error {response.status_code}: {response.text}")
+                return False
+                
+        return True
+        
+    except Exception as e:
+        print(f"❌ Exception in test_debug_kategorie_endpoint: {str(e)}")
+        return False
+
+def test_mini_import():
+    """
+    Test 2: Mini-Import (50-100 Kunden) testen
+    Starte einen Import und prüfe die Logs, Hauptkategorien sollten echte Produktnamen sein
+    """
+    print("\n" + "="*80)
+    print("TEST 2: Mini-Import Test - JTL Customer Sync")
+    print("="*80)
+    
+    try:
+        print("🚀 Starting JTL Customer Sync (limited test)...")
+        
+        # Starte den Import
+        response = requests.post(f"{API_BASE}/coldleads/jtl-customers/sync-daily", 
+                               json={}, 
+                               timeout=120)
+        
+        print(f"Status: {response.status_code}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            print(f"✅ Import Response OK: {data.get('ok', False)}")
+            
+            # Zeige Import-Statistiken
+            new_customers = data.get('new_customers', 0)
+            updated = data.get('updated', 0)
+            total = data.get('total', 0)
+            duration = data.get('duration', 0)
+            
+            print(f"📊 Import Statistics:")
+            print(f"  - Total processed: {total}")
+            print(f"  - New customers: {new_customers}")
+            print(f"  - Updated: {updated}")
+            print(f"  - Duration: {duration}ms ({duration/1000:.1f}s)")
+            
+            if total > 0:
+                print("✅ Import successful - customers processed")
+                return True
+            else:
+                print("⚠️  No customers processed")
+                return False
+                
+        else:
+            print(f"❌ Import failed {response.status_code}: {response.text}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Exception in test_mini_import: {str(e)}")
+        return False
+
+def test_customer_data_validation():
+    """
+    Test 3: Kunden-Daten validieren
+    Prüfe ob `hauptartikel` jetzt sinnvolle Werte hat
+    """
+    print("\n" + "="*80)
+    print("TEST 3: Customer Data Validation - Hauptartikel Check")
+    print("="*80)
+    
+    try:
+        print("🔍 Loading customer list to validate hauptartikel...")
+        
+        # Lade Kunden-Liste
+        response = requests.get(f"{API_BASE}/customers/list", 
+                              params={"limit": 20, "filter": "all"}, 
+                              timeout=30)
+        
+        print(f"Status: {response.status_code}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            print(f"✅ Customer List Response OK: {data.get('ok', False)}")
+            
+            customers = data.get('customers', [])
+            print(f"📊 Customers loaded: {len(customers)}")
+            
+            if not customers:
+                print("⚠️  No customers found")
+                return False
+            
+            # Analysiere hauptartikel Werte
+            expected_categories = [
+                'Schleifscheibe', 'Fächerscheibe', 'Trennscheibe', 
+                'Schleifband', 'Fräser', 'Bohrer', 'Schleifpapier', 
+                'Vlies', 'Polierscheibe', 'Fiberscheibe', 
+                'Schruppscheibe', 'Lamellenscheibe'
+            ]
+            
+            customers_with_hauptartikel = 0
+            valid_hauptartikel = 0
+            invalid_hauptartikel = 0
+            hauptartikel_values = {}
+            
+            print("\n📋 Customer Hauptartikel Analysis:")
+            
+            for i, customer in enumerate(customers[:10]):  # Zeige nur erste 10
+                kKunde = customer.get('kKunde', 'N/A')
+                company_name = customer.get('company_name', 'N/A')
+                hauptartikel = customer.get('hauptartikel')
+                
+                print(f"  {i+1}. kKunde={kKunde}, {company_name[:30]}...")
+                
+                if hauptartikel:
+                    customers_with_hauptartikel += 1
+                    print(f"     🎯 Hauptartikel: '{hauptartikel}'")
+                    
+                    # Zähle Häufigkeit
+                    hauptartikel_values[hauptartikel] = hauptartikel_values.get(hauptartikel, 0) + 1
+                    
+                    # Validiere Kategorie
+                    if hauptartikel in expected_categories:
+                        valid_hauptartikel += 1
+                        print(f"     ✅ Valid product category")
+                    else:
+                        # Prüfe auf problematische Muster
+                        if (hauptartikel.endswith('er') and any(c.isdigit() for c in hauptartikel)) or \
+                           'Set' in hauptartikel or \
+                           hauptartikel.isdigit() or \
+                           len(hauptartikel) <= 3:
+                            invalid_hauptartikel += 1
+                            print(f"     ❌ Invalid category (number/set pattern)")
+                        else:
+                            valid_hauptartikel += 1
+                            print(f"     ⚠️  Unknown but potentially valid category")
+                else:
+                    print(f"     ⚪ No hauptartikel")
+            
+            print(f"\n📊 Hauptartikel Summary:")
+            print(f"  - Customers with hauptartikel: {customers_with_hauptartikel}/{len(customers)}")
+            print(f"  - Valid categories: {valid_hauptartikel}")
+            print(f"  - Invalid categories: {invalid_hauptartikel}")
+            
+            if hauptartikel_values:
+                print(f"\n🏷️  Most common hauptartikel:")
+                sorted_values = sorted(hauptartikel_values.items(), key=lambda x: x[1], reverse=True)
+                for kategorie, count in sorted_values[:5]:
+                    print(f"    - {kategorie}: {count} customers")
+            
+            # Erfolg wenn mehr gültige als ungültige Kategorien
+            success = valid_hauptartikel > invalid_hauptartikel and customers_with_hauptartikel > 0
+            
+            if success:
+                print("✅ Customer data validation successful - hauptartikel contains real product names")
+            else:
+                print("❌ Customer data validation failed - too many invalid hauptartikel values")
+                
+            return success
+            
+        else:
+            print(f"❌ Customer list failed {response.status_code}: {response.text}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Exception in test_customer_data_validation: {str(e)}")
+        return False
 
 def test_jtl_customer_sync():
     """Test JTL Customer Sync Daily API"""
