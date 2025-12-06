@@ -2529,7 +2529,7 @@ export default function App() {
     // Status alle 10 Sekunden aktualisieren
     const statusInterval = setInterval(() => {
       loadAutopilotStatus()
-      loadColdLeadsStats() // Stats auch refreshen
+      loadColdLeadStats() // Stats auch refreshen
     }, 10000)
     
     return () => {
