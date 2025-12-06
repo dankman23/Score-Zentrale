@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import PreiseModule from '../components/PreiseModule'
 import FibuModule from '../components/FibuModule'
+import KundenView from '../components/KundenView'
 
 // Lightweight utils inlined (avoid missing imports)
 const toArray = (v) => Array.isArray(v) ? v : (v && v.data && Array.isArray(v.data) ? v.data : (v ? [v] : []))
