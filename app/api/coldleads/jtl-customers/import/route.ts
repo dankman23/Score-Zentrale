@@ -138,18 +138,35 @@ export async function POST(request: NextRequest) {
         updated_at: new Date()
       }
       
-      // Upsert: Update wenn Kunde bereits existiert (via kKunde), sonst Insert
-      const updateResult = await prospectsCollection.updateOne(
-        { 'jtl_customer.kKunde': customer.kKunde },
-        { 
-          $set: prospectData,
-          $setOnInsert: { 
-            created_at: new Date(),
-            customer_source: 'jtl'
+      // WICHTIG: Nur JTL-Felder updaten, REST UNANGETASTET LASSEN!
+      // Zuerst prüfen ob Kunde bereits existiert
+      const existingProspect = await prospectsCollection.findOne({
+        'jtl_customer.kKunde': customer.kKunde
+      })
+      
+      if (existingProspect) {
+        // UPDATE: Nur JTL-spezifische Felder aktualisieren
+        const updateResult = await prospectsCollection.updateOne(
+          { 'jtl_customer.kKunde': customer.kKunde },
+          { 
+            $set: {
+              // Nur JTL-Daten updaten
+              'jtl_customer': prospectData.jtl_customer,
+              'company_name': prospectData.company_name, // Name könnte sich ändern
+              'website': prospectData.website || existingProspect.website, // Nur wenn neu
+              'updated_at': new Date()
+            }
           }
-        },
-        { upsert: true }
-      )
+        )
+        updated++
+      } else {
+        // INSERT: Neuer Kunde
+        await prospectsCollection.insertOne({
+          ...prospectData,
+          created_at: new Date()
+        })
+        imported++
+      }
       
       if (updateResult.upsertedCount > 0) {
         imported++
