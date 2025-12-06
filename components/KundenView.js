@@ -223,24 +223,40 @@ export default function KundenView() {
                 </thead>
                 <tbody>
                   {customers.map((c) => {
-                    const channelLabel = CHANNEL_LABELS[c.primary_channel] || CHANNEL_LABELS.unknown
+                    const channelLabel = CHANNEL_LABELS[c.last_order_channel || c.primary_channel] || CHANNEL_LABELS.unknown
+                    
+                    // Name zusammenstellen: Firma + Vorname + Nachname
+                    let fullName = c.company_name || ''
+                    const vorname = c.jtl_customer?.vorname
+                    const nachname = c.jtl_customer?.nachname
+                    if (vorname || nachname) {
+                      const personName = [vorname, nachname].filter(Boolean).join(' ')
+                      if (fullName && personName) {
+                        fullName = `${fullName} (${personName})`
+                      } else if (personName) {
+                        fullName = personName
+                      }
+                    }
+                    
                     return (
                       <tr key={c._id}>
                         <td>
-                          <div className="font-weight-bold">{c.company_name}</div>
-                          {c.website && (
-                            <small className="text-muted">{c.website}</small>
+                          <div className="font-weight-bold">{fullName}</div>
+                          {c.email && (
+                            <small className="text-muted">{c.email}</small>
                           )}
                         </td>
-                        <td>
+                        <td className="text-right">
+                          <strong>{fmtCurrency(c.total_revenue)}</strong>
+                        </td>
+                        <td className="text-right">
+                          <strong>{c.total_orders || 0}</strong>
+                        </td>
+                        <td className="text-center">
                           {c.is_b2b ? (
-                            <span className="badge badge-primary" title={`Confidence: ${c.b2b_confidence}%`}>
-                              <i className="bi bi-briefcase mr-1"/>B2B
-                            </span>
+                            <i className="bi bi-check-circle-fill text-success" style={{fontSize: '1.2rem'}} title={`B2B (${c.b2b_confidence}% Confidence)`}/>
                           ) : (
-                            <span className="badge badge-secondary">
-                              <i className="bi bi-person mr-1"/>B2C
-                            </span>
+                            <i className="bi bi-dash-circle text-muted" style={{fontSize: '1.2rem'}} title="B2C"/>
                           )}
                         </td>
                         <td>
@@ -248,22 +264,13 @@ export default function KundenView() {
                             {channelLabel.icon} {channelLabel.name}
                           </span>
                         </td>
-                        <td className="text-right">
-                          <strong>{c.total_orders || 0}</strong>
-                        </td>
-                        <td className="text-right">
-                          <strong>{fmtCurrency(c.total_revenue)}</strong>
-                        </td>
-                        <td className="text-right">
-                          {fmtCurrency(c.avg_order_value)}
-                        </td>
                         <td>
                           {fmtDate(c.last_order)}
                         </td>
                         <td>
-                          {c.warm_aquise_score ? (
-                            <span className="badge badge-success">
-                              Score: {c.warm_aquise_score}
+                          {c.hauptartikel ? (
+                            <span className="badge badge-info">
+                              {c.hauptartikel}
                             </span>
                           ) : (
                             <span className="text-muted small">-</span>
