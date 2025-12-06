@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     
     for (const customer of jtlCustomers) {
       // Normalisiere Website-URL
-      let website = customer.cHomepage
+      let website = customer.cWWW
       if (website) {
         website = website.trim()
         if (!website.startsWith('http')) {
