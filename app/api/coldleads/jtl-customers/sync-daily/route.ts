@@ -246,7 +246,7 @@ export async function POST(request: NextRequest) {
           jtl_customer: jtlData,
           
           autopilot_skip: true,
-          email: customer.cEmail,
+          email: customer.cEMail,
           
           // Platzhalter für später hinzugefügte Daten
           warm_aquise_score: null,
