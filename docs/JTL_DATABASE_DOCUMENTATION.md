@@ -56,68 +56,70 @@ ORDER BY GesamtUmsatz DESC
 
 ---
 
-### **2. BESTELLUNGEN (tBestellung)**
+### **2. AUFTRÄGE (Verkauf.tAuftrag) ✅ AKTUELL**
 
-**Verwendung:** Kopfdaten von Bestellungen/Aufträgen
+**Verwendung:** Kopfdaten von Aufträgen/Bestellungen (AKTUELLE Tabelle!)
+
+**⚠️ WICHTIG:** `Verkauf.tAuftrag` ist die **aktuelle** Tabelle! `tBestellung` ist veraltet.
 
 **Wichtige Spalten:**
 ```sql
-kBestellung     INT PRIMARY KEY    -- Bestellungs-ID
+kAuftrag        INT PRIMARY KEY    -- Auftrags-ID
 kKunde          INT                -- Kunden-ID (FK)
-cBestellNr      NVARCHAR(255)      -- Bestellnummer
-cStatus         NVARCHAR(50)       -- Status: 'offen', 'abgeschlossen', 'storno', 'gelöscht'
+cAuftragsNr     NVARCHAR(255)      -- Auftragsnummer (z.B. "AU-12345")
+nStorno         INT                -- 0 = Aktiv, 1 = Storniert
 fGesamtsumme    DECIMAL(18,2)      -- Gesamtsumme BRUTTO
-fWarensumme     DECIMAL(18,2)      -- Warensumme NETTO
 cZahlungsart    NVARCHAR(255)      -- Zahlungsart (z.B. "PayPal", "Rechnung")
 cVersandart     NVARCHAR(255)      -- Versandart
-dErstellt       DATETIME           -- Bestelldatum
+dErstellt       DATETIME           -- Auftragsdatum
 ```
 
 **⚠️ WICHTIG - Status-Filter:**
 ```sql
--- IMMER storno und gelöscht ausschließen!
-WHERE b.cStatus NOT IN ('storno', 'gelöscht')
+-- IMMER Stornos ausschließen + nur echte Aufträge (AU-Nummern)!
+WHERE (o.nStorno IS NULL OR o.nStorno = 0)
+  AND o.cAuftragsNr LIKE 'AU%'
 ```
 
 **Best Practice Query:**
 ```sql
--- Bestellungen eines Kunden
+-- Aufträge eines Kunden
 SELECT 
-  b.kBestellung,
-  b.cBestellNr,
-  b.fGesamtsumme,
-  b.fWarensumme,
-  b.cZahlungsart,
-  b.cVersandart,
-  b.dErstellt
-FROM tBestellung b
-WHERE b.kKunde = @kKunde
-  AND b.cStatus NOT IN ('storno', 'gelöscht')
-ORDER BY b.dErstellt DESC
+  o.kAuftrag,
+  o.cAuftragsNr,
+  o.fGesamtsumme,
+  o.cZahlungsart,
+  o.cVersandart,
+  o.dErstellt
+FROM Verkauf.tAuftrag o
+WHERE o.kKunde = @kKunde
+  AND (o.nStorno IS NULL OR o.nStorno = 0)
+  AND o.cAuftragsNr LIKE 'AU%'
+ORDER BY o.dErstellt DESC
 ```
 
 ---
 
-### **3. BESTELLPOSITIONEN (tBestellpos)**
+### **3. AUFTRAGSPOSITIONEN (Verkauf.tAuftragPosition) ✅ AKTUELL**
 
-**Verwendung:** Einzelne Artikel in einer Bestellung
+**Verwendung:** Einzelne Artikel in einem Auftrag (AKTUELLE Tabelle!)
+
+**⚠️ WICHTIG:** `Verkauf.tAuftragPosition` ist die **aktuelle** Tabelle! `tBestellpos` ist veraltet.
 
 **Wichtige Spalten:**
 ```sql
-kBestellpos     INT PRIMARY KEY    -- Positions-ID
-kBestellung     INT                -- Bestellungs-ID (FK)
-kArtikel        INT                -- Artikel-ID (FK)
-cName           NVARCHAR(255)      -- Artikelname
-cArtNr          NVARCHAR(255)      -- Artikelnummer
-fAnzahl         DECIMAL(18,2)      -- Menge
-fVKNetto        DECIMAL(18,2)      -- VK-Preis NETTO pro Stück
-nTyp            INT                -- 0 = Artikel, 1 = Versandposition, 2 = Gutschein
+kAuftragPosition  INT PRIMARY KEY  -- Positions-ID
+kAuftrag          INT               -- Auftrags-ID (FK)
+kArtikel          INT               -- Artikel-ID (FK)
+cName             NVARCHAR(255)     -- Artikelname
+fAnzahl           DECIMAL(18,2)     -- Menge
+fVKNetto          DECIMAL(18,2)     -- VK-Preis NETTO pro Stück
 ```
 
-**⚠️ WICHTIG - nTyp-Filter:**
+**⚠️ WICHTIG - Artikel-Filter:**
 ```sql
--- Nur echte Artikel, keine Versandkosten/Gutscheine
-WHERE bp.nTyp = 0
+-- Nur echte Artikel (kArtikel > 0)
+WHERE op.kArtikel > 0
 ```
 
 **Best Practice Query:**
@@ -126,14 +128,15 @@ WHERE bp.nTyp = 0
 SELECT TOP 10
   a.cName as Produktname,
   a.cArtNr as Artikelnummer,
-  SUM(bp.fAnzahl) as GesamtMenge,
-  SUM(bp.fAnzahl * bp.fVKNetto) as GesamtUmsatz
-FROM tBestellung b
-INNER JOIN tBestellpos bp ON bp.kBestellung = b.kBestellung
-INNER JOIN tArtikel a ON a.kArtikel = bp.kArtikel
-WHERE b.kKunde = @kKunde
-  AND b.cStatus NOT IN ('storno', 'gelöscht')
-  AND bp.nTyp = 0  -- Nur Artikel
+  SUM(op.fAnzahl) as GesamtMenge,
+  SUM(op.fAnzahl * op.fVKNetto) as GesamtUmsatz
+FROM Verkauf.tAuftrag o
+INNER JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
+INNER JOIN tArtikel a ON a.kArtikel = op.kArtikel
+WHERE o.kKunde = @kKunde
+  AND (o.nStorno IS NULL OR o.nStorno = 0)
+  AND o.cAuftragsNr LIKE 'AU%'
+  AND op.kArtikel > 0
 GROUP BY a.cName, a.cArtNr
 ORDER BY GesamtUmsatz DESC
 ```
