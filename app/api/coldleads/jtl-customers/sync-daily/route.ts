@@ -159,10 +159,30 @@ export async function POST(request: NextRequest) {
               'company_name': customer.cFirma,
               'website': website || existingProspect.website,
               'email': customer.cEmail || existingProspect.email,
+              
+              // Neu: B2B-Klassifizierung
+              'is_b2b': b2bResult.is_b2b,
+              'b2b_confidence': b2bResult.confidence,
+              'b2b_indicators': b2bResult.indicators,
+              
+              // Neu: Kanal-Zuordnung
+              'primary_channel': channelData.primary,
+              'channels': channelData.channels,
+              
+              // Neu: Statistiken
+              'stats.total_orders': customer.nAnzahlBestellungen || 0,
+              'stats.total_revenue': customer.nUmsatzGesamt || 0,
+              'stats.avg_order_value': customer.nAnzahlBestellungen > 0 
+                ? (customer.nUmsatzGesamt || 0) / customer.nAnzahlBestellungen 
+                : 0,
+              'stats.first_order': customer.dErsteBestellung,
+              'stats.last_order': customer.dLetzteBestellung,
+              'stats.order_frequency': orderFrequency,
+              
               'updated_at': new Date(),
               'last_jtl_sync': new Date()
             }
-            // WICHTIG: warm_aquise_score, custom_notes, etc. NICHT touched!
+            // WICHTIG: warm_aquise_score, analysis_v3, email_sequence NICHT touched!
           }
         )
         
