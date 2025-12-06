@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
     // Lade ALLE Kunden aus JTL-Wawi mit aktuellen Daten
     const pool = await getMssqlPool()
     
+    // Lade Kunden mit Bestell-Statistiken
     const result = await pool.request().query(`
       SELECT 
         k.kKunde,
@@ -43,19 +44,19 @@ export async function POST(request: NextRequest) {
         k.cWWW as cHomepage,
         k.cUSTID,
         k.dErstellt,
-        ISNULL(SUM(r.fGesamtsumme), 0) as nUmsatzGesamt,
-        COUNT(DISTINCT r.kRechnung) as nAnzahlRechnungen,
-        MAX(r.dErstellt) as dLetzteRechnung
+        k.nIstFirma,
+        ISNULL(SUM(a.fGesamtsummeNetto), 0) as nUmsatzGesamt,
+        COUNT(DISTINCT a.kBestellung) as nAnzahlBestellungen,
+        MAX(a.dErstellt) as dLetzteBestellung,
+        MIN(a.dErstellt) as dErsteBestellung
       FROM tKunde k
-      LEFT JOIN tRechnung r ON r.kKunde = k.kKunde AND r.cStatus != 'storno'
+      LEFT JOIN tBestellung a ON a.kKunde = k.kKunde AND a.cStatus NOT IN ('storno', 'gelöscht')
       WHERE 
         k.nRegistriert = 1
-        AND k.cFirma IS NOT NULL
-        AND k.cFirma != ''
       GROUP BY 
         k.kKunde, k.cFirma, k.cAnrede, k.cVorname, k.cNachname,
         k.cStrasse, k.cPLZ, k.cOrt, k.cLand, k.cTel, k.cMobil,
-        k.cFax, k.cMail, k.cWWW, k.cUSTID, k.dErstellt
+        k.cFax, k.cMail, k.cWWW, k.cUSTID, k.dErstellt, k.nIstFirma
       ORDER BY nUmsatzGesamt DESC
     `)
     
