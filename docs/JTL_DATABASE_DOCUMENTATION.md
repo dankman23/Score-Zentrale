@@ -466,6 +466,12 @@ tArtikelAttribut (kArtikel → kArtikel)
 
 ## 🆕 CHANGELOG
 
+**2025-12-06:**
+- 🔥 **KRITISCHES UPDATE:** tBestellung/tBestellpos sind **VERALTET**
+- Alle Queries auf **Verkauf.tAuftrag / Verkauf.tAuftragPosition** aktualisiert
+- Filter-Logik korrigiert: `nStorno` statt `cStatus`, `cAuftragsNr LIKE 'AU%'`
+- Häufige-Fehler-Sektion aktualisiert
+
 **2025-12-05:**
 - Initial-Dokumentation erstellt
 - Best Practices hinzugefügt
