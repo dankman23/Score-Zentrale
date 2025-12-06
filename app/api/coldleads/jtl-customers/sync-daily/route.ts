@@ -88,17 +88,19 @@ export async function POST(request: NextRequest) {
       let hauptartikel = null
       
       try {
-        // Bestellungen laden (aus Verkauf.tAuftrag)
+        // Bestellungen laden (aus Verkauf.tAuftrag mit JOINs)
         const ordersResult = await pool.request()
           .input('kKunde', customer.kKunde)
           .query(`
             SELECT
               o.kAuftrag,
               o.cAuftragsNr,
-              o.cZahlungsart,
-              o.cVersandart,
+              ISNULL(z.cName, '') as cZahlungsart,
+              ISNULL(v.cName, '') as cVersandart,
               o.dErstellt
             FROM Verkauf.tAuftrag o
+            LEFT JOIN tZahlungsart z ON z.kZahlungsart = o.kZahlungsart
+            LEFT JOIN tVersandart v ON v.kVersandArt = o.kVersandArt
             WHERE o.kKunde = @kKunde
               AND (o.nStorno IS NULL OR o.nStorno = 0)
               AND o.cAuftragsNr LIKE 'AU%'
