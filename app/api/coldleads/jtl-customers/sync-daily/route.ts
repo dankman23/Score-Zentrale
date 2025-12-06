@@ -139,15 +139,16 @@ export async function POST(request: NextRequest) {
               .query(`
                 SELECT TOP 1
                   ISNULL(a.cName, 'Sonstige') as hauptkategorie,
-                  SUM(bp.fAnzahl * bp.fVKNetto) as umsatz
-                FROM tBestellung b
-                INNER JOIN tBestellpos bp ON bp.kBestellung = b.kBestellung
-                INNER JOIN tArtikel art ON art.kArtikel = bp.kArtikel
+                  SUM(op.fAnzahl * op.fVKNetto) as umsatz
+                FROM Verkauf.tAuftrag o
+                INNER JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
+                INNER JOIN tArtikel art ON art.kArtikel = op.kArtikel
                 LEFT JOIN tArtikelAttribut aa ON aa.kArtikel = art.kArtikel AND aa.cName = 'Produktkategorie'
                 LEFT JOIN tArtikelAttribut a ON a.kArtikel = art.kArtikel AND a.cName = 'attr_produktkategorie'
-                WHERE b.kKunde = @kKunde
-                  AND b.cStatus NOT IN ('storno', 'gelöscht')
-                  AND bp.nTyp = 0
+                WHERE o.kKunde = @kKunde
+                  AND (o.nStorno IS NULL OR o.nStorno = 0)
+                  AND o.cAuftragsNr LIKE 'AU%'
+                  AND op.kArtikel > 0
                 GROUP BY ISNULL(a.cName, 'Sonstige')
                 ORDER BY umsatz DESC
               `)
