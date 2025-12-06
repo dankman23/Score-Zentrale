@@ -14,41 +14,204 @@ from datetime import datetime
 BASE_URL = "https://customer-hub-78.preview.emergentagent.com"
 TIMEOUT = 300  # 5 minutes for import
 
-def test_api_call(payload: Dict[str, Any], test_name: str) -> Dict[str, Any]:
-    """Make API call and return response"""
-    print(f"\n🧪 {test_name}")
-    print(f"📤 Request: {json.dumps(payload, indent=2)}")
+def log(message):
+    """Log with timestamp"""
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    print(f"[{timestamp}] {message}")
+
+def test_jtl_customer_sync():
+    """Test JTL Customer Sync Daily API"""
+    log("🔄 Testing JTL Customer Sync Daily API...")
     
     try:
-        response = requests.post(API_URL, json=payload, timeout=30)
-        print(f"📊 Status: {response.status_code}")
+        # Test POST /api/coldleads/jtl-customers/sync-daily
+        url = f"{BASE_URL}/api/coldleads/jtl-customers/sync-daily"
+        log(f"POST {url}")
         
-        if response.headers.get('content-type', '').startswith('application/json'):
-            result = response.json()
-            print(f"📥 Response: {json.dumps(result, indent=2)}")
-            return {
-                'status_code': response.status_code,
-                'data': result,
-                'success': response.status_code == 200 and result.get('ok') == True
-            }
-        else:
-            print(f"❌ Non-JSON response: {response.text[:500]}")
-            return {
-                'status_code': response.status_code,
-                'data': {'error': 'Non-JSON response'},
-                'success': False
-            }
-            
+        start_time = time.time()
+        response = requests.post(url, timeout=TIMEOUT)
+        duration = time.time() - start_time
+        
+        log(f"Response Status: {response.status_code}")
+        log(f"Response Time: {duration:.2f}s")
+        
+        if response.status_code != 200:
+            log(f"❌ FAILED: Expected 200, got {response.status_code}")
+            log(f"Response: {response.text}")
+            return False
+        
+        try:
+            data = response.json()
+        except json.JSONDecodeError:
+            log("❌ FAILED: Invalid JSON response")
+            log(f"Response: {response.text}")
+            return False
+        
+        # Validate response structure
+        required_fields = ['ok', 'new_customers', 'updated', 'unchanged', 'total', 'duration']
+        for field in required_fields:
+            if field not in data:
+                log(f"❌ FAILED: Missing field '{field}' in response")
+                return False
+        
+        if not data['ok']:
+            log(f"❌ FAILED: API returned ok=false")
+            log(f"Error: {data.get('error', 'Unknown error')}")
+            return False
+        
+        # Log results
+        log(f"✅ JTL Customer Sync completed successfully!")
+        log(f"   New customers: {data['new_customers']}")
+        log(f"   Updated: {data['updated']}")
+        log(f"   Unchanged: {data['unchanged']}")
+        log(f"   Total processed: {data['total']}")
+        log(f"   Duration: {data['duration']}ms ({data['duration']/1000:.1f}s)")
+        
+        # Validate that some customers were processed
+        if data['total'] == 0:
+            log("⚠️  WARNING: No customers were processed - this might indicate a database issue")
+            return False
+        
+        # Check if we have a reasonable number of customers (at least 1000+ as mentioned in requirements)
+        if data['total'] < 1000:
+            log(f"⚠️  WARNING: Only {data['total']} customers processed, expected 1000+")
+        
+        return True
+        
+    except requests.exceptions.Timeout:
+        log(f"❌ FAILED: Request timed out after {TIMEOUT}s")
+        return False
     except requests.exceptions.RequestException as e:
-        print(f"❌ Request failed: {str(e)}")
-        return {
-            'status_code': 0,
-            'data': {'error': str(e)},
-            'success': False
-        }
+        log(f"❌ FAILED: Request error: {e}")
+        return False
+    except Exception as e:
+        log(f"❌ FAILED: Unexpected error: {e}")
+        return False
 
-def validate_response_structure(data: Dict[str, Any], test_name: str) -> bool:
-    """Validate response structure"""
+def test_customers_list_api():
+    """Test Customers List API"""
+    log("🔄 Testing Customers List API...")
+    
+    try:
+        # Test GET /api/customers/list
+        url = f"{BASE_URL}/api/customers/list"
+        log(f"GET {url}")
+        
+        response = requests.get(url, timeout=30)
+        
+        log(f"Response Status: {response.status_code}")
+        
+        if response.status_code != 200:
+            log(f"❌ FAILED: Expected 200, got {response.status_code}")
+            log(f"Response: {response.text}")
+            return False
+        
+        try:
+            data = response.json()
+        except json.JSONDecodeError:
+            log("❌ FAILED: Invalid JSON response")
+            log(f"Response: {response.text}")
+            return False
+        
+        # Validate response structure
+        if not data.get('ok'):
+            log(f"❌ FAILED: API returned ok=false")
+            log(f"Error: {data.get('error', 'Unknown error')}")
+            return False
+        
+        if 'customers' not in data:
+            log("❌ FAILED: Missing 'customers' field in response")
+            return False
+        
+        customers = data['customers']
+        log(f"✅ Customers List API working - returned {len(customers)} customers")
+        
+        if len(customers) == 0:
+            log("⚠️  WARNING: No customers returned - might be expected if sync hasn't run yet")
+            return True
+        
+        # Validate customer structure
+        sample_customer = customers[0]
+        required_fields = ['company_name', 'jtl_customer', 'total_revenue', 'total_orders']
+        
+        for field in required_fields:
+            if field not in sample_customer:
+                log(f"❌ FAILED: Missing field '{field}' in customer object")
+                return False
+        
+        # Validate JTL customer data
+        jtl_customer = sample_customer.get('jtl_customer', {})
+        if 'kKunde' not in sample_customer and 'kKunde' not in jtl_customer:
+            log("❌ FAILED: Missing 'kKunde' field in customer")
+            return False
+        
+        # Log sample customer data
+        log(f"✅ Sample customer validation passed:")
+        log(f"   Company: {sample_customer.get('company_name', 'N/A')}")
+        log(f"   kKunde: {sample_customer.get('kKunde') or jtl_customer.get('kKunde', 'N/A')}")
+        log(f"   Total Revenue: {sample_customer.get('total_revenue', 0)}")
+        log(f"   Total Orders: {sample_customer.get('total_orders', 0)}")
+        
+        return True
+        
+    except requests.exceptions.RequestException as e:
+        log(f"❌ FAILED: Request error: {e}")
+        return False
+    except Exception as e:
+        log(f"❌ FAILED: Unexpected error: {e}")
+        return False
+
+def test_database_consistency():
+    """Test database consistency by checking for imported JTL customers"""
+    log("🔄 Testing database consistency...")
+    
+    try:
+        # Use the customers list API to check for JTL imported customers
+        url = f"{BASE_URL}/api/customers/list?limit=10"
+        response = requests.get(url, timeout=30)
+        
+        if response.status_code != 200:
+            log(f"❌ FAILED: Could not fetch customers for consistency check")
+            return False
+        
+        data = response.json()
+        if not data.get('ok') or 'customers' not in data:
+            log(f"❌ FAILED: Invalid response for consistency check")
+            return False
+        
+        customers = data['customers']
+        
+        # Check for customers with imported_from_jtl flag or JTL customer data
+        jtl_customers = []
+        for customer in customers:
+            if (customer.get('customer_source') == 'jtl' or 
+                customer.get('jtl_customer', {}).get('kKunde')):
+                jtl_customers.append(customer)
+        
+        if len(jtl_customers) == 0:
+            log("⚠️  WARNING: No JTL customers found in database - sync might not have completed")
+            return False
+        
+        log(f"✅ Database consistency check passed:")
+        log(f"   Found {len(jtl_customers)} JTL customers out of {len(customers)} total")
+        
+        # Validate JTL customer structure
+        sample_jtl = jtl_customers[0]
+        jtl_data = sample_jtl.get('jtl_customer', {})
+        
+        required_jtl_fields = ['kKunde']
+        for field in required_jtl_fields:
+            if field not in jtl_data and field not in sample_jtl:
+                log(f"❌ FAILED: Missing JTL field '{field}' in customer")
+                return False
+        
+        log(f"   Sample JTL customer kKunde: {jtl_data.get('kKunde') or sample_jtl.get('kKunde')}")
+        
+        return True
+        
+    except Exception as e:
+        log(f"❌ FAILED: Database consistency check error: {e}")
+        return False
     print(f"\n🔍 Validating response structure for {test_name}")
     
     if not data.get('ok'):
