@@ -212,14 +212,13 @@ export default function KundenView() {
               <table className="table table-hover mb-0">
                 <thead className="bg-light">
                   <tr>
-                    <th>Firma</th>
-                    <th>B2B</th>
+                    <th>Name</th>
+                    <th className="text-right">Gesamtumsatz</th>
+                    <th className="text-right">Anz. Best.</th>
+                    <th className="text-center">B2B</th>
                     <th>Kanal</th>
-                    <th className="text-right">Bestellungen</th>
-                    <th className="text-right">Umsatz</th>
-                    <th className="text-right">Ø Bestellung</th>
                     <th>Letzte Bestellung</th>
-                    <th>Warmakquise</th>
+                    <th>Hauptartikel</th>
                   </tr>
                 </thead>
                 <tbody>
