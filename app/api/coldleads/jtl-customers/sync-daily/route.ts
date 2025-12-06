@@ -46,9 +46,7 @@ export async function POST(request: NextRequest) {
       WHERE 
         k.nRegistriert = 1
       GROUP BY 
-        k.kKunde, k.cFirma, k.cAnrede, k.cVorname, k.cNachname,
-        k.cStrasse, k.cPLZ, k.cOrt, k.cLand, k.cTel, k.cMobil,
-        k.cMail, k.cWWW
+        k.kKunde, k.cFirma
       ORDER BY nUmsatzGesamt DESC
     `)
     
