@@ -78,6 +78,49 @@ export async function POST(request: NextRequest) {
         }
       }
       
+      // B2B-Erkennung
+      const b2bResult = detectB2B(customer)
+      
+      // Lade Bestellungen für Kanal-Analyse (nur erste 100 für Performance)
+      let channelData = { primary: 'unknown', channels: [] }
+      let orderFrequency = 0
+      
+      try {
+        const ordersResult = await pool.request()
+          .input('kKunde', customer.kKunde)
+          .query(`
+            SELECT TOP 100
+              b.cBestellNr,
+              b.cZahlungsart,
+              b.cVersandart,
+              b.fGesamtsumme,
+              b.dErstellt
+            FROM tBestellung b
+            WHERE b.kKunde = @kKunde
+              AND b.cStatus NOT IN ('storno', 'gelöscht')
+            ORDER BY b.dErstellt DESC
+          `)
+        
+        const orders = ordersResult.recordset
+        
+        if (orders.length > 0) {
+          // Kanal-Analyse
+          channelData = determinePrimaryChannel(orders)
+          
+          // Bestell-Frequenz berechnen
+          if (customer.dErsteBestellung && customer.dLetzteBestellung && customer.nAnzahlBestellungen > 0) {
+            orderFrequency = calculateOrderFrequency(
+              new Date(customer.dErsteBestellung),
+              new Date(customer.dLetzteBestellung),
+              customer.nAnzahlBestellungen
+            )
+          }
+        }
+      } catch (orderError) {
+        console.error(`[JTL-Sync] Fehler beim Laden der Bestellungen für kKunde ${customer.kKunde}:`, orderError.message)
+        // Weiter ohne Bestellungs-Daten
+      }
+      
       // Prüfe ob Kunde in MongoDB existiert
       const existingProspect = await prospectsCollection.findOne({
         'jtl_customer.kKunde': customer.kKunde
@@ -100,8 +143,9 @@ export async function POST(request: NextRequest) {
         ustid: customer.cUSTID,
         erstellt: customer.dErstellt,
         umsatzGesamt: customer.nUmsatzGesamt,
-        anzahlRechnungen: customer.nAnzahlRechnungen,
-        letzteRechnung: customer.dLetzteRechnung
+        anzahlBestellungen: customer.nAnzahlBestellungen,
+        ersteBestellung: customer.dErsteBestellung,
+        letzteBestellung: customer.dLetzteBestellung
       }
       
       if (existingProspect) {
