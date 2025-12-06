@@ -41,11 +41,8 @@ export async function POST(request: NextRequest) {
         k.cLand,
         k.cTel,
         k.cMobil,
-        k.cFax,
         k.cMail as cEmail,
         k.cWWW as cHomepage,
-        k.cUSTID,
-        k.dErstellt,
         -- Umsatz über Auftragspositionen (NETTO)
         ISNULL(SUM(op.fAnzahl * op.fVKNetto), 0) as nUmsatzGesamt,
         COUNT(DISTINCT o.kAuftrag) as nAnzahlBestellungen,
