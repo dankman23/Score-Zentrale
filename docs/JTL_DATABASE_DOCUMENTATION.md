@@ -414,30 +414,28 @@ ORDER BY o.dErstellt DESC
 
 ## ⚠️ HÄUFIGE FEHLER
 
-### **1. Falsche Spaltennamen**
+### **1. Falsche Tabellennamen (KRITISCH!)**
 ```sql
-❌ fGesamtsummeNetto    -- Existiert nicht!
-❌ fGesamtsummeNetter   -- Tippfehler!
-✅ fGesamtsumme         -- Korrekt (BRUTTO)
-✅ fWarensumme          -- Korrekt (NETTO)
+❌ tBestellung / tBestellpos    -- VERALTET! Existiert nicht mehr!
+✅ Verkauf.tAuftrag / Verkauf.tAuftragPosition  -- AKTUELL!
 ```
 
 ### **2. Status vergessen**
 ```sql
-❌ SELECT * FROM tBestellung
-✅ SELECT * FROM tBestellung WHERE cStatus NOT IN ('storno', 'gelöscht')
+❌ SELECT * FROM Verkauf.tAuftrag
+✅ SELECT * FROM Verkauf.tAuftrag WHERE (nStorno IS NULL OR nStorno = 0) AND cAuftragsNr LIKE 'AU%'
 ```
 
-### **3. nTyp vergessen**
+### **3. Artikel-Filter vergessen**
 ```sql
-❌ SELECT * FROM tBestellpos
-✅ SELECT * FROM tBestellpos WHERE nTyp = 0  -- Nur Artikel
+❌ SELECT * FROM Verkauf.tAuftragPosition
+✅ SELECT * FROM Verkauf.tAuftragPosition WHERE kArtikel > 0
 ```
 
 ### **4. INNER JOIN statt LEFT JOIN**
 ```sql
-❌ INNER JOIN tBestellung  -- Kunden ohne Bestellungen fehlen!
-✅ LEFT JOIN tBestellung   -- Alle Kunden
+❌ INNER JOIN Verkauf.tAuftrag  -- Kunden ohne Aufträge fehlen!
+✅ LEFT JOIN Verkauf.tAuftrag   -- Alle Kunden
 ```
 
 ---
