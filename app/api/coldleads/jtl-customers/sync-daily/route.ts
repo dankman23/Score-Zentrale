@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
     const pool = await getMssqlPool()
     
     // Lade Kunden mit Bestell-Statistiken
+    // Umsatz über tBestellpos berechnen (genauer als fBruttosumme)
     const result = await pool.request().query(`
       SELECT 
         k.kKunde,
@@ -46,12 +47,16 @@ export async function POST(request: NextRequest) {
         k.cUSTID,
         k.dErstellt,
         k.nIstFirma,
-        ISNULL(SUM(a.fGesamtsumme), 0) as nUmsatzGesamt,
-        COUNT(DISTINCT a.kBestellung) as nAnzahlBestellungen,
-        MAX(a.dErstellt) as dLetzteBestellung,
-        MIN(a.dErstellt) as dErsteBestellung
+        -- Umsatz über Bestellpositionen (NETTO)
+        ISNULL(SUM(bp.fAnzahl * bp.fVKNetto), 0) as nUmsatzGesamt,
+        COUNT(DISTINCT b.kBestellung) as nAnzahlBestellungen,
+        MAX(b.dErstellt) as dLetzteBestellung,
+        MIN(b.dErstellt) as dErsteBestellung
       FROM tKunde k
-      LEFT JOIN tBestellung a ON a.kKunde = k.kKunde AND a.cStatus NOT IN ('storno', 'gelöscht')
+      LEFT JOIN tBestellung b ON b.kKunde = k.kKunde 
+        AND b.cStatus NOT IN ('storno', 'gelöscht')
+      LEFT JOIN tBestellpos bp ON bp.kBestellung = b.kBestellung
+        AND bp.nTyp = 0  -- Nur Artikel, keine Versandkosten
       WHERE 
         k.nRegistriert = 1
       GROUP BY 
