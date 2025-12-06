@@ -74,10 +74,27 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('[ColdLeads Search] Error:', error)
+    
+    // Spezifisches Error-Handling für verschiedene Fehlertypen
+    let errorMessage = error.message || 'Suche fehlgeschlagen'
+    let statusCode = 500
+    
+    if (error.name === 'MongoNetworkError') {
+      errorMessage = 'Datenbankverbindung fehlgeschlagen - bitte später versuchen'
+      statusCode = 503
+    } else if (error.message?.includes('ECONNREFUSED')) {
+      errorMessage = 'Google Search API nicht erreichbar'
+      statusCode = 503
+    } else if (error.message?.includes('timeout')) {
+      errorMessage = 'Zeitüberschreitung - bitte Limit reduzieren'
+      statusCode = 504
+    }
+    
     return NextResponse.json({
       ok: false,
-      error: error.message || 'Suche fehlgeschlagen'
-    }, { status: 500 })
+      error: errorMessage,
+      errorType: error.name || 'Error'
+    }, { status: statusCode })
   }
 }
 
@@ -97,9 +114,15 @@ export async function GET(request: NextRequest) {
     const collection = db.collection('prospects')
 
     // Handle filter: "replied" means hasReply=true, otherwise filter by status
-    let filter = {}
+    let filter: any = {}
     if (status === 'replied') {
       filter = { hasReply: true }
+    } else if (status === 'jtl_customers') {
+      // Alle JTL-Kunden (importiert aus JTL-Wawi)
+      filter = { customer_source: 'jtl' }
+    } else if (status === 'new_customers') {
+      // Nur Neukunden (durch Kaltakquise gewonnen)
+      filter = { customer_source: 'coldlead', status: 'customer' }
     } else if (status !== 'all') {
       filter = { status }
     }

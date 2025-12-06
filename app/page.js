@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import PreiseModule from '../components/PreiseModule'
 import FibuModule from '../components/FibuModule'
+import KundenView from '../components/KundenView'
 
 // Lightweight utils inlined (avoid missing imports)
 const toArray = (v) => Array.isArray(v) ? v : (v && v.data && Array.isArray(v.data) ? v.data : (v ? [v] : []))
@@ -2472,8 +2473,9 @@ export default function App() {
           'sales': 'sales',
           'marketing': 'marketing',
           'glossar': 'glossar',
+          'kunden': 'kunden',
+          'warmakquise': 'warmakquise',
           'kaltakquise': 'kaltakquise',
-          'warmakquise': 'marketing', // warmakquise is a sub of marketing
           'produkte': 'produkte',
           'preise': 'preise',
           'orga': 'orga',
@@ -2526,13 +2528,20 @@ export default function App() {
     
     loadAutopilotStatus()
     
+    // Status alle 10 Sekunden aktualisieren
+    const statusInterval = setInterval(() => {
+      loadAutopilotStatus()
+      loadColdLeadStats() // Stats auch refreshen
+    }, 10000)
+    
     return () => {
+      clearInterval(statusInterval)
       if (autopilotIntervalRef.current) {
         clearInterval(autopilotIntervalRef.current)
         autopilotIntervalRef.current = null
       }
     }
-  }, [authChecked, activeTab, autopilotState.running])
+  }, [authChecked, activeTab])
 
   // 6. ARTIKEL-BROWSER laden
   useEffect(() => {
@@ -4403,7 +4412,39 @@ export default function App() {
         </div>
       )}
 
-      {/* Kaltakquise */}
+      {/* Kunden-Tab (NEU) */}
+      {activeTab==='kunden' && (
+        <KundenView />
+      )}
+
+      {/* Warmakquise-Tab (NEU) */}
+      {activeTab==='warmakquise' && (
+        <div>
+          <div className="d-flex align-items-center justify-content-between mb-4">
+            <div>
+              <h2 className="mb-1"><i className="bi bi-fire mr-2"/>Warmakquise</h2>
+              <p className="text-muted small mb-0">Bestehende Kunden reaktivieren & Cross-Selling</p>
+            </div>
+          </div>
+          
+          <div className="card border-0 shadow-sm">
+            <div className="card-body">
+              <div className="text-center py-5">
+                <i className="bi bi-fire" style={{fontSize:'3rem', color:'#ff6b6b'}}/>
+                <h4 className="mt-3">Warmakquise-Tab in Entwicklung</h4>
+                <p className="text-muted">
+                  Hier werden Kunden mit Reaktivierungs-Potenzial angezeigt.
+                </p>
+                <p className="text-muted small">
+                  <strong>Features:</strong> Warmakquise-Score, Letzte-Bestellung-Filter, Cross-Selling-Vorschläge
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Kaltakquise (UNVERÄNDERT!) */}
       {activeTab==='kaltakquise' && (
         <div>
           <div className="d-flex align-items-center justify-content-between mb-4">
@@ -4555,7 +4596,7 @@ export default function App() {
           </div>
 
           {/* DACH Crawler - Direkt anzeigen (Google-Suche entfernt) */}
-          {coldStatusFilter === 'all' && false && (
+          {coldStatusFilter === 'all' && (
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-body">
                 <div className="d-flex align-items-center mb-3">
@@ -5042,6 +5083,44 @@ export default function App() {
                       >
                         <i className="bi bi-arrow-repeat mr-1"/>Follow-ups
                       </button>
+                      <button 
+                        className="btn btn-outline-info btn-sm mr-2 mb-2"
+                        onClick={async () => {
+                          if (!confirm('Alle JTL-Kunden in Datenbank importieren? Dies kann einige Minuten dauern.')) return
+                          setColdLoading(true)
+                          try {
+                            const res = await fetch('/api/coldleads/jtl-customers/import', { method: 'POST' })
+                            const data = await res.json()
+                            if (data.ok) {
+                              alert(`✅ Import erfolgreich!\n\nImportiert: ${data.imported}\nAktualisiert: ${data.updated}\nÜbersprungen: ${data.skipped}\n\nDauer: ${(data.duration/1000).toFixed(1)}s`)
+                              loadColdProspects()
+                              loadColdStats()
+                            } else {
+                              alert('❌ Import fehlgeschlagen: ' + data.error)
+                            }
+                          } catch (e) {
+                            alert('❌ Fehler: ' + e.message)
+                          } finally {
+                            setColdLoading(false)
+                          }
+                        }}
+                        disabled={coldLoading}
+                        title="Importiert alle Kunden aus JTL-Wawi"
+                      >
+                        <i className="bi bi-download mr-1"/>JTL-Kunden importieren
+                      </button>
+                      <button 
+                        className="btn btn-outline-success btn-sm mr-2 mb-2"
+                        onClick={() => {
+                          const includeAnalysis = confirm('📊 Analyse-Daten im Export inkludieren?\n\n✅ JA = Vollständiger Export mit Materialien, Anwendungen, etc.\n❌ NEIN = Nur Basisdaten')
+                          const url = `/api/coldleads/export/csv?status=${coldStatusFilter}&includeAnalysis=${includeAnalysis}`
+                          window.open(url, '_blank')
+                        }}
+                        disabled={coldLoading || coldProspects.length === 0}
+                        title="Exportiert aktuelle Ansicht als CSV"
+                      >
+                        <i className="bi bi-file-earmark-spreadsheet mr-1"/>CSV Export ({coldProspects.length})
+                      </button>
                       <div className="btn-group btn-group-sm mb-2">
                         <button className={`btn ${coldStatusFilter==='all'?'btn-primary':'btn-outline-secondary'}`} onClick={()=>{setColdStatusFilter('all'); setShowColdProspectDetails(null)}}>
                           <i className="bi bi-list mr-1"/>Alle ({coldStats.total})
@@ -5061,6 +5140,14 @@ export default function App() {
                         <button className={`btn ${coldStatusFilter==='replied'?'btn-warning':'btn-outline-warning'}`} onClick={()=>{setColdStatusFilter('replied'); setShowColdProspectDetails(null)}}>
                           <i className="bi bi-envelope-check mr-1"/>Antworten ({coldStats.replied || 0})
                           {coldLeadStats.unreadReplies > 0 && <span className="badge badge-danger ml-1">{coldLeadStats.unreadReplies}</span>}
+                        </button>
+                      </div>
+                      <div className="btn-group btn-group-sm mb-2">
+                        <button className={`btn ${coldStatusFilter==='new_customers'?'btn-success':'btn-outline-success'}`} onClick={()=>{setColdStatusFilter('new_customers'); setShowColdProspectDetails(null)}}>
+                          <i className="bi bi-star-fill mr-1"/>Neukunden ({coldLeadStats.new_customers || 0})
+                        </button>
+                        <button className={`btn ${coldStatusFilter==='jtl_customers'?'btn-info':'btn-outline-info'}`} onClick={()=>{setColdStatusFilter('jtl_customers'); setShowColdProspectDetails(null)}}>
+                          <i className="bi bi-building mr-1"/>JTL-Kunden ({coldLeadStats.jtl_customers || 0})
                         </button>
                         <button className={`btn ${coldStatusFilter==='prompts'?'btn-dark':'btn-outline-dark'}`} onClick={()=>{setColdStatusFilter('prompts'); setShowColdProspectDetails(null)}}>
                           <i className="bi bi-gear mr-1"/>Mail Prompts
@@ -5209,8 +5296,19 @@ export default function App() {
                               </td>
                             )}
                             <td className="align-middle">
-                              <div className="text-white font-weight-bold text-truncate" style={{maxWidth:'170px'}} title={p.company_name}>
-                                {p.company_name || 'Unbekannt'}
+                              <div className="d-flex align-items-center">
+                                <div className="text-white font-weight-bold text-truncate" style={{maxWidth:'170px'}} title={p.company_name}>
+                                  {p.company_name || 'Unbekannt'}
+                                </div>
+                                {p.jtl_customer_match?.matched && (
+                                  <span 
+                                    className="badge badge-warning ml-2" 
+                                    style={{fontSize:'0.7rem', cursor:'help'}}
+                                    title={`⚠️ Bereits JTL-Kunde: ${p.jtl_customer_match.jtlCustomer?.cFirma} (${p.jtl_customer_match.confidence}% Match)`}
+                                  >
+                                    <i className="bi bi-exclamation-triangle"/> JTL-Kunde
+                                  </span>
+                                )}
                               </div>
                             </td>
                             <td className="align-middle">

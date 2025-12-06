@@ -103,9 +103,30 @@ export async function POST(request: Request) {
     
   } catch (error: any) {
     console.error('[AnalyzeV3] Error:', error)
+    
+    // Spezifisches Error-Handling
+    let errorMessage = error.message || 'Analysis failed'
+    let statusCode = 500
+    
+    if (error.message?.includes('Jina.ai')) {
+      errorMessage = 'Website-Crawling fehlgeschlagen (Jina.ai nicht erreichbar)'
+      statusCode = 503
+    } else if (error.message?.includes('OpenAI') || error.message?.includes('GPT')) {
+      errorMessage = 'AI-Analyse fehlgeschlagen (OpenAI API Error)'
+      statusCode = 503
+    } else if (error.message?.includes('ENOTFOUND') || error.message?.includes('ETIMEDOUT')) {
+      errorMessage = 'Website nicht erreichbar oder Timeout'
+      statusCode = 504
+    } else if (error.name === 'MongoNetworkError') {
+      errorMessage = 'Datenbankverbindung fehlgeschlagen'
+      statusCode = 503
+    }
+    
     return NextResponse.json({
       ok: false,
-      error: error.message || 'Analysis failed'
-    }, { status: 500 })
+      error: errorMessage,
+      errorType: error.name || 'Error',
+      website: error.website || null
+    }, { status: statusCode })
   }
 }

@@ -58,11 +58,45 @@ export async function POST() {
       'autopilot_skip': { $ne: true }  // Skip failed Prospects
     }).limit(20).toArray()
     
-    // Filtere die mit gültiger Email
+    // Filtere die mit gültiger Email UND prüfe JTL-Customer-Match
     let nextProspect = null
     for (const candidate of candidates) {
       const email = candidate.analysis_v3?.contact_person?.email
       if (email && typeof email === 'string' && email.length > 5 && email.includes('@')) {
+        
+        // Prüfe ob bereits als JTL-Kunde bekannt (nur wenn noch nicht geprüft)
+        if (!candidate.jtl_customer_match) {
+          console.log(`[Autopilot Tick] Checking JTL-Customer-Match for: ${candidate.company_name}`)
+          
+          try {
+            // JTL-Check API aufrufen
+            const jtlCheckResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/coldleads/check-jtl-customer`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                prospect_id: candidate._id.toString(),
+                company_name: candidate.company_name,
+                website: candidate.website,
+                email: email,
+                update_prospect: true
+              })
+            })
+            
+            const jtlCheckData = await jtlCheckResponse.json()
+            
+            if (jtlCheckData.ok && jtlCheckData.match?.matched) {
+              console.log(`[Autopilot Tick] ⚠️ ${candidate.company_name} ist bereits JTL-Kunde - SKIP`)
+              continue // Nächsten Kandidaten prüfen
+            }
+          } catch (jtlError) {
+            console.error('[Autopilot Tick] JTL-Check failed:', jtlError)
+            // Bei Fehler: Prospect trotzdem verwenden (fail-safe)
+          }
+        } else if (candidate.jtl_customer_match?.matched) {
+          console.log(`[Autopilot Tick] ⚠️ ${candidate.company_name} bereits als JTL-Kunde markiert - SKIP`)
+          continue
+        }
+        
         nextProspect = candidate
         break
       }

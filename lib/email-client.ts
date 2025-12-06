@@ -67,14 +67,22 @@ export async function sendEmail(to: string, subject: string, html: string, text?
   // TEST MODE: Wenn EMAIL_TEST_MODE aktiviert ist, sende ALLE Mails nur an BCC
   const testMode = process.env.EMAIL_TEST_MODE === 'true'
   
-  const emailFrom = process.env.EMAIL_FROM || 'noreply@example.com'
-  const emailBcc = process.env.EMAIL_BCC || ''
+  const emailFrom = process.env.SMTP_FROM || process.env.EMAIL_FROM || 'noreply@example.com'
+  const emailBcc = process.env.SMTP_BCC || process.env.EMAIL_BCC || ''
+  
+  const smtpFromName = process.env.SMTP_FROM_NAME || 'Score Schleifwerkzeuge'
+  const smtpReplyTo = process.env.SMTP_REPLY_TO
   
   const mailOptions: any = {
-    from: `Score Schleifwerkzeuge <${emailFrom}>`,
+    from: `${smtpFromName} <${emailFrom}>`,
     subject: testMode ? `[TEST] ${subject}` : subject,
     html: fullHTML,
     text: text || html.replace(/<[^>]*>/g, '')
+  }
+  
+  // Add Reply-To if configured
+  if (smtpReplyTo) {
+    mailOptions.replyTo = smtpReplyTo
   }
   
   // Add BCC if configured
