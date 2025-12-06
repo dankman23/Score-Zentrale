@@ -203,6 +203,10 @@ export async function POST(request: NextRequest) {
               // Neu: Kanal-Zuordnung
               'primary_channel': channelData.primary,
               'channels': channelData.channels,
+              'last_order_channel': lastOrderChannel,
+              
+              // Neu: Hauptartikel
+              'hauptartikel': hauptartikel,
               
               // Neu: Statistiken
               'stats.total_orders': customer.nAnzahlBestellungen || 0,
