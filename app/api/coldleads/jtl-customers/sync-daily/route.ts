@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       GROUP BY 
         k.kKunde, k.cFirma, k.cAnrede, k.cVorname, k.cNachname,
         k.cStrasse, k.cPLZ, k.cOrt, k.cLand, k.cTel, k.cMobil,
-        k.cFax, k.cMail, k.cWWW, k.cUSTID, k.dErstellt, k.nIstFirma
+        k.cFax, k.cMail, k.cWWW, k.cUSTID, k.dErstellt
       ORDER BY nUmsatzGesamt DESC
     `)
     
