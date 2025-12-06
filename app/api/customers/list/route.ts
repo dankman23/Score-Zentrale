@@ -94,13 +94,28 @@ export async function GET(request: NextRequest) {
         website: c.website,
         email: c.email,
         
+        // JTL-Kontakt
+        jtl_customer: {
+          vorname: c.jtl_customer?.vorname,
+          nachname: c.jtl_customer?.nachname,
+          strasse: c.jtl_customer?.strasse,
+          plz: c.jtl_customer?.plz,
+          ort: c.jtl_customer?.ort,
+          telefon: c.jtl_customer?.telefon,
+          email: c.jtl_customer?.email
+        },
+        
         // B2B
         is_b2b: c.is_b2b || false,
         b2b_confidence: c.b2b_confidence || 0,
         
         // Kanal
         primary_channel: c.primary_channel || 'unknown',
+        last_order_channel: c.last_order_channel || c.primary_channel || 'unknown',
         channels: c.channels || [],
+        
+        // Hauptartikel
+        hauptartikel: c.hauptartikel || null,
         
         // Stats
         total_orders: c.stats?.total_orders || 0,
