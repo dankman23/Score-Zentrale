@@ -81,15 +81,19 @@ export async function POST(request: NextRequest) {
       // B2B-Erkennung
       const b2bResult = detectB2B(customer)
       
-      // Lade Bestellungen für Kanal-Analyse (nur erste 100 für Performance)
+      // Lade Bestellungen für Kanal-Analyse & Hauptartikel (alle Bestellungen)
       let channelData = { primary: 'unknown', channels: [] }
       let orderFrequency = 0
+      let lastOrderChannel = 'unknown'
+      let hauptartikel = null
       
       try {
+        // Bestellungen laden
         const ordersResult = await pool.request()
           .input('kKunde', customer.kKunde)
           .query(`
-            SELECT TOP 100
+            SELECT
+              b.kBestellung,
               b.cBestellNr,
               b.cZahlungsart,
               b.cVersandart,
@@ -107,6 +111,11 @@ export async function POST(request: NextRequest) {
           // Kanal-Analyse
           channelData = determinePrimaryChannel(orders)
           
+          // Kanal der LETZTEN Bestellung (wichtig für Spalte!)
+          const lastOrder = orders[0]
+          const channelCheck = determinePrimaryChannel([lastOrder])
+          lastOrderChannel = channelCheck.primary
+          
           // Bestell-Frequenz berechnen
           if (customer.dErsteBestellung && customer.dLetzteBestellung && customer.nAnzahlBestellungen > 0) {
             orderFrequency = calculateOrderFrequency(
@@ -115,10 +124,36 @@ export async function POST(request: NextRequest) {
               customer.nAnzahlBestellungen
             )
           }
+          
+          // Hauptartikel bestimmen (meist gekaufte Produktkategorie nach Umsatz)
+          try {
+            const produkteResult = await pool.request()
+              .input('kKunde', customer.kKunde)
+              .query(`
+                SELECT TOP 1
+                  ISNULL(a.cName, 'Sonstige') as hauptkategorie,
+                  SUM(bp.fAnzahl * bp.fVKNetto) as umsatz
+                FROM tBestellung b
+                INNER JOIN tBestellpos bp ON bp.kBestellung = b.kBestellung
+                INNER JOIN tArtikel art ON art.kArtikel = bp.kArtikel
+                LEFT JOIN tArtikelAttribut aa ON aa.kArtikel = art.kArtikel AND aa.cName = 'Produktkategorie'
+                LEFT JOIN tArtikelAttribut a ON a.kArtikel = art.kArtikel AND a.cName = 'attr_produktkategorie'
+                WHERE b.kKunde = @kKunde
+                  AND b.cStatus NOT IN ('storno', 'gelöscht')
+                  AND bp.nTyp = 0
+                GROUP BY ISNULL(a.cName, 'Sonstige')
+                ORDER BY umsatz DESC
+              `)
+            
+            if (produkteResult.recordset.length > 0) {
+              hauptartikel = produkteResult.recordset[0].hauptkategorie
+            }
+          } catch (produktError) {
+            console.error(`[JTL-Sync] Fehler beim Laden der Produktkategorien:`, produktError.message)
+          }
         }
       } catch (orderError) {
         console.error(`[JTL-Sync] Fehler beim Laden der Bestellungen für kKunde ${customer.kKunde}:`, orderError.message)
-        // Weiter ohne Bestellungs-Daten
       }
       
       // Prüfe ob Kunde in MongoDB existiert
