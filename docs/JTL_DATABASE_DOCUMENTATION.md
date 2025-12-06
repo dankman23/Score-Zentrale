@@ -390,23 +390,24 @@ ORDER BY Umsatz DESC
 
 ---
 
-### **Q4: Kanal-Erkennung aus Bestellnummer**
+### **Q4: Kanal-Erkennung aus Auftragsnummer (AKTUALISIERT für Verkauf.tAuftrag)**
 ```sql
 SELECT 
-  b.cBestellNr,
-  b.cZahlungsart,
-  b.cVersandart,
+  o.cAuftragsNr,
+  o.cZahlungsart,
+  o.cVersandart,
   CASE
-    WHEN b.cBestellNr LIKE '302-%' OR b.cBestellNr LIKE '303-%' THEN 'Amazon'
-    WHEN b.cBestellNr LIKE '%eBay%' THEN 'eBay'
-    WHEN b.cZahlungsart LIKE '%PayPal%' THEN 'Shop'
-    WHEN b.cZahlungsart LIKE '%Rechnung%' THEN 'Direktvertrieb'
+    WHEN o.cAuftragsNr LIKE '302-%' OR o.cAuftragsNr LIKE '303-%' THEN 'Amazon'
+    WHEN o.cAuftragsNr LIKE '%eBay%' THEN 'eBay'
+    WHEN o.cZahlungsart LIKE '%PayPal%' THEN 'Shop'
+    WHEN o.cZahlungsart LIKE '%Rechnung%' THEN 'Direktvertrieb'
     ELSE 'Unbekannt'
   END as Kanal
-FROM tBestellung b
-WHERE b.kKunde = @kKunde
-  AND b.cStatus NOT IN ('storno', 'gelöscht')
-ORDER BY b.dErstellt DESC
+FROM Verkauf.tAuftrag o
+WHERE o.kKunde = @kKunde
+  AND (o.nStorno IS NULL OR o.nStorno = 0)
+  AND o.cAuftragsNr LIKE 'AU%'
+ORDER BY o.dErstellt DESC
 ```
 
 ---
