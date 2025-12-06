@@ -70,6 +70,17 @@ export default function KundenView() {
   
   return (
     <div>
+      <style jsx>{`
+        .kunden-table tbody td {
+          color: #e5e7eb !important;
+        }
+        .kunden-table tbody td strong {
+          color: #f3f4f6 !important;
+        }
+        .kunden-table thead th {
+          color: #1f2937 !important;
+        }
+      `}</style>
       {/* Header */}
       <div className="d-flex align-items-center justify-content-between mb-4">
         <div>
