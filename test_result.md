@@ -237,10 +237,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "COMPLETED: ✅ Klingspor Price Configurator umfassend getestet"
-    - "COMPLETED: ✅ CS 310 X Basis-Test mit korrekten Berechnungen"
-    - "COMPLETED: ✅ MBM-Berechnung nach Breite verifiziert"
-    - "COMPLETED: ✅ Fehlerbehandlung für ungültige Parameter getestet"
+    - "COMPLETED: ✅ JTL Customer Import umfassend getestet"
+    - "COMPLETED: ✅ JTL Customer Sync Daily API funktioniert korrekt"
+    - "COMPLETED: ✅ Customers List API mit 4,310+ importierten Kunden"
+    - "COMPLETED: ✅ Datenbank-Konsistenz verifiziert"
   stuck_tasks: []
   test_priority: "high_first"
   test_all: false
