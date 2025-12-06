@@ -713,6 +713,9 @@ test_plan:
       - working: true
         agent: "testing"
         comment: "✅ HAUPTARTIKEL-INTEGRATION WORKING CORRECTLY! Testing results: (1) ✅ hauptartikel-Feld wird bei Kunden gesetzt (7/10 Kunden haben Werte), (2) ✅ Kategorien sind einzelne Wörter wie erwartet (z.B. '20x', 'Klingspor', '300', '100x', 'PEC'), (3) ✅ Produktkategorien-SQL-Query funktioniert ohne 'Invalid column name cName' Fehler, (4) ✅ Integration in Customer Sync läuft stabil, (5) ⚠️ Minor: Kategorien sind teilweise Produktcodes statt Substantive - dies ist korrekt da es das erste Wort aus Produktnamen extrahiert. Hauptartikel-Integration erfolgreich implementiert und funktionsfähig!"
+      - working: true
+        agent: "testing"
+        comment: "✅ VERBESSERTE HAUPTKATEGORIE-LOGIK ERFOLGREICH GETESTET! Comprehensive testing completed: (1) ✅ Debug-Endpoint /api/debug/test-kategorie working perfectly - returns real product categories like 'Schleifband', 'Vlies' instead of numbers/sets, (2) ✅ Customer data validation successful - 9/10 customers have valid hauptartikel values: 'Schleifband' (7 customers), 'Schleifscheibe' (2 customers), (3) ✅ No invalid categories found - no more '5er', '10x', '4er-Set' patterns, (4) ✅ SQL query improvements working - CASE statements properly match product names like 'Schleifscheibe', 'Fächerscheibe', 'Trennscheibe', 'Schleifband', 'Fräser', 'Bohrer', etc., (5) ✅ JTL Customer Sync running successfully in background. CRITICAL SUCCESS: Product category recognition now identifies real product names instead of meaningless numbers or sets. System ready for production use!"
 
 agent_communication:
   - agent: "main"
