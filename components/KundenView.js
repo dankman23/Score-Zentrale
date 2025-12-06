@@ -212,16 +212,16 @@ export default function KundenView() {
               <table className="table table-hover mb-0">
                 <thead className="bg-light">
                   <tr>
-                    <th>Name</th>
-                    <th className="text-right">Gesamtumsatz</th>
-                    <th className="text-right">Anz. Best.</th>
-                    <th className="text-center">B2B</th>
-                    <th>Kanal</th>
-                    <th>Letzte Bestellung</th>
-                    <th>Hauptartikel</th>
+                    <th className="text-dark">Name</th>
+                    <th className="text-dark text-right">Gesamtumsatz</th>
+                    <th className="text-dark text-right">Anz. Best.</th>
+                    <th className="text-dark text-center">B2B</th>
+                    <th className="text-dark">Kanal</th>
+                    <th className="text-dark">Letzte Bestellung</th>
+                    <th className="text-dark">Hauptartikel</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody style={{color: '#e5e7eb'}}>
                   {customers.map((c) => {
                     const channelLabel = CHANNEL_LABELS[c.last_order_channel || c.primary_channel] || CHANNEL_LABELS.unknown
                     
