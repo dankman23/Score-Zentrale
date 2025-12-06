@@ -94,21 +94,22 @@ export async function POST(request: NextRequest) {
       let hauptartikel = null
       
       try {
-        // Bestellungen laden
+        // Bestellungen laden (aus Verkauf.tAuftrag)
         const ordersResult = await pool.request()
           .input('kKunde', customer.kKunde)
           .query(`
             SELECT
-              b.kBestellung,
-              b.cBestellNr,
-              b.cZahlungsart,
-              b.cVersandart,
-              b.fGesamtsumme,
-              b.dErstellt
-            FROM tBestellung b
-            WHERE b.kKunde = @kKunde
-              AND b.cStatus NOT IN ('storno', 'gelöscht')
-            ORDER BY b.dErstellt DESC
+              o.kAuftrag,
+              o.cAuftragsNr,
+              o.cZahlungsart,
+              o.cVersandart,
+              o.fGesamtsumme,
+              o.dErstellt
+            FROM Verkauf.tAuftrag o
+            WHERE o.kKunde = @kKunde
+              AND (o.nStorno IS NULL OR o.nStorno = 0)
+              AND o.cAuftragsNr LIKE 'AU%'
+            ORDER BY o.dErstellt DESC
           `)
         
         const orders = ordersResult.recordset
