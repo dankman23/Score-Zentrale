@@ -176,9 +176,10 @@ export default function RootLayout({ children }) {
                       <i className="bi bi-send mr-1"/>Outbound
                     </a>
                     <div className="dropdown-menu">
-                      <a className="dropdown-item" href="#outbound">Prospect Management</a>
-                      <a className="dropdown-item" href="#kaltakquise">Kaltakquise</a>
-                      <a className="dropdown-item" href="#warmakquise">Warmakquise</a>
+                      <h6 className="dropdown-header" style={{fontSize: '0.7rem'}}>Outbound-Module</h6>
+                      <a className="dropdown-item" href="#kunden"><i className="bi bi-building mr-1"/>Kunden</a>
+                      <a className="dropdown-item" href="#warmakquise"><i className="bi bi-fire mr-1"/>Warmakquise</a>
+                      <a className="dropdown-item" href="#kaltakquise"><i className="bi bi-snowflake mr-1"/>Kaltakquise</a>
                     </div>
                   </li>
                   <li className="nav-item"><a className="nav-link py-1 px-2" href="#produkte" style={{fontSize: '0.85rem'}}><i className="bi bi-box-seam mr-1"/>Produkte</a></li>
