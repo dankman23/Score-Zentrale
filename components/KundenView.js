@@ -220,7 +220,7 @@ export default function KundenView() {
             </div>
           ) : (
             <div className="table-responsive">
-              <table className="table table-hover mb-0">
+              <table className="table table-hover mb-0 kunden-table">
                 <thead className="bg-light">
                   <tr>
                     <th className="text-dark">Name</th>
