@@ -240,16 +240,16 @@ export default function KundenView() {
                     
                     return (
                       <tr key={c._id}>
-                        <td>
+                        <td style={{color: '#e5e7eb'}}>
                           <div className="font-weight-bold">{fullName}</div>
                           {c.email && (
-                            <small className="text-muted">{c.email}</small>
+                            <small style={{color: '#9ca3af'}}>{c.email}</small>
                           )}
                         </td>
-                        <td className="text-right">
+                        <td className="text-right" style={{color: '#e5e7eb'}}>
                           <strong>{fmtCurrency(c.total_revenue)}</strong>
                         </td>
-                        <td className="text-right">
+                        <td className="text-right" style={{color: '#e5e7eb'}}>
                           <strong>{c.total_orders || 0}</strong>
                         </td>
                         <td className="text-center">
@@ -264,7 +264,7 @@ export default function KundenView() {
                             {channelLabel.icon} {channelLabel.name}
                           </span>
                         </td>
-                        <td>
+                        <td style={{color: '#e5e7eb'}}>
                           {fmtDate(c.last_order)}
                         </td>
                         <td>
@@ -273,7 +273,7 @@ export default function KundenView() {
                               {c.hauptartikel}
                             </span>
                           ) : (
-                            <span className="text-muted small">-</span>
+                            <span style={{color: '#9ca3af'}} className="small">-</span>
                           )}
                         </td>
                       </tr>
