@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
               'jtl_customer': jtlData,
               'company_name': customer.cFirma,
               'website': website || existingProspect.website,
-              'email': customer.cEmail || existingProspect.email,
+              'email': customer.cEMail || existingProspect.email,
               
               // Neu: B2B-Klassifizierung
               'is_b2b': b2bResult.is_b2b,
