@@ -1,5 +1,5 @@
 // Test: JTL tKunde Spalten ermitteln
-const { getMssqlPool } = require('./lib/db/mssql')
+const { getMssqlPool } = require('./app/lib/db/mssql')
 
 async function testColumns() {
   try {
