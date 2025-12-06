@@ -324,22 +324,25 @@ WHERE b.dErstellt BETWEEN @von AND @bis
 
 ## 📊 HÄUFIGE QUERIES
 
-### **Q1: Kunden mit Gesamtumsatz**
+### **Q1: Kunden mit Gesamtumsatz (AKTUALISIERT für Verkauf.tAuftrag)**
 ```sql
 SELECT 
   k.kKunde,
   k.cFirma,
   k.cVorname + ' ' + k.cNachname as Name,
   k.cMail,
-  COUNT(DISTINCT b.kBestellung) as AnzahlBestellungen,
-  ISNULL(SUM(b.fGesamtsumme), 0) as GesamtUmsatz,
-  MAX(b.dErstellt) as LetzteBestellung
+  COUNT(DISTINCT o.kAuftrag) as AnzahlAuftraege,
+  ISNULL(SUM(op.fAnzahl * op.fVKNetto), 0) as GesamtUmsatzNetto,
+  MAX(o.dErstellt) as LetzteBestellung
 FROM tKunde k
-LEFT JOIN tBestellung b ON b.kKunde = k.kKunde 
-  AND b.cStatus NOT IN ('storno', 'gelöscht')
+LEFT JOIN Verkauf.tAuftrag o ON o.kKunde = k.kKunde 
+  AND (o.nStorno IS NULL OR o.nStorno = 0)
+  AND o.cAuftragsNr LIKE 'AU%'
+LEFT JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
+  AND op.kArtikel > 0
 WHERE k.nRegistriert = 1
 GROUP BY k.kKunde, k.cFirma, k.cVorname, k.cNachname, k.cMail
-ORDER BY GesamtUmsatz DESC
+ORDER BY GesamtUmsatzNetto DESC
 ```
 
 ---
