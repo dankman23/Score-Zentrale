@@ -168,13 +168,7 @@ export async function POST(request: NextRequest) {
         imported++
       }
       
-      if (updateResult.upsertedCount > 0) {
-        imported++
-      } else if (updateResult.modifiedCount > 0) {
-        updated++
-      } else {
-        skipped++
-      }
+      // Zähler wurden bereits in if/else gesetzt
     }
     
     const duration = Date.now() - startTime
