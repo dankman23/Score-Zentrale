@@ -97,7 +97,6 @@ export async function POST(request: NextRequest) {
               o.cAuftragsNr,
               o.cZahlungsart,
               o.cVersandart,
-              o.fGesamtsumme,
               o.dErstellt
             FROM Verkauf.tAuftrag o
             WHERE o.kKunde = @kKunde
