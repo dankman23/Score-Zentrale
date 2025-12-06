@@ -130,9 +130,9 @@ export default function RootLayout({ children }) {
                   <i className="bi bi-send mr-1"/>Outbound
                 </a>
                 <div className="dropdown-menu" aria-labelledby="outboundDropdown">
-                  <a className="dropdown-item" href="#outbound"><i className="bi bi-list-ul mr-2"/>Prospect Management</a>
-                  <a className="dropdown-item" href="#kaltakquise"><i className="bi bi-search mr-2"/>Kaltakquise</a>
-                  <a className="dropdown-item" href="#warmakquise"><i className="bi bi-people mr-2"/>Warmakquise</a>
+                  <a className="dropdown-item" href="#kunden"><i className="bi bi-building mr-2"/>Kunden</a>
+                  <a className="dropdown-item" href="#warmakquise"><i className="bi bi-fire mr-2"/>Warmakquise</a>
+                  <a className="dropdown-item" href="#kaltakquise"><i className="bi bi-snowflake mr-2"/>Kaltakquise</a>
                 </div>
               </li>
               <li className="nav-item"><a className="nav-link" href="#produkte"><i className="bi bi-box-seam mr-1"/>Produkte</a></li>
