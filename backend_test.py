@@ -255,6 +255,59 @@ def test_customer_data_validation():
         print(f"❌ Exception in test_customer_data_validation: {str(e)}")
         return False
 
+def main():
+    """
+    Hauptfunktion - führt alle Tests aus
+    """
+    print("🚀 BACKEND TESTING: Verbesserte Hauptkategorie-Logik")
+    print("="*80)
+    print("Testing improved product category recognition logic")
+    print("Expected: Real product names instead of numbers/sets")
+    print("="*80)
+    
+    # Test Results
+    results = {}
+    
+    # Test 1: Debug-Endpoint
+    print("\n⏳ Running Test 1: Debug-Endpoint...")
+    results['debug_endpoint'] = test_debug_kategorie_endpoint()
+    
+    # Test 2: Mini-Import
+    print("\n⏳ Running Test 2: Mini-Import...")
+    results['mini_import'] = test_mini_import()
+    
+    # Test 3: Customer Data Validation
+    print("\n⏳ Running Test 3: Customer Data Validation...")
+    results['customer_validation'] = test_customer_data_validation()
+    
+    # Summary
+    print("\n" + "="*80)
+    print("🏁 FINAL TEST RESULTS")
+    print("="*80)
+    
+    passed = 0
+    total = len(results)
+    
+    for test_name, result in results.items():
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"{test_name}: {status}")
+        if result:
+            passed += 1
+    
+    print(f"\n📊 Overall Result: {passed}/{total} tests passed")
+    
+    if passed == total:
+        print("🎉 ALL TESTS PASSED - Hauptkategorie-Logik working correctly!")
+        print("✅ Real product categories are now recognized instead of numbers/sets")
+        return True
+    else:
+        print("⚠️  SOME TESTS FAILED - Issues found with category recognition")
+        return False
+
+if __name__ == "__main__":
+    success = main()
+    sys.exit(0 if success else 1)
+
 def test_jtl_customer_sync():
     """Test JTL Customer Sync Daily API"""
     log("🔄 Testing JTL Customer Sync Daily API...")
