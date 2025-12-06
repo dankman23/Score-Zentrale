@@ -127,30 +127,45 @@ export async function POST(request: NextRequest) {
             )
           }
           
-          // Hauptartikel bestimmen (meist gekaufter Artikel nach Umsatz)
+          // Hauptartikel bestimmen (meist gekaufte Produktkategorie = erstes Substantiv im Titel)
           try {
             const produkteResult = await pool.request()
               .input('kKunde', customer.kKunde)
               .query(`
-                SELECT TOP 1
-                  art.cName as hauptartikel,
-                  SUM(op.fAnzahl * op.fVKNetto) as umsatz
-                FROM Verkauf.tAuftrag o
-                INNER JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
-                INNER JOIN tArtikel art ON art.kArtikel = op.kArtikel
-                WHERE o.kKunde = @kKunde
-                  AND (o.nStorno IS NULL OR o.nStorno = 0)
-                  AND o.cAuftragsNr LIKE 'AU%'
-                  AND op.kArtikel > 0
-                GROUP BY art.cName
+                WITH Kategorien AS (
+                  SELECT 
+                    CASE 
+                      WHEN CHARINDEX(' ', art.cName) > 0 
+                      THEN LEFT(art.cName, CHARINDEX(' ', art.cName) - 1)
+                      ELSE art.cName
+                    END as kategorie,
+                    SUM(op.fAnzahl * op.fVKNetto) as umsatz
+                  FROM Verkauf.tAuftrag o
+                  INNER JOIN Verkauf.tAuftragPosition op ON op.kAuftrag = o.kAuftrag
+                  INNER JOIN tArtikel art ON art.kArtikel = op.kArtikel
+                  WHERE o.kKunde = @kKunde
+                    AND (o.nStorno IS NULL OR o.nStorno = 0)
+                    AND o.cAuftragsNr LIKE 'AU%'
+                    AND op.kArtikel > 0
+                  GROUP BY 
+                    CASE 
+                      WHEN CHARINDEX(' ', art.cName) > 0 
+                      THEN LEFT(art.cName, CHARINDEX(' ', art.cName) - 1)
+                      ELSE art.cName
+                    END
+                )
+                SELECT TOP 1 kategorie, umsatz
+                FROM Kategorien
+                WHERE kategorie NOT IN ('Kord', 'und', 'der', 'die', 'das')
+                  AND LEN(kategorie) > 2
                 ORDER BY umsatz DESC
               `)
             
             if (produkteResult.recordset.length > 0) {
-              hauptartikel = produkteResult.recordset[0].hauptartikel
+              hauptartikel = produkteResult.recordset[0].kategorie
             }
           } catch (produktError) {
-            console.error(`[JTL-Sync] Fehler beim Laden des Hauptartikels:`, produktError.message)
+            console.error(`[JTL-Sync] Fehler beim Laden der Hauptkategorie:`, produktError.message)
           }
         }
       } catch (orderError) {
