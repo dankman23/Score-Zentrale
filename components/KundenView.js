@@ -426,39 +426,107 @@ export default function KundenView() {
                     <i className="bi bi-inbox" style={{fontSize:'3rem', color:'#ccc'}}/>
                     <h5 className="mt-3">Keine Bestellungen</h5>
                   </div>
+                ) : showAllArticles ? (
+                  <div className="table-responsive">
+                    {articlesLoading ? (
+                      <div className="text-center py-5">
+                        <div className="spinner-border text-primary" role="status"></div>
+                      </div>
+                    ) : (
+                      <table className="table table-sm">
+                        <thead style={{backgroundColor: '#f3f4f6'}}>
+                          <tr>
+                            <th style={{color: '#111827', fontWeight: '600'}}>Artikel</th>
+                            <th style={{color: '#111827', fontWeight: '600'}}>Art.-Nr.</th>
+                            <th style={{color: '#111827', fontWeight: '600'}} className="text-right">Gesamt Anzahl</th>
+                            <th style={{color: '#111827', fontWeight: '600'}} className="text-right">Gesamt Umsatz</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {allArticles.map((article, idx) => (
+                            <tr key={idx}>
+                              <td style={{color: '#1f2937'}}>{article.cArtikelName || '-'}</td>
+                              <td style={{color: '#374151'}}>{article.cArtNr}</td>
+                              <td style={{color: '#1f2937'}} className="text-right"><strong>{article.fGesamtAnzahl}</strong></td>
+                              <td style={{color: '#1f2937'}} className="text-right"><strong>{fmtCurrency(article.fGesamtUmsatz)}</strong></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
                 ) : (
                   <div className="table-responsive">
                     <table className="table table-sm table-hover">
-                      <thead className="bg-light">
+                      <thead style={{backgroundColor: '#f3f4f6'}}>
                         <tr>
-                          <th style={{color: '#1f2937'}}>Auftragsnr.</th>
-                          <th style={{color: '#1f2937'}}>Datum</th>
-                          <th style={{color: '#1f2937'}} className="text-right">Betrag (Netto)</th>
-                          <th style={{color: '#1f2937'}}>Zahlungsart</th>
-                          <th style={{color: '#1f2937'}}>Versandart</th>
-                          <th style={{color: '#1f2937'}}>Status</th>
-                          <th style={{color: '#1f2937'}}>Artikel</th>
+                          <th style={{color: '#111827', fontWeight: '600', padding: '12px 8px'}}>Auftragsnr.</th>
+                          <th style={{color: '#111827', fontWeight: '600', padding: '12px 8px'}}>Datum</th>
+                          <th style={{color: '#111827', fontWeight: '600', padding: '12px 8px'}} className="text-right">Betrag (Netto)</th>
+                          <th style={{color: '#111827', fontWeight: '600', padding: '12px 8px'}}>Zahlungsart</th>
+                          <th style={{color: '#111827', fontWeight: '600', padding: '12px 8px'}}>Versandart</th>
+                          <th style={{color: '#111827', fontWeight: '600', padding: '12px 8px'}}>Status</th>
+                          <th style={{color: '#111827', fontWeight: '600', padding: '12px 8px'}}>Artikel</th>
                         </tr>
                       </thead>
                       <tbody>
                         {orders.map((order, idx) => (
-                          <tr key={idx}>
-                            <td style={{color: '#1f2937'}}><strong>{order.cAuftragsNr}</strong></td>
-                            <td style={{color: '#374151'}}>{fmtDate(order.dErstellt)}</td>
-                            <td style={{color: '#1f2937'}} className="text-right">
-                              <strong>{fmtCurrency(order.fGesamtsummeNetto)}</strong>
-                            </td>
-                            <td style={{color: '#374151'}}>{order.cZahlungsart || '-'}</td>
-                            <td style={{color: '#374151'}}>{order.cVersandart || '-'}</td>
-                            <td>
-                              <span className={`badge badge-${order.cStatus === 'Abgeschlossen' ? 'success' : order.cStatus === 'Storniert' ? 'danger' : 'warning'}`}>
-                                {order.cStatus}
-                              </span>
-                            </td>
-                            <td style={{color: '#6b7280', fontSize: '0.85rem'}}>
-                              {order.artikel_count ? `${order.artikel_count} Artikel` : '-'}
-                            </td>
-                          </tr>
+                          <>
+                            <tr key={idx} style={{cursor: 'pointer'}} onClick={() => toggleOrderDetails(order)}>
+                              <td style={{color: '#1f2937', padding: '8px'}}>
+                                <i className={`bi bi-chevron-${expandedOrder === order.kAuftrag ? 'down' : 'right'} mr-2`} style={{fontSize: '0.8rem'}}/>
+                                <strong>{order.cAuftragsNr}</strong>
+                              </td>
+                              <td style={{color: '#374151', padding: '8px'}}>{fmtDate(order.dErstellt)}</td>
+                              <td style={{color: '#1f2937', padding: '8px'}} className="text-right">
+                                <strong>{fmtCurrency(order.fGesamtsummeNetto)}</strong>
+                              </td>
+                              <td style={{color: '#374151', padding: '8px'}}>{order.cZahlungsart || '-'}</td>
+                              <td style={{color: '#374151', padding: '8px'}}>{order.cVersandart || '-'}</td>
+                              <td style={{padding: '8px'}}>
+                                <span className={`badge badge-${order.cStatus === 'Abgeschlossen' ? 'success' : order.cStatus === 'Storniert' ? 'danger' : 'warning'}`}>
+                                  {order.cStatus}
+                                </span>
+                              </td>
+                              <td style={{color: '#6b7280', fontSize: '0.85rem', padding: '8px'}}>
+                                {order.artikel_count ? `${order.artikel_count} Artikel` : '-'}
+                              </td>
+                            </tr>
+                            {expandedOrder === order.kAuftrag && (
+                              <tr>
+                                <td colSpan="7" style={{backgroundColor: '#f9fafb', padding: '0'}}>
+                                  {loadingItems[order.kAuftrag] ? (
+                                    <div className="text-center py-3">
+                                      <div className="spinner-border spinner-border-sm text-primary" role="status"></div>
+                                    </div>
+                                  ) : orderItems[order.kAuftrag] ? (
+                                    <table className="table table-sm mb-0" style={{fontSize: '0.85rem'}}>
+                                      <thead style={{backgroundColor: '#e5e7eb'}}>
+                                        <tr>
+                                          <th style={{color: '#374151', padding: '8px'}}>Artikel</th>
+                                          <th style={{color: '#374151', padding: '8px'}}>Art.-Nr.</th>
+                                          <th style={{color: '#374151', padding: '8px'}} className="text-right">Anzahl</th>
+                                          <th style={{color: '#374151', padding: '8px'}} className="text-right">VK (Netto)</th>
+                                          <th style={{color: '#374151', padding: '8px'}} className="text-right">Gesamt</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {orderItems[order.kAuftrag].map((item, i) => (
+                                          <tr key={i}>
+                                            <td style={{color: '#374151', padding: '6px'}}>{item.cArtikelName || '-'}</td>
+                                            <td style={{color: '#6b7280', padding: '6px'}}>{item.cArtNr}</td>
+                                            <td style={{color: '#1f2937', padding: '6px'}} className="text-right">{item.fAnzahl}</td>
+                                            <td style={{color: '#1f2937', padding: '6px'}} className="text-right">{fmtCurrency(item.fPreisNetto)}</td>
+                                            <td style={{color: '#1f2937', padding: '6px'}} className="text-right"><strong>{fmtCurrency(item.fGesamtNetto)}</strong></td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  ) : null}
+                                </td>
+                              </tr>
+                            )}
+                          </>
                         ))}
                       </tbody>
                     </table>
