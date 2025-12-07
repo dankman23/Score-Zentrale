@@ -23,6 +23,14 @@ export default function KundenView() {
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [orders, setOrders] = useState([])
   const [ordersLoading, setOrdersLoading] = useState(false)
+  const [expandedOrder, setExpandedOrder] = useState(null)
+  const [orderItems, setOrderItems] = useState({})
+  const [loadingItems, setLoadingItems] = useState({})
+  
+  // Alle Artikel des Kunden
+  const [showAllArticles, setShowAllArticles] = useState(false)
+  const [allArticles, setAllArticles] = useState([])
+  const [articlesLoading, setArticlesLoading] = useState(false)
   
   useEffect(() => {
     loadCustomers()
