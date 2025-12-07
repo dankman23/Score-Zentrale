@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
           -- Status
           CASE 
             WHEN o.nStorno = 1 THEN 'Storniert'
-            WHEN o.cAbgeschlossen = 'Y' THEN 'Abgeschlossen'
+            WHEN o.nAuftragStatus >= 4 THEN 'Abgeschlossen'
             ELSE 'Offen'
           END as cStatus
         FROM Verkauf.tAuftrag o
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
           AND o.cAuftragsNr LIKE 'AU%'
         GROUP BY 
           o.kAuftrag, o.cAuftragsNr, o.dErstellt, z.cName, v.cName, 
-          o.nStorno, o.cAbgeschlossen
+          o.nStorno, o.nAuftragStatus
         ORDER BY o.dErstellt DESC
       `)
     
