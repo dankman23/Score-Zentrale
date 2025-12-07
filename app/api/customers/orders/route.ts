@@ -34,6 +34,8 @@ export async function GET(request: NextRequest) {
           ISNULL(v.cName, '') as cVersandart,
           -- Berechne Gesamtsumme aus Positionen
           ISNULL(SUM(op.fAnzahl * op.fVKNetto), 0) as fGesamtsummeNetto,
+          -- Anzahl Artikel
+          COUNT(DISTINCT op.kArtikel) as artikel_count,
           -- Status
           CASE 
             WHEN o.nStorno = 1 THEN 'Storniert'
