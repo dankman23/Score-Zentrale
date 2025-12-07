@@ -127,6 +127,9 @@ export async function GET(request: NextRequest) {
       filter = { status }
     }
     
+    // Total count ermitteln
+    const total = await collection.countDocuments(filter)
+    
     // Wenn limit = 0, kein Limit setzen (alle Dokumente)
     const query = collection.find(filter).sort({ created_at: -1 })
     const prospects = limit > 0 
@@ -136,6 +139,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       count: prospects.length,
+      total: total,
       prospects: prospects.map(p => ({
         id: p.id || p._id.toString(),
         company_name: p.company_name,
