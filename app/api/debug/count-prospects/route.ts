@@ -6,7 +6,7 @@ import { connectToDatabase } from '@/lib/api'
 
 export async function GET() {
   try {
-    const db = await connectToDatabase()
+    const { db } = await connectToDatabase()
     const prospectsCollection = db.collection('prospects')
     
     // Zähle verschiedene Kategorien
