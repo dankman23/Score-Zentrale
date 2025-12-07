@@ -26,16 +26,15 @@ export async function GET(request: NextRequest) {
     const result = await pool.request()
       .input('kAuftrag', parseInt(kAuftrag))
       .query(`
-        SELECT 
+        SELECT DISTINCT
           op.kAuftragPosition,
-          ab.cName as cArtikelName,
+          op.cName as cArtikelName,
           art.cArtNr,
           op.fAnzahl,
           op.fVKNetto as fPreisNetto,
           (op.fAnzahl * op.fVKNetto) as fGesamtNetto
         FROM Verkauf.tAuftragPosition op
         INNER JOIN tArtikel art ON art.kArtikel = op.kArtikel
-        LEFT JOIN tArtikelBeschreibung ab ON ab.kArtikel = art.kArtikel AND ab.kSprache = 1
         WHERE op.kAuftrag = @kAuftrag
           AND op.kArtikel > 0
         ORDER BY op.kAuftragPosition
