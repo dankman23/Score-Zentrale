@@ -70,7 +70,15 @@ export default function KundenView() {
     setOrders([])
     
     try {
-      const res = await fetch(`/api/customers/orders?kKunde=${customer.jtl_customer.kKunde}`)
+      // Verwende kKunde vom Root-Level (nicht von jtl_customer)
+      const kKunde = customer.kKunde || customer.jtl_customer?.kKunde
+      if (!kKunde) {
+        alert('❌ Keine Kunden-ID gefunden. Bitte JTL-Sync durchführen.')
+        setOrdersLoading(false)
+        return
+      }
+      
+      const res = await fetch(`/api/customers/orders?kKunde=${kKunde}`)
       const data = await res.json()
       if (data.ok) {
         setOrders(data.orders || [])
