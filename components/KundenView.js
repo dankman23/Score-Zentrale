@@ -406,8 +406,9 @@ export default function KundenView() {
           <div className="modal-dialog modal-xl">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">
-                  <i className="bi bi-bag mr-2"/>Bestellhistorie - {selectedCustomer.company_name || `${selectedCustomer.jtl_customer?.vorname} ${selectedCustomer.jtl_customer?.nachname}`}
+                <h5 className="modal-title" style={{color: '#1f2937'}}>
+                  <i className="bi bi-bag mr-2"/>
+                  {showAllArticles ? 'Alle Artikel' : 'Bestellhistorie'} - {selectedCustomer.company_name || `${selectedCustomer.jtl_customer?.vorname} ${selectedCustomer.jtl_customer?.nachname}`}
                 </h5>
                 <button type="button" className="close" onClick={closeOrdersModal}>
                   <span>&times;</span>
