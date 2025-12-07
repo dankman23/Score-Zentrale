@@ -64,6 +64,14 @@ export async function GET(request: NextRequest) {
       awaitingFollowup,
       byStatus: statusCounts,
       total: byStatus.reduce((sum, item) => sum + item.count, 0),
+      // Einzelne Status-Counts für Frontend
+      new: statusCounts.new || 0,
+      analyzed: statusCounts.analyzed || 0,
+      no_email: statusCounts.no_email || 0,
+      contacted: statusCounts.contacted || 0,
+      qualified: statusCounts.qualified || 0,
+      discarded: statusCounts.discarded || 0,
+      replied: unreadReplies,
       jtl_customers: jtlCustomersCount,
       new_customers: newCustomersCount
     })
