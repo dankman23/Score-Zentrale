@@ -280,7 +280,7 @@ export default function KundenView() {
                     }
                     
                     return (
-                      <tr key={c._id}>
+                      <tr key={c._id} style={{cursor: 'pointer'}} onClick={() => showOrders(c)}>
                         <td style={{color: '#e5e7eb'}}>
                           <div className="font-weight-bold">{fullName}</div>
                           {c.email && (
