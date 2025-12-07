@@ -19,6 +19,11 @@ export default function KundenView() {
   const [sort, setSort] = useState('revenue')
   const [stats, setStats] = useState(null)
   
+  // Modal für Bestellhistorie
+  const [selectedCustomer, setSelectedCustomer] = useState(null)
+  const [orders, setOrders] = useState([])
+  const [ordersLoading, setOrdersLoading] = useState(false)
+  
   useEffect(() => {
     loadCustomers()
   }, [filter, channelFilter, sort])
