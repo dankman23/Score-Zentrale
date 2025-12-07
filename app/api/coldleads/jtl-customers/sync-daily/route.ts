@@ -201,6 +201,8 @@ export async function POST(request: NextRequest) {
       const jtlData = {
         kKunde: customer.kKunde,
         firma: customer.cFirma,
+        vorname: customer.cVorname,
+        nachname: customer.cNachname,
         strasse: customer.cStrasse,
         plz: customer.cPLZ,
         ort: customer.cOrt,
