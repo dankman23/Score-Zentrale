@@ -103,6 +103,59 @@ export default function KundenView() {
   function closeOrdersModal() {
     setSelectedCustomer(null)
     setOrders([])
+    setExpandedOrder(null)
+    setOrderItems({})
+    setShowAllArticles(false)
+    setAllArticles([])
+  }
+  
+  async function toggleOrderDetails(order) {
+    const orderId = order.kAuftrag
+    
+    if (expandedOrder === orderId) {
+      setExpandedOrder(null)
+      return
+    }
+    
+    setExpandedOrder(orderId)
+    
+    // Wenn bereits geladen, nicht neu laden
+    if (orderItems[orderId]) return
+    
+    setLoadingItems({...loadingItems, [orderId]: true})
+    
+    try {
+      const res = await fetch(`/api/customers/order-details?kAuftrag=${orderId}`)
+      const data = await res.json()
+      if (data.ok) {
+        setOrderItems({...orderItems, [orderId]: data.items || []})
+      }
+    } catch (e) {
+      console.error('Fehler beim Laden der Artikel:', e)
+    } finally {
+      setLoadingItems({...loadingItems, [orderId]: false})
+    }
+  }
+  
+  async function loadAllArticles(customer) {
+    setShowAllArticles(true)
+    setArticlesLoading(true)
+    setAllArticles([])
+    
+    try {
+      const kKunde = customer.kKunde || customer.jtl_customer?.kKunde
+      const res = await fetch(`/api/customers/all-articles?kKunde=${kKunde}`)
+      const data = await res.json()
+      if (data.ok) {
+        setAllArticles(data.articles || [])
+      } else {
+        alert('❌ Fehler beim Laden der Artikel: ' + data.error)
+      }
+    } catch (e) {
+      alert('❌ Fehler: ' + e.message)
+    } finally {
+      setArticlesLoading(false)
+    }
   }
   
   const fmtCurrency = (val) => {
