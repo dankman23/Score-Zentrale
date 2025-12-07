@@ -64,6 +64,31 @@ export default function KundenView() {
     }
   }
   
+  async function showOrders(customer) {
+    setSelectedCustomer(customer)
+    setOrdersLoading(true)
+    setOrders([])
+    
+    try {
+      const res = await fetch(`/api/customers/orders?kKunde=${customer.jtl_customer.kKunde}`)
+      const data = await res.json()
+      if (data.ok) {
+        setOrders(data.orders || [])
+      } else {
+        alert('❌ Fehler beim Laden der Bestellungen: ' + data.error)
+      }
+    } catch (e) {
+      alert('❌ Fehler: ' + e.message)
+    } finally {
+      setOrdersLoading(false)
+    }
+  }
+  
+  function closeOrdersModal() {
+    setSelectedCustomer(null)
+    setOrders([])
+  }
+  
   const fmtCurrency = (val) => {
     return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(val || 0)
   }
