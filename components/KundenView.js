@@ -330,6 +330,79 @@ export default function KundenView() {
       <div className="text-center mt-3 text-muted small">
         {customers.length} Kunden angezeigt
       </div>
+      
+      {/* Bestellhistorie Modal */}
+      {selectedCustomer && (
+        <div className="modal d-block" style={{backgroundColor: 'rgba(0,0,0,0.5)'}}>
+          <div className="modal-dialog modal-xl">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  <i className="bi bi-bag mr-2"/>Bestellhistorie - {selectedCustomer.company_name || `${selectedCustomer.jtl_customer?.vorname} ${selectedCustomer.jtl_customer?.nachname}`}
+                </h5>
+                <button type="button" className="close" onClick={closeOrdersModal}>
+                  <span>&times;</span>
+                </button>
+              </div>
+              <div className="modal-body" style={{maxHeight: '70vh', overflowY: 'auto'}}>
+                {ordersLoading ? (
+                  <div className="text-center py-5">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="sr-only">Laden...</span>
+                    </div>
+                  </div>
+                ) : orders.length === 0 ? (
+                  <div className="text-center py-5">
+                    <i className="bi bi-inbox" style={{fontSize:'3rem', color:'#ccc'}}/>
+                    <h5 className="mt-3">Keine Bestellungen</h5>
+                  </div>
+                ) : (
+                  <div className="table-responsive">
+                    <table className="table table-sm table-hover">
+                      <thead className="bg-light">
+                        <tr>
+                          <th style={{color: '#1f2937'}}>Auftragsnr.</th>
+                          <th style={{color: '#1f2937'}}>Datum</th>
+                          <th style={{color: '#1f2937'}} className="text-right">Betrag (Netto)</th>
+                          <th style={{color: '#1f2937'}}>Zahlungsart</th>
+                          <th style={{color: '#1f2937'}}>Versandart</th>
+                          <th style={{color: '#1f2937'}}>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {orders.map((order, idx) => (
+                          <tr key={idx}>
+                            <td style={{color: '#e5e7eb'}}>{order.cAuftragsNr}</td>
+                            <td style={{color: '#e5e7eb'}}>{fmtDate(order.dErstellt)}</td>
+                            <td style={{color: '#e5e7eb'}} className="text-right">
+                              <strong>{fmtCurrency(order.fGesamtsummeNetto)}</strong>
+                            </td>
+                            <td style={{color: '#e5e7eb'}}>{order.cZahlungsart || '-'}</td>
+                            <td style={{color: '#e5e7eb'}}>{order.cVersandart || '-'}</td>
+                            <td>
+                              <span className={`badge badge-${order.cStatus === 'Abgeschlossen' ? 'success' : order.cStatus === 'Storniert' ? 'danger' : 'warning'}`}>
+                                {order.cStatus}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer">
+                <div className="mr-auto">
+                  <strong>{orders.length}</strong> Bestellungen gefunden
+                </div>
+                <button type="button" className="btn btn-secondary" onClick={closeOrdersModal}>
+                  Schließen
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
