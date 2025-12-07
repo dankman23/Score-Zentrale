@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
-import { getMongoClient } from '../../../lib/mongodb'
+import { getMongoClient } from '../../lib/mongodb'
 
 /**
  * POST /api/customers/reset-jtl
