@@ -535,8 +535,20 @@ export default function KundenView() {
               </div>
               <div className="modal-footer">
                 <div className="mr-auto">
-                  <strong>{orders.length}</strong> Bestellungen gefunden
+                  {showAllArticles ? (
+                    <strong>{allArticles.length}</strong> + ' Artikel gesamt'
+                  ) : (
+                    <strong>{orders.length}</strong> + ' Bestellungen'
+                  )}
                 </div>
+                <button 
+                  type="button" 
+                  className={`btn btn-${showAllArticles ? 'secondary' : 'primary'} mr-2`}
+                  onClick={() => showAllArticles ? setShowAllArticles(false) : loadAllArticles(selectedCustomer)}
+                >
+                  <i className={`bi bi-${showAllArticles ? 'arrow-left' : 'list-ul'} mr-1`}/>
+                  {showAllArticles ? 'Zurück zu Bestellungen' : 'Alle Artikel anzeigen'}
+                </button>
                 <button type="button" className="btn btn-secondary" onClick={closeOrdersModal}>
                   Schließen
                 </button>
