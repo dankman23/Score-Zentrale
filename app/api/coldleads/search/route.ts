@@ -147,7 +147,7 @@ export async function GET(request: NextRequest) {
         industry: p.industry,
         region: p.region,
         status: p.status,
-        score: p.score || null,
+        score: p.score || p.analysis?.analyse_qualität || p.analysis_v3?.overall_score || null,
         analysis: p.analysis || null,
         analysis_v3: p.analysis_v3 || null,
         email_sequence: p.email_sequence || null,
@@ -155,7 +155,8 @@ export async function GET(request: NextRequest) {
         history: p.history || [],
         hasReply: p.hasReply || false,
         lastReplyAt: p.lastReplyAt || null,
-        created_at: p.created_at
+        created_at: p.created_at,
+        jtl_customer_match: p.jtl_customer_match || null
       }))
     })
 
