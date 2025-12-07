@@ -11,11 +11,13 @@ export async function GET() {
     const result = await pool.request().query(`
       SELECT TOP 5
         k.kKunde,
-        f.cName as cFirma,
-        f.cEMail,
+        a.cFirma,
+        a.cVorname,
+        a.cName as cNachname,
+        a.cMail as cEMail,
         k.dErstellt
       FROM tKunde k
-      LEFT JOIN tFirma f ON f.kFirma = k.kFirma
+      LEFT JOIN tAdresse a ON a.kKunde = k.kKunde AND a.nStandard = 1
       WHERE 1=1
       ORDER BY k.kKunde DESC
     `)
