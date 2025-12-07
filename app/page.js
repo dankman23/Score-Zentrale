@@ -1396,16 +1396,15 @@ export default function App() {
         const statsRes = await fetch('/api/coldleads/stats')
         const statsData = await statsRes.json()
         if (statsData.ok) {
-          const all = []  // Nicht mehr benötigt, Stats kommen von API
           setColdStats({
-            total: all.length,
-            new: all.filter(p => p.status === 'new').length,
-            analyzed: all.filter(p => p.status === 'analyzed').length,
-            no_email: all.filter(p => p.status === 'no_email').length,
-            contacted: all.filter(p => p.status === 'contacted').length,
-            replied: all.filter(p => p.hasReply === true).length
+            total: statsData.total || 0,
+            new: statsData.new || 0,
+            analyzed: statsData.analyzed || 0,
+            no_email: statsData.no_email || 0,
+            contacted: statsData.contacted || 0,
+            replied: statsData.replied || 0
           })
-          console.log(`Stats: ${all.length} total, ${all.filter(p => p.status === 'analyzed').length} analyzed`)
+          console.log(`Stats from API: ${statsData.total} total, ${statsData.analyzed} analyzed`)
         }
       }
     } catch (e) {
