@@ -19,8 +19,16 @@ export async function GET(request: NextRequest) {
       replyRead: { $ne: true }
     })
 
-    // Count by status
+    // Count by status (nur Cold Leads, KEINE JTL-Kunden!)
     const byStatus = await collection.aggregate([
+      {
+        $match: {
+          $or: [
+            { customer_source: { $ne: 'jtl' } },
+            { customer_source: { $exists: false } }
+          ]
+        }
+      },
       {
         $group: {
           _id: '$status',
