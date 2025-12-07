@@ -375,22 +375,26 @@ export default function KundenView() {
                           <th style={{color: '#1f2937'}}>Zahlungsart</th>
                           <th style={{color: '#1f2937'}}>Versandart</th>
                           <th style={{color: '#1f2937'}}>Status</th>
+                          <th style={{color: '#1f2937'}}>Artikel</th>
                         </tr>
                       </thead>
                       <tbody>
                         {orders.map((order, idx) => (
                           <tr key={idx}>
-                            <td style={{color: '#e5e7eb'}}>{order.cAuftragsNr}</td>
-                            <td style={{color: '#e5e7eb'}}>{fmtDate(order.dErstellt)}</td>
-                            <td style={{color: '#e5e7eb'}} className="text-right">
+                            <td style={{color: '#1f2937'}}><strong>{order.cAuftragsNr}</strong></td>
+                            <td style={{color: '#374151'}}>{fmtDate(order.dErstellt)}</td>
+                            <td style={{color: '#1f2937'}} className="text-right">
                               <strong>{fmtCurrency(order.fGesamtsummeNetto)}</strong>
                             </td>
-                            <td style={{color: '#e5e7eb'}}>{order.cZahlungsart || '-'}</td>
-                            <td style={{color: '#e5e7eb'}}>{order.cVersandart || '-'}</td>
+                            <td style={{color: '#374151'}}>{order.cZahlungsart || '-'}</td>
+                            <td style={{color: '#374151'}}>{order.cVersandart || '-'}</td>
                             <td>
                               <span className={`badge badge-${order.cStatus === 'Abgeschlossen' ? 'success' : order.cStatus === 'Storniert' ? 'danger' : 'warning'}`}>
                                 {order.cStatus}
                               </span>
+                            </td>
+                            <td style={{color: '#6b7280', fontSize: '0.85rem'}}>
+                              {order.artikel_count ? `${order.artikel_count} Artikel` : '-'}
                             </td>
                           </tr>
                         ))}
