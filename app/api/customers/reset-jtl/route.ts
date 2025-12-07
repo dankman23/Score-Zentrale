@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
-import { getMongoClient } from '../../../lib/mongodb'
+import { connectToDatabase } from '../../../app/lib/api'
 
 /**
  * POST /api/customers/reset-jtl
@@ -10,8 +10,7 @@ import { getMongoClient } from '../../../lib/mongodb'
  */
 export async function POST() {
   try {
-    const client = await getMongoClient()
-    const db = client.db()
+    const db = await connectToDatabase()
     const prospectsCollection = db.collection('prospects')
     
     // Lösche alle Kunden mit imported_from_jtl = true
