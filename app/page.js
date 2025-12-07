@@ -2600,6 +2600,18 @@ export default function App() {
 
   return (
     <div>
+      <style dangerouslySetInnerHTML={{__html: `
+        .kunden-table tbody tr td {
+          color: #e5e7eb !important;
+        }
+        .kunden-table tbody tr td strong {
+          color: #f3f4f6 !important;
+        }
+        .kunden-table thead th {
+          color: #1f2937 !important;
+          background-color: #f3f4f6 !important;
+        }
+      `}} />
       {/* Date Range - nur bei Dashboard, Sales, Marketing */}
       {(activeTab === 'dashboard' || activeTab === 'sales' || activeTab === 'marketing') && (
         <>
