@@ -5324,18 +5324,22 @@ export default function App() {
                               </div>
                             </td>
                             <td className="align-middle">
-                              <a href={p.website} target="_blank" rel="noopener" className="text-info text-truncate d-inline-block small" style={{maxWidth:'190px'}} title={p.website}>
-                                {(() => {
-                                  try {
-                                    // Extrahiere nur Hostname (ohne /impressum/, /kontakt/ etc.)
-                                    const url = new URL(p.website.startsWith('http') ? p.website : 'https://' + p.website)
-                                    return url.hostname.replace('www.', '')
-                                  } catch (e) {
-                                    // Fallback bei ungültiger URL
-                                    return p.website.replace('https://','').replace('http://','').replace('www.','').split('/')[0]
-                                  }
-                                })()}
-                              </a>
+                              {p.website ? (
+                                <a href={p.website} target="_blank" rel="noopener" className="text-info text-truncate d-inline-block small" style={{maxWidth:'190px'}} title={p.website}>
+                                  {(() => {
+                                    try {
+                                      // Extrahiere nur Hostname (ohne /impressum/, /kontakt/ etc.)
+                                      const url = new URL(p.website.startsWith('http') ? p.website : 'https://' + p.website)
+                                      return url.hostname.replace('www.', '')
+                                    } catch (e) {
+                                      // Fallback bei ungültiger URL
+                                      return p.website.replace('https://','').replace('http://','').replace('www.','').split('/')[0]
+                                    }
+                                  })()}
+                                </a>
+                              ) : (
+                                <span className="text-muted small">-</span>
+                              )}
                             </td>
                             <td className="align-middle">
                               <span className="badge badge-light small">{p.industry}</span>
