@@ -123,7 +123,15 @@ export async function GET(request: NextRequest) {
     } else if (status === 'new_customers') {
       // Nur Neukunden (durch Kaltakquise gewonnen)
       filter = { customer_source: 'coldlead', status: 'customer' }
-    } else if (status !== 'all') {
+    } else if (status === 'all') {
+      // "Alle" = Nur Cold Leads, KEINE JTL-Kunden!
+      filter = { 
+        $or: [
+          { customer_source: { $ne: 'jtl' } },
+          { customer_source: { $exists: false } }
+        ]
+      }
+    } else {
       filter = { status }
     }
     
