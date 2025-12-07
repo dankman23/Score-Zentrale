@@ -1384,18 +1384,19 @@ export default function App() {
   const loadColdProspects = async (filterOverride = null) => {
     try {
       const filterToUse = filterOverride || coldStatusFilter
-      // Lade alle Prospects des gewählten Filters (limit=0 = kein Limit)
-      const res = await fetch(`/api/coldleads/search?status=${filterToUse}&limit=0`)
+      // Lade Prospects mit Limit (performance!)
+      const limit = 100 // Max 100 Prospects anzeigen
+      const res = await fetch(`/api/coldleads/search?status=${filterToUse}&limit=${limit}`)
       const data = await res.json()
       if (data.ok) {
         setColdProspects(data.prospects)
-        console.log(`Loaded ${data.prospects.length} prospects with status: ${filterToUse}`)
+        console.log(`Loaded ${data.prospects.length} of ${data.total} prospects with status: ${filterToUse}`)
         
-        // Statistiken berechnen - lade ALLE Prospects für korrekte Zählung (KEIN LIMIT)
-        const allRes = await fetch(`/api/coldleads/search?status=all&limit=0`)
-        const allData = await allRes.json()
-        if (allData.ok) {
-          const all = allData.prospects
+        // Statistiken von Stats-API laden (SCHNELL!)
+        const statsRes = await fetch('/api/coldleads/stats')
+        const statsData = await statsRes.json()
+        if (statsData.ok) {
+          const all = []  // Nicht mehr benötigt, Stats kommen von API
           setColdStats({
             total: all.length,
             new: all.filter(p => p.status === 'new').length,
