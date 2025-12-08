@@ -2008,6 +2008,24 @@ export default function App() {
       const useSelection = selectedArtikel.length > 0
       const count = useSelection ? selectedArtikel.length : (artikelTotal > 1000 ? 1000 : artikelTotal)
       
+      // Warnung wenn keine Auswahl getroffen wurde
+      if (!useSelection && artikelTotal === 0) {
+        alert('❌ Keine Artikel gefunden. Bitte überprüfen Sie Ihre Filter.')
+        return
+      }
+      
+      // Warnung wenn viele Artikel ohne Auswahl verarbeitet werden
+      if (!useSelection && artikelTotal > 100) {
+        const proceed = confirm(
+          `⚠️ ACHTUNG!\n\n` +
+          `Sie haben KEINE Artikel ausgewählt!\n` +
+          `Es werden ${count} gefilterte Artikel verarbeitet.\n\n` +
+          `💡 TIPP: Wählen Sie einzelne Artikel aus, indem Sie die Checkboxen anklicken.\n\n` +
+          `Möchten Sie wirklich ${count} Artikel verarbeiten?`
+        )
+        if (!proceed) return
+      }
+      
       // 1. Lade Kosten-Schätzung
       const estimateRes = await fetch(`/api/amazon/bulletpoints/batch/estimate?count=${count}`)
       const estimateData = await estimateRes.json()
@@ -2021,14 +2039,15 @@ export default function App() {
       
       // 2. Zeige Kosten-Bestätigung
       const modeText = useSelection 
-        ? `${count} ausgewählte Artikel` 
+        ? `✅ ${count} AUSGEWÄHLTE Artikel` 
         : (artikelTotal > 1000 
-          ? `${count} Artikel (von ${artikelTotal.toLocaleString()} gefilterten - Limit 1000)`
-          : `${count} gefilterte Artikel`)
+          ? `⚠️ ${count} gefilterte Artikel (von ${artikelTotal.toLocaleString()} - Limit 1000)`
+          : `⚠️ ${count} gefilterte Artikel (KEINE AUSWAHL)`)
       
       const confirmed = confirm(
         `🤖 Amazon Bulletpoints Batch-Generierung\n\n` +
         `📦 Artikel: ${modeText}\n` +
+        `🎯 Prompt: v${selectedPromptId}\n` +
         `🤖 Modell: Claude Sonnet 4\n\n` +
         `📊 Geschätzte Token:\n` +
         `  • Input: ${estimate.inputTokens.toLocaleString()}\n` +
@@ -2039,7 +2058,6 @@ export default function App() {
         `  • Output: $${estimate.costs.outputUSD}\n` +
         `  • GESAMT: $${estimate.costs.totalUSD} (≈ €${estimate.costs.totalEUR})\n\n` +
         `⏱️ Geschätzte Dauer: ${Math.ceil(count * 3 / 60)} Minuten\n\n` +
-        `ℹ️ HINWEIS: Es werden nur die aktuell ${useSelection ? 'ausgewählten' : 'gefilterten'} Artikel generiert!\n\n` +
         `Fortfahren?`
       )
       
