@@ -1,22 +1,14 @@
 import { MongoClient } from 'mongodb'
 
+// Globaler singleton Client - wird von ALLEN Teilen der App verwendet
 let cachedClient: MongoClient | null = null
 let cachedDb: any = null
 let connectionPromise: Promise<{ client: MongoClient; db: any }> | null = null
 
 export async function connectToDatabase() {
-  // Wenn bereits eine Verbindung existiert
+  // Wenn bereits eine Verbindung existiert, verwende sie
   if (cachedClient && cachedDb) {
-    try {
-      // Teste ob Verbindung noch funktioniert
-      await cachedDb.admin().ping()
-      return { client: cachedClient, db: cachedDb }
-    } catch (error) {
-      console.log('[MongoDB] Connection lost, resetting...')
-      cachedClient = null
-      cachedDb = null
-      connectionPromise = null
-    }
+    return { client: cachedClient, db: cachedDb }
   }
 
   // Wenn bereits ein Verbindungsversuch läuft, warte darauf
@@ -31,16 +23,14 @@ export async function connectToDatabase() {
     throw new Error('MONGO_URL and DB_NAME environment variables must be set')
   }
 
-  console.log('[MongoDB] Creating new connection to:', dbName)
+  console.log('[MongoDB API] Creating new connection to:', dbName)
 
   // Erstelle Connection Promise
   connectionPromise = (async () => {
     try {
-      // MongoDB Atlas requires specific SSL/TLS configuration
-      const isAtlas = uri.includes('mongodb+srv://') || uri.includes('.mongodb.net')
-      
+      // SEHR KLEINER Connection Pool um Atlas-Limit nicht zu überschreiten
       const clientOptions: any = {
-        maxPoolSize: 10,
+        maxPoolSize: 3,  // REDUZIERT von 10 auf 3!
         minPoolSize: 1,
         serverSelectionTimeoutMS: 30000,
         socketTimeoutMS: 75000,
@@ -48,13 +38,9 @@ export async function connectToDatabase() {
         heartbeatFrequencyMS: 10000,
         retryWrites: true,
         retryReads: true,
-      }
-      
-      if (isAtlas) {
-        // Explizite TLS-Konfiguration für Atlas
-        clientOptions.tls = true
-        clientOptions.tlsAllowInvalidCertificates = false
-        clientOptions.tlsAllowInvalidHostnames = false
+        tls: true,
+        tlsAllowInvalidCertificates: false,
+        tlsAllowInvalidHostnames: false
       }
       
       const client = new MongoClient(uri, clientOptions)
@@ -68,11 +54,11 @@ export async function connectToDatabase() {
       cachedClient = client
       cachedDb = db
       
-      console.log('✅ MongoDB connected successfully to:', dbName)
+      console.log('✅ MongoDB API connected successfully (pool: 3)')
 
       return { client, db }
     } catch (error) {
-      console.error('[MongoDB] Connection failed:', error.message)
+      console.error('[MongoDB API] Connection failed:', error.message)
       connectionPromise = null
       throw error
     }
