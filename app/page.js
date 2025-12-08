@@ -2398,6 +2398,7 @@ export default function App() {
 
   // Lädt Artikel-Liste mit Filter & Pagination
   const loadArtikelList = async () => {
+    console.log('[loadArtikelList] CALLED - Starting to load articles...')
     setArtikelLoading(true)
     try {
       const params = new URLSearchParams({
@@ -2412,22 +2413,30 @@ export default function App() {
       if (artikelFilter.warengruppe) params.append('warengruppe', artikelFilter.warengruppe)
       if (artikelFilter.abp && artikelFilter.abp !== 'all') params.append('abp', artikelFilter.abp)
 
-      const res = await fetch('/api/jtl/articles/list?' + params.toString())
+      const url = '/api/jtl/articles/list?' + params.toString()
+      console.log('[loadArtikelList] Fetching:', url)
+      
+      const res = await fetch(url)
+      console.log('[loadArtikelList] Response status:', res.status)
+      
       const data = await res.json()
+      console.log('[loadArtikelList] Response data:', data.ok, 'Articles:', data.articles?.length)
       
       if (data.ok) {
         setArtikelList(data.articles || [])
         setArtikelTotal(data.pagination?.total || 0)
         setArtikelTotalPages(data.pagination?.totalPages || 0)
+        console.log('[loadArtikelList] SUCCESS - Total:', data.pagination?.total)
       } else {
-        console.error('Error loading articles:', data.error)
+        console.error('[loadArtikelList] ERROR:', data.error)
         setArtikelList([])
       }
     } catch (e) {
-      console.error('Error loading artikel:', e)
+      console.error('[loadArtikelList] EXCEPTION:', e)
       setArtikelList([])
     } finally {
       setArtikelLoading(false)
+      console.log('[loadArtikelList] DONE - Loading state set to false')
     }
   }
 
