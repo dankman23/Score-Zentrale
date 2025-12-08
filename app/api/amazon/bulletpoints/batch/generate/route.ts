@@ -27,16 +27,17 @@ export async function POST(request: NextRequest) {
     
     // Lade ausgewählten Prompt (by version number from promptId)
     const promptVersion = parseInt(promptId) || 2
-    const selectedPrompt = await promptsCollection.findOne({ version: promptVersion, isActive: true })
+    // Suche nach Prompt ohne isActive-Filter, damit auch inaktive Prompts verwendet werden können
+    const selectedPrompt = await promptsCollection.findOne({ version: promptVersion })
     
     if (!selectedPrompt) {
       return NextResponse.json({
         ok: false,
-        error: 'Prompt nicht gefunden'
+        error: `Prompt mit Version ${promptVersion} nicht gefunden`
       }, { status: 400 })
     }
     
-    console.log(`[Batch Generate] Verwende Prompt v${selectedPrompt.version}: ${selectedPrompt.name}`)
+    console.log(`[Batch Generate] Verwende Prompt v${selectedPrompt.version}: ${selectedPrompt.name} (${selectedPrompt.isActive ? 'aktiv' : 'inaktiv'})`)
     
     let artikelIds: number[] = []
     
