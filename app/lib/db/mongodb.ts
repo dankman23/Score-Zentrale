@@ -16,8 +16,18 @@ export async function getDb(): Promise<Db> {
   }
 
   if (!cachedClient) {
-    cachedClient = new MongoClient(MONGO_URL)
+    // SEHR KLEINER Connection Pool um Atlas-Limit nicht zu überschreiten
+    cachedClient = new MongoClient(MONGO_URL, {
+      maxPoolSize: 2,  // REDUZIERT!
+      minPoolSize: 1,
+      retryWrites: true,
+      serverSelectionTimeoutMS: 30000,
+      tls: true,
+      tlsAllowInvalidCertificates: false,
+      tlsAllowInvalidHostnames: false
+    })
     await cachedClient.connect()
+    console.log('✅ MongoDB DB/LIB connected successfully (pool: 2)')
   }
 
   // Get database name from env var or URL path
