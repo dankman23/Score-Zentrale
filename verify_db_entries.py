@@ -8,7 +8,7 @@ import json
 import os
 import uuid
 
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://customer-hub-78.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://jtlsync.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def verify_analyze_db_entries():

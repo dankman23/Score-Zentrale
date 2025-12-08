@@ -1,82 +1,179 @@
 <analysis>
-The trajectory outlines a comprehensive development process for a Score-Zentrale application, focusing on its outbound module. The initial phase involved a thorough, read-only analysis of the existing Kaltakquise (cold acquisition) module, culminating in a detailed report on its architecture, workflows, and identified issues, along with a strategic roadmap.
+<original_problem_statement>
+The initial problem was a critical failure in the Score-Zentrale application's Kunden (Customers) tab. The JTL-Sync feature, designed to import customer data from an external JTL MSSQL database into MongoDB, was completely broken. The backend API endpoint  was throwing SQL errors due to invalid table and column names (e.g., , ).
 
-The second phase was reactive, addressing critical user-reported bugs. This involved debugging a stalled Autopilot worker, which was caused by a state desynchronization between the frontend and the database, and fixing a misconfigured email BCC functionality by correcting mismatched environment variable names in the email service code.
+Throughout the session, the user requested several fixes and new features:
+- Fix the JTL customer import.
+- Implement a more robust logic for determining the main product category.
+- Fix multiple UI issues, including black text on a black background and missing customer names in the table.
+- Implement a customer order history view.
+- Set up a nightly, automatic sync for JTL customer data.
+- Fix a major regression where the Kaltakquise (Cold Acquisition) tab became completely non-functional (empty lists, zeroed-out stats).
+- Investigate and fix an issue where the Autopilot appeared to be sending duplicate emails.
+</original_problem_statement>
 
-The third and most extensive phase involved a major feature overhaul based on new user requirements. The goal was to build a central customer management system. This necessitated creating new UI tabs (Kunden, Warmakquise) and backend infrastructure in parallel with the existing Kaltakquise module to avoid disruption. Development involved creating new API endpoints for importing and enriching customer data from an external JTL (MSSQL) database, updating the data model to include metrics like total revenue and order count, and building a new frontend component to display this data. The most recent task is debugging a persistent SQL error within the JTL customer import logic, where the AI is struggling to identify the correct column names for order data, blocking the completion of the import feature.
+**User's preferred language**: German
 
-Based on the trajectory, the user's primary language is **German**. All future responses should be in German.
+**what currently exists?**
+The application now has two largely functional modules: Kaltakquise and Kunden.
+
+-   **Kunden (Customers) Module:** The JTL customer import is now working. It correctly imports ~92,000 customers from the JTL MSSQL database, joining data from , , , and  to enrich customer profiles in MongoDB. A customer order history view has been implemented; clicking on a customer in the list opens a modal displaying their order history, with expandable rows to show the items in each order. A separate tab in the modal shows a summary of all articles ever purchased by that customer.
+
+-   **Kaltakquise (Cold Acquisition) Module:** A major regression that caused this tab to be empty has been fixed. The list of cold leads now loads correctly and efficiently, and the statistics (New, Analyzed, Contacted) are displayed accurately. The data for existing leads (website, industry, analysis scores) is correctly shown.
+
+-   **Nightly Sync:** A background job managed by  has been configured to run the JTL customer import automatically every night at 2 AM. This job correctly updates existing customer records without overwriting manually added data like .
+
+**Last working item**:
+    - Last item agent was working: The agent was investigating a new, critical bug reported by the user: The Autopilot feature appears to be sending duplicate emails. The user provided a screenshot showing the same email received twice in their  inbox. The agent's initial hypothesis was that this was caused by a BCC being sent to the same inbox that the From address forwards to. However, the user refuted this, stating that  (From) and  (BCC) are separate mailboxes. This implies the emails are genuinely being sent twice by the application. The investigation was halted by the user's request to prepare for a fork.
+    - Status: IN PROGRESS
+    - Agent Testing Done: N
+    - Which testing method agent to use? backend testing agent
+    - User Testing Done: N
+
+**All Pending/In progress Issue list**:
+  Issue 1:  Autopilot sends duplicate emails (P0)
+  
+  Issues Detail:
+  - Issue 1: 
+     - Attempted fixes: The agent investigated the SMTP configuration in  and the email sending code in . The agent hypothesized that the issue was due to the  address () and the  address () resolving to the same physical inbox. This hypothesis was proven incorrect by the user. The issue is not a mail client configuration problem but likely a logic error in the Autopilot worker itself.
+     - Next debug checklist: 
+       -  Examine the Autopilot worker script () and its tick logic ().
+       - Add detailed logging to the worker to trace the lifecycle of an email task. Log when a prospect is selected, when the email is generated, when  is called, and when the prospect's status is updated in the database.
+       - Verify that after an email is sent, the prospect's  status is updated immediately and correctly to prevent it from being picked up again in the same or a subsequent run.
+       - Check for race conditions or transaction failures where the email is sent but the database update fails, causing the worker to re-process the same task.
+     - Why fix this issue and what will be achieved with the fix? This is a critical bug. Sending duplicate emails to potential leads is unprofessional and damages the company's reputation, undermining the entire purpose of the Kaltakquise module.
+     - Status:  IN PROGRESS
+     - Is recurring issue? N
+     - Should Test frontend/backend/both after fix? backend
+     - Blocked on other issue: None
+
+**In progress Task List**:
+  There are no in-progress tasks. The last work item was debugging a new critical issue.
+
+**Upcoming and Future Tasks**
+    Upcoming Tasks:
+    - (P1) Improve Frontend Performance: The Kaltakquise list loads the first 100 items. Implement a Load More button or infinite scroll for a better user experience, as requested by the user previously.
+    - (P2) Create a full Customer Detail Page: The current order history is in a modal. A dedicated page for a customer could show more details, notes, and historical data.
+
+    Future Tasks:
+    - Implement full ID standardization across the application.
+    - Create a UI for managing email prompts.
+    - Add batch operations for analyzing leads.
+
+**Completed work in this session**
+- List of all completed tasks with file and method name:
+  - JTL Customer Import Fixed: The core import logic in  was completely rewritten to use the correct JTL database tables (, ) and columns.
+  - Kaltakquise Module Restored: Fixed a major regression where the Kaltakquise tab was empty. This involved fixing performance issues in , fixing data mapping in , and correcting the stats calculation in .
+  - Customer Order History Implemented: Created new API endpoints (, , ) and updated  to display a customer's order history in a modal.
+  - Nightly Auto-Sync Implemented: Created a Supervisor job () to run the JTL import automatically.
+  - Product Categorization Logic Improved: Updated the SQL query in  to identify main product categories based on specific keywords (e.g., Schleifband, Fräser) instead of a flawed noun-extraction logic.
+  - Data Integrity Fixed: Corrected the import process to properly store customer names and the  identifier, resolving issues where the UI showed empty fields.
+  - UI Bugs Fixed: Resolved issues with unreadable text color in tables by adding global CSS overrides in .
+
+- Recently completed:
+  - Kaltakquise module data filtering (DONE)
+  - Kaltakquise stats API fix (DONE)
+  - Kaltakquise data mapping fix (DONE)
+  - Customer Order History article display (DONE)
+  - Filtering of Angebote from orders (VERIFIED, NO CHANGE NEEDED)
+
+**Earlier issues found/mentioned but not fixed**
+   - None. All issues that were raised during the session were addressed, leading to the discovery of the final duplicate email bug which is now the main pending issue.
+
+**Known issue recurrence from previous fork**
+  - Issue recurrence in previous fork: The initial summary mentioned debugging a stalled Autopilot worker. The current duplicate email bug is also related to the Autopilot, suggesting this component may be fragile.
+  - Recurrence count: 1
+  - Status: IN PROGRESS
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+-   **Frameworks:** Next.js (App Router), React
+-   **Backend:** Next.js API Routes, TypeScript
+-   **Databases:**
+    -   MongoDB: Primary application database for  collection.
+    -   Microsoft SQL Server (MSSQL): External JTL-Wawi ERP data source.
+-   **Key Logic:**
+    -   **ETL Process:** A complex ETL process from MSSQL to MongoDB was fixed and refined. It involves joining multiple tables (, , , ) to build a comprehensive customer document.
+    -   **Background Worker:** A -managed Node.js script () orchestrates sending cold emails. Another  job was added for the nightly JTL sync.
+    -   **Error Driven Development:** The agent systematically tackled a chain of Invalid column name errors, which led to the discovery of the correct JTL database schema.
+
+**key DB schema**
+-   **JTL (MSSQL) Relationships Discovered:**
+    -   Customer Info:  JOIN  ON  =  (This was the key discovery for names/addresses).
+    -   Order Info:  JOIN  ON  = .
+    -   Order Items:  JOIN  ON .
+    -   Article Names:  JOIN  ON .
+-   **MongoDB  collection:**
+    - Contains both cold leads and imported JTL customers, differentiated by .
+    - JTL customers have a  sub-document with raw data and calculated stats.
+
+**changes in tech stack**
+- No changes to the core tech stack. A  job was added for task scheduling.
+
+**All files of reference**
+-   : Heavily modified to fix the JTL import. Contains the final, correct SQL query.
+-   : Created and heavily modified to build the entire Kunden tab UI, including the order history modal.
+-   : Heavily modified to fix the Kaltakquise tab's data loading performance and logic.
+-   : Modified the GET handler to correctly filter data, map fields, and paginate results.
+-   : Modified to correctly calculate stats for cold leads only and return a flat object.
+-   : New file to fetch a customer's order history.
+-   : New file to fetch items for a specific order.
+-   : New file to fetch an aggregate list of all items purchased by a customer.
+-    & : New files to enable the automatic nightly sync.
+-   : The script responsible for sending emails, which is now the primary suspect for the duplicate email bug.
+
+**Areas that need refactoring**:
+-   The main frontend file  is extremely large and contains logic for multiple tabs. While  was a good step, the Kaltakquise logic could also be extracted into its own component to improve maintainability.
+-   The brute-force global CSS injection in  to fix the table text color is a hack and should be replaced with a proper, scoped CSS solution.
+
+**key api endpoints**
+-   : Triggers the JTL customer import.
+-   : Lists cold leads (for Kaltakquise tab).
+-   : Gets statistics for the Kaltakquise tab.
+-   : Lists imported JTL customers (for Kunden tab).
+-   : Gets order history for a specific customer.
+-   : Gets line items for a specific order.
+-   : Gets an aggregate list of all articles purchased by a customer.
+-   : The endpoint that triggers the Autopilot worker to process the next batch of emails.
+
+**Critical Info for New Agent**
+-   The JTL MSSQL schema discovery was a painful and iterative process. The key takeaway is that customer contact information is in the  table, not  or . The correct, working SQL queries are now in place in .
+-   The Kaltakquise module was non-functional due to a combination of performance, data mapping, and filtering issues. These have been resolved, but be aware that the frontend code in  is sensitive to the data structure returned by the APIs.
+-   **The current highest-priority bug is that the Autopilot sends duplicate emails.** Your initial investigation should focus on the logic within . The user has confirmed the From and BCC mailboxes are separate, so the problem is not in email client configuration but in the application logic itself.
+
+**documents created in this job**
+  - Various temporary debug API routes were created under  and test scripts like . These can likely be removed.
+  - The internal documentation  was updated.
+
+**Last 10 User Messages and any pending user messages**
+1.  **User (Msg 653):** Reports that emails seem to be sent twice, provides screenshot.
+2.  **User (Msg 666):** Confirms the duplicate emails are in the  inbox, provides a screenshot as proof.
+3.  **User (Msg 679):** Clarifies that  and  are separate mailboxes, refuting the agent's theory.
+4.  **User (Msg 682):** Asks the agent to prepare everything for forking to GitHub.
+
+**Pending user messages:** The user is waiting for the duplicate email issue to be investigated and fixed. The request to prepare for forking was the last instruction.
+
+**Project Health Check:**
+- Broken: The Autopilot email sending logic is critically broken, sending duplicate emails.
+- Mocked: None.
+
+**3rd Party Integrations**
+- Microsoft SQL Server (JTL-Wawi): Primary external data source.
+- Google Custom Search, Jina.ai, GPT Models: Used by the Kaltakquise module for lead analysis (functionality was not touched in this session but is part of the system).
+
+**Testing status**
+  - Testing agent used after significant changes: YES
+  - Troubleshoot agent used after agent stuck in loop: NO
+  - Test files created: Several temporary test scripts and debug API routes were created and used (e.g., , ).
+  - Known regressions: A major regression occurred where the Kaltakquise tab broke completely. This was subsequently fixed. The current duplicate email issue might be a new regression in the Autopilot module.
+
+**Credentials to test flow:**
+- Frontend Password: 
+
+**What agent forgot to execute**
+- The agent was in the middle of debugging the duplicate email issue when the user asked to prepare for a fork. It did not complete the debugging of this critical issue.
+- The global style hack injected into  is a temporary fix for the table text color and should be refactored into a proper CSS solution.
+
 </analysis>
-
-<product_requirements>
-The application, Score-Zentrale, is a business intelligence suite. The current focus is on the Outbound module, which is being restructured into three distinct functional tabs:
-
-1.  **Kaltakquise (Cold Acquisition - Mostly Complete & Stable):** An automated system for finding, analyzing, and contacting new leads. It includes a DACH-region web crawler, an LLM-based website analyzer, a multi-stage email sequence generator, and an Autopilot worker to orchestrate the process. The core functionality is stable after several critical bug fixes.
-
-2.  **Kunden (Customers - In Development):** A new, central customer relationship management hub. The core requirement is to perform a one-time and subsequent nightly import of all customers from an external JTL-Wawi (MSSQL) database into the application's MongoDB. This import must enrich the customer data by calculating total revenue, order count, B2B status, last order date, sales channel, and the most purchased product category. The system must use an upsert logic to update existing records without deleting custom data (like warm-acquisition scores).
-
-3.  **Warmakquise (Warm Acquisition - Planned):** A tab intended for re-engaging existing customers. The data for this, particularly a warm_aquise_score, was lost and needs to be preserved by the new customer import logic.
-</product_requirements>
-
-<key_technical_concepts>
-- **Frameworks:** Next.js (App Router), React
-- **Backend:** Next.js API Routes, TypeScript, Node.js
-- **Databases:**
-    - MongoDB: Primary application database.
-    - Microsoft SQL Server (MSSQL): External JTL-Wawi ERP data source.
-- **Key Logic:**
-    - ETL Process: Extracting from MSSQL, transforming/enriching data (e.g., calculating revenue, B2B status), and loading/upserting into MongoDB.
-    - Background Worker: A -managed Node.js script for the Autopilot feature, which runs periodic tasks.
-    - Third-Party APIs: Google Custom Search, Jina.ai (for web crawling), and GPT models (for analysis).
-</key_technical_concepts>
-
-<code_architecture>
-The application is a Next.js monolith. The frontend is a large single-page application () with tab-based navigation. The backend consists of API routes for different modules.
-
-**Directory Structure (Key Files):**
-
-
--   ** & **
-    -   **Importance:** These are the core frontend files.  contains the UI logic for all tabs, including state management for the Kaltakquise and the new Kunden/Warmakquise tabs.  contains the main navigation structure.
-    -   **Changes:** Heavily modified to add new navigation items and tabs for Kunden and Warmakquise. A periodic polling mechanism was added to sync the Autopilot status. UI elements for JTL import and CSV export were added. A major bug involving a duplicate, overlapping navigation menu was fixed.
-
--   ****
-    -   **Importance:** This is the central API for the new customer management feature. It contains the complex logic to fetch all customers and their orders from the JTL MSSQL database, perform data enrichment (B2B/channel detection, revenue calculation), and upsert the results into MongoDB.
-    -   **Changes:** Newly created and iteratively developed. Currently blocked by SQL errors as it contains incorrect column names for the  table (e.g., ).
-
--   ****
-    -   **Importance:** Handles all outgoing SMTP emails.
-    -   **Changes:** Corrected to use the proper environment variables (, ) instead of misnamed ones, fixing a critical bug where BCC emails were not being sent correctly.
-
--   ****
-    -   **Importance:** A new React component created to encapsulate the entire UI for the Kunden tab, including the customer list, statistics, and import button.
-    -   **Changes:** Newly created to separate concerns from the massive  file. It fetches data from the  endpoint and displays it in a table with the user-requested columns.
-
--   ** & **
-    -   **Importance:** Created to solve the recurring issue of not knowing the correct JTL database schema. The goal is to create a central, reliable source of truth for JTL table and column names that future agents can reference and update.
-    -   **Changes:** Newly created in response to repeated SQL failures.
-</code_architecture>
-
-<pending_tasks>
-- **Fix JTL Customer Import:** Resolve the SQL errors in  to make the customer import functional.
-- **Implement Customer Detail View:** The user requested a detail view showing all of a customer's orders, email, and address. This has not been implemented.
-- **Implement Nightly Sync:** The daily sync is currently triggered by a button press. A cron job or scheduled task needs to be set up to run it automatically at night.
-- **Complete Original Roadmap:** Many items from the initial analysis are still open, including full ID standardization, a UI for email prompt management, and batch operations for analysis.
-</pending_tasks>
-
-<current_work>
-The immediate focus is on debugging the critical JTL customer import feature, which is the cornerstone of the new Kunden tab. The user reported that clicking the JTL-Sync button fails and no customers are imported.
-
-The investigation traced the issue to the backend API endpoint at . This endpoint is throwing a 500 server error due to an invalid SQL query. Specifically, the query attempts to select columns like  and  from the JTL database tables (, ), but these column names are incorrect, resulting in an Invalid column name error from the MSSQL driver.
-
-The previous engineer's last actions were attempts to find the correct column names. This involved:
-1.  Trying to fix typos ( -> ), which also failed.
-2.  Trying to access the provided JTL database documentation URL, which was a dead link (404).
-3.  Crawling the main JTL database documentation website. This returned a massive list of all tables, which was not immediately helpful.
-
-The work is currently stalled at this point: the import is completely broken, and the correct database schema for order information is still unknown. The last action was to search for the  table within the huge amount of crawled text from the JTL documentation website to pinpoint the correct column names for total order value and item quantity.
-</current_work>
-
-<optional_next_step>
-Continue the debugging process by thoroughly searching the crawled JTL documentation for the  and  table schemas to find the correct column names for order total and quantity.
-</optional_next_step>
