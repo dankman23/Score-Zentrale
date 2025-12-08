@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { connectToDatabase } from '@/lib/api'
+import { getDb } from '@/app/lib/db/mongodb'
 
 /**
  * GET /api/jtl/articles/list
@@ -10,7 +10,7 @@ import { connectToDatabase } from '@/lib/api'
  */
 export async function GET(request: NextRequest) {
   try {
-    const { db } = await connectToDatabase()
+    const db = await getDb()
     const articlesCollection = db.collection('articles')
     const bulletpointsCollection = db.collection('amazon_bulletpoints_generated')
 
