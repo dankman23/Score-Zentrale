@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getMssqlPool } from '../../../lib/db/mssql'
+import { getMssqlPool } from '@/lib/db/mssql'
 
 /**
  * GET /api/jtl/preis-historie?sku=122112
