@@ -5,14 +5,32 @@ import crypto from 'crypto'
 
 // Admin accounts from environment variable (JSON format)
 // Example: ADMIN_USERS='[{"username":"Alex","password":"Ali","role":"admin","displayName":"Alex"}]'
-const USERS = process.env.ADMIN_USERS 
-  ? JSON.parse(process.env.ADMIN_USERS)
-  : [
-      // Fallback for development only
+// PRODUCTION: ADMIN_USERS environment variable MUST be set!
+
+function getAdminUsers() {
+  if (!process.env.ADMIN_USERS) {
+    // Development-only fallback with clear warning
+    if (process.env.NODE_ENV === 'production') {
+      console.error('[AUTH] CRITICAL: ADMIN_USERS not set in production!')
+      throw new Error('ADMIN_USERS environment variable is required in production')
+    }
+    console.warn('[AUTH] WARNING: Using development fallback credentials. Set ADMIN_USERS env var!')
+    return [
       { username: 'Alex', password: 'Ali', role: 'admin', displayName: 'Alex' },
       { username: 'David', password: 'Enste', role: 'admin', displayName: 'David' },
       { username: 'Danki', password: 'lll', role: 'admin', displayName: 'Danki' }
     ]
+  }
+  
+  try {
+    return JSON.parse(process.env.ADMIN_USERS)
+  } catch (e) {
+    console.error('[AUTH] ERROR: Invalid ADMIN_USERS JSON format:', e)
+    throw new Error('ADMIN_USERS must be valid JSON array')
+  }
+}
+
+const USERS = getAdminUsers()
 
 export async function POST(request: NextRequest) {
   try {
