@@ -6713,6 +6713,12 @@ export default function App() {
             >
               <i className="bi bi-chat-left-text mr-2"/>Prompts
             </button>
+            <button 
+              className={`btn ${produkteTab === 'berater' ? 'btn-primary' : 'btn-outline-secondary'}`}
+              onClick={() => setProdukteTab('berater')}
+            >
+              <i className="bi bi-lightbulb mr-2"/>Produktberater
+            </button>
           </div>
 
           {/* Import Tab */}
