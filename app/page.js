@@ -7784,7 +7784,7 @@ export default function App() {
               <div className="card border-0 shadow-sm">
                 <div className="card-body">
                   <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h5 className="mb-0"><i className="bi bi-chat-left-text mr-2"/>Amazon Bulletpoint Prompts</h5>
+                    <h5 className="mb-0" style={{color: '#fff'}}><i className="bi bi-chat-left-text mr-2"/>Amazon Bulletpoint Prompts</h5>
                     <button 
                       className="btn btn-primary btn-sm"
                       onClick={() => openPromptModal('create')}
