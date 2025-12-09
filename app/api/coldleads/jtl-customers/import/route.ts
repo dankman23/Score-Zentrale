@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 300 // 5 Minuten für großen Import
 
 import { NextRequest, NextResponse } from 'next/server'
-import { connectToDatabase } from '@/lib/api'
+import { connectToDatabase } from '../../../lib/api'
 import { connectToMSSQLRead } from '@/lib/db/mssql'
 
 /**

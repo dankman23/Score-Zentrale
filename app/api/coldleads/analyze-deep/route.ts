@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ObjectId } from 'mongodb'
 import { analyzeFirmaForScore } from '@/services/coldleads/score-analyzer'
-import { connectToDatabase } from '@/lib/api'
+import { connectToDatabase } from '../../../lib/api'
 import { getDb } from '@/lib/db/mongodb'
 
 export const runtime = 'nodejs'

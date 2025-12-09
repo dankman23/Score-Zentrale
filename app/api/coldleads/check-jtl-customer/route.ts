@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { checkJTLCustomerMatch } from '@/lib/jtl-customer-matcher'
-import { connectToDatabase } from '@/lib/api'
+import { connectToDatabase } from '../../../lib/api'
 import { buildProspectQuery } from '@/lib/prospect-utils'
 
 /**

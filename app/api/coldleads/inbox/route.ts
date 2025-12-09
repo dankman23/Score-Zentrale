@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { fetchUnreadEmails } from '@/lib/imap-client'
-import { connectToDatabase } from '@/lib/api'
+import { connectToDatabase } from '../../../lib/api'
 
 /**
  * GET /api/coldleads/inbox

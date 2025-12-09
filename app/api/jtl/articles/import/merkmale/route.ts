@@ -4,7 +4,7 @@ export const maxDuration = 300
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getMssqlPool } from '@/lib/db/mssql'
-import { connectToDatabase } from '@/lib/api'
+import { connectToDatabase } from '../../../lib/api'
 
 /**
  * POST /api/jtl/articles/import/merkmale
