@@ -111,7 +111,7 @@ export default function RootLayout({ children }) {
       <body>
         {/* Navbar */}
         <nav className="navbar navbar-expand-lg navbar-dark sticky-top">
-          <a className="navbar-brand d-flex align-items-center" href="#dashboard">
+          <a className="navbar-brand d-flex align-items-center" href="/"
             <img src="https://customer-assets.emergentagent.com/job_score-zentrale/artifacts/h3bcqslm_logo_score_schleifwerkzeuge.png" alt="SCORE" className="brand-logo mr-2" style={{height: '28px', width: 'auto'}}/>
             <span className="brand-title">Score Zentrale</span>
           </a>
