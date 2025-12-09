@@ -167,24 +167,24 @@ export default function RootLayout({ children }) {
             <div className="container">
               <div className="hero-shield p-0">
                 <ul className="nav nav-pills subnav-icons" style={{margin: 0, padding: '5px 0', flexWrap: 'nowrap', gap: '4px'}}>
-                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#dashboard" style={{fontSize: '0.85rem'}}><i className="bi bi-speedometer2 mr-1"/>Dashboard</a></li>
-                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#sales" style={{fontSize: '0.85rem'}}><i className="bi bi-bar-chart mr-1"/>Sales</a></li>
-                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#marketing" style={{fontSize: '0.85rem'}}><i className="bi bi-bullseye mr-1"/>Marketing</a></li>
-                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#glossar" style={{fontSize: '0.85rem'}}><i className="bi bi-book mr-1"/>Glossar</a></li>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="/#dashboard" style={{fontSize: '0.85rem'}}><i className="bi bi-speedometer2 mr-1"/>Dashboard</a></li>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="/#sales" style={{fontSize: '0.85rem'}}><i className="bi bi-bar-chart mr-1"/>Sales</a></li>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="/#marketing" style={{fontSize: '0.85rem'}}><i className="bi bi-bullseye mr-1"/>Marketing</a></li>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="/#glossar" style={{fontSize: '0.85rem'}}><i className="bi bi-book mr-1"/>Glossar</a></li>
                   <li className="nav-item dropdown">
-                    <a className="nav-link dropdown-toggle py-1 px-2" href="#outbound" role="button" data-toggle="dropdown" style={{fontSize: '0.85rem'}}>
+                    <a className="nav-link dropdown-toggle py-1 px-2" href="/#outbound" role="button" data-toggle="dropdown" style={{fontSize: '0.85rem'}}>
                       <i className="bi bi-send mr-1"/>Outbound
                     </a>
                     <div className="dropdown-menu">
                       <h6 className="dropdown-header" style={{fontSize: '0.7rem'}}>Outbound-Module</h6>
-                      <a className="dropdown-item" href="#kunden"><i className="bi bi-building mr-1"/>Kunden</a>
-                      <a className="dropdown-item" href="#warmakquise"><i className="bi bi-fire mr-1"/>Warmakquise</a>
-                      <a className="dropdown-item" href="#kaltakquise"><i className="bi bi-snowflake mr-1"/>Kaltakquise</a>
+                      <a className="dropdown-item" href="/#kunden"><i className="bi bi-building mr-1"/>Kunden</a>
+                      <a className="dropdown-item" href="/#warmakquise"><i className="bi bi-fire mr-1"/>Warmakquise</a>
+                      <a className="dropdown-item" href="/#kaltakquise"><i className="bi bi-snowflake mr-1"/>Kaltakquise</a>
                     </div>
                   </li>
-                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#produkte" style={{fontSize: '0.85rem'}}><i className="bi bi-box-seam mr-1"/>Produkte</a></li>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="/#produkte" style={{fontSize: '0.85rem'}}><i className="bi bi-box-seam mr-1"/>Produkte</a></li>
                   <li className="nav-item dropdown">
-                    <a className="nav-link dropdown-toggle py-1 px-2" href="#preise" role="button" data-toggle="dropdown" style={{fontSize: '0.85rem'}}>
+                    <a className="nav-link dropdown-toggle py-1 px-2" href="/#preise" role="button" data-toggle="dropdown" style={{fontSize: '0.85rem'}}>
                       <i className="bi bi-calculator mr-1"/>Preise
                     </a>
                     <div className="dropdown-menu">
@@ -192,8 +192,8 @@ export default function RootLayout({ children }) {
                       <a className="dropdown-item" href="/preise/konfigurator">Konfigurator</a>
                     </div>
                   </li>
-                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#orga" style={{fontSize: '0.85rem'}}><i className="bi bi-calendar-check mr-1"/>Orga</a></li>
-                  <li className="nav-item"><a className="nav-link py-1 px-2" href="#fibu" style={{fontSize: '0.85rem'}}><i className="bi bi-receipt-cutoff mr-1"/>FIBU</a></li>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="/#orga" style={{fontSize: '0.85rem'}}><i className="bi bi-calendar-check mr-1"/>Orga</a></li>
+                  <li className="nav-item"><a className="nav-link py-1 px-2" href="/#fibu" style={{fontSize: '0.85rem'}}><i className="bi bi-receipt-cutoff mr-1"/>FIBU</a></li>
                   <li className="nav-item"><a className="nav-link py-1 px-2 logout-btn-hero" href="/login" style={{fontSize: '0.85rem', color: '#ff6b6b !important'}}><i className="bi bi-box-arrow-right mr-1"/>Abmelden</a></li>
                 </ul>
               </div>
