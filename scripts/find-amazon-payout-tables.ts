@@ -1,4 +1,4 @@
-import { getJTLConnection } from '../lib/db/mssql'
+import { getJTLConnection } from '@/lib/db/mssql'
 
 /**
  * Durchsucht JTL-Datenbank nach Amazon-Auszahlungs-Tabellen

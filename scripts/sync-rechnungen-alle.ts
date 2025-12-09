@@ -6,7 +6,7 @@
  * - /api/fibu/rechnungen/extern (funktioniert bereits)
  */
 
-import { getDb } from '../lib/db/mongodb'
+import { getDb } from '@/lib/db/mongodb'
 
 async function main() {
   console.log('\n=== SYNC: fibu_rechnungen_alle ===\n')

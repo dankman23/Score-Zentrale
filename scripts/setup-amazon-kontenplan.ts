@@ -1,4 +1,4 @@
-import { getDb } from '../lib/db/mongodb'
+import { getDb } from '@/lib/db/mongodb'
 
 /**
  * Setup-Script: Amazon-Kontenplan vorbereiten

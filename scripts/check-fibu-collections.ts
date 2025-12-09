@@ -2,7 +2,7 @@
  * Analysiert FIBU Collections
  */
 
-import { getDb } from '../lib/db/mongodb'
+import { getDb } from '@/lib/db/mongodb'
 
 async function main() {
   console.log('\n=== FIBU COLLECTIONS ANALYSE ===\n')
