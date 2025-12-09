@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const prospectsCollection = db.collection('prospects')
     
     // Lade ALLE Kunden aus JTL-Wawi
-    const pool = await connectToMSSQLRead()
+    const pool = await getMssqlPool()
     
     const result = await pool.request().query(`
       SELECT 
