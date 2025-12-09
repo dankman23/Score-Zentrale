@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getPayPalClient } from '../../../../../lib/paypal-client'
+import { getPayPalClient } from '@/lib/paypal-client'
 import { getDb } from '../../../../lib/db/mongodb'
 
 /**

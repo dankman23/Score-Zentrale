@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchPageTimeSeries } from '../../../../../lib/analytics'
+import { fetchPageTimeSeries } from '@/lib/analytics'
 
 export async function GET(request: NextRequest) {
   try {

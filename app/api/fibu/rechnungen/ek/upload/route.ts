@@ -2,8 +2,8 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { extractInvoiceData } from '../../../../../lib/gemini'
-import { getDb } from '../../../../../lib/db/mongodb'
+import { extractInvoiceData } from '@/lib/gemini'
+import { getDb } from '@/lib/db/mongodb'
 
 /**
  * POST /api/fibu/rechnungen/ek/upload

@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
 import { getDb } from '../../../../lib/db/mongodb'
-import { getLearningStats } from '../../../../../lib/fibu/learning-database'
+import { getLearningStats } from '@/lib/fibu/learning-database'
 
 export async function GET() {
   try {
