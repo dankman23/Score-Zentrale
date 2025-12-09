@@ -10,7 +10,7 @@ import { connectToDatabase } from '@/lib/api'
  */
 export async function POST() {
   try {
-    const db = await connectToDatabase()
+    const { db } = await connectToDatabase()
     const prospectsCollection = db.collection('prospects')
     
     // Lösche alle Kunden mit imported_from_jtl = true
