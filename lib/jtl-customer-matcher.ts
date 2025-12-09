@@ -8,7 +8,7 @@
  * 3. Domain-Matching (Email-Domain vs. Website)
  */
 
-import { getMssqlPool } from '../lib/db/mssql'
+import { getMssqlPool } from '@/lib/db/mssql'
 
 export interface JTLCustomerMatch {
   matched: boolean

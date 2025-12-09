@@ -111,3 +111,4 @@ node_modules/@next/swc-linux-arm64-gnu/next-swc.linux-arm64-gnu.node
 *.env
 *.env.*
 .next/cache/webpack/server-production/3.pack
+.next/cache/webpack/server-production/6.pack
