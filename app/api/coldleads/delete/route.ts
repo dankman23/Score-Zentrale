@@ -1,7 +1,7 @@
 export const runtime = 'nodejs'
 
 import { NextResponse } from 'next/server'
-import { connectToMongoDB } from '@/lib/mongodb'
+import { connectToMongoDB } from '@/../lib/mongodb'
 
 /**
  * DELETE /api/coldleads/delete

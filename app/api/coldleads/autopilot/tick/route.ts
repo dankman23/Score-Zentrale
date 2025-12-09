@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 60 // Max 60 Sekunden
 
 import { NextResponse } from 'next/server'
-import { connectToMongoDB } from '@/lib/mongodb'
+import { connectToMongoDB } from '@/../lib/mongodb'
 
 /**
  * POST /api/coldleads/autopilot/tick
