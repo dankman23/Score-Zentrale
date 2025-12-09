@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
-import { connectToDatabase } from '../../../app/lib/api'
+import { connectToDatabase } from '../../../lib/api'
 
 /**
  * POST /api/customers/reset-jtl

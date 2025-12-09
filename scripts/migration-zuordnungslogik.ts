@@ -9,7 +9,7 @@
  * WICHTIG: Bestehende Felder bleiben erhalten!
  */
 
-import { getDb } from '../app/lib/db/mongodb'
+import { getDb } from '../lib/db/mongodb'
 
 async function migrate() {
   const db = await getDb()

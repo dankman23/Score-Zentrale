@@ -1,4 +1,4 @@
-import { getJTLConnection } from '../app/lib/db/mssql'
+import { getJTLConnection } from '../lib/db/mssql'
 
 async function analyzeTransactionTypes() {
   try {

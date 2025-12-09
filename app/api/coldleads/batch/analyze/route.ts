@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 300 // 5 Minuten für Batch
 
 import { NextRequest, NextResponse } from 'next/server'
-import { connectToDatabase } from '../../../../../app/lib/api'
+import { connectToDatabase } from '../../../../../lib/api'
 import { buildProspectQuery } from '../../../../../lib/prospect-utils'
 
 /**

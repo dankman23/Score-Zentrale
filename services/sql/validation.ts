@@ -3,8 +3,8 @@
  * Prüft kritische Tabellen und Spalten für Score Zentrale
  */
 
-import { getMssqlPool } from '../../app/lib/db/mssql'
-import { tableExists, hasColumn, firstExistingTable } from '../../app/lib/sql/utils'
+import { getMssqlPool } from '../../lib/db/mssql'
+import { tableExists, hasColumn, firstExistingTable } from '../../lib/sql/utils'
 
 export interface SchemaRequirement {
   category: string

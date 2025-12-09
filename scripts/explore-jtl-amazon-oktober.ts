@@ -1,4 +1,4 @@
-import { getMssqlPool } from '../app/lib/db/mssql'
+import { getMssqlPool } from '../lib/db/mssql'
 
 async function exploreJTLAmazonOktober() {
   try {

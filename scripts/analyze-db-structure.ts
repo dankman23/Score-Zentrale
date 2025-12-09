@@ -2,7 +2,7 @@
  * Analyse: Datenbank-Struktur für Zahlungen & VK-Belege
  */
 
-import { getDb } from '../app/lib/db/mongodb'
+import { getDb } from '../lib/db/mongodb'
 
 async function analyze() {
   const db = await getDb()

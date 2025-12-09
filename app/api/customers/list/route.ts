@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { connectToDatabase } from '../../../../app/lib/api'
+import { connectToDatabase } from '../../../../lib/api'
 
 /**
  * GET /api/customers/list
