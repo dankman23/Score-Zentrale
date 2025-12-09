@@ -7814,14 +7814,14 @@ export default function App() {
                     </div>
                   ) : (
                     <div className="table-responsive">
-                      <table className="table table-hover">
+                      <table className="table table-hover" style={{color: '#fff'}}>
                         <thead>
                           <tr>
-                            <th>Version</th>
-                            <th>Name</th>
-                            <th>Beschreibung</th>
-                            <th>Status</th>
-                            <th>Aktionen</th>
+                            <th style={{color: '#fff'}}>Version</th>
+                            <th style={{color: '#fff'}}>Name</th>
+                            <th style={{color: '#fff'}}>Beschreibung</th>
+                            <th style={{color: '#fff'}}>Status</th>
+                            <th style={{color: '#fff'}}>Aktionen</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -7830,11 +7830,11 @@ export default function App() {
                               <td className="align-middle">
                                 <span className="badge badge-secondary">v{prompt.version}</span>
                               </td>
-                              <td className="align-middle">
+                              <td className="align-middle" style={{color: '#fff'}}>
                                 <strong>{prompt.name}</strong>
                               </td>
                               <td className="align-middle">
-                                <small className="text-muted">{prompt.beschreibung}</small>
+                                <small style={{color: '#aaa'}}>{prompt.beschreibung}</small>
                               </td>
                               <td className="align-middle">
                                 {prompt.isActive ? (
