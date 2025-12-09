@@ -202,7 +202,7 @@ export function getMainProductCategoryQuery() {
  * WICHTIG für Agents: Diese Datei IMMER referenzieren!
  * 
  * Import in TypeScript:
- * import { getCustomersWithRevenueQuery, VERSION_INFO } from '@/../lib/jtl-db-schema'
+ * import { getCustomersWithRevenueQuery, VERSION_INFO } from '@/lib/jtl-db-schema'
  * 
  * Vor JTL-Queries IMMER:
  * 1. Diese Datei prüfen

@@ -3,9 +3,9 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
 import { NextRequest, NextResponse } from 'next/server'
-import { connectToDatabase } from '@/../lib/api'
-import { getMssqlPool } from '@/../lib/db/mssql'
-import { detectB2B, determinePrimaryChannel, calculateOrderFrequency } from '@/../lib/customer-intelligence'
+import { connectToDatabase } from '@/lib/api'
+import { getMssqlPool } from '@/lib/db/mssql'
+import { detectB2B, determinePrimaryChannel, calculateOrderFrequency } from '@/lib/customer-intelligence'
 
 /**
  * POST /api/coldleads/jtl-customers/sync-daily

@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getMssqlPool } from '@/../lib/db/mssql'
+import { getMssqlPool } from '@/lib/db/mssql'
 
 /**
  * GET /api/debug/test-kategorie?kKunde=100000

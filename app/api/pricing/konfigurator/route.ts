@@ -6,8 +6,8 @@ import {
   calculateKlingsporBeltPrice,
   selectScoreEk,
   getMinOrderQty
-} from '@/../lib/pricing/klingspor-pricing'
-import { calculateScoreSellingPrices } from '@/../lib/pricing/price-formula'
+} from '@/lib/pricing/klingspor-pricing'
+import { calculateScoreSellingPrices } from '@/lib/pricing/price-formula'
 
 interface KonfiguratorRequest {
   manufacturer: 'Klingspor'

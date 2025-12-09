@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { connectToMongoDB } from '@/../lib/mongodb'
+import { connectToMongoDB } from '@/lib/mongodb'
 
 /**
  * GET /api/coldleads/prompts

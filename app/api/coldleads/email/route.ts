@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { generateEmail, sendEmail, testSMTP } from '../../../../services/coldleads/emailer'
-import { connectToDatabase } from '@/../lib/api'
+import { connectToDatabase } from '@/lib/api'
 
 /**
  * POST /api/coldleads/email

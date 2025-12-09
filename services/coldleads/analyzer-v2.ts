@@ -3,7 +3,7 @@
  * Basierend auf ChatGPT Briefing - Strukturiertes Parsing + Glossar-Mapping
  */
 
-import { mapToGlossary, getProductRecommendations } from '@/../lib/glossary'
+import { mapToGlossary, getProductRecommendations } from '@/lib/glossary'
 
 interface AnalysisResult {
   company_profile: {

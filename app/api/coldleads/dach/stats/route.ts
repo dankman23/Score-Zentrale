@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getCrawlStatistics } from '@/services/coldleads/dach-crawler'
-import { connectToDatabase } from '@/../lib/api'
+import { connectToDatabase } from '@/lib/api'
 
 /**
  * GET /api/coldleads/dach/stats

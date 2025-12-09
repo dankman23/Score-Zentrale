@@ -8,9 +8,9 @@
  * - Brand Matching
  */
 
-import { mapToGlossary } from '@/../lib/glossary'
-import { selectBrandsForProspect } from '@/../lib/score-coldleads-config'
-import { emergentChatCompletion } from '@/../lib/emergent-llm'
+import { mapToGlossary } from '@/lib/glossary'
+import { selectBrandsForProspect } from '@/lib/score-coldleads-config'
+import { emergentChatCompletion } from '@/lib/emergent-llm'
 
 export interface AnalyzerV3Result {
   company: string
