@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchAmazonSettlementsFromJTL } from '../../../lib/fibu/amazon-import-v2'
+import { fetchAmazonSettlementsFromJTL } from '@/lib/fibu/amazon-import-v2'
 
 export const runtime = 'nodejs'
 export const maxDuration = 180

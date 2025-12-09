@@ -2,8 +2,8 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '../../../lib/db/mongodb'
-import { parseKontenplanExcel, validateKonto, getKontenklasse, getKontenklasseName } from '../../../lib/kontenplan-utils'
+import { getDb } from '@/lib/db/mongodb'
+import { parseKontenplanExcel, validateKonto, getKontenklasse, getKontenklasseName } from '@/lib/kontenplan-utils'
 
 /**
  * POST /api/fibu/kontenplan/import

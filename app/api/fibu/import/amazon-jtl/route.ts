@@ -3,10 +3,10 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '../../../lib/db/mongodb'
+import { getDb } from '@/lib/db/mongodb'
 import { 
   importAndAggregateAmazonJtlData
-} from '../../../lib/fibu/amazon-import-v2'
+} from '@/lib/fibu/amazon-import-v2'
 
 /**
  * Amazon-Import aus JTL-SQL (NEU: mit Geldtransit!)

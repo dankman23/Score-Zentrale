@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { crawlDACHRegion } from '@/services/coldleads/dach-crawler'
-import { connectToDatabase } from '../../../lib/api'
+import { connectToDatabase } from '@/lib/api'
 
 /**
  * POST /api/coldleads/dach/crawl

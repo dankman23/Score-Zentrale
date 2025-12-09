@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getCampaignMetrics } from '../../../lib/google-ads'
+import { getCampaignMetrics } from '@/lib/google-ads'
 
 export async function GET(request: NextRequest) {
   try {

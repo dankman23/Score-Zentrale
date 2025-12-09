@@ -2,8 +2,8 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { processEmailInbox, getPendingEmails } from '../../../lib/email-inbox'
-import { getDb } from '../../../lib/db/mongodb'
+import { processEmailInbox, getPendingEmails } from '@/lib/email-inbox'
+import { getDb } from '@/lib/db/mongodb'
 
 /**
  * GET /api/fibu/email-inbox

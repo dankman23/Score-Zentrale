@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getMssqlPool } from '../../../lib/db/mssql'
+import { getMssqlPool } from '@/lib/db/mssql'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'

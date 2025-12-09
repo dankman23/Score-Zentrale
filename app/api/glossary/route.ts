@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { GLOSSARY } from '../../../lib/glossary'
+import { GLOSSARY } from '@/lib/glossary'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'

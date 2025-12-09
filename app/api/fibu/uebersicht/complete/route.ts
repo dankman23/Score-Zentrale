@@ -2,8 +2,8 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '../../../lib/db/mongodb'
-import { getJTLConnection } from '../../../lib/db/mssql'
+import { getDb } from '@/lib/db/mongodb'
+import { getJTLConnection } from '@/lib/db/mssql'
 
 // Server-side Cache
 let cachedData: any = null

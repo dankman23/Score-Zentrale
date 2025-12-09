@@ -9,14 +9,14 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '../../../lib/db/mongodb'
+import { getDb } from '@/lib/db/mongodb'
 import {
   extractAuNummer,
   extractRechnungsNr,
   extractAmazonOrderId,
   calculateBetragDatumScore,
   detectPartialPayment
-} from '../../../lib/fibu/matching-engine'
+} from '@/lib/fibu/matching-engine'
 
 export async function GET(request: NextRequest) {
   try {

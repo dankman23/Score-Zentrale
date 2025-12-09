@@ -2,8 +2,8 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getMssqlPool } from '../../../lib/db/mssql'
-import { firstExistingTable, hasColumn, inclusiveDateWhere, pickFirstExisting } from '../../../lib/sql/utils'
+import { getMssqlPool } from '@/lib/db/mssql'
+import { firstExistingTable, hasColumn, inclusiveDateWhere, pickFirstExisting } from '@/lib/sql/utils'
 import sql from 'mssql'
 
 /**

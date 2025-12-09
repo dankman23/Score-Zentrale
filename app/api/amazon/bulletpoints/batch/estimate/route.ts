@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { ClaudeClient } from '../../../lib/claude-client'
+import { ClaudeClient } from '@/lib/claude-client'
 
 /**
  * GET /api/amazon/bulletpoints/batch/estimate

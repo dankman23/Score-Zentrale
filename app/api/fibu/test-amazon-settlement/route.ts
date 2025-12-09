@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getJTLConnection } from '../../../lib/db/mssql'
+import { getJTLConnection } from '@/lib/db/mssql'
 
 export async function GET() {
   try {

@@ -1,7 +1,7 @@
 export const runtime = 'nodejs'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '../../../lib/db/mongodb'
+import { getDb } from '@/lib/db/mongodb'
 
 /**
  * GET /api/fibu/rechnungen/vk
