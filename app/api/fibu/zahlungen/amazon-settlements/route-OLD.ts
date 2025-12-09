@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getJTLConnection } from '../../../../lib/db/mssql'
+import { getJTLConnection } from '@/lib/db/mssql'
 
 /**
  * GET /api/fibu/zahlungen/amazon-settlements

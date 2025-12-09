@@ -2,8 +2,8 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '../../../../lib/db/mongodb'
-import { findKreditor, learnKreditorMapping, extractBelegnummer } from '../../../../lib/kreditor-matching'
+import { getDb } from '@/lib/db/mongodb'
+import { findKreditor, learnKreditorMapping, extractBelegnummer } from '@/lib/kreditor-matching'
 
 /**
  * GET /api/fibu/rechnungen/ek?from=2025-10-01&to=2025-10-31

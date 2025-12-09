@@ -2,14 +2,14 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '../../../../lib/db/mongodb'
+import { getDb } from '@/lib/db/mongodb'
 import { 
   Booking10itFormat,
   generate10itCSV,
   createEKBuchung,
   createVKBuchung,
   validateKontoZuordnung
-} from '../../../../lib/export-10it-format'
+} from '@/lib/export-10it-format'
 
 /**
  * GET /api/fibu/export/10it

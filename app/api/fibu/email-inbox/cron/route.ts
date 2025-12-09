@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { processEmailInbox } from '../../../../lib/email-inbox'
+import { processEmailInbox } from '@/lib/email-inbox'
 
 /**
  * GET /api/fibu/email-inbox/cron

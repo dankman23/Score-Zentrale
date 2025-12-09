@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getJTLConnection } from '../../../../lib/db/mssql'
+import { getJTLConnection } from '@/lib/db/mssql'
 
 export async function GET(request: NextRequest) {
   try {

@@ -9,7 +9,7 @@
 export const runtime = 'nodejs'
 
 import { NextResponse } from 'next/server'
-import { getDb } from '../../../../lib/db/mongodb'
+import { getDb } from '@/lib/db/mongodb'
 import { initLearningCollections, importDefaultRules } from '@/lib/fibu/learning-database'
 
 export async function POST() {

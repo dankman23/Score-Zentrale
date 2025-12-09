@@ -16,7 +16,7 @@ import {
   extractAmazonOrderId,
   calculateBetragDatumScore,
   detectPartialPayment
-} from '../../../../lib/fibu/matching-engine'
+} from '@/lib/fibu/matching-engine'
 
 export async function GET(request: NextRequest) {
   try {
