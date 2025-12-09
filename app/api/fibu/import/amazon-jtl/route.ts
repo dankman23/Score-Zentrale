@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     console.log(`  Positive Summe: ${positive_summe.toFixed(2)} EUR`)
     console.log(`  Negative Summe: ${negative_summe.toFixed(2)} EUR`)
     console.log(`  Konten:`)
-    for (const [konto, stats] of nachKonto.entries()) {
+    for (const [konto, stats] of Array.from(nachKonto.entries())) {
       console.log(`    ${konto}: ${stats.anzahl} Buchungen, ${stats.summe.toFixed(2)} EUR`)
     }
     
