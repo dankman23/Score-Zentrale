@@ -709,6 +709,12 @@ export default function App() {
   const [artikelLoading, setArtikelLoading] = useState(false)
   const [availableHerstellerArtikel, setAvailableHerstellerArtikel] = useState([])
   const [availableWarengruppenArtikel, setAvailableWarengruppenArtikel] = useState([])
+  
+  // Produktberater
+  const [beraterChat, setBeraterChat] = useState([])
+  const [beraterInput, setBeraterInput] = useState('')
+  const [beraterLoading, setBeraterLoading] = useState(false)
+  const [beraterProducts, setBeraterProducts] = useState([])
   const [artikelSortBy, setArtikelSortBy] = useState('cArtNr')
   
   // Orga Tab
