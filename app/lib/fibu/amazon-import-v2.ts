@@ -36,6 +36,8 @@ export interface AmazonSettlementRaw {
   Amount: number
   PostedDateTime: Date
   SKU: string
+  QuantityPurchased?: string
+  SellerSKU?: string
   MarketplaceName: string
 }
 
