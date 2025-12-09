@@ -3,13 +3,14 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '../../../../../lib/db/mongodb'
+import { connectToDatabase } from '@/lib/api'
 import { getMssqlPool } from '@/lib/db/mssql'
 import { ClaudeClient } from '@/lib/claude-client'
 
 /**
  * POST /api/amazon/bulletpoints/batch/generate
  * Generiert Amazon Bulletpoints für mehrere Artikel auf einmal
+ * OPTIMIERT: Besseres Error Handling, robuste MongoDB-Verbindung
  * 
  * Body: { kArtikel: number[] } oder { filter: {...}, limit?: number }
  */
@@ -20,7 +21,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { kArtikel: kArtikelList, filter, limit, promptId } = body
     
-    const db = await getDb()
+    console.log('[Batch Generate] Start - Request:', { 
+      artikelCount: kArtikelList?.length, 
+      hasFilter: !!filter, 
+      limit, 
+      promptId 
+    })
+    
+    const { db } = await connectToDatabase()
     const articlesCollection = db.collection('articles')
     const bulletpointsCollection = db.collection('amazon_bulletpoints_generated')
     const promptsCollection = db.collection('amazon_bulletpoint_prompts')
