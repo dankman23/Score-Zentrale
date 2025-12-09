@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 300 // 5 Minuten Timeout
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getMssqlPool } from '@/lib/db/mssql'
+import { getMssqlPool } from '../../../lib/db/mssql'
 import { connectToDatabase } from '../../../lib/api'
 
 /**

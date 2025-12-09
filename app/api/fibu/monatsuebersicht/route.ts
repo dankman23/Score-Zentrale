@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/db/mongodb'
-import { getJTLConnection } from '@/lib/db/mssql'
+import { getJTLConnection } from '../../../lib/db/mssql'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'

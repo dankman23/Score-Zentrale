@@ -12,7 +12,7 @@ export const maxDuration = 300
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/db/mongodb'
-import { getMssqlPool } from '@/lib/db/mssql'
+import { getMssqlPool } from '../../../lib/db/mssql'
 
 export async function POST(request: NextRequest) {
   try {

@@ -4,7 +4,7 @@ export const maxDuration = 300
 
 import { NextRequest, NextResponse } from 'next/server'
 import { connectToDatabase } from '../../../lib/api'
-import { getMssqlPool } from '@/lib/db/mssql'
+import { getMssqlPool } from '../../../lib/db/mssql'
 import { detectB2B, determinePrimaryChannel, calculateOrderFrequency } from '@/lib/customer-intelligence'
 
 /**
