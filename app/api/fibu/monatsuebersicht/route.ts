@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '@/lib/db/mongodb'
+import { getDb } from '../../../lib/db/mongodb'
 import { getJTLConnection } from '../../../lib/db/mssql'
 
 export const runtime = 'nodejs'

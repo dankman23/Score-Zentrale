@@ -2,7 +2,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '@/lib/db/mongodb'
+import { getDb } from '../../../lib/db/mongodb'
 
 /**
  * POST /api/fibu/auto-match-ek-zahlungen

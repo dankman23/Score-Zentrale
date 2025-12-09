@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getMssqlPool } from '../../../lib/db/mssql'
-import { hasColumn, pickFirstExisting, firstExistingTable } from '@/lib/sql/utils'
+import { hasColumn, pickFirstExisting, firstExistingTable } from '../../../lib/sql/utils'
 import sql from 'mssql'
 
 /**

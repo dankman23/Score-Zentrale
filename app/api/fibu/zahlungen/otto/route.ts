@@ -2,8 +2,8 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getOttoClient } from '@/lib/otto-client'
-import { getDb } from '@/lib/db/mongodb'
+import { getOttoClient } from '../../../lib/otto-client'
+import { getDb } from '../../../lib/db/mongodb'
 
 /**
  * GET /api/fibu/zahlungen/otto

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '@/lib/db/mongodb'
+import { getDb } from '../../../lib/db/mongodb'
 import { spawn } from 'child_process'
 
 export const runtime = 'nodejs'

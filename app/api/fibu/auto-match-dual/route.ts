@@ -11,9 +11,9 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '@/lib/db/mongodb'
-import { findDualMatch } from '@/lib/fibu/dual-matcher'
-import { mapZahlung } from '@/lib/fibu/zahlung-mapper'
+import { getDb } from '../../../lib/db/mongodb'
+import { findDualMatch } from '../../../lib/fibu/dual-matcher'
+import { mapZahlung } from '../../../lib/fibu/zahlung-mapper'
 
 export async function POST(request: NextRequest) {
   try {

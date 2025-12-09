@@ -7,8 +7,8 @@
 export const runtime = 'nodejs'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '@/lib/db/mongodb'
-import { saveMatchingRule, saveMatchingHistory } from '@/lib/fibu/learning-database'
+import { getDb } from '../../../lib/db/mongodb'
+import { saveMatchingRule, saveMatchingHistory } from '../../../lib/fibu/learning-database'
 
 export async function POST(request: NextRequest) {
   try {

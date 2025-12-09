@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getMssqlPool } from '../../../lib/db/mssql'
-import { getDb } from '@/lib/db/mongodb'
+import { getDb } from '../../../lib/db/mongodb'
 
 /**
  * ALLE Rechnungen aus JTL-Wawi laden

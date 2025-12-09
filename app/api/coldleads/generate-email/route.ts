@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generatePersonalizedEmail } from '@/services/coldleads/email-generator'
 import { sendEmail } from '@/services/coldleads/emailer'
-import { getDb } from '@/lib/db/mongodb'
+import { getDb } from '../../../lib/db/mongodb'
 
 export const runtime = 'nodejs'
 export const maxDuration = 30

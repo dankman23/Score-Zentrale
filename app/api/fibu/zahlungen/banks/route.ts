@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getMssqlPool } from '../../../lib/db/mssql'
-import { getDb } from '@/lib/db/mongodb'
+import { getDb } from '../../../lib/db/mongodb'
 
 // Konto-IDs aus JTL
 const BANK_ACCOUNTS = {
