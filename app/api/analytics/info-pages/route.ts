@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchInfoPages } from '@/lib/analytics';
+import { fetchInfoPages } from '@/../lib/analytics';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';

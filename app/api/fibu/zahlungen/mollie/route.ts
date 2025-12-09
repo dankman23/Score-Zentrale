@@ -2,8 +2,8 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getMollieClient } from '@/lib/mollie-client'
-import { getDb } from '@/lib/db/mongodb'
+import { getMollieClient } from '@/../lib/mollie-client'
+import { getDb } from '@/../lib/db/mongodb'
 
 /**
  * GET /api/fibu/zahlungen/mollie

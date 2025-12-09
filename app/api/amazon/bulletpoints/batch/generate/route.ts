@@ -3,9 +3,9 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
 import { NextRequest, NextResponse } from 'next/server'
-import { connectToDatabase } from '@/lib/api'
-import { getMssqlPool } from '@/lib/db/mssql'
-import { ClaudeClient } from '@/lib/claude-client'
+import { connectToDatabase } from '@/../lib/api'
+import { getMssqlPool } from '@/../lib/db/mssql'
+import { ClaudeClient } from '@/../lib/claude-client'
 
 /**
  * POST /api/amazon/bulletpoints/batch/generate

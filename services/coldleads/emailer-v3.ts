@@ -7,8 +7,8 @@
  * - Strukturierte CTAs
  */
 
-import { getEmailSignature, SCORE_CONFIG, selectValuePropositions } from '@/lib/score-coldleads-config'
-import { emergentChatCompletion } from '@/lib/emergent-llm'
+import { getEmailSignature, SCORE_CONFIG, selectValuePropositions } from '@/../lib/score-coldleads-config'
+import { emergentChatCompletion } from '@/../lib/emergent-llm'
 import type { AnalyzerV3Result } from './analyzer-v3'
 
 export interface EmailV3Result {

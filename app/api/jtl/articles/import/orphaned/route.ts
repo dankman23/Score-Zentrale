@@ -2,8 +2,8 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getMssqlPool } from '@/lib/db/mssql'
-import { connectToDatabase } from '@/lib/api'
+import { getMssqlPool } from '@/../lib/db/mssql'
+import { connectToDatabase } from '@/../lib/api'
 
 /**
  * GET /api/jtl/articles/import/orphaned

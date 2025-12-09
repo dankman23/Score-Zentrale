@@ -2,8 +2,8 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '@/lib/db/mongodb'
-import { getEbayAPI } from '@/lib/ebay-api'
+import { getDb } from '@/../lib/db/mongodb'
+import { getEbayAPI } from '@/../lib/ebay-api'
 
 /**
  * POST /api/fibu/zahlungen/ebay/sync

@@ -2,9 +2,9 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '@/lib/db/mongodb'
-import { parseEKRechnung } from '@/lib/ek-rechnung-parser'
-import { parseInvoiceWithGemini } from '@/lib/gemini'
+import { getDb } from '@/../lib/db/mongodb'
+import { parseEKRechnung } from '@/../lib/ek-rechnung-parser'
+import { parseInvoiceWithGemini } from '@/../lib/gemini'
 
 // Dynamic import for pdf-parse to avoid Next.js build issues
 let pdfParse: any = null

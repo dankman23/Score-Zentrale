@@ -2,8 +2,8 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getMssqlPool } from '@/lib/db/mssql'
-import { getDb } from '@/lib/db/mongodb'
+import { getMssqlPool } from '@/../lib/db/mssql'
+import { getDb } from '@/../lib/db/mongodb'
 
 /**
  * Externe Rechnungen aus MongoDB laden (gecacht)

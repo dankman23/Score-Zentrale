@@ -2,8 +2,8 @@ export const runtime = 'nodejs'
 
 import { NextResponse } from 'next/server'
 import { connectToMongoDB } from '@/../lib/mongodb'
-import { sendEmail } from '@/lib/email-client'
-import { SCORE_CONFIG } from '@/lib/score-coldleads-config'
+import { sendEmail } from '@/../lib/email-client'
+import { SCORE_CONFIG } from '@/../lib/score-coldleads-config'
 
 /**
  * GET /api/coldleads/followup/auto

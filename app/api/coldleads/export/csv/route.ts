@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
 import { NextRequest, NextResponse } from 'next/server'
-import { connectToDatabase } from '@/lib/api'
+import { connectToDatabase } from '@/../lib/api'
 
 /**
  * GET /api/coldleads/export/csv

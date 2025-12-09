@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchBeilegerMetrics } from '@/lib/analytics';
+import { fetchBeilegerMetrics } from '@/../lib/analytics';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
