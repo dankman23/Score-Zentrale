@@ -76,7 +76,7 @@ export function calculateScoreSellingPrices(
   // Default Regler für "Alte PB - Alle Konfektionen"
   const defaultRegler: PriceFormulaRegler = {
     gewinn_regler_1a: 0.362,
-    gewinn_regler_2c: 11.5,  // Angepasst für korrekte VK-Berechnung (EK 33,9 € → Plattform 90,47 €)
+    gewinn_regler_2c: 1.822,
     paypal_fix: 0.35,
     fixkosten_beitrag: 0.5,
     ebay_amazon: 0.14,

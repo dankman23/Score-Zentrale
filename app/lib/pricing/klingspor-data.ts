@@ -3,16 +3,15 @@
  * Lädt JSON-Daten aus /app/data/klingspor/
  */
 
-import validEntriesData from '../../data/klingspor_new/valid_entries.json'
-import availableGritsData from '../../data/klingspor_new/available_grits.json'
-import backingDataNew from '../../data/klingspor_new/backing.json'
-import typesData from '../../data/klingspor_new/types.json'
-import definitionPhData from '../../data/klingspor_new/definition_ph.json'
-import zms2DataNew from '../../data/klingspor_new/zms2.json'
+import validEntriesData from '../../data/klingspor/valid_entries.json'
+import availableGritsData from '../../data/klingspor/available_grits.json'
+import definitionPhData from '../../data/klingspor/definition_ph.json'
+import backingData from '../../data/klingspor/backing.json'
 import zpqgData from '../../data/klingspor/zpqg.json'
 import zpsdData from '../../data/klingspor/zpsd.json'
 import zsc2Data from '../../data/klingspor/zsc2.json'
 import zsg1Data from '../../data/klingspor/zsg1.json'
+import zms2Data from '../../data/klingspor/zms2.json'
 import exchangeRatesData from '../../data/klingspor/exchange_rates.json'
 
 export interface ValidEntry {
@@ -104,75 +103,41 @@ export interface ExchangeRate {
   [key: string]: any
 }
 
-// Export data (with type assertions to bypass strict type checking for JSON imports)
-export const validEntries: ValidEntry[] = validEntriesData as any
-export const availableGrits: AvailableGrit[] = availableGritsData as any
-export const backingMap: Record<string, {de: string, en: string}> = backingDataNew as any
-export const phMap: Record<string, number> = definitionPhData as any
-export const zms2Map: Record<string, {salesOrgMultiplier: number, konditionsbetrag_cent: number}> = zms2DataNew as any
-export const allTypes: string[] = typesData as any
-export const zpqg: ZPQG[] = zpqgData as any
-export const zpsd: ZPSD[] = zpsdData as any
+// Export data
+export const validEntries: ValidEntry[] = validEntriesData as ValidEntry[]
+export const availableGrits: AvailableGrit[] = availableGritsData as AvailableGrit[]
+export const definitionPh: DefinitionPH[] = definitionPhData as DefinitionPH[]
+export const backing: Backing[] = backingData as Backing[]
+export const zpqg: ZPQG[] = zpqgData as ZPQG[]
+export const zpsd: ZPSD[] = zpsdData as ZPSD[]
 export const zsc2: ZSC2[] = zsc2Data as ZSC2[]
 export const zsg1: ZSG1[] = zsg1Data as ZSG1[]
+export const zms2: ZMS2[] = zms2Data as ZMS2[]
 export const exchangeRates: ExchangeRate[] = exchangeRatesData as ExchangeRate[]
 
-// Helper: Typen Liste (ALLE 55 Typen aus der neuen Excel)
+// Helper: Typen Liste
 export function getAvailableTypes(): string[] {
-  return allTypes
+  const uniqueTypes = new Set(validEntries.map(e => e['SaU Type']))
+  return Array.from(uniqueTypes).sort()
 }
 
-// Helper: Körnungen für Typ (aus available_grits)
+// Helper: Körnungen für Typ
 export function getGritsForType(type: string): number[] {
-  const grits = availableGrits
+  return availableGrits
     .filter(g => g['SaU Type'] === type)
     .map(g => g.Korn)
-    .filter(k => k !== null && k !== undefined && typeof k === 'number')
     .filter((v, i, a) => a.indexOf(v) === i)
     .sort((a, b) => a - b)
-  
-  return grits
 }
 
-// Helper: Backing-Typ (verwendet neue backing.json)
+// Helper: Backing-Typ
 export function getBackingType(type: string): string {
-  const backingInfo = backingMap[type]
-  if (backingInfo && backingInfo.de) {
-    return backingInfo.de
-  }
-  
-  // Fallback: Regel-basiert
-  if (type.startsWith('PS')) return 'Papier'
-  if (type.startsWith('NBS') || type.startsWith('NBF')) return 'Vlies'
-  return 'Gewebe'
+  const entry = backing.find(b => b.Typ === type)
+  return entry ? entry.UNTERLAGENART : 'Unbekannt'
 }
 
-// Helper: Product Hierarchy (verwendet definition_ph.json mit Fallback)
+// Helper: Product Hierarchy
 export function getProductHierarchy(type: string): number | null {
-  // Prüfe phMap zuerst (vollständige Abdeckung aller 55 Typen)
-  if (phMap[type]) {
-    return phMap[type]
-  }
-  
-  // Fallback: validEntries
   const entry = validEntries.find(e => e['SaU Type'] === type)
-  if (entry && entry.PH) {
-    return entry.PH
-  }
-  
-  // Letzter Fallback: Standard PH für coat.abras.standard belts
-  return 10200101
-}
-
-// Helper: Sales Org Multiplier (aus zms2.json)
-export function getSalesOrgMultiplier(salesOrg: string, ph: number, type: string): number {
-  // Match-Key: "DE10 10200101 CS 308 Y"
-  const key = `${salesOrg} ${ph} ${type}`
-  const entry = zms2Map[key]
-  
-  if (entry && entry.salesOrgMultiplier !== undefined) {
-    return entry.salesOrgMultiplier
-  }
-  
-  return 0
+  return entry ? entry.PH : null
 }

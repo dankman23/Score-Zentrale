@@ -31,28 +31,84 @@ interface EmergentChatResponse {
 
 /**
  * Sends a chat completion request to Emergent's LLM API
+ * Supports both old format (messages, options) and new format (options object)
  */
 export async function emergentChatCompletion(
-  options: EmergentChatOptions,
+  messagesOrOptions: ChatMessage[] | EmergentChatOptions,
+  optionsOrRetries?: { model?: string; temperature?: number; max_tokens?: number } | number,
   retries = 2
 ): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY // Emergent Key stored here
+  const apiKey = process.env.OPENAI_API_KEY || process.env.EMERGENT_LLM_KEY
   
-  if (!apiKey || !apiKey.startsWith('sk-emergent-')) {
-    throw new Error('Emergent Universal Key not configured')
+  console.log(`[EmergentLLM] API Key present: ${!!apiKey}, starts with sk-: ${apiKey?.startsWith('sk-')}`)
+  
+  if (!apiKey) {
+    throw new Error('LLM API Key not configured - missing EMERGENT_LLM_KEY or OPENAI_API_KEY')
+  }
+  
+  if (!apiKey.startsWith('sk-')) {
+    throw new Error(`LLM API Key invalid format - got: ${apiKey.substring(0, 10)}...`)
   }
 
-  const requestBody = {
-    model: options.model || 'gpt-4',
-    messages: options.messages,
-    temperature: options.temperature ?? 0.3,
-    max_tokens: options.max_tokens ?? 1000
+  // Handle both old and new calling formats
+  let messages: ChatMessage[]
+  let model: string
+  let temperature: number
+  let max_tokens: number
+  
+  if (Array.isArray(messagesOrOptions)) {
+    // Old format: emergentChatCompletion(messages, {model, temperature, max_tokens})
+    messages = messagesOrOptions
+    const opts = (optionsOrRetries as any) || {}
+    model = opts.model || 'gpt-4o-mini'
+    temperature = opts.temperature ?? 0.3
+    max_tokens = opts.max_tokens ?? 1000
+    if (typeof optionsOrRetries === 'number') {
+      retries = optionsOrRetries
+    }
+  } else {
+    // New format: emergentChatCompletion({messages, model, temperature, max_tokens})
+    messages = messagesOrOptions.messages
+    model = messagesOrOptions.model || 'gpt-4o-mini'
+    temperature = messagesOrOptions.temperature ?? 0.3
+    max_tokens = messagesOrOptions.max_tokens ?? 1000
+    if (typeof optionsOrRetries === 'number') {
+      retries = optionsOrRetries
+    }
+  }
+
+  // Build request body based on key type
+  const requestBody: any = {
+    model,
+    messages,
+    temperature,
+    max_tokens
+  }
+  
+  // For Emergent API, we need to specify the provider
+  if (apiKey.startsWith('sk-emergent')) {
+    // Detect provider from model name
+    if (model.startsWith('gpt')) {
+      requestBody.provider = 'openai'
+    } else if (model.startsWith('claude')) {
+      requestBody.provider = 'anthropic'
+    } else if (model.startsWith('gemini')) {
+      requestBody.provider = 'gemini'
+    } else {
+      // Default to OpenAI for unknown models
+      requestBody.provider = 'openai'
+    }
   }
 
   let lastError: Error | null = null
   
-  // Use environment variable for API endpoint (deployment-ready)
-  const apiEndpoint = process.env.EMERGENT_API_URL || 'https://api.emergent.sh/v1/chat/completions'
+  // Use correct endpoint based on key type (configurable via env vars)
+  const emergentEndpoint = process.env.EMERGENT_API_ENDPOINT || 'https://api.emergent.ai/v1/chat/completions'
+  const openaiEndpoint = process.env.OPENAI_API_ENDPOINT || 'https://api.openai.com/v1/chat/completions'
+  
+  const apiEndpoint = apiKey.startsWith('sk-emergent') 
+    ? emergentEndpoint  // Emergent Universal Key
+    : openaiEndpoint    // OpenAI direct
   
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {

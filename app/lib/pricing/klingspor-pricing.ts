@@ -6,14 +6,16 @@
 import {
   validEntries,
   availableGrits,
+  definitionPh,
+  backing,
   zpqg,
   zpsd,
   zsc2,
   zsg1,
+  zms2,
   getBackingType,
   getProductHierarchy,
-  getGritsForType,
-  getSalesOrgMultiplier
+  getGritsForType
 } from './klingspor-data'
 
 export interface KlingsporBeltPriceRequest {
@@ -54,7 +56,7 @@ export function calculateKlingsporBeltPrice(
   
   const gritNum = typeof grit === 'string' ? parseInt(grit) : grit
   
-  // 1. Validierung - prüfe ob Typ + Körnung existiert
+  // 1. Validierung
   const availableGrit = availableGrits.find(
     g => g['SaU Type'] === type && g.Korn === gritNum
   )
@@ -71,55 +73,56 @@ export function calculateKlingsporBeltPrice(
     throw new Error(`Produkthierarchie für Typ ${type} nicht gefunden`)
   }
   
-  // 3. Fläche berechnen (m²) - Excel: C5 = D2*E2/1000000
-  const m2 = (widthMm * lengthMm) / 1000000
+  // 3. Fläche berechnen (m²)
+  const m2Demand = (widthMm * lengthMm) / 1000000
   
-  // 4. ZPQG - Preis pro 100 m² - Excel: C6 = VLOOKUP($B$2,ZPQG!$B:$E,4,FALSE)
+  // 4. ZPQG - Preis pro 100 m²
   const zpqgEntry = zpqg.find(z => z['SaU Type'] === type)
   if (!zpqgEntry) {
     throw new Error(`ZPQG-Eintrag für Typ ${type} nicht gefunden`)
   }
-  const zpqg_price_per_100m2 = zpqgEntry.Konditionsbetrag  // Z.B. 1185 für CS 308 Y
+  const pricePer100m2 = zpqgEntry.Konditionsbetrag
   
-  // 5. Basispreis - Excel: C7 = C5*C6/100
-  const basicPrice = (m2 * zpqg_price_per_100m2) / 100
+  // 5. Basispreis
+  const basicPrice = (m2Demand * pricePer100m2) / 100
   
-  // 6. ZPSD - Typ/Körnungs-Zuschlag (Faktor) - Excel: C8 = VLOOKUP($B$2&$C$2,ZPSD!$A:$G,7,FALSE)
-  const zpsdKey = `${type}${gritNum}`
-  const zpsdEntry = zpsd.find(z => `${z['SaU Type']}${z.Korn}` === zpsdKey)
-  const zpsd_factor = zpsdEntry ? zpsdEntry.Konditionsbetrag : 0  // Z.B. 0 oder 0.05 = 5%
+  // 6. ZPSD - Körnungszuschlag
+  const zpsdEntry = zpsd.find(
+    z => z['SaU Type'] === type && z.Korn === gritNum
+  )
+  const zpsdFactor = zpsdEntry ? zpsdEntry.Konditionsbetrag : 0
+  const zpsdAmount = basicPrice * zpsdFactor
   
-  // 7. ZSC2 - Rollenlängen-Zuschlag (Faktor) - Excel: C9 = VLOOKUP($F$2,ZSC2!$B:$G,6,FALSE)/100
+  // 7. ZSC2 - PH-Zuschlag (in %)
   const zsc2Entry = zsc2.find(z => z.Produkthierarchie === ph)
-  const zsc2_factor = zsc2Entry ? (zsc2Entry.Betrag / 100) : 0  // Z.B. 0.113 = 11,3%
+  const zsc2Percent = zsc2Entry ? zsc2Entry.Betrag : 0
+  const zsc2Factor = zsc2Percent / 100
+  const zsc2Amount = basicPrice * zsc2Factor
   
-  // 8. Rollbreiten-Zuschlag (absolut in EUR) - Excel: C10 = fixer Wert aus Tabelle
-  // Für jetzt: hardcoded 18.15 (typischer Wert), TODO: aus Tabelle laden
-  const rollWidthSurcharge = 18.15
+  // 8. ZSG1 - Leimzuschlag
+  const backingShort = backingType.charAt(0).toLowerCase() // 'g' für Gewebe, 'p' für Papier
+  const zsg1Entry = zsg1.find(
+    z => z.Produkthierarchie === ph &&
+         z['ab Breite [mm]'] <= widthMm
+  )
+  const glueSurcharge = zsg1Entry ? (zsg1Entry.Konditionsbetrag / 100) : 0
   
-  // 9. ZSG1 - Leimzuschlag (absolut in EUR) - Excel: C14 = VLOOKUP($F$2&" "&$C$11&" "&$C$12&" "&$C$13,ZSG1!$A:$G,7,FALSE)
-  // Match-Key: PH + "x" + Breite (101 oder 1) + Staffelmenge (0 oder höher)
-  // Vereinfacht: Suche nach PH + backing "x" + passender Breite + Staffelmenge 0
-  const zsg1Candidates = zsg1.filter(
-    z => z.Produkthierarchie === ph && 
-         z.Unterlagenart === 'x' &&
-         z['ab Breite [mm]'] <= widthMm &&
-         z.Staffelmenge === 0
-  ).sort((a, b) => b['ab Breite [mm]'] - a['ab Breite [mm]'])  // Höchste passende Breite
+  // 9. Summe produktspezifisch
+  const totalProductSpecific = basicPrice + zpsdAmount + zsc2Amount + glueSurcharge
   
-  const glueSurcharge = zsg1Candidates.length > 0 ? zsg1Candidates[0].Konditionsbetrag : 30  // in Cent
+  // 10. ZMS2 - Sales Org Multiplikator
+  const zms2Match = `${ph}${type}`
+  const zms2Entry = zms2.find(
+    z => z.Verkaufsorganisation === salesOrg &&
+         z.Match.includes(type)
+  )
+  const salesOrgMultiplier = zms2Entry ? zms2Entry.Konditionsbetrag : null
   
-  // 10. Summe produktspezifisch - Excel: C15 = C7*(1+C8)*(1+C9)+(C10*C5/100)+(C14/100)
-  const totalProductSpecific = 
-    basicPrice * (1 + zpsd_factor) * (1 + zsc2_factor) +
-    (rollWidthSurcharge * m2 / 100) +
-    (glueSurcharge / 100)
-  
-  // 11. ZMS2 - Sales Org Multiplikator - Excel: C16 = VLOOKUP(I2&" "&F2&" "&B2,ZMS2!$A:$I,9,FALSE)/100
-  const salesOrgMultiplier = getSalesOrgMultiplier(salesOrg, ph, type)  // z.B. 2.9403
-  
-  // 12. Listenpreis in EUR - Excel: C17 = (C16+1)*C15
-  const listPrice = (salesOrgMultiplier + 1) * totalProductSpecific
+  // 11. Listenpreis
+  let listPrice = totalProductSpecific
+  if (salesOrgMultiplier) {
+    listPrice = salesOrgMultiplier
+  }
   
   // 12. Score-EK-Varianten
   const scoreEkPaperVlies = listPrice * 0.36  // 64% Rabatt
@@ -135,11 +138,11 @@ export function calculateKlingsporBeltPrice(
     productHierarchy: ph,
     
     // Debug
-    m2Demand: parseFloat(m2.toFixed(6)),
-    pricePer100m2: zpqg_price_per_100m2,
+    m2Demand: parseFloat(m2Demand.toFixed(6)),
+    pricePer100m2,
     basicPrice: parseFloat(basicPrice.toFixed(2)),
-    zpsdFactor: zpsd_factor,
-    zsc2Factor: zsc2_factor,
+    zpsdFactor,
+    zsc2Factor,
     glueSurcharge: parseFloat(glueSurcharge.toFixed(2)),
     totalProductSpecific: parseFloat(totalProductSpecific.toFixed(2)),
     salesOrgMultiplier

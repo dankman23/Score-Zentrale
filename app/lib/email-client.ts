@@ -1,0 +1,112 @@
+import nodemailer from 'nodemailer'
+
+let transporter: any = null
+
+export function getEmailTransporter() {
+  // Nicht cachen - immer neu erstellen für korrekte Config
+  // SMTP Host jetzt ohne Fallback - muss als Umgebungsvariable gesetzt werden
+  const smtpHost = process.env.SMTP_HOST
+  
+  if (!smtpHost) {
+    console.warn('[Email] SMTP_HOST nicht gesetzt - Email-Versand deaktiviert')
+    // Erstelle einen "dummy" transporter der nicht sendet
+    return nodemailer.createTransport({
+      streamTransport: true,
+      newline: 'unix'
+    })
+  }
+  
+  transporter = nodemailer.createTransport({
+    host: smtpHost,
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: process.env.SMTP_SECURE === 'true', // false für Port 587
+    auth: {
+      user: process.env.SMTP_USER || process.env.EMAIL_USER,
+      pass: process.env.SMTP_PASSWORD || process.env.EMAIL_PASSWORD
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  })
+
+  return transporter
+}
+
+/**
+ * Konvertiert einfache Text-Email mit <b> und <a> Tags in vollständiges HTML
+ */
+function wrapInHTML(body: string): string {
+  // Ersetze Zeilenumbrüche mit <br>
+  let html = body.replace(/\n/g, '<br>\n')
+  
+  // Bereits vorhandene HTML-Tags bleiben
+  // Wrap in HTML-Struktur
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; }
+    a { color: #0066cc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    b { font-weight: bold; }
+  </style>
+</head>
+<body>
+${html}
+</body>
+</html>`
+}
+
+export async function sendEmail(to: string, subject: string, html: string, text?: string) {
+  const transporter = getEmailTransporter()
+  
+  // Wrap in vollständiges HTML wenn nötig
+  const fullHTML = html.includes('<!DOCTYPE') ? html : wrapInHTML(html)
+  
+  // TEST MODE: Wenn EMAIL_TEST_MODE aktiviert ist, sende ALLE Mails nur an BCC
+  const testMode = process.env.EMAIL_TEST_MODE === 'true'
+  
+  const emailFrom = process.env.SMTP_FROM || process.env.EMAIL_FROM || 'noreply@example.com'
+  const emailBcc = process.env.SMTP_BCC || process.env.EMAIL_BCC || ''
+  
+  const smtpFromName = process.env.SMTP_FROM_NAME || 'Score Schleifwerkzeuge'
+  const smtpReplyTo = process.env.SMTP_REPLY_TO
+  
+  const mailOptions: any = {
+    from: `${smtpFromName} <${emailFrom}>`,
+    subject: testMode ? `[TEST] ${subject}` : subject,
+    html: fullHTML,
+    text: text || html.replace(/<[^>]*>/g, '')
+  }
+  
+  // Add Reply-To if configured
+  if (smtpReplyTo) {
+    mailOptions.replyTo = smtpReplyTo
+  }
+  
+  // Add BCC if configured
+  if (emailBcc) {
+    mailOptions.bcc = emailBcc
+  }
+  
+  // Im Test-Modus: Sende NUR an BCC (kein TO)
+  // Im Produktiv-Modus: Sende an TO + BCC
+  if (testMode) {
+    // Füge Hinweis in E-Mail-Body ein
+    mailOptions.html = `<div style="background: #fff3cd; border: 2px solid #ffc107; padding: 10px; margin-bottom: 20px;"><strong>🧪 TEST-MODUS:</strong> Diese E-Mail würde normalerweise an <strong>${to}</strong> gesendet.</div>` + mailOptions.html
+    console.log(`[Email] TEST MODE: Email würde an ${to} gesendet, geht nur an BCC`)
+  } else {
+    mailOptions.to = to
+    console.log(`[Email] LIVE MODE: Sende an ${to}${emailBcc ? ' mit BCC an ' + emailBcc : ''}`)
+  }
+
+  try {
+    const info = await transporter.sendMail(mailOptions)
+    console.log('[Email] Sent:', info.messageId, 'to', to)
+    return { ok: true, messageId: info.messageId }
+  } catch (error: any) {
+    console.error('[Email] Error:', error)
+    return { ok: false, error: error.message }
+  }
+}
