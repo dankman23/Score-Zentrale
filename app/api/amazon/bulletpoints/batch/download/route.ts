@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
     
     // ABP-Filter (mit/ohne Bulletpoints)
     if (abpParam === 'mit') {
-      query.bullets = { $exists: true, $ne: null, $ne: [] }
+      query.bullets = { $exists: true, $not: { $in: [null, []] } }
     } else if (abpParam === 'ohne') {
       query.$or = [
         { bullets: { $exists: false } },
