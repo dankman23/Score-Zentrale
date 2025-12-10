@@ -241,6 +241,7 @@ test_plan:
     - "COMPLETED: ✅ JTL Customer Sync Daily API funktioniert korrekt"
     - "COMPLETED: ✅ Customers List API mit 4,310+ importierten Kunden"
     - "COMPLETED: ✅ Datenbank-Konsistenz verifiziert"
+    - "COMPLETED: ✅ Produktberater Chat API umfassend getestet mit kritischem Fix"
   stuck_tasks: []
   test_priority: "high_first"
   test_all: false
