@@ -2650,9 +2650,9 @@ export default function App() {
 
   // 8. ARTIKEL IMPORT Status
   useEffect(() => {
-    if (!authChecked || activeTab !== 'produkte' || produkteTab !== 'import') return
+    if (!authChecked || activeTab !== 'produkte' || produkteTab !== 'artikel' || artikelTab !== 'import') return
     loadArtikelStatus()
-  }, [authChecked, activeTab, produkteTab])
+  }, [authChecked, activeTab, produkteTab, artikelTab])
 
   // 9. AMAZON PROMPTS laden
   useEffect(() => {
