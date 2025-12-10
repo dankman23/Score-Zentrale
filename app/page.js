@@ -1864,8 +1864,6 @@ export default function App() {
     }
   }
 
-  const openPromptModal = (mode, prompt = null) => {
-
   // ========================================
   // PRODUKTBERATER FUNCTIONS
   // ========================================
