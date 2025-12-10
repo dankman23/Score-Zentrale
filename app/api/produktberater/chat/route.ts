@@ -259,27 +259,39 @@ Sei präzise, professionell und hilfreich!`
               availability: product.availability
             })
           } else {
-            // articles format
-            // Baue Shop-URL korrekt
-            const shopUrl = product.cSeo 
-              ? `https://score-schleifwerkzeuge.de/${product.cSeo}` 
-              : `https://score-schleifwerkzeuge.de/artikel/${product.kArtikel}`
+            // articles format - from JTL database
+            // Shop-URL: Nutze die korrekte JTL-Shop URL mit SEO-Pfad
+            let shopUrl = `https://score-schleifwerkzeuge.de/`
+            if (product.cSeo) {
+              shopUrl += product.cSeo
+            } else if (product.cURL) {
+              shopUrl += product.cURL
+            } else {
+              shopUrl += `${product.cName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
+            }
             
-            // Versuche Bild-URL zu konstruieren
-            const imageUrl = product.cBildpfad 
-              ? `https://score-schleifwerkzeuge.de/media/image/${product.cBildpfad}` 
-              : (product.cVorschaubildURL || null)
+            // Bild-URL: JTL speichert Bilder in media/image/product/
+            let imageUrl = null
+            if (product.Bilder && product.Bilder.length > 0) {
+              // Nutze erstes Bild aus dem Bilder-Array
+              const firstImage = product.Bilder[0]
+              imageUrl = `https://score-schleifwerkzeuge.de/media/image/product/${firstImage.cPfad}`
+            } else if (product.cBildpfad) {
+              imageUrl = `https://score-schleifwerkzeuge.de/media/image/product/${product.cBildpfad}`
+            } else if (product.cVorschaubildURL) {
+              imageUrl = product.cVorschaubildURL
+            }
             
             matchingProducts.push({
               product_id: product.kArtikel?.toString() || product._id,
               title: product.cName,
-              brand: product.cHerstellerName,
+              brand: product.cHerstellerName || 'Unbekannt',
               mpn: product.cArtNr,
               gtin: product.cBarcode || null,
-              price: product.fVKNetto ? `${product.fVKNetto.toFixed(2)} EUR` : null,
+              price: product.fVKNetto ? `${product.fVKNetto.toFixed(2)} €` : null,
               image_link: imageUrl,
               shop_url: shopUrl,
-              availability: product.fLagerbestand > 0 ? 'in stock' : 'out of stock',
+              availability: product.fLagerbestand > 0 ? 'auf Lager' : 'nicht verfügbar',
               stock: product.fLagerbestand || 0
             })
           }
