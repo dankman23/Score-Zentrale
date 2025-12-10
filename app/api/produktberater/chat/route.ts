@@ -260,6 +260,16 @@ Sei präzise, professionell und hilfreich!`
             })
           } else {
             // articles format
+            // Baue Shop-URL korrekt
+            const shopUrl = product.cSeo 
+              ? `https://score-schleifwerkzeuge.de/${product.cSeo}` 
+              : `https://score-schleifwerkzeuge.de/artikel/${product.kArtikel}`
+            
+            // Versuche Bild-URL zu konstruieren
+            const imageUrl = product.cBildpfad 
+              ? `https://score-schleifwerkzeuge.de/media/image/${product.cBildpfad}` 
+              : (product.cVorschaubildURL || null)
+            
             matchingProducts.push({
               product_id: product.kArtikel?.toString() || product._id,
               title: product.cName,
@@ -267,9 +277,10 @@ Sei präzise, professionell und hilfreich!`
               mpn: product.cArtNr,
               gtin: product.cBarcode || null,
               price: product.fVKNetto ? `${product.fVKNetto.toFixed(2)} EUR` : null,
-              image_link: null, // articles don't have image links
-              shop_url: `https://shopping-feeds.preview.emergentagent.com/artikel/${product.kArtikel}`,
-              availability: product.cAktiv ? 'in stock' : 'out of stock'
+              image_link: imageUrl,
+              shop_url: shopUrl,
+              availability: product.fLagerbestand > 0 ? 'in stock' : 'out of stock',
+              stock: product.fLagerbestand || 0
             })
           }
         }
