@@ -879,6 +879,23 @@ export default function App() {
     setLoading(false)
   }
 
+  const loadSuppliersTimeseries = async () => {
+    if (selectedSuppliers.length === 0) {
+      setSuppliersTimeseries(null)
+      return
+    }
+    
+    try {
+      const suppliers = selectedSuppliers.join(',')
+      const res = await getJson(`/api/jtl/sales/suppliers-timeseries?from=${from}&to=${to}&suppliers=${encodeURIComponent(suppliers)}`)
+      if (res?.ok) {
+        setSuppliersTimeseries(res)
+      }
+    } catch (e) {
+      console.error('[Suppliers Timeseries] Error:', e)
+    }
+  }
+
   const fetchSalesTables = async () => {
     try {
       const [prods, cats] = await Promise.all([
