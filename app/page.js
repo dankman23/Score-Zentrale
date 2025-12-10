@@ -7844,7 +7844,7 @@ export default function App() {
             </div>
           )}
           {/* Prompts Tab */}
-          {produkteTab === 'artikel' && artikelTab === 'prompts' && (
+          {produkteTab === 'prompts' && (
             <div>
               <div className="card border-0 shadow-sm">
                 <div className="card-body">
