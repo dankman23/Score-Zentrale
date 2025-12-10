@@ -6800,7 +6800,7 @@ export default function App() {
           )}
 
           {/* Import Tab */}
-          {produkteTab === 'import' && (
+          {produkteTab === 'artikel' && artikelTab === 'import' && (
             <div>
               <div className="card border-0 shadow-sm mb-4">
                 <div className="card-body">
