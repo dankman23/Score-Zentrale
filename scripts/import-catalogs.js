@@ -13,6 +13,12 @@ const catalogs = [
     url: 'https://customer-assets.emergentagent.com/job_jtlsync/artifacts/40xfkgzc_Klingspor%20Katalog.pdf'
   },
   {
+    file: 'klingspor-grundwissen.pdf',
+    manufacturer: 'Klingspor',
+    name: 'Klingspor Grundwissen kompakt',
+    url: 'https://customer-assets.emergentagent.com/job_jtlsync/artifacts/1828i5ug_Klingspor_Grundwissen_kompakt.pdf'
+  },
+  {
     file: 'norton.pdf',
     manufacturer: 'Norton',
     name: 'Norton St. Gobain INDUSTRIELLE ANWENDUNGEN KATALOG 2025',
@@ -65,6 +71,12 @@ const catalogs = [
     manufacturer: 'RHODIUS',
     name: 'RHODIUS Katalog',
     url: 'https://customer-assets.emergentagent.com/job_jtlsync/artifacts/15xs37ic_RHODIUS%20Katalog.pdf'
+  },
+  {
+    file: 'flexovit.pdf',
+    manufacturer: 'FLEXOVIT',
+    name: 'FLEXOVIT Katalog',
+    url: 'https://customer-assets.emergentagent.com/job_jtlsync/artifacts/ob12hrhy_FLEXOVIT%20Katalog.pdf'
   }
 ]
 
