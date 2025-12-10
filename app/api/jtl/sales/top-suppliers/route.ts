@@ -78,32 +78,44 @@ export async function GET(request: NextRequest) {
     // Zusammenfassen der Lieferanten gemäß Vorgabe
     const supplierMap = new Map()
     
-    // Mapping: kLieferant -> Gruppe
-    const groupMapping: { [key: number]: string } = {
-      11: 'AWUKO ABRASIVES',
-      15: 'AWUKO ABRASIVES',
-      13: 'Starcke GmbH',
-      22: 'Starcke GmbH',
-      4: 'Klingspor AG',
-      8: 'Klingspor AG',
-      9: 'VSM Deutschland',
-      10: 'VSM Deutschland'
+    // Mapping: kLieferant -> Gruppe  
+    // User-Vorgabe: 11+15 (AWUKO), 13+22 (Starcke), 4+8 (Klingspor), 9+10 (VSM)
+    const groupMapping: { [key: number]: { group: string, display: string } } = {
+      11: { group: 'AWUKO', display: 'AWUKO ABRASIVES' },
+      15: { group: 'AWUKO', display: 'AWUKO ABRASIVES' },
+      13: { group: 'Starcke', display: 'Starcke GmbH & Co. KG' },
+      22: { group: 'Starcke', display: 'Starcke GmbH & Co. KG' },
+      4: { group: 'Klingspor', display: 'Klingspor AG' },
+      8: { group: 'Klingspor', display: 'Klingspor AG' },
+      9: { group: 'VSM', display: 'VSM Deutschland' },
+      10: { group: 'VSM', display: 'VSM Deutschland' }
     }
 
     // Aggregiere die Daten
     result.recordset.forEach(row => {
       const kLieferant = row.kLieferant
-      const groupName = groupMapping[kLieferant] || row.supplier_name
       
-      if (!supplierMap.has(groupName)) {
-        supplierMap.set(groupName, {
-          supplier: groupName,
+      // Verwende entweder die Gruppe oder den Original-Namen
+      let groupKey: string
+      let displayName: string
+      
+      if (groupMapping[kLieferant]) {
+        groupKey = groupMapping[kLieferant].group
+        displayName = groupMapping[kLieferant].display
+      } else {
+        groupKey = `supplier_${kLieferant}`
+        displayName = row.supplier_name
+      }
+      
+      if (!supplierMap.has(groupKey)) {
+        supplierMap.set(groupKey, {
+          supplier: displayName,
           orders: 0,
           revenue: 0
         })
       }
       
-      const existing = supplierMap.get(groupName)
+      const existing = supplierMap.get(groupKey)
       existing.orders += parseInt(row.orders || 0)
       existing.revenue += parseFloat(row.revenue || 0)
     })
