@@ -1865,6 +1865,65 @@ export default function App() {
   }
 
   const openPromptModal = (mode, prompt = null) => {
+
+  // ========================================
+  // PRODUKTBERATER FUNCTIONS
+  // ========================================
+  
+  const sendBeraterMessage = async () => {
+    if (!beraterInput.trim()) return
+    
+    const userMessage = beraterInput.trim()
+    setBeraterInput('')
+    setBeraterLoading(true)
+    
+    // Füge User-Message zum Chat hinzu
+    const newChat = [...beraterChat, { role: 'user', content: userMessage }]
+    setBeraterChat(newChat)
+    
+    try {
+      const res = await fetch('/api/produktberater/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userMessage,
+          conversation_history: beraterChat
+        })
+      })
+      
+      const data = await res.json()
+      
+      if (data.ok) {
+        // Füge Assistant-Message hinzu
+        setBeraterChat([...newChat, { role: 'assistant', content: data.message }])
+        
+        // Aktualisiere gefundene Produkte
+        if (data.products && data.products.length > 0) {
+          setBeraterProducts(data.products)
+        }
+        
+        console.log('[Produktberater] Gefunden:', data.products?.length || 0, 'Produkte')
+      } else {
+        alert('❌ Fehler: ' + data.error)
+        setBeraterChat(newChat.slice(0, -1)) // Entferne User-Message bei Fehler
+      }
+    } catch (e) {
+      console.error('[Produktberater] Error:', e)
+      alert('❌ Fehler: ' + e.message)
+      setBeraterChat(newChat.slice(0, -1))
+    } finally {
+      setBeraterLoading(false)
+    }
+  }
+  
+  const resetBeraterChat = () => {
+    if (confirm('Chat zurücksetzen?')) {
+      setBeraterChat([])
+      setBeraterProducts([])
+      setBeraterInput('')
+    }
+  }
+
     setPromptModalMode(mode)
     if (mode === 'edit' && prompt) {
       setEditingPrompt(prompt)
