@@ -2643,9 +2643,9 @@ export default function App() {
 
   // 7. ARTIKEL-FILTER laden
   useEffect(() => {
-    if (!authChecked || activeTab !== 'produkte' || produkteTab !== 'artikel' || artikelTab !== 'browser') return
+    if (!authChecked || activeTab !== 'produkte' || produkteTab !== 'browser') return
     loadArtikelFilters()
-  }, [authChecked, activeTab, produkteTab, artikelTab])
+  }, [authChecked, activeTab, produkteTab])
 
   // 8. ARTIKEL IMPORT Status
   useEffect(() => {
