@@ -208,9 +208,40 @@ Sei präzise, professionell und hilfreich!`
                 }
               ]
             })
-            .limit(6)
+            .sort({ fLagerbestand: -1 }) // Sortiere nach Lagerbestand (verfügbar zuerst)
+            .limit(20) // Mehr Produkte holen für Diversität
             .toArray()
         }
+        
+        // Diversifizierung: Hole verschiedene Hersteller
+        const herstellerMap = new Map()
+        const diversifiedProducts = []
+        
+        for (const product of textProducts) {
+          const hersteller = product.brand || product.cHerstellerName || 'Unbekannt'
+          
+          if (!herstellerMap.has(hersteller)) {
+            herstellerMap.set(hersteller, [])
+          }
+          herstellerMap.get(hersteller).push(product)
+        }
+        
+        // Nimm max 2 Produkte pro Hersteller für Diversität
+        const manufacturers = Array.from(herstellerMap.keys())
+        console.log('[Produktberater] Gefundene Hersteller:', manufacturers)
+        
+        for (const manufacturer of manufacturers) {
+          const productsFromManufacturer = herstellerMap.get(manufacturer)
+          // Sortiere nach Verfügbarkeit
+          const sorted = productsFromManufacturer.sort((a: any, b: any) => {
+            const aStock = a.fLagerbestand || a.quantity || 0
+            const bStock = b.fLagerbestand || b.quantity || 0
+            return bStock - aStock
+          })
+          diversifiedProducts.push(...sorted.slice(0, 2)) // Max 2 pro Hersteller
+        }
+        
+        textProducts = diversifiedProducts.slice(0, 6)
         
         for (const product of textProducts) {
           // Handle both shopping_feed and articles format
