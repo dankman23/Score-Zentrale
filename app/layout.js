@@ -139,6 +139,7 @@ export default function RootLayout({ children }) {
               <li className="nav-item"><a className="nav-link" href="/#sales"><i className="bi bi-bar-chart mr-1"/>Sales</a></li>
               <li className="nav-item"><a className="nav-link" href="/#marketing"><i className="bi bi-bullseye mr-1"/>Marketing</a></li>
               <li className="nav-item"><a className="nav-link" href="/#glossar"><i className="bi bi-book mr-1"/>Glossar</a></li>
+              <li className="nav-item"><a className="nav-link" href="/#produktberater"><i className="bi bi-lightbulb mr-1"/>Berater</a></li>
               <li className="nav-item dropdown">
                 <a className="nav-link dropdown-toggle" href="/#outbound" id="outboundDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i className="bi bi-send mr-1"/>Outbound
@@ -151,7 +152,6 @@ export default function RootLayout({ children }) {
                 </div>
               </li>
               <li className="nav-item"><a className="nav-link" href="/#produkte"><i className="bi bi-box-seam mr-1"/>Produkte</a></li>
-              <li className="nav-item"><a className="nav-link" href="/#produktberater"><i className="bi bi-lightbulb mr-1"/>Berater</a></li>
               <li className="nav-item dropdown">
                 <a className="nav-link dropdown-toggle" href="/#preise" id="preiseDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i className="bi bi-calculator mr-1"/>Preise
