@@ -100,8 +100,11 @@ export default function RootLayout({ children }) {
             filter: invert(1);
             cursor: pointer;
           }
-          /* FIX: Bootstrap Dropdown Arrow für alle Dropdowns */
-          .navbar .dropdown-toggle::after {
+          /* CRITICAL FIX: Dropdown Arrow für ALLE Dropdowns erzwingen */
+          .navbar .dropdown-toggle::after,
+          a[id="produkteDropdown"]::after,
+          a[id="outboundDropdown"]::after,
+          a[id="preiseDropdown"]::after {
             display: inline-block !important;
             margin-left: 0.255em !important;
             vertical-align: 0.255em !important;
