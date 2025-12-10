@@ -3487,56 +3487,155 @@ export default function App() {
           )}
 
           {salesTab==='manufacturers' && (
-            <div className="card">
-              <div className="card-header d-flex justify-content-between align-items-center">
-                <span>Top-Hersteller nach Umsatz & Marge</span>
-                <button className="btn btn-outline-primary btn-sm" onClick={()=>exportCSV(topManufacturers, 'top-hersteller.csv')}>CSV</button>
+            <div>
+              {/* Sub-Tabs: Tabelle / Diagramm */}
+              <div className="btn-group mb-3" role="group">
+                <button 
+                  className={`btn btn-sm ${manufacturersView==='table'?'btn-primary':'btn-outline-primary'}`}
+                  onClick={()=>{setManufacturersView('table'); setSelectedManufacturers([])}}
+                >
+                  <i className="bi bi-table mr-1"/>Tabelle
+                </button>
+                <button 
+                  className={`btn btn-sm ${manufacturersView==='chart'?'btn-primary':'btn-outline-primary'}`}
+                  onClick={()=>setManufacturersView('chart')}
+                >
+                  <i className="bi bi-graph-up mr-1"/>Diagramm
+                </button>
               </div>
-              <div className="card-body p-0">
-                <div className="table-responsive" style={{maxHeight:420}}>
-                  <table className="table table-dark table-hover table-sm mb-0">
-                    <thead className="thead-dark">
-                      <tr>
-                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'manufacturer', direction: sortBy.field==='manufacturer' && sortBy.direction==='asc'?'desc':'asc'})}>
-                          Hersteller {sortBy.field==='manufacturer' && (sortBy.direction==='asc'?'↑':'↓')}
-                        </th>
-                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'orders', direction: sortBy.field==='orders' && sortBy.direction==='asc'?'desc':'asc'})}>
-                          Bestellungen {sortBy.field==='orders' && (sortBy.direction==='asc'?'↑':'↓')}
-                        </th>
-                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'revenue', direction: sortBy.field==='revenue' && sortBy.direction==='asc'?'desc':'asc'})}>
-                          Umsatz (Netto) {sortBy.field==='revenue' && (sortBy.direction==='asc'?'↑':'↓')}
-                        </th>
-                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'cost', direction: sortBy.field==='cost' && sortBy.direction==='asc'?'desc':'asc'})}>
-                          Kosten {sortBy.field==='cost' && (sortBy.direction==='asc'?'↑':'↓')}
-                        </th>
-                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'margin', direction: sortBy.field==='margin' && sortBy.direction==='asc'?'desc':'asc'})}>
-                          Marge (Netto) {sortBy.field==='margin' && (sortBy.direction==='asc'?'↑':'↓')}
-                        </th>
-                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'marginPct', direction: sortBy.field==='marginPct' && sortBy.direction==='asc'?'desc':'asc'})}>
-                          Marge % {sortBy.field==='marginPct' && (sortBy.direction==='asc'?'↑':'↓')}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[...(topManufacturers||[])].sort((a,b)=>{
-                        const aVal = sortBy.field==='manufacturer' ? a[sortBy.field] : parseFloat(a[sortBy.field])
-                        const bVal = sortBy.field==='manufacturer' ? b[sortBy.field] : parseFloat(b[sortBy.field])
-                        return sortBy.direction==='asc' ? (aVal>bVal?1:-1) : (aVal<bVal?1:-1)
-                      }).map((m,idx)=> (
-                        <tr key={idx}>
-                          <td>{m.manufacturer}</td>
-                          <td>{m.orders}</td>
-                          <td>{fmtCurrency(m.revenue)}</td>
-                          <td>{fmtCurrency(m.cost)}</td>
-                          <td className="text-success">{fmtCurrency(m.margin)}</td>
-                          <td>{m.marginPct}%</td>
-                        </tr>
-                      ))}
-                      {topManufacturers?.length===0 && <tr><td colSpan={6} className="text-center text-muted">Keine Daten</td></tr>}
-                    </tbody>
-                  </table>
+
+              {manufacturersView==='table' && (
+                <div className="card">
+                  <div className="card-header d-flex justify-content-between align-items-center">
+                    <span>Top-Hersteller nach Umsatz & Marge</span>
+                    <button className="btn btn-outline-primary btn-sm" onClick={()=>exportCSV(topManufacturers, 'top-hersteller.csv')}>CSV</button>
+                  </div>
+                  <div className="card-body p-0">
+                    <div className="table-responsive" style={{maxHeight:420}}>
+                      <table className="table table-dark table-hover table-sm mb-0">
+                        <thead className="thead-dark">
+                          <tr>
+                            <th style={{width:30}}>
+                              <input 
+                                type="checkbox"
+                                onChange={(e)=>{
+                                  if(e.target.checked) {
+                                    setSelectedManufacturers(topManufacturers.map(m=>m.manufacturer))
+                                  } else {
+                                    setSelectedManufacturers([])
+                                  }
+                                }}
+                                checked={selectedManufacturers.length === topManufacturers.length && topManufacturers.length > 0}
+                              />
+                            </th>
+                            <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'manufacturer', direction: sortBy.field==='manufacturer' && sortBy.direction==='asc'?'desc':'asc'})}>
+                              Hersteller {sortBy.field==='manufacturer' && (sortBy.direction==='asc'?'↑':'↓')}
+                            </th>
+                            <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'orders', direction: sortBy.field==='orders' && sortBy.direction==='asc'?'desc':'asc'})}>
+                              Bestellungen {sortBy.field==='orders' && (sortBy.direction==='asc'?'↑':'↓')}
+                            </th>
+                            <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'revenue', direction: sortBy.field==='revenue' && sortBy.direction==='asc'?'desc':'asc'})}>
+                              Umsatz (Netto) {sortBy.field==='revenue' && (sortBy.direction==='asc'?'↑':'↓')}
+                            </th>
+                            <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'cost', direction: sortBy.field==='cost' && sortBy.direction==='asc'?'desc':'asc'})}>
+                              Kosten {sortBy.field==='cost' && (sortBy.direction==='asc'?'↑':'↓')}
+                            </th>
+                            <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'margin', direction: sortBy.field==='margin' && sortBy.direction==='asc'?'desc':'asc'})}>
+                              Marge (Netto) {sortBy.field==='margin' && (sortBy.direction==='asc'?'↑':'↓')}
+                            </th>
+                            <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'marginPct', direction: sortBy.field==='marginPct' && sortBy.direction==='asc'?'desc':'asc'})}>
+                              Marge % {sortBy.field==='marginPct' && (sortBy.direction==='asc'?'↑':'↓')}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[...(topManufacturers||[])].sort((a,b)=>{
+                            const aVal = sortBy.field==='manufacturer' ? a[sortBy.field] : parseFloat(a[sortBy.field])
+                            const bVal = sortBy.field==='manufacturer' ? b[sortBy.field] : parseFloat(b[sortBy.field])
+                            return sortBy.direction==='asc' ? (aVal>bVal?1:-1) : (aVal<bVal?1:-1)
+                          }).map((m,idx)=> (
+                            <tr 
+                              key={idx}
+                              style={{cursor:'pointer'}}
+                              onClick={()=>{
+                                const isSelected = selectedManufacturers.includes(m.manufacturer)
+                                if(isSelected) {
+                                  setSelectedManufacturers(selectedManufacturers.filter(x=>x!==m.manufacturer))
+                                } else {
+                                  setSelectedManufacturers([...selectedManufacturers, m.manufacturer])
+                                }
+                              }}
+                            >
+                              <td onClick={(e)=>e.stopPropagation()}>
+                                <input 
+                                  type="checkbox" 
+                                  checked={selectedManufacturers.includes(m.manufacturer)}
+                                  onChange={(e)=>{
+                                    if(e.target.checked) {
+                                      setSelectedManufacturers([...selectedManufacturers, m.manufacturer])
+                                    } else {
+                                      setSelectedManufacturers(selectedManufacturers.filter(x=>x!==m.manufacturer))
+                                    }
+                                  }}
+                                />
+                              </td>
+                              <td>{m.manufacturer}</td>
+                              <td>{m.orders}</td>
+                              <td>{fmtCurrency(m.revenue)}</td>
+                              <td>{fmtCurrency(m.cost)}</td>
+                              <td className="text-success">{fmtCurrency(m.margin)}</td>
+                              <td>{m.marginPct}%</td>
+                            </tr>
+                          ))}
+                          {topManufacturers?.length===0 && <tr><td colSpan={7} className="text-center text-muted">Keine Daten</td></tr>}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  {selectedManufacturers.length > 0 && (
+                    <div className="card-footer">
+                      <button 
+                        className="btn btn-primary btn-sm"
+                        onClick={()=>setManufacturersView('chart')}
+                      >
+                        <i className="bi bi-graph-up mr-1"/>{selectedManufacturers.length} Hersteller im Diagramm anzeigen
+                      </button>
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
+
+              {manufacturersView==='chart' && (
+                <div className="card">
+                  <div className="card-header d-flex justify-content-between align-items-center">
+                    <span>Zeitliche Entwicklung der Umsätze</span>
+                    <button className="btn btn-outline-secondary btn-sm" onClick={()=>{setManufacturersView('table')}}>
+                      <i className="bi bi-arrow-left mr-1"/>Zurück zur Tabelle
+                    </button>
+                  </div>
+                  <div className="card-body">
+                    {selectedManufacturers.length === 0 ? (
+                      <div className="alert alert-info">
+                        Bitte wählen Sie mindestens einen Hersteller aus der Tabelle aus.
+                      </div>
+                    ) : !manufacturersTimeseries ? (
+                      <div className="text-center py-5">
+                        <div className="spinner-border text-primary" role="status"></div>
+                        <p className="mt-3 text-muted">Lade Daten...</p>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="mb-3">
+                          <small className="text-muted">
+                            Ausgewählte Hersteller: {selectedManufacturers.map((m,i)=><span key={i} className="badge badge-primary mr-1">{m}</span>)}
+                          </small>
+                        </div>
+                        <TimeseriesChart data={manufacturersTimeseries} labelKey="manufacturer" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
