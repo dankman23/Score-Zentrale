@@ -2637,9 +2637,9 @@ export default function App() {
 
   // 6. ARTIKEL-BROWSER laden
   useEffect(() => {
-    if (!authChecked || activeTab !== 'produkte' || produkteTab !== 'artikel' || artikelTab !== 'browser') return
+    if (!authChecked || activeTab !== 'produkte' || produkteTab !== 'browser') return
     loadArtikelList()
-  }, [authChecked, activeTab, produkteTab, artikelTab, artikelPage, artikelPerPage, artikelFilter, artikelSortBy, artikelSortOrder])
+  }, [authChecked, activeTab, produkteTab, artikelPage, artikelPerPage, artikelFilter, artikelSortBy, artikelSortOrder])
 
   // 7. ARTIKEL-FILTER laden
   useEffect(() => {
