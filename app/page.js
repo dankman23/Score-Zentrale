@@ -6756,36 +6756,48 @@ export default function App() {
             </div>
           </div>
 
-          {/* Tab Navigation */}
+          {/* Main Tab Navigation - Artikel oder Berater */}
           <div className="btn-group mb-4 w-100">
             <button 
-              className={`btn ${produkteTab === 'import' ? 'btn-primary' : 'btn-outline-secondary'}`}
-              onClick={() => { setProdukteTab('import'); loadArtikelStatus(); }}
+              className={`btn ${produkteTab === 'artikel' ? 'btn-primary' : 'btn-outline-secondary'}`}
+              onClick={() => setProdukteTab('artikel')}
             >
-              <i className="bi bi-download mr-2"/>Import
-            </button>
-            <button 
-              className={`btn ${produkteTab === 'browser' ? 'btn-primary' : 'btn-outline-secondary'}`}
-              onClick={() => { 
-                setProdukteTab('browser'); 
-                if (amazonPrompts.length === 0) loadAmazonPrompts();
-              }}
-            >
-              <i className="bi bi-database mr-2"/>JTL-Daten
-            </button>
-            <button 
-              className={`btn ${produkteTab === 'prompts' ? 'btn-primary' : 'btn-outline-secondary'}`}
-              onClick={() => { setProdukteTab('prompts'); loadAmazonPrompts(); }}
-            >
-              <i className="bi bi-chat-left-text mr-2"/>Prompts
+              <i className="bi bi-database mr-2"/>Artikel
             </button>
             <button 
               className={`btn ${produkteTab === 'berater' ? 'btn-primary' : 'btn-outline-secondary'}`}
               onClick={() => setProdukteTab('berater')}
             >
-              <i className="bi bi-lightbulb mr-2"/>Produktberater
+              <i className="bi bi-lightbulb mr-2"/>Berater
             </button>
           </div>
+
+          {/* Artikel Sub-Tabs */}
+          {produkteTab === 'artikel' && (
+            <div className="btn-group mb-4 w-100">
+              <button 
+                className={`btn ${artikelTab === 'import' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                onClick={() => { setArtikelTab('import'); loadArtikelStatus(); }}
+              >
+                <i className="bi bi-download mr-2"/>Import
+              </button>
+              <button 
+                className={`btn ${artikelTab === 'browser' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                onClick={() => { 
+                  setArtikelTab('browser'); 
+                  if (amazonPrompts.length === 0) loadAmazonPrompts();
+                }}
+              >
+                <i className="bi bi-database mr-2"/>JTL-Daten
+              </button>
+              <button 
+                className={`btn ${artikelTab === 'prompts' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                onClick={() => { setArtikelTab('prompts'); loadAmazonPrompts(); }}
+              >
+                <i className="bi bi-chat-left-text mr-2"/>Prompts
+              </button>
+            </div>
+          )}
 
           {/* Import Tab */}
           {produkteTab === 'import' && (
