@@ -72,3 +72,14 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+
+
+/* Hover Dropdown für Navigationsmenü */
+.dropdown-hover:hover .dropdown-menu {
+  display: block !important;
+}
+
+.dropdown-menu {
+  display: none;
+}
