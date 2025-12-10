@@ -3410,7 +3410,25 @@ export default function App() {
           )}
 
           {salesTab==='platforms' && (
-            <div className="card">
+            <div>
+              {/* Sub-Tabs: Tabelle / Diagramm */}
+              <div className="btn-group mb-3" role="group">
+                <button 
+                  className={`btn btn-sm ${platformsView==='table'?'btn-primary':'btn-outline-primary'}`}
+                  onClick={()=>{setPlatformsView('table'); setSelectedPlatforms([])}}
+                >
+                  <i className="bi bi-table mr-1"/>Tabelle
+                </button>
+                <button 
+                  className={`btn btn-sm ${platformsView==='chart'?'btn-primary':'btn-outline-primary'}`}
+                  onClick={()=>setPlatformsView('chart')}
+                >
+                  <i className="bi bi-graph-up mr-1"/>Diagramm
+                </button>
+              </div>
+
+              {platformsView==='table' && (
+                <div className="card">
               <div className="card-header d-flex justify-content-between align-items-center">
                 <span>Top-Plattformen nach Umsatz & Marge</span>
                 <button className="btn btn-outline-primary btn-sm" onClick={()=>exportCSV(topPlatforms, 'top-plattformen.csv')}>CSV</button>
