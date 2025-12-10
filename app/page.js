@@ -8254,8 +8254,22 @@ export default function App() {
               )}
 
 
-            {/* Produktberater Tab */}
-            {produkteTab === 'berater' && (
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Produktberater Section */}
+      {activeTab==='produktberater' && (
+        <div>
+          <div className="d-flex align-items-center justify-content-between mb-4">
+            <div>
+              <h2 className="mb-1"><i className="bi bi-lightbulb mr-2"/>Produktberater</h2>
+              <p className="text-muted small mb-0">AI-gestützte Produktempfehlungen</p>
+            </div>
+          </div>
+
+          {activeTab === 'produktberater' && (
               <div>
                 <div className="card border-0 shadow-sm mb-4" style={{backgroundColor: '#1a1f2c', minHeight: '400px'}}>
                   <div className="card-body">
