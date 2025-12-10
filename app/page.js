@@ -665,7 +665,11 @@ function SuppliersChart({ data }) {
     }
   }, [data])
 
-  return <canvas ref={canvasRef} style={{height: '400px'}}></canvas>
+  return (
+    <div style={{position: 'relative', height: '450px', width: '100%'}}>
+      <canvas ref={canvasRef}></canvas>
+    </div>
+  )
 }
 
 export default function App() {
