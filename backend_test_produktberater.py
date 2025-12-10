@@ -11,7 +11,7 @@ import os
 from datetime import datetime
 
 # Base URL aus .env
-BASE_URL = "https://shopping-feeds.preview.emergentagent.com"
+BASE_URL = "https://tool-expert.preview.emergentagent.com"
 
 def test_produktberater_chat():
     """Testet die Produktberater Chat API umfassend"""

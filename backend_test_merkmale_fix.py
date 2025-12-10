@@ -21,7 +21,7 @@ import os
 from typing import Dict, List, Any, Optional
 
 # Configuration
-BASE_URL = "https://shopping-feeds.preview.emergentagent.com"
+BASE_URL = "https://tool-expert.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class MerkmaleFixTester:
