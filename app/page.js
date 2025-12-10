@@ -3438,6 +3438,23 @@ export default function App() {
                   <table className="table table-dark table-hover table-sm mb-0">
                     <thead className="thead-dark">
                       <tr>
+                        <th style={{width:30}}>
+                          <input 
+                            type="checkbox"
+                            onChange={(e)=>{
+                              if(e.target.checked) {
+                                const names = topPlatforms.map(p => {
+                                  const platformNames = {'1': 'Direktvertrieb','2': 'Onlineshop','8': 'Otto','31': 'ebay.de','32': 'ebay.com','34': 'ebay.co.uk','36': 'ebay.at','38': 'ebay.fr','39': 'ebay.it','42': 'ebay.es','43': 'ebay.ch','44': 'ebay.ie','51': 'Amazon.de','54': 'Amazon.fr','56': 'Amazon.it','57': 'Amazon.es','60': 'Amazon.nl','65': 'Amazon.com.be'}
+                                  return platformNames[p.platform] || `Plattform #${p.platform}`
+                                })
+                                setSelectedPlatforms(names)
+                              } else {
+                                setSelectedPlatforms([])
+                              }
+                            }}
+                            checked={selectedPlatforms.length === topPlatforms.length && topPlatforms.length > 0}
+                          />
+                        </th>
                         <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'platform', direction: sortBy.field==='platform' && sortBy.direction==='asc'?'desc':'asc'})}>
                           Plattform {sortBy.field==='platform' && (sortBy.direction==='asc'?'↑':'↓')}
                         </th>
