@@ -6970,7 +6970,7 @@ export default function App() {
           )}
 
           {/* Browser Tab */}
-          {produkteTab === 'browser' && (
+          {produkteTab === 'artikel' && artikelTab === 'browser' && (
             <div>
               <div className="card border-0 shadow-sm">
                 <div className="card-body">
