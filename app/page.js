@@ -8344,29 +8344,49 @@ export default function App() {
                         </h6>
                         <div className="row">
                           {beraterProducts.map((product, idx) => (
-                            <div key={idx} className="col-md-6 mb-3">
+                            <div key={idx} className="col-md-6 col-lg-4 mb-3">
                               <div className="card" style={{backgroundColor: '#2d3748', border: '1px solid #444'}}>
+                                {product.image_link && (
+                                  <img 
+                                    src={product.image_link} 
+                                    className="card-img-top" 
+                                    alt={product.title}
+                                    style={{height: '200px', objectFit: 'cover'}}
+                                    onError={(e) => e.target.style.display = 'none'}
+                                  />
+                                )}
                                 <div className="card-body">
                                   <h6 className="card-title" style={{color: '#fff'}}>
-                                    {product.cName}
+                                    {product.title}
                                   </h6>
                                   <p className="card-text">
                                     <small style={{color: '#aaa'}}>
-                                      <strong>Art.-Nr.:</strong> {product.cArtNr}<br/>
-                                      <strong>Hersteller:</strong> {product.cHerstellerName}<br/>
-                                      {product.cBarcode && (
-                                        <><strong>EAN:</strong> {product.cBarcode}<br/></>
+                                      {product.brand && (
+                                        <><strong>Hersteller:</strong> {product.brand}<br/></>
                                       )}
-                                      <strong>Preis:</strong> {product.fVKNetto?.toFixed(2) || '0.00'} € (netto)
+                                      {product.mpn && (
+                                        <><strong>Art.-Nr.:</strong> {product.mpn}<br/></>
+                                      )}
+                                      {product.gtin && (
+                                        <><strong>EAN:</strong> {product.gtin}<br/></>
+                                      )}
+                                      {product.price && (
+                                        <><strong>Preis:</strong> {product.price}<br/></>
+                                      )}
+                                      {product.availability && (
+                                        <span className={`badge ${product.availability === 'in_stock' ? 'badge-success' : 'badge-warning'}`}>
+                                          {product.availability === 'in_stock' ? '✓ Auf Lager' : 'Nicht verfügbar'}
+                                        </span>
+                                      )}
                                     </small>
                                   </p>
                                   <a 
                                     href={product.shop_url} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className="btn btn-sm btn-primary"
+                                    className="btn btn-sm btn-primary btn-block"
                                   >
-                                    <i className="bi bi-box-arrow-up-right mr-1"/>Zum Produkt
+                                    <i className="bi bi-cart-plus mr-1"/>In den Warenkorb
                                   </a>
                                 </div>
                               </div>
