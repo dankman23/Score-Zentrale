@@ -35,7 +35,15 @@ async function importShoppingFeed() {
     process.exit(1)
   }
   
-  const client = new MongoClient(mongoUrl)
+  const client = new MongoClient(mongoUrl, {
+    maxPoolSize: 2,
+    minPoolSize: 1,
+    retryWrites: true,
+    serverSelectionTimeoutMS: 30000,
+    tls: true,
+    tlsAllowInvalidCertificates: false,
+    tlsAllowInvalidHostnames: false
+  })
   
   try {
     // Connect MongoDB
