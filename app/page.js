@@ -3542,6 +3542,50 @@ export default function App() {
                   </table>
                 </div>
               </div>
+              {selectedPlatforms.length > 0 && (
+                <div className="card-footer">
+                  <button 
+                    className="btn btn-primary btn-sm"
+                    onClick={()=>setPlatformsView('chart')}
+                  >
+                    <i className="bi bi-graph-up mr-1"/>{selectedPlatforms.length} Plattform(en) im Diagramm anzeigen
+                  </button>
+                </div>
+              )}
+            </div>
+              )}
+
+              {platformsView==='chart' && (
+                <div className="card">
+                  <div className="card-header d-flex justify-content-between align-items-center">
+                    <span>Zeitliche Entwicklung der Umsätze</span>
+                    <button className="btn btn-outline-secondary btn-sm" onClick={()=>{setPlatformsView('table')}}>
+                      <i className="bi bi-arrow-left mr-1"/>Zurück zur Tabelle
+                    </button>
+                  </div>
+                  <div className="card-body">
+                    {selectedPlatforms.length === 0 ? (
+                      <div className="alert alert-info">
+                        Bitte wählen Sie mindestens eine Plattform aus der Tabelle aus.
+                      </div>
+                    ) : !platformsTimeseries ? (
+                      <div className="text-center py-5">
+                        <div className="spinner-border text-primary" role="status"></div>
+                        <p className="mt-3 text-muted">Lade Daten...</p>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="mb-3">
+                          <small className="text-muted">
+                            Ausgewählte Plattformen: {selectedPlatforms.map((p,i)=><span key={i} className="badge badge-primary mr-1">{p}</span>)}
+                          </small>
+                        </div>
+                        <TimeseriesChart data={platformsTimeseries} labelKey="platform" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
