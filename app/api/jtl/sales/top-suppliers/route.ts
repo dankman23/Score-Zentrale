@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     const query = `
       SELECT 
         l.kLieferant,
-        ISNULL(l.cName, 'Unbekannt') AS supplier_name,
+        ISNULL(l.cFirma, 'Unbekannt') AS supplier_name,
         COUNT(DISTINCT b.kLieferantenBestellung) AS orders,
         SUM(${netExpr}) AS revenue
       FROM ${purchaseOrderTable} b
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
       INNER JOIN ${supplierTable} l ON b.kLieferant = l.kLieferant
       WHERE CAST(b.${dateField} AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
-      GROUP BY l.kLieferant, l.cName
+      GROUP BY l.kLieferant, l.cFirma
       ORDER BY revenue DESC
     `
 
