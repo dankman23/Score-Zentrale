@@ -25,38 +25,23 @@ export async function GET(request: NextRequest) {
 
     const pool = await getMssqlPool()
     
-    // Beschaffung (Purchase Orders) Tabellen - probiere beide Varianten
-    const headerCandidates = [
-      'Beschaffung.tBestellung',
-      'dbo.tBestellung'
-    ]
-    const posCandidates = [
-      'Beschaffung.tBestellungPos',
-      'dbo.tBestellungPos'
-    ]
-
-    const purchaseOrderTable = await firstExistingTable(pool, headerCandidates)
-    const posTable = await firstExistingTable(pool, posCandidates)
+    // Lieferantenbestellungen Tabellen
+    const purchaseOrderTable = 'dbo.tLieferantenBestellung'
+    const posTable = 'dbo.tLieferantenBestellungPos'
     const supplierTable = 'dbo.tLieferant'
 
-    if (!purchaseOrderTable || !posTable) {
-      return NextResponse.json({
-        ok: false,
-        error: 'Keine Bestellungstabellen gefunden'
-      }, { status: 404 })
-    }
-
-    // Prüfe verfügbare Felder
+    // Prüfe verfügbare Felder für Datum
     const dateField = await pickFirstExisting(pool, purchaseOrderTable, ['dErstellt', 'dBestelldatum']) || 'dErstellt'
     
+    // Status-Filter (optional) - Stornierte Bestellungen ausschließen
     const hasNStorno = await hasColumn(pool, purchaseOrderTable, 'nStorno')
     const stornoFilter = hasNStorno ? 'AND (b.nStorno IS NULL OR b.nStorno = 0)' : ''
 
-    // Positionsfelder
-    const qtyField = await pickFirstExisting(pool, posTable, ['fMenge', 'nMenge']) || 'fMenge'
-    const ekField = await pickFirstExisting(pool, posTable, ['fEKPreis', 'fEKNetto']) || 'fEKPreis'
+    // Positionsfelder für Mengen und Preise
+    const qtyField = await pickFirstExisting(pool, posTable, ['fMenge', 'nMenge', 'fAnzahl']) || 'fMenge'
+    const ekField = await pickFirstExisting(pool, posTable, ['fEKPreis', 'fEKNetto', 'fPreis']) || 'fEKPreis'
     
-    // Netto-Summe berechnen
+    // Netto-Summe berechnen (entweder direkt aus Spalte oder berechnet)
     const hasGesamtNetto = await hasColumn(pool, posTable, 'fGesamtNetto')
     let netExpr: string
     
@@ -66,18 +51,18 @@ export async function GET(request: NextRequest) {
       netExpr = `COALESCE(p.${ekField} * COALESCE(p.${qtyField}, 1), 0)`
     }
 
-    // Foreign Key zu Header
-    const fkField = await pickFirstExisting(pool, posTable, ['kBestellung', 'tBestellung_kBestellung']) || 'kBestellung'
+    // Foreign Key zu Header (kLieferantenBestellung in Pos-Tabelle)
+    const fkField = 'kLieferantenBestellung'
 
     // Query: Aggregiere Bestellungen nach Lieferant
     const query = `
       SELECT 
         l.kLieferant,
         ISNULL(l.cName, 'Unbekannt') AS supplier_name,
-        COUNT(DISTINCT b.kBestellung) AS orders,
+        COUNT(DISTINCT b.kLieferantenBestellung) AS orders,
         SUM(${netExpr}) AS revenue
       FROM ${purchaseOrderTable} b
-      INNER JOIN ${posTable} p ON b.kBestellung = p.${fkField}
+      INNER JOIN ${posTable} p ON b.kLieferantenBestellung = p.${fkField}
       INNER JOIN ${supplierTable} l ON b.kLieferant = l.kLieferant
       WHERE CAST(b.${dateField} AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
