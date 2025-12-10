@@ -8393,7 +8393,7 @@ export default function App() {
                                     rel="noopener noreferrer"
                                     className="btn btn-sm btn-primary btn-block"
                                   >
-                                    <i className="bi bi-cart-plus mr-1"/>In den Warenkorb
+                                    <i className="bi bi-box-arrow-up-right mr-1"/>Zum Produkt
                                   </a>
                                 </div>
                               </div>
