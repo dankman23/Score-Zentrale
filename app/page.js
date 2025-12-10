@@ -7863,7 +7863,7 @@ export default function App() {
             </div>
           )}
           {/* Prompts Tab */}
-          {produkteTab === 'prompts' && (
+          {produkteTab === 'artikel' && artikelTab === 'prompts' && (
             <div>
               <div className="card border-0 shadow-sm">
                 <div className="card-body">
