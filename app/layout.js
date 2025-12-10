@@ -1,6 +1,5 @@
 import './globals.css'
 import LogoutButton from '../components/LogoutButton'
-import ProdukteDropdown from './components/ProdukteDropdown'
 
 export const metadata = {
   title: 'SCORE Zentrale',
