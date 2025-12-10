@@ -701,9 +701,26 @@ export default function App() {
   const [topPlatforms, setTopPlatforms] = useState([])
   const [topManufacturers, setTopManufacturers] = useState([])
   const [topSuppliers, setTopSuppliers] = useState([])
-  const [suppliersView, setSuppliersView] = useState('table') // 'table' or 'chart'
+  
+  // Suppliers View State
+  const [suppliersView, setSuppliersView] = useState('table')
   const [selectedSuppliers, setSelectedSuppliers] = useState([])
   const [suppliersTimeseries, setSuppliersTimeseries] = useState(null)
+  
+  // Manufacturers View State
+  const [manufacturersView, setManufacturersView] = useState('table')
+  const [selectedManufacturers, setSelectedManufacturers] = useState([])
+  const [manufacturersTimeseries, setManufacturersTimeseries] = useState(null)
+  
+  // Platforms View State
+  const [platformsView, setPlatformsView] = useState('table')
+  const [selectedPlatforms, setSelectedPlatforms] = useState([])
+  const [platformsTimeseries, setPlatformsTimeseries] = useState(null)
+  
+  // Categories View State
+  const [categoriesView, setCategoriesView] = useState('table')
+  const [selectedCategories, setSelectedCategories] = useState([])
+  const [categoriesTimeseries, setCategoriesTimeseries] = useState(null)
   const [ts, setTs] = useState([])
   const [tsFees, setTsFees] = useState([])
   const [platTs, setPlatTs] = useState([])
