@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     const { db } = await connectToDatabase()
     const catalogsCollection = db.collection('manufacturer_catalogs')
-    const articlesCollection = db.collection('articles')
+    const shoppingFeedCollection = db.collection('shopping_feed')
 
     // Lade alle verfügbaren Kataloge
     const catalogs = await catalogsCollection.find({ status: 'active' }).toArray()
