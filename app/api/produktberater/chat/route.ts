@@ -109,7 +109,7 @@ Sei präzise, professionell und hilfreich!`
       mpns.push(match[1])
     }
 
-    // Suche matching Produkte in JTL
+    // Suche matching Produkte im Shopping Feed
     const matchingProducts: any[] = []
     
     if (eans.length > 0 || mpns.length > 0) {
@@ -120,28 +120,78 @@ Sei präzise, professionell und hilfreich!`
       }
       
       if (eans.length > 0) {
-        query.$or.push({ cBarcode: { $in: eans } })
+        query.$or.push({ gtin: { $in: eans } })
       }
       if (mpns.length > 0) {
-        query.$or.push({ 'variations.cArtNr': { $in: mpns } })
+        // MPN kann verschiedene Formate haben
+        const mpnVariations = mpns.flatMap(mpn => [
+          mpn,
+          mpn.toUpperCase(),
+          mpn.toLowerCase(),
+          `score-${mpn}`,
+          mpn.replace(/[^a-zA-Z0-9]/g, '')
+        ])
+        query.$or.push({ mpn: { $in: mpnVariations } })
       }
 
       if (query.$or.length > 0) {
-        const products = await articlesCollection
+        const products = await shoppingFeedCollection
           .find(query)
           .limit(10)
           .toArray()
 
         for (const product of products) {
           matchingProducts.push({
-            kArtikel: product.kArtikel,
-            cArtNr: product.cArtNr,
-            cName: product.cName,
-            cBarcode: product.cBarcode,
-            cHerstellerName: product.cHerstellerName,
-            fVKNetto: product.fVKNetto,
-            // TODO: Produkt-Link generieren
-            shop_url: `https://score-schleifwerkzeuge.de/artikel/${product.cArtNr}`
+            product_id: product.product_id,
+            title: product.title,
+            brand: product.brand,
+            mpn: product.mpn,
+            gtin: product.gtin,
+            price: product.price,
+            image_link: product.image_link,
+            shop_url: product.link,
+            availability: product.availability
+          })
+        }
+      }
+    }
+    
+    // Fallback: Textsuche wenn keine EAN/MPN gefunden
+    if (matchingProducts.length === 0 && assistantMessage) {
+      console.log('[Produktberater] Keine EAN/MPN, versuche Textsuche...')
+      
+      // Extrahiere Produktnamen/Keywords aus der Antwort
+      const keywords = assistantMessage
+        .match(/\*\*([^*]+)\*\*/g)
+        ?.map(k => k.replace(/\*\*/g, '').trim())
+        .slice(0, 3) || []
+      
+      if (keywords.length > 0) {
+        console.log('[Produktberater] Suche nach Keywords:', keywords)
+        
+        const textProducts = await shoppingFeedCollection
+          .find({
+            $or: keywords.map(kw => ({
+              $or: [
+                { title: { $regex: kw, $options: 'i' } },
+                { description: { $regex: kw, $options: 'i' } }
+              ]
+            }))
+          })
+          .limit(6)
+          .toArray()
+        
+        for (const product of textProducts) {
+          matchingProducts.push({
+            product_id: product.product_id,
+            title: product.title,
+            brand: product.brand,
+            mpn: product.mpn,
+            gtin: product.gtin,
+            price: product.price,
+            image_link: product.image_link,
+            shop_url: product.link,
+            availability: product.availability
           })
         }
       }
