@@ -547,14 +547,14 @@ function TimeseriesChart({ data, labelKey }) {
       chartRef.current.destroy()
     }
 
-    // Prepare data for Chart.js
-    const suppliers = [...new Set(data.timeseries.map(d => d.supplier))]
+    // Prepare data for Chart.js - works for any entity (supplier, manufacturer, platform, category)
+    const entities = [...new Set(data.timeseries.map(d => d[labelKey]))]
     const periods = [...new Set(data.timeseries.map(d => d.period))].sort()
 
-    const datasets = suppliers.map((supplier, idx) => {
-      const supplierData = data.timeseries.filter(d => d.supplier === supplier)
+    const datasets = entities.map((entity, idx) => {
+      const entityData = data.timeseries.filter(d => d[labelKey] === entity)
       const revenueData = periods.map(period => {
-        const entry = supplierData.find(d => d.period === period)
+        const entry = entityData.find(d => d.period === period)
         return entry ? parseFloat(entry.revenue) : 0
       })
 
