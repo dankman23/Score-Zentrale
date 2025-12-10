@@ -560,6 +560,7 @@ export default function App() {
   const [margin, setMargin] = useState(null)
   const [topPlatforms, setTopPlatforms] = useState([])
   const [topManufacturers, setTopManufacturers] = useState([])
+  const [topSuppliers, setTopSuppliers] = useState([])
   const [ts, setTs] = useState([])
   const [tsFees, setTsFees] = useState([])
   const [platTs, setPlatTs] = useState([])
