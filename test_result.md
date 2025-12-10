@@ -217,6 +217,18 @@ backend:
         comment: "✅ BUCHUNGSLOGIK INTEGRATION VERIFIED: Zahlungen API now correctly populates buchung field! Sample Amazon payment shows proper structure: sollKonto=1815, habenKonto=69001, nettoBetrag=14.76, mwstSatz=19%, buchungstext='Amazon ItemPrice 306-2426721-5897152', gegenkontoTyp='erloes'. Import fixes successful - buchung field no longer null for Amazon & PayPal payments. MwSt calculations working correctly (19% standard rate)."
 
 frontend:
+  - task: "Produktberater Chat-Interface UI"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Produktberater UI implementiert mit Chat-Interface, Produktanzeige, Session-Persistenz und Zurücksetzen-Button. Backend API bereits getestet (7/7 Tests bestanden). UI-Tests erforderlich für: Chat-Eingabe/Response, Produkt-Anzeige, Chat-Verlauf, Zurücksetzen-Funktion."
+
   - task: "UI-Anzeige Gegenkonto"
     implemented: false
     working: "NA"
