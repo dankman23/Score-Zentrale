@@ -2874,6 +2874,27 @@ export default function App() {
     }
   }, [selectedSuppliers, from, to, activeTab, salesTab, suppliersView])
 
+  // 7. Hersteller Zeitreihen laden
+  useEffect(() => {
+    if (activeTab === 'sales' && salesTab === 'manufacturers' && manufacturersView === 'chart') {
+      loadManufacturersTimeseries()
+    }
+  }, [selectedManufacturers, from, to, activeTab, salesTab, manufacturersView])
+
+  // 8. Plattformen Zeitreihen laden
+  useEffect(() => {
+    if (activeTab === 'sales' && salesTab === 'platforms' && platformsView === 'chart') {
+      loadPlatformsTimeseries()
+    }
+  }, [selectedPlatforms, from, to, activeTab, salesTab, platformsView])
+
+  // 9. Warengruppen Zeitreihen laden
+  useEffect(() => {
+    if (activeTab === 'sales' && salesTab === 'categories' && categoriesView === 'chart') {
+      loadCategoriesTimeseries()
+    }
+  }, [selectedCategories, from, to, activeTab, salesTab, categoriesView])
+
   // 6. ARTIKEL-BROWSER laden
   useEffect(() => {
     if (!authChecked || activeTab !== 'produkte' || produkteTab !== 'browser') return
