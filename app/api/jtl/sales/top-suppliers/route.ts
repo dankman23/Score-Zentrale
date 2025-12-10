@@ -76,40 +76,45 @@ export async function GET(request: NextRequest) {
       .query(query)
 
     // Zusammenfassen der Lieferanten gemäß Vorgabe
+    // User-Vorgabe: Zusammenfassung nach ähnlichen Namen
+    // Klingspor AG + Klingspor AG Konfektion -> Klingspor AG
+    // VSM Deutschland + VSM Deutschland Konfektion -> VSM Deutschland
+    // Starcke GmbH & Co. KG + Starcke GmbH & Co. KG Konfektion -> Starcke GmbH & Co. KG
+    // AWUKO ABRASIVES (alle Varianten) -> AWUKO ABRASIVES
+    
     const supplierMap = new Map()
     
-    // Mapping: kLieferant -> Gruppe  
-    // User-Vorgabe: 11+15 (AWUKO), 13+22 (Starcke), 4+8 (Klingspor), 9+10 (VSM)
-    const groupMapping: { [key: number]: { group: string, display: string } } = {
-      11: { group: 'AWUKO', display: 'AWUKO ABRASIVES' },
-      15: { group: 'AWUKO', display: 'AWUKO ABRASIVES' },
-      13: { group: 'Starcke', display: 'Starcke GmbH & Co. KG' },
-      22: { group: 'Starcke', display: 'Starcke GmbH & Co. KG' },
-      4: { group: 'Klingspor', display: 'Klingspor AG' },
-      8: { group: 'Klingspor', display: 'Klingspor AG' },
-      9: { group: 'VSM', display: 'VSM Deutschland' },
-      10: { group: 'VSM', display: 'VSM Deutschland' }
+    const normalizeSupplierName = (name: string): { groupKey: string, display: string } => {
+      const lower = name.toLowerCase()
+      
+      // Klingspor-Gruppe
+      if (lower.includes('klingspor')) {
+        return { groupKey: 'klingspor', display: 'Klingspor AG' }
+      }
+      // VSM-Gruppe
+      if (lower.includes('vsm')) {
+        return { groupKey: 'vsm', display: 'VSM Deutschland' }
+      }
+      // Starcke-Gruppe
+      if (lower.includes('starcke')) {
+        return { groupKey: 'starcke', display: 'Starcke GmbH & Co. KG' }
+      }
+      // AWUKO-Gruppe
+      if (lower.includes('awuko')) {
+        return { groupKey: 'awuko', display: 'AWUKO ABRASIVES' }
+      }
+      
+      // Alle anderen: Original-Name verwenden
+      return { groupKey: name, display: name }
     }
 
     // Aggregiere die Daten
     result.recordset.forEach(row => {
-      const kLieferant = row.kLieferant
-      
-      // Verwende entweder die Gruppe oder den Original-Namen
-      let groupKey: string
-      let displayName: string
-      
-      if (groupMapping[kLieferant]) {
-        groupKey = groupMapping[kLieferant].group
-        displayName = groupMapping[kLieferant].display
-      } else {
-        groupKey = `supplier_${kLieferant}`
-        displayName = row.supplier_name
-      }
+      const { groupKey, display } = normalizeSupplierName(row.supplier_name)
       
       if (!supplierMap.has(groupKey)) {
         supplierMap.set(groupKey, {
-          supplier: displayName,
+          supplier: display,
           orders: 0,
           revenue: 0
         })
