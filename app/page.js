@@ -8275,7 +8275,7 @@ export default function App() {
             {/* Produktberater Tab */}
             {produkteTab === 'berater' && (
               <div>
-                <div className="card border-0 shadow-sm" style={{backgroundColor: '#1a1f2c'}}>
+                <div className="card border-0 shadow-sm mb-4" style={{backgroundColor: '#1a1f2c', minHeight: '400px'}}>
                   <div className="card-body">
                     <div className="d-flex justify-content-between align-items-center mb-4">
                       <h5 className="mb-0" style={{color: '#fff'}}>
