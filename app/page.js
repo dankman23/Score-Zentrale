@@ -6745,7 +6745,7 @@ export default function App() {
       )}
 
       {/* Request Inspector - nur bei Dashboard/Sales/Marketing */}
-      {(activeTab === 'dashboard' || activeTab === 'sales' || activeTab === 'marketing') && (
+      {showApiMonitor && (activeTab === 'dashboard' || activeTab === 'sales' || activeTab === 'marketing') && (
         <div className="position-fixed d-none d-lg-block" style={{right:12, bottom:54, zIndex:1059, width:340}}>
           <div className="card border-0 shadow-sm" style={{opacity:.96}}>
             <div className="card-header bg-dark text-white py-2 px-3 d-flex justify-content-between align-items-center border-0">
@@ -6753,7 +6753,17 @@ export default function App() {
                 <i className="bi bi-activity mr-2"/>
                 <span className="small font-weight-bold">API Monitor</span>
               </div>
-              <span className="badge badge-light">{netlog?.[0]?.ms? `${netlog[0].ms} ms` : ''}</span>
+              <div className="d-flex align-items-center">
+                <span className="badge badge-light mr-2">{netlog?.[0]?.ms? `${netlog[0].ms} ms` : ''}</span>
+                <button 
+                  className="btn btn-sm btn-link text-white p-0"
+                  onClick={()=>setShowApiMonitor(false)}
+                  title="Schließen"
+                  style={{fontSize:'1.2rem', lineHeight:1}}
+                >
+                  ×
+                </button>
+              </div>
             </div>
             <div className="card-body p-2" style={{maxHeight:180, overflowY:'auto', fontSize:'0.8rem'}}>
               {(netlog||[]).map((r,i)=> (
