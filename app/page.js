@@ -3503,7 +3503,31 @@ export default function App() {
                         }
                         const name = platformNames[p.platform] || `Plattform #${p.platform}`
                         return (
-                          <tr key={idx}>
+                          <tr 
+                            key={idx}
+                            style={{cursor:'pointer'}}
+                            onClick={()=>{
+                              const isSelected = selectedPlatforms.includes(name)
+                              if(isSelected) {
+                                setSelectedPlatforms(selectedPlatforms.filter(x=>x!==name))
+                              } else {
+                                setSelectedPlatforms([...selectedPlatforms, name])
+                              }
+                            }}
+                          >
+                            <td onClick={(e)=>e.stopPropagation()}>
+                              <input 
+                                type="checkbox" 
+                                checked={selectedPlatforms.includes(name)}
+                                onChange={(e)=>{
+                                  if(e.target.checked) {
+                                    setSelectedPlatforms([...selectedPlatforms, name])
+                                  } else {
+                                    setSelectedPlatforms(selectedPlatforms.filter(x=>x!==name))
+                                  }
+                                }}
+                              />
+                            </td>
                             <td>{name}</td>
                             <td>{p.orders}</td>
                             <td>{fmtCurrency(p.revenue)}</td>
@@ -3513,7 +3537,7 @@ export default function App() {
                           </tr>
                         )
                       })}
-                      {topPlatforms?.length===0 && <tr><td colSpan={6} className="text-center text-muted">Keine Daten</td></tr>}
+                      {topPlatforms?.length===0 && <tr><td colSpan={7} className="text-center text-muted">Keine Daten</td></tr>}
                     </tbody>
                   </table>
                 </div>
