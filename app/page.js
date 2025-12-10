@@ -8257,6 +8257,156 @@ export default function App() {
                   </div>
                 </div>
               )}
+
+
+            {/* Produktberater Tab */}
+            {produkteTab === 'berater' && (
+              <div>
+                <div className="card border-0 shadow-sm">
+                  <div className="card-body">
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                      <h5 className="mb-0" style={{color: '#fff'}}>
+                        <i className="bi bi-lightbulb mr-2"/>Produktberater
+                      </h5>
+                      {beraterChat.length > 0 && (
+                        <button 
+                          className="btn btn-sm btn-outline-secondary"
+                          onClick={resetBeraterChat}
+                        >
+                          <i className="bi bi-arrow-clockwise mr-1"/>Zurücksetzen
+                        </button>
+                      )}
+                    </div>
+
+                    {beraterChat.length === 0 ? (
+                      <div className="text-center py-5">
+                        <i className="bi bi-chat-dots" style={{fontSize: '4rem', color: '#aaa'}}/>
+                        <h4 className="mt-3" style={{color: '#fff'}}>Willkommen beim Produktberater!</h4>
+                        <p style={{color: '#aaa', maxWidth: '600px', margin: '0 auto'}}>
+                          Beschreiben Sie Ihre Anforderungen, und ich helfe Ihnen, das passende Schleifwerkzeug zu finden.
+                          <br/>Z.B.: "Ich brauche ein Schleifband für Edelstahl, Körnung 80-120"
+                        </p>
+                      </div>
+                    ) : (
+                      <div style={{height: '500px', overflowY: 'auto', marginBottom: '20px'}}>
+                        {beraterChat.map((msg, idx) => (
+                          <div 
+                            key={idx}
+                            className="mb-3"
+                            style={{
+                              display: 'flex',
+                              justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start'
+                            }}
+                          >
+                            <div 
+                              style={{
+                                maxWidth: '70%',
+                                padding: '12px 16px',
+                                borderRadius: '12px',
+                                backgroundColor: msg.role === 'user' ? '#007bff' : '#2d3748',
+                                color: '#fff'
+                              }}
+                            >
+                              {msg.role === 'assistant' && (
+                                <div className="mb-2">
+                                  <i className="bi bi-robot mr-2"/>
+                                  <strong>Produktberater</strong>
+                                </div>
+                              )}
+                              <div style={{whiteSpace: 'pre-wrap'}}>{msg.content}</div>
+                            </div>
+                          </div>
+                        ))}
+                        {beraterLoading && (
+                          <div className="mb-3" style={{display: 'flex', justifyContent: 'flex-start'}}>
+                            <div 
+                              style={{
+                                maxWidth: '70%',
+                                padding: '12px 16px',
+                                borderRadius: '12px',
+                                backgroundColor: '#2d3748',
+                                color: '#fff'
+                              }}
+                            >
+                              <i className="bi bi-three-dots"/>
+                              <span className="ml-2">Suche passende Produkte...</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Gefundene Produkte */}
+                    {beraterProducts.length > 0 && (
+                      <div className="mb-3">
+                        <h6 style={{color: '#fff'}}>
+                          <i className="bi bi-box-seam mr-2"/>Gefundene Produkte ({beraterProducts.length})
+                        </h6>
+                        <div className="row">
+                          {beraterProducts.map((product, idx) => (
+                            <div key={idx} className="col-md-6 mb-3">
+                              <div className="card" style={{backgroundColor: '#2d3748', border: '1px solid #444'}}>
+                                <div className="card-body">
+                                  <h6 className="card-title" style={{color: '#fff'}}>
+                                    {product.cName}
+                                  </h6>
+                                  <p className="card-text">
+                                    <small style={{color: '#aaa'}}>
+                                      <strong>Art.-Nr.:</strong> {product.cArtNr}<br/>
+                                      <strong>Hersteller:</strong> {product.cHerstellerName}<br/>
+                                      {product.cBarcode && (
+                                        <><strong>EAN:</strong> {product.cBarcode}<br/></>
+                                      )}
+                                      <strong>Preis:</strong> {product.fVKNetto?.toFixed(2) || '0.00'} € (netto)
+                                    </small>
+                                  </p>
+                                  <a 
+                                    href={product.shop_url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="btn btn-sm btn-primary"
+                                  >
+                                    <i className="bi bi-box-arrow-up-right mr-1"/>Zum Produkt
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Chat Input */}
+                    <div className="input-group">
+                      <input 
+                        type="text"
+                        className="form-control"
+                        placeholder="Beschreiben Sie Ihre Anforderungen..."
+                        value={beraterInput}
+                        onChange={(e) => setBeraterInput(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && !beraterLoading && sendBeraterMessage()}
+                        disabled={beraterLoading}
+                        style={{backgroundColor: '#2d3748', color: '#fff', border: '1px solid #444'}}
+                      />
+                      <div className="input-group-append">
+                        <button 
+                          className="btn btn-primary"
+                          onClick={sendBeraterMessage}
+                          disabled={beraterLoading || !beraterInput.trim()}
+                        >
+                          {beraterLoading ? (
+                            <><i className="bi bi-three-dots"/> Verarbeite...</>
+                          ) : (
+                            <><i className="bi bi-send"/> Senden</>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             </div>
           )}
         </div>
