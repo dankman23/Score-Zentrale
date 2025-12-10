@@ -3388,24 +3388,136 @@ export default function App() {
           )}
 
           {salesTab==='categories' && (
-            <div className="card">
-              <div className="card-header d-flex justify-content-between align-items-center">
-                <span>Top-Warengruppen</span>
-                <button className="btn btn-outline-primary btn-sm" onClick={()=>exportCSV(topCategories, 'top-warengruppen.csv')}>CSV</button>
+            <div>
+              {/* Sub-Tabs: Tabelle / Diagramm */}
+              <div className="btn-group mb-3" role="group">
+                <button 
+                  className={`btn btn-sm ${categoriesView==='table'?'btn-primary':'btn-outline-primary'}`}
+                  onClick={()=>{setCategoriesView('table'); setSelectedCategories([])}}
+                >
+                  <i className="bi bi-table mr-1"/>Tabelle
+                </button>
+                <button 
+                  className={`btn btn-sm ${categoriesView==='chart'?'btn-primary':'btn-outline-primary'}`}
+                  onClick={()=>setCategoriesView('chart')}
+                >
+                  <i className="bi bi-graph-up mr-1"/>Diagramm
+                </button>
               </div>
-              <div className="card-body p-0">
-                <div className="table-responsive" style={{maxHeight:420}}>
-                  <table className="table table-dark table-hover table-sm mb-0">
-                    <thead className="thead-dark"><tr><th>Kategorie</th><th>Artikel</th><th>Umsatz (Netto)</th></tr></thead>
-                    <tbody>
-                      {(topCategories||[]).map((r,idx)=> (
-                        <tr key={idx}><td>{r.category||r.kategorie}</td><td>{r.items||'-'}</td><td>{fmtCurrency(r.revenue||r.umsatz)}</td></tr>
-                      ))}
-                      {topCategories?.length===0 && <tr><td colSpan={3} className="text-center text-muted">Keine Daten</td></tr>}
-                    </tbody>
-                  </table>
+
+              {categoriesView==='table' && (
+                <div className="card">
+                  <div className="card-header d-flex justify-content-between align-items-center">
+                    <span>Top-Warengruppen</span>
+                    <button className="btn btn-outline-primary btn-sm" onClick={()=>exportCSV(topCategories, 'top-warengruppen.csv')}>CSV</button>
+                  </div>
+                  <div className="card-body p-0">
+                    <div className="table-responsive" style={{maxHeight:420}}>
+                      <table className="table table-dark table-hover table-sm mb-0">
+                        <thead className="thead-dark">
+                          <tr>
+                            <th style={{width:30}}>
+                              <input 
+                                type="checkbox"
+                                onChange={(e)=>{
+                                  if(e.target.checked) {
+                                    setSelectedCategories(topCategories.map(c=>c.category||c.kategorie))
+                                  } else {
+                                    setSelectedCategories([])
+                                  }
+                                }}
+                                checked={selectedCategories.length === topCategories.length && topCategories.length > 0}
+                              />
+                            </th>
+                            <th>Kategorie</th>
+                            <th>Artikel</th>
+                            <th>Umsatz (Netto)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(topCategories||[]).map((r,idx)=> {
+                            const catName = r.category||r.kategorie
+                            return (
+                              <tr 
+                                key={idx}
+                                style={{cursor:'pointer'}}
+                                onClick={()=>{
+                                  const isSelected = selectedCategories.includes(catName)
+                                  if(isSelected) {
+                                    setSelectedCategories(selectedCategories.filter(x=>x!==catName))
+                                  } else {
+                                    setSelectedCategories([...selectedCategories, catName])
+                                  }
+                                }}
+                              >
+                                <td onClick={(e)=>e.stopPropagation()}>
+                                  <input 
+                                    type="checkbox" 
+                                    checked={selectedCategories.includes(catName)}
+                                    onChange={(e)=>{
+                                      if(e.target.checked) {
+                                        setSelectedCategories([...selectedCategories, catName])
+                                      } else {
+                                        setSelectedCategories(selectedCategories.filter(x=>x!==catName))
+                                      }
+                                    }}
+                                  />
+                                </td>
+                                <td>{catName}</td>
+                                <td>{r.items||'-'}</td>
+                                <td>{fmtCurrency(r.revenue||r.umsatz)}</td>
+                              </tr>
+                            )
+                          })}
+                          {topCategories?.length===0 && <tr><td colSpan={4} className="text-center text-muted">Keine Daten</td></tr>}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  {selectedCategories.length > 0 && (
+                    <div className="card-footer">
+                      <button 
+                        className="btn btn-primary btn-sm"
+                        onClick={()=>setCategoriesView('chart')}
+                      >
+                        <i className="bi bi-graph-up mr-1"/>{selectedCategories.length} Warengruppe(n) im Diagramm anzeigen
+                      </button>
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
+
+              {categoriesView==='chart' && (
+                <div className="card">
+                  <div className="card-header d-flex justify-content-between align-items-center">
+                    <span>Zeitliche Entwicklung der Umsätze</span>
+                    <button className="btn btn-outline-secondary btn-sm" onClick={()=>{setCategoriesView('table')}}>
+                      <i className="bi bi-arrow-left mr-1"/>Zurück zur Tabelle
+                    </button>
+                  </div>
+                  <div className="card-body">
+                    {selectedCategories.length === 0 ? (
+                      <div className="alert alert-info">
+                        Bitte wählen Sie mindestens eine Warengruppe aus der Tabelle aus.
+                      </div>
+                    ) : !categoriesTimeseries ? (
+                      <div className="text-center py-5">
+                        <div className="spinner-border text-primary" role="status"></div>
+                        <p className="mt-3 text-muted">Lade Daten...</p>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="mb-3">
+                          <small className="text-muted">
+                            Ausgewählte Warengruppen: {selectedCategories.map((c,i)=><span key={i} className="badge badge-primary mr-1">{c}</span>)}
+                          </small>
+                        </div>
+                        <TimeseriesChart data={categoriesTimeseries} labelKey="category" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
