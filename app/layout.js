@@ -204,7 +204,15 @@ export default function RootLayout({ children }) {
                       <a className="dropdown-item" href="/#kaltakquise"><i className="bi bi-snowflake mr-1"/>Kaltakquise</a>
                     </div>
                   </li>
-                  <li className="nav-item"><a className="nav-link py-1 px-2" href="/#produkte" style={{fontSize: '0.85rem'}}><i className="bi bi-box-seam mr-1"/>Produkte</a></li>
+                  <li className="nav-item dropdown">
+                    <a className="nav-link dropdown-toggle py-1 px-2" href="/#produkte" role="button" data-toggle="dropdown" style={{fontSize: '0.85rem'}}>
+                      <i className="bi bi-box-seam mr-1"/>Produkte
+                    </a>
+                    <div className="dropdown-menu">
+                      <a className="dropdown-item" href="/#produkte"><i className="bi bi-grid mr-1"/>Artikel</a>
+                      <a className="dropdown-item" href="/#produktberater"><i className="bi bi-lightbulb mr-1"/>Produktberater</a>
+                    </div>
+                  </li>
                   <li className="nav-item dropdown">
                     <a className="nav-link dropdown-toggle py-1 px-2" href="/#preise" role="button" data-toggle="dropdown" style={{fontSize: '0.85rem'}}>
                       <i className="bi bi-calculator mr-1"/>Preise
