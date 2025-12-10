@@ -4,7 +4,12 @@ const https = require('https')
 const path = require('path')
 require('dotenv').config({ path: path.join(__dirname, '../.env') })
 
-const FEED_URL = 'https://score-schleifwerkzeuge.de/store-api/product-export/SWPERULYSJRJNE1WMZFIS0DNUQ/google3.xml'
+const FEED_URLS = [
+  'https://score-schleifwerkzeuge.de/store-api/product-export/SWPEWTLUSNPQB202UDVMOXDCQG/google.xml',
+  'https://score-schleifwerkzeuge.de/store-api/product-export/SWPEV096MGCWNMTERMPLTK90YG/google2.xml',
+  'https://score-schleifwerkzeuge.de/store-api/product-export/SWPERULYSJRJNE1WMZFIS0DNUQ/google3.xml',
+  'https://score-schleifwerkzeuge.de/store-api/product-export/SWPEBWNYNGPGU2J4EDLVNHJRDW/google4.xml'
+]
 
 async function fetchFeed() {
   return new Promise((resolve, reject) => {
