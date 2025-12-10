@@ -1922,3 +1922,28 @@ frontend:
         agent: "main"
         comment: "✅ FRONTEND E2E GETESTET: Navigierte zu https://shopping-feeds.preview.emergentagent.com/preise. (1) Seite lädt korrekt mit Tabbed-Layout, (2) Typ 'CS 310 X' aus Dropdown gewählt, (3) Körnung '80' ausgewählt (abhängig von Typ), (4) Breite=100mm, Länge=1000mm vorbelegt, (5) Button 'Berechnen' geklickt, (6) Ergebnisse angezeigt: Stück-EK 84.40€, MBM 15 Stück, Gesamt-EK 1.266,00€, Typ: CS 310 X | Körnung: 16 | Unterlagenart: Gewebe, Maße: 100mm × 1000mm | Listenpreis: 324,63€. Alle UI-Komponenten funktionieren korrekt!"
 
+
+  - task: "Produktberater: POST /api/produktberater/chat (Chat-API mit GPT-4o + RAG)"
+    implemented: true
+    working: "needs_testing"
+    file: "/app/app/api/produktberater/chat/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEUE IMPLEMENTIERUNG: Produktberater Chat-API erstellt. (1) Akzeptiert POST mit { message: string, session_id?: string }, (2) RAG-Pipeline: Lädt Kataloge aus 'manufacturer_catalogs' collection (12 Hersteller + 425 Klingspor Datenblätter), (3) GPT-4o generiert Produktempfehlungen basierend auf Katalog-Wissen (mit Klingspor-Präferenz), (4) Matched Empfehlungen gegen 'shopping_feed' collection via Text-Search (MPNs, Titel, Beschreibung), (5) Returnt empfohlene Produkte mit image_link, title, link, price, mpn, brand. OpenAI API Key aus .env. MongoDB Collections: manufacturer_catalogs (437 Dokumente), shopping_feed (aktuell 45.425 Produkte aus Feed 1). MongoDB M10 Tier-Upgrade propagiert noch (30-60 Min), dann werden alle 4 Feeds (~135.000 Produkte) automatisch importiert."
+
+  - task: "Shopping Feed Import: /scripts/import-shopping-feed.js (4 Feeds + Nightly Sync)"
+    implemented: true
+    working: "partial"
+    file: "/app/scripts/import-shopping-feed.js, /app/scripts/nightly-feed-sync.sh, /etc/supervisor/conf.d/shopping-feed-nightly.conf"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEUE IMPLEMENTIERUNG: (1) import-shopping-feed.js modifiziert: Verarbeitet alle 4 Google Shopping Feed URLs sequenziell, XML-Parsing mit xml2js, Bulk Insert in 'shopping_feed' collection, Indexes auf mpn/gtin/brand/text, (2) nightly-feed-sync.sh erstellt: Wrapper-Script stoppt Next.js vor Import (MongoDB M0 Connection-Limit), führt Import durch, startet Next.js wieder, (3) Supervisor-Job shopping-feed-nightly.conf: Läuft täglich um 1 Uhr morgens automatisch. AKTUELLER STATUS: Feed 1 erfolgreich importiert (45.425 Produkte), Feeds 2-4 fehlgeschlagen wegen MongoDB M0 512MB Limit. USER HAT AUF M10 (10GB) HOCHGESTUFT - Upgrade propagiert 30-60 Min, danach werden alle 4 Feeds automatisch importiert (nächtlicher Job läuft bereits)."
+
