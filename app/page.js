@@ -532,6 +532,142 @@ function KpiTile({ title, value, sub, demo }) {
 
 const fmtCurrency = (n) => new Intl.NumberFormat('de-DE', { style:'currency', currency:'EUR' }).format(Number(n||0))
 
+// Suppliers Chart Component
+function SuppliersChart({ data }) {
+  const canvasRef = useRef(null)
+  const chartRef = useRef(null)
+
+  useEffect(() => {
+    if (!canvasRef.current || !data || !data.timeseries) return
+
+    const ctx = canvasRef.current.getContext('2d')
+
+    // Destroy existing chart
+    if (chartRef.current) {
+      chartRef.current.destroy()
+    }
+
+    // Prepare data for Chart.js
+    const suppliers = [...new Set(data.timeseries.map(d => d.supplier))]
+    const periods = [...new Set(data.timeseries.map(d => d.period))].sort()
+
+    const datasets = suppliers.map((supplier, idx) => {
+      const supplierData = data.timeseries.filter(d => d.supplier === supplier)
+      const revenueData = periods.map(period => {
+        const entry = supplierData.find(d => d.period === period)
+        return entry ? parseFloat(entry.revenue) : 0
+      })
+
+      // Farben-Palette
+      const colors = [
+        'rgb(255, 99, 132)',
+        'rgb(54, 162, 235)',
+        'rgb(255, 206, 86)',
+        'rgb(75, 192, 192)',
+        'rgb(153, 102, 255)',
+        'rgb(255, 159, 64)',
+        'rgb(199, 199, 199)',
+        'rgb(83, 102, 255)',
+        'rgb(255, 99, 255)',
+        'rgb(99, 255, 132)'
+      ]
+
+      return {
+        label: supplier,
+        data: revenueData,
+        borderColor: colors[idx % colors.length],
+        backgroundColor: colors[idx % colors.length].replace('rgb', 'rgba').replace(')', ', 0.1)'),
+        borderWidth: 2,
+        tension: 0.3,
+        fill: false
+      }
+    })
+
+    // Format X-Achse basierend auf Gruppierung
+    const formatPeriod = (period) => {
+      const date = new Date(period)
+      if (data.grouping === 'day') {
+        return date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
+      } else if (data.grouping === 'week') {
+        return 'KW ' + date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
+      } else {
+        return date.toLocaleDateString('de-DE', { month: 'short', year: '2-digit' })
+      }
+    }
+
+    chartRef.current = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: periods.map(formatPeriod),
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              color: '#fff',
+              font: { size: 12 }
+            }
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+              label: function(context) {
+                let label = context.dataset.label || ''
+                if (label) {
+                  label += ': '
+                }
+                label += new Intl.NumberFormat('de-DE', { 
+                  style: 'currency', 
+                  currency: 'EUR' 
+                }).format(context.parsed.y)
+                return label
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { 
+              color: '#aaa',
+              maxRotation: 45,
+              minRotation: 0
+            },
+            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { 
+              color: '#aaa',
+              callback: function(value) {
+                return new Intl.NumberFormat('de-DE', { 
+                  style: 'currency', 
+                  currency: 'EUR',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                }).format(value)
+              }
+            },
+            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+          }
+        }
+      }
+    })
+
+    return () => {
+      if (chartRef.current) {
+        chartRef.current.destroy()
+      }
+    }
+  }, [data])
+
+  return <canvas ref={canvasRef} style={{height: '400px'}}></canvas>
+}
+
 export default function App() {
   const router = useRouter()
   
