@@ -717,6 +717,21 @@ test_plan:
         agent: "testing"
         comment: "✅ VERBESSERTE HAUPTKATEGORIE-LOGIK ERFOLGREICH GETESTET! Comprehensive testing completed: (1) ✅ Debug-Endpoint /api/debug/test-kategorie working perfectly - returns real product categories like 'Schleifband', 'Vlies' instead of numbers/sets, (2) ✅ Customer data validation successful - 9/10 customers have valid hauptartikel values: 'Schleifband' (7 customers), 'Schleifscheibe' (2 customers), (3) ✅ No invalid categories found - no more '5er', '10x', '4er-Set' patterns, (4) ✅ SQL query improvements working - CASE statements properly match product names like 'Schleifscheibe', 'Fächerscheibe', 'Trennscheibe', 'Schleifband', 'Fräser', 'Bohrer', etc., (5) ✅ JTL Customer Sync running successfully in background. CRITICAL SUCCESS: Product category recognition now identifies real product names instead of meaningless numbers or sets. System ready for production use!"
 
+  - task: "Produktberater Chat: POST /api/produktberater/chat"
+    implemented: true
+    working: true
+    file: "/app/app/api/produktberater/chat/route.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Produktberater Feature mit Chat-Interface und AI-Produktempfehlungen implementiert. Verwendet GPT-4o Model, 437 Hersteller-Kataloge verfügbar (inkl. Klingspor als Premium-Partner), 166,914 Artikel in MongoDB. Unterstützt Session-Persistenz, Conversation History, EAN/MPN-Suche und Textsuche-Fallback."
+      - working: true
+        agent: "testing"
+        comment: "✅ PRODUKTBERATER CHAT API COMPREHENSIVE TESTING COMPLETED SUCCESSFULLY! All 7/7 test scenarios PASSED: (1) ✅ Einfache Anfrage - API returns 200 OK with AI response (1156 chars), Klingspor als Premium-Partner erwähnt, 6 Produkte gefunden aus articles collection, (2) ✅ Spezifische Anfrage - Körnung 80, 100mm Breite, Edelstahl korrekt in Antwort berücksichtigt, (3) ✅ Allgemeine Frage - Vielfältige Produktkategorien erklärt (Schleifscheibe, Trennscheibe), (4) ✅ Session-Persistenz - Conversation history funktioniert, Kontext aus vorheriger Nachricht berücksichtigt, (5) ✅ Fehlerbehandlung - Leere/fehlende Nachrichten korrekt mit 400 Bad Request abgelehnt, (6) ✅ Performance - Response Zeit 8-13s (akzeptabel < 30s), Token Usage: ~11k total, (7) ✅ KRITISCHER FIX ANGEWENDET: API suchte ursprünglich in leerer 'shopping_feed' Collection, jetzt Fallback auf 'articles' Collection mit 8,697 Klingspor-Produkten. Produktsuche funktioniert perfekt mit korrekten Feldern: title, brand, price, mpn, shop_url, availability. GPT-4o Integration working flawlessly, OpenAI API key functional. System ready for production use!"
+
 agent_communication:
   - agent: "main"
     message: "🚀 AUTOPILOT-OPTIMIERUNG ABGESCHLOSSEN! Alle Änderungen implementiert: (1) Collections vereinheitlicht - ALLE APIs nutzen jetzt 'prospects' (vorher: 3 verschiedene Collections!), (2) BCC erweitert auf beide Adressen, (3) Frontend-Statusanzeige mit Live-Phase-Indicator, (4) Gesendete Mails sichtbar im Kontaktiert-Tab mit Follow-up-Status. BITTE TESTEN: (a) POST /api/coldleads/dach/crawl → prüfe dass in 'prospects' gespeichert wird, (b) POST /api/coldleads/analyze-deep → prüfe 'prospects' Collection, (c) POST /api/coldleads/autopilot/tick → kompletter Flow (crawl → analyze → email), (d) Frontend: Autopilot-Statusanzeige, Kontaktiert-Tab mit Gesendet-Spalte."
