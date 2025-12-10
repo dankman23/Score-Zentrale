@@ -532,8 +532,8 @@ function KpiTile({ title, value, sub, demo }) {
 
 const fmtCurrency = (n) => new Intl.NumberFormat('de-DE', { style:'currency', currency:'EUR' }).format(Number(n||0))
 
-// Suppliers Chart Component
-function SuppliersChart({ data }) {
+// Generic Timeseries Chart Component
+function TimeseriesChart({ data, labelKey }) {
   const canvasRef = useRef(null)
   const chartRef = useRef(null)
 
