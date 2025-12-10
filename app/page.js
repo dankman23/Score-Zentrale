@@ -561,6 +561,9 @@ export default function App() {
   const [topPlatforms, setTopPlatforms] = useState([])
   const [topManufacturers, setTopManufacturers] = useState([])
   const [topSuppliers, setTopSuppliers] = useState([])
+  const [suppliersView, setSuppliersView] = useState('table') // 'table' or 'chart'
+  const [selectedSuppliers, setSelectedSuppliers] = useState([])
+  const [suppliersTimeseries, setSuppliersTimeseries] = useState(null)
   const [ts, setTs] = useState([])
   const [tsFees, setTsFees] = useState([])
   const [platTs, setPlatTs] = useState([])
