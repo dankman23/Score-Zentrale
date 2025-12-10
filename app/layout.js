@@ -161,7 +161,7 @@ export default function RootLayout({ children }) {
                 </div>
               </li>
               <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle" href="#" id="produkteDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a className="nav-link dropdown-toggle" href="/#produkte" id="produkteDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i className="bi bi-box-seam mr-1"/>Produkte
                 </a>
                 <div className="dropdown-menu" aria-labelledby="produkteDropdown">
