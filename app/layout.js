@@ -100,6 +100,17 @@ export default function RootLayout({ children }) {
             filter: invert(1);
             cursor: pointer;
           }
+          /* FIX: Bootstrap Dropdown Arrow für alle Dropdowns */
+          .navbar .dropdown-toggle::after {
+            display: inline-block !important;
+            margin-left: 0.255em !important;
+            vertical-align: 0.255em !important;
+            content: "" !important;
+            border-top: 0.3em solid !important;
+            border-right: 0.3em solid transparent !important;
+            border-bottom: 0 !important;
+            border-left: 0.3em solid transparent !important;
+          }
         `}} />
         {/* Chart.js */}
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
