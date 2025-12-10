@@ -136,7 +136,7 @@ export default function RootLayout({ children }) {
                   <a className="dropdown-item" href="/#kaltakquise"><i className="bi bi-snowflake mr-2"/>Kaltakquise</a>
                 </div>
               </li>
-              <li className="nav-item dropdown" onMouseEnter={(e) => e.currentTarget.querySelector('.dropdown-menu').classList.add('show')} onMouseLeave={(e) => e.currentTarget.querySelector('.dropdown-menu').classList.remove('show')}>
+              <li className="nav-item dropdown dropdown-hover">
                 <a className="nav-link dropdown-toggle" href="/#produkte" id="produkteDropdown" role="button">
                   <i className="bi bi-box-seam mr-1"/>Produkte
                 </a>
