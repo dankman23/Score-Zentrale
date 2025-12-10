@@ -817,7 +817,7 @@ export default function App() {
     setLoading(true); setError(''); setDemoMode(false)
     try {
       const started = performance.now()
-      const [k1, k2, t1, t2, osRaw, poRaw, expRaw, marginRaw, topPlatRaw, topManufRaw] = await Promise.all([
+      const [k1, k2, t1, t2, osRaw, poRaw, expRaw, marginRaw, topPlatRaw, topManufRaw, topSuppRaw] = await Promise.all([
         getJson(`/api/jtl/sales/kpi?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/kpi/with_platform_fees?from=${from}&to=${to}`),
         getJson(`/api/jtl/sales/timeseries?from=${from}&to=${to}`),
