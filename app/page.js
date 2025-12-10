@@ -3282,6 +3282,48 @@ export default function App() {
               </div>
             </div>
           )}
+
+          {salesTab==='suppliers' && (
+            <div className="card">
+              <div className="card-header d-flex justify-content-between align-items-center">
+                <span>Top-Lieferanten nach Bestellsumme</span>
+                <button className="btn btn-outline-primary btn-sm" onClick={()=>exportCSV(topSuppliers, 'top-lieferanten.csv')}>CSV</button>
+              </div>
+              <div className="card-body p-0">
+                <div className="table-responsive" style={{maxHeight:420}}>
+                  <table className="table table-dark table-hover table-sm mb-0">
+                    <thead className="thead-dark">
+                      <tr>
+                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'supplier', direction: sortBy.field==='supplier' && sortBy.direction==='asc'?'desc':'asc'})}>
+                          Lieferant {sortBy.field==='supplier' && (sortBy.direction==='asc'?'↑':'↓')}
+                        </th>
+                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'orders', direction: sortBy.field==='orders' && sortBy.direction==='asc'?'desc':'asc'})}>
+                          Bestellungen {sortBy.field==='orders' && (sortBy.direction==='asc'?'↑':'↓')}
+                        </th>
+                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'revenue', direction: sortBy.field==='revenue' && sortBy.direction==='asc'?'desc':'asc'})}>
+                          Bestellsumme (Netto) {sortBy.field==='revenue' && (sortBy.direction==='asc'?'↑':'↓')}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...(topSuppliers||[])].sort((a,b)=>{
+                        const aVal = sortBy.field==='supplier' ? a[sortBy.field] : parseFloat(a[sortBy.field])
+                        const bVal = sortBy.field==='supplier' ? b[sortBy.field] : parseFloat(b[sortBy.field])
+                        return sortBy.direction==='asc' ? (aVal>bVal?1:-1) : (aVal<bVal?1:-1)
+                      }).map((s,idx)=> (
+                        <tr key={idx}>
+                          <td>{s.supplier}</td>
+                          <td>{s.orders}</td>
+                          <td>{fmtCurrency(s.revenue)}</td>
+                        </tr>
+                      ))}
+                      {topSuppliers?.length===0 && <tr><td colSpan={3} className="text-center text-muted">Keine Daten</td></tr>}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
