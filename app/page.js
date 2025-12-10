@@ -1054,6 +1054,57 @@ export default function App() {
     }
   }
 
+  const loadManufacturersTimeseries = async () => {
+    if (selectedManufacturers.length === 0) {
+      setManufacturersTimeseries(null)
+      return
+    }
+    
+    try {
+      const manufacturers = selectedManufacturers.join(',')
+      const res = await getJson(`/api/jtl/sales/manufacturers-timeseries?from=${from}&to=${to}&manufacturers=${encodeURIComponent(manufacturers)}`)
+      if (res?.ok) {
+        setManufacturersTimeseries(res)
+      }
+    } catch (e) {
+      console.error('[Manufacturers Timeseries] Error:', e)
+    }
+  }
+
+  const loadPlatformsTimeseries = async () => {
+    if (selectedPlatforms.length === 0) {
+      setPlatformsTimeseries(null)
+      return
+    }
+    
+    try {
+      const platforms = selectedPlatforms.join(',')
+      const res = await getJson(`/api/jtl/sales/platforms-timeseries?from=${from}&to=${to}&platforms=${encodeURIComponent(platforms)}`)
+      if (res?.ok) {
+        setPlatformsTimeseries(res)
+      }
+    } catch (e) {
+      console.error('[Platforms Timeseries] Error:', e)
+    }
+  }
+
+  const loadCategoriesTimeseries = async () => {
+    if (selectedCategories.length === 0) {
+      setCategoriesTimeseries(null)
+      return
+    }
+    
+    try {
+      const categories = selectedCategories.join(',')
+      const res = await getJson(`/api/jtl/sales/categories-timeseries?from=${from}&to=${to}&categories=${encodeURIComponent(categories)}`)
+      if (res?.ok) {
+        setCategoriesTimeseries(res)
+      }
+    } catch (e) {
+      console.error('[Categories Timeseries] Error:', e)
+    }
+  }
+
   const fetchSalesTables = async () => {
     try {
       const [prods, cats] = await Promise.all([
