@@ -792,6 +792,7 @@ export default function App() {
   const [noteFor, setNoteFor] = useState(null)
   const [noteText, setNoteText] = useState('')
   const [netlog, setNetlog] = useState([]) // request inspector
+  const [showApiMonitor, setShowApiMonitor] = useState(true) // API Monitor sichtbar
   const [marketingSub, setMarketingSub] = useState('analytics') // analytics|googleads|glossar
   const [glossarSub, setGlossarSub] = useState('anwendungen') // anwendungen|kategorien|werkstoffe|maschinen
   const [glossarSearch, setGlossarSearch] = useState('')
