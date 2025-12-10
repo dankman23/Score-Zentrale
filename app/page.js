@@ -3556,8 +3556,6 @@ export default function App() {
               )}
 
               {platformsView==='chart' && (
-
-              {platformsView==='chart' && (
                 <div className="card">
                   <div className="card-header d-flex justify-content-between align-items-center">
                     <span>Zeitliche Entwicklung der Umsätze</span>
