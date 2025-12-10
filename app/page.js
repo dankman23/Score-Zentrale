@@ -3672,7 +3672,7 @@ export default function App() {
                             Ausgewählte Lieferanten: {selectedSuppliers.map((s,i)=><span key={i} className="badge badge-primary mr-1">{s}</span>)}
                           </small>
                         </div>
-                        <SuppliersChart data={suppliersTimeseries} />
+                        <TimeseriesChart data={suppliersTimeseries} labelKey="supplier" />
                       </div>
                     )}
                   </div>
