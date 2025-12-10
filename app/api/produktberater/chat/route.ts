@@ -177,7 +177,8 @@ Sei präzise, professionell und hilfreich!`
       if (keywords.length > 0) {
         console.log('[Produktberater] Suche nach Keywords:', keywords)
         
-        const textProducts = await shoppingFeedCollection
+        // Versuche zuerst shopping_feed
+        let textProducts = await shoppingFeedCollection
           .find({
             $or: keywords.map(kw => ({
               $or: [
@@ -189,18 +190,57 @@ Sei präzise, professionell und hilfreich!`
           .limit(6)
           .toArray()
         
+        // Fallback auf articles collection wenn shopping_feed leer ist
+        if (textProducts.length === 0) {
+          console.log('[Produktberater] Shopping feed leer, suche in articles...')
+          textProducts = await articlesCollection
+            .find({
+              $and: [
+                { cAktiv: true },
+                {
+                  $or: keywords.map(kw => ({
+                    $or: [
+                      { cName: { $regex: kw, $options: 'i' } },
+                      { cKurzBeschreibung: { $regex: kw, $options: 'i' } },
+                      { cHerstellerName: { $regex: kw, $options: 'i' } }
+                    ]
+                  }))
+                }
+              ]
+            })
+            .limit(6)
+            .toArray()
+        }
+        
         for (const product of textProducts) {
-          matchingProducts.push({
-            product_id: product.product_id,
-            title: product.title,
-            brand: product.brand,
-            mpn: product.mpn,
-            gtin: product.gtin,
-            price: product.price,
-            image_link: product.image_link,
-            shop_url: product.link,
-            availability: product.availability
-          })
+          // Handle both shopping_feed and articles format
+          if (product.product_id) {
+            // shopping_feed format
+            matchingProducts.push({
+              product_id: product.product_id,
+              title: product.title,
+              brand: product.brand,
+              mpn: product.mpn,
+              gtin: product.gtin,
+              price: product.price,
+              image_link: product.image_link,
+              shop_url: product.link,
+              availability: product.availability
+            })
+          } else {
+            // articles format
+            matchingProducts.push({
+              product_id: product.kArtikel?.toString() || product._id,
+              title: product.cName,
+              brand: product.cHerstellerName,
+              mpn: product.cArtNr,
+              gtin: product.cBarcode || null,
+              price: product.fVKNetto ? `${product.fVKNetto.toFixed(2)} EUR` : null,
+              image_link: null, // articles don't have image links
+              shop_url: `https://shopping-feeds.preview.emergentagent.com/artikel/${product.kArtikel}`,
+              availability: product.cAktiv ? 'in stock' : 'out of stock'
+            })
+          }
         }
       }
     }
