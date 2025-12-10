@@ -573,7 +573,7 @@ function TimeseriesChart({ data, labelKey }) {
       ]
 
       return {
-        label: supplier,
+        label: entity,
         data: revenueData,
         borderColor: colors[idx % colors.length],
         backgroundColor: colors[idx % colors.length].replace('rgb', 'rgba').replace(')', ', 0.1)'),
