@@ -3311,44 +3311,143 @@ export default function App() {
           )}
 
           {salesTab==='suppliers' && (
-            <div className="card">
-              <div className="card-header d-flex justify-content-between align-items-center">
-                <span>Top-Lieferanten nach Bestellsumme</span>
-                <button className="btn btn-outline-primary btn-sm" onClick={()=>exportCSV(topSuppliers, 'top-lieferanten.csv')}>CSV</button>
+            <div>
+              {/* Sub-Tabs: Tabelle / Diagramm */}
+              <div className="btn-group mb-3" role="group">
+                <button 
+                  className={`btn btn-sm ${suppliersView==='table'?'btn-primary':'btn-outline-primary'}`}
+                  onClick={()=>{setSuppliersView('table'); setSelectedSuppliers([])}}
+                >
+                  <i className="bi bi-table mr-1"/>Tabelle
+                </button>
+                <button 
+                  className={`btn btn-sm ${suppliersView==='chart'?'btn-primary':'btn-outline-primary'}`}
+                  onClick={()=>setSuppliersView('chart')}
+                >
+                  <i className="bi bi-graph-up mr-1"/>Diagramm
+                </button>
               </div>
-              <div className="card-body p-0">
-                <div className="table-responsive" style={{maxHeight:420}}>
-                  <table className="table table-dark table-hover table-sm mb-0">
-                    <thead className="thead-dark">
-                      <tr>
-                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'supplier', direction: sortBy.field==='supplier' && sortBy.direction==='asc'?'desc':'asc'})}>
-                          Lieferant {sortBy.field==='supplier' && (sortBy.direction==='asc'?'↑':'↓')}
-                        </th>
-                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'orders', direction: sortBy.field==='orders' && sortBy.direction==='asc'?'desc':'asc'})}>
-                          Bestellungen {sortBy.field==='orders' && (sortBy.direction==='asc'?'↑':'↓')}
-                        </th>
-                        <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'revenue', direction: sortBy.field==='revenue' && sortBy.direction==='asc'?'desc':'asc'})}>
-                          Bestellsumme (Netto) {sortBy.field==='revenue' && (sortBy.direction==='asc'?'↑':'↓')}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[...(topSuppliers||[])].sort((a,b)=>{
-                        const aVal = sortBy.field==='supplier' ? a[sortBy.field] : parseFloat(a[sortBy.field])
-                        const bVal = sortBy.field==='supplier' ? b[sortBy.field] : parseFloat(b[sortBy.field])
-                        return sortBy.direction==='asc' ? (aVal>bVal?1:-1) : (aVal<bVal?1:-1)
-                      }).map((s,idx)=> (
-                        <tr key={idx}>
-                          <td>{s.supplier}</td>
-                          <td>{s.orders}</td>
-                          <td>{fmtCurrency(s.revenue)}</td>
-                        </tr>
-                      ))}
-                      {topSuppliers?.length===0 && <tr><td colSpan={3} className="text-center text-muted">Keine Daten</td></tr>}
-                    </tbody>
-                  </table>
+
+              {suppliersView==='table' && (
+                <div className="card">
+                  <div className="card-header d-flex justify-content-between align-items-center">
+                    <span>Top-Lieferanten nach Bestellsumme</span>
+                    <button className="btn btn-outline-primary btn-sm" onClick={()=>exportCSV(topSuppliers, 'top-lieferanten.csv')}>CSV</button>
+                  </div>
+                  <div className="card-body p-0">
+                    <div className="table-responsive" style={{maxHeight:420}}>
+                      <table className="table table-dark table-hover table-sm mb-0">
+                        <thead className="thead-dark">
+                          <tr>
+                            <th style={{width:30}}>
+                              <input 
+                                type="checkbox"
+                                onChange={(e)=>{
+                                  if(e.target.checked) {
+                                    setSelectedSuppliers(topSuppliers.map(s=>s.supplier))
+                                  } else {
+                                    setSelectedSuppliers([])
+                                  }
+                                }}
+                                checked={selectedSuppliers.length === topSuppliers.length && topSuppliers.length > 0}
+                              />
+                            </th>
+                            <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'supplier', direction: sortBy.field==='supplier' && sortBy.direction==='asc'?'desc':'asc'})}>
+                              Lieferant {sortBy.field==='supplier' && (sortBy.direction==='asc'?'↑':'↓')}
+                            </th>
+                            <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'orders', direction: sortBy.field==='orders' && sortBy.direction==='asc'?'desc':'asc'})}>
+                              Bestellungen {sortBy.field==='orders' && (sortBy.direction==='asc'?'↑':'↓')}
+                            </th>
+                            <th style={{cursor:'pointer'}} onClick={()=>setSortBy({field:'revenue', direction: sortBy.field==='revenue' && sortBy.direction==='asc'?'desc':'asc'})}>
+                              Bestellsumme (Netto) {sortBy.field==='revenue' && (sortBy.direction==='asc'?'↑':'↓')}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[...(topSuppliers||[])].sort((a,b)=>{
+                            const aVal = sortBy.field==='supplier' ? a[sortBy.field] : parseFloat(a[sortBy.field])
+                            const bVal = sortBy.field==='supplier' ? b[sortBy.field] : parseFloat(b[sortBy.field])
+                            return sortBy.direction==='asc' ? (aVal>bVal?1:-1) : (aVal<bVal?1:-1)
+                          }).map((s,idx)=> (
+                            <tr 
+                              key={idx} 
+                              style={{cursor:'pointer'}}
+                              onClick={()=>{
+                                const isSelected = selectedSuppliers.includes(s.supplier)
+                                if(isSelected) {
+                                  setSelectedSuppliers(selectedSuppliers.filter(x=>x!==s.supplier))
+                                } else {
+                                  setSelectedSuppliers([...selectedSuppliers, s.supplier])
+                                }
+                              }}
+                            >
+                              <td onClick={(e)=>e.stopPropagation()}>
+                                <input 
+                                  type="checkbox" 
+                                  checked={selectedSuppliers.includes(s.supplier)}
+                                  onChange={(e)=>{
+                                    if(e.target.checked) {
+                                      setSelectedSuppliers([...selectedSuppliers, s.supplier])
+                                    } else {
+                                      setSelectedSuppliers(selectedSuppliers.filter(x=>x!==s.supplier))
+                                    }
+                                  }}
+                                />
+                              </td>
+                              <td>{s.supplier}</td>
+                              <td>{s.orders}</td>
+                              <td>{fmtCurrency(s.revenue)}</td>
+                            </tr>
+                          ))}
+                          {topSuppliers?.length===0 && <tr><td colSpan={4} className="text-center text-muted">Keine Daten</td></tr>}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  {selectedSuppliers.length > 0 && (
+                    <div className="card-footer">
+                      <button 
+                        className="btn btn-primary btn-sm"
+                        onClick={()=>setSuppliersView('chart')}
+                      >
+                        <i className="bi bi-graph-up mr-1"/>{selectedSuppliers.length} Lieferant(en) im Diagramm anzeigen
+                      </button>
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
+
+              {suppliersView==='chart' && (
+                <div className="card">
+                  <div className="card-header d-flex justify-content-between align-items-center">
+                    <span>Zeitliche Entwicklung der Bestellsummen</span>
+                    <button className="btn btn-outline-secondary btn-sm" onClick={()=>{setSuppliersView('table')}}>
+                      <i className="bi bi-arrow-left mr-1"/>Zurück zur Tabelle
+                    </button>
+                  </div>
+                  <div className="card-body">
+                    {selectedSuppliers.length === 0 ? (
+                      <div className="alert alert-info">
+                        Bitte wählen Sie mindestens einen Lieferanten aus der Tabelle aus.
+                      </div>
+                    ) : !suppliersTimeseries ? (
+                      <div className="text-center py-5">
+                        <div className="spinner-border text-primary" role="status"></div>
+                        <p className="mt-3 text-muted">Lade Daten...</p>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="mb-3">
+                          <small className="text-muted">
+                            Ausgewählte Lieferanten: {selectedSuppliers.map((s,i)=><span key={i} className="badge badge-primary mr-1">{s}</span>)}
+                          </small>
+                        </div>
+                        <SuppliersChart data={suppliersTimeseries} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
