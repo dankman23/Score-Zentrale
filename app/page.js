@@ -2655,9 +2655,9 @@ export default function App() {
 
   // 9. AMAZON PROMPTS laden
   useEffect(() => {
-    if (!authChecked || activeTab !== 'produkte' || produkteTab !== 'artikel' || artikelTab !== 'prompts') return
+    if (!authChecked || activeTab !== 'produkte' || produkteTab !== 'prompts') return
     loadAmazonPrompts()
-  }, [authChecked, activeTab, produkteTab, artikelTab])
+  }, [authChecked, activeTab, produkteTab])
 
   // 10. WARMAQUISE Leads laden
   useEffect(() => {
