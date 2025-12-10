@@ -1922,6 +1922,7 @@ export default function App() {
     }
   }
 
+  const openPromptModal = (mode, prompt = null) => {
     setPromptModalMode(mode)
     if (mode === 'edit' && prompt) {
       setEditingPrompt(prompt)
