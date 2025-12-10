@@ -126,10 +126,49 @@ async function importCatalogs() {
         size_mb: parseFloat(sizeInMB),
         file_path: filePath,
         imported_at: new Date(),
-        status: 'active'
+        status: 'active',
+        type: 'catalog'
       })
       
       console.log(`✅ ${catalog.manufacturer} importiert`)
+    }
+    
+    // Importiere Klingspor Datenblätter
+    console.log('\n📁 Importiere Klingspor Datenblätter...')
+    const klingsporDir = path.join(CATALOG_DIR, 'klingspor-datenblaetter')
+    
+    if (fs.existsSync(klingsporDir)) {
+      const datasheets = fs.readdirSync(klingsporDir).filter(f => f.endsWith('.pdf'))
+      console.log(`📄 ${datasheets.length} Klingspor Datenblätter gefunden`)
+      
+      let imported = 0
+      for (const file of datasheets) {
+        const filePath = path.join(klingsporDir, file)
+        const stats = fs.statSync(filePath)
+        const sizeInMB = (stats.size / (1024 * 1024)).toFixed(2)
+        
+        // Extrahiere Produktname aus Dateiname
+        const productName = file.replace('.pdf', '').replace(/_/g, ' ')
+        
+        await collection.insertOne({
+          manufacturer: 'Klingspor',
+          name: `Klingspor Datenblatt: ${productName}`,
+          file: `klingspor-datenblaetter/${file}`,
+          url: null,
+          size_mb: parseFloat(sizeInMB),
+          file_path: filePath,
+          imported_at: new Date(),
+          status: 'active',
+          type: 'datasheet'
+        })
+        
+        imported++
+        if (imported % 50 === 0) {
+          console.log(`  ✅ ${imported}/${datasheets.length} Datenblätter importiert...`)
+        }
+      }
+      
+      console.log(`✅ ${imported} Klingspor Datenblätter importiert`)
     }
     
     const count = await collection.countDocuments()
