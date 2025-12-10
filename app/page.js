@@ -2658,6 +2658,13 @@ export default function App() {
     }
   }, [authChecked, activeTab])
 
+  // 6. Lieferanten Zeitreihen laden
+  useEffect(() => {
+    if (activeTab === 'sales' && salesTab === 'suppliers' && suppliersView === 'chart') {
+      loadSuppliersTimeseries()
+    }
+  }, [selectedSuppliers, from, to, activeTab, salesTab, suppliersView])
+
   // 6. ARTIKEL-BROWSER laden
   useEffect(() => {
     if (!authChecked || activeTab !== 'produkte' || produkteTab !== 'browser') return
