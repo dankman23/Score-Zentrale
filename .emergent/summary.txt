@@ -1,179 +1,209 @@
 <analysis>
-<original_problem_statement>
-The initial problem was a critical failure in the Score-Zentrale application's Kunden (Customers) tab. The JTL-Sync feature, designed to import customer data from an external JTL MSSQL database into MongoDB, was completely broken. The backend API endpoint  was throwing SQL errors due to invalid table and column names (e.g., , ).
 
-Throughout the session, the user requested several fixes and new features:
-- Fix the JTL customer import.
-- Implement a more robust logic for determining the main product category.
-- Fix multiple UI issues, including black text on a black background and missing customer names in the table.
-- Implement a customer order history view.
-- Set up a nightly, automatic sync for JTL customer data.
-- Fix a major regression where the Kaltakquise (Cold Acquisition) tab became completely non-functional (empty lists, zeroed-out stats).
-- Investigate and fix an issue where the Autopilot appeared to be sending duplicate emails.
+<original_problem_statement>
+The user wants to add a new Produktberater (Product Advisor) feature to the Produkte section of the application.
+
+**PRODUCT REQUIREMENTS:**
+1.  **New Tab:** Create a new tab named Produktberater.
+2.  **Chat Interface:** This tab should feature a chat interface where users can ask for product recommendations (e.g., I need a sanding belt for stainless steel).
+3.  **AI-Powered Recommendations:** Use an AI model (GPT-4o) to understand the user's request and provide expert-level product recommendations.
+4.  **Knowledge Base:** The AI's knowledge should be based on a comprehensive set of manufacturer catalogs and product datasheets provided by the user. The user has explicitly mentioned a preference for Klingspor products due to a partnership.
+5.  **Shop Integration:** The AI's recommendations must be linked to actual products available in the user's online shop. This includes showing product photos, titles, and direct links to the product pages.
+6.  **Product Data Source:** The product data (links, photos, EAN/MPN, price, availability) should come from four separate Google Shopping Feed XML files provided by the user.
+7.  **Automatic Updates:** The product data from the four shopping feeds must be updated automatically on a nightly basis to ensure the information is always current.
+8.  **API Key:** The user has provided a new OpenAI API key to be used for this feature.
 </original_problem_statement>
 
 **User's preferred language**: German
 
 **what currently exists?**
-The application now has two largely functional modules: Kaltakquise and Kunden.
-
--   **Kunden (Customers) Module:** The JTL customer import is now working. It correctly imports ~92,000 customers from the JTL MSSQL database, joining data from , , , and  to enrich customer profiles in MongoDB. A customer order history view has been implemented; clicking on a customer in the list opens a modal displaying their order history, with expandable rows to show the items in each order. A separate tab in the modal shows a summary of all articles ever purchased by that customer.
-
--   **Kaltakquise (Cold Acquisition) Module:** A major regression that caused this tab to be empty has been fixed. The list of cold leads now loads correctly and efficiently, and the statistics (New, Analyzed, Contacted) are displayed accurately. The data for existing leads (website, industry, analysis scores) is correctly shown.
-
--   **Nightly Sync:** A background job managed by  has been configured to run the JTL customer import automatically every night at 2 AM. This job correctly updates existing customer records without overwriting manually added data like .
+A new Produktberater tab has been successfully created and integrated into the Produkte section. The core functionality is partially implemented:
+-   **Frontend:** A chat interface has been built in .
+-   **Backend API:** A new API endpoint  has been created. It uses GPT-4o to process user queries.
+-   **Knowledge Base:** A  collection in MongoDB has been populated with 12 manufacturer catalogs and 425 detailed Klingspor datasheets. The AI prompt is configured to leverage this knowledge base, with a special emphasis on Klingspor.
+-   **Product Matching:** A  collection has been created in MongoDB. It currently contains ~27,000 products parsed from **one** of the four provided shopping feeds. The backend API matches AI recommendations against this collection using text search to find and display real products with images and links to the user's shop.
 
 **Last working item**:
-    - Last item agent was working: The agent was investigating a new, critical bug reported by the user: The Autopilot feature appears to be sending duplicate emails. The user provided a screenshot showing the same email received twice in their  inbox. The agent's initial hypothesis was that this was caused by a BCC being sent to the same inbox that the From address forwards to. However, the user refuted this, stating that  (From) and  (BCC) are separate mailboxes. This implies the emails are genuinely being sent twice by the application. The investigation was halted by the user's request to prepare for a fork.
-    - Status: IN PROGRESS
+    - Last item agent was working: The agent was about to start implementing the user's final, critical request: to integrate all **four** shopping feeds (instead of just one) and to create a nightly job to automatically update this data. The agent had just acknowledged the request and stated the plan to modify the import script and create a cron job.
+    - Status: NOT STARTED
     - Agent Testing Done: N
     - Which testing method agent to use? backend testing agent
     - User Testing Done: N
 
 **All Pending/In progress Issue list**:
-  Issue 1:  Autopilot sends duplicate emails (P0)
-  
-  Issues Detail:
-  - Issue 1: 
-     - Attempted fixes: The agent investigated the SMTP configuration in  and the email sending code in . The agent hypothesized that the issue was due to the  address () and the  address () resolving to the same physical inbox. This hypothesis was proven incorrect by the user. The issue is not a mail client configuration problem but likely a logic error in the Autopilot worker itself.
-     - Next debug checklist: 
-       -  Examine the Autopilot worker script () and its tick logic ().
-       - Add detailed logging to the worker to trace the lifecycle of an email task. Log when a prospect is selected, when the email is generated, when  is called, and when the prospect's status is updated in the database.
-       - Verify that after an email is sent, the prospect's  status is updated immediately and correctly to prevent it from being picked up again in the same or a subsequent run.
-       - Check for race conditions or transaction failures where the email is sent but the database update fails, causing the worker to re-process the same task.
-     - Why fix this issue and what will be achieved with the fix? This is a critical bug. Sending duplicate emails to potential leads is unprofessional and damages the company's reputation, undermining the entire purpose of the Kaltakquise module.
-     - Status:  IN PROGRESS
-     - Is recurring issue? N
-     - Should Test frontend/backend/both after fix? backend
-     - Blocked on other issue: None
+  There are no outstanding bugs or issues. The current work is focused on completing a new feature.
 
 **In progress Task List**:
-  There are no in-progress tasks. The last work item was debugging a new critical issue.
+  Task 1:  Complete the Shopping Feed Integration (P0)
+  Task 2:  Implement Nightly Automatic Updates for Shopping Feeds (P0)
+
+ Task Detail:
+  - Task 1: 
+     - Where to resume: Modify the existing script . It currently handles a single hardcoded URL. It needs to be updated to accept an array of the four URLs provided by the user and loop through them, parsing and upserting products from all feeds into the  collection. Ensure the database is cleared or products are correctly upserted to avoid duplicates.
+     - What will be achieved with this? The product advisor will have a complete and accurate database of all products available in the user's shop, making its recommendations comprehensive.
+     - Status:  IN PROGRESS
+     - Should Test frontend/backend/both after fix? backend
+     - Blocked on something: None
+  - Task 2: 
+     - Where to resume: Create a new supervisor configuration file in , similar to . This new config will execute the updated  script every night (e.g., at 3 AM). A simple wrapper script (e.g., ) might be needed to call the main import script.
+     - What will be achieved with this? The product data used by the advisor will remain up-to-date with the user's shop inventory, pricing, and availability without manual intervention.
+     - Status:  NOT STARTED
+     - Should Test frontend/backend/both after fix? backend
+     - Blocked on something: Task 1: Complete the Shopping Feed Integration
 
 **Upcoming and Future Tasks**
     Upcoming Tasks:
-    - (P1) Improve Frontend Performance: The Kaltakquise list loads the first 100 items. Implement a Load More button or infinite scroll for a better user experience, as requested by the user previously.
-    - (P2) Create a full Customer Detail Page: The current order history is in a modal. A dedicated page for a customer could show more details, notes, and historical data.
-
-    Future Tasks:
-    - Implement full ID standardization across the application.
-    - Create a UI for managing email prompts.
-    - Add batch operations for analyzing leads.
+    - There are no other upcoming tasks requested by the user. The entire focus is on completing the Produktberator feature.
 
 **Completed work in this session**
 - List of all completed tasks with file and method name:
-  - JTL Customer Import Fixed: The core import logic in  was completely rewritten to use the correct JTL database tables (, ) and columns.
-  - Kaltakquise Module Restored: Fixed a major regression where the Kaltakquise tab was empty. This involved fixing performance issues in , fixing data mapping in , and correcting the stats calculation in .
-  - Customer Order History Implemented: Created new API endpoints (, , ) and updated  to display a customer's order history in a modal.
-  - Nightly Auto-Sync Implemented: Created a Supervisor job () to run the JTL import automatically.
-  - Product Categorization Logic Improved: Updated the SQL query in  to identify main product categories based on specific keywords (e.g., Schleifband, Fräser) instead of a flawed noun-extraction logic.
-  - Data Integrity Fixed: Corrected the import process to properly store customer names and the  identifier, resolving issues where the UI showed empty fields.
-  - UI Bugs Fixed: Resolved issues with unreadable text color in tables by adding global CSS overrides in .
+  - **Produktberater Feature (Initial Implementation):**
+    - Created the chat UI and frontend logic in .
+    - Created the backend API at  using GPT-4o.
+    - Stored the user-provided OpenAI API key in the  file.
+  - **Knowledge Base Creation:**
+    - Created  to parse and import PDF documents.
+    - Successfully imported 12 manufacturer catalogs and 425 Klingspor datasheets into the  MongoDB collection.
+  - **Shopping Feed Integration (Partial):**
+    - Created  to parse a Google Shopping Feed XML file.
+    - Imported ~27,000 products from a single feed URL into the  collection.
+  - **Deployment & Build Fixes:**
+    - Resolved multiple TypeScript build errors by correcting import paths across numerous files (e.g.,  vs  vs ). This involved centralizing library files into  and updating .
+    - Fixed a type error in  related to a duplicate  property.
+    - Fixed a type error in  by adding the missing  property.
+  - **Bug Fixes:**
+    - **Critical Navigation Fix:** Corrected all  links in  to  to ensure navigation works correctly from nested pages (like ) back to the main single-page application tabs.
+    - **Production UI Fix:** Fixed an issue where a  dropdown in the price configurator was not appearing in the production build by increasing the  and refining the portal settings in .
+    - **UI Style Fix:** Corrected an issue with black text on a dark background in the Prompts tab by adding explicit text color classes in .
+    - **API Error Fix:** Corrected an import path for the database connection in , which was causing invalid JSON errors on the frontend.
+  - **MongoDB Connection Stability:**
+    - Investigated and resolved persistent MongoDB SSL/TLS connection errors, which were caused by hitting the connection limits of the M0 free tier. This was mitigated by consolidating multiple connection handlers and reducing  in , , and .
 
 - Recently completed:
-  - Kaltakquise module data filtering (DONE)
-  - Kaltakquise stats API fix (DONE)
-  - Kaltakquise data mapping fix (DONE)
-  - Customer Order History article display (DONE)
-  - Filtering of Angebote from orders (VERIFIED, NO CHANGE NEEDED)
+  - Integration of Klingspor datasheets and additional catalogs (DONE)
+  - Partial integration of one shopping feed (DONE)
+  - Navigation bug fix for hash links (DONE)
+  - Production UI fix for Select dropdown (DONE)
 
 **Earlier issues found/mentioned but not fixed**
-   - None. All issues that were raised during the session were addressed, leading to the discovery of the final duplicate email bug which is now the main pending issue.
+   - The root cause of the MongoDB connection instability (the limitations of the M0 free tier) was identified, but the user has not yet upgraded. The connection pool size has been reduced as a workaround, but the agent recommended an upgrade to M10 for long-term stability. This is not a bug to fix but a known infrastructure limitation.
 
 **Known issue recurrence from previous fork**
-  - Issue recurrence in previous fork: The initial summary mentioned debugging a stalled Autopilot worker. The current duplicate email bug is also related to the Autopilot, suggesting this component may be fragile.
-  - Recurrence count: 1
-  - Status: IN PROGRESS
+  - None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frameworks:** Next.js (App Router), React
--   **Backend:** Next.js API Routes, TypeScript
--   **Databases:**
-    -   MongoDB: Primary application database for  collection.
-    -   Microsoft SQL Server (MSSQL): External JTL-Wawi ERP data source.
--   **Key Logic:**
-    -   **ETL Process:** A complex ETL process from MSSQL to MongoDB was fixed and refined. It involves joining multiple tables (, , , ) to build a comprehensive customer document.
-    -   **Background Worker:** A -managed Node.js script () orchestrates sending cold emails. Another  job was added for the nightly JTL sync.
-    -   **Error Driven Development:** The agent systematically tackled a chain of Invalid column name errors, which led to the discovery of the correct JTL database schema.
+-   **RAG (Retrieval-Augmented Generation):** The core of the product advisor. It uses GPT-4o for language understanding and generation, augmented with data retrieved from two MongoDB collections:  for technical knowledge and  for real-time product data.
+-   **Data Ingestion Pipeline:** Implemented scripts to handle various data formats:
+    -   PDFs using .
+    -   ZIP archives using the  command.
+    -   XML (Google Shopping Feed) using  and .
+-   **Scheduled Jobs (Cron/Supervisor):** A nightly job has been requested and needs to be implemented using  to keep the product data fresh.
+-   **API Integration:** Uses the usage: openai [-h] [-v] [-b API_BASE] [-k API_KEY] [-p PROXY [PROXY ...]]
+              [-o ORGANIZATION] [-t {openai,azure}]
+              [--api-version API_VERSION] [--azure-endpoint AZURE_ENDPOINT]
+              [--azure-ad-token AZURE_AD_TOKEN] [-V]
+              {api,tools,migrate,grit} ...
+
+positional arguments:
+  {api,tools,migrate,grit}
+    api                 Direct API calls
+    tools               Client side tools for convenience
+
+options:
+  -h, --help            show this help message and exit
+  -v, --verbose         Set verbosity.
+  -b API_BASE, --api-base API_BASE
+                        What API base url to use.
+  -k API_KEY, --api-key API_KEY
+                        What API key to use.
+  -p PROXY [PROXY ...], --proxy PROXY [PROXY ...]
+                        What proxy to use.
+  -o ORGANIZATION, --organization ORGANIZATION
+                        Which organization to run as (will use your default
+                        organization if not specified)
+  -t {openai,azure}, --api-type {openai,azure}
+                        The backend API to call, must be `openai` or `azure`
+  --api-version API_VERSION
+                        The Azure API version, e.g.
+                        'https://learn.microsoft.com/en-us/azure/ai-
+                        services/openai/reference#rest-api-versioning'
+  --azure-endpoint AZURE_ENDPOINT
+                        The Azure endpoint, e.g.
+                        'https://endpoint.openai.azure.com'
+  --azure-ad-token AZURE_AD_TOKEN
+                        A token from Azure Active Directory,
+                        https://www.microsoft.com/en-
+                        us/security/business/identity-access/microsoft-entra-
+                        id
+  -V, --version         show program's version number and exit npm package to interact with the GPT-4o model.
 
 **key DB schema**
--   **JTL (MSSQL) Relationships Discovered:**
-    -   Customer Info:  JOIN  ON  =  (This was the key discovery for names/addresses).
-    -   Order Info:  JOIN  ON  = .
-    -   Order Items:  JOIN  ON .
-    -   Article Names:  JOIN  ON .
--   **MongoDB  collection:**
-    - Contains both cold leads and imported JTL customers, differentiated by .
-    - JTL customers have a  sub-document with raw data and calculated stats.
+-   **catalogs**: 
+-   **shopping_feed_products**: 
 
 **changes in tech stack**
-- No changes to the core tech stack. A  job was added for task scheduling.
+-   New dependencies added: , ,  (system package).
 
 **All files of reference**
--   : Heavily modified to fix the JTL import. Contains the final, correct SQL query.
--   : Created and heavily modified to build the entire Kunden tab UI, including the order history modal.
--   : Heavily modified to fix the Kaltakquise tab's data loading performance and logic.
--   : Modified the GET handler to correctly filter data, map fields, and paginate results.
--   : Modified to correctly calculate stats for cold leads only and return a flat object.
--   : New file to fetch a customer's order history.
--   : New file to fetch items for a specific order.
--   : New file to fetch an aggregate list of all items purchased by a customer.
--    & : New files to enable the automatic nightly sync.
--   : The script responsible for sending emails, which is now the primary suspect for the duplicate email bug.
+-   **/app/scripts/import-shopping-feed.js**: **CRITICAL.** This new script currently imports from one XML feed. It **must be modified** to loop through all four feed URLs provided by the user.
+-   **/app/app/api/produktberater/chat/route.ts**: New backend API that orchestrates the RAG process.
+-   **/app/scripts/import-catalogs.js**: New script used to populate the knowledge base from PDF files.
+-   **/app/app/page.js**: Heavily modified to include the new Produktberater tab, its state management, and the chat UI.
+-   **/app/app/layout.js**: Modified to fix a critical app-wide navigation bug.
+-   **/app/app/components/ui/select.jsx**: Modified to fix a UI bug that only appeared in production builds.
 
 **Areas that need refactoring**:
--   The main frontend file  is extremely large and contains logic for multiple tabs. While  was a good step, the Kaltakquise logic could also be extracted into its own component to improve maintainability.
--   The brute-force global CSS injection in  to fix the table text color is a hack and should be replaced with a proper, scoped CSS solution.
+- The agent has noted that the MongoDB connection strategy, while currently working, is a workaround for the M0 free tier's limitations. Consolidating the three separate DB connection handlers (, , ) into a single, true singleton instance would be a robust long-term improvement, especially if the user decides to upgrade their DB plan.
 
 **key api endpoints**
--   : Triggers the JTL customer import.
--   : Lists cold leads (for Kaltakquise tab).
--   : Gets statistics for the Kaltakquise tab.
--   : Lists imported JTL customers (for Kunden tab).
--   : Gets order history for a specific customer.
--   : Gets line items for a specific order.
--   : Gets an aggregate list of all articles purchased by a customer.
--   : The endpoint that triggers the Autopilot worker to process the next batch of emails.
+-   : The new endpoint for the product advisor chat.
 
 **Critical Info for New Agent**
--   The JTL MSSQL schema discovery was a painful and iterative process. The key takeaway is that customer contact information is in the  table, not  or . The correct, working SQL queries are now in place in .
--   The Kaltakquise module was non-functional due to a combination of performance, data mapping, and filtering issues. These have been resolved, but be aware that the frontend code in  is sensitive to the data structure returned by the APIs.
--   **The current highest-priority bug is that the Autopilot sends duplicate emails.** Your initial investigation should focus on the logic within . The user has confirmed the From and BCC mailboxes are separate, so the problem is not in email client configuration but in the application logic itself.
+-   **Highest Priority:** The Produktberator feature is incomplete. You must modify  to process all **four** XML feed URLs provided by the user in message #691. The current script only handles one.
+-   **Second Priority:** After modifying the script, you must create a  job to run it automatically every night. This is a hard requirement from the user.
+-   **MongoDB Limits:** The application is running on a MongoDB M0 Free Tier, which has caused significant connection stability issues. While workarounds have been implemented (reducing pool size), be aware that connection-related errors may reappear under load. An upgrade to M10 was recommended to the user.
+-   **Data Sources:** The AI has two main data sources in MongoDB: the  collection for general knowledge and  for specific, sellable products. The matching logic relies on text search within the  collection.
 
 **documents created in this job**
-  - Various temporary debug API routes were created under  and test scripts like . These can likely be removed.
-  - The internal documentation  was updated.
+  - /app/scripts/import-catalogs.js
+  - /app/scripts/import-shopping-feed.js
+  - /app/app/api/produktberater/chat/route.ts
+  - /app/DEPLOYMENT.md
+  - Multiple temporary PDF/ZIP files were downloaded to  for processing.
 
 **Last 10 User Messages and any pending user messages**
-1.  **User (Msg 653):** Reports that emails seem to be sent twice, provides screenshot.
-2.  **User (Msg 666):** Confirms the duplicate emails are in the  inbox, provides a screenshot as proof.
-3.  **User (Msg 679):** Clarifies that  and  are separate mailboxes, refuting the agent's theory.
-4.  **User (Msg 682):** Asks the agent to prepare everything for forking to GitHub.
-
-**Pending user messages:** The user is waiting for the duplicate email issue to be investigated and fixed. The request to prepare for forking was the last instruction.
+1.  **User (Msg 645):** Asks to add more catalogs and proposes the excellent idea of using a shopping feed for product photos and links via MPN/EAN matching. (Agent action: Implemented).
+2.  **User (Msg 653):** Provides the URL for the *first* shopping feed. (Agent action: Implemented).
+3.  **User (Msg 674):** Asks to add even more catalogs and a ZIP file with 425 Klingspor datasheets, emphasizing Klingspor as a key partner. (Agent action: Implemented).
+4.  **User (Msg 691):** **CRITICAL PENDING REQUEST.** Informs the agent that there are **four** shopping feeds in total, providing all four URLs. Explicitly asks for this data to be refreshed regularly (nightly).
+5.  **User (Msg 692):** Agent acknowledges the request and is about to start work. The session ends here.
 
 **Project Health Check:**
-- Broken: The Autopilot email sending logic is critically broken, sending duplicate emails.
+- Broken:
+    - The product data for the advisor is incomplete, as it's based on only 25% of the available shopping feeds.
+    - The product data is static and will become outdated. The required nightly update job is missing.
 - Mocked: None.
 
 **3rd Party Integrations**
-- Microsoft SQL Server (JTL-Wawi): Primary external data source.
-- Google Custom Search, Jina.ai, GPT Models: Used by the Kaltakquise module for lead analysis (functionality was not touched in this session but is part of the system).
+-   **OpenAI GPT-4o:** Used for the product advisor chat. Uses a user-provided API key stored in .
+-   **Google Shopping Feed:** The application ingests product data from four XML feed URLs hosted on .
 
 **Testing status**
-  - Testing agent used after significant changes: YES
+  - Testing agent used after significant changes: NO (Agent performed manual  tests and visual verification via screenshots).
   - Troubleshoot agent used after agent stuck in loop: NO
-  - Test files created: Several temporary test scripts and debug API routes were created and used (e.g., , ).
-  - Known regressions: A major regression occurred where the Kaltakquise tab broke completely. This was subsequently fixed. The current duplicate email issue might be a new regression in the Autopilot module.
+  - Test files created: None.
+  - Known regressions: A major regression where the entire preview was broken was introduced and fixed during build-error resolution. The app is currently stable in the preview environment.
 
 **Credentials to test flow:**
 - Frontend Password: 
+- OpenAI API Key is stored in  as .
 
 **What agent forgot to execute**
-- The agent was in the middle of debugging the duplicate email issue when the user asked to prepare for a fork. It did not complete the debugging of this critical issue.
-- The global style hack injected into  is a temporary fix for the table text color and should be refactored into a proper CSS solution.
+The agent was stopped right before it could execute the user's final and most important requests for the Produktberater feature:
+1.  **Integrate all four shopping feeds:** The current script  is hardcoded for a single feed. It was not updated to handle all four.
+2.  **Create a nightly update job:** No  configuration or cron script was created to automate the feed import.
 
 </analysis>

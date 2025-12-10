@@ -233,7 +233,7 @@ TotalAmount: 8417.90 EUR
 
 **Beispiel-Aufruf:**
 ```bash
-curl -X POST "https://jtlsync.preview.emergentagent.com/api/fibu/import/amazon-jtl?from=2025-10-01&to=2025-10-31&force=true"
+curl -X POST "https://shopping-feeds.preview.emergentagent.com/api/fibu/import/amazon-jtl?from=2025-10-01&to=2025-10-31&force=true"
 ```
 
 **Response:**
@@ -267,7 +267,7 @@ curl -X POST "https://jtlsync.preview.emergentagent.com/api/fibu/import/amazon-j
 **Pfad:** `/app/jtl-amazon-oktober-2025-ROHDATEN.csv`  
 **Inhalt:** 7.881 Zeilen aus `pf_amazon_settlementpos`  
 **Felder:** kMessageId, PostedDateTime, TransactionType, OrderID, AmountType, AmountDescription, Amount, SettlementID  
-**Download:** `https://jtlsync.preview.emergentagent.com/api/fibu/debug/export-jtl-raw?from=2025-10-01&to=2025-10-31&format=csv`
+**Download:** `https://shopping-feeds.preview.emergentagent.com/api/fibu/debug/export-jtl-raw?from=2025-10-01&to=2025-10-31&format=csv`
 
 ### 2. Jera/Addison Export (Referenz)
 **Pfad:** `/app/jera-export-addison-oktober-2025.csv`  
@@ -327,17 +327,17 @@ curl -X POST "https://jtlsync.preview.emergentagent.com/api/fibu/import/amazon-j
 ## 🚀 Deployment & Aktivierung
 
 ### Produktiv-Umgebung:
-**URL:** `https://jtlsync.preview.emergentagent.com`  
+**URL:** `https://shopping-feeds.preview.emergentagent.com`  
 **Datenbank:** MongoDB Atlas (Collection: `zahlungen`)  
 **JTL-Datenbank:** MSSQL Server (162.55.235.45)
 
 ### Erstmaliger Import (Beispiel):
 ```bash
 # 1. Import für Oktober 2025
-curl -X POST "https://jtlsync.preview.emergentagent.com/api/fibu/import/amazon-jtl?from=2025-10-01&to=2025-10-31&force=true"
+curl -X POST "https://shopping-feeds.preview.emergentagent.com/api/fibu/import/amazon-jtl?from=2025-10-01&to=2025-10-31&force=true"
 
 # 2. Import für November 2025
-curl -X POST "https://jtlsync.preview.emergentagent.com/api/fibu/import/amazon-jtl?from=2025-11-01&to=2025-11-30&force=true"
+curl -X POST "https://shopping-feeds.preview.emergentagent.com/api/fibu/import/amazon-jtl?from=2025-11-01&to=2025-11-30&force=true"
 ```
 
 ### Regelmäßiger Import (Vorschlag):
