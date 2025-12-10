@@ -25,19 +25,49 @@ export async function GET(request: NextRequest) {
 
     const pool = await getMssqlPool()
     
-    // Beschaffung (Purchase Orders) Tabellen
-    const purchaseOrderTable = 'Beschaffung.tBestellung'
+    // Beschaffung (Purchase Orders) Tabellen - probiere beide Varianten
+    const headerCandidates = [
+      'Beschaffung.tBestellung',
+      'dbo.tBestellung'
+    ]
+    const posCandidates = [
+      'Beschaffung.tBestellungPos',
+      'dbo.tBestellungPos'
+    ]
+
+    const purchaseOrderTable = await firstExistingTable(pool, headerCandidates)
+    const posTable = await firstExistingTable(pool, posCandidates)
     const supplierTable = 'dbo.tLieferant'
 
+    if (!purchaseOrderTable || !posTable) {
+      return NextResponse.json({
+        ok: false,
+        error: 'Keine Bestellungstabellen gefunden'
+      }, { status: 404 })
+    }
+
     // Prüfe verfügbare Felder
-    const hasDErstellt = await hasColumn(pool, purchaseOrderTable, 'dErstellt')
-    const dateField = hasDErstellt ? 'dErstellt' : 'dErstellDatum'
+    const dateField = await pickFirstExisting(pool, purchaseOrderTable, ['dErstellt', 'dBestelldatum']) || 'dErstellt'
     
     const hasNStorno = await hasColumn(pool, purchaseOrderTable, 'nStorno')
     const stornoFilter = hasNStorno ? 'AND (b.nStorno IS NULL OR b.nStorno = 0)' : ''
 
-    // Summe-Felder für Bestellungen
-    const netSumField = await pickFirstExisting(pool, purchaseOrderTable, ['fGesamtsumme', 'fSummeNetto', 'fNetto']) || 'fGesamtsumme'
+    // Positionsfelder
+    const qtyField = await pickFirstExisting(pool, posTable, ['fMenge', 'nMenge']) || 'fMenge'
+    const ekField = await pickFirstExisting(pool, posTable, ['fEKPreis', 'fEKNetto']) || 'fEKPreis'
+    
+    // Netto-Summe berechnen
+    const hasGesamtNetto = await hasColumn(pool, posTable, 'fGesamtNetto')
+    let netExpr: string
+    
+    if (hasGesamtNetto) {
+      netExpr = 'COALESCE(p.fGesamtNetto, 0)'
+    } else {
+      netExpr = `COALESCE(p.${ekField} * COALESCE(p.${qtyField}, 1), 0)`
+    }
+
+    // Foreign Key zu Header
+    const fkField = await pickFirstExisting(pool, posTable, ['kBestellung', 'tBestellung_kBestellung']) || 'kBestellung'
 
     // Query: Aggregiere Bestellungen nach Lieferant
     const query = `
@@ -45,8 +75,9 @@ export async function GET(request: NextRequest) {
         l.kLieferant,
         ISNULL(l.cName, 'Unbekannt') AS supplier_name,
         COUNT(DISTINCT b.kBestellung) AS orders,
-        SUM(ISNULL(b.${netSumField}, 0)) AS revenue
+        SUM(${netExpr}) AS revenue
       FROM ${purchaseOrderTable} b
+      INNER JOIN ${posTable} p ON b.kBestellung = p.${fkField}
       INNER JOIN ${supplierTable} l ON b.kLieferant = l.kLieferant
       WHERE CAST(b.${dateField} AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
