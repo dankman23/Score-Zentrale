@@ -19,6 +19,18 @@ const catalogs = [
     url: 'https://customer-assets.emergentagent.com/job_jtlsync/artifacts/p7mzcjps_Norton%20St.%20Gobain%20INDUSTRIELLE%20ANWENDUNGEN%20KATALOG%202025.pdf'
   },
   {
+    file: 'norton-clipper.pdf',
+    manufacturer: 'Norton Clipper',
+    name: 'NORTON CLIPPER KATALOG 2025',
+    url: 'https://customer-assets.emergentagent.com/job_jtlsync/artifacts/i26renzq_NORTON%20CLIPPER%20%20KATALOG%202025.pdf'
+  },
+  {
+    file: 'norton-schleifmittel.pdf',
+    manufacturer: 'Norton',
+    name: 'Norton Schleifmittel AAM_Cat_2025-SWISS',
+    url: 'https://customer-assets.emergentagent.com/job_jtlsync/artifacts/0r73wvws_Norton%20Schleifmittel%20AAM_Cat_2025-SWISS.pdf'
+  },
+  {
     file: 'pferd.pdf',
     manufacturer: 'PFERD',
     name: 'PFERD Katalog',
@@ -35,6 +47,24 @@ const catalogs = [
     manufacturer: 'VSM',
     name: 'VSM Katalog',
     url: 'https://customer-assets.emergentagent.com/job_jtlsync/artifacts/of6i0cm8_VSM%20Katalog.pdf'
+  },
+  {
+    file: '3m.pdf',
+    manufacturer: '3M',
+    name: '3M Katalog',
+    url: 'https://customer-assets.emergentagent.com/job_jtlsync/artifacts/0ct5f2qg_3M%20Katalog.pdf'
+  },
+  {
+    file: 'lukas.pdf',
+    manufacturer: 'LUKAS',
+    name: 'LUKAS Gesamtkatalog 2026-2027',
+    url: 'https://customer-assets.emergentagent.com/job_jtlsync/artifacts/s0omg7no_LUKAS_Gesamtkatalog_2026-2027_deutsch_gesamt_web_2.pdf'
+  },
+  {
+    file: 'rhodius.pdf',
+    manufacturer: 'RHODIUS',
+    name: 'RHODIUS Katalog',
+    url: 'https://customer-assets.emergentagent.com/job_jtlsync/artifacts/15xs37ic_RHODIUS%20Katalog.pdf'
   }
 ]
 
