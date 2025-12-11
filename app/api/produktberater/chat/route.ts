@@ -293,8 +293,16 @@ Sei präzise, professionell und hilfreich!`
           const productsFromManufacturer = herstellerMap.get(manufacturer)
           // Sortiere nach Verfügbarkeit
           const sorted = productsFromManufacturer.sort((a: any, b: any) => {
-            const aStock = a.fLagerbestand || a.quantity || 0
-            const bStock = b.fLagerbestand || b.quantity || 0
+            // Priorisiere Produkte mit Lagerbestand (articles collection)
+            const aStock = a.fLagerbestand || 0
+            const bStock = b.fLagerbestand || 0
+            
+            // Für shopping_feed: priorisiere "in_stock"
+            const aAvailable = a.availability?.toLowerCase().includes('in_stock') ? 1 : 0
+            const bAvailable = b.availability?.toLowerCase().includes('in_stock') ? 1 : 0
+            
+            // Sortiere: in_stock zuerst, dann nach Lagerbestand
+            if (aAvailable !== bAvailable) return bAvailable - aAvailable
             return bStock - aStock
           })
           diversifiedProducts.push(...sorted.slice(0, 2)) // Max 2 pro Hersteller
