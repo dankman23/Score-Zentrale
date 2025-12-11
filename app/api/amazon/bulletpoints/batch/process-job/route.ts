@@ -98,7 +98,6 @@ export async function POST(request: NextRequest) {
               a.cArtNr,
               a.cName,
               a.cBeschreibung,
-              a.cKurzBeschreibung,
               h.cName as cHerstellerName
             FROM dbo.tArtikel a
             LEFT JOIN dbo.tHersteller h ON a.kHersteller = h.kHersteller
