@@ -37,6 +37,19 @@ async function executeTick() {
     return
   }
   
+  // Wenn Server unhealthy ist, überspringe Tick
+  if (!serverHealthy && consecutiveErrors > 2) {
+    console.log('[Autopilot Worker] Server unhealthy, skipping tick until server recovers...')
+    return
+  }
+  
+  // Warte bei wiederholten Fehlern (exponentieller Backoff)
+  const backoffDelay = getBackoffDelay()
+  if (backoffDelay > 0) {
+    console.log(`[Autopilot Worker] Waiting ${backoffDelay/1000}s before next attempt (backoff)...`)
+    await new Promise(resolve => setTimeout(resolve, backoffDelay))
+  }
+  
   isProcessing = true
   tickCount++
   lastTickTime = new Date()
@@ -44,15 +57,23 @@ async function executeTick() {
   const startTime = Date.now()
   console.log(`\n[Autopilot Worker] ====== TICK #${tickCount} ====== ${lastTickTime.toISOString()}`)
   
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/coldleads/autopilot/tick`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'AutopilotWorker/1.0'
-      },
-      timeout: 120000 // 2 Minuten Timeout
-    })
+  let retryCount = 0
+  let success = false
+  
+  while (retryCount < MAX_RETRIES && !success) {
+    try {
+      if (retryCount > 0) {
+        console.log(`[Autopilot Worker] Retry attempt ${retryCount}/${MAX_RETRIES}...`)
+      }
+      
+      const response = await fetch(`${API_BASE_URL}/api/coldleads/autopilot/tick`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'AutopilotWorker/1.0'
+        },
+        timeout: 120000 // 2 Minuten Timeout
+      })
     
     const duration = Date.now() - startTime
     
