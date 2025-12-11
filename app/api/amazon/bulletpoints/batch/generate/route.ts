@@ -74,13 +74,20 @@ export async function POST(request: NextRequest) {
         query.cWarengruppenName = filter.warengruppe
       }
       
+      // Limit auf max 50 Artikel um Timeout zu vermeiden
+      const maxLimit = 50
+      const effectiveLimit = Math.min(limit || 50, maxLimit)
+      
       const articles = await articlesCollection
         .find(query)
-        .limit(limit || 1000)
+        .limit(effectiveLimit)
         .project({ kArtikel: 1 })
         .toArray()
       
       artikelIds = articles.map(a => a.kArtikel)
+      
+      if (limit && limit > maxLimit) {
+        console.log(`[Batch Generate] Limit von ${limit} auf ${maxLimit} reduziert um Timeout zu vermeiden`)
     }
     else {
       return NextResponse.json({
