@@ -7890,7 +7890,10 @@ export default function App() {
                                         <i className="bi bi-play-fill mr-1"/>
                                         {selectedArtikel.length > 0 
                                           ? `${selectedArtikel.length} Ausgewählte generieren`
-                                          : `${artikelTotal.toLocaleString()} Gefilterte generieren`
+                                          : (customBatchLimit && parseInt(customBatchLimit) > 0
+                                            ? `${Math.min(parseInt(customBatchLimit), artikelTotal).toLocaleString()} Gefilterte generieren`
+                                            : `${artikelTotal.toLocaleString()} Gefilterte generieren`
+                                          )
                                         }
                                       </>
                                     )}
