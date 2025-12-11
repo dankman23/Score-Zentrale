@@ -52,16 +52,30 @@ export async function GET(request: NextRequest) {
       }
     }
     
+    // Check if we need to join with tHersteller table
+    const herstellerTable = 'dbo.tHersteller'
+    const hasKHersteller = await hasColumn(pool, articleTable, 'kHersteller')
+    const hasTHersteller = hasKHersteller ? await hasColumn(pool, herstellerTable, 'kHersteller') : false
+    
+    const herstellerJoin = hasTHersteller 
+      ? `LEFT JOIN ${herstellerTable} h ON a.kHersteller = h.kHersteller`
+      : ''
+    
+    const herstellerSelect = hasTHersteller 
+      ? 'MAX(h.cName)'
+      : 'NULL'
+    
     const query = `
       SELECT TOP ${limit}
         a.cArtNr AS sku,
         ${posNameField ? `MAX(op.${posNameField})` : `a.cArtNr`} AS name,
-        MAX(a.cHersteller) AS hersteller,
+        ${herstellerSelect} AS hersteller,
         SUM(op.${qtyField}) AS quantity,
         SUM(${netTotalExpr}) AS revenue
       FROM ${orderTable} o
       INNER JOIN ${orderPosTable} op ON o.kAuftrag = op.kAuftrag
       LEFT JOIN ${articleTable} a ON op.kArtikel = a.kArtikel
+      ${herstellerJoin}
       WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
         AND ${articleFilter}
