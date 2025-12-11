@@ -329,29 +329,14 @@ export async function POST(request: NextRequest) {
                 previous_status: previousProspect.status,
                 jtl_customer: jtlData,
                 
-                // Neu: B2B-Klassifizierung
-                'is_b2b': b2bResult.is_b2b,
-                'b2b_confidence': b2bResult.confidence,
-                'b2b_indicators': b2bResult.indicators,
+                // Behalte alle anderen Daten vom Prospect
+                company_name: customer.cFirma,
+                website: website || previousProspect.website,
+                email: customer.cEMail || previousProspect.email,
                 
-                // Neu: Kanal-Zuordnung
-                'primary_channel': channelData.primary,
-                'channels': channelData.channels,
-                'last_order_channel': lastOrderChannel,
-                
-                // Neu: Hauptartikel
-                'hauptartikel': hauptartikel,
-                
-                // Neu: Statistiken
+                // Statistiken (vereinfacht)
                 'stats.total_orders': customer.nAnzahlBestellungen || 0,
                 'stats.total_revenue': customer.nUmsatzGesamt || 0,
-                'stats.avg_order_value': customer.nAnzahlBestellungen > 0 
-                  ? (customer.nUmsatzGesamt || 0) / customer.nAnzahlBestellungen 
-                  : 0,
-                'stats.order_frequency': orderFrequency,
-                'stats.days_since_last_order': daysSinceLastOrder,
-                'stats.is_active': daysSinceLastOrder < 365,
-                'stats.lifetime_days': lifetimeDays,
                 
                 updated_at: new Date(),
                 last_jtl_sync: new Date()
