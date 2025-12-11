@@ -107,7 +107,16 @@ Kurzbeschreibung: ${artikel.cKurzBeschreibung || 'Keine Kurzbeschreibung'}
 Hersteller: ${artikel.cHerstellerName || 'Unbekannt'}
           `.trim()
           
-          const response = await claude.generateText(selectedPrompt.systemPrompt, userPrompt)
+          const response = await claude.createMessage(
+            [
+              {
+                role: 'user',
+                content: userPrompt
+              }
+            ],
+            selectedPrompt.systemPrompt,
+            2000
+          )
           
           // Speichere Ergebnis
           await bulletpointsCollection.updateOne(
