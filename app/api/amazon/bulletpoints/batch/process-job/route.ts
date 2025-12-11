@@ -134,7 +134,6 @@ Artikel-Nr: ${artikel.cArtNr}
 Name: ${artikel.cName}
 Beschreibung: ${cBeschreibung || 'Keine Beschreibung'}
 Kurzbeschreibung: ${cKurzBeschreibung || 'Keine Kurzbeschreibung'}
-Hersteller: ${artikel.cHerstellerName || 'Unbekannt'}
           `.trim()
           
           const response = await claude.generateText(selectedPrompt.systemPrompt, userPrompt)
