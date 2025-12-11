@@ -91,41 +91,11 @@ export async function POST(request: NextRequest) {
       // Verarbeite jeden Artikel im Chunk
       for (const kArtikel of chunk) {
         try {
-          // Artikel aus MSSQL laden (nur Basis-Daten)
-          const artikelResult = await pool.request().query(`
-            SELECT 
-              kArtikel,
-              cArtNr,
-              cName
-            FROM dbo.tArtikel
-            WHERE kArtikel = ${kArtikel}
-          `)
+          // 1. Lade Artikel aus MongoDB (wie generate API)
+          const artikel = await articlesCollection.findOne({ kArtikel })
           
-          if (artikelResult.recordset.length === 0) {
-            throw new Error('Artikel nicht gefunden')
-          }
-          
-          const artikel = artikelResult.recordset[0]
-          
-          // Lade Beschreibung aus separater Tabelle
-          let cBeschreibung = null
-          let cKurzBeschreibung = null
-          
-          try {
-            const beschreibungResult = await pool.request().query(`
-              SELECT 
-                cKurzBeschreibung,
-                cBeschreibung
-              FROM tArtikelBeschreibung
-              WHERE kArtikel = ${kArtikel} AND kSprache = 1
-            `)
-            
-            if (beschreibungResult.recordset.length > 0) {
-              cBeschreibung = beschreibungResult.recordset[0].cBeschreibung
-              cKurzBeschreibung = beschreibungResult.recordset[0].cKurzBeschreibung
-            }
-          } catch (e) {
-            console.log(`[Job ${jobId}] Beschreibung nicht verfügbar für Artikel ${kArtikel}`)
+          if (!artikel) {
+            throw new Error('Artikel nicht in MongoDB gefunden')
           }
           
           // Generiere Bulletpoints mit Claude
