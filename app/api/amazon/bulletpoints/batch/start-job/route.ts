@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       
       const articles = await articlesCollection
         .find(query)
-        .limit(limit || 5000) // Max 5000 Artikel
+        .limit(limit || 10000) // Max 10000 Artikel - Async-Job-System kann unbegrenzt verarbeiten
         .project({ kArtikel: 1 })
         .toArray()
       
