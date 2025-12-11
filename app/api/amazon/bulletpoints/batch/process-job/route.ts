@@ -102,8 +102,9 @@ export async function POST(request: NextRequest) {
           const userPrompt = `
 Artikel-Nr: ${artikel.cArtNr}
 Name: ${artikel.cName}
-Beschreibung: ${cBeschreibung || 'Keine Beschreibung'}
-Kurzbeschreibung: ${cKurzBeschreibung || 'Keine Kurzbeschreibung'}
+Beschreibung: ${artikel.cBeschreibung || 'Keine Beschreibung'}
+Kurzbeschreibung: ${artikel.cKurzBeschreibung || 'Keine Kurzbeschreibung'}
+Hersteller: ${artikel.cHerstellerName || 'Unbekannt'}
           `.trim()
           
           const response = await claude.generateText(selectedPrompt.systemPrompt, userPrompt)
