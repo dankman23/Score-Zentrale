@@ -130,15 +130,18 @@ backend:
 
   - task: "Amazon Bulletpoints ASYNC JOB SYSTEM: POST /api/amazon/bulletpoints/batch/process-job"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/app/api/amazon/bulletpoints/batch/process-job/route.ts"
-    stuck_count: 0
+    stuck_count: 1
     priority: "P0-CRITICAL"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "🔧 WORKER-API für asynchrone Job-Verarbeitung. Nimmt jobId, lädt Job aus MongoDB, verarbeitet Artikel in Chunks von 50. Verwendet Claude Sonnet 4 via ClaudeClient. Update Job-Status alle 10 Artikel. Bei Abschluss: status='completed' mit processed/succeeded/failed counts. Bei Fehler: status='failed'. maxDuration: 300s pro Chunk. Läuft im Hintergrund unabhängig vom Frontend!"
+      - working: false
+        agent: "testing"
+        comment: "❌ PROCESS-JOB API PARTIALLY WORKING - CLAUDE INTEGRATION ISSUE: Core worker functionality working correctly: (1) ✅ Job processing architecture working - loads jobs from MongoDB, processes in chunks, updates status, (2) ✅ Article loading from MongoDB working, (3) ✅ Job status updates working (pending → running → completed), (4) ✅ Error handling and progress tracking working, (5) ❌ CRITICAL ISSUE: Claude Sonnet 4 API integration failing with '500 litellm.APIConnectionError: content' - Emergent LLM Key or endpoint issue. FIXED during testing: SQL schema issues (removed non-existent columns cKurzBeschreibung, cBeschreibung from tArtikel), updated to use claude.createMessage() instead of non-existent generateText() method. Worker processes articles but bulletpoint generation fails due to Claude API issue."
 
   - task: "Amazon Bulletpoints ASYNC JOB SYSTEM: GET /api/amazon/bulletpoints/batch/job-status"
     implemented: true
