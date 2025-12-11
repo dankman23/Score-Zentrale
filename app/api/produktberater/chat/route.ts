@@ -174,6 +174,19 @@ Sei präzise, professionell und hilfreich!`
         ?.map(k => k.replace(/\*\*/g, '').trim())
         .slice(0, 3) || []
       
+      // Extrahiere Maße aus der User-Message (z.B. "50 x 2000", "50x2000", "50 x 2000 mm")
+      const userMessage = message.toLowerCase()
+      const dimensionPattern = /(\d+)\s*x\s*(\d+)/i
+      const dimensionMatch = userMessage.match(dimensionPattern)
+      
+      let width = null
+      let length = null
+      if (dimensionMatch) {
+        width = parseInt(dimensionMatch[1])
+        length = parseInt(dimensionMatch[2])
+        console.log('[Produktberater] Extrahierte Maße:', { width, length })
+      }
+      
       if (keywords.length > 0) {
         console.log('[Produktberater] Suche nach Keywords:', keywords)
         
@@ -187,7 +200,7 @@ Sei präzise, professionell und hilfreich!`
               ]
             }))
           })
-          .limit(6)
+          .limit(20) // Mehr holen für Filtering
           .toArray()
         
         // Fallback auf articles collection wenn shopping_feed leer ist
@@ -197,6 +210,7 @@ Sei präzise, professionell und hilfreich!`
             .find({
               $and: [
                 { cAktiv: true },
+                { fLagerbestand: { $gt: 0 } }, // NUR verfügbare Artikel!
                 {
                   $or: keywords.map(kw => ({
                     $or: [
@@ -209,9 +223,38 @@ Sei präzise, professionell und hilfreich!`
               ]
             })
             .sort({ fLagerbestand: -1 }) // Sortiere nach Lagerbestand (verfügbar zuerst)
-            .limit(20) // Mehr Produkte holen für Diversität
+            .limit(30) // Mehr Produkte holen für Diversität
             .toArray()
         }
+        
+        // Filtere nach Maßen wenn spezifiziert
+        if (width && length) {
+          console.log('[Produktberater] Filtere nach Maßen:', { width, length })
+          textProducts = textProducts.filter(product => {
+            const title = product.title || product.cName || ''
+            const dimensionInTitle = title.match(/(\d+)\s*x\s*(\d+)/i)
+            
+            if (dimensionInTitle) {
+              const pWidth = parseInt(dimensionInTitle[1])
+              const pLength = parseInt(dimensionInTitle[2])
+              
+              // Toleranz: +/- 5mm für Breite, +/- 100mm für Länge
+              const widthMatch = Math.abs(pWidth - width) <= 5
+              const lengthMatch = Math.abs(pLength - length) <= 100
+              
+              return widthMatch && lengthMatch
+            }
+            return false
+          })
+          
+          console.log('[Produktberater] Nach Maß-Filter:', textProducts.length, 'Produkte')
+        }
+        
+        // Filtere nach Verfügbarkeit (nur auf Lager)
+        textProducts = textProducts.filter(product => {
+          const stock = product.fLagerbestand || product.quantity || 0
+          return stock > 0
+        })
         
         // Diversifizierung: Hole verschiedene Hersteller
         const herstellerMap = new Map()
