@@ -51,7 +51,9 @@ export class ClaudeClient {
         temperature: 0.7
       }
 
-      console.log('[Claude Client] Request:', JSON.stringify(requestBody, null, 2).substring(0, 500))
+      console.log('[Claude Client] systemPrompt:', systemPrompt ? systemPrompt.substring(0, 100) : 'EMPTY/UNDEFINED')
+      console.log('[Claude Client] Messages count:', messages.length)
+      console.log('[Claude Client] openaiMessages:', JSON.stringify(openaiMessages, null, 2).substring(0, 1000))
 
       const response = await fetch(this.endpoint, {
         method: 'POST',
