@@ -745,6 +745,11 @@ export default function App() {
   // Sales tables
   const [salesTab, setSalesTab] = useState('products')
   const [topProducts, setTopProducts] = useState([])
+  const [topProductsLimit, setTopProductsLimit] = useState(20)
+  const [topProductsHersteller, setTopProductsHersteller] = useState('')
+  const [topProductsWarengruppe, setTopProductsWarengruppe] = useState('')
+  const [availableHersteller, setAvailableHersteller] = useState([])
+  const [availableWarengruppen, setAvailableWarengruppen] = useState([])
   const [topCategories, setTopCategories] = useState([])
   const [limit, setLimit] = useState(20)
   const [sortBy, setSortBy] = useState({ field: 'revenue', direction: 'desc' })
