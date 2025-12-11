@@ -3462,15 +3462,88 @@ export default function App() {
                 <span>Top-Produkte</span>
                 <button className="btn btn-outline-primary btn-sm" onClick={()=>exportCSV(topProducts, 'top-products.csv')}>CSV</button>
               </div>
+              
+              {/* Filter-Leiste */}
+              <div className="card-body border-bottom" style={{backgroundColor: '#2b3035'}}>
+                <div className="row">
+                  <div className="col-md-3">
+                    <label className="small text-muted mb-1">Anzahl anzeigen</label>
+                    <select 
+                      className="form-control form-control-sm"
+                      value={topProductsLimit}
+                      onChange={(e)=>setTopProductsLimit(parseInt(e.target.value))}
+                      style={{backgroundColor: '#1e1e1e', color: '#fff', borderColor: '#495057'}}
+                    >
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={200}>200</option>
+                      <option value={500}>500</option>
+                    </select>
+                  </div>
+                  
+                  <div className="col-md-4">
+                    <label className="small text-muted mb-1">Hersteller</label>
+                    <select 
+                      className="form-control form-control-sm"
+                      value={topProductsHersteller}
+                      onChange={(e)=>setTopProductsHersteller(e.target.value)}
+                      style={{backgroundColor: '#1e1e1e', color: '#fff', borderColor: '#495057'}}
+                    >
+                      <option value="">Alle Hersteller</option>
+                      {salesFiltersAvailableHersteller.map((h,idx)=>(
+                        <option key={idx} value={h}>{h}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="col-md-4">
+                    <label className="small text-muted mb-1">Warengruppe</label>
+                    <select 
+                      className="form-control form-control-sm"
+                      value={topProductsWarengruppe}
+                      onChange={(e)=>setTopProductsWarengruppe(e.target.value)}
+                      style={{backgroundColor: '#1e1e1e', color: '#fff', borderColor: '#495057'}}
+                    >
+                      <option value="">Alle Warengruppen</option>
+                      {salesFiltersAvailableWarengruppen.map((w,idx)=>(
+                        <option key={idx} value={w}>{w}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="col-md-1 d-flex align-items-end">
+                    <button 
+                      className="btn btn-outline-secondary btn-sm w-100"
+                      onClick={()=>{
+                        setTopProductsHersteller('')
+                        setTopProductsWarengruppe('')
+                        setTopProductsLimit(20)
+                      }}
+                      title="Filter zurücksetzen"
+                    >
+                      <i className="bi bi-x-circle"/>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
               <div className="card-body p-0">
                 <div className="table-responsive" style={{maxHeight:420}}>
                   <table className="table table-dark table-hover table-sm mb-0">
-                    <thead className="thead-dark"><tr><th>ArtikelNr</th><th>Name</th><th>Menge</th><th>Umsatz (Netto)</th></tr></thead>
+                    <thead className="thead-dark"><tr><th>ArtikelNr</th><th>Name</th><th>Hersteller</th><th>Menge</th><th>Umsatz (Netto)</th></tr></thead>
                     <tbody>
                       {(topProducts||[]).map((r,idx)=> (
-                        <tr key={idx}><td>{r.sku||r.artikelNr}</td><td>{r.name}</td><td>{r.quantity||'-'}</td><td>{fmtCurrency(r.revenue||r.umsatz)}</td></tr>
+                        <tr key={idx}>
+                          <td>{r.sku||r.artikelNr}</td>
+                          <td>{r.name}</td>
+                          <td>{r.hersteller||'-'}</td>
+                          <td>{r.quantity||'-'}</td>
+                          <td>{fmtCurrency(r.revenue||r.umsatz)}</td>
+                        </tr>
                       ))}
-                      {topProducts?.length===0 && <tr><td colSpan={4} className="text-center text-muted">Keine Daten</td></tr>}
+                      {topProducts?.length===0 && <tr><td colSpan={5} className="text-center text-muted">Keine Daten</td></tr>}
                     </tbody>
                   </table>
                 </div>
