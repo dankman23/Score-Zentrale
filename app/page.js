@@ -9109,8 +9109,8 @@ export default function App() {
                                         <><strong>Preis:</strong> {product.price}<br/></>
                                       )}
                                       {product.availability && (
-                                        <span className={`badge ${product.availability === 'in_stock' ? 'badge-success' : 'badge-warning'}`}>
-                                          {product.availability === 'in_stock' ? '✓ Auf Lager' : 'Nicht verfügbar'}
+                                        <span className={`badge ${product.availability.toLowerCase().includes('in_stock') || product.availability.toLowerCase().includes('auf lager') ? 'badge-success' : 'badge-warning'}`}>
+                                          {product.availability.toLowerCase().includes('in_stock') || product.availability.toLowerCase().includes('auf lager') ? '✓ Auf Lager' : 'Nicht verfügbar'}
                                         </span>
                                       )}
                                     </small>
