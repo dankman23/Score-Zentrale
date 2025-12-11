@@ -49,9 +49,14 @@ export async function POST(request: NextRequest) {
     
     let artikelIds: number[] = []
     
-    // Fall 1: Direkte Artikel-ID Liste
+    // Fall 1: Direkte Artikel-ID Liste (max 50)
     if (kArtikelList && Array.isArray(kArtikelList)) {
-      artikelIds = kArtikelList
+      const maxLimit = 50
+      artikelIds = kArtikelList.slice(0, maxLimit)
+      
+      if (kArtikelList.length > maxLimit) {
+        console.log(`[Batch Generate] Artikel-Liste von ${kArtikelList.length} auf ${maxLimit} begrenzt`)
+      }
     }
     // Fall 2: Filter-basierte Auswahl
     else if (filter) {
