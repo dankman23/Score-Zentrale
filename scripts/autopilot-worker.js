@@ -97,9 +97,15 @@ async function executeTick() {
     console.error(`[Autopilot Worker] ❌ Request failed after ${duration}ms:`, error.message)
     
     // Bei Netzwerkfehlern: Prüfe ob der Server überhaupt erreichbar ist
-    if (error.code === 'ECONNREFUSED') {
+    if (error.code === 'ECONNREFUSED' || error.code === 'ECONNRESET' || error.message.includes('ECONNREFUSED')) {
       console.error(`[Autopilot Worker] ⚠️  Next.js Server nicht erreichbar unter ${API_BASE_URL}`)
       console.error(`[Autopilot Worker]    Warte auf Server-Start...`)
+      console.error(`[Autopilot Worker]    Autopilot-Worker läuft weiter und versucht es im nächsten Tick erneut.`)
+    } else if (error.code === 'ETIMEDOUT' || error.message.includes('timeout')) {
+      console.error(`[Autopilot Worker] ⏱️  Request Timeout nach ${duration}ms`)
+      console.error(`[Autopilot Worker]    Dies kann bei langsamen API-Anfragen oder Server-Überlastung passieren.`)
+    } else {
+      console.error(`[Autopilot Worker] Unerwarteter Fehler:`, error)
     }
   } finally {
     isProcessing = false
