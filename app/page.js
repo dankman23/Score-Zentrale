@@ -844,6 +844,7 @@ export default function App() {
   const [batchResults, setBatchResults] = useState([])
   const [selectedArtikel, setSelectedArtikel] = useState([])
   const [selectedPromptId, setSelectedPromptId] = useState(2) // Version 2 ist Standard
+  const [customBatchLimit, setCustomBatchLimit] = useState('') // Benutzerdefinierte Anzahl
   
   // Preise
   const [preiseTab, setPreiseTab] = useState('alte_pb') // alte_pb | neue_2025
