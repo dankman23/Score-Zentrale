@@ -217,7 +217,7 @@ Sei präzise, professionell und hilfreich!`
             .find({
               $and: [
                 { cAktiv: true },
-                { fLagerbestand: { $gt: 0 } }, // NUR verfügbare Artikel!
+                // KEIN fLagerbestand-Filter hier - das machen wir später
                 {
                   $or: keywords.map(kw => ({
                     $or: [
