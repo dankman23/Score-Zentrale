@@ -1,6 +1,6 @@
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
-export const maxDuration = 300
+export const maxDuration = 60 // Reduziert auf 60 Sekunden um Nginx-Timeout zu vermeiden
 
 import { NextRequest, NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/api'
