@@ -91,16 +91,14 @@ export async function POST(request: NextRequest) {
       // Verarbeite jeden Artikel im Chunk
       for (const kArtikel of chunk) {
         try {
-          // Artikel aus MSSQL laden
+          // Artikel aus MSSQL laden (nur Basis-Daten)
           const artikelResult = await pool.request().query(`
             SELECT 
-              a.kArtikel,
-              a.cArtNr,
-              a.cName,
-              h.cName as cHerstellerName
-            FROM dbo.tArtikel a
-            LEFT JOIN dbo.tHersteller h ON a.kHersteller = h.kHersteller
-            WHERE a.kArtikel = ${kArtikel}
+              kArtikel,
+              cArtNr,
+              cName
+            FROM dbo.tArtikel
+            WHERE kArtikel = ${kArtikel}
           `)
           
           if (artikelResult.recordset.length === 0) {
