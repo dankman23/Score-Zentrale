@@ -7854,7 +7854,7 @@ export default function App() {
                                         <i className="bi bi-play-fill mr-1"/>
                                         {selectedArtikel.length > 0 
                                           ? `${selectedArtikel.length} Ausgewählte generieren`
-                                          : `${artikelTotal > 1000 ? '1000' : artikelTotal} Gefilterte generieren`
+                                          : `${artikelTotal.toLocaleString()} Gefilterte generieren`
                                         }
                                       </>
                                     )}
