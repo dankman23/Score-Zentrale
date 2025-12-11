@@ -39,7 +39,8 @@ async function executeTick() {
       headers: {
         'Content-Type': 'application/json',
         'User-Agent': 'AutopilotWorker/1.0'
-      }
+      },
+      timeout: 120000 // 2 Minuten Timeout
     })
     
     const duration = Date.now() - startTime
