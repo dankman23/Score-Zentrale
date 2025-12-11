@@ -7832,7 +7832,7 @@ export default function App() {
                                       )}
                                     </select>
                                   </div>
-                                  {selectedArtikel.length === 0 && (
+                                  {selectedArtikel.length === 0 && artikelTotal > 0 && (
                                     <div className="mr-3">
                                       <small className="d-block mb-1" style={{color: '#adb5bd'}}>
                                         Anzahl (optional):
