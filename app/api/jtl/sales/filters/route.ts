@@ -13,16 +13,22 @@ export async function GET() {
     const pool = await getMssqlPool()
     const articleTable = 'dbo.tArtikel'
     
-    // Hole Hersteller (distinct, sortiert)
-    const herstellerQuery = `
-      SELECT DISTINCT cHersteller
-      FROM ${articleTable}
-      WHERE cHersteller IS NOT NULL AND cHersteller != ''
-      ORDER BY cHersteller
-    `
+    // Hole Hersteller (distinct, sortiert) - über tHersteller Tabelle
+    const herstellerTable = 'dbo.tHersteller'
+    const hasKHersteller = await hasColumn(pool, articleTable, 'kHersteller')
+    const hasTHersteller = hasKHersteller ? await hasColumn(pool, herstellerTable, 'kHersteller') : false
     
-    const herstellerResult = await pool.request().query(herstellerQuery)
-    const hersteller = herstellerResult.recordset.map((r: any) => r.cHersteller)
+    let hersteller: string[] = []
+    if (hasTHersteller) {
+      const herstellerQuery = `
+        SELECT DISTINCT h.cName
+        FROM ${herstellerTable} h
+        WHERE h.cName IS NOT NULL AND h.cName != ''
+        ORDER BY h.cName
+      `
+      const herstellerResult = await pool.request().query(herstellerQuery)
+      hersteller = herstellerResult.recordset.map((r: any) => r.cName)
+    }
     
     // Hole Warengruppen (wenn Feld existiert)
     let warengruppen: string[] = []
