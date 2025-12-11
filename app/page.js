@@ -2911,6 +2911,18 @@ export default function App() {
     fetchSalesTables()
   }, [authChecked, activeTab, from, to, limit])
 
+  // 2b. SALES-FILTER laden (einmalig)
+  useEffect(() => {
+    if (!authChecked || activeTab !== 'sales') return
+    fetchSalesFilters()
+  }, [authChecked, activeTab])
+  
+  // 2c. Top-Produkte neu laden wenn Filter sich ändern
+  useEffect(() => {
+    if (!authChecked || activeTab !== 'sales' || salesTab !== 'products') return
+    fetchSalesTables()
+  }, [topProductsLimit, topProductsHersteller, topProductsWarengruppe])
+
   // 3. KALTAKQUISE-DATEN laden
   useEffect(() => {
     if (!authChecked || activeTab !== 'kaltakquise') return
