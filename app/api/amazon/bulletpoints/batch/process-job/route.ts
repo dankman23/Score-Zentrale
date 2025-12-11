@@ -134,7 +134,8 @@ export async function POST(request: NextRequest) {
           const userPrompt = `
 Artikel-Nr: ${artikel.cArtNr}
 Name: ${artikel.cName}
-Beschreibung: ${artikel.cBeschreibung || 'Keine Beschreibung'}
+Beschreibung: ${cBeschreibung || 'Keine Beschreibung'}
+Kurzbeschreibung: ${cKurzBeschreibung || 'Keine Kurzbeschreibung'}
 Hersteller: ${artikel.cHerstellerName || 'Unbekannt'}
           `.trim()
           
