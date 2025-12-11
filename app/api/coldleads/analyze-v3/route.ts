@@ -34,11 +34,12 @@ export async function POST(request: Request) {
     
     console.log(`[AnalyzeV3] Email sequence generated`)
     
-    // Step 3: JTL-Customer-Check (VOR dem Speichern!)
+    // Step 3: JTL-Customer-Check (Analyse wird TROTZDEM gespeichert!)
     console.log(`[AnalyzeV3] Checking if company is JTL customer...`)
     let jtlMatch: any = null
     let finalStatus = 'analyzed'
     let autopilotSkip = false
+    let jtlCustomerData: any = null
     
     try {
       const { checkJTLCustomerMatch } = await import('@/lib/jtl-customer-matcher')
@@ -51,11 +52,13 @@ export async function POST(request: Request) {
       )
       
       if (jtlMatch.matched) {
-        console.log(`[AnalyzeV3] ⚠️  CUSTOMER DETECTED! ${jtlMatch.jtlCustomer?.cFirma} (${jtlMatch.confidence}% confidence)`)
+        console.log(`[AnalyzeV3] ⚠️  JTL-KUNDE ERKANNT! ${jtlMatch.jtlCustomer?.cFirma} (${jtlMatch.confidence}% confidence)`)
+        console.log(`[AnalyzeV3] Analyse wird trotzdem gespeichert, Status wird auf 'customer' gesetzt`)
         finalStatus = 'customer'
         autopilotSkip = true
+        jtlCustomerData = jtlMatch.jtlCustomer
       } else {
-        console.log(`[AnalyzeV3] ✅ Not a JTL customer, can be contacted`)
+        console.log(`[AnalyzeV3] ✅ Kein JTL-Kunde, kann kontaktiert werden`)
       }
     } catch (jtlError: any) {
       console.error('[AnalyzeV3] JTL-Check failed:', jtlError.message)
