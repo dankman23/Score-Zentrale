@@ -2361,15 +2361,16 @@ export default function App() {
         return
       }
 
-      // 3. Starte Batch-Generierung
+      // 3. Starte Batch-Generierung (Async Job System)
       setBatchGenerating(true)
       setShowBatchModal(true)
       setBatchProgress({ processed: 0, succeeded: 0, failed: 0, total: count })
       setBatchResults([])
 
-      console.log('[Batch Generation] Starte mit Filter:', artikelFilter)
+      console.log('[Batch Generation] Starte Async Job mit Filter:', artikelFilter)
 
-      const res = await fetch('/api/amazon/bulletpoints/batch/generate', {
+      // Starte Job
+      const res = await fetch('/api/amazon/bulletpoints/batch/start-job', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(
@@ -2379,40 +2380,84 @@ export default function App() {
         )
       })
 
-      // Robustes JSON-Parsing mit Error-Handling
-      let data
-      try {
-        const responseText = await res.text()
-        console.log('[Batch Generate] Response:', responseText.substring(0, 500))
-        
-        if (!responseText || responseText.trim() === '') {
-          throw new Error('Leere Response vom Server')
-        }
-        
-        data = JSON.parse(responseText)
-      } catch (parseError) {
-        console.error('[Batch Generate] JSON Parse Error:', parseError)
-        console.error('[Batch Generate] Response Status:', res.status, res.statusText)
-        throw new Error(`Fehler beim Verarbeiten der Server-Antwort: ${parseError.message}`)
-      }
+      const data = await res.json()
       
-      if (data.ok) {
-        setBatchProgress({
-          processed: data.processed,
-          succeeded: data.succeeded,
-          failed: data.failed,
-          total: data.processed
-        })
-        setBatchResults(data.results || [])
-        
-        alert(`✅ Batch-Generierung abgeschlossen!\n\n${data.succeeded} erfolgreich\n${data.failed} fehlgeschlagen\nDauer: ${data.duration}`)
-      } else {
-        alert('❌ Fehler: ' + data.error)
+      if (!data.ok) {
+        alert('❌ Fehler beim Starten des Jobs: ' + data.error)
+        setBatchGenerating(false)
+        return
       }
+
+      const jobId = data.jobId
+      console.log(`[Batch Generation] Job gestartet: ${jobId}`)
+
+      // Polle Job-Status alle 2 Sekunden
+      const pollInterval = setInterval(async () => {
+        try {
+          const statusRes = await fetch(`/api/amazon/bulletpoints/batch/job-status?jobId=${jobId}`)
+          const statusData = await statusRes.json()
+
+          if (!statusData.ok) {
+            console.error('[Job Status] Fehler:', statusData.error)
+            clearInterval(pollInterval)
+            alert('❌ Fehler beim Abrufen des Job-Status: ' + statusData.error)
+            setBatchGenerating(false)
+            return
+          }
+
+          const job = statusData.job
+
+          // Update Progress
+          setBatchProgress({
+            processed: job.processed || 0,
+            succeeded: job.succeeded || 0,
+            failed: job.failed || 0,
+            total: job.total || count
+          })
+
+          setBatchResults(job.results || [])
+
+          console.log(`[Job ${jobId}] Status: ${job.status}, Progress: ${job.processed}/${job.total}`)
+
+          // Job abgeschlossen?
+          if (job.status === 'completed') {
+            clearInterval(pollInterval)
+            setBatchGenerating(false)
+            
+            const duration = job.finished_at && job.started_at 
+              ? Math.round((new Date(job.finished_at) - new Date(job.started_at)) / 1000) 
+              : 0
+            
+            alert(
+              `✅ Batch-Generierung abgeschlossen!\n\n` +
+              `${job.succeeded} erfolgreich\n` +
+              `${job.failed} fehlgeschlagen\n` +
+              `Dauer: ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')} min`
+            )
+            
+            // Artikel neu laden
+            await fetchArtikel()
+          }
+
+          // Job fehlgeschlagen?
+          if (job.status === 'failed') {
+            clearInterval(pollInterval)
+            setBatchGenerating(false)
+            alert('❌ Job fehlgeschlagen: ' + (job.error || 'Unbekannter Fehler'))
+          }
+
+        } catch (pollError) {
+          console.error('[Job Polling] Error:', pollError)
+          // Polling nicht abbrechen bei Netzwerkfehlern
+        }
+      }, 2000) // Alle 2 Sekunden
+
+      // Cleanup bei Component Unmount
+      return () => clearInterval(pollInterval)
+
     } catch (e) {
       alert('❌ Fehler: ' + e.message)
       console.error('[Batch Generate] Error:', e)
-    } finally {
       setBatchGenerating(false)
     }
   }
