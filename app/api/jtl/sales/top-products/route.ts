@@ -87,6 +87,7 @@ export async function GET(request: NextRequest) {
     const rows = (result.recordset || []).map(r => ({
       sku: r.sku || 'N/A',
       name: r.name || 'Unbekannt',
+      hersteller: r.hersteller || '-',
       quantity: parseFloat(r.quantity || 0).toFixed(2),
       revenue: parseFloat(r.revenue || 0).toFixed(2)
     }))
