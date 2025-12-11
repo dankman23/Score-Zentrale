@@ -44,18 +44,22 @@ export class ClaudeClient {
         ...messages.map(m => ({ role: m.role, content: m.content }))
       ]
 
+      const requestBody = {
+        model: this.model,
+        messages: openaiMessages,
+        max_tokens: maxTokens,
+        temperature: 0.7
+      }
+
+      console.log('[Claude Client] Request:', JSON.stringify(requestBody, null, 2).substring(0, 500))
+
       const response = await fetch(this.endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.apiKey}`
         },
-        body: JSON.stringify({
-          model: this.model,
-          messages: openaiMessages,
-          max_tokens: maxTokens,
-          temperature: 0.7
-        })
+        body: JSON.stringify(requestBody)
       })
 
       if (!response.ok) {
