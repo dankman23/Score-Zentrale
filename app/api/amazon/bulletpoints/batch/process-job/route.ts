@@ -118,15 +118,22 @@ Hersteller: ${artikel.cHerstellerName || 'Unbekannt'}
             2000
           )
           
+          const bulletpointsRaw = response.content[0]?.text || ''
+          const bullets = bulletpointsRaw.split(';').map(b => b.trim()).filter(b => b.length > 0)
+          
           // Speichere Ergebnis
           await bulletpointsCollection.updateOne(
             { kArtikel },
             {
               $set: {
                 kArtikel,
-                bulletpoints: response,
+                cArtNr: artikel.cArtNr,
+                cName: artikel.cName,
+                bulletpoints: bulletpointsRaw,
+                bullets: bullets,
+                generatedAt: new Date(),
                 promptVersion: selectedPrompt.version,
-                generated_at: new Date(),
+                promptName: selectedPrompt.name,
                 jobId
               }
             },
@@ -137,7 +144,7 @@ Hersteller: ${artikel.cHerstellerName || 'Unbekannt'}
           results.push({
             kArtikel,
             status: 'success',
-            bulletpoints: response.substring(0, 100) + '...'
+            bulletpoints: bulletpointsRaw.substring(0, 100) + '...'
           })
           
         } catch (error: any) {
