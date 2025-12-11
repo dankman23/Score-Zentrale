@@ -6,10 +6,18 @@
  * Dieser Worker läuft kontinuierlich im Hintergrund und triggert
  * den Autopilot alle 60 Sekunden, unabhängig davon ob jemand
  * auf der Website ist.
+ * 
+ * Features:
+ * - Automatisches Retry bei Fehlern
+ * - Health-Check des Next.js Servers
+ * - Exponentieller Backoff bei wiederholten Fehlern
+ * - Automatisches Wiederverbinden nach Server-Neustarts
  */
 
 const TICK_INTERVAL = 60000 // 60 Sekunden
 const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+const MAX_RETRIES = 3
+const HEALTH_CHECK_INTERVAL = 30000 // 30 Sekunden zwischen Health-Checks bei Problemen
 
 console.log('[Autopilot Worker] Starting...')
 console.log(`[Autopilot Worker] API Base URL: ${API_BASE_URL}`)
@@ -18,6 +26,9 @@ console.log(`[Autopilot Worker] Tick Interval: ${TICK_INTERVAL}ms (${TICK_INTERV
 let isProcessing = false
 let tickCount = 0
 let lastTickTime = null
+let consecutiveErrors = 0
+let serverHealthy = false
+let lastHealthCheck = null
 
 async function executeTick() {
   // Verhindere überlappende Ticks
