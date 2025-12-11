@@ -1113,8 +1113,17 @@ export default function App() {
 
   const fetchSalesTables = async () => {
     try {
+      // Top-Produkte mit Filtern
+      let productsUrl = `/api/jtl/sales/top-products?limit=${topProductsLimit}&from=${from}&to=${to}`
+      if (topProductsHersteller) {
+        productsUrl += `&hersteller=${encodeURIComponent(topProductsHersteller)}`
+      }
+      if (topProductsWarengruppe) {
+        productsUrl += `&warengruppe=${encodeURIComponent(topProductsWarengruppe)}`
+      }
+      
       const [prods, cats] = await Promise.all([
-        getJson(`/api/jtl/sales/top-products?limit=${limit}&from=${from}&to=${to}`),
+        getJson(productsUrl),
         getJson(`/api/jtl/sales/top-categories?limit=${limit}&from=${from}&to=${to}`)
       ])
       setTopProducts(Array.isArray(prods?.rows)?prods.rows:(Array.isArray(prods)?prods:toArray(prods)))
