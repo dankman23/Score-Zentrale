@@ -2911,10 +2911,13 @@ export default function App() {
     fetchSalesTables()
   }, [authChecked, activeTab, from, to, limit])
 
-  // 2b. SALES-FILTER laden (einmalig)
+  // 2b. SALES-FILTER laden (einmalig beim ersten Laden der Sales-Section)
   useEffect(() => {
-    if (!authChecked || activeTab !== 'sales') return
-    fetchSalesFilters()
+    if (!authChecked) return
+    // Lade Filter wenn entweder Dashboard oder Sales Tab aktiv ist (weil Sales auch im Dashboard angezeigt wird)
+    if (activeTab === 'dashboard' || activeTab === 'sales') {
+      fetchSalesFilters()
+    }
   }, [authChecked, activeTab])
   
   // 2c. Top-Produkte neu laden wenn Filter sich ändern
