@@ -74,74 +74,107 @@ async function executeTick() {
         },
         timeout: 120000 // 2 Minuten Timeout
       })
-    
-    const duration = Date.now() - startTime
-    
-    if (!response.ok) {
-      const text = await response.text()
-      console.error(`[Autopilot Worker] HTTP ${response.status}: ${text}`)
-      return
+      
+      if (!response.ok) {
+        const text = await response.text()
+        throw new Error(`API returned error ${response.status}: ${text}`)
+      }
+      
+      const result = await response.json()
+      const duration = Date.now() - startTime
+      
+      // Erfolg! Reset error counter
+      consecutiveErrors = 0
+      serverHealthy = true
+      success = true
+      
+      // Log basierend auf Action
+      switch (result.action) {
+        case 'skip':
+          console.log(`[Autopilot Worker] ⏸️  ${result.reason}`)
+          break
+        
+        case 'limit_reached':
+          console.log(`[Autopilot Worker] 🛑 Limit erreicht: ${result.dailyCount}/${result.dailyLimit}`)
+          break
+        
+        case 'email_sent':
+          console.log(`[Autopilot Worker] ✅ Email versendet: ${result.prospect.company_name}`)
+          console.log(`[Autopilot Worker]    Count: ${result.dailyCount}/${result.dailyLimit}`)
+          console.log(`[Autopilot Worker]    Duration: ${result.duration}ms`)
+          break
+        
+        case 'search_no_results':
+          console.log(`[Autopilot Worker] 🔍 Keine neuen Firmen gefunden`)
+          break
+        
+        case 'analyzed_but_no_email':
+          console.log(`[Autopilot Worker] 📧 Firmen analysiert, aber keine E-Mail gefunden`)
+          break
+        
+        case 'email_failed_continue':
+          console.log(`[Autopilot Worker] ⚠️  Email fehlgeschlagen: ${result.prospect}`)
+          console.log(`[Autopilot Worker]    Fehler: ${result.error}`)
+          break
+        
+        case 'error':
+          console.error(`[Autopilot Worker] ❌ Fehler: ${result.error}`)
+          break
+        
+        default:
+          console.log(`[Autopilot Worker] Unknown action: ${result.action}`, result)
+      }
+      
+      console.log(`[Autopilot Worker] Tick completed in ${duration}ms`)
+      
+    } catch (error) {
+      retryCount++
+      const duration = Date.now() - startTime
+      
+      // Bei Netzwerkfehlern: Prüfe ob der Server überhaupt erreichbar ist
+      if (error.code === 'ECONNREFUSED' || error.code === 'ECONNRESET' || error.message.includes('ECONNREFUSED')) {
+        console.error(`[Autopilot Worker] ⚠️  Next.js Server nicht erreichbar unter ${API_BASE_URL}`)
+        serverHealthy = false
+        
+        // Versuche Health-Check
+        await checkServerHealth()
+        
+        if (retryCount < MAX_RETRIES) {
+          console.log(`[Autopilot Worker]    Warte 10s vor erneutem Versuch...`)
+          await new Promise(resolve => setTimeout(resolve, 10000))
+        }
+      } else if (error.code === 'ETIMEDOUT' || error.message.includes('timeout')) {
+        console.error(`[Autopilot Worker] ⏱️  Request Timeout nach ${duration}ms`)
+        console.error(`[Autopilot Worker]    Dies kann bei langsamen API-Anfragen oder Server-Überlastung passieren.`)
+        
+        if (retryCount < MAX_RETRIES) {
+          console.log(`[Autopilot Worker]    Warte 5s vor erneutem Versuch...`)
+          await new Promise(resolve => setTimeout(resolve, 5000))
+        }
+      } else {
+        console.error(`[Autopilot Worker] ❌ Request failed after ${duration}ms:`, error.message)
+        
+        if (retryCount < MAX_RETRIES) {
+          console.log(`[Autopilot Worker]    Warte 3s vor erneutem Versuch...`)
+          await new Promise(resolve => setTimeout(resolve, 3000))
+        }
+      }
+      
+      // Letzter Retry-Versuch fehlgeschlagen
+      if (retryCount >= MAX_RETRIES) {
+        console.error(`[Autopilot Worker] ❌ Alle ${MAX_RETRIES} Retry-Versuche fehlgeschlagen`)
+        consecutiveErrors++
+        console.error(`[Autopilot Worker]    Consecutive Errors: ${consecutiveErrors}`)
+        
+        if (consecutiveErrors >= 3) {
+          console.error(`[Autopilot Worker] ⚠️  WARNUNG: ${consecutiveErrors} aufeinanderfolgende Fehler!`)
+          console.error(`[Autopilot Worker]    Worker pausiert bis Server wieder erreichbar ist.`)
+        }
+      }
     }
-    
-    const result = await response.json()
-    
-    // Log basierend auf Action
-    switch (result.action) {
-      case 'skip':
-        console.log(`[Autopilot Worker] ⏸️  ${result.reason}`)
-        break
-      
-      case 'limit_reached':
-        console.log(`[Autopilot Worker] 🛑 Limit erreicht: ${result.dailyCount}/${result.dailyLimit}`)
-        break
-      
-      case 'email_sent':
-        console.log(`[Autopilot Worker] ✅ Email versendet: ${result.prospect.company_name}`)
-        console.log(`[Autopilot Worker]    Count: ${result.dailyCount}/${result.dailyLimit}`)
-        console.log(`[Autopilot Worker]    Duration: ${result.duration}ms`)
-        break
-      
-      case 'search_no_results':
-        console.log(`[Autopilot Worker] 🔍 Keine neuen Firmen gefunden`)
-        break
-      
-      case 'analyzed_but_no_email':
-        console.log(`[Autopilot Worker] 📧 Firmen analysiert, aber keine E-Mail gefunden`)
-        break
-      
-      case 'email_failed_continue':
-        console.log(`[Autopilot Worker] ⚠️  Email fehlgeschlagen: ${result.prospect}`)
-        console.log(`[Autopilot Worker]    Fehler: ${result.error}`)
-        break
-      
-      case 'error':
-        console.error(`[Autopilot Worker] ❌ Fehler: ${result.error}`)
-        break
-      
-      default:
-        console.log(`[Autopilot Worker] Unknown action: ${result.action}`, result)
-    }
-    
-    console.log(`[Autopilot Worker] Tick completed in ${duration}ms`)
-    
-  } catch (error) {
-    const duration = Date.now() - startTime
-    console.error(`[Autopilot Worker] ❌ Request failed after ${duration}ms:`, error.message)
-    
-    // Bei Netzwerkfehlern: Prüfe ob der Server überhaupt erreichbar ist
-    if (error.code === 'ECONNREFUSED' || error.code === 'ECONNRESET' || error.message.includes('ECONNREFUSED')) {
-      console.error(`[Autopilot Worker] ⚠️  Next.js Server nicht erreichbar unter ${API_BASE_URL}`)
-      console.error(`[Autopilot Worker]    Warte auf Server-Start...`)
-      console.error(`[Autopilot Worker]    Autopilot-Worker läuft weiter und versucht es im nächsten Tick erneut.`)
-    } else if (error.code === 'ETIMEDOUT' || error.message.includes('timeout')) {
-      console.error(`[Autopilot Worker] ⏱️  Request Timeout nach ${duration}ms`)
-      console.error(`[Autopilot Worker]    Dies kann bei langsamen API-Anfragen oder Server-Überlastung passieren.`)
-    } else {
-      console.error(`[Autopilot Worker] Unerwarteter Fehler:`, error)
-    }
-  } finally {
-    isProcessing = false
   }
+  
+  isProcessing = false
 }
 
 // Graceful Shutdown Handler
