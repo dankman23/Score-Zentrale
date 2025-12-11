@@ -39,10 +39,24 @@ export async function GET(request: NextRequest) {
     const hasCauftragsNr = await hasColumn(pool, orderTable, 'cAuftragsNr')
     const orderTypeFilter = hasCauftragsNr ? `AND o.cAuftragsNr LIKE 'AU%'` : ''
     
+    // Zusätzliche Filter für Hersteller und Warengruppe
+    let additionalFilters = ''
+    if (hersteller) {
+      additionalFilters += ' AND a.cHersteller = @hersteller'
+    }
+    if (warengruppe) {
+      // Warengruppe könnte in verschiedenen Feldern sein
+      const hasWarengruppe = await hasColumn(pool, articleTable, 'cWarengruppe')
+      if (hasWarengruppe) {
+        additionalFilters += ' AND a.cWarengruppe = @warengruppe'
+      }
+    }
+    
     const query = `
       SELECT TOP ${limit}
         a.cArtNr AS sku,
         ${posNameField ? `MAX(op.${posNameField})` : `a.cArtNr`} AS name,
+        MAX(a.cHersteller) AS hersteller,
         SUM(op.${qtyField}) AS quantity,
         SUM(${netTotalExpr}) AS revenue
       FROM ${orderTable} o
@@ -52,6 +66,7 @@ export async function GET(request: NextRequest) {
         ${stornoFilter}
         AND ${articleFilter}
         ${orderTypeFilter}
+        ${additionalFilters}
       GROUP BY a.cArtNr
       ORDER BY SUM(${netTotalExpr}) DESC
     `
