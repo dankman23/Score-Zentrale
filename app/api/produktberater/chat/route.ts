@@ -237,7 +237,12 @@ Sei präzise, professionell und hilfreich!`
         // Filtere nach Maßen wenn spezifiziert
         if (width && length) {
           console.log('[Produktberater] Filtere nach Maßen:', { width, length })
-          textProducts = textProducts.filter(product => {
+          
+          // Bevorzuge passende Maße, aber behalte auch Produkte OHNE Maß-Angabe
+          const withDimensions = []
+          const withoutDimensions = []
+          
+          for (const product of textProducts) {
             const title = product.title || product.cName || ''
             const dimensionInTitle = title.match(/(\d+)\s*x\s*(\d+)/i)
             
@@ -245,16 +250,23 @@ Sei präzise, professionell und hilfreich!`
               const pWidth = parseInt(dimensionInTitle[1])
               const pLength = parseInt(dimensionInTitle[2])
               
-              // Toleranz: +/- 5mm für Breite, +/- 100mm für Länge
-              const widthMatch = Math.abs(pWidth - width) <= 5
-              const lengthMatch = Math.abs(pLength - length) <= 100
+              // Toleranz: +/- 10mm für Breite, +/- 200mm für Länge (lockerer!)
+              const widthMatch = Math.abs(pWidth - width) <= 10
+              const lengthMatch = Math.abs(pLength - length) <= 200
               
-              return widthMatch && lengthMatch
+              if (widthMatch && lengthMatch) {
+                withDimensions.push(product)
+              }
+            } else {
+              // Produkt hat keine Maß-Angabe im Titel - behalte es trotzdem
+              withoutDimensions.push(product)
             }
-            return false
-          })
+          }
           
-          console.log('[Produktberater] Nach Maß-Filter:', textProducts.length, 'Produkte')
+          // Bevorzuge passende Maße, füge dann Produkte ohne Maß hinzu
+          textProducts = [...withDimensions, ...withoutDimensions].slice(0, 30)
+          
+          console.log('[Produktberater] Nach Maß-Filter:', textProducts.length, 'Produkte (', withDimensions.length, 'mit passenden Maßen,', withoutDimensions.length, 'ohne Maß-Angabe)')
         }
         
         // Filtere nach Verfügbarkeit (nur auf Lager)
