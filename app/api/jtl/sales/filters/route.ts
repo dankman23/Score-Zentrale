@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
 import { getMssqlPool } from '@/lib/db/mssql'
+import { hasColumn } from '@/lib/sql/utils'
 
 /**
  * GET /api/jtl/sales/filters
