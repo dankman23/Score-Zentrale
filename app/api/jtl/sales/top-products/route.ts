@@ -51,10 +51,15 @@ export async function GET(request: NextRequest) {
       additionalFilters += ' AND h.cName = @hersteller'
     }
     if (warengruppe) {
-      // Warengruppe könnte in verschiedenen Feldern sein
-      const hasWarengruppe = await hasColumn(pool, articleTable, 'cWarengruppe')
-      if (hasWarengruppe) {
-        additionalFilters += ' AND a.cWarengruppe = @warengruppe'
+      // Warengruppe über tWarengruppe Tabelle
+      const warengruppeTable = 'dbo.tWarengruppe'
+      const hasKWarengruppe = await hasColumn(pool, articleTable, 'kWarengruppe')
+      const hasTWarengruppe = hasKWarengruppe ? await hasColumn(pool, warengruppeTable, 'kWarengruppe') : false
+      
+      if (hasTWarengruppe) {
+        // Wir müssen auch die Warengruppe joinen für den Filter
+        needsWarengruppeJoin = true
+        additionalFilters += ' AND wg.cName = @warengruppe'
       }
     }
     
