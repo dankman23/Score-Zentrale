@@ -113,6 +113,55 @@ backend:
         agent: "testing"
         comment: "✅ AMAZON BULLETPOINTS CSV DOWNLOAD API WORKING PERFECTLY! Comprehensive testing completed: (1) ✅ CSV download successful - returns 200 OK with proper CSV file (3 records generated from batch test). (2) ✅ UTF-8 BOM present for Excel compatibility. (3) ✅ CSV structure validated - correct header: kArtikel;cArtNr;cName;Bulletpoint 1;Bulletpoint 2;Bulletpoint 3;Bulletpoint 4;Bulletpoint 5;Generiert am. (4) ✅ Content-Type: text/csv; charset=utf-8 and Content-Disposition: attachment with filename amazon_bulletpoints_2025-11-23.csv. (5) ✅ kArtikel filter working - ?kArtikel=94626,119231 returns filtered results. (6) ✅ German date formatting working (23.11.2025, 09:57:26). (7) ✅ Semicolon delimiter and proper CSV escaping working. API ready for production use!"
 
+  - task: "Amazon Bulletpoints ASYNC JOB SYSTEM: POST /api/amazon/bulletpoints/batch/start-job"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/amazon/bulletpoints/batch/start-job/route.ts"
+    stuck_count: 0
+    priority: "P0-CRITICAL"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "🚀 NEUES ASYNC-JOB-SYSTEM für 1000+ Artikel ohne Timeouts! API erstellt Job in MongoDB Collection 'batch_jobs' und gibt sofort jobId zurück. Akzeptiert { kArtikel: number[] } oder { filter: {...}, limit?: number }. Startet Worker asynchron via fetch() zu /process-job. Returnt { ok, jobId, total, message }. Löst das Nginx-Timeout-Problem bei großen Batches!"
+
+  - task: "Amazon Bulletpoints ASYNC JOB SYSTEM: POST /api/amazon/bulletpoints/batch/process-job"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/amazon/bulletpoints/batch/process-job/route.ts"
+    stuck_count: 0
+    priority: "P0-CRITICAL"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 WORKER-API für asynchrone Job-Verarbeitung. Nimmt jobId, lädt Job aus MongoDB, verarbeitet Artikel in Chunks von 50. Verwendet Claude Sonnet 4 via ClaudeClient. Update Job-Status alle 10 Artikel. Bei Abschluss: status='completed' mit processed/succeeded/failed counts. Bei Fehler: status='failed'. maxDuration: 300s pro Chunk. Läuft im Hintergrund unabhängig vom Frontend!"
+
+  - task: "Amazon Bulletpoints ASYNC JOB SYSTEM: GET /api/amazon/bulletpoints/batch/job-status"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/amazon/bulletpoints/batch/job-status/route.ts"
+    stuck_count: 0
+    priority: "P0-CRITICAL"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "📊 JOB-STATUS-API für Polling. Query-Parameter: ?jobId=xxx. Returnt { ok, job: { id, status, total, processed, succeeded, failed, progress, created_at, started_at, finished_at, results[], error } }. Status: 'pending'|'running'|'completed'|'failed'. Progress in Prozent berechnet."
+
+backend:
+  - task: "Amazon Bulletpoints ASYNC SYSTEM - Frontend Integration"
+    implemented: true
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "P0-CRITICAL"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✨ FRONTEND INTEGRIERT! generateBatchBulletpoints() Funktion umgeschrieben: (1) Ruft /start-job auf, erhält jobId, (2) Polling mit setInterval alle 2 Sekunden zu /job-status, (3) Update batchProgress State live, (4) Bei completed: Alert + fetchArtikel() reload, (5) Bei failed: Error Alert. Modal kann während Job nicht geschlossen werden. READY FOR END-TO-END TESTING!"
+
 backend:
   - task: "Autopilot: Collections vereinheitlichen (alle → prospects)"
     implemented: true
