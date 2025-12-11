@@ -176,10 +176,19 @@ Sei präzise, professionell und hilfreich!`
       console.log('[Produktberater] Keine EAN/MPN, versuche Textsuche...')
       
       // Extrahiere Produktnamen/Keywords aus der Antwort
-      const keywords = assistantMessage
+      let keywords = assistantMessage
         .match(/\*\*([^*]+)\*\*/g)
         ?.map(k => k.replace(/\*\*/g, '').trim())
         .slice(0, 3) || []
+      
+      // Extrahiere nur den Produktnamen ohne Maße und Hersteller
+      keywords = keywords.map(kw => {
+        // Entferne " in [Maße]" Teil
+        const withoutDimensions = kw.replace(/\s+in\s+\d+\s*x\s*\d+\s*mm/i, '')
+        // Entferne " (Hersteller)" Teil
+        const withoutBrand = withoutDimensions.replace(/\s*\([^)]+\)\s*$/, '')
+        return withoutBrand.trim()
+      })
       
       // Extrahiere Maße aus der User-Message (z.B. "50 x 2000", "50x2000", "50 x 2000 mm")
       const userMessage = message.toLowerCase()
