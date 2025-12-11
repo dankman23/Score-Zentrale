@@ -1,9 +1,7 @@
 /**
  * Claude Sonnet 4 Client mit Emergent LLM Key (Universal Key)
- * Verwendet Emergent Integrations Endpoint
+ * Verwendet Emergent Integrations Endpoint direkt via fetch()
  */
-
-import OpenAI from 'openai'
 
 export interface ClaudeMessage {
   role: 'user' | 'assistant'
@@ -23,20 +21,15 @@ export interface ClaudeResponse {
 }
 
 export class ClaudeClient {
-  private client: OpenAI
+  private apiKey: string
   private model: string = 'claude-sonnet-4-20250514' // Claude Sonnet 4
+  private endpoint: string = 'https://integrations.emergentagent.com/llm/v1/chat/completions'
 
   constructor() {
-    const apiKey = process.env.EMERGENT_LLM_KEY || ''
-    if (!apiKey) {
+    this.apiKey = process.env.EMERGENT_LLM_KEY || ''
+    if (!this.apiKey) {
       throw new Error('EMERGENT_LLM_KEY nicht gefunden')
     }
-
-    // Emergent Universal Key über Emergent Integrations Endpoint
-    this.client = new OpenAI({
-      apiKey: apiKey,
-      baseURL: 'https://integrations.emergentagent.com/llm' // Emergent Integrations Endpoint
-    })
   }
 
   async createMessage(
@@ -47,29 +40,44 @@ export class ClaudeClient {
     try {
       // Konvertiere zu OpenAI-Format (kompatibel mit Emergent Endpoint)
       const openaiMessages = [
-        { role: 'system' as const, content: systemPrompt },
-        ...messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content }))
+        { role: 'system', content: systemPrompt },
+        ...messages.map(m => ({ role: m.role, content: m.content }))
       ]
 
-      const response = await this.client.chat.completions.create({
-        model: this.model, // anthropic/claude-3-7-sonnet-20250219
-        messages: openaiMessages,
-        max_tokens: maxTokens,
-        temperature: 0.7
+      const response = await fetch(this.endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`
+        },
+        body: JSON.stringify({
+          model: this.model,
+          messages: openaiMessages,
+          max_tokens: maxTokens,
+          temperature: 0.7
+        })
       })
 
-      // Konvertiere Antwort zu Claude-Format für Kompatibilität
-      const content = response.choices[0]?.message?.content || ''
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('[Claude Client] HTTP Error:', response.status, errorText)
+        throw new Error(`Claude API Error: ${response.status} - ${errorText}`)
+      }
+
+      const data = await response.json()
+
+      // Konvertiere OpenAI-Response zu Claude-Format für Kompatibilität
+      const content = data.choices[0]?.message?.content || ''
       
       return {
-        id: response.id,
-        model: response.model,
+        id: data.id,
+        model: data.model,
         role: 'assistant',
         content: [{ type: 'text', text: content }],
-        stop_reason: 'end_turn',
+        stop_reason: data.choices[0]?.finish_reason || 'end_turn',
         usage: {
-          input_tokens: response.usage?.prompt_tokens || 0,
-          output_tokens: response.usage?.completion_tokens || 0
+          input_tokens: data.usage?.prompt_tokens || 0,
+          output_tokens: data.usage?.completion_tokens || 0
         }
       }
     } catch (error: any) {
