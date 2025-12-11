@@ -2301,24 +2301,36 @@ export default function App() {
   // Batch Bulletpoint Generation
   const startBatchGeneration = async () => {
     try {
-      // Verwende entweder ausgewählte Artikel oder alle gefilterten
+      // Verwende entweder ausgewählte Artikel oder alle gefilterten mit optionalem Limit
       const useSelection = selectedArtikel.length > 0
-      const count = useSelection ? selectedArtikel.length : (artikelTotal > 1000 ? 1000 : artikelTotal)
       
-      // Warnung wenn keine Auswahl getroffen wurde
+      // Bestimme die Anzahl der zu verarbeitenden Artikel
+      let count
+      if (useSelection) {
+        count = selectedArtikel.length
+      } else {
+        // Wenn ein benutzerdefiniertes Limit eingegeben wurde, verwende es
+        if (customBatchLimit && parseInt(customBatchLimit) > 0) {
+          count = Math.min(parseInt(customBatchLimit), artikelTotal)
+        } else {
+          count = artikelTotal
+        }
+      }
+      
+      // Warnung wenn keine Artikel gefunden wurden
       if (!useSelection && artikelTotal === 0) {
         alert('❌ Keine Artikel gefunden. Bitte überprüfen Sie Ihre Filter.')
         return
       }
       
       // Warnung wenn viele Artikel ohne Auswahl verarbeitet werden
-      if (!useSelection && artikelTotal > 100) {
+      if (!useSelection && count > 100) {
         const proceed = confirm(
           `⚠️ ACHTUNG!\n\n` +
           `Sie haben KEINE Artikel ausgewählt!\n` +
-          `Es werden ${count} gefilterte Artikel verarbeitet.\n\n` +
+          `Es werden ${count.toLocaleString()} gefilterte Artikel verarbeitet.\n\n` +
           `💡 TIPP: Wählen Sie einzelne Artikel aus, indem Sie die Checkboxen anklicken.\n\n` +
-          `Möchten Sie wirklich ${count} Artikel verarbeiten?`
+          `Möchten Sie wirklich ${count.toLocaleString()} Artikel verarbeiten?`
         )
         if (!proceed) return
       }
