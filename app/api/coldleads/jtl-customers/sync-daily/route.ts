@@ -270,11 +270,103 @@ export async function POST(request: NextRequest) {
         const region = customer.cLand === 'AT' ? 'Österreich' : 
                       customer.cLand === 'CH' ? 'Schweiz' : 'Deutschland'
         
-        await prospectsCollection.insertOne({
-          company_name: customer.cFirma,
-          website: website || null,
-          status: 'customer',
-          customer_source: 'jtl',
+        // PRÜFUNG: War dieser Kunde vorher im Kaltakquise-Tool?
+        // Prüfe über Email, Website oder Firma-Name
+        let wasContacted = false
+        let previousProspect: any = null
+        let conversionSource = null
+        
+        try {
+          // Suche nach matching Prospects (status=contacted oder analyzed)
+          const matchQuery: any[] = []
+          
+          if (customer.cEMail) {
+            matchQuery.push({ 'analysis_v3.contact_person.email': customer.cEMail })
+            matchQuery.push({ email: customer.cEMail })
+          }
+          
+          if (website) {
+            matchQuery.push({ website: website })
+          }
+          
+          if (customer.cFirma) {
+            // Name-Matching (case-insensitive, ähnlich)
+            matchQuery.push({ 
+              company_name: { 
+                $regex: customer.cFirma.trim(), 
+                $options: 'i' 
+              } 
+            })
+          }
+          
+          if (matchQuery.length > 0) {
+            previousProspect = await prospectsCollection.findOne({
+              $or: matchQuery,
+              status: { $in: ['contacted', 'analyzed', 'replied', 'new'] }
+            })
+            
+            if (previousProspect) {
+              wasContacted = true
+              conversionSource = 'coldleads'
+              console.log(`[JTL-Sync] 🎉 CONVERSION! ${customer.cFirma} war vorher kontaktiert (${previousProspect.status})`)
+            }
+          }
+        } catch (matchError: any) {
+          console.error('[JTL-Sync] Error checking previous contact:', matchError.message)
+        }
+        
+        // Wenn Kunde vorher kontaktiert wurde: UPDATE statt INSERT
+        if (wasContacted && previousProspect) {
+          // Update den vorhandenen Prospect zu "customer" 
+          await prospectsCollection.updateOne(
+            { _id: previousProspect._id },
+            {
+              $set: {
+                status: 'customer',
+                customer_source: 'jtl',
+                converted_from_coldleads: true,
+                conversion_date: new Date(),
+                previous_status: previousProspect.status,
+                jtl_customer: jtlData,
+                
+                // Neu: B2B-Klassifizierung
+                'is_b2b': b2bResult.is_b2b,
+                'b2b_confidence': b2bResult.confidence,
+                'b2b_indicators': b2bResult.indicators,
+                
+                // Neu: Kanal-Zuordnung
+                'primary_channel': channelData.primary,
+                'channels': channelData.channels,
+                'last_order_channel': lastOrderChannel,
+                
+                // Neu: Hauptartikel
+                'hauptartikel': hauptartikel,
+                
+                // Neu: Statistiken
+                'stats.total_orders': customer.nAnzahlBestellungen || 0,
+                'stats.total_revenue': customer.nUmsatzGesamt || 0,
+                'stats.avg_order_value': customer.nAnzahlBestellungen > 0 
+                  ? (customer.nUmsatzGesamt || 0) / customer.nAnzahlBestellungen 
+                  : 0,
+                'stats.order_frequency': orderFrequency,
+                'stats.days_since_last_order': daysSinceLastOrder,
+                'stats.is_active': daysSinceLastOrder < 365,
+                'stats.lifetime_days': lifetimeDays,
+                
+                updated_at: new Date(),
+                last_jtl_sync: new Date()
+              }
+            }
+          )
+          
+          newCustomers++
+        } else {
+          // INSERT: Komplett neuer Kunde (kein Match in Kaltakquise)
+          await prospectsCollection.insertOne({
+            company_name: customer.cFirma,
+            website: website || null,
+            status: 'customer',
+            customer_source: 'jtl',
           region: region,
           industry: null,
           score: null,
