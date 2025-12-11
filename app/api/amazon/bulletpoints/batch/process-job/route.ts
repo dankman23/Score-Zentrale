@@ -97,7 +97,6 @@ export async function POST(request: NextRequest) {
               a.kArtikel,
               a.cArtNr,
               a.cName,
-              a.cBeschreibung,
               h.cName as cHerstellerName
             FROM dbo.tArtikel a
             LEFT JOIN dbo.tHersteller h ON a.kHersteller = h.kHersteller
@@ -109,6 +108,27 @@ export async function POST(request: NextRequest) {
           }
           
           const artikel = artikelResult.recordset[0]
+          
+          // Lade Beschreibung aus separater Tabelle
+          let cBeschreibung = null
+          let cKurzBeschreibung = null
+          
+          try {
+            const beschreibungResult = await pool.request().query(`
+              SELECT 
+                cKurzBeschreibung,
+                cBeschreibung
+              FROM tArtikelBeschreibung
+              WHERE kArtikel = ${kArtikel} AND kSprache = 1
+            `)
+            
+            if (beschreibungResult.recordset.length > 0) {
+              cBeschreibung = beschreibungResult.recordset[0].cBeschreibung
+              cKurzBeschreibung = beschreibungResult.recordset[0].cKurzBeschreibung
+            }
+          } catch (e) {
+            console.log(`[Job ${jobId}] Beschreibung nicht verfügbar für Artikel ${kArtikel}`)
+          }
           
           // Generiere Bulletpoints mit Claude
           const userPrompt = `
