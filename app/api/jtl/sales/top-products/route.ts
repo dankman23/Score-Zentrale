@@ -64,11 +64,12 @@ export async function GET(request: NextRequest) {
     const hasKHersteller = await hasColumn(pool, articleTable, 'kHersteller')
     const hasTHersteller = hasKHersteller ? await hasColumn(pool, herstellerTable, 'kHersteller') : false
     
-    const herstellerJoin = hasTHersteller 
+    // Always join if Hersteller table exists OR if we need to filter by hersteller
+    const herstellerJoin = (hasTHersteller || needsHerstellerJoin)
       ? `LEFT JOIN ${herstellerTable} h ON a.kHersteller = h.kHersteller`
       : ''
     
-    const herstellerSelect = hasTHersteller 
+    const herstellerSelect = (hasTHersteller || needsHerstellerJoin)
       ? 'MAX(h.cName)'
       : 'NULL'
     
