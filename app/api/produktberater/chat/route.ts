@@ -278,20 +278,9 @@ Sei präzise, professionell und hilfreich!`
           console.log('[Produktberater] Nach Maß-Filter:', textProducts.length, 'Produkte (', withDimensions.length, 'mit passenden Maßen,', withoutDimensions.length, 'ohne Maß-Angabe)')
         }
         
-        // Filtere nach Verfügbarkeit (nur auf Lager)
-        textProducts = textProducts.filter(product => {
-          // shopping_feed hat 'availability' field
-          if (product.availability) {
-            const avail = product.availability.toLowerCase().trim()
-            return avail.includes('in_stock') || avail.includes('in stock') || avail.includes('auf lager')
-          }
-          // articles collection hat 'fLagerbestand' field
-          if (product.fLagerbestand !== undefined) {
-            return product.fLagerbestand > 0
-          }
-          // Fallback: wenn kein Verfügbarkeits-Info, zeige es trotzdem
-          return true
-        })
+        // Priorisiere verfügbare Produkte, aber filtere NICHT komplett
+        // (Sortierung später macht available Produkte zu First-Class)
+        console.log('[Produktberater] VOR Verfügbarkeits-Priorisierung:', textProducts.length, 'Produkte')
         
         // Diversifizierung: Hole verschiedene Hersteller
         const herstellerMap = new Map()
