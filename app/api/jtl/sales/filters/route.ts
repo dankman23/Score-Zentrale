@@ -31,20 +31,25 @@ export async function GET() {
       hersteller = herstellerResult.recordset.map((r: any) => r.cName)
     }
     
-    // Hole Warengruppen (wenn Feld existiert)
+    // Hole Warengruppen über tWarengruppe Tabelle
+    const warengruppeTable = 'dbo.tWarengruppe'
     let warengruppen: string[] = []
     try {
-      const warengruppenQuery = `
-        SELECT DISTINCT cWarengruppe
-        FROM ${articleTable}
-        WHERE cWarengruppe IS NOT NULL AND cWarengruppe != ''
-        ORDER BY cWarengruppe
-      `
-      const warengruppenResult = await pool.request().query(warengruppenQuery)
-      warengruppen = warengruppenResult.recordset.map((r: any) => r.cWarengruppe)
+      const hasKWarengruppe = await hasColumn(pool, articleTable, 'kWarengruppe')
+      const hasTWarengruppe = hasKWarengruppe ? await hasColumn(pool, warengruppeTable, 'kWarengruppe') : false
+      
+      if (hasTWarengruppe) {
+        const warengruppenQuery = `
+          SELECT DISTINCT wg.cName
+          FROM ${warengruppeTable} wg
+          WHERE wg.cName IS NOT NULL AND wg.cName != ''
+          ORDER BY wg.cName
+        `
+        const warengruppenResult = await pool.request().query(warengruppenQuery)
+        warengruppen = warengruppenResult.recordset.map((r: any) => r.cName)
+      }
     } catch (e) {
-      // Feld existiert nicht - das ist OK
-      console.log('[Sales Filters] cWarengruppe field not found, skipping')
+      console.log('[Sales Filters] tWarengruppe table error:', e)
     }
     
     return NextResponse.json({ 
