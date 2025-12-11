@@ -71,10 +71,18 @@ export async function GET(request: NextRequest) {
       ORDER BY SUM(${netTotalExpr}) DESC
     `
 
-    const result = await pool.request()
+    const requestObj = pool.request()
       .input('from', sql.Date, from)
       .input('to', sql.Date, to)
-      .query(query)
+    
+    if (hersteller) {
+      requestObj.input('hersteller', sql.NVarChar, hersteller)
+    }
+    if (warengruppe) {
+      requestObj.input('warengruppe', sql.NVarChar, warengruppe)
+    }
+    
+    const result = await requestObj.query(query)
 
     const rows = (result.recordset || []).map(r => ({
       sku: r.sku || 'N/A',
