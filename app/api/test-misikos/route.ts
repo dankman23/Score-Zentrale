@@ -8,16 +8,18 @@ export async function GET() {
   try {
     const pool = await getMssqlPool()
     
+    // Zuerst: Alle Spalten auflisten
+    const columnsResult = await pool.request().query(`
+      SELECT TOP 1 * FROM tKunde
+    `)
+    
+    const columns = Object.keys(columnsResult.recordset[0] || {})
+    
+    // Dann: Nach Misikos suchen
     const result = await pool.request().query(`
-      SELECT TOP 10 
-        k.cFirma, 
-        k.cMail as cEmail, 
-        k.cWWW as cHomepage,
-        k.kKunde
-      FROM tKunde k
-      WHERE k.cFirma LIKE '%misikos%' 
-        OR k.cMail LIKE '%misikos%'
-        OR k.cWWW LIKE '%misikos%'
+      SELECT TOP 10 *
+      FROM tKunde 
+      WHERE cFirma LIKE '%misikos%'
     `)
     
     return NextResponse.json({
