@@ -41,8 +41,15 @@ export async function GET(request: NextRequest) {
     
     // Zusätzliche Filter für Hersteller und Warengruppe
     let additionalFilters = ''
+    let needsHerstellerJoin = false
+    
     if (hersteller) {
-      additionalFilters += ' AND a.cHersteller = @hersteller'
+      // Check if we need to filter via tHersteller table
+      const hasKHersteller = await hasColumn(pool, articleTable, 'kHersteller')
+      if (hasKHersteller) {
+        needsHerstellerJoin = true
+        additionalFilters += ' AND h.cName = @hersteller'
+      }
     }
     if (warengruppe) {
       // Warengruppe könnte in verschiedenen Feldern sein
