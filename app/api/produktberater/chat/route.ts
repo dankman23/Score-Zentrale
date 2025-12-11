@@ -259,8 +259,17 @@ Sei präzise, professionell und hilfreich!`
         
         // Filtere nach Verfügbarkeit (nur auf Lager)
         textProducts = textProducts.filter(product => {
-          const stock = product.fLagerbestand || product.quantity || 0
-          return stock > 0
+          // shopping_feed hat 'availability' field
+          if (product.availability) {
+            const avail = product.availability.toLowerCase().trim()
+            return avail.includes('in_stock') || avail.includes('in stock') || avail.includes('auf lager')
+          }
+          // articles collection hat 'fLagerbestand' field
+          if (product.fLagerbestand !== undefined) {
+            return product.fLagerbestand > 0
+          }
+          // Fallback: wenn kein Verfügbarkeits-Info, zeige es trotzdem
+          return true
         })
         
         // Diversifizierung: Hole verschiedene Hersteller
