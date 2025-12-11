@@ -3530,9 +3530,11 @@ export default function App() {
               </div>
               
               <div className="card-body p-0">
-                <div className="table-responsive" style={{maxHeight:420}}>
+                <div className="table-responsive" style={{maxHeight:800}}>
                   <table className="table table-dark table-hover table-sm mb-0">
-                    <thead className="thead-dark"><tr><th>ArtikelNr</th><th>Name</th><th>Hersteller</th><th>Menge</th><th>Umsatz (Netto)</th></tr></thead>
+                    <thead className="thead-dark" style={{position: 'sticky', top: 0, backgroundColor: '#1e1e1e', zIndex: 10}}>
+                      <tr><th>ArtikelNr</th><th>Name</th><th>Hersteller</th><th>Menge</th><th>Umsatz (Netto)</th></tr>
+                    </thead>
                     <tbody>
                       {(topProducts||[]).map((r,idx)=> (
                         <tr key={idx}>
