@@ -2452,9 +2452,6 @@ export default function App() {
         }
       }, 2000) // Alle 2 Sekunden
 
-      // Cleanup bei Component Unmount
-      return () => clearInterval(pollInterval)
-
     } catch (e) {
       alert('❌ Fehler: ' + e.message)
       console.error('[Batch Generate] Error:', e)
