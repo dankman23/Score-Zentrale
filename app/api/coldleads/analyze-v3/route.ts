@@ -34,7 +34,35 @@ export async function POST(request: Request) {
     
     console.log(`[AnalyzeV3] Email sequence generated`)
     
-    // Step 3: Save to MongoDB (with upsert)
+    // Step 3: JTL-Customer-Check (VOR dem Speichern!)
+    console.log(`[AnalyzeV3] Checking if company is JTL customer...`)
+    let jtlMatch: any = null
+    let finalStatus = 'analyzed'
+    let autopilotSkip = false
+    
+    try {
+      const { checkJTLCustomerMatch } = await import('@/lib/jtl-customer-matcher')
+      const contactEmail = analysis.contact_person?.email
+      
+      jtlMatch = await checkJTLCustomerMatch(
+        analysis.company || company_name,
+        website,
+        contactEmail
+      )
+      
+      if (jtlMatch.matched) {
+        console.log(`[AnalyzeV3] ⚠️  CUSTOMER DETECTED! ${jtlMatch.jtlCustomer?.cFirma} (${jtlMatch.confidence}% confidence)`)
+        finalStatus = 'customer'
+        autopilotSkip = true
+      } else {
+        console.log(`[AnalyzeV3] ✅ Not a JTL customer, can be contacted`)
+      }
+    } catch (jtlError: any) {
+      console.error('[AnalyzeV3] JTL-Check failed:', jtlError.message)
+      // Bei Fehler: Weiter mit normalem Prozess (fail-safe)
+    }
+    
+    // Step 4: Save to MongoDB (with upsert)
     const db = await connectToMongoDB()
     const prospectsCollection = db.collection('prospects')
     
@@ -46,7 +74,9 @@ export async function POST(request: Request) {
       {
         $set: {
           company_name: analysis.company,
-          status: 'analyzed',
+          status: finalStatus,  // 'analyzed' ODER 'customer'
+          ...(autopilotSkip && { autopilot_skip: true }),
+          ...(jtlMatch && { jtl_customer_match: jtlMatch }),
           score: analysis.confidence_overall,
           industry: industry || analysis.branch_guess[0] || 'Unbekannt',
           region: region || 'Deutschland',
