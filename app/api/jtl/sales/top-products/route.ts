@@ -39,17 +39,16 @@ export async function GET(request: NextRequest) {
     const hasCauftragsNr = await hasColumn(pool, orderTable, 'cAuftragsNr')
     const orderTypeFilter = hasCauftragsNr ? `AND o.cAuftragsNr LIKE 'AU%'` : ''
     
+    // Check if we need to join with tHersteller table
+    const herstellerTable = 'dbo.tHersteller'
+    const hasKHersteller = await hasColumn(pool, articleTable, 'kHersteller')
+    const hasTHersteller = hasKHersteller ? await hasColumn(pool, herstellerTable, 'kHersteller') : false
+    
     // Zusätzliche Filter für Hersteller und Warengruppe
     let additionalFilters = ''
-    let needsHerstellerJoin = false
     
-    if (hersteller) {
-      // Check if we need to filter via tHersteller table
-      const hasKHersteller = await hasColumn(pool, articleTable, 'kHersteller')
-      if (hasKHersteller) {
-        needsHerstellerJoin = true
-        additionalFilters += ' AND h.cName = @hersteller'
-      }
+    if (hersteller && hasTHersteller) {
+      additionalFilters += ' AND h.cName = @hersteller'
     }
     if (warengruppe) {
       // Warengruppe könnte in verschiedenen Feldern sein
@@ -59,17 +58,12 @@ export async function GET(request: NextRequest) {
       }
     }
     
-    // Check if we need to join with tHersteller table
-    const herstellerTable = 'dbo.tHersteller'
-    const hasKHersteller = await hasColumn(pool, articleTable, 'kHersteller')
-    const hasTHersteller = hasKHersteller ? await hasColumn(pool, herstellerTable, 'kHersteller') : false
-    
-    // Always join if Hersteller table exists OR if we need to filter by hersteller
-    const herstellerJoin = (hasTHersteller || needsHerstellerJoin)
+    // Join with tHersteller if available
+    const herstellerJoin = hasTHersteller 
       ? `LEFT JOIN ${herstellerTable} h ON a.kHersteller = h.kHersteller`
       : ''
     
-    const herstellerSelect = (hasTHersteller || needsHerstellerJoin)
+    const herstellerSelect = hasTHersteller 
       ? 'MAX(h.cName)'
       : 'NULL'
     
