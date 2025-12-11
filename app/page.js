@@ -7832,6 +7832,31 @@ export default function App() {
                                       )}
                                     </select>
                                   </div>
+                                  {selectedArtikel.length === 0 && (
+                                    <div className="mr-3">
+                                      <small className="d-block mb-1" style={{color: '#adb5bd'}}>
+                                        Anzahl (optional):
+                                      </small>
+                                      <input
+                                        type="number"
+                                        className="form-control form-control-sm"
+                                        placeholder={`Max: ${artikelTotal.toLocaleString()}`}
+                                        value={customBatchLimit}
+                                        onChange={(e) => setCustomBatchLimit(e.target.value)}
+                                        min="1"
+                                        max={artikelTotal}
+                                        style={{
+                                          width: '150px',
+                                          backgroundColor: '#2b3035',
+                                          color: '#ffffff',
+                                          borderColor: '#495057'
+                                        }}
+                                      />
+                                      <small className="text-muted">
+                                        Leer = alle {artikelTotal.toLocaleString()}
+                                      </small>
+                                    </div>
+                                  )}
                                   {selectedArtikel.length > 0 ? (
                                     <button 
                                       className="btn btn-sm btn-outline-secondary mr-2"
