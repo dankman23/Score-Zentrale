@@ -44,23 +44,19 @@ export async function GET(request: NextRequest) {
     const hasKHersteller = await hasColumn(pool, articleTable, 'kHersteller')
     const hasTHersteller = hasKHersteller ? await hasColumn(pool, herstellerTable, 'kHersteller') : false
     
+    // Check Warengruppe table
+    const warengruppeTable = 'dbo.tWarengruppe'
+    const hasKWarengruppe = await hasColumn(pool, articleTable, 'kWarengruppe')
+    const hasTWarengruppe = hasKWarengruppe ? await hasColumn(pool, warengruppeTable, 'kWarengruppe') : false
+    
     // Zusätzliche Filter für Hersteller und Warengruppe
     let additionalFilters = ''
     
     if (hersteller && hasTHersteller) {
       additionalFilters += ' AND h.cName = @hersteller'
     }
-    if (warengruppe) {
-      // Warengruppe über tWarengruppe Tabelle
-      const warengruppeTable = 'dbo.tWarengruppe'
-      const hasKWarengruppe = await hasColumn(pool, articleTable, 'kWarengruppe')
-      const hasTWarengruppe = hasKWarengruppe ? await hasColumn(pool, warengruppeTable, 'kWarengruppe') : false
-      
-      if (hasTWarengruppe) {
-        // Wir müssen auch die Warengruppe joinen für den Filter
-        needsWarengruppeJoin = true
-        additionalFilters += ' AND wg.cName = @warengruppe'
-      }
+    if (warengruppe && hasTWarengruppe) {
+      additionalFilters += ' AND wg.cName = @warengruppe'
     }
     
     // Join with tHersteller if available
