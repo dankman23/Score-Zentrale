@@ -2336,9 +2336,7 @@ export default function App() {
       // 2. Zeige Kosten-Bestätigung
       const modeText = useSelection 
         ? `✅ ${count} AUSGEWÄHLTE Artikel` 
-        : (artikelTotal > 1000 
-          ? `⚠️ ${count} gefilterte Artikel (von ${artikelTotal.toLocaleString()} - Limit 1000)`
-          : `⚠️ ${count} gefilterte Artikel (KEINE AUSWAHL)`)
+        : `⚠️ ${count} gefilterte Artikel (KEINE AUSWAHL)`
       
       const confirmed = confirm(
         `🤖 Amazon Bulletpoints Batch-Generierung\n\n` +
