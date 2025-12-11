@@ -80,6 +80,8 @@ export async function POST(request: Request) {
           status: finalStatus,  // 'analyzed' ODER 'customer'
           ...(autopilotSkip && { autopilot_skip: true }),
           ...(jtlMatch && { jtl_customer_match: jtlMatch }),
+          ...(jtlCustomerData && { jtl_customer: jtlCustomerData }),
+          ...(finalStatus === 'customer' && { customer_source: 'jtl_detected_during_analysis' }),
           score: analysis.confidence_overall,
           industry: industry || analysis.branch_guess[0] || 'Unbekannt',
           region: region || 'Deutschland',
