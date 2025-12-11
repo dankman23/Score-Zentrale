@@ -12,6 +12,8 @@ export async function GET(request: NextRequest) {
     const from = searchParams.get('from') || new Date(Date.now() - 29 * 24 * 3600 * 1000).toISOString().slice(0, 10)
     const to = searchParams.get('to') || new Date().toISOString().slice(0, 10)
     const limit = parseInt(searchParams.get('limit') || '20')
+    const hersteller = searchParams.get('hersteller') || null
+    const warengruppe = searchParams.get('warengruppe') || null
 
     const pool = await getMssqlPool()
     const orderTable = 'Verkauf.tAuftrag'
