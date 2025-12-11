@@ -11,12 +11,12 @@ export async function GET() {
     const result = await pool.request().query(`
       SELECT TOP 10 
         cFirma, 
-        cEMail, 
+        cMail, 
         cWWW,
         kKunde
       FROM dbo.tKunde 
       WHERE cFirma LIKE '%misikos%' 
-        OR cEMail LIKE '%misikos%'
+        OR cMail LIKE '%misikos%'
         OR cWWW LIKE '%misikos%'
     `)
     
