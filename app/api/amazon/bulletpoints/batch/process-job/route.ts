@@ -114,7 +114,7 @@ Hersteller: ${artikel.cHerstellerName || 'Unbekannt'}
                 content: userPrompt
               }
             ],
-            selectedPrompt.systemPrompt,
+            selectedPrompt.prompt || '',  // Korrektur: Feld heißt 'prompt', nicht 'systemPrompt'
             2000
           )
           
