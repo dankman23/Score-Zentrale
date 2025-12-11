@@ -146,16 +146,82 @@ setInterval(() => {
   console.log(`[Autopilot Worker]    Processing: ${isProcessing ? 'Yes' : 'No'}`)
 }, 10 * 60 * 1000)
 
-// Starte ersten Tick nach 10 Sekunden (damit Next.js Zeit hat hochzufahren)
+/**
+ * Health-Check: Prüft ob der Next.js Server erreichbar ist
+ */
+async function checkServerHealth() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/health`, {
+      method: 'GET',
+      timeout: 5000
+    })
+    
+    if (response.ok) {
+      if (!serverHealthy) {
+        console.log('[Autopilot Worker] ✅ Server ist wieder erreichbar!')
+      }
+      serverHealthy = true
+      consecutiveErrors = 0
+      lastHealthCheck = new Date()
+      return true
+    } else {
+      console.log(`[Autopilot Worker] ⚠️  Server antwortet mit Status: ${response.status}`)
+      serverHealthy = false
+      return false
+    }
+  } catch (error) {
+    if (serverHealthy) {
+      console.error(`[Autopilot Worker] ⚠️  Server Health-Check fehlgeschlagen: ${error.message}`)
+    }
+    serverHealthy = false
+    return false
+  }
+}
+
+/**
+ * Wartet mit exponentiellen Backoff bei wiederholten Fehlern
+ */
+function getBackoffDelay() {
+  if (consecutiveErrors === 0) return 0
+  // Exponentieller Backoff: 5s, 10s, 20s, 40s, max 60s
+  const delay = Math.min(5000 * Math.pow(2, consecutiveErrors - 1), 60000)
+  return delay
+}
+
+// Warte 10 Sekunden, damit Next.js hochfahren kann
 console.log('[Autopilot Worker] Waiting 10s for Next.js to start...')
-setTimeout(() => {
+setTimeout(async () => {
+  console.log('[Autopilot Worker] Performing initial health check...')
+  
+  // Versuche Health-Check bis zu 5 Mal
+  let healthCheckAttempts = 0
+  while (!serverHealthy && healthCheckAttempts < 5) {
+    await checkServerHealth()
+    if (!serverHealthy) {
+      healthCheckAttempts++
+      console.log(`[Autopilot Worker] Health-Check Versuch ${healthCheckAttempts}/5 fehlgeschlagen, warte 5s...`)
+      await new Promise(resolve => setTimeout(resolve, 5000))
+    }
+  }
+  
+  if (!serverHealthy) {
+    console.log('[Autopilot Worker] ⚠️  Server ist nach 5 Versuchen nicht erreichbar')
+    console.log('[Autopilot Worker]    Worker läuft trotzdem weiter und versucht es periodisch erneut...')
+  }
+  
+  console.log('[Autopilot Worker] ✅ Worker initialized and waiting...')
   console.log('[Autopilot Worker] Starting tick loop...')
   
-  // Führe ersten Tick sofort aus
+  // Führe den ersten Tick sofort aus
   executeTick()
   
   // Dann alle 60 Sekunden
   setInterval(executeTick, TICK_INTERVAL)
+  
+  // Health-Check alle 30 Sekunden wenn Server als unhealthy markiert ist
+  setInterval(async () => {
+    if (!serverHealthy || consecutiveErrors > 0) {
+      await checkServerHealth()
+    }
+  }, HEALTH_CHECK_INTERVAL)
 }, 10000)
-
-console.log('[Autopilot Worker] ✅ Worker initialized and waiting...')
