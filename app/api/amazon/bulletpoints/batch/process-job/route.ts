@@ -115,7 +115,6 @@ export async function POST(request: NextRequest) {
 Artikel-Nr: ${artikel.cArtNr}
 Name: ${artikel.cName}
 Beschreibung: ${artikel.cBeschreibung || 'Keine Beschreibung'}
-Kurzbeschreibung: ${artikel.cKurzBeschreibung || 'Keine Kurzbeschreibung'}
 Hersteller: ${artikel.cHerstellerName || 'Unbekannt'}
           `.trim()
           
