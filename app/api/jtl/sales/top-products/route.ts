@@ -68,6 +68,11 @@ export async function GET(request: NextRequest) {
       ? 'MAX(h.cName)'
       : 'NULL'
     
+    // Join with tWarengruppe if available
+    const warengruppeJoin = hasTWarengruppe
+      ? `LEFT JOIN ${warengruppeTable} wg ON a.kWarengruppe = wg.kWarengruppe`
+      : ''
+    
     const query = `
       SELECT TOP ${limit}
         a.cArtNr AS sku,
@@ -79,6 +84,7 @@ export async function GET(request: NextRequest) {
       INNER JOIN ${orderPosTable} op ON o.kAuftrag = op.kAuftrag
       LEFT JOIN ${articleTable} a ON op.kArtikel = a.kArtikel
       ${herstellerJoin}
+      ${warengruppeJoin}
       WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
         AND ${articleFilter}
