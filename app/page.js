@@ -7661,23 +7661,19 @@ export default function App() {
                 <div className="card-body">
                   <h5 className="mb-3"><i className="bi bi-database mr-2"/>JTL-Daten Browser</h5>
                   
-                  {artikelTotal === 0 && !artikelLoading ? (
+                  {artikelImportProgress.imported === 0 && artikelTotal === 0 && !artikelLoading ? (
                     <div className="text-center py-5">
                       <i className="bi bi-inbox" style={{fontSize: '4rem', color: '#ccc'}}/>
-                      <h4 className="mt-3 text-muted">Keine Artikel gefunden</h4>
+                      <h4 className="mt-3 text-muted">Keine Artikel importiert</h4>
                       <p className="text-muted">
-                        {artikelImportProgress.imported === 0 
-                          ? 'Gehen Sie zum Import-Tab und starten Sie den Artikel-Import.' 
-                          : 'Versuchen Sie, die Filter anzupassen.'}
+                        Gehen Sie zum Import-Tab und starten Sie den Artikel-Import.
                       </p>
-                      {artikelImportProgress.imported === 0 && (
-                        <button 
-                          className="btn btn-primary"
-                          onClick={() => setProdukteTab('import')}
-                        >
-                          <i className="bi bi-download mr-2"/>Zum Import
-                        </button>
-                      )}
+                      <button 
+                        className="btn btn-primary"
+                        onClick={() => setProdukteTab('import')}
+                      >
+                        <i className="bi bi-download mr-2"/>Zum Import
+                      </button>
                     </div>
                   ) : (
                     <div>
