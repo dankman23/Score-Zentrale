@@ -1111,6 +1111,18 @@ export default function App() {
     }
   }
 
+  const fetchSalesFilters = async () => {
+    try {
+      const res = await getJson('/api/jtl/sales/filters')
+      if (res?.ok) {
+        setSalesFiltersAvailableHersteller(res.hersteller || [])
+        setSalesFiltersAvailableWarengruppen(res.warengruppen || [])
+      }
+    } catch (e) {
+      console.error('[Sales Filters] Error:', e)
+    }
+  }
+
   const fetchSalesTables = async () => {
     try {
       // Top-Produkte mit Filtern
