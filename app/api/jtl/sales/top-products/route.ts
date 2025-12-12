@@ -9,15 +9,17 @@ import sql from 'mssql'
 /**
  * GET /api/jtl/sales/top-products
  * 
- * NEUE LOGIK: Stücklisten-Auflösung
+ * NEUE LOGIK: Stücklisten-Auflösung mit EK-basierter Umsatzaufteilung
  * 
- * Wenn ein verkaufter Artikel (Auktion) eine Stückliste hat, wird der Umsatz
- * auf die eigentlichen Artikel (Kind-Artikel) anteilig aufgeteilt.
+ * Wenn ein Bundle verkauft wird, wird der Umsatz NICHT einfach durch die Anzahl
+ * der Artikel geteilt, sondern nach dem EK-Anteil aufgeteilt.
  * 
  * Beispiel:
- * - Bundle "5x Schleifscheiben Set" verkauft für 100€
- * - Stückliste enthält 3 verschiedene Artikel
- * - Jeder Artikel bekommt 100€ / 3 = 33,33€ zugerechnet
+ * - Bundle verkauft für 100€
+ * - Artikel A: 2 Stück x 5€ EK = 10€ EK (20% Anteil)
+ * - Artikel B: 1 Stück x 40€ EK = 40€ EK (80% Anteil)
+ * - Artikel A bekommt: 100€ * 20% = 20€
+ * - Artikel B bekommt: 100€ * 80% = 80€
  */
 export async function GET(request: NextRequest) {
   try {
@@ -43,7 +45,6 @@ export async function GET(request: NextRequest) {
     const qtyField = await pickFirstExisting(pool, orderPosTable, ['fAnzahl', 'nAnzahl', 'fMenge']) || 'fAnzahl'
     const netField = await pickFirstExisting(pool, orderPosTable, ['fVKNetto', 'fPreis']) || 'fVKNetto'
 
-    // Filter: Only count "Aufträge" (AU...), not "Angebote" (AN...)
     const hasCauftragsNr = await hasColumn(pool, orderTable, 'cAuftragsNr')
     const orderTypeFilter = hasCauftragsNr ? `AND o.cAuftragsNr LIKE 'AU%'` : ''
     
@@ -69,18 +70,14 @@ export async function GET(request: NextRequest) {
     }
 
     /**
-     * Die Abfrage funktioniert so:
+     * Die Abfrage mit EK-basierter Umsatzaufteilung:
      * 
-     * 1. VerkaufsPositionen (CTE): Alle verkauften Positionen im Zeitraum
+     * 1. StuecklistenMitEK: Für jeden Vater-Artikel die Kind-Artikel mit ihrem EK-Wert
+     *    und dem Gesamt-EK der Stückliste (für Anteilsberechnung)
      * 
-     * 2. StuecklistenInfo (CTE): Für jeden Vater-Artikel die Anzahl der Kind-Artikel
-     *    (um den Umsatz anteilig aufzuteilen)
-     * 
-     * 3. AufgeloesteArtikel (CTE): 
-     *    - Wenn Artikel KEINE Stückliste hat → direkt verwenden
-     *    - Wenn Artikel Stückliste hat → Kind-Artikel mit anteiligem Umsatz
-     * 
-     * 4. Finale Aggregation nach echtem Artikel (kArtikel)
+     * 2. AufgeloesteArtikel: 
+     *    - Direkte Verkäufe → Umsatz 1:1
+     *    - Bundle-Verkäufe → Umsatz * (Kind-EK-Anteil / Gesamt-EK)
      */
     const query = `
       ;WITH VerkaufsPositionen AS (
@@ -98,13 +95,18 @@ export async function GET(request: NextRequest) {
           AND op.kArtikel > 0
       ),
       
-      StuecklistenInfo AS (
-        -- Anzahl der Kind-Artikel pro Vater-Artikel (für anteilige Aufteilung)
+      StuecklistenMitEK AS (
+        -- Für jeden Vater-Artikel: Kind-Artikel mit EK und Gesamt-EK
         SELECT 
-          kVaterArtikel,
-          COUNT(DISTINCT kArtikel) AS anzahl_kind_artikel
-        FROM ${stuecklisteTable}
-        GROUP BY kVaterArtikel
+          st.kVaterArtikel,
+          st.kArtikel AS kKindArtikel,
+          st.fAnzahl AS anzahl_im_set,
+          COALESCE(a.fEKNetto, 0) AS ek_netto,
+          st.fAnzahl * COALESCE(a.fEKNetto, 0) AS ek_anteil,
+          -- Gesamt-EK der Stückliste (Summe aller Kind-EKs)
+          SUM(st.fAnzahl * COALESCE(a.fEKNetto, 0)) OVER (PARTITION BY st.kVaterArtikel) AS gesamt_ek
+        FROM ${stuecklisteTable} st
+        INNER JOIN ${articleTable} a ON st.kArtikel = a.kArtikel
       ),
       
       AufgeloesteArtikel AS (
@@ -121,14 +123,17 @@ export async function GET(request: NextRequest) {
         
         UNION ALL
         
-        -- Fall 2: Artikel HAT Stückliste → Kind-Artikel mit anteiligem Umsatz
+        -- Fall 2: Artikel HAT Stückliste → Kind-Artikel mit EK-anteiligem Umsatz
         SELECT 
-          st.kArtikel AS echter_artikel,
-          vp.menge * st.fAnzahl AS menge,  -- Menge * Anzahl pro Stückliste
-          vp.umsatz_netto / si.anzahl_kind_artikel AS umsatz_netto  -- Umsatz anteilig
+          sek.kKindArtikel AS echter_artikel,
+          vp.menge * sek.anzahl_im_set AS menge,
+          -- Umsatz anteilig nach EK: (EK-Anteil / Gesamt-EK) * Umsatz
+          CASE 
+            WHEN sek.gesamt_ek > 0 THEN vp.umsatz_netto * (sek.ek_anteil / sek.gesamt_ek)
+            ELSE vp.umsatz_netto / COUNT(*) OVER (PARTITION BY vp.verkaufter_artikel)  -- Fallback: gleichmäßig
+          END AS umsatz_netto
         FROM VerkaufsPositionen vp
-        INNER JOIN ${stuecklisteTable} st ON st.kVaterArtikel = vp.verkaufter_artikel
-        INNER JOIN StuecklistenInfo si ON si.kVaterArtikel = vp.verkaufter_artikel
+        INNER JOIN StuecklistenMitEK sek ON sek.kVaterArtikel = vp.verkaufter_artikel
       )
       
       -- Finale Aggregation nach echtem Artikel (nur nach Artikelnummer!)
@@ -150,7 +155,7 @@ export async function GET(request: NextRequest) {
       ORDER BY SUM(aa.umsatz_netto) DESC
     `
 
-    console.log('[Top-Products] Query with Stücklisten-Auflösung')
+    console.log('[Top-Products] Query with EK-based revenue allocation')
 
     const requestObj = pool.request()
       .input('from', sql.Date, from)
@@ -177,7 +182,7 @@ export async function GET(request: NextRequest) {
       ok: true, 
       period: { from, to }, 
       rows,
-      info: 'Umsätze auf Stücklisten-Artikel aufgelöst (anteilig bei mehreren Kind-Artikeln)'
+      info: 'Umsätze auf Stücklisten-Artikel nach EK-Anteil aufgelöst'
     })
   } catch (error: any) {
     console.error('[/api/jtl/sales/top-products] Error:', error)
