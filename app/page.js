@@ -3598,6 +3598,7 @@ export default function App() {
                                         <thead>
                                           <tr className="text-muted">
                                             <th>Typ</th>
+                                            <th>Plattform</th>
                                             <th>Auftrag</th>
                                             <th>Datum</th>
                                             <th>Verkauft als</th>
@@ -3611,24 +3612,34 @@ export default function App() {
                                               <td>
                                                 <span className={`badge ${d.typ==='Bundle' ? 'bg-info' : 'bg-secondary'}`}>
                                                   {d.typ}
-                                                  {d.typ==='Bundle' && d.anzahlImBundle > 1 && ` (÷${d.anzahlImBundle})`}
+                                                  {d.typ==='Bundle' && d.ekAnteilProzent && ` ${d.ekAnteilProzent}%`}
+                                                </span>
+                                              </td>
+                                              <td>
+                                                <span className={`badge ${
+                                                  d.plattform?.includes('Amazon') ? 'bg-warning text-dark' :
+                                                  d.plattform?.includes('bay') ? 'bg-primary' :
+                                                  d.plattform?.includes('Otto') ? 'bg-danger' :
+                                                  'bg-secondary'
+                                                }`} style={{fontSize:'0.75em'}}>
+                                                  {d.plattform || '-'}
                                                 </span>
                                               </td>
                                               <td><small>{d.auftrag}</small></td>
                                               <td><small>{d.datum ? new Date(d.datum).toLocaleDateString('de-DE') : '-'}</small></td>
-                                              <td title={d.verkauftName}><small className="text-truncate d-inline-block" style={{maxWidth:200}}>{d.verkauftName}</small></td>
+                                              <td title={d.verkauftName}><small className="text-truncate d-inline-block" style={{maxWidth:180}}>{d.verkauftName}</small></td>
                                               <td className="text-end">{d.menge?.toFixed(2)}</td>
                                               <td className="text-end">{fmtCurrency(d.umsatz)}</td>
                                             </tr>
                                           ))}
                                           {expanded.details.length === 0 && (
-                                            <tr><td colSpan={6} className="text-center text-muted">Keine Einzelverkäufe gefunden</td></tr>
+                                            <tr><td colSpan={7} className="text-center text-muted">Keine Einzelverkäufe gefunden</td></tr>
                                           )}
                                         </tbody>
                                         {expanded.summe && (
                                           <tfoot style={{borderTop:'2px solid #444'}}>
                                             <tr className="fw-bold">
-                                              <td colSpan={4} className="text-end">Summe:</td>
+                                              <td colSpan={5} className="text-end">Summe:</td>
                                               <td className="text-end">{expanded.summe.menge}</td>
                                               <td className="text-end">{fmtCurrency(expanded.summe.umsatz)}</td>
                                             </tr>
