@@ -22,6 +22,8 @@ export async function getDb(): Promise<Db> {
     return cachedDb
   }
 
+  const MONGO_URL = getMongoUrl()
+
   if (!cachedClient) {
     // SEHR KLEINER Connection Pool um Atlas-Limit nicht zu überschreiten
     cachedClient = new MongoClient(MONGO_URL, {
