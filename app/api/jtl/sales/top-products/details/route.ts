@@ -11,6 +11,10 @@ import sql from 'mssql'
  * 
  * Liefert die Summanden (einzelne Verkäufe) für einen bestimmten Artikel.
  * Zeigt welche Auktionen/Bundles zu dem Umsatz beigetragen haben.
+ * 
+ * NEU: 
+ * - Plattform (Amazon, eBay, etc.) wird angezeigt
+ * - Bei Stücklisten wird der Umsatz nach EK-Anteil aufgeteilt
  */
 export async function GET(request: NextRequest) {
   try {
@@ -28,6 +32,7 @@ export async function GET(request: NextRequest) {
     const orderPosTable = 'Verkauf.tAuftragPosition'
     const articleTable = 'dbo.tArtikel'
     const stuecklisteTable = 'dbo.tStueckliste'
+    const plattformTable = 'dbo.tPlattform'
 
     const hasNStorno = await hasColumn(pool, orderTable, 'nStorno')
     const stornoFilter = hasNStorno ? 'AND (o.nStorno IS NULL OR o.nStorno = 0)' : ''
@@ -40,6 +45,9 @@ export async function GET(request: NextRequest) {
 
     const hasCauftragsNr = await hasColumn(pool, orderTable, 'cAuftragsNr')
     const orderTypeFilter = hasCauftragsNr ? `AND o.cAuftragsNr LIKE 'AU%'` : ''
+    
+    // Check for platform
+    const hasKPlattform = await hasColumn(pool, orderTable, 'kPlattform')
 
     // Finde zuerst den kArtikel für die ArtikelNr
     const artikelResult = await pool.request()
@@ -53,19 +61,21 @@ export async function GET(request: NextRequest) {
     const kArtikel = artikelResult.recordset[0].kArtikel
 
     /**
-     * Abfrage: Finde alle Verkäufe die zu diesem Artikel beitragen
-     * 
-     * 1. Direktverkäufe: Artikel wurde direkt verkauft (nicht als Teil eines Bundles)
-     * 2. Bundle-Verkäufe: Artikel ist Teil einer Stückliste die verkauft wurde
+     * Abfrage mit EK-basierter Umsatzaufteilung und Plattform
      */
     const query = `
-      ;WITH StuecklistenInfo AS (
-        -- Anzahl der Kind-Artikel pro Vater-Artikel (für anteilige Aufteilung)
+      ;WITH StuecklistenMitEK AS (
+        -- Für jeden Vater-Artikel: Kind-Artikel mit EK und Gesamt-EK
         SELECT 
-          kVaterArtikel,
-          COUNT(DISTINCT kArtikel) AS anzahl_kind_artikel
-        FROM ${stuecklisteTable}
-        GROUP BY kVaterArtikel
+          st.kVaterArtikel,
+          st.kArtikel AS kKindArtikel,
+          st.fAnzahl AS anzahl_im_set,
+          COALESCE(a.fEKNetto, 0) AS ek_netto,
+          st.fAnzahl * COALESCE(a.fEKNetto, 0) AS ek_anteil,
+          SUM(st.fAnzahl * COALESCE(a.fEKNetto, 0)) OVER (PARTITION BY st.kVaterArtikel) AS gesamt_ek,
+          COUNT(*) OVER (PARTITION BY st.kVaterArtikel) AS anzahl_kind_artikel
+        FROM ${stuecklisteTable} st
+        INNER JOIN ${articleTable} a ON st.kArtikel = a.kArtikel
       )
       
       -- Fall 1: Direktverkäufe
@@ -73,15 +83,18 @@ export async function GET(request: NextRequest) {
         'Direkt' AS typ,
         o.cAuftragsNr AS auftrag,
         CAST(o.dErstellt AS DATE) AS datum,
+        ${hasKPlattform ? 'COALESCE(p.cName, \'Unbekannt\')' : '\'Unbekannt\''} AS plattform,
         a_verkauft.cArtNr AS verkauft_als,
         COALESCE(ab_verkauft.cName, a_verkauft.cArtNr) AS verkauft_name,
         op.${qtyField} AS menge,
         (op.${netField} * op.${qtyField}) AS umsatz,
-        1 AS anzahl_artikel_im_bundle
+        1 AS anzahl_artikel_im_bundle,
+        NULL AS ek_anteil_prozent
       FROM ${orderTable} o
       INNER JOIN ${orderPosTable} op ON o.kAuftrag = op.kAuftrag
       INNER JOIN ${articleTable} a_verkauft ON op.kArtikel = a_verkauft.kArtikel
       LEFT JOIN dbo.tArtikelBeschreibung ab_verkauft ON ab_verkauft.kArtikel = a_verkauft.kArtikel AND ab_verkauft.kSprache = 1
+      ${hasKPlattform ? `LEFT JOIN ${plattformTable} p ON o.kPlattform = p.nPlattform` : ''}
       WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
         AND ${articleFilter}
@@ -94,23 +107,33 @@ export async function GET(request: NextRequest) {
       
       UNION ALL
       
-      -- Fall 2: Als Teil eines Bundles verkauft
+      -- Fall 2: Als Teil eines Bundles verkauft (mit EK-Anteil)
       SELECT 
         'Bundle' AS typ,
         o.cAuftragsNr AS auftrag,
         CAST(o.dErstellt AS DATE) AS datum,
+        ${hasKPlattform ? 'COALESCE(p.cName, \'Unbekannt\')' : '\'Unbekannt\''} AS plattform,
         a_vater.cArtNr AS verkauft_als,
         COALESCE(ab_vater.cName, a_vater.cArtNr) AS verkauft_name,
-        op.${qtyField} * st.fAnzahl AS menge,
-        (op.${netField} * op.${qtyField}) / si.anzahl_kind_artikel AS umsatz,
-        si.anzahl_kind_artikel
+        op.${qtyField} * sek.anzahl_im_set AS menge,
+        -- Umsatz nach EK-Anteil
+        CASE 
+          WHEN sek.gesamt_ek > 0 THEN (op.${netField} * op.${qtyField}) * (sek.ek_anteil / sek.gesamt_ek)
+          ELSE (op.${netField} * op.${qtyField}) / sek.anzahl_kind_artikel
+        END AS umsatz,
+        sek.anzahl_kind_artikel,
+        -- EK-Anteil in Prozent anzeigen
+        CASE 
+          WHEN sek.gesamt_ek > 0 THEN ROUND((sek.ek_anteil / sek.gesamt_ek) * 100, 1)
+          ELSE ROUND(100.0 / sek.anzahl_kind_artikel, 1)
+        END AS ek_anteil_prozent
       FROM ${orderTable} o
       INNER JOIN ${orderPosTable} op ON o.kAuftrag = op.kAuftrag
-      INNER JOIN ${stuecklisteTable} st ON st.kVaterArtikel = op.kArtikel
-      INNER JOIN StuecklistenInfo si ON si.kVaterArtikel = op.kArtikel
-      INNER JOIN ${articleTable} a_kind ON st.kArtikel = a_kind.kArtikel
+      INNER JOIN StuecklistenMitEK sek ON sek.kVaterArtikel = op.kArtikel
+      INNER JOIN ${articleTable} a_kind ON sek.kKindArtikel = a_kind.kArtikel
       INNER JOIN ${articleTable} a_vater ON op.kArtikel = a_vater.kArtikel
       LEFT JOIN dbo.tArtikelBeschreibung ab_vater ON ab_vater.kArtikel = a_vater.kArtikel AND ab_vater.kSprache = 1
+      ${hasKPlattform ? `LEFT JOIN ${plattformTable} p ON o.kPlattform = p.nPlattform` : ''}
       WHERE CAST(o.dErstellt AS DATE) BETWEEN @from AND @to
         ${stornoFilter}
         AND ${articleFilter}
@@ -130,11 +153,13 @@ export async function GET(request: NextRequest) {
       typ: r.typ,
       auftrag: r.auftrag,
       datum: r.datum,
+      plattform: r.plattform,
       verkauftAls: r.verkauft_als,
       verkauftName: r.verkauft_name,
       menge: parseFloat(r.menge || 0),
       umsatz: parseFloat(r.umsatz || 0),
-      anzahlImBundle: r.anzahl_artikel_im_bundle
+      anzahlImBundle: r.anzahl_artikel_im_bundle,
+      ekAnteilProzent: r.ek_anteil_prozent ? parseFloat(r.ek_anteil_prozent) : null
     }))
 
     // Summe berechnen
