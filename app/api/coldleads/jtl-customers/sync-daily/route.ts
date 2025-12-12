@@ -380,8 +380,6 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    }  // Ende des else-Blocks (Zeile 268)
-    
     const duration = Date.now() - startTime
     
     console.log(`[JTL-Sync] ✅ Complete in ${duration}ms`)
@@ -403,5 +401,4 @@ export async function POST(request: NextRequest) {
       error: error.message || 'Sync fehlgeschlagen'
     }, { status: 500 })
   }
-}
 }
