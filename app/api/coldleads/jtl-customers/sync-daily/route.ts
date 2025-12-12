@@ -352,31 +352,26 @@ export async function POST(request: NextRequest) {
             website: website || null,
             status: 'customer',
             customer_source: 'jtl',
-          region: region,
-          industry: null,
-          score: null,
+            region: region,
+            industry: null,
+            score: null,
+            jtl_customer: jtlData,
+            autopilot_skip: true,
+            email: customer.cEMail,
+            warm_aquise_score: null,
+            custom_notes: null,
+            history: [],
+            hasReply: false,
+            lastReplyAt: null,
+            imported_from_jtl: true,
+            imported_at: new Date(),
+            created_at: new Date(),
+            updated_at: new Date(),
+            last_jtl_sync: new Date()
+          })
           
-          jtl_customer: jtlData,
-          
-          autopilot_skip: true,
-          email: customer.cEMail,
-          
-          // Platzhalter für später hinzugefügte Daten
-          warm_aquise_score: null,
-          custom_notes: null,
-          
-          history: [],
-          hasReply: false,
-          lastReplyAt: null,
-          
-          imported_from_jtl: true,
-          imported_at: new Date(),
-          created_at: new Date(),
-          updated_at: new Date(),
-          last_jtl_sync: new Date()
-        })
-        
-        newCustomers++
+          newCustomers++
+        }
       }
     }
     
