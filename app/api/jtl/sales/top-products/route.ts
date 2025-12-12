@@ -131,10 +131,10 @@ export async function GET(request: NextRequest) {
         INNER JOIN StuecklistenInfo si ON si.kVaterArtikel = vp.verkaufter_artikel
       )
       
-      -- Finale Aggregation nach echtem Artikel
+      -- Finale Aggregation nach echtem Artikel (nur nach Artikelnummer!)
       SELECT TOP ${limit}
         a.cArtNr AS sku,
-        COALESCE(ab.cName, a.cArtNr) AS name,
+        MAX(COALESCE(ab.cName, a.cArtNr)) AS name,
         ${hasTHersteller ? 'MAX(h.cName)' : 'NULL'} AS hersteller,
         SUM(aa.menge) AS quantity,
         SUM(aa.umsatz_netto) AS revenue
@@ -146,7 +146,7 @@ export async function GET(request: NextRequest) {
       WHERE 1=1
         ${herstellerFilter}
         ${warengruppeFilter}
-      GROUP BY a.cArtNr, COALESCE(ab.cName, a.cArtNr)
+      GROUP BY a.cArtNr
       ORDER BY SUM(aa.umsatz_netto) DESC
     `
 
