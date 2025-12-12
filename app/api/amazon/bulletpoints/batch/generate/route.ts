@@ -285,7 +285,7 @@ ${merkmaleText || 'Keine Angabe'}
       processed: artikelIds.length,
       succeeded,
       failed,
-      duration: `${duration}s`,
+      duration: `${durationFormatted}s`,
       results
     })
     
