@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
       
       if (limit && limit > maxLimit) {
         console.log(`[Batch Generate] Limit von ${limit} auf ${maxLimit} reduziert um Timeout zu vermeiden`)
+      }
     }
     else {
       return NextResponse.json({
