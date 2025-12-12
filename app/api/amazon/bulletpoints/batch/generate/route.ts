@@ -302,3 +302,4 @@ ${merkmaleText || 'Keine Angabe'}
     }, { status: 500 })
   }
 }
+}
