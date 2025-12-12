@@ -278,9 +278,7 @@ ${merkmaleText || 'Keine Angabe'}
     const duration = Math.round((Date.now() - startTime) / 1000)
     console.log(`[Batch Generate] Abgeschlossen in ${duration}s: ${succeeded} erfolgreich, ${failed} fehlgeschlagen`)
     
-    const duration = ((Date.now() - startTime) / 1000).toFixed(1)
-    
-    console.log(`[Batch Generate] Abgeschlossen in ${duration}s: ${succeeded} erfolgreich, ${failed} fehlgeschlagen`)
+    const durationFormatted = ((Date.now() - startTime) / 1000).toFixed(1)
     
     return NextResponse.json({
       ok: true,
