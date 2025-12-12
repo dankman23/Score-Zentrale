@@ -134,8 +134,8 @@ export async function GET(request: NextRequest) {
       -- Finale Aggregation nach echtem Artikel
       SELECT TOP ${limit}
         a.cArtNr AS sku,
-        ab.cName AS name,
-        ${hasTHersteller ? 'h.cName' : 'NULL'} AS hersteller,
+        COALESCE(ab.cName, a.cArtNr) AS name,
+        ${hasTHersteller ? 'MAX(h.cName)' : 'NULL'} AS hersteller,
         SUM(aa.menge) AS quantity,
         SUM(aa.umsatz_netto) AS revenue
       FROM AufgeloesteArtikel aa
@@ -146,7 +146,7 @@ export async function GET(request: NextRequest) {
       WHERE 1=1
         ${herstellerFilter}
         ${warengruppeFilter}
-      GROUP BY a.cArtNr, ab.cName${hasTHersteller ? ', h.cName' : ''}
+      GROUP BY a.cArtNr, COALESCE(ab.cName, a.cArtNr)
       ORDER BY SUM(aa.umsatz_netto) DESC
     `
 
