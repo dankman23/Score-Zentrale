@@ -753,6 +753,33 @@ export default function App() {
   const [topCategories, setTopCategories] = useState([])
   const [limit, setLimit] = useState(20)
   const [sortBy, setSortBy] = useState({ field: 'revenue', direction: 'desc' })
+  const [expandedProductRows, setExpandedProductRows] = useState({})  // {artikelNr: {loading, details, summe}}
+  
+  // Toggle product row details
+  const toggleProductDetails = async (artikelNr) => {
+    if (expandedProductRows[artikelNr]) {
+      // Collapse
+      setExpandedProductRows(prev => {
+        const next = {...prev}
+        delete next[artikelNr]
+        return next
+      })
+    } else {
+      // Expand and load details
+      setExpandedProductRows(prev => ({...prev, [artikelNr]: {loading: true, details: [], summe: null}}))
+      try {
+        const res = await fetch(`/api/jtl/sales/top-products/details?artikelNr=${encodeURIComponent(artikelNr)}&from=${dateRange.from}&to=${dateRange.to}`)
+        const data = await res.json()
+        if (data.ok) {
+          setExpandedProductRows(prev => ({...prev, [artikelNr]: {loading: false, details: data.details, summe: data.summe}}))
+        } else {
+          setExpandedProductRows(prev => ({...prev, [artikelNr]: {loading: false, details: [], summe: null, error: data.error}}))
+        }
+      } catch (err) {
+        setExpandedProductRows(prev => ({...prev, [artikelNr]: {loading: false, details: [], summe: null, error: err.message}}))
+      }
+    }
+  }
 
   // Kaltakquise
   const [coldLeadsTab, setColdLeadsTab] = useState('search')
