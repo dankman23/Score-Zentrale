@@ -291,7 +291,6 @@ ${merkmaleText || 'Keine Angabe'}
   } catch (error: any) {
     console.error('[Batch Generate] Critical Error:', error)
     
-    // Stelle sicher, dass IMMER ein valides JSON zurückgegeben wird
     return NextResponse.json({
       ok: false,
       error: error?.message || 'Unbekannter Fehler bei der Bulletpoint-Generierung',
