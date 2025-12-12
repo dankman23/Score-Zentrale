@@ -379,7 +379,8 @@ export async function POST(request: NextRequest) {
         newCustomers++
       }
     }
-    // Ende des else-Blocks (Zeile 268)
+    
+    }  // Ende des else-Blocks (Zeile 268)
     
     const duration = Date.now() - startTime
     
