@@ -3563,19 +3563,87 @@ export default function App() {
                 <div className="table-responsive" style={{maxHeight:800}}>
                   <table className="table table-dark table-hover table-sm mb-0">
                     <thead className="thead-dark" style={{position: 'sticky', top: 0, backgroundColor: '#1e1e1e', zIndex: 10}}>
-                      <tr><th>ArtikelNr</th><th>Name</th><th>Hersteller</th><th>Menge</th><th>Umsatz (Netto)</th></tr>
+                      <tr><th style={{width:30}}></th><th>ArtikelNr</th><th>Name</th><th>Hersteller</th><th>Menge</th><th>Umsatz (Netto)</th></tr>
                     </thead>
                     <tbody>
-                      {(topProducts||[]).map((r,idx)=> (
-                        <tr key={idx}>
-                          <td>{r.sku||r.artikelNr}</td>
-                          <td>{r.name}</td>
-                          <td>{r.hersteller||'-'}</td>
-                          <td>{r.quantity||'-'}</td>
-                          <td>{fmtCurrency(r.revenue||r.umsatz)}</td>
-                        </tr>
-                      ))}
-                      {topProducts?.length===0 && <tr><td colSpan={5} className="text-center text-muted">Keine Daten</td></tr>}
+                      {(topProducts||[]).map((r,idx)=> {
+                        const artikelNr = r.sku||r.artikelNr
+                        const expanded = expandedProductRows[artikelNr]
+                        return (
+                          <React.Fragment key={idx}>
+                            <tr 
+                              style={{cursor:'pointer'}} 
+                              onClick={()=>toggleProductDetails(artikelNr)}
+                              className={expanded ? 'table-active' : ''}
+                            >
+                              <td>
+                                <i className={`bi ${expanded ? 'bi-chevron-down' : 'bi-chevron-right'}`}/>
+                              </td>
+                              <td>{artikelNr}</td>
+                              <td>{r.name}</td>
+                              <td>{r.hersteller||'-'}</td>
+                              <td>{r.quantity||'-'}</td>
+                              <td>{fmtCurrency(r.revenue||r.umsatz)}</td>
+                            </tr>
+                            {expanded && (
+                              <tr>
+                                <td colSpan={6} style={{padding:0, backgroundColor:'#2a2a2a'}}>
+                                  {expanded.loading ? (
+                                    <div className="p-3 text-center"><i className="bi bi-hourglass-split"/> Lade Details...</div>
+                                  ) : expanded.error ? (
+                                    <div className="p-3 text-danger">Fehler: {expanded.error}</div>
+                                  ) : (
+                                    <div className="p-2">
+                                      <table className="table table-sm table-dark mb-0" style={{fontSize:'0.85em'}}>
+                                        <thead>
+                                          <tr className="text-muted">
+                                            <th>Typ</th>
+                                            <th>Auftrag</th>
+                                            <th>Datum</th>
+                                            <th>Verkauft als</th>
+                                            <th className="text-end">Menge</th>
+                                            <th className="text-end">Umsatz</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {expanded.details.map((d,i)=>(
+                                            <tr key={i}>
+                                              <td>
+                                                <span className={`badge ${d.typ==='Bundle' ? 'bg-info' : 'bg-secondary'}`}>
+                                                  {d.typ}
+                                                  {d.typ==='Bundle' && d.anzahlImBundle > 1 && ` (÷${d.anzahlImBundle})`}
+                                                </span>
+                                              </td>
+                                              <td><small>{d.auftrag}</small></td>
+                                              <td><small>{d.datum ? new Date(d.datum).toLocaleDateString('de-DE') : '-'}</small></td>
+                                              <td title={d.verkauftName}><small className="text-truncate d-inline-block" style={{maxWidth:200}}>{d.verkauftName}</small></td>
+                                              <td className="text-end">{d.menge?.toFixed(2)}</td>
+                                              <td className="text-end">{fmtCurrency(d.umsatz)}</td>
+                                            </tr>
+                                          ))}
+                                          {expanded.details.length === 0 && (
+                                            <tr><td colSpan={6} className="text-center text-muted">Keine Einzelverkäufe gefunden</td></tr>
+                                          )}
+                                        </tbody>
+                                        {expanded.summe && (
+                                          <tfoot style={{borderTop:'2px solid #444'}}>
+                                            <tr className="fw-bold">
+                                              <td colSpan={4} className="text-end">Summe:</td>
+                                              <td className="text-end">{expanded.summe.menge}</td>
+                                              <td className="text-end">{fmtCurrency(expanded.summe.umsatz)}</td>
+                                            </tr>
+                                          </tfoot>
+                                        )}
+                                      </table>
+                                    </div>
+                                  )}
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
+                        )
+                      })}
+                      {topProducts?.length===0 && <tr><td colSpan={6} className="text-center text-muted">Keine Daten</td></tr>}
                     </tbody>
                   </table>
                 </div>
