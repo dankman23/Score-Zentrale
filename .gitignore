@@ -28,11 +28,12 @@ next-env.d.ts
 # Production builds
 /build
 dist/
-dist
 
-# Environment files (comprehensive coverage)
-*token.json*
-*credentials.json*
+# Environment files
+.env
+.env.*
+*.env
+!.env.example
 
 # Logs and debug files
 npm-debug.log*
@@ -47,7 +48,7 @@ dump.rdb
 
 # Python
 __pycache__/
-*pyc*
+*.pyc
 venv/
 .venv/
 
@@ -76,46 +77,17 @@ agenthub/agents/youtube/db
 .cache/
 
 # Mobile development
-android-sdk/ node_modules/@next/swc-linux-arm64-gnu/next-swc.linux-arm64-gnu.node
+android-sdk/
+
+# Credentials
+*token.json*
+*credentials.json*
+
+# Large cache files
+.next/cache/webpack/server-production/*.pack
 node_modules/@next/swc-linux-arm64-musl/next-swc.linux-arm64-musl.node
 node_modules/@next/swc-linux-arm64-gnu/next-swc.linux-arm64-gnu.node
-.next/cache/webpack/server-production/0.pack
-
-# Environment files - NEVER commit to Git!
-.env
-.env.*
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
-.next/cache/webpack/server-production/3.pack
-.next/cache/webpack/server-production/6.pack
 data/catalogs/pferd.pdf
-data/catalogs/norton-clipper.pdf
 data/catalogs/klingspor-datenblaetter.zip
--e 
-# Environment files
-*.env
-*.env.*
+data/catalogs/norton-clipper.pdf
+.next/cache/webpack/server-production/0.pack
