@@ -1,10 +1,17 @@
 import 'server-only'
 import { MongoClient, Db } from 'mongodb'
 
-const MONGO_URL = process.env.MONGO_URL!
+// Don't check MONGO_URL at module load time - only when actually connecting
+// This allows the build to succeed without env vars present
+let cachedClient: MongoClient | null = null
+let cachedDb: Db | null = null
 
-if (!MONGO_URL) {
-  throw new Error('MONGO_URL environment variable not set')
+function getMongoUrl(): string {
+  const url = process.env.MONGO_URL
+  if (!url) {
+    throw new Error('MONGO_URL environment variable not set')
+  }
+  return url
 }
 
 let cachedClient: MongoClient | null = null
