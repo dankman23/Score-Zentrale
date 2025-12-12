@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://biz-insight-5.preview.emergentagent.com"
+BASE_URL = "https://bulletpoint-master.preview.emergentagent.com"
 TIMEOUT = 180  # 3 minutes max for import test
 
 def log(message):

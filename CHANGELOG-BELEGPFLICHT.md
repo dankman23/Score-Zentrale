@@ -74,7 +74,7 @@ for (const nr of ohneBeleg) {
 
 **API-Test:**
 ```bash
-curl https://biz-insight-5.preview.emergentagent.com/api/fibu/kontenplan
+curl https://bulletpoint-master.preview.emergentagent.com/api/fibu/kontenplan
 ```
 
 **Ergebnis (Auszug):**
