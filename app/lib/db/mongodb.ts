@@ -14,9 +14,6 @@ function getMongoUrl(): string {
   return url
 }
 
-let cachedClient: MongoClient | null = null
-let cachedDb: Db | null = null
-
 export async function getDb(): Promise<Db> {
   if (cachedDb) {
     return cachedDb
