@@ -393,7 +393,6 @@ export async function POST(request: NextRequest) {
       total: jtlCustomers.length,
       duration: duration
     })
-    
   } catch (error: any) {
     console.error('[JTL-Sync] Error:', error)
     
