@@ -768,7 +768,7 @@ export default function App() {
       // Expand and load details
       setExpandedProductRows(prev => ({...prev, [artikelNr]: {loading: true, details: [], summe: null}}))
       try {
-        const res = await fetch(`/api/jtl/sales/top-products/details?artikelNr=${encodeURIComponent(artikelNr)}&from=${dateRange.from}&to=${dateRange.to}`)
+        const res = await fetch(`/api/jtl/sales/top-products/details?artikelNr=${encodeURIComponent(artikelNr)}&from=${from}&to=${to}`)
         const data = await res.json()
         if (data.ok) {
           setExpandedProductRows(prev => ({...prev, [artikelNr]: {loading: false, details: data.details, summe: data.summe}}))
