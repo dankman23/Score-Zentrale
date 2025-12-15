@@ -2985,6 +2985,14 @@ export default function App() {
       } else {
         return aVal < bVal ? 1 : -1
       }
+
+  // Artikelrating: Daten laden wenn Tab aktiviert wird
+  useEffect(() => {
+    if (activeTab === 'artikelrating' && ratingArticles.length === 0) {
+      loadRatingArticles()
+    }
+  }, [activeTab])
+
     })
   }
 
