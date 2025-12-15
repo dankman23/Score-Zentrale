@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
         kArtikel: row.kArtikel,
         cArtNr: row.cArtNr,
         cName: row.cName,
-        cHersteller: row.cHersteller,
+        cHersteller: row.Hersteller || '',
         totalMenge: Math.round(row.totalMenge || 0),
         totalMarge: parseFloat((row.totalMarge || 0).toFixed(2)),
         margeProMonat: parseFloat(baseScore.toFixed(2)),
