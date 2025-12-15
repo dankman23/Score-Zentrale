@@ -1407,11 +1407,8 @@ export default function PreiseModule() {
                           // Mindestmenge ist das MAXIMUM von VE oder der berechneten Menge
                           let mindestMenge = Math.max(ve, mindestMengeAusEK)
                           
-                          // Auf schöne Zahl AUFRUNDEN
+                          // Auf schöne Zahl AUFRUNDEN (Abnahmeintervall gilt NICHT für Mindestmenge!)
                           mindestMenge = rundeAufSchoeneAuf(mindestMenge)
-                          
-                          // Muss Vielfaches des Abnahmeintervalls sein
-                          mindestMenge = Math.ceil(mindestMenge / abnahme) * abnahme
                           
                           // 2. Staffeln berechnen
                           const staffeln = [{
