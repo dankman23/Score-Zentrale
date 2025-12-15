@@ -81,7 +81,9 @@ export async function POST(request: NextRequest) {
     console.log(`[Batch Job] Created job ${jobId} for ${artikelIds.length} articles`)
     
     // Starte Job asynchron (Fire & Forget)
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/amazon/bulletpoints/batch/process-job`, {
+    // WICHTIG: Verwende localhost für interne Kommunikation, nicht die externe URL!
+    const internalUrl = 'http://localhost:3000'
+    fetch(`${internalUrl}/api/amazon/bulletpoints/batch/process-job`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ jobId })
