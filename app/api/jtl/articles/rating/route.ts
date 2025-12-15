@@ -69,6 +69,7 @@ export async function GET(request: NextRequest) {
         INNER JOIN dbo.tArtikel child ON sl.kArtikel = child.kArtikel
         LEFT JOIN dbo.tArtikelBeschreibung child_desc ON child_desc.kArtikel = child.kArtikel AND child_desc.kSprache = 1
         LEFT JOIN dbo.tHersteller child_h ON child.kHersteller = child_h.kHersteller
+        LEFT JOIN dbo.tWarengruppe child_wg ON child.kWarengruppe = child_wg.kWarengruppe
         CROSS APPLY (
           SELECT SUM(a_child.fEKNetto * sl_inner.fAnzahl) as total_ek
           FROM dbo.tStueckliste sl_inner
