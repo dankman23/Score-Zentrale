@@ -9088,15 +9088,47 @@ export default function App() {
                               <span className="sr-only">Verarbeitet...</span>
                             </div>
                             <h5>Bulletpoints werden generiert...</h5>
-                            <p className="text-muted">Dies kann einige Minuten dauern. Bitte warten...</p>
+                            {(() => {
+                              const processed = batchProgress.processed || 0
+                              const total = batchProgress.total || 1
+                              const percent = Math.round((processed / total) * 100)
+                              
+                              // Restzeit berechnen
+                              let remainingText = ''
+                              if (batchProgress.started_at && processed > 0) {
+                                const elapsed = (Date.now() - new Date(batchProgress.started_at).getTime()) / 1000
+                                const avgTimePerItem = elapsed / processed
+                                const remaining = (total - processed) * avgTimePerItem
+                                const remainingMin = Math.ceil(remaining / 60)
+                                remainingText = remainingMin > 0 ? `ca. ${remainingMin} Min. verbleibend` : 'Gleich fertig...'
+                              }
+                              
+                              return (
+                                <>
+                                  <p className="text-muted mb-2">
+                                    <strong>{processed}</strong> / <strong>{total}</strong> Artikel verarbeitet ({percent}%)
+                                  </p>
+                                  {remainingText && (
+                                    <p className="text-info mb-3">
+                                      <i className="bi bi-clock me-1"/>
+                                      {remainingText}
+                                    </p>
+                                  )}
+                                </>
+                              )
+                            })()}
                             <div className="progress" style={{height: '25px'}}>
                               <div 
                                 className="progress-bar progress-bar-striped progress-bar-animated" 
                                 style={{width: `${batchProgress.total > 0 ? (batchProgress.processed / batchProgress.total * 100) : 0}%`}}
                               >
-                                {batchProgress.processed} / {batchProgress.total}
+                                {Math.round(batchProgress.total > 0 ? (batchProgress.processed / batchProgress.total * 100) : 0)}%
                               </div>
                             </div>
+                            <p className="text-muted mt-3 small">
+                              <i className="bi bi-info-circle me-1"/>
+                              Du kannst diese Seite schließen - der Job läuft im Hintergrund weiter.
+                            </p>
                           </div>
                         ) : (
                           <div>
