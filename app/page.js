@@ -9324,6 +9324,18 @@ export default function App() {
         </div>
       )}
 
+
+      {/* Artikelrating Section */}
+      {activeTab==='artikelrating' && (
+        <div>
+          <iframe 
+            src="/produkte/rating" 
+            style={{width: '100%', height: '90vh', border: 'none', borderRadius: '8px'}}
+            title="Artikelrating"
+          />
+        </div>
+      )}
+
       {/* Produktberater Section */}
       {activeTab==='produktberater' && (
         <div>
