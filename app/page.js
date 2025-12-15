@@ -2476,7 +2476,8 @@ export default function App() {
             processed: job.processed || 0,
             succeeded: job.succeeded || 0,
             failed: job.failed || 0,
-            total: job.total || count
+            total: job.total || count,
+            started_at: job.started_at || null
           })
 
           setBatchResults(job.results || [])
