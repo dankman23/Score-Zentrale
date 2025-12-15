@@ -7753,10 +7753,12 @@ export default function App() {
                 <strong><i className="bi bi-cpu me-1"/>Bulletpoint-Generierung läuft:</strong>{' '}
                 <span className="ms-2">{batchProgress.processed} / {batchProgress.total}</span>
                 {' '}({Math.round((batchProgress.processed / (batchProgress.total || 1)) * 100)}%)
-                {batchProgress.started_at && batchProgress.processed > 0 && (() => {
-                  const elapsed = (Date.now() - new Date(batchProgress.started_at).getTime()) / 1000
-                  const avgTime = elapsed / batchProgress.processed
-                  const remaining = (batchProgress.total - batchProgress.processed) * avgTime
+                {batchProgress.started_at && batchProgress.processed > 50 && (() => {
+                  // Verwende realistischere Schätzung: ~0.8 Sekunden pro Artikel (basierend auf 5 parallel)
+                  // Statt die gesamte elapsed time zu nutzen (die Pausen enthält)
+                  const avgTimePerArticle = 0.8 // Sekunden
+                  const remainingArticles = batchProgress.total - batchProgress.processed
+                  const remaining = remainingArticles * avgTimePerArticle
                   const remainingMin = Math.ceil(remaining / 60)
                   return remainingMin > 0 ? <span className="ms-3 text-muted">• ca. {remainingMin} Min. verbleibend</span> : <span className="ms-3 text-success">• Gleich fertig!</span>
                 })()}
