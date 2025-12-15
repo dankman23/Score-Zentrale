@@ -9308,6 +9308,11 @@ export default function App() {
 
 
             </div>
+
+          {/* Artikelrating Tab */}
+          {produkteTab === 'rating' && (
+            <ArtikelRatingTab />
+          )}
           )}
         </div>
       )}
