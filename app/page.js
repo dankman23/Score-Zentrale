@@ -9452,13 +9452,16 @@ export default function App() {
                 </div>
                 <div className="col-md-3">
                   <label className="form-label text-white fw-bold">Hersteller Filter</label>
-                  <input
-                    type="text"
+                  <select
                     className="form-control"
-                    placeholder="z.B. Klingspor"
                     value={ratingFilterHersteller}
                     onChange={(e) => setRatingFilterHersteller(e.target.value)}
-                  />
+                  >
+                    <option value="">Alle Hersteller</option>
+                    {ratingHerstellerList.map((h, idx) => (
+                      <option key={idx} value={h}>{h}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="col-md-3 d-flex align-items-end">
                   <div className="form-check">
