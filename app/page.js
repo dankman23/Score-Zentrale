@@ -2926,6 +2926,68 @@ export default function App() {
   // ========================================
   // ALLE useEffects - WIEDERHERGESTELLT
   // ========================================
+
+  // Artikelrating laden
+  const loadRatingArticles = async () => {
+    setRatingLoading(true)
+    try {
+      const params = new URLSearchParams({
+        dateFrom: ratingDateFrom,
+        dateTo: ratingDateTo,
+        includeAvailability: ratingIncludeAvailability.toString()
+      })
+      
+      const res = await fetch(`/api/jtl/articles/rating?${params}`)
+      const data = await res.json()
+      
+      if (data.ok) {
+        setRatingArticles(data.articles)
+      } else {
+        alert('Fehler: ' + data.error)
+      }
+    } catch (error) {
+      console.error('Error loading rating articles:', error)
+      alert('Fehler beim Laden der Artikel')
+    } finally {
+      setRatingLoading(false)
+    }
+  }
+
+  const handleRatingSort = (field) => {
+    if (ratingSortBy === field) {
+      setRatingSortOrder(ratingSortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setRatingSortBy(field)
+      setRatingSortOrder('desc')
+    }
+  }
+
+  const getSortedRatingArticles = () => {
+    let filtered = ratingArticles
+
+    if (ratingFilterHersteller) {
+      filtered = filtered.filter(a => 
+        a.cHersteller.toLowerCase().includes(ratingFilterHersteller.toLowerCase())
+      )
+    }
+
+    return filtered.sort((a, b) => {
+      let aVal = a[ratingSortBy]
+      let bVal = b[ratingSortBy]
+      
+      if (ratingSortBy === 'cArtNr' || ratingSortBy === 'cName' || ratingSortBy === 'cHersteller') {
+        aVal = String(aVal).toLowerCase()
+        bVal = String(bVal).toLowerCase()
+      }
+      
+      if (ratingSortOrder === 'asc') {
+        return aVal > bVal ? 1 : -1
+      } else {
+        return aVal < bVal ? 1 : -1
+      }
+    })
+  }
+
   
   // 1. AUTH-CHECK (MUSS ZUERST LAUFEN)
   useEffect(() => {
