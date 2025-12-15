@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
         LEFT JOIN dbo.tArtikelBeschreibung ab ON ab.kArtikel = a.kArtikel AND ab.kSprache = 1
         LEFT JOIN dbo.tHersteller h ON a.kHersteller = h.kHersteller
         WHERE CAST(o.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
-          AND o.cStatus != 'Storno'
+          AND (o.nStorno IS NULL OR o.nStorno = 0)
         GROUP BY a.kArtikel, a.cArtNr, ab.cName, h.cName
       ),
       
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
           WHERE sl_inner.kVaterArtikel = parent.kArtikel
         ) parent_ek
         WHERE CAST(o.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
-          AND o.cStatus != 'Storno'
+          AND (o.nStorno IS NULL OR o.nStorno = 0)
         GROUP BY child.kArtikel, child.cArtNr, child_desc.cName, child_h.cName
       ),
       
