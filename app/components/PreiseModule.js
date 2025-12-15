@@ -1426,7 +1426,7 @@ export default function PreiseModule() {
                           // g2-Preise berechnen für jede Staffel
                           const staffelnMitPreis = await Promise.all(staffeln.map(async (s, idx) => {
                             try {
-                              const res = await fetch('/api/preise/calculate-g2', {
+                              const res = await fetch('/api/preise/g2/berechnen', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
