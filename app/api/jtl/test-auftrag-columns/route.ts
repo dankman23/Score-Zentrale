@@ -18,14 +18,24 @@ export async function GET() {
     
     const result = await pool.request().query(query)
     
-    // Sample von tAuftrag
+    // Sample von tAuftrag mit verschiedenen nType
     const sampleQuery = `
-      SELECT TOP 5 *
+      SELECT TOP 20 kAuftrag, nType, dErstellt, nStorno
       FROM Verkauf.tAuftrag
       ORDER BY dErstellt DESC
     `
     
     const sample = await pool.request().query(sampleQuery)
+    
+    // nType Verteilung
+    const typeDistQuery = `
+      SELECT nType, COUNT(*) as Anzahl
+      FROM Verkauf.tAuftrag
+      GROUP BY nType
+      ORDER BY nType
+    `
+    
+    const typeDist = await pool.request().query(typeDistQuery)
     
     return NextResponse.json({
       ok: true,
