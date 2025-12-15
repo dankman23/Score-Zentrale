@@ -1229,7 +1229,7 @@ export default function PreiseModule() {
                           onChange={(e) => setStaffelAbnahmeintervall(Math.max(1, parseInt(e.target.value) || 1))}
                           style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '1.2rem'}}
                         />
-                        <small className="text-muted">Stück (Mindestbestellmenge Lieferant)</small>
+                        <small className="text-muted">Alle Staffeln müssen Vielfache davon sein</small>
                       </div>
 
                       {/* EK pro Stück */}
