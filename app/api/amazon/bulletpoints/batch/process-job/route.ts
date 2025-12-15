@@ -202,38 +202,6 @@ Hersteller: ${artikel.cHerstellerName || 'Unbekannt'}
       
       console.log(`[Job ${jobId}] Batch done. Processed: ${processed}/${job.artikelIds.length} (${PARALLEL_COUNT}x parallel)`)
     }
-          status: 'success',
-          bulletpoints: bulletpointsRaw.substring(0, 100) + '...'
-        })
-        
-      } catch (error: any) {
-        failed++
-        results.push({
-          kArtikel,
-          status: 'failed',
-          error: error.message
-        })
-        console.error(`[Job ${jobId}] Failed for article ${kArtikel}:`, error.message)
-      }
-      
-      processed++
-    }
-    
-    // Update Job Progress
-    await jobsCollection.updateOne(
-      { _id: new ObjectId(jobId) },
-      { 
-        $set: { 
-          processed,
-          succeeded,
-          failed,
-          results: results.slice(-50), // Nur letzte 50 Ergebnisse
-          updated_at: new Date()
-        }
-      }
-    )
-    
-    console.log(`[Job ${jobId}] Chunk done. Processed: ${processed}/${job.artikelIds.length}`)
     
     // Prüfe ob noch mehr Artikel zu verarbeiten sind
     if (processed < job.artikelIds.length) {
