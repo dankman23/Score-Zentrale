@@ -122,9 +122,12 @@ export async function GET(request: NextRequest) {
         COALESCE(ds.cArtNr, ss.cArtNr),
         COALESCE(ds.cName, ss.cName),
         COALESCE(ds.Hersteller, ss.Hersteller),
+        COALESCE(ds.Warengruppe, ss.Warengruppe),
         ds.DirectMenge,
+        ds.DirectUmsatz,
         ds.DirectMarge,
         ss.StucklisteMenge,
+        ss.StucklisteUmsatz,
         ss.StucklisteMarge
       HAVING (COALESCE(ds.DirectMarge, 0) + COALESCE(ss.StucklisteMarge, 0)) > 0
       ORDER BY margeProMonat DESC
