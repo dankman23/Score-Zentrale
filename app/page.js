@@ -2537,67 +2537,11 @@ export default function App() {
       }
 
       const jobId = data.jobId
+      setCurrentJobId(jobId)
       console.log(`[Batch Generation] Job gestartet: ${jobId}`)
 
-      // Polle Job-Status alle 2 Sekunden
-      const pollInterval = setInterval(async () => {
-        try {
-          const statusRes = await fetch(`/api/amazon/bulletpoints/batch/job-status?jobId=${jobId}`)
-          const statusData = await statusRes.json()
-
-          if (!statusData.ok) {
-            console.error('[Job Status] Fehler:', statusData.error)
-            clearInterval(pollInterval)
-            alert('❌ Fehler beim Abrufen des Job-Status: ' + statusData.error)
-            setBatchGenerating(false)
-            return
-          }
-
-          const job = statusData.job
-
-          // Update Progress
-          setBatchProgress({
-            processed: job.processed || 0,
-            succeeded: job.succeeded || 0,
-            failed: job.failed || 0,
-            total: job.total || count,
-            started_at: job.started_at || null
-          })
-
-          setBatchResults(job.results || [])
-
-          console.log(`[Job ${jobId}] Status: ${job.status}, Progress: ${job.processed}/${job.total}`)
-
-          // Job abgeschlossen?
-          if (job.status === 'completed') {
-            clearInterval(pollInterval)
-            setBatchGenerating(false)
-            
-            const duration = job.finished_at && job.started_at 
-              ? Math.round((new Date(job.finished_at) - new Date(job.started_at)) / 1000) 
-              : 0
-            
-            alert(
-              `✅ Batch-Generierung abgeschlossen!\n\n` +
-              `${job.succeeded} erfolgreich\n` +
-              `${job.failed} fehlgeschlagen\n` +
-              `Dauer: ${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')} min`
-            )
-            
-            // Artikel neu laden
-            await fetchArtikel()
-          }
-
-          // Job fehlgeschlagen?
-          if (job.status === 'failed') {
-            clearInterval(pollInterval)
-            setBatchGenerating(false)
-            alert('❌ Job fehlgeschlagen: ' + (job.error || 'Unbekannter Fehler'))
-          }
-
-        } catch (pollError) {
-          console.error('[Job Polling] Error:', pollError)
-          // Polling nicht abbrechen bei Netzwerkfehlern
+      // Nutze das globale Polling (statt lokales setInterval)
+      startPolling(jobId)
         }
       }, 2000) // Alle 2 Sekunden
 
