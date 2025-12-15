@@ -1440,12 +1440,15 @@ export default function PreiseModule() {
                           
                           // Für jede Schwelle: Menge berechnen
                           for (const schwelle of schwellenWerte) {
+                            // Berechne Menge für diese EK-Schwelle
                             const mengeRoh = schwelle / ek
-                            let menge = rundeAufVielfaches(Math.ceil(mengeRoh))
-                            menge = rundeAufSchoeneNaechste(menge) // Auf NÄCHSTE schöne Zahl
+                            let menge = Math.ceil(mengeRoh)
                             
-                            // Muss Vielfaches von VE und Abnahme sein
-                            menge = rundeAufVielfaches(menge)
+                            // Auf NÄCHSTE schöne Zahl runden
+                            menge = rundeAufSchoeneNaechste(menge)
+                            
+                            // Muss Vielfaches des Abnahmeintervalls sein
+                            menge = Math.ceil(menge / abnahme) * abnahme
                             
                             // Nur hinzufügen wenn deutlich größer als letzte Staffel
                             const letzteStaffel = staffeln[staffeln.length - 1]
