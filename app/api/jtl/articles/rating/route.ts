@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
           a.kArtikel,
           a.cArtNr,
           a.cName,
-          a.cHersteller,
+          '' as Hersteller,
           SUM(ap.fAnzahl) as DirectMenge,
           SUM((ap.fVKNetto - a.fEKNetto) * ap.fAnzahl) as DirectMarge
         FROM Verkauf.tAuftragPosition ap
@@ -44,8 +44,7 @@ export async function GET(request: NextRequest) {
         INNER JOIN dbo.tArtikel a ON ap.kArtikel = a.kArtikel
         WHERE CAST(au.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
           AND au.cStatus != 'Storno'
-          ${hersteller ? "AND a.cHersteller = @hersteller" : ""}
-        GROUP BY a.kArtikel, a.cArtNr, a.cName, a.cHersteller
+        GROUP BY a.kArtikel, a.cArtNr, a.cName
       ),
       
       StucklisteSales AS (
