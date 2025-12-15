@@ -847,7 +847,7 @@ export default function App() {
   const [glossarSearch, setGlossarSearch] = useState('')
   
   // Produkte (Artikel-Import)
-  const [produkteTab, setProdukteTab] = useState('import') // import | browser | prompts
+  const [produkteTab, setProdukteTab] = useState('import') // import | browser | prompts | rating
   
   // Amazon Bulletpoints
   const [amazonPrompts, setAmazonPrompts] = useState([])
