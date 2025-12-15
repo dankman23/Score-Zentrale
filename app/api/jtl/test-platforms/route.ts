@@ -53,6 +53,7 @@ export async function GET() {
     
     return NextResponse.json({
       ok: true,
+      platformCols: platformCols.recordset,
       platforms: platforms.recordset,
       shopStructure: shopStructure.recordset,
       shopSample: shopSample.recordset,
