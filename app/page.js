@@ -9577,7 +9577,7 @@ export default function App() {
                   <tbody style={{color: '#fff'}}>
                     {ratingLoading ? (
                       <tr>
-                        <td colSpan="7" className="text-center py-5">
+                        <td colSpan="8" className="text-center py-5">
                           <div className="spinner-border text-primary" role="status">
                             <span className="sr-only">Lädt...</span>
                           </div>
@@ -9585,7 +9585,7 @@ export default function App() {
                       </tr>
                     ) : getSortedRatingArticles().length === 0 ? (
                       <tr>
-                        <td colSpan="7" className="text-center text-muted py-5">
+                        <td colSpan="8" className="text-center text-muted py-5">
                           Keine Artikel gefunden. Bitte Daten laden.
                         </td>
                       </tr>
