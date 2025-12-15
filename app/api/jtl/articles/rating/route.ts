@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
         COALESCE(ds.kArtikel, ss.kArtikel) as kArtikel,
         COALESCE(ds.cArtNr, ss.cArtNr) as cArtNr,
         COALESCE(ds.cName, ss.cName) as cName,
-        COALESCE(ds.cHersteller, ss.cHersteller) as cHersteller,
+        COALESCE(ds.Hersteller, ss.Hersteller) as Hersteller,
         COALESCE(ds.DirectMenge, 0) + COALESCE(ss.StucklisteMenge, 0) as totalMenge,
         COALESCE(ds.DirectMarge, 0) + COALESCE(ss.StucklisteMarge, 0) as totalMarge,
         (COALESCE(ds.DirectMarge, 0) + COALESCE(ss.StucklisteMarge, 0)) / @monthsFactor as margeProMonat,
