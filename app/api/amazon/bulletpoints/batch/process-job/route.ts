@@ -118,17 +118,17 @@ export async function POST(request: NextRequest) {
     let failed = job.failed || 0
     const results = job.results || []
     
-    // Verarbeite jeden Artikel im Chunk
-    for (const kArtikel of chunk) {
+    // PARALLEL: Verarbeite 5 Artikel gleichzeitig
+    const PARALLEL_COUNT = 5
+    
+    const processArticle = async (kArtikel: number) => {
       try {
-        // 1. Lade Artikel aus MongoDB
         const artikel = await articlesCollection.findOne({ kArtikel })
         
         if (!artikel) {
           throw new Error('Artikel nicht in MongoDB gefunden')
         }
         
-        // Generiere Bulletpoints mit Claude
         const userPrompt = `
 Artikel-Nr: ${artikel.cArtNr}
 Name: ${artikel.cName}
@@ -138,20 +138,14 @@ Hersteller: ${artikel.cHerstellerName || 'Unbekannt'}
         `.trim()
         
         const response = await claude.createMessage(
-          [
-            {
-              role: 'user',
-              content: userPrompt
-            }
-          ],
+          [{ role: 'user', content: userPrompt }],
           selectedPrompt.prompt || '',
           2000
         )
         
         const bulletpointsRaw = response.content[0]?.text || ''
-        const bullets = bulletpointsRaw.split(';').map(b => b.trim()).filter(b => b.length > 0)
+        const bullets = bulletpointsRaw.split(';').map((b: string) => b.trim()).filter((b: string) => b.length > 0)
         
-        // Speichere Ergebnis
         await bulletpointsCollection.updateOne(
           { kArtikel },
           {
@@ -170,9 +164,44 @@ Hersteller: ${artikel.cHerstellerName || 'Unbekannt'}
           { upsert: true }
         )
         
-        succeeded++
-        results.push({
-          kArtikel,
+        return { kArtikel, status: 'success', bulletpoints: bulletpointsRaw.substring(0, 100) + '...' }
+      } catch (error: any) {
+        console.error(`[Job ${jobId}] Failed for article ${kArtikel}:`, error.message)
+        return { kArtikel, status: 'failed', error: error.message }
+      }
+    }
+    
+    // Verarbeite in Batches von PARALLEL_COUNT
+    for (let i = 0; i < chunk.length; i += PARALLEL_COUNT) {
+      const batch = chunk.slice(i, i + PARALLEL_COUNT)
+      const batchResults = await Promise.all(batch.map(processArticle))
+      
+      for (const result of batchResults) {
+        if (result.status === 'success') {
+          succeeded++
+        } else {
+          failed++
+        }
+        results.push(result)
+        processed++
+      }
+      
+      // Update Progress nach jedem Batch
+      await jobsCollection.updateOne(
+        { _id: new ObjectId(jobId) },
+        { 
+          $set: { 
+            processed,
+            succeeded,
+            failed,
+            results: results.slice(-50),
+            updated_at: new Date()
+          }
+        }
+      )
+      
+      console.log(`[Job ${jobId}] Batch done. Processed: ${processed}/${job.artikelIds.length} (${PARALLEL_COUNT}x parallel)`)
+    }
           status: 'success',
           bulletpoints: bulletpointsRaw.substring(0, 100) + '...'
         })
