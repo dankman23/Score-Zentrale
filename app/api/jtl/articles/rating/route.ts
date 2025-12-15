@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
         INNER JOIN dbo.tArtikel a ON op.kArtikel = a.kArtikel
         LEFT JOIN dbo.tArtikelBeschreibung ab ON ab.kArtikel = a.kArtikel AND ab.kSprache = 1
         LEFT JOIN dbo.tHersteller h ON a.kHersteller = h.kHersteller
+        LEFT JOIN dbo.tWarengruppe wg ON a.kWarengruppe = wg.kWarengruppe
         WHERE CAST(o.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
           AND (o.nStorno IS NULL OR o.nStorno = 0)
           AND o.nType = 1
