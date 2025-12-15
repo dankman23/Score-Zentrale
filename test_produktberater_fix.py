@@ -6,7 +6,7 @@ Test für Produktberater Fix - Prüft ob Produkte aus articles Collection gefund
 import requests
 import json
 
-BASE_URL = "https://bulletpoint-master.preview.emergentagent.com"
+BASE_URL = "https://staffel-price.preview.emergentagent.com"
 
 def test_product_matching():
     """Testet ob die Produktsuche jetzt funktioniert"""

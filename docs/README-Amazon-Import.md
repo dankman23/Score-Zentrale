@@ -18,17 +18,17 @@
 
 ```bash
 # Import für Oktober 2025
-curl -X POST "https://bulletpoint-master.preview.emergentagent.com/api/fibu/import/amazon-jtl?from=2025-10-01&to=2025-10-31&force=true"
+curl -X POST "https://staffel-price.preview.emergentagent.com/api/fibu/import/amazon-jtl?from=2025-10-01&to=2025-10-31&force=true"
 
 # Import für aktuellen Monat
-curl -X POST "https://bulletpoint-master.preview.emergentagent.com/api/fibu/import/amazon-jtl?force=true"
+curl -X POST "https://staffel-price.preview.emergentagent.com/api/fibu/import/amazon-jtl?force=true"
 ```
 
 ### CSV-Export der Rohdaten:
 
 ```bash
 # Download als CSV
-curl "https://bulletpoint-master.preview.emergentagent.com/api/fibu/debug/export-jtl-raw?from=2025-10-01&to=2025-10-31&format=csv" -o amazon-rohdaten.csv
+curl "https://staffel-price.preview.emergentagent.com/api/fibu/debug/export-jtl-raw?from=2025-10-01&to=2025-10-31&format=csv" -o amazon-rohdaten.csv
 ```
 
 ---

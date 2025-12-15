@@ -11,7 +11,7 @@ import sys
 from typing import Dict, Any, Optional
 
 # Configuration
-BASE_URL = "https://bulletpoint-master.preview.emergentagent.com"
+BASE_URL = "https://staffel-price.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class AmazonBulletpointsAsyncTester:

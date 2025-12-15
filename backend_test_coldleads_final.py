@@ -8,7 +8,7 @@ import requests
 import json
 import time
 
-BASE_URL = "https://bulletpoint-master.preview.emergentagent.com/api"
+BASE_URL = "https://staffel-price.preview.emergentagent.com/api"
 
 def print_section(title):
     print(f"\n{'='*80}")
