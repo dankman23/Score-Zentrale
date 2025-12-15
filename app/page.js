@@ -907,8 +907,20 @@ export default function App() {
       clearInterval(pollingInterval)
     }
     
+    let pollCount = 0
+    
     const interval = setInterval(async () => {
       try {
+        pollCount++
+        
+        // Watchdog-Call alle 20 Polls (= alle 60 Sekunden bei 3s Intervall)
+        if (pollCount % 20 === 0) {
+          console.log('[Batch] Running watchdog check...')
+          fetch('/api/amazon/bulletpoints/batch/watchdog').catch(e => {
+            console.error('[Batch Watchdog] Error:', e)
+          })
+        }
+        
         const statusRes = await fetch(`/api/amazon/bulletpoints/batch/job-status?jobId=${jobId}`)
         const statusData = await statusRes.json()
         
