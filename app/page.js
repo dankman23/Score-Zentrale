@@ -2959,6 +2959,10 @@ export default function App() {
         // Hersteller-Liste extrahieren
         const hersteller = [...new Set(filteredArticles.map(a => a.cHersteller).filter(h => h && h !== '-'))]
         setRatingHerstellerList(hersteller.sort())
+        
+        // Warengruppen-Liste extrahieren
+        const warengruppen = [...new Set(filteredArticles.map(a => a.cWarengruppe).filter(w => w && w !== '-'))]
+        setRatingWarengruppenList(warengruppen.sort())
       } else {
         alert('Fehler: ' + data.error)
       }
