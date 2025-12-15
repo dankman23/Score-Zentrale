@@ -23,23 +23,10 @@ export async function GET() {
     `
     const test = await pool.request().query(shopSample)
     
-    // Count pro Plattform
-    const countQuery = `
-      SELECT 
-        p.cName as Plattform,
-        COUNT(DISTINCT asho.kArtikel) as AnzahlArtikel
-      FROM dbo.tArtikelShop asho
-      INNER JOIN dbo.tShop s ON asho.kShop = s.kShop
-      INNER JOIN dbo.tPlattform p ON s.nPlattform = p.nPlattform
-      GROUP BY p.cName
-      ORDER BY AnzahlArtikel DESC
-    `
-    const counts = await pool.request().query(countQuery)
-    
     return NextResponse.json({
       ok: true,
-      testArtikel: test.recordset,
-      counts: counts.recordset
+      shopCols: shopCols.recordset,
+      shopSample: test.recordset
     })
     
   } catch (error: any) {
