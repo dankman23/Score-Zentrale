@@ -9500,33 +9500,33 @@ export default function App() {
           <div className="card">
             <div className="card-body p-0">
               <div className="table-responsive">
-                <table className="table table-hover mb-0">
+                <table className="table table-hover mb-0" style={{color: '#fff'}}>
                   <thead style={{backgroundColor: '#1a252f'}}>
-                    <tr>
-                      <th className="cursor-pointer" onClick={() => handleRatingSort('cArtNr')}>
+                    <tr style={{color: '#fff'}}>
+                      <th className="cursor-pointer" onClick={() => handleRatingSort('cArtNr')} style={{color: '#fff'}}>
                         Artikelnr {ratingSortBy === 'cArtNr' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
                       </th>
-                      <th className="cursor-pointer" onClick={() => handleRatingSort('cName')}>
+                      <th className="cursor-pointer" onClick={() => handleRatingSort('cName')} style={{color: '#fff'}}>
                         Name {ratingSortBy === 'cName' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
                       </th>
-                      <th className="cursor-pointer" onClick={() => handleRatingSort('cHersteller')}>
+                      <th className="cursor-pointer" onClick={() => handleRatingSort('cHersteller')} style={{color: '#fff'}}>
                         Hersteller {ratingSortBy === 'cHersteller' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
                       </th>
-                      <th className="text-right cursor-pointer" onClick={() => handleRatingSort('totalMenge')}>
+                      <th className="text-right cursor-pointer" onClick={() => handleRatingSort('totalMenge')} style={{color: '#fff'}}>
                         Menge {ratingSortBy === 'totalMenge' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
                       </th>
-                      <th className="text-right cursor-pointer" onClick={() => handleRatingSort('totalMarge')}>
+                      <th className="text-right cursor-pointer" onClick={() => handleRatingSort('totalMarge')} style={{color: '#fff'}}>
                         Marge € {ratingSortBy === 'totalMarge' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
                       </th>
-                      <th className="text-right cursor-pointer" onClick={() => handleRatingSort('margeProMonat')}>
+                      <th className="text-right cursor-pointer" onClick={() => handleRatingSort('margeProMonat')} style={{color: '#fff'}}>
                         Marge/Monat {ratingSortBy === 'margeProMonat' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
                       </th>
-                      <th className="text-right cursor-pointer text-warning fw-bold" onClick={() => handleRatingSort('ratingScore')}>
+                      <th className="text-right cursor-pointer text-warning fw-bold" onClick={() => handleRatingSort('ratingScore')} style={{color: '#F6B10A'}}>
                         Rating {ratingSortBy === 'ratingScore' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
                       </th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody style={{color: '#fff'}}>
                     {ratingLoading ? (
                       <tr>
                         <td colSpan="7" className="text-center py-5">
