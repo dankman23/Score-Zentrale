@@ -1400,15 +1400,6 @@ export default function PreiseModule() {
                             return distUnter <= distUeber ? unter : ueber
                           }
                           
-                          // Hilfsfunktion: Auf VE und Abnahmeintervall runden
-                          const rundeAufVielfaches = (menge) => {
-                            // Muss Vielfaches von VE sein
-                            let gerundet = Math.ceil(menge / ve) * ve
-                            // Muss auch Vielfaches von Abnahmeintervall sein
-                            gerundet = Math.ceil(gerundet / abnahme) * abnahme
-                            return gerundet
-                          }
-                          
                           // 1. Mindestbestellmenge berechnen (IMMER AUFRUNDEN)
                           // Berechne die Menge, die mindestens benötigt wird für MindestEK
                           const mindestMengeAusEK = Math.ceil(mindestEK / ek)
