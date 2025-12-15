@@ -1424,25 +1424,62 @@ export default function PreiseModule() {
                           }
                           
                           // g2-Preise berechnen für jede Staffel
+                          // Lade zuerst die g2-Config und Formeln
+                          const configRes = await fetch('/api/preise/g2/config')
+                          const configData = await configRes.json()
+                          let g2Config = {
+                            gstart_ek: 12,
+                            gneu_ek: 100,
+                            gneu_vk: 189,
+                            fixcost1: 0.35,
+                            fixcost2: 1.4,
+                            varpct1: 0.25,
+                            varpct2: 0.02,
+                            aufschlag: 1.08,
+                            shp_fac: 0.92
+                          }
+                          if (configData.ok && configData.configs?.length > 0) {
+                            const savedConfig = configData.configs.find(c => c.warengruppe === staffelG2Warengruppe) || configData.configs[0]
+                            g2Config = { ...g2Config, ...savedConfig }
+                          }
+                          
+                          // Lade Formel-Regler
+                          const formelRes = await fetch('/api/preise/formeln')
+                          const formelData = await formelRes.json()
+                          const selectedFormel = (formelData.sheets || []).find(s => s.id === staffelG2Warengruppe) || formelData.sheets?.[0]
+                          
+                          if (!selectedFormel?.regler) {
+                            throw new Error('Keine Preisformel für Warengruppe gefunden')
+                          }
+                          
                           const staffelnMitPreis = await Promise.all(staffeln.map(async (s, idx) => {
                             try {
+                              // Paket-EK für die Staffelmenge
+                              const paketEK = ek * s.ab
+                              
                               const res = await fetch('/api/preise/g2/berechnen', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
-                                  ek: ek,
-                                  menge: s.ab,
-                                  sheet: staffelG2Warengruppe
+                                  ek: paketEK,
+                                  warengruppe_regler: selectedFormel.regler,
+                                  g2_params: g2Config,
+                                  staffel_mengen: [1]
                                 })
                               })
                               const data = await res.json()
+                              
+                              // shop_unit ist der VK pro Stück (Paket-VK / Menge)
+                              const vkProStueck = data.ok ? (data.shop_unit || data.plattform_unit || 0) : 0
+                              
                               return {
                                 ...s,
-                                vkProStueck: data.vk_pro_stueck || 0,
-                                vkGesamt: (data.vk_pro_stueck || 0) * s.ab,
-                                rabatt: idx > 0 ? (idx * 3) : 0 // Staffelrabatt
+                                vkProStueck: parseFloat(vkProStueck.toFixed(2)),
+                                vkGesamt: parseFloat((vkProStueck * s.ab).toFixed(2)),
+                                rabatt: idx > 0 ? (idx * 3) : 0
                               }
                             } catch (e) {
+                              console.error('Preisberechnung Fehler:', e)
                               return { ...s, vkProStueck: 0, vkGesamt: 0, rabatt: 0 }
                             }
                           }))
