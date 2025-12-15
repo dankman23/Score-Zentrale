@@ -7772,6 +7772,31 @@ export default function App() {
             </button>
           </div>
 
+          {/* Running Job Banner - auf ALLEN Tabs sichtbar */}
+          {batchGenerating && (
+            <div className="alert alert-info d-flex align-items-center mb-4" style={{backgroundColor: '#1a3a4a', borderColor: '#17a2b8'}}>
+              <div className="spinner-border spinner-border-sm text-info me-3" role="status"/>
+              <div className="flex-grow-1">
+                <strong><i className="bi bi-cpu me-1"/>Bulletpoint-Generierung läuft:</strong>{' '}
+                <span className="ms-2">{batchProgress.processed} / {batchProgress.total}</span>
+                {' '}({Math.round((batchProgress.processed / (batchProgress.total || 1)) * 100)}%)
+                {batchProgress.started_at && batchProgress.processed > 0 && (() => {
+                  const elapsed = (Date.now() - new Date(batchProgress.started_at).getTime()) / 1000
+                  const avgTime = elapsed / batchProgress.processed
+                  const remaining = (batchProgress.total - batchProgress.processed) * avgTime
+                  const remainingMin = Math.ceil(remaining / 60)
+                  return remainingMin > 0 ? <span className="ms-3 text-muted">• ca. {remainingMin} Min. verbleibend</span> : <span className="ms-3 text-success">• Gleich fertig!</span>
+                })()}
+              </div>
+              <div className="progress ms-3" style={{height: '22px', width: '180px'}}>
+                <div 
+                  className="progress-bar progress-bar-striped progress-bar-animated bg-info" 
+                  style={{width: `${(batchProgress.processed / (batchProgress.total || 1)) * 100}%`}}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Import Tab */}
           {produkteTab === 'import' && (
             <div>
