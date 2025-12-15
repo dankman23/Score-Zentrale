@@ -1366,8 +1366,8 @@ export default function PreiseModule() {
                           // Parse Rundungswerte
                           const rundungswerte = staffelRundung.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0).sort((a,b) => a - b)
                           
-                          // Hilfsfunktion: Auf schöne Zahl runden
-                          const rundeAufSchoen = (menge) => {
+                          // Hilfsfunktion: Auf schöne Zahl AUFRUNDEN (für Mindestmenge)
+                          const rundeAufSchoeneAuf = (menge) => {
                             if (rundungswerte.length === 0) return menge
                             for (const r of rundungswerte) {
                               if (r >= menge) return r
@@ -1375,6 +1375,29 @@ export default function PreiseModule() {
                             // Größer als alle → auf nächstes Vielfaches des größten runden
                             const max = rundungswerte[rundungswerte.length - 1]
                             return Math.ceil(menge / max) * max
+                          }
+                          
+                          // Hilfsfunktion: Auf NÄCHSTE schöne Zahl runden (für weitere Staffeln)
+                          const rundeAufSchoeneNaechste = (menge) => {
+                            if (rundungswerte.length === 0) return menge
+                            // Finde die beiden nächsten schönen Zahlen (unter und über)
+                            let unter = null
+                            let ueber = null
+                            for (const r of rundungswerte) {
+                              if (r <= menge) unter = r
+                              if (r >= menge && ueber === null) ueber = r
+                            }
+                            // Falls größer als alle: auf Vielfaches runden
+                            if (ueber === null) {
+                              const max = rundungswerte[rundungswerte.length - 1]
+                              return Math.round(menge / max) * max
+                            }
+                            // Falls kleiner als alle: aufrunden
+                            if (unter === null) return ueber
+                            // Wähle die nähere
+                            const distUnter = menge - unter
+                            const distUeber = ueber - menge
+                            return distUnter <= distUeber ? unter : ueber
                           }
                           
                           // Hilfsfunktion: Auf VE und Abnahmeintervall runden
@@ -1386,10 +1409,10 @@ export default function PreiseModule() {
                             return gerundet
                           }
                           
-                          // 1. Mindestbestellmenge berechnen
-                          const mindestMengeRoh = Math.ceil(mindestEK / ek)
-                          let mindestMenge = rundeAufVielfaches(mindestMengeRoh)
-                          mindestMenge = rundeAufSchoen(mindestMenge)
+                          // 1. Mindestbestellmenge berechnen (IMMER AUFRUNDEN)
+                          const mindestMengeRoh = mindestEK / ek
+                          let mindestMenge = rundeAufVielfaches(Math.ceil(mindestMengeRoh))
+                          mindestMenge = rundeAufSchoeneAuf(mindestMenge) // AUFRUNDEN auf schöne Zahl
                           if (mindestMenge < ve) mindestMenge = ve
                           if (mindestMenge < abnahme) mindestMenge = abnahme
                           
@@ -1406,15 +1429,21 @@ export default function PreiseModule() {
                             .filter(w => !isNaN(w) && w > 0)
                             .sort((a, b) => a - b)
                           
+                          // Mindestabstand zwischen Staffeln (20% der vorherigen Menge)
+                          const MINDEST_ABSTAND_FAKTOR = 1.3
+                          
                           // Für jede Schwelle: Menge berechnen
                           for (const schwelle of schwellenWerte) {
-                            const mengeRoh = Math.ceil(schwelle / ek)
-                            let menge = rundeAufVielfaches(mengeRoh)
-                            menge = rundeAufSchoen(menge)
+                            const mengeRoh = schwelle / ek
+                            let menge = rundeAufVielfaches(Math.ceil(mengeRoh))
+                            menge = rundeAufSchoeneNaechste(menge) // Auf NÄCHSTE schöne Zahl
                             
-                            // Nur hinzufügen wenn größer als letzte Staffel
+                            // Muss Vielfaches von VE und Abnahme sein
+                            menge = rundeAufVielfaches(menge)
+                            
+                            // Nur hinzufügen wenn deutlich größer als letzte Staffel
                             const letzteStaffel = staffeln[staffeln.length - 1]
-                            if (menge > letzteStaffel.ab) {
+                            if (menge > letzteStaffel.ab * MINDEST_ABSTAND_FAKTOR) {
                               staffeln.push({
                                 ab: menge,
                                 ekGesamt: menge * ek,
