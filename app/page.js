@@ -872,6 +872,71 @@ export default function App() {
   // Batch Bulletpoint Generation
   const [batchGenerating, setBatchGenerating] = useState(false)
   const [batchProgress, setBatchProgress] = useState({ processed: 0, succeeded: 0, failed: 0, total: 0, started_at: null })
+  const [currentJobId, setCurrentJobId] = useState(null)
+  
+  // Check for running jobs on page load
+  useEffect(() => {
+    const checkRunningJob = async () => {
+      try {
+        const res = await fetch('/api/amazon/bulletpoints/batch/running-job')
+        const data = await res.json()
+        if (data.ok && data.job && data.job.status === 'running') {
+          console.log('[Batch] Found running job:', data.job.id)
+          setCurrentJobId(data.job.id)
+          setBatchGenerating(true)
+          setBatchProgress({
+            processed: data.job.processed || 0,
+            succeeded: data.job.succeeded || 0,
+            failed: data.job.failed || 0,
+            total: data.job.total || 0,
+            started_at: data.job.started_at
+          })
+          // Start polling
+          pollJobStatus(data.job.id)
+        }
+      } catch (err) {
+        console.log('[Batch] No running job found')
+      }
+    }
+    checkRunningJob()
+  }, [])
+  
+  const pollJobStatus = async (jobId) => {
+    const interval = setInterval(async () => {
+      try {
+        const statusRes = await fetch(`/api/amazon/bulletpoints/batch/job-status?jobId=${jobId}`)
+        const statusData = await statusRes.json()
+        
+        if (!statusData.ok) {
+          clearInterval(interval)
+          setBatchGenerating(false)
+          return
+        }
+        
+        const job = statusData.job
+        setBatchProgress({
+          processed: job.processed || 0,
+          succeeded: job.succeeded || 0,
+          failed: job.failed || 0,
+          total: job.total || 0,
+          started_at: job.started_at
+        })
+        
+        if (job.status === 'completed' || job.status === 'failed' || job.status === 'cancelled') {
+          clearInterval(interval)
+          setBatchGenerating(false)
+          setCurrentJobId(null)
+          if (job.status === 'completed') {
+            alert(`✅ Fertig! ${job.succeeded} Bulletpoints generiert, ${job.failed} fehlgeschlagen.`)
+          }
+        }
+      } catch (err) {
+        console.error('[Batch Poll] Error:', err)
+      }
+    }, 3000)
+    
+    return () => clearInterval(interval)
+  }
   const [showBatchModal, setShowBatchModal] = useState(false)
   const [batchResults, setBatchResults] = useState([])
   const [selectedArtikel, setSelectedArtikel] = useState([])
