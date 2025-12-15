@@ -2987,9 +2987,11 @@ export default function App() {
     let filtered = ratingArticles
 
     if (ratingFilterHersteller) {
-      filtered = filtered.filter(a => 
-        a.cHersteller.toLowerCase().includes(ratingFilterHersteller.toLowerCase())
-      )
+      filtered = filtered.filter(a => a.cHersteller === ratingFilterHersteller)
+    }
+    
+    if (ratingFilterWarengruppe) {
+      filtered = filtered.filter(a => a.cWarengruppe === ratingFilterWarengruppe)
     }
 
     return filtered.sort((a, b) => {
