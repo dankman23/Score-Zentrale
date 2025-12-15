@@ -21,8 +21,6 @@ import sql from 'mssql'
  * - includeAvailability: true/false (Verfügbarkeits-Faktor)
  */
 export async function GET(request: NextRequest) {
-  let pool: sql.ConnectionPool | null = null
-  
   try {
     const searchParams = request.nextUrl.searchParams
     const dateFrom = searchParams.get('dateFrom') || '2024-01-01'
@@ -31,9 +29,9 @@ export async function GET(request: NextRequest) {
     const warengruppe = searchParams.get('warengruppe') || null
     const includeAvailability = searchParams.get('includeAvailability') === 'true'
     
-    console.log('[Article Rating] Connecting to MSSQL...')
-    pool = await sql.connect(config)
-    console.log('[Article Rating] Connected')
+    console.log('[Article Rating] Fetching pool...')
+    const pool = await getMssqlPool()
+    console.log('[Article Rating] Pool ready')
     
     // Berechne Anzahl Tage für Normalisierung
     const daysQuery = `
