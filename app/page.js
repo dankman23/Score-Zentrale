@@ -7951,31 +7951,6 @@ export default function App() {
                     </div>
                   ) : (
                     <div>
-                      {/* Running Job Banner */}
-                      {batchGenerating && (
-                        <div className="alert alert-info d-flex align-items-center mb-3" style={{backgroundColor: '#1a3a4a', borderColor: '#17a2b8'}}>
-                          <div className="spinner-border spinner-border-sm text-info me-3" role="status"/>
-                          <div className="flex-grow-1">
-                            <strong>Bulletpoint-Generierung läuft:</strong>{' '}
-                            <span>{batchProgress.processed} / {batchProgress.total}</span>
-                            {' '}({Math.round((batchProgress.processed / (batchProgress.total || 1)) * 100)}%)
-                            {batchProgress.started_at && batchProgress.processed > 0 && (() => {
-                              const elapsed = (Date.now() - new Date(batchProgress.started_at).getTime()) / 1000
-                              const avgTime = elapsed / batchProgress.processed
-                              const remaining = (batchProgress.total - batchProgress.processed) * avgTime
-                              const remainingMin = Math.ceil(remaining / 60)
-                              return remainingMin > 0 ? <span className="ms-2 text-muted">• ca. {remainingMin} Min. verbleibend</span> : null
-                            })()}
-                          </div>
-                          <div className="progress flex-grow-1 mx-3" style={{height: '20px', maxWidth: '200px'}}>
-                            <div 
-                              className="progress-bar progress-bar-striped progress-bar-animated bg-info" 
-                              style={{width: `${(batchProgress.processed / (batchProgress.total || 1)) * 100}%`}}
-                            />
-                          </div>
-                        </div>
-                      )}
-                      
                       {/* Filter & Stats */}
                       <div className="row mb-3">
                         <div className="col-md-12">
