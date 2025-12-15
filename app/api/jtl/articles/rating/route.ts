@@ -206,9 +206,5 @@ export async function GET(request: NextRequest) {
       ok: false,
       error: error.message
     }, { status: 500 })
-  } finally {
-    if (pool) {
-      await pool.close()
-    }
   }
 }
