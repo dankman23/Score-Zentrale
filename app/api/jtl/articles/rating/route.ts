@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
           child.kArtikel,
           child.cArtNr,
           child.cName,
-          child.cHersteller,
+          '' as Hersteller,
           SUM(
             (child.fEKNetto * sl.fAnzahl) / NULLIF(parent_ek.total_ek, 0) * 
             ((ap.fVKNetto - parent.fEKNetto) * ap.fAnzahl)
@@ -71,8 +71,7 @@ export async function GET(request: NextRequest) {
         ) parent_ek
         WHERE CAST(au.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
           AND au.cStatus != 'Storno'
-          ${hersteller ? "AND child.cHersteller = @hersteller" : ""}
-        GROUP BY child.kArtikel, child.cArtNr, child.cName, child.cHersteller
+        GROUP BY child.kArtikel, child.cArtNr, child.cName
       ),
       
       PlatformCounts AS (
