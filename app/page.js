@@ -871,7 +871,7 @@ export default function App() {
   
   // Batch Bulletpoint Generation
   const [batchGenerating, setBatchGenerating] = useState(false)
-  const [batchProgress, setBatchProgress] = useState({ processed: 0, succeeded: 0, failed: 0, total: 0 })
+  const [batchProgress, setBatchProgress] = useState({ processed: 0, succeeded: 0, failed: 0, total: 0, started_at: null })
   const [showBatchModal, setShowBatchModal] = useState(false)
   const [batchResults, setBatchResults] = useState([])
   const [selectedArtikel, setSelectedArtikel] = useState([])
