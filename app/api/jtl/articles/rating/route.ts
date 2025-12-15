@@ -33,6 +33,11 @@ export async function GET(request: NextRequest) {
     const pool = await getMssqlPool()
     console.log('[Article Rating] Pool ready')
     
+    const orderTable = 'Verkauf.tAuftrag'
+    const orderPosTable = 'Verkauf.tAuftragsposition'
+    const articleTable = 'dbo.tArtikel'
+    const stuecklisteTable = 'dbo.tStueckliste'
+    
     // Berechne Anzahl Tage für Normalisierung
     const daysQuery = `
       SELECT DATEDIFF(day, @dateFrom, @dateTo) + 1 AS days
