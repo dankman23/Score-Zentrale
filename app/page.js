@@ -868,6 +868,17 @@ export default function App() {
   // Cache für Artikel-Daten (per kArtikel)
   const [artikelDetailsCache, setArtikelDetailsCache] = useState({})
   const [artikelBulletpointsCache, setArtikelBulletpointsCache] = useState({})
+
+  // Artikelrating States
+  const [ratingArticles, setRatingArticles] = useState([])
+  const [ratingLoading, setRatingLoading] = useState(false)
+  const [ratingDateFrom, setRatingDateFrom] = useState('2024-11-01')
+  const [ratingDateTo, setRatingDateTo] = useState(new Date().toISOString().split('T')[0])
+  const [ratingIncludeAvailability, setRatingIncludeAvailability] = useState(false)
+  const [ratingFilterHersteller, setRatingFilterHersteller] = useState('')
+  const [ratingSortBy, setRatingSortBy] = useState('ratingScore')
+  const [ratingSortOrder, setRatingSortOrder] = useState('desc')
+
   
   // Batch Bulletpoint Generation
   const [batchGenerating, setBatchGenerating] = useState(false)
