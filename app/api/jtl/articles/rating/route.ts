@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
         WHERE CAST(o.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
           AND (o.nStorno IS NULL OR o.nStorno = 0)
           AND o.nType = 1
-        GROUP BY child.kArtikel, child.cArtNr, child_desc.cName, child_h.cName
+        GROUP BY child.kArtikel, child.cArtNr, child_desc.cName, child_h.cName, child_wg.cName
       ),
       
       PlatformCounts AS (
