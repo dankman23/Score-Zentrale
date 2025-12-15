@@ -70,10 +70,10 @@ export default function PreiseModule() {
       try {
         const config = JSON.parse(savedConfig)
         setStaffelVE(config.ve || 1)
-        setStaffelMindestTyp(config.mindestTyp || 'ek')
-        setStaffelMindestWert(config.mindestWert || '50')
-        setStaffelSchwellen(config.schwellen || [])
-        setStaffelRundung(config.rundung || '')
+        setStaffelAbnahmeintervall(config.abnahmeintervall || 1)
+        setStaffelMindestWert(config.mindestWert || '2')
+        setStaffelSchwellen(config.schwellen || [{ wert: '25' }, { wert: '50' }, { wert: '100' }, { wert: '250' }])
+        setStaffelRundung(config.rundung || '3,5,10,15,20,25,30,40,50,75,100,150,200,300')
         setStaffelG2EK(config.ek || '5')
         setStaffelG2Warengruppe(config.warengruppe || 'lagerware')
       } catch (e) {
