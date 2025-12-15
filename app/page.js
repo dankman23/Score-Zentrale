@@ -9401,11 +9401,156 @@ export default function App() {
       {/* Artikelrating Section */}
       {activeTab==='artikelrating' && (
         <div>
-          <iframe 
-            src="/produkte/rating" 
-            style={{width: '100%', height: '90vh', border: 'none', borderRadius: '8px'}}
-            title="Artikelrating"
-          />
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h2 className="mb-0"><i className="bi bi-star mr-2"/>Artikelrating</h2>
+          </div>
+
+          {/* Filter */}
+          <div className="card mb-4">
+            <div className="card-body">
+              <div className="row g-3">
+                <div className="col-md-3">
+                  <label className="form-label text-white fw-bold">Von Datum</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    value={ratingDateFrom}
+                    onChange={(e) => setRatingDateFrom(e.target.value)}
+                  />
+                </div>
+                <div className="col-md-3">
+                  <label className="form-label text-white fw-bold">Bis Datum</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    value={ratingDateTo}
+                    onChange={(e) => setRatingDateTo(e.target.value)}
+                  />
+                </div>
+                <div className="col-md-3">
+                  <label className="form-label text-white fw-bold">Hersteller Filter</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="z.B. Klingspor"
+                    value={ratingFilterHersteller}
+                    onChange={(e) => setRatingFilterHersteller(e.target.value)}
+                  />
+                </div>
+                <div className="col-md-3 d-flex align-items-end">
+                  <div className="form-check">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      id="availabilityCheck"
+                      checked={ratingIncludeAvailability}
+                      onChange={(e) => setRatingIncludeAvailability(e.target.checked)}
+                    />
+                    <label className="form-check-label text-white" htmlFor="availabilityCheck">
+                      Verfügbarkeits-Faktor
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={loadRatingArticles}
+                disabled={ratingLoading}
+                className="btn btn-primary mt-3"
+              >
+                {ratingLoading ? 'Lädt...' : 'Daten laden'}
+              </button>
+            </div>
+          </div>
+
+          {/* Stats */}
+          {ratingArticles.length > 0 && (
+            <div className="card mb-4">
+              <div className="card-body">
+                <div className="row text-center">
+                  <div className="col-md-4">
+                    <h3 className="text-info mb-0">{getSortedRatingArticles().length}</h3>
+                    <small className="text-muted">Artikel</small>
+                  </div>
+                  <div className="col-md-4">
+                    <h3 className="text-success mb-0">
+                      {getSortedRatingArticles().reduce((sum, a) => sum + a.totalMarge, 0).toFixed(0)}€
+                    </h3>
+                    <small className="text-muted">Gesamt-Marge</small>
+                  </div>
+                  <div className="col-md-4">
+                    <h3 className="text-warning mb-0">
+                      {getSortedRatingArticles().reduce((sum, a) => sum + a.margeProMonat, 0).toFixed(0)}€
+                    </h3>
+                    <small className="text-muted">Marge/Monat</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tabelle */}
+          <div className="card">
+            <div className="card-body p-0">
+              <div className="table-responsive">
+                <table className="table table-hover mb-0">
+                  <thead style={{backgroundColor: '#1a252f'}}>
+                    <tr>
+                      <th className="cursor-pointer" onClick={() => handleRatingSort('cArtNr')}>
+                        Artikelnr {ratingSortBy === 'cArtNr' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th className="cursor-pointer" onClick={() => handleRatingSort('cName')}>
+                        Name {ratingSortBy === 'cName' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th className="cursor-pointer" onClick={() => handleRatingSort('cHersteller')}>
+                        Hersteller {ratingSortBy === 'cHersteller' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th className="text-right cursor-pointer" onClick={() => handleRatingSort('totalMenge')}>
+                        Menge {ratingSortBy === 'totalMenge' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th className="text-right cursor-pointer" onClick={() => handleRatingSort('totalMarge')}>
+                        Marge € {ratingSortBy === 'totalMarge' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th className="text-right cursor-pointer" onClick={() => handleRatingSort('margeProMonat')}>
+                        Marge/Monat {ratingSortBy === 'margeProMonat' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
+                      </th>
+                      <th className="text-right cursor-pointer text-warning fw-bold" onClick={() => handleRatingSort('ratingScore')}>
+                        Rating {ratingSortBy === 'ratingScore' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ratingLoading ? (
+                      <tr>
+                        <td colSpan="7" className="text-center py-5">
+                          <div className="spinner-border text-primary" role="status">
+                            <span className="sr-only">Lädt...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : getSortedRatingArticles().length === 0 ? (
+                      <tr>
+                        <td colSpan="7" className="text-center text-muted py-5">
+                          Keine Artikel gefunden. Bitte Daten laden.
+                        </td>
+                      </tr>
+                    ) : (
+                      getSortedRatingArticles().map((article, idx) => (
+                        <tr key={idx}>
+                          <td className="font-monospace text-info">{article.cArtNr}</td>
+                          <td>{article.cName}</td>
+                          <td className="text-muted">{article.cHersteller || '-'}</td>
+                          <td className="text-right">{article.totalMenge}</td>
+                          <td className="text-right text-success">{article.totalMarge.toFixed(2)}€</td>
+                          <td className="text-right fw-bold">{article.margeProMonat.toFixed(2)}€</td>
+                          <td className="text-right fw-bold text-warning">{article.ratingScore.toFixed(2)}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
