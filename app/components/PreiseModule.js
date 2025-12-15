@@ -1410,11 +1410,17 @@ export default function PreiseModule() {
                           }
                           
                           // 1. Mindestbestellmenge berechnen (IMMER AUFRUNDEN)
-                          const mindestMengeRoh = mindestEK / ek
-                          let mindestMenge = rundeAufVielfaches(Math.ceil(mindestMengeRoh))
-                          mindestMenge = rundeAufSchoeneAuf(mindestMenge) // AUFRUNDEN auf schöne Zahl
-                          if (mindestMenge < ve) mindestMenge = ve
-                          if (mindestMenge < abnahme) mindestMenge = abnahme
+                          // Berechne die Menge, die mindestens benötigt wird für MindestEK
+                          const mindestMengeAusEK = Math.ceil(mindestEK / ek)
+                          
+                          // Mindestmenge ist das MAXIMUM von VE oder der berechneten Menge
+                          let mindestMenge = Math.max(ve, mindestMengeAusEK)
+                          
+                          // Auf schöne Zahl AUFRUNDEN
+                          mindestMenge = rundeAufSchoeneAuf(mindestMenge)
+                          
+                          // Muss Vielfaches des Abnahmeintervalls sein
+                          mindestMenge = Math.ceil(mindestMenge / abnahme) * abnahme
                           
                           // 2. Staffeln berechnen
                           const staffeln = [{
