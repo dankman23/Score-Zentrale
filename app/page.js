@@ -9514,17 +9514,23 @@ export default function App() {
             <div className="card mb-4">
               <div className="card-body">
                 <div className="row text-center">
-                  <div className="col-md-4">
+                  <div className="col-md-3">
                     <h3 className="text-info mb-0">{getSortedRatingArticles().length}</h3>
                     <small className="text-muted">Artikel</small>
                   </div>
-                  <div className="col-md-4">
+                  <div className="col-md-3">
+                    <h3 className="text-primary mb-0">
+                      {getSortedRatingArticles().reduce((sum, a) => sum + a.totalUmsatz, 0).toFixed(0)}€
+                    </h3>
+                    <small className="text-muted">Gesamt-Umsatz</small>
+                  </div>
+                  <div className="col-md-3">
                     <h3 className="text-success mb-0">
                       {getSortedRatingArticles().reduce((sum, a) => sum + a.totalMarge, 0).toFixed(0)}€
                     </h3>
                     <small className="text-muted">Gesamt-Marge</small>
                   </div>
-                  <div className="col-md-4">
+                  <div className="col-md-3">
                     <h3 className="text-warning mb-0">
                       {getSortedRatingArticles().reduce((sum, a) => sum + a.margeProMonat, 0).toFixed(0)}€
                     </h3>
