@@ -30,7 +30,9 @@ export async function GET(request: NextRequest) {
           a.cArtNr,
           ab.cName,
           COALESCE(h.cName, '') as Hersteller,
+          COALESCE(wg.cName, '') as Warengruppe,
           SUM(op.fAnzahl) as DirectMenge,
+          SUM(op.fVKNetto * op.fAnzahl) as DirectUmsatz,
           SUM((op.fVKNetto - a.fEKNetto) * op.fAnzahl) as DirectMarge
         FROM Verkauf.tAuftragPosition op
         INNER JOIN Verkauf.tAuftrag o ON op.kAuftrag = o.kAuftrag
