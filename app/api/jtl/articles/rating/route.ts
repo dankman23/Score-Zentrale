@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     console.log('[Article Rating] Pool ready')
     
     const orderTable = 'Verkauf.tAuftrag'
-    const orderPosTable = 'Verkauf.tAuftragsposition'
+    const orderPosTable = 'Verkauf.tAuftragPosition'
     const articleTable = 'dbo.tArtikel'
     const stuecklisteTable = 'dbo.tStueckliste'
     
