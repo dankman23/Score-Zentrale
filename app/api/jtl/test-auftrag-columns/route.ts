@@ -9,23 +9,18 @@ export async function GET() {
     const pool = await getMssqlPool()
     
     const query = `
-      SELECT TOP 5 COLUMN_NAME, DATA_TYPE 
+      SELECT COLUMN_NAME, DATA_TYPE 
       FROM INFORMATION_SCHEMA.COLUMNS 
       WHERE TABLE_SCHEMA = 'Verkauf' 
         AND TABLE_NAME = 'tAuftrag'
-        AND (COLUMN_NAME LIKE '%typ%' OR COLUMN_NAME LIKE '%status%' OR COLUMN_NAME LIKE '%art%')
       ORDER BY ORDINAL_POSITION
     `
     
     const result = await pool.request().query(query)
     
-    // Auch eine Sample von tAuftrag mit diesen Spalten
+    // Sample von tAuftrag
     const sampleQuery = `
-      SELECT TOP 10 
-        kAuftrag,
-        dErstellt,
-        cStatus,
-        nStorno
+      SELECT TOP 5 *
       FROM Verkauf.tAuftrag
       ORDER BY dErstellt DESC
     `
