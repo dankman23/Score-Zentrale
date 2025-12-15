@@ -7743,6 +7743,12 @@ export default function App() {
             >
               <i className="bi bi-chat-left-text mr-2"/>Prompts
             </button>
+            <button 
+              className={`btn ${produkteTab === 'rating' ? 'btn-primary' : 'btn-outline-secondary'}`}
+              onClick={() => { window.location.href = '/produkte/rating'; }}
+            >
+              <i className="bi bi-star mr-2"/>Artikelrating
+            </button>
           </div>
 
           {/* Running Job Banner - auf ALLEN Tabs sichtbar */}
