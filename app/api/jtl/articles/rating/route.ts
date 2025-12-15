@@ -73,13 +73,11 @@ export async function GET(request: NextRequest) {
       
       PlatformCounts AS (
         SELECT 
-          ao.kArtikel,
-          p.cName as plattform,
-          COUNT(DISTINCT ao.kArtikelOnlineshop) as anzahl_angebote
-        FROM dbo.tArtikelOnlineshop ao
-        INNER JOIN dbo.tPlattform p ON ao.kPlattform = p.kPlattform
-        WHERE ao.nAktiv = 1
-        GROUP BY ao.kArtikel, p.cName
+          kArtikel,
+          '' as plattform,
+          0 as anzahl_angebote
+        FROM DirectSales
+        WHERE 1 = 0
       )
       
       SELECT 
