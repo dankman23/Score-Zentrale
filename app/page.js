@@ -9311,7 +9311,13 @@ export default function App() {
 
           {/* Artikelrating Tab */}
           {produkteTab === 'rating' && (
-            <ArtikelRatingTab />
+            <div>
+              <iframe 
+                src="/produkte/rating" 
+                style={{width: '100%', height: '800px', border: 'none', borderRadius: '8px'}}
+                title="Artikelrating"
+              />
+            </div>
           )}
           )}
         </div>
