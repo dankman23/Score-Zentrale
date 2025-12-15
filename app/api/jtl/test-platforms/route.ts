@@ -38,16 +38,9 @@ export async function GET() {
     `
     const shopSample = await pool.request().query(artikelShopSample)
     
-    // 4. Anzahl Artikel pro Plattform
+    // 4. Simple count
     const countQuery = `
-      SELECT 
-        p.cName as Plattform,
-        COUNT(DISTINCT asho.kArtikel) as AnzahlArtikel
-      FROM dbo.tArtikelShop asho
-      INNER JOIN dbo.tShop s ON asho.kShop = s.kShop
-      INNER JOIN dbo.tPlattform p ON s.kPlattform = p.kPlattform
-      GROUP BY p.cName
-      ORDER BY AnzahlArtikel DESC
+      SELECT COUNT(*) as total FROM dbo.tArtikelShop
     `
     const counts = await pool.request().query(countQuery)
     
