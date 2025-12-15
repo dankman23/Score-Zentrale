@@ -876,6 +876,7 @@ export default function App() {
   const [ratingDateTo, setRatingDateTo] = useState(new Date().toISOString().split('T')[0])
   const [ratingIncludeAvailability, setRatingIncludeAvailability] = useState(false)
   const [ratingFilterHersteller, setRatingFilterHersteller] = useState('')
+  const [ratingHerstellerList, setRatingHerstellerList] = useState([])
   const [ratingSortBy, setRatingSortBy] = useState('ratingScore')
   const [ratingSortOrder, setRatingSortOrder] = useState('desc')
 
