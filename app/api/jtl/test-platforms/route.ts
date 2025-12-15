@@ -8,10 +8,18 @@ export async function GET() {
   try {
     const pool = await getMssqlPool()
     
-    // 1. Alle Plattformen anzeigen
+    // 1. Struktur von tPlattform
+    const platformStructure = `
+      SELECT COLUMN_NAME, DATA_TYPE 
+      FROM INFORMATION_SCHEMA.COLUMNS 
+      WHERE TABLE_NAME = 'tPlattform'
+      ORDER BY ORDINAL_POSITION
+    `
+    const platformCols = await pool.request().query(platformStructure)
+    
+    // 2. Alle Plattformen anzeigen
     const platformsQuery = `
       SELECT TOP 20 * FROM dbo.tPlattform
-      ORDER BY kPlattform
     `
     const platforms = await pool.request().query(platformsQuery)
     
