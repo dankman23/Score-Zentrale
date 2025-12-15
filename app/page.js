@@ -9562,13 +9562,14 @@ export default function App() {
                     ) : (
                       getSortedRatingArticles().map((article, idx) => (
                         <tr key={idx}>
-                          <td className="font-monospace text-info">{article.cArtNr}</td>
-                          <td>{article.cName}</td>
-                          <td className="text-muted">{article.cHersteller || '-'}</td>
-                          <td className="text-right">{article.totalMenge}</td>
-                          <td className="text-right text-success">{article.totalMarge.toFixed(2)}€</td>
-                          <td className="text-right fw-bold">{article.margeProMonat.toFixed(2)}€</td>
-                          <td className="text-right fw-bold text-warning">{article.ratingScore.toFixed(2)}</td>
+                          <td className="font-monospace" style={{color: '#17a2b8'}}>{article.cArtNr}</td>
+                          <td style={{color: '#fff'}}>{article.cName}</td>
+                          <td style={{color: '#aaa'}}>{article.cHersteller || '-'}</td>
+                          <td className="text-right" style={{color: '#fff'}}>{article.totalMenge}</td>
+                          <td className="text-right" style={{color: '#28a745'}}>{article.totalUmsatz?.toFixed(2) || '0.00'}€</td>
+                          <td className="text-right" style={{color: '#28a745'}}>{article.totalMarge.toFixed(2)}€</td>
+                          <td className="text-right fw-bold" style={{color: '#fff'}}>{article.margeProMonat.toFixed(2)}€</td>
+                          <td className="text-right fw-bold" style={{color: '#F6B10A'}}>{article.ratingScore.toFixed(2)}</td>
                         </tr>
                       ))
                     )}
