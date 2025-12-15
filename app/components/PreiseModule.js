@@ -1183,417 +1183,430 @@ export default function PreiseModule() {
         {/* Staffelgrenzen Tab */}
         {tab === 'staffelgrenzen' && (
           <div>
-            <div className="alert alert-info mb-3">
-              <small>
-                <i className="bi bi-info-circle mr-2"/>
-                Staffelgrenzen werden automatisch berechnet basierend auf VE, Mindestverkauf und definierten Schwellen.
-                Die Preise werden mit der g2-Logik berechnet.
-              </small>
+            <div className="alert alert-info mb-4">
+              <i className="bi bi-info-circle me-2"/>
+              Staffelgrenzen berechnen basierend auf VE, Abnahmeintervall und EK-Schwellen. 
+              Die Staffelgrenzen werden auf schöne Zahlen gerundet.
             </div>
 
             <div className="row">
-              <div className="col-md-2">
-                {/* Basisparameter */}
-                <div className="card mb-2">
-                  <div className="card-header py-1">
-                    <strong className="small">Basisparameter</strong>
+              {/* Linke Spalte: Eingaben */}
+              <div className="col-md-5">
+                <div className="card bg-dark border-secondary">
+                  <div className="card-header bg-secondary">
+                    <strong><i className="bi bi-sliders me-2"/>Eingabeparameter</strong>
                   </div>
-                  <div className="card-body p-2">
-                    <div className="form-group mb-2">
-                      <label className="small mb-1 text-white">VE (Stück)</label>
-                      <input 
-                        type="number"
-                        className="form-control form-control-sm"
-                        min="1"
-                        step="1"
-                        value={staffelVE}
-                        onChange={(e) => setStaffelVE(Math.max(1, parseInt(e.target.value) || 1))}
-                        style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057'}}
-                      />
-                    </div>
+                  <div className="card-body">
+                    <div className="row g-3">
+                      {/* VE (Lieferumfang) */}
+                      <div className="col-md-6">
+                        <label className="form-label text-white fw-bold">
+                          VE (Lieferumfang)
+                        </label>
+                        <input 
+                          type="number"
+                          className="form-control form-control-lg"
+                          min="1"
+                          step="1"
+                          value={staffelVE}
+                          onChange={(e) => setStaffelVE(Math.max(1, parseInt(e.target.value) || 1))}
+                          style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '1.2rem'}}
+                        />
+                        <small className="text-muted">Stück pro Verpackung</small>
+                      </div>
 
-                    <div className="form-group mb-2">
-                      <label className="small mb-1 text-white">Mindestverkauf</label>
-                      <select 
-                        className="form-control form-control-sm"
-                        value={staffelMindestTyp}
-                        onChange={(e) => setStaffelMindestTyp(e.target.value)}
-                        style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057'}}
-                      >
-                        <option value="ek">EK (netto)</option>
-                        <option value="vk">VK (netto)</option>
-                        <option value="stueck">Stückzahl</option>
-                      </select>
-                    </div>
+                      {/* Abnahmeintervall Lieferant */}
+                      <div className="col-md-6">
+                        <label className="form-label text-white fw-bold">
+                          Abnahmeintervall Lieferant
+                        </label>
+                        <input 
+                          type="number"
+                          className="form-control form-control-lg"
+                          min="1"
+                          step="1"
+                          value={staffelAbnahmeintervall}
+                          onChange={(e) => setStaffelAbnahmeintervall(Math.max(1, parseInt(e.target.value) || 1))}
+                          style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '1.2rem'}}
+                        />
+                        <small className="text-muted">Stück (Mindestbestellmenge Lieferant)</small>
+                      </div>
 
-                    <div className="form-group mb-2">
-                      <label className="small mb-1 text-white">Wert</label>
-                      <input 
-                        type="number"
-                        className="form-control form-control-sm"
-                        min="0"
-                        step="0.01"
-                        value={staffelMindestWert}
-                        onChange={(e) => setStaffelMindestWert(e.target.value)}
-                        style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057'}}
-                      />
-                    </div>
-
-                    <div className="form-group mb-2">
-                      <label className="small mb-1 text-white">EK/Stück</label>
-                      <input 
-                        type="number"
-                        className="form-control form-control-sm"
-                        min="0"
-                        step="0.01"
-                        value={staffelG2EK}
-                        onChange={(e) => setStaffelG2EK(e.target.value)}
-                        style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057'}}
-                      />
-                    </div>
-
-                    <div className="form-group mb-0">
-                      <label className="small mb-1 text-white">Warengruppe</label>
-                      <select 
-                        className="form-control form-control-sm"
-                        value={staffelG2Warengruppe}
-                        onChange={(e) => setStaffelG2Warengruppe(e.target.value)}
-                        style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057'}}
-                      >
-                        {sheets.map(s => (
-                          <option key={s.id} value={s.id}>{s.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Staffel-Schwellen */}
-                <div className="card mb-2">
-                  <div className="card-header py-1">
-                    <strong className="small">Schwellen (max. 7)</strong>
-                  </div>
-                  <div className="card-body p-2">
-                    {staffelSchwellen.map((schwelle, idx) => (
-                      <div key={idx} className="mb-2">
-                        <div className="row mb-1">
-                          <div className="col-12">
-                            <select 
-                              className="form-control form-control-sm"
-                              value={schwelle.typ}
-                              onChange={(e) => {
-                                const neu = [...staffelSchwellen]
-                                neu[idx].typ = e.target.value
-                                setStaffelSchwellen(neu)
-                              }}
-                              style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '0.8rem'}}
-                            >
-                              <option value="vk">VK € (netto)</option>
-                              <option value="ek">EK € (netto)</option>
-                              <option value="stueck">Menge (Stück)</option>
-                            </select>
-                          </div>
-                        </div>
-                        <div className="row">
-                          <div className="col-12">
-                            <div className="input-group input-group-sm">
-                              <input 
-                                type="number"
-                                className="form-control"
-                                value={schwelle.wert}
-                                onChange={(e) => {
-                                  const neu = [...staffelSchwellen]
-                                  neu[idx].wert = e.target.value
-                                  setStaffelSchwellen(neu)
-                                }}
-                                style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '0.85rem'}}
-                              />
-                              <div className="input-group-append">
-                                <button 
-                                  className="btn btn-outline-danger"
-                                  onClick={() => {
-                                    const neu = staffelSchwellen.filter((_, i) => i !== idx)
-                                    setStaffelSchwellen(neu)
-                                  }}
-                                  disabled={staffelSchwellen.length <= 1}
-                                  style={{padding: '0.375rem 0.5rem'}}
-                                >
-                                  <i className="bi bi-x"/>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
+                      {/* EK pro Stück */}
+                      <div className="col-md-6">
+                        <label className="form-label text-white fw-bold">
+                          EK / Stück (netto)
+                        </label>
+                        <div className="input-group input-group-lg">
+                          <input 
+                            type="number"
+                            className="form-control"
+                            min="0.01"
+                            step="0.01"
+                            value={staffelG2EK}
+                            onChange={(e) => setStaffelG2EK(e.target.value)}
+                            style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '1.2rem'}}
+                          />
+                          <span className="input-group-text" style={{backgroundColor: '#495057', color: '#fff'}}>€</span>
                         </div>
                       </div>
-                    ))}
-                    {staffelSchwellen.length < 7 && (
-                      <button 
-                        className="btn btn-sm btn-outline-primary btn-block"
-                        onClick={() => setStaffelSchwellen([...staffelSchwellen, { typ: 'vk', wert: '500' }])}
-                        style={{fontSize: '0.8rem'}}
-                      >
-                        <i className="bi bi-plus mr-1"/>Schwelle hinzufügen
-                      </button>
-                    )}
-                  </div>
-                </div>
 
-                {/* Rundung */}
-                <div className="card mb-2">
-                  <div className="card-header py-1">
-                    <strong className="small">Rundung (Schöne Zahlen)</strong>
-                  </div>
-                  <div className="card-body p-2">
-                    <div className="form-group mb-0">
+                      {/* Mindest-EK */}
+                      <div className="col-md-6">
+                        <label className="form-label text-white fw-bold">
+                          Mindest-EK (Erstbestellung)
+                        </label>
+                        <div className="input-group input-group-lg">
+                          <input 
+                            type="number"
+                            className="form-control"
+                            min="0.01"
+                            step="0.01"
+                            value={staffelMindestWert}
+                            onChange={(e) => setStaffelMindestWert(e.target.value)}
+                            style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '1.2rem'}}
+                          />
+                          <span className="input-group-text" style={{backgroundColor: '#495057', color: '#fff'}}>€</span>
+                        </div>
+                        <small className="text-muted">Mindestwarenwert EK für erste Staffel</small>
+                      </div>
+
+                      {/* Warengruppe */}
+                      <div className="col-md-12">
+                        <label className="form-label text-white fw-bold">
+                          Warengruppe
+                        </label>
+                        <select 
+                          className="form-control form-control-lg"
+                          value={staffelG2Warengruppe}
+                          onChange={(e) => setStaffelG2Warengruppe(e.target.value)}
+                          style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '1.1rem'}}
+                        >
+                          {sheets.map(s => (
+                            <option key={s.id} value={s.id}>{s.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <hr className="my-4" style={{borderColor: '#495057'}}/>
+
+                    {/* Schwellen (EK) */}
+                    <div className="mb-3">
+                      <label className="form-label text-white fw-bold">
+                        <i className="bi bi-graph-up-arrow me-2"/>
+                        EK-Schwellen für Staffelgrenzen
+                      </label>
+                      <div className="d-flex flex-wrap gap-2">
+                        {staffelSchwellen.map((s, idx) => (
+                          <div key={idx} className="input-group" style={{width: 'auto'}}>
+                            <span className="input-group-text" style={{backgroundColor: '#495057', color: '#fff'}}>EK €</span>
+                            <input 
+                              type="number"
+                              className="form-control"
+                              value={s.wert}
+                              onChange={(e) => {
+                                const newSchwellen = [...staffelSchwellen]
+                                newSchwellen[idx].wert = e.target.value
+                                setStaffelSchwellen(newSchwellen)
+                              }}
+                              style={{width: '80px', backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057'}}
+                            />
+                            <button 
+                              className="btn btn-outline-danger btn-sm"
+                              onClick={() => {
+                                const newSchwellen = staffelSchwellen.filter((_, i) => i !== idx)
+                                setStaffelSchwellen(newSchwellen)
+                              }}
+                            >
+                              <i className="bi bi-x"/>
+                            </button>
+                          </div>
+                        ))}
+                        {staffelSchwellen.length < 7 && (
+                          <button 
+                            className="btn btn-outline-success"
+                            onClick={() => setStaffelSchwellen([...staffelSchwellen, { wert: '' }])}
+                          >
+                            <i className="bi bi-plus"/> Schwelle
+                          </button>
+                        )}
+                      </div>
+                      <small className="text-muted">EK-Werte bei denen neue Staffelstufen erstellt werden (max. 7)</small>
+                    </div>
+
+                    {/* Rundung */}
+                    <div className="mb-3">
+                      <label className="form-label text-white fw-bold">
+                        Rundung (Schöne Zahlen)
+                      </label>
                       <textarea 
-                        className="form-control form-control-sm"
+                        className="form-control"
                         rows="2"
-                        placeholder="3,5,10,15,20,25,30,40,50,75,100,150,200,300"
                         value={staffelRundung}
                         onChange={(e) => setStaffelRundung(e.target.value)}
-                        style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '0.8rem'}}
+                        placeholder="3,5,10,15,20,25,30,40,50,75,100..."
+                        style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057'}}
                       />
-                      <small className="text-muted" style={{fontSize: '0.65rem'}}>Kommagetrennt</small>
+                      <small className="text-muted">Kommagetrennte Werte für Mengenrundung</small>
                     </div>
-                  </div>
-                </div>
 
-                {/* Aktionen */}
-                <button 
-                  className="btn btn-primary btn-block btn-sm mb-1"
-                  onClick={async () => {
-                    setStaffelLoading(true)
-                    try {
-                      const ekWert = parseFloat(staffelG2EK) || 0
-                      const vkWert = ekWert * 2.5 // Vereinfachte g2-Berechnung als Beispiel
-                      
-                      // Mindestmenge berechnen
-                      const mindestWert = parseFloat(staffelMindestWert) || 0
-                      let qMinRaw = 0
-                      
-                      if (staffelMindestTyp === 'ek') {
-                        qMinRaw = mindestWert / ekWert
-                      } else if (staffelMindestTyp === 'vk') {
-                        qMinRaw = mindestWert / vkWert
-                      } else {
-                        qMinRaw = mindestWert
-                      }
-                      
-                      let qMin = Math.max(Math.ceil(qMinRaw), staffelVE)
-                      qMin = Math.ceil(qMin / staffelVE) * staffelVE
-                      
-                      // Rundungsliste parsen
-                      const rundungsliste = staffelRundung
-                        .split(',')
-                        .map(s => parseInt(s.trim()))
-                        .filter(n => !isNaN(n) && n > 0)
-                        .sort((a, b) => a - b)
-                      
-                      // Staffelgrenzen berechnen
-                      const grenzen = []
-                      
-                      for (const schwelle of staffelSchwellen) {
-                        const wert = parseFloat(schwelle.wert) || 0
-                        let qRaw = 0
-                        
-                        if (schwelle.typ === 'vk') {
-                          qRaw = wert / vkWert
-                        } else if (schwelle.typ === 'ek') {
-                          qRaw = wert / ekWert
-                        } else {
-                          qRaw = wert
-                        }
-                        
-                        let q = Math.max(Math.ceil(qRaw), qMin)
-                        q = Math.ceil(q / staffelVE) * staffelVE
-                        
-                        // Rundung anwenden
-                        if (rundungsliste.length > 0) {
-                          const gerundet = rundungsliste.find(r => r >= q)
-                          if (gerundet) {
-                            q = gerundet
-                            // VE-Check nach Rundung
-                            if (q % staffelVE !== 0) {
-                              q = Math.ceil(q / staffelVE) * staffelVE
+                    {/* Berechnen Button */}
+                    <button 
+                      className="btn btn-primary btn-lg w-100 mt-3"
+                      disabled={staffelLoading}
+                      onClick={async () => {
+                        setStaffelLoading(true)
+                        try {
+                          const ek = parseFloat(staffelG2EK) || 1
+                          const ve = parseInt(staffelVE) || 1
+                          const abnahme = parseInt(staffelAbnahmeintervall) || 1
+                          const mindestEK = parseFloat(staffelMindestWert) || 2
+                          
+                          // Parse Rundungswerte
+                          const rundungswerte = staffelRundung.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0).sort((a,b) => a - b)
+                          
+                          // Hilfsfunktion: Auf schöne Zahl runden
+                          const rundeAufSchoen = (menge) => {
+                            if (rundungswerte.length === 0) return menge
+                            for (const r of rundungswerte) {
+                              if (r >= menge) return r
+                            }
+                            // Größer als alle → auf nächstes Vielfaches des größten runden
+                            const max = rundungswerte[rundungswerte.length - 1]
+                            return Math.ceil(menge / max) * max
+                          }
+                          
+                          // Hilfsfunktion: Auf VE und Abnahmeintervall runden
+                          const rundeAufVielfaches = (menge) => {
+                            // Muss Vielfaches von VE sein
+                            let gerundet = Math.ceil(menge / ve) * ve
+                            // Muss auch Vielfaches von Abnahmeintervall sein
+                            gerundet = Math.ceil(gerundet / abnahme) * abnahme
+                            return gerundet
+                          }
+                          
+                          // 1. Mindestbestellmenge berechnen
+                          const mindestMengeRoh = Math.ceil(mindestEK / ek)
+                          let mindestMenge = rundeAufVielfaches(mindestMengeRoh)
+                          mindestMenge = rundeAufSchoen(mindestMenge)
+                          if (mindestMenge < ve) mindestMenge = ve
+                          if (mindestMenge < abnahme) mindestMenge = abnahme
+                          
+                          // 2. Staffeln berechnen
+                          const staffeln = [{
+                            ab: mindestMenge,
+                            ekGesamt: mindestMenge * ek,
+                            label: 'Mindestmenge'
+                          }]
+                          
+                          // Parse Schwellen und sortieren
+                          const schwellenWerte = staffelSchwellen
+                            .map(s => parseFloat(s.wert))
+                            .filter(w => !isNaN(w) && w > 0)
+                            .sort((a, b) => a - b)
+                          
+                          // Für jede Schwelle: Menge berechnen
+                          for (const schwelle of schwellenWerte) {
+                            const mengeRoh = Math.ceil(schwelle / ek)
+                            let menge = rundeAufVielfaches(mengeRoh)
+                            menge = rundeAufSchoen(menge)
+                            
+                            // Nur hinzufügen wenn größer als letzte Staffel
+                            const letzteStaffel = staffeln[staffeln.length - 1]
+                            if (menge > letzteStaffel.ab) {
+                              staffeln.push({
+                                ab: menge,
+                                ekGesamt: menge * ek,
+                                label: `ab ${schwelle}€ EK`
+                              })
                             }
                           }
+                          
+                          // g2-Preise berechnen für jede Staffel
+                          const staffelnMitPreis = await Promise.all(staffeln.map(async (s, idx) => {
+                            try {
+                              const res = await fetch('/api/preise/calculate-g2', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  ek: ek,
+                                  menge: s.ab,
+                                  sheet: staffelG2Warengruppe
+                                })
+                              })
+                              const data = await res.json()
+                              return {
+                                ...s,
+                                vkProStueck: data.vk_pro_stueck || 0,
+                                vkGesamt: (data.vk_pro_stueck || 0) * s.ab,
+                                rabatt: idx > 0 ? (idx * 3) : 0 // Staffelrabatt
+                              }
+                            } catch (e) {
+                              return { ...s, vkProStueck: 0, vkGesamt: 0, rabatt: 0 }
+                            }
+                          }))
+                          
+                          setStaffelGrenzen(staffelnMitPreis)
+                          setStaffelAuswahlMenge(staffelnMitPreis[0]?.ab || mindestMenge)
+                          
+                        } catch (e) {
+                          console.error('Fehler bei Staffelberechnung:', e)
+                          alert('Fehler: ' + e.message)
                         }
-                        
-                        grenzen.push(q)
-                      }
-                      
-                      // Deduplizieren, sortieren, filtern
-                      const eindeutig = Array.from(new Set(grenzen))
-                        .sort((a, b) => a - b)
-                        .filter(q => q >= qMin)
-                        .slice(0, 7)
-                      
-                      // Staffeltabelle mit Preisen erstellen
-                      const staffeltabelle = [
-                        {
-                          ab: qMin,
-                          preisProStueck: vkWert,
-                          preisProVE: vkWert * staffelVE,
-                          warenwert: qMin * vkWert,
-                          rabatt: 0
-                        }
-                      ]
-                      
-                      eindeutig.forEach((q, idx) => {
-                        const rabatt = (idx + 1) * 5 // 5%, 10%, 15% etc
-                        const preisProStueck = vkWert * (1 - rabatt / 100)
-                        staffeltabelle.push({
-                          ab: q,
-                          preisProStueck,
-                          preisProVE: preisProStueck * staffelVE,
-                          warenwert: q * preisProStueck,
-                          rabatt
-                        })
-                      })
-                      
-                      setStaffelGrenzen(staffeltabelle)
-                      setStaffelTestMenge(qMin)
-                      
-                    } catch (e) {
-                      alert('Fehler bei Berechnung: ' + e.message)
-                    } finally {
-                      setStaffelLoading(false)
-                    }
-                  }}
-                  disabled={staffelLoading}
-                >
-                  {staffelLoading ? (
-                    <><span className="spinner-border spinner-border-sm mr-2"/>Berechne...</>
-                  ) : (
-                    <><i className="bi bi-calculator mr-2"/>Staffelgrenzen berechnen</>
-                  )}
-                </button>
-
-                <button 
-                  className="btn btn-outline-secondary btn-block btn-sm"
-                  onClick={() => {
-                    localStorage.setItem('staffelgrenzen_config', JSON.stringify({
-                      ve: staffelVE,
-                      mindestTyp: staffelMindestTyp,
-                      mindestWert: staffelMindestWert,
-                      schwellen: staffelSchwellen,
-                      rundung: staffelRundung,
-                      ek: staffelG2EK,
-                      warengruppe: staffelG2Warengruppe
-                    }))
-                    alert('✅ Gespeichert!')
-                  }}
-                >
-                  <i className="bi bi-save mr-1"/>Speichern
-                </button>
+                        setStaffelLoading(false)
+                      }}
+                    >
+                      {staffelLoading ? (
+                        <><span className="spinner-border spinner-border-sm me-2"/>Berechne...</>
+                      ) : (
+                        <><i className="bi bi-calculator me-2"/>Staffelgrenzen berechnen</>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              <div className="col-md-10">
+              {/* Rechte Spalte: Ausgabe */}
+              <div className="col-md-7">
                 {staffelGrenzen.length > 0 ? (
-                  <>
-                    <div className="row">
-                      <div className="col-md-8">
-                        {/* Staffelpreistabelle - ALLE sichtbar ohne Scroll */}
-                        <div className="card mb-2">
-                          <div className="card-header py-1 px-2">
-                            <strong style={{fontSize: '0.8rem'}}>Mengenstaffeln</strong>
-                          </div>
-                          <div className="card-body p-1">
-                            <table className="table table-sm table-hover mb-0" style={{fontSize: '0.8rem'}}>
-                              <thead style={{backgroundColor: '#495057', color: '#fff'}}>
-                                <tr>
-                                  <th className="py-1 px-2" style={{fontSize: '0.75rem', color: '#fff'}}>Anzahl</th>
-                                  <th className="text-right py-1 px-2" style={{fontSize: '0.75rem', color: '#fff'}}>€/Stk</th>
-                                  <th className="text-right py-1 px-2" style={{fontSize: '0.75rem', color: '#fff'}}>€/VE</th>
-                                  <th className="text-right py-1 px-2" style={{fontSize: '0.75rem', color: '#fff'}}>Warenwert</th>
-                                  <th className="text-right py-1 px-2" style={{fontSize: '0.75rem', color: '#fff'}}>Rabatt</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {staffelGrenzen.map((staffel, idx) => {
-                                  const isAktiv = staffelTestMenge >= staffel.ab && 
-                                    (idx === staffelGrenzen.length - 1 || staffelTestMenge < staffelGrenzen[idx + 1]?.ab)
-                                  
-                                  return (
-                                    <tr 
-                                      key={idx} 
-                                      id={`staffel-${idx}`}
-                                      className={isAktiv ? 'table-success font-weight-bold' : ''}
-                                      style={{color: isAktiv ? '#000' : '#fff'}}
-                                    >
-                                      <td className="py-1 px-2">ab {staffel.ab}</td>
-                                      <td className="text-right py-1 px-2">{staffel.preisProStueck.toFixed(2)}</td>
-                                      <td className="text-right py-1 px-2">{staffel.preisProVE.toFixed(2)}</td>
-                                      <td className="text-right py-1 px-2">{staffel.warenwert.toFixed(2)}</td>
-                                      <td className="text-right py-1 px-2">{staffel.rabatt}%</td>
-                                    </tr>
-                                  )
-                                })}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
+                  <div className="card bg-dark border-success">
+                    <div className="card-header bg-success text-white">
+                      <strong><i className="bi bi-table me-2"/>Berechnete Staffeltabelle</strong>
+                    </div>
+                    <div className="card-body">
+                      {/* Staffeltabelle im Shop-Style */}
+                      <div className="table-responsive">
+                        <table className="table table-dark table-hover mb-0" style={{fontSize: '1.1rem'}}>
+                          <thead>
+                            <tr className="bg-secondary">
+                              <th className="text-center" style={{width: '80px'}}>Auswahl</th>
+                              <th>Menge</th>
+                              <th className="text-end">Preis/Stück</th>
+                              <th className="text-end">Gesamt VK</th>
+                              <th className="text-end">Gesamt EK</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {staffelGrenzen.map((s, idx) => (
+                              <tr 
+                                key={idx} 
+                                className={staffelAuswahlMenge === s.ab ? 'table-success' : ''}
+                                style={{cursor: 'pointer'}}
+                                onClick={() => setStaffelAuswahlMenge(s.ab)}
+                              >
+                                <td className="text-center">
+                                  <input 
+                                    type="radio" 
+                                    name="staffelAuswahl"
+                                    checked={staffelAuswahlMenge === s.ab}
+                                    onChange={() => setStaffelAuswahlMenge(s.ab)}
+                                    style={{width: '20px', height: '20px'}}
+                                  />
+                                </td>
+                                <td>
+                                  <strong>{s.ab} Stück</strong>
+                                  {idx === 0 && <span className="badge bg-info ms-2">Mindestmenge</span>}
+                                </td>
+                                <td className="text-end">
+                                  <strong>{s.vkProStueck?.toFixed(2)} €</strong>
+                                </td>
+                                <td className="text-end">
+                                  {s.vkGesamt?.toFixed(2)} €
+                                </td>
+                                <td className="text-end text-muted">
+                                  ({s.ekGesamt?.toFixed(2)} € EK)
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
 
-                      <div className="col-md-4">
-                        {/* Mengen-Simulation */}
-                        <div className="card mb-2">
-                          <div className="card-header py-1 px-2">
-                            <strong style={{fontSize: '0.8rem'}}>Simulation</strong>
-                          </div>
-                          <div className="card-body p-2">
-                            <div className="form-group mb-2">
-                              <label className="mb-1 text-white" style={{fontSize: '0.75rem'}}>Menge (Stück)</label>
-                              <input 
-                                type="number"
-                                className="form-control form-control-sm"
-                                min={staffelGrenzen[0]?.ab || staffelVE}
-                                step={staffelVE}
-                                value={staffelTestMenge}
-                                onChange={(e) => {
-                                  const val = parseInt(e.target.value) || staffelVE
-                                  const min = staffelGrenzen[0]?.ab || staffelVE
-                                  const rounded = Math.max(Math.ceil(val / staffelVE) * staffelVE, min)
-                                  setStaffelTestMenge(rounded)
-                                }}
-                                style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '0.85rem'}}
-                              />
-                              <small className="text-muted" style={{fontSize: '0.65rem'}}>Schrittweite: {staffelVE}</small>
-                            </div>
+                      <hr className="my-4" style={{borderColor: '#495057'}}/>
 
-                            {(() => {
-                              const aktiveStaffel = [...staffelGrenzen]
-                                .reverse()
-                                .find(s => staffelTestMenge >= s.ab) || staffelGrenzen[0]
-                              
-                              const warenwert = staffelTestMenge * aktiveStaffel.preisProStueck
-                              
-                              return (
-                                <div className="alert alert-success mb-0 p-2" style={{fontSize: '0.75rem'}}>
-                                  <div className="mb-1"><strong>Aktiv: ab {aktiveStaffel.ab} Stk</strong></div>
-                                  <div className="mb-1">
-                                    <strong>€/Stk:</strong> {aktiveStaffel.preisProStueck.toFixed(2)} €
-                                  </div>
-                                  <div className="mb-1">
-                                    <strong>€/VE:</strong> {aktiveStaffel.preisProVE.toFixed(2)} €
-                                  </div>
-                                  <hr className="my-1"/>
-                                  <div>
-                                    <strong>Wert bei {staffelTestMenge} Stk:</strong><br/>
-                                    <h6 className="mb-0 mt-1">{warenwert.toFixed(2)} €</h6>
-                                  </div>
-                                </div>
-                              )
-                            })()}
-                          </div>
+                      {/* Mengen-Anpassung */}
+                      <div className="bg-dark p-4 rounded border border-secondary">
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                          <h5 className="mb-0 text-white">
+                            <i className="bi bi-cart3 me-2"/>
+                            Bestellmenge anpassen
+                          </h5>
                         </div>
+                        
+                        <div className="d-flex align-items-center justify-content-center gap-3 mb-4">
+                          <button 
+                            className="btn btn-outline-secondary btn-lg"
+                            onClick={() => {
+                              const ve = parseInt(staffelVE) || 1
+                              const newMenge = Math.max(staffelGrenzen[0]?.ab || ve, (staffelAuswahlMenge || 0) - ve)
+                              setStaffelAuswahlMenge(newMenge)
+                            }}
+                          >
+                            <i className="bi bi-dash-lg"/>
+                          </button>
+                          
+                          <div className="text-center">
+                            <input 
+                              type="number"
+                              className="form-control form-control-lg text-center"
+                              style={{width: '150px', fontSize: '1.5rem', backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057'}}
+                              value={staffelAuswahlMenge || ''}
+                              onChange={(e) => setStaffelAuswahlMenge(parseInt(e.target.value) || 0)}
+                            />
+                            <small className="text-muted">Stück</small>
+                          </div>
+                          
+                          <button 
+                            className="btn btn-outline-secondary btn-lg"
+                            onClick={() => {
+                              const ve = parseInt(staffelVE) || 1
+                              setStaffelAuswahlMenge((staffelAuswahlMenge || 0) + ve)
+                            }}
+                          >
+                            <i className="bi bi-plus-lg"/>
+                          </button>
+                        </div>
+
+                        {/* Warenkorbwert */}
+                        {(() => {
+                          const menge = staffelAuswahlMenge || 0
+                          const staffel = [...staffelGrenzen].reverse().find(s => menge >= s.ab) || staffelGrenzen[0]
+                          const gesamtVK = staffel ? (staffel.vkProStueck * menge) : 0
+                          const gesamtEK = menge * (parseFloat(staffelG2EK) || 0)
+                          
+                          return (
+                            <div className="text-center">
+                              <div className="display-6 text-success mb-2">
+                                {gesamtVK.toFixed(2)} € <small className="text-muted fs-5">inkl. MwSt.</small>
+                              </div>
+                              <div className="text-muted">
+                                ({(gesamtVK / 1.19).toFixed(2)} € netto | EK: {gesamtEK.toFixed(2)} €)
+                              </div>
+                              <div className="text-muted small mt-1">
+                                Preis/Stück: {staffel?.vkProStueck?.toFixed(2) || '0.00'} €
+                              </div>
+                              
+                              <button className="btn btn-success btn-lg mt-4 px-5">
+                                <i className="bi bi-cart-plus me-2"/>
+                                In den Warenkorb
+                              </button>
+                            </div>
+                          )
+                        })()}
                       </div>
                     </div>
-                  </>
+                  </div>
                 ) : (
-                  <div className="alert alert-info">
-                    <i className="bi bi-info-circle mr-2"/>
-                    Klicken Sie auf "Staffelgrenzen berechnen" um die Mengenstaffeln zu generieren.
+                  <div className="card bg-dark border-secondary h-100">
+                    <div className="card-body d-flex align-items-center justify-content-center">
+                      <div className="text-center text-muted">
+                        <i className="bi bi-table display-1 mb-3"/>
+                        <p className="mb-0">
+                          Klicke auf <strong>"Staffelgrenzen berechnen"</strong> um die Mengenstaffeln zu generieren.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
