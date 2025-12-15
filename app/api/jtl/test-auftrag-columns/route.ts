@@ -40,7 +40,8 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       columns: result.recordset,
-      sample: sample.recordset
+      sample: sample.recordset,
+      typeDistribution: typeDist.recordset
     })
     
   } catch (error: any) {
