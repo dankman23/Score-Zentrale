@@ -873,35 +873,40 @@ export default function App() {
   const [batchGenerating, setBatchGenerating] = useState(false)
   const [batchProgress, setBatchProgress] = useState({ processed: 0, succeeded: 0, failed: 0, total: 0, started_at: null })
   const [currentJobId, setCurrentJobId] = useState(null)
+  const [pollingInterval, setPollingInterval] = useState(null)
   
-  // Check for running jobs on page load
-  useEffect(() => {
-    const checkRunningJob = async () => {
-      try {
-        const res = await fetch('/api/amazon/bulletpoints/batch/running-job')
-        const data = await res.json()
-        if (data.ok && data.job && data.job.status === 'running') {
-          console.log('[Batch] Found running job:', data.job.id)
-          setCurrentJobId(data.job.id)
-          setBatchGenerating(true)
-          setBatchProgress({
-            processed: data.job.processed || 0,
-            succeeded: data.job.succeeded || 0,
-            failed: data.job.failed || 0,
-            total: data.job.total || 0,
-            started_at: data.job.started_at
-          })
-          // Start polling
-          pollJobStatus(data.job.id)
+  // Check for running jobs on page load AND when switching to Produkte tab
+  const checkRunningJob = async () => {
+    try {
+      const res = await fetch('/api/amazon/bulletpoints/batch/running-job')
+      const data = await res.json()
+      if (data.ok && data.job && data.job.status === 'running') {
+        console.log('[Batch] Found running job:', data.job.id)
+        setCurrentJobId(data.job.id)
+        setBatchGenerating(true)
+        setBatchProgress({
+          processed: data.job.processed || 0,
+          succeeded: data.job.succeeded || 0,
+          failed: data.job.failed || 0,
+          total: data.job.total || 0,
+          started_at: data.job.started_at
+        })
+        // Start polling if not already
+        if (!pollingInterval) {
+          startPolling(data.job.id)
         }
-      } catch (err) {
-        console.log('[Batch] No running job found')
       }
+    } catch (err) {
+      console.log('[Batch] Error checking job:', err)
     }
-    checkRunningJob()
-  }, [])
+  }
   
-  const pollJobStatus = async (jobId) => {
+  const startPolling = (jobId) => {
+    // Clear existing interval
+    if (pollingInterval) {
+      clearInterval(pollingInterval)
+    }
+    
     const interval = setInterval(async () => {
       try {
         const statusRes = await fetch(`/api/amazon/bulletpoints/batch/job-status?jobId=${jobId}`)
@@ -909,6 +914,7 @@ export default function App() {
         
         if (!statusData.ok) {
           clearInterval(interval)
+          setPollingInterval(null)
           setBatchGenerating(false)
           return
         }
@@ -924,6 +930,7 @@ export default function App() {
         
         if (job.status === 'completed' || job.status === 'failed' || job.status === 'cancelled') {
           clearInterval(interval)
+          setPollingInterval(null)
           setBatchGenerating(false)
           setCurrentJobId(null)
           if (job.status === 'completed') {
@@ -935,8 +942,20 @@ export default function App() {
       }
     }, 3000)
     
-    return () => clearInterval(interval)
+    setPollingInterval(interval)
   }
+  
+  // Check on initial load
+  useEffect(() => {
+    checkRunningJob()
+  }, [])
+  
+  // Also check when switching to produkte tab
+  useEffect(() => {
+    if (activeTab === 'produkte') {
+      checkRunningJob()
+    }
+  }, [activeTab])
   const [showBatchModal, setShowBatchModal] = useState(false)
   const [batchResults, setBatchResults] = useState([])
   const [selectedArtikel, setSelectedArtikel] = useState([])
