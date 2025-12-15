@@ -7745,7 +7745,7 @@ export default function App() {
             </button>
             <button 
               className={`btn ${produkteTab === 'rating' ? 'btn-primary' : 'btn-outline-secondary'}`}
-              onClick={() => { window.location.href = '/produkte/rating'; }}
+              onClick={() => { setProdukteTab('rating'); }}
             >
               <i className="bi bi-star mr-2"/>Artikelrating
             </button>
