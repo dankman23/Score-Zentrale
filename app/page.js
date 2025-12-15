@@ -9533,6 +9533,9 @@ export default function App() {
                       <th className="text-right cursor-pointer" onClick={() => handleRatingSort('totalMenge')} style={{color: '#fff'}}>
                         Menge {ratingSortBy === 'totalMenge' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
                       </th>
+                      <th className="text-right cursor-pointer" onClick={() => handleRatingSort('totalUmsatz')} style={{color: '#fff'}}>
+                        Umsatz € {ratingSortBy === 'totalUmsatz' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
+                      </th>
                       <th className="text-right cursor-pointer" onClick={() => handleRatingSort('totalMarge')} style={{color: '#fff'}}>
                         Marge € {ratingSortBy === 'totalMarge' && (ratingSortOrder === 'asc' ? '↑' : '↓')}
                       </th>
