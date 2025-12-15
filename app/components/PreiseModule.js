@@ -1446,7 +1446,7 @@ export default function PreiseModule() {
                           // Lade Formel-Regler
                           const formelRes = await fetch('/api/preise/formeln')
                           const formelData = await formelRes.json()
-                          const selectedFormel = (formelData.sheets || []).find(s => s.id === staffelG2Warengruppe) || formelData.sheets?.[0]
+                          const selectedFormel = (formelData.formeln || []).find(s => s.sheet === staffelG2Warengruppe) || formelData.formeln?.[0]
                           
                           if (!selectedFormel?.regler) {
                             throw new Error('Keine Preisformel für Warengruppe gefunden')
