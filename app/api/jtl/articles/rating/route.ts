@@ -5,17 +5,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getMssqlPool } from '@/lib/db/mssql'
 import sql from 'mssql'
 
-/**
- * GET /api/jtl/articles/rating
- * 
- * Artikel-Rating basierend auf Marge pro Monat
- */
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const dateFrom = searchParams.get('dateFrom') || '2024-01-01'
     const dateTo = searchParams.get('dateTo') || new Date().toISOString().split('T')[0]
-    const hersteller = searchParams.get('hersteller') || null
     const includeAvailability = searchParams.get('includeAvailability') === 'true'
     
     const pool = await getMssqlPool()
@@ -29,49 +23,52 @@ export async function GET(request: NextRequest) {
     const totalDays = daysResult.recordset[0].days
     const monthsFactor = totalDays / 30.0
     
-    // Hauptquery
     const query = `
       WITH DirectSales AS (
         SELECT 
           a.kArtikel,
           a.cArtNr,
-          a.cName,
-          '' as Hersteller,
-          SUM(ap.fAnzahl) as DirectMenge,
-          SUM((ap.fVKNetto - a.fEKNetto) * ap.fAnzahl) as DirectMarge
-        FROM Verkauf.tAuftragPosition ap
-        INNER JOIN Verkauf.tAuftrag au ON ap.kAuftrag = au.kAuftrag
-        INNER JOIN dbo.tArtikel a ON ap.kArtikel = a.kArtikel
-        WHERE CAST(au.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
-          AND au.cStatus != 'Storno'
-        GROUP BY a.kArtikel, a.cArtNr, a.cName
+          ab.cName,
+          COALESCE(h.cName, '') as Hersteller,
+          SUM(op.fAnzahl) as DirectMenge,
+          SUM((op.fVKNetto - a.fEKNetto) * op.fAnzahl) as DirectMarge
+        FROM Verkauf.tAuftragPosition op
+        INNER JOIN Verkauf.tAuftrag o ON op.kAuftrag = o.kAuftrag
+        INNER JOIN dbo.tArtikel a ON op.kArtikel = a.kArtikel
+        LEFT JOIN dbo.tArtikelBeschreibung ab ON ab.kArtikel = a.kArtikel AND ab.kSprache = 1
+        LEFT JOIN dbo.tHersteller h ON a.kHersteller = h.kHersteller
+        WHERE CAST(o.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
+          AND o.cStatus != 'Storno'
+        GROUP BY a.kArtikel, a.cArtNr, ab.cName, h.cName
       ),
       
       StucklisteSales AS (
         SELECT 
           child.kArtikel,
           child.cArtNr,
-          child.cName,
-          '' as Hersteller,
+          child_desc.cName,
+          COALESCE(child_h.cName, '') as Hersteller,
           SUM(
             (child.fEKNetto * sl.fAnzahl) / NULLIF(parent_ek.total_ek, 0) * 
-            ((ap.fVKNetto - parent.fEKNetto) * ap.fAnzahl)
+            ((op.fVKNetto - parent.fEKNetto) * op.fAnzahl)
           ) as StucklisteMarge,
-          SUM(ap.fAnzahl * sl.fAnzahl) as StucklisteMenge
-        FROM Verkauf.tAuftragPosition ap
-        INNER JOIN Verkauf.tAuftrag au ON ap.kAuftrag = au.kAuftrag
-        INNER JOIN dbo.tArtikel parent ON ap.kArtikel = parent.kArtikel
+          SUM(op.fAnzahl * sl.fAnzahl) as StucklisteMenge
+        FROM Verkauf.tAuftragPosition op
+        INNER JOIN Verkauf.tAuftrag o ON op.kAuftrag = o.kAuftrag
+        INNER JOIN dbo.tArtikel parent ON op.kArtikel = parent.kArtikel
         INNER JOIN dbo.tStueckliste sl ON parent.kArtikel = sl.kVaterArtikel
         INNER JOIN dbo.tArtikel child ON sl.kArtikel = child.kArtikel
+        LEFT JOIN dbo.tArtikelBeschreibung child_desc ON child_desc.kArtikel = child.kArtikel AND child_desc.kSprache = 1
+        LEFT JOIN dbo.tHersteller child_h ON child.kHersteller = child_h.kHersteller
         CROSS APPLY (
           SELECT SUM(a_child.fEKNetto * sl_inner.fAnzahl) as total_ek
           FROM dbo.tStueckliste sl_inner
           INNER JOIN dbo.tArtikel a_child ON sl_inner.kArtikel = a_child.kArtikel
           WHERE sl_inner.kVaterArtikel = parent.kArtikel
         ) parent_ek
-        WHERE CAST(au.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
-          AND au.cStatus != 'Storno'
-        GROUP BY child.kArtikel, child.cArtNr, child.cName
+        WHERE CAST(o.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
+          AND o.cStatus != 'Storno'
+        GROUP BY child.kArtikel, child.cArtNr, child_desc.cName, child_h.cName
       ),
       
       PlatformCounts AS (
@@ -126,7 +123,6 @@ export async function GET(request: NextRequest) {
       .input('dateFrom', sql.Date, dateFrom)
       .input('dateTo', sql.Date, dateTo)
       .input('monthsFactor', sql.Float, monthsFactor)
-      .input('hersteller', sql.NVarChar, hersteller)
       .query(query)
     
     const articles = result.recordset.map((row: any) => {
