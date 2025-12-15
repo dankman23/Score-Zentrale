@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
         COALESCE(ds.kArtikel, ss.kArtikel),
         COALESCE(ds.cArtNr, ss.cArtNr),
         COALESCE(ds.cName, ss.cName),
-        COALESCE(ds.cHersteller, ss.cHersteller),
+        COALESCE(ds.Hersteller, ss.Hersteller),
         ds.DirectMenge,
         ds.DirectMarge,
         ss.StucklisteMenge,
