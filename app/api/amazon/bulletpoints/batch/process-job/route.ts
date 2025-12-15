@@ -205,14 +205,42 @@ Hersteller: ${artikel.cHerstellerName || 'Unbekannt'}
     
     // Prüfe ob noch mehr Artikel zu verarbeiten sind
     if (processed < job.artikelIds.length) {
-      // Rufe sich selbst wieder auf (Fire & Forget)
+      // Rufe sich selbst wieder auf mit Retry-Logik
       const internalUrl = 'http://localhost:3000'
-      fetch(`${internalUrl}/api/amazon/bulletpoints/batch/process-job`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jobId })
-      }).catch(err => {
-        console.error(`[Job ${jobId}] Failed to continue:`, err.message)
+      
+      // Async-Funktion für Retry
+      const continueJob = async (retries = 3) => {
+        for (let attempt = 1; attempt <= retries; attempt++) {
+          try {
+            const response = await fetch(`${internalUrl}/api/amazon/bulletpoints/batch/process-job`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ jobId }),
+              signal: AbortSignal.timeout(30000) // 30 Sekunden Timeout
+            })
+            
+            if (response.ok) {
+              console.log(`[Job ${jobId}] Continuation successful (attempt ${attempt})`)
+              return
+            } else {
+              console.error(`[Job ${jobId}] Continuation failed with status ${response.status} (attempt ${attempt})`)
+            }
+          } catch (err: any) {
+            console.error(`[Job ${jobId}] Continuation error (attempt ${attempt}/${retries}):`, err.message)
+          }
+          
+          // Warte kurz vor nächstem Versuch
+          if (attempt < retries) {
+            await new Promise(resolve => setTimeout(resolve, 2000))
+          }
+        }
+        
+        console.error(`[Job ${jobId}] CRITICAL: Failed to continue after ${retries} attempts. Job may be stuck!`)
+      }
+      
+      // Fire & Forget mit Retry-Logik
+      continueJob().catch(err => {
+        console.error(`[Job ${jobId}] continueJob failed:`, err)
       })
       
       return NextResponse.json({
