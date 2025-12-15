@@ -2942,7 +2942,21 @@ export default function App() {
       const data = await res.json()
       
       if (data.ok) {
-        setRatingArticles(data.articles)
+        // Versandpositionen filtern (cArtNr enthält "versand" oder "porto")
+        const filteredArticles = data.articles.filter(a => {
+          const artNr = (a.cArtNr || '').toLowerCase()
+          const name = (a.cName || '').toLowerCase()
+          return !artNr.includes('versand') && 
+                 !artNr.includes('porto') && 
+                 !name.includes('versand') && 
+                 !name.includes('porto')
+        })
+        
+        setRatingArticles(filteredArticles)
+        
+        // Hersteller-Liste extrahieren
+        const hersteller = [...new Set(filteredArticles.map(a => a.cHersteller).filter(h => h && h !== '-'))]
+        setRatingHerstellerList(hersteller.sort())
       } else {
         alert('Fehler: ' + data.error)
       }
