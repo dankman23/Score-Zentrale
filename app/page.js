@@ -9458,20 +9458,33 @@ export default function App() {
                     onChange={(e) => setRatingDateTo(e.target.value)}
                   />
                 </div>
-                <div className="col-md-3">
-                  <label className="form-label text-white fw-bold">Hersteller Filter</label>
+                <div className="col-md-2">
+                  <label className="form-label text-white fw-bold">Hersteller</label>
                   <select
                     className="form-control"
                     value={ratingFilterHersteller}
                     onChange={(e) => setRatingFilterHersteller(e.target.value)}
                   >
-                    <option value="">Alle Hersteller</option>
+                    <option value="">Alle</option>
                     {ratingHerstellerList.map((h, idx) => (
                       <option key={idx} value={h}>{h}</option>
                     ))}
                   </select>
                 </div>
-                <div className="col-md-3 d-flex align-items-end">
+                <div className="col-md-2">
+                  <label className="form-label text-white fw-bold">Warengruppe</label>
+                  <select
+                    className="form-control"
+                    value={ratingFilterWarengruppe}
+                    onChange={(e) => setRatingFilterWarengruppe(e.target.value)}
+                  >
+                    <option value="">Alle</option>
+                    {ratingWarengruppenList.map((w, idx) => (
+                      <option key={idx} value={w}>{w}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-md-2 d-flex align-items-end">
                   <div className="form-check">
                     <input
                       type="checkbox"
