@@ -2542,8 +2542,6 @@ export default function App() {
 
       // Nutze das globale Polling (statt lokales setInterval)
       startPolling(jobId)
-        }
-      }, 2000) // Alle 2 Sekunden
 
     } catch (e) {
       alert('❌ Fehler: ' + e.message)
