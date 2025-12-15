@@ -52,6 +52,11 @@ export async function GET(request: NextRequest) {
           child.cArtNr,
           child_desc.cName,
           COALESCE(child_h.cName, '') as Hersteller,
+          COALESCE(child_wg.cName, '') as Warengruppe,
+          SUM(
+            (child.fEKNetto * sl.fAnzahl) / NULLIF(parent_ek.total_ek, 0) * 
+            (op.fVKNetto * op.fAnzahl)
+          ) as StucklisteUmsatz,
           SUM(
             (child.fEKNetto * sl.fAnzahl) / NULLIF(parent_ek.total_ek, 0) * 
             ((op.fVKNetto - parent.fEKNetto) * op.fAnzahl)
