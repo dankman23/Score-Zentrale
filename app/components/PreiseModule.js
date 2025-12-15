@@ -35,17 +35,17 @@ export default function PreiseModule() {
 
   // Staffelgrenzen-Tab
   const [staffelVE, setStaffelVE] = useState(1)
-  const [staffelMindestTyp, setStaffelMindestTyp] = useState('ek') // 'ek' | 'vk' | 'stueck'
-  const [staffelMindestWert, setStaffelMindestWert] = useState('50')
+  const [staffelAbnahmeintervall, setStaffelAbnahmeintervall] = useState(1) // NEU: Abnahmeintervall Lieferant
+  const [staffelMindestWert, setStaffelMindestWert] = useState('2') // Standard: 2€ EK
   const [staffelSchwellen, setStaffelSchwellen] = useState([
-    { typ: 'vk', wert: '100' },
-    { typ: 'vk', wert: '250' },
-    { typ: 'vk', wert: '500' },
-    { typ: 'vk', wert: '1000' }
-  ])
+    { wert: '25' },
+    { wert: '50' },
+    { wert: '100' },
+    { wert: '250' }
+  ]) // Nur EK-Schwellen
   const [staffelRundung, setStaffelRundung] = useState('3,5,10,15,20,25,30,40,50,75,100,150,200,300')
   const [staffelGrenzen, setStaffelGrenzen] = useState([])
-  const [staffelTestMenge, setStaffelTestMenge] = useState(10)
+  const [staffelAuswahlMenge, setStaffelAuswahlMenge] = useState(null) // Gewählte Menge in der Ausgabe
   const [staffelLoading, setStaffelLoading] = useState(false)
   const [staffelG2EK, setStaffelG2EK] = useState('5')
   const [staffelG2Warengruppe, setStaffelG2Warengruppe] = useState('lagerware')
