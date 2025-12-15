@@ -8,48 +8,39 @@ export async function GET() {
   try {
     const pool = await getMssqlPool()
     
-    // 1. Struktur von tPlattform
-    const platformStructure = `
-      SELECT COLUMN_NAME, DATA_TYPE 
-      FROM INFORMATION_SCHEMA.COLUMNS 
-      WHERE TABLE_NAME = 'tPlattform'
-      ORDER BY ORDINAL_POSITION
+    // Test: Artikel 404546 (Top-Artikel aus Rating)
+    const testQuery = `
+      SELECT 
+        a.kArtikel,
+        a.cArtNr,
+        s.kShop,
+        s.cName as ShopName,
+        s.nPlattform,
+        p.cName as PlattformName
+      FROM dbo.tArtikel a
+      INNER JOIN dbo.tArtikelShop asho ON a.kArtikel = asho.kArtikel
+      INNER JOIN dbo.tShop s ON asho.kShop = s.kShop
+      INNER JOIN dbo.tPlattform p ON s.nPlattform = p.nPlattform
+      WHERE a.cArtNr = '404546'
     `
-    const platformCols = await pool.request().query(platformStructure)
+    const test = await pool.request().query(testQuery)
     
-    // 2. Alle Plattformen anzeigen
-    const platformsQuery = `
-      SELECT TOP 20 * FROM dbo.tPlattform
-    `
-    const platforms = await pool.request().query(platformsQuery)
-    
-    // 2. Struktur von tArtikelShop
-    const artikelShopStructure = `
-      SELECT TOP 5 COLUMN_NAME, DATA_TYPE 
-      FROM INFORMATION_SCHEMA.COLUMNS 
-      WHERE TABLE_NAME = 'tArtikelShop'
-      ORDER BY ORDINAL_POSITION
-    `
-    const shopStructure = await pool.request().query(artikelShopStructure)
-    
-    // 3. Sample von tArtikelShop
-    const artikelShopSample = `
-      SELECT TOP 10 * FROM dbo.tArtikelShop
-    `
-    const shopSample = await pool.request().query(artikelShopSample)
-    
-    // 4. Simple count
+    // Count pro Plattform
     const countQuery = `
-      SELECT COUNT(*) as total FROM dbo.tArtikelShop
+      SELECT 
+        p.cName as Plattform,
+        COUNT(DISTINCT asho.kArtikel) as AnzahlArtikel
+      FROM dbo.tArtikelShop asho
+      INNER JOIN dbo.tShop s ON asho.kShop = s.kShop
+      INNER JOIN dbo.tPlattform p ON s.nPlattform = p.nPlattform
+      GROUP BY p.cName
+      ORDER BY AnzahlArtikel DESC
     `
     const counts = await pool.request().query(countQuery)
     
     return NextResponse.json({
       ok: true,
-      platformCols: platformCols.recordset,
-      platforms: platforms.recordset,
-      shopStructure: shopStructure.recordset,
-      shopSample: shopSample.recordset,
+      testArtikel: test.recordset,
       counts: counts.recordset
     })
     
