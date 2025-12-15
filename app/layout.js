@@ -211,6 +211,7 @@ export default function RootLayout({ children }) {
                     </a>
                     <div className="dropdown-menu">
                       <a className="dropdown-item" href="/#produkte"><i className="bi bi-grid mr-1"/>Artikel</a>
+                      <a className="dropdown-item" href="/#artikelrating"><i className="bi bi-star mr-1"/>Artikelrating</a>
                       <a className="dropdown-item" href="/#produktberater"><i className="bi bi-lightbulb mr-1"/>Produktberater</a>
                     </div>
                   </li>
