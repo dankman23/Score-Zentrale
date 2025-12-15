@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
         LEFT JOIN dbo.tHersteller h ON a.kHersteller = h.kHersteller
         WHERE CAST(o.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
           AND (o.nStorno IS NULL OR o.nStorno = 0)
+          AND o.nType = 1
         GROUP BY a.kArtikel, a.cArtNr, ab.cName, h.cName
       ),
       
