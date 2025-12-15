@@ -2945,6 +2945,7 @@ export default function App() {
           'warmakquise': 'warmakquise',
           'kaltakquise': 'kaltakquise',
           'produkte': 'produkte',
+          'artikelrating': 'artikelrating',
           'produktberater': 'produktberater',
           'preise': 'preise',
           'orga': 'orga',
