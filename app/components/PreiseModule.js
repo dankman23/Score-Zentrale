@@ -1201,7 +1201,7 @@ export default function PreiseModule() {
                       {/* VE (Lieferumfang) */}
                       <div className="col-md-6">
                         <label className="form-label text-white fw-bold">
-                          VE (Lieferumfang)
+                          VE (Verpackungseinheit)
                         </label>
                         <input 
                           type="number"
@@ -1212,7 +1212,7 @@ export default function PreiseModule() {
                           onChange={(e) => setStaffelVE(Math.max(1, parseInt(e.target.value) || 1))}
                           style={{backgroundColor: '#2b3035', color: '#fff', borderColor: '#495057', fontSize: '1.2rem'}}
                         />
-                        <small className="text-muted">Stück pro Verpackung</small>
+                        <small className="text-muted">Aus JTL-Artikeldaten, definiert Mindestbestellmenge</small>
                       </div>
 
                       {/* Abnahmeintervall Lieferant */}
