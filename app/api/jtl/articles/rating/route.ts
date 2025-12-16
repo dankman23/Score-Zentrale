@@ -80,15 +80,6 @@ export async function GET(request: NextRequest) {
         INNER JOIN StuecklistenMitEK sek ON sek.kVaterArtikel = vp.verkaufter_artikel
       ),
       
-      PlatformCounts AS (
-        SELECT 
-          kArtikel,
-          '' as plattform,
-          0 as anzahl_angebote
-        FROM DirectSales
-        WHERE 1 = 0
-      )
-      
       ArtikelAggregation AS (
         -- Finale Aggregation nach echtem Artikel
         SELECT 
