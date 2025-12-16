@@ -50,9 +50,9 @@ export async function GET(request: NextRequest) {
         SELECT 
           child.kArtikel,
           child.cArtNr,
-          child_desc.cName,
-          COALESCE(child_h.cName, '') as Hersteller,
-          COALESCE(child_wg.cName, '') as Warengruppe,
+          MAX(child_desc.cName) as cName,
+          MAX(COALESCE(child_h.cName, '')) as Hersteller,
+          MAX(COALESCE(child_wg.cName, '')) as Warengruppe,
           SUM(
             (child.fEKNetto * sl.fAnzahl) / NULLIF(parent_ek.total_ek, 0) * 
             (op.fVKNetto * op.fAnzahl)
