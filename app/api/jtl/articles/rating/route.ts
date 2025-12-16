@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
     
     const query = `
       WITH DirectSales AS (
+        -- Nur Artikel OHNE Stückliste (Basis-Artikel)
         SELECT 
           a.kArtikel,
           a.cArtNr,
@@ -43,6 +44,10 @@ export async function GET(request: NextRequest) {
         WHERE CAST(o.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
           AND (o.nStorno IS NULL OR o.nStorno = 0)
           AND o.nType = 1
+          -- NUR Artikel die KEINE Stückliste haben (nicht Parent sind)
+          AND NOT EXISTS (
+            SELECT 1 FROM dbo.tStueckliste sl WHERE sl.kVaterArtikel = a.kArtikel
+          )
         GROUP BY a.kArtikel, a.cArtNr
       ),
       
