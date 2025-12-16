@@ -118,35 +118,15 @@ export async function GET(request: NextRequest) {
         totalUmsatz,
         totalMarge,
         totalMarge / @monthsFactor as margeProMonat,
-        MAX(CASE WHEN pc.plattform LIKE '%eBay%' THEN pc.anzahl_angebote ELSE 0 END) as ebay_angebote,
-        MAX(CASE WHEN pc.plattform LIKE '%Amazon%' THEN pc.anzahl_angebote ELSE 0 END) as amazon_angebote,
-        MAX(CASE WHEN pc.plattform LIKE '%Shop%' OR pc.plattform LIKE '%JTL%' THEN pc.anzahl_angebote ELSE 0 END) as shop_angebote,
-        MAX(CASE WHEN pc.plattform LIKE '%Otto%' THEN pc.anzahl_angebote ELSE 0 END) as otto_angebote,
-        MAX(CASE WHEN pc.plattform LIKE '%OBI%' THEN pc.anzahl_angebote ELSE 0 END) as obi_angebote,
-        (
-          CASE WHEN MAX(CASE WHEN pc.plattform LIKE '%eBay%' THEN 1 ELSE 0 END) > 0 THEN 1 ELSE 0 END +
-          CASE WHEN MAX(CASE WHEN pc.plattform LIKE '%Amazon%' THEN 1 ELSE 0 END) > 0 THEN 1 ELSE 0 END +
-          CASE WHEN MAX(CASE WHEN pc.plattform LIKE '%Shop%' OR pc.plattform LIKE '%JTL%' THEN 1 ELSE 0 END) > 0 THEN 1 ELSE 0 END +
-          CASE WHEN MAX(CASE WHEN pc.plattform LIKE '%Otto%' THEN 1 ELSE 0 END) > 0 THEN 1 ELSE 0 END +
-          CASE WHEN MAX(CASE WHEN pc.plattform LIKE '%OBI%' THEN 1 ELSE 0 END) > 0 THEN 1 ELSE 0 END
-        ) as anzahlPlattformen
+        0 as ebay_angebote,
+        0 as amazon_angebote,
+        0 as shop_angebote,
+        0 as otto_angebote,
+        0 as obi_angebote,
+        0 as anzahlPlattformen
         
-      FROM DirectSales ds
-      FULL OUTER JOIN StucklisteSales ss ON ds.kArtikel = ss.kArtikel
-      LEFT JOIN PlatformCounts pc ON COALESCE(ds.kArtikel, ss.kArtikel) = pc.kArtikel
-      GROUP BY 
-        COALESCE(ds.kArtikel, ss.kArtikel),
-        COALESCE(ds.cArtNr, ss.cArtNr),
-        COALESCE(ds.cName, ss.cName),
-        COALESCE(ds.Hersteller, ss.Hersteller),
-        COALESCE(ds.Warengruppe, ss.Warengruppe),
-        ds.DirectMenge,
-        ds.DirectUmsatz,
-        ds.DirectMarge,
-        ss.StucklisteMenge,
-        ss.StucklisteUmsatz,
-        ss.StucklisteMarge
-      HAVING (COALESCE(ds.DirectMarge, 0) + COALESCE(ss.StucklisteMarge, 0)) > 0
+      FROM ArtikelAggregation
+      WHERE totalMarge > 0
       ORDER BY margeProMonat DESC
     `
     
