@@ -52,6 +52,8 @@ export async function GET(request: NextRequest) {
       ),
       
       StucklisteSales AS (
+        -- Nur Parent-Verkäufe auf Children verteilen
+        -- WICHTIG: Children werden mit VK=0 in tAuftragPosition eingetragen!
         SELECT 
           child.kArtikel,
           child.cArtNr,
@@ -60,16 +62,16 @@ export async function GET(request: NextRequest) {
           MAX(COALESCE(child_wg.cName, '')) as Warengruppe,
           SUM(
             (child.fEKNetto * sl.fAnzahl) / NULLIF(parent_ek.total_ek, 0) * 
-            (op.fVKNetto * op.fAnzahl)
+            (parent_op.fVKNetto * parent_op.fAnzahl)
           ) as StucklisteUmsatz,
           SUM(
             (child.fEKNetto * sl.fAnzahl) / NULLIF(parent_ek.total_ek, 0) * 
-            ((op.fVKNetto - parent.fEKNetto) * op.fAnzahl)
+            ((parent_op.fVKNetto - parent.fEKNetto) * parent_op.fAnzahl)
           ) as StucklisteMarge,
-          SUM(op.fAnzahl * sl.fAnzahl) as StucklisteMenge
-        FROM Verkauf.tAuftragPosition op
-        INNER JOIN Verkauf.tAuftrag o ON op.kAuftrag = o.kAuftrag
-        INNER JOIN dbo.tArtikel parent ON op.kArtikel = parent.kArtikel
+          SUM(parent_op.fAnzahl * sl.fAnzahl) as StucklisteMenge
+        FROM Verkauf.tAuftragPosition parent_op
+        INNER JOIN Verkauf.tAuftrag o ON parent_op.kAuftrag = o.kAuftrag
+        INNER JOIN dbo.tArtikel parent ON parent_op.kArtikel = parent.kArtikel
         INNER JOIN dbo.tStueckliste sl ON parent.kArtikel = sl.kVaterArtikel
         INNER JOIN dbo.tArtikel child ON sl.kArtikel = child.kArtikel
         LEFT JOIN dbo.tArtikelBeschreibung child_desc ON child_desc.kArtikel = child.kArtikel AND child_desc.kSprache = 1
@@ -84,6 +86,8 @@ export async function GET(request: NextRequest) {
         WHERE CAST(o.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
           AND (o.nStorno IS NULL OR o.nStorno = 0)
           AND o.nType = 1
+          -- Nur Parents (Artikel MIT Stückliste)
+          AND EXISTS (SELECT 1 FROM dbo.tStueckliste WHERE kVaterArtikel = parent.kArtikel)
         GROUP BY child.kArtikel, child.cArtNr
       ),
       
