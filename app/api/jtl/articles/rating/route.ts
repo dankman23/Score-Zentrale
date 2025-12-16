@@ -89,16 +89,35 @@ export async function GET(request: NextRequest) {
         WHERE 1 = 0
       )
       
+      ArtikelAggregation AS (
+        -- Finale Aggregation nach echtem Artikel
+        SELECT 
+          a.kArtikel,
+          a.cArtNr,
+          MAX(COALESCE(ab.cName, a.cArtNr)) AS cName,
+          MAX(COALESCE(h.cName, '')) AS Hersteller,
+          MAX(COALESCE(wg.cName, '')) AS Warengruppe,
+          SUM(aa.menge) AS totalMenge,
+          SUM(aa.umsatz_netto) AS totalUmsatz,
+          SUM((aa.vk_netto - a.fEKNetto) * aa.menge) AS totalMarge
+        FROM AufgeloesteArtikel aa
+        INNER JOIN dbo.tArtikel a ON aa.echter_artikel = a.kArtikel
+        LEFT JOIN dbo.tArtikelBeschreibung ab ON ab.kArtikel = a.kArtikel AND ab.kSprache = 1
+        LEFT JOIN dbo.tHersteller h ON a.kHersteller = h.kHersteller
+        LEFT JOIN dbo.tWarengruppe wg ON a.kWarengruppe = wg.kWarengruppe
+        GROUP BY a.kArtikel, a.cArtNr
+      )
+      
       SELECT 
-        COALESCE(ds.kArtikel, ss.kArtikel) as kArtikel,
-        COALESCE(ds.cArtNr, ss.cArtNr) as cArtNr,
-        COALESCE(ds.cName, ss.cName) as cName,
-        COALESCE(ds.Hersteller, ss.Hersteller) as Hersteller,
-        COALESCE(ds.Warengruppe, ss.Warengruppe) as Warengruppe,
-        COALESCE(ds.DirectMenge, 0) + COALESCE(ss.StucklisteMenge, 0) as totalMenge,
-        COALESCE(ds.DirectUmsatz, 0) + COALESCE(ss.StucklisteUmsatz, 0) as totalUmsatz,
-        COALESCE(ds.DirectMarge, 0) + COALESCE(ss.StucklisteMarge, 0) as totalMarge,
-        (COALESCE(ds.DirectMarge, 0) + COALESCE(ss.StucklisteMarge, 0)) / @monthsFactor as margeProMonat,
+        kArtikel,
+        cArtNr,
+        cName,
+        Hersteller,
+        Warengruppe,
+        totalMenge,
+        totalUmsatz,
+        totalMarge,
+        totalMarge / @monthsFactor as margeProMonat,
         MAX(CASE WHEN pc.plattform LIKE '%eBay%' THEN pc.anzahl_angebote ELSE 0 END) as ebay_angebote,
         MAX(CASE WHEN pc.plattform LIKE '%Amazon%' THEN pc.anzahl_angebote ELSE 0 END) as amazon_angebote,
         MAX(CASE WHEN pc.plattform LIKE '%Shop%' OR pc.plattform LIKE '%JTL%' THEN pc.anzahl_angebote ELSE 0 END) as shop_angebote,
