@@ -28,9 +28,9 @@ export async function GET(request: NextRequest) {
         SELECT 
           a.kArtikel,
           a.cArtNr,
-          ab.cName,
-          COALESCE(h.cName, '') as Hersteller,
-          COALESCE(wg.cName, '') as Warengruppe,
+          MAX(ab.cName) as cName,
+          MAX(COALESCE(h.cName, '')) as Hersteller,
+          MAX(COALESCE(wg.cName, '')) as Warengruppe,
           SUM(op.fAnzahl) as DirectMenge,
           SUM(op.fVKNetto * op.fAnzahl) as DirectUmsatz,
           SUM((op.fVKNetto - a.fEKNetto) * op.fAnzahl) as DirectMarge
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
         WHERE CAST(o.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
           AND (o.nStorno IS NULL OR o.nStorno = 0)
           AND o.nType = 1
-        GROUP BY a.kArtikel, a.cArtNr, ab.cName, h.cName, wg.cName, ab.kArtikelBeschreibung
+        GROUP BY a.kArtikel, a.cArtNr
       ),
       
       StucklisteSales AS (
