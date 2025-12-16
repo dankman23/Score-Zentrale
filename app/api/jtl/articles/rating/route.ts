@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
           MAX(COALESCE(wg.cName, '')) AS Warengruppe,
           SUM(aa.menge) AS totalMenge,
           SUM(aa.umsatz_netto) AS totalUmsatz,
-          SUM((aa.vk_netto - a.fEKNetto) * aa.menge) AS totalMarge
+          SUM(aa.umsatz_netto - (a.fEKNetto * aa.menge)) AS totalMarge
         FROM AufgeloesteArtikel aa
         INNER JOIN dbo.tArtikel a ON aa.echter_artikel = a.kArtikel
         LEFT JOIN dbo.tArtikelBeschreibung ab ON ab.kArtikel = a.kArtikel AND ab.kSprache = 1
