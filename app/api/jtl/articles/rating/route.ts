@@ -24,71 +24,60 @@ export async function GET(request: NextRequest) {
     const monthsFactor = totalDays / 30.0
     
     const query = `
-      WITH DirectSales AS (
-        -- Nur Artikel OHNE Stückliste (Basis-Artikel)
+      WITH VerkaufsPositionen AS (
+        -- Alle verkauften Positionen im Zeitraum
         SELECT 
-          a.kArtikel,
-          a.cArtNr,
-          MAX(ab.cName) as cName,
-          MAX(COALESCE(h.cName, '')) as Hersteller,
-          MAX(COALESCE(wg.cName, '')) as Warengruppe,
-          SUM(op.fAnzahl) as DirectMenge,
-          SUM(op.fVKNetto * op.fAnzahl) as DirectUmsatz,
-          SUM((op.fVKNetto - a.fEKNetto) * op.fAnzahl) as DirectMarge
-        FROM Verkauf.tAuftragPosition op
-        INNER JOIN Verkauf.tAuftrag o ON op.kAuftrag = o.kAuftrag
-        INNER JOIN dbo.tArtikel a ON op.kArtikel = a.kArtikel
-        LEFT JOIN dbo.tArtikelBeschreibung ab ON ab.kArtikel = a.kArtikel AND ab.kSprache = 1
-        LEFT JOIN dbo.tHersteller h ON a.kHersteller = h.kHersteller
-        LEFT JOIN dbo.tWarengruppe wg ON a.kWarengruppe = wg.kWarengruppe
+          op.kArtikel AS verkaufter_artikel,
+          op.fAnzahl AS menge,
+          (op.fVKNetto * op.fAnzahl) AS umsatz_netto,
+          op.fVKNetto AS vk_netto
+        FROM Verkauf.tAuftrag o
+        INNER JOIN Verkauf.tAuftragPosition op ON o.kAuftrag = op.kAuftrag
         WHERE CAST(o.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
           AND (o.nStorno IS NULL OR o.nStorno = 0)
           AND o.nType = 1
-          -- NUR Artikel die KEINE Stückliste haben (nicht Parent sind)
-          AND NOT EXISTS (
-            SELECT 1 FROM dbo.tStueckliste sl WHERE sl.kVaterArtikel = a.kArtikel
-          )
-        GROUP BY a.kArtikel, a.cArtNr
+          AND op.kArtikel > 0
       ),
       
-      StucklisteSales AS (
-        -- Nur Parent-Verkäufe auf Children verteilen
-        -- WICHTIG: Children werden mit VK=0 in tAuftragPosition eingetragen!
+      StuecklistenMitEK AS (
+        -- Für jeden Vater-Artikel: Kind-Artikel mit EK und Gesamt-EK
         SELECT 
-          child.kArtikel,
-          child.cArtNr,
-          MAX(child_desc.cName) as cName,
-          MAX(COALESCE(child_h.cName, '')) as Hersteller,
-          MAX(COALESCE(child_wg.cName, '')) as Warengruppe,
-          SUM(
-            (child.fEKNetto * sl.fAnzahl) / NULLIF(parent_ek.total_ek, 0) * 
-            (parent_op.fVKNetto * parent_op.fAnzahl)
-          ) as StucklisteUmsatz,
-          SUM(
-            (child.fEKNetto * sl.fAnzahl) / NULLIF(parent_ek.total_ek, 0) * 
-            ((parent_op.fVKNetto - parent.fEKNetto) * parent_op.fAnzahl)
-          ) as StucklisteMarge,
-          SUM(parent_op.fAnzahl * sl.fAnzahl) as StucklisteMenge
-        FROM Verkauf.tAuftragPosition parent_op
-        INNER JOIN Verkauf.tAuftrag o ON parent_op.kAuftrag = o.kAuftrag
-        INNER JOIN dbo.tArtikel parent ON parent_op.kArtikel = parent.kArtikel
-        INNER JOIN dbo.tStueckliste sl ON parent.kArtikel = sl.kVaterArtikel
-        INNER JOIN dbo.tArtikel child ON sl.kArtikel = child.kArtikel
-        LEFT JOIN dbo.tArtikelBeschreibung child_desc ON child_desc.kArtikel = child.kArtikel AND child_desc.kSprache = 1
-        LEFT JOIN dbo.tHersteller child_h ON child.kHersteller = child_h.kHersteller
-        LEFT JOIN dbo.tWarengruppe child_wg ON child.kWarengruppe = child_wg.kWarengruppe
-        CROSS APPLY (
-          SELECT SUM(a_child.fEKNetto * sl_inner.fAnzahl) as total_ek
-          FROM dbo.tStueckliste sl_inner
-          INNER JOIN dbo.tArtikel a_child ON sl_inner.kArtikel = a_child.kArtikel
-          WHERE sl_inner.kVaterArtikel = parent.kArtikel
-        ) parent_ek
-        WHERE CAST(o.dErstellt AS DATE) BETWEEN @dateFrom AND @dateTo
-          AND (o.nStorno IS NULL OR o.nStorno = 0)
-          AND o.nType = 1
-          -- Nur Parents (Artikel MIT Stückliste)
-          AND EXISTS (SELECT 1 FROM dbo.tStueckliste WHERE kVaterArtikel = parent.kArtikel)
-        GROUP BY child.kArtikel, child.cArtNr
+          st.kVaterArtikel,
+          st.kArtikel AS kKindArtikel,
+          st.fAnzahl AS anzahl_im_set,
+          COALESCE(a.fEKNetto, 0) AS ek_netto,
+          st.fAnzahl * COALESCE(a.fEKNetto, 0) AS ek_anteil,
+          SUM(st.fAnzahl * COALESCE(a.fEKNetto, 0)) OVER (PARTITION BY st.kVaterArtikel) AS gesamt_ek
+        FROM dbo.tStueckliste st
+        INNER JOIN dbo.tArtikel a ON st.kArtikel = a.kArtikel
+      ),
+      
+      AufgeloesteArtikel AS (
+        -- Fall 1: Artikel hat KEINE Stückliste → direkt verwenden
+        SELECT 
+          vp.verkaufter_artikel AS echter_artikel,
+          vp.menge,
+          vp.umsatz_netto,
+          vp.vk_netto
+        FROM VerkaufsPositionen vp
+        WHERE NOT EXISTS (
+          SELECT 1 FROM dbo.tStueckliste st 
+          WHERE st.kVaterArtikel = vp.verkaufter_artikel
+        )
+        
+        UNION ALL
+        
+        -- Fall 2: Artikel HAT Stückliste → Kind-Artikel mit EK-anteiligem Umsatz
+        SELECT 
+          sek.kKindArtikel AS echter_artikel,
+          vp.menge * sek.anzahl_im_set AS menge,
+          CASE 
+            WHEN sek.gesamt_ek > 0 THEN vp.umsatz_netto * (sek.ek_anteil / sek.gesamt_ek)
+            ELSE vp.umsatz_netto / COUNT(*) OVER (PARTITION BY vp.verkaufter_artikel)
+          END AS umsatz_netto,
+          vp.vk_netto AS vk_netto
+        FROM VerkaufsPositionen vp
+        INNER JOIN StuecklistenMitEK sek ON sek.kVaterArtikel = vp.verkaufter_artikel
       ),
       
       PlatformCounts AS (
