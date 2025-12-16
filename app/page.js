@@ -9592,14 +9592,14 @@ export default function App() {
                     ) : (
                       getSortedRatingArticles().map((article, idx) => (
                         <tr key={idx}>
-                          <td className="font-monospace" style={{color: '#17a2b8'}}>{article.cArtNr}</td>
-                          <td style={{color: '#fff'}}>{article.cName}</td>
-                          <td style={{color: '#aaa'}}>{article.cHersteller || '-'}</td>
-                          <td className="text-right" style={{color: '#fff'}}>{article.totalMenge}</td>
-                          <td className="text-right" style={{color: '#28a745'}}>{article.totalUmsatz?.toFixed(2) || '0.00'}€</td>
-                          <td className="text-right" style={{color: '#28a745'}}>{article.totalMarge.toFixed(2)}€</td>
-                          <td className="text-right fw-bold" style={{color: '#fff'}}>{article.margeProMonat.toFixed(2)}€</td>
-                          <td className="text-right fw-bold" style={{color: '#F6B10A'}}>{article.ratingScore.toFixed(2)}</td>
+                          <td className="font-monospace" style={{color: '#17a2b8', fontSize: '14px'}}>{article.cArtNr}</td>
+                          <td style={{color: '#fff', fontSize: '14px'}}>{article.cName}</td>
+                          <td style={{color: '#ccc', fontSize: '14px'}}>{article.cHersteller || '-'}</td>
+                          <td className="text-right" style={{color: '#fff', fontSize: '14px'}}>{article.totalMenge}</td>
+                          <td className="text-right" style={{color: '#28a745', fontSize: '14px'}}>{article.totalUmsatz?.toFixed(2) || '0.00'}€</td>
+                          <td className="text-right" style={{color: '#28a745', fontSize: '14px'}}>{article.totalMarge.toFixed(2)}€</td>
+                          <td className="text-right fw-bold" style={{color: '#fff', fontSize: '14px'}}>{article.margeProMonat.toFixed(2)}€</td>
+                          <td className="text-right fw-bold" style={{color: '#F6B10A', fontSize: '14px'}}>{article.ratingScore.toFixed(2)}</td>
                         </tr>
                       ))
                     )}
